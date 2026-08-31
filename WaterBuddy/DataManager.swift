@@ -137,6 +137,7 @@ final class DataManager {
 
     // MARK: - Shared instance
 
+    @available(watchOS, unavailable, message: "The watch is not a writer of the phone's stores. Use WristModel and WristPlan.")
     static let shared = DataManager()
 
     // MARK: - Dependencies
@@ -391,6 +392,7 @@ final class DataManager {
     ///   - calendar: Decides when "today" ends. Defaults to the user's local Gregorian day.
     ///   - now: The clock. Injectable so the daily rollover is testable without waiting a day.
     ///   - reloadWidgets: Called after every mutation to nudge WidgetKit.
+    @available(watchOS, unavailable, message: "The watch is not a writer of the phone's stores.")
     init(
         defaults: UserDefaults = DataManager.sharedDefaults,
         modelContainer: ModelContainer = DataManager.sharedModelContainer,
@@ -1129,6 +1131,7 @@ final class DataManager {
     /// `.standard` — the app keeps working and the widget goes blank, rather than the app
     /// crashing on launch (rule `25-shared-storage`). The final `try!` is reached only if an
     /// in-memory container cannot be created, which would mean SwiftData itself is unusable.
+    @available(watchOS, unavailable, message: "The watch holds no WaterLog store. See rule 25-shared-storage.")
     nonisolated static let sharedModelContainer: ModelContainer = {
         let schema = Schema([WaterLog.self])
 
