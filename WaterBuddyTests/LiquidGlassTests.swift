@@ -111,3 +111,25 @@ struct LiquidGlassInteractionTests {
         #expect(LiquidGlassModifier(shape: Circle()).interactive == false)
     }
 }
+
+/// The **flat** half of the design system: what a pane draws when it cannot sample a backdrop —
+/// a WidgetKit widget, or (after this suite) a watchOS target, which has no
+/// `Color(.secondarySystemBackground)` at all.
+struct LiquidGlassBaseTests {
+
+    /// `.material`'s Reduce-Transparency fill must equal `.archived`'s — not merely "some
+    /// colour". If a future edit reintroduces a system-material colour here, this is the test
+    /// that catches it before the watch target stops compiling again.
+    @Test
+    func materialAndArchivedAgreeUnderReduceTransparency() {
+        #expect(LiquidGlass.Base.material(.thin).opaqueFill == LiquidGlass.Base.archived.opaqueFill)
+    }
+
+    /// `.flat`'s own opaque fill is returned verbatim, never substituted.
+    @Test
+    func flatReturnsItsOwnOpaqueFillUnchanged() {
+        let fill = Color(red: 0.5, green: 0.1, blue: 0.9)
+        let base = LiquidGlass.Base.flat(translucent: .clear, opaque: fill)
+        #expect(base.opaqueFill == fill)
+    }
+}

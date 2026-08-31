@@ -109,9 +109,16 @@ enum LiquidGlass {
         )
 
         /// The fill that replaces the whole stack when Reduce Transparency is on.
+        ///
+        /// `.material` delegates to `.archived.opaqueFill` rather than a system colour: the app
+        /// and the widget already agree here (rule `65-accessibility`: "the widget draws ... a
+        /// contrast threshold, not taste"), and `Color(.secondarySystemBackground)` does not exist
+        /// on watchOS — this is the fix for the one compile error that blocks `WaterSurface.swift`
+        /// from joining a watch target (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md`
+        /// §13). Never add a second literal here: `Base.archived` is the one place the number lives.
         var opaqueFill: Color {
             switch self {
-            case .material: Color(.secondarySystemBackground)
+            case .material: Base.archived.opaqueFill
             case .flat(_, let opaque): opaque
             }
         }
