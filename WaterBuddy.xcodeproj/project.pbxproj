@@ -1,0 +1,915 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E59CB5DDACB14921F5A6F5B1 /* WaterBuddyWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 084FF4DB9E64ED71586EC608 /* WaterBuddyWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F14DA4479F0FB010BFE9420B /* WaterBuddyWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1F6BD9F4DB0BE3AB5AB08F5E /* WaterBuddyWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		423D952E88C50D89075DC631 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9947C2133046293D00972CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6273D2F7D706C59BE59C7434;
+			remoteInfo = WaterBuddyWidgetExtension;
+		};
+		8F50E2EDA7146F24416BD1C9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9947C2133046293D00972CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BFEFF83A095BBD4658E8A453;
+			remoteInfo = WaterBuddyWatch;
+		};
+		9947C2293046293E00972CEA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9947C2133046293D00972CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9947C21A3046293D00972CEA;
+			remoteInfo = WaterBuddy;
+		};
+		9947C2333046293F00972CEA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9947C2133046293D00972CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9947C21A3046293D00972CEA;
+			remoteInfo = WaterBuddy;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1A6876C6AC773C2E37134B39 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				F14DA4479F0FB010BFE9420B /* WaterBuddyWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D26257DAEFFAD43C692F3BF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E59CB5DDACB14921F5A6F5B1 /* WaterBuddyWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		084FF4DB9E64ED71586EC608 /* WaterBuddyWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WaterBuddyWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F6BD9F4DB0BE3AB5AB08F5E /* WaterBuddyWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaterBuddyWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9947C21B3046293D00972CEA /* WaterBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaterBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9947C2283046293E00972CEA /* WaterBuddyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WaterBuddyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9947C2323046293F00972CEA /* WaterBuddyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WaterBuddyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4D91E460176EB1EE87230C86 /* Exceptions for "WaterBuddy" folder in "WaterBuddyWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DataManager.swift,
+				LiquidGlassModifier.swift,
+				NotificationManager.swift,
+				ReminderPlan.swift,
+				WaterLog.swift,
+				WaterSurface.swift,
+			);
+			target = 6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9947C21D3046293D00972CEA /* WaterBuddy */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4D91E460176EB1EE87230C86 /* Exceptions for "WaterBuddy" folder in "WaterBuddyWidgetExtension" target */,
+			);
+			path = WaterBuddy;
+			sourceTree = "<group>";
+		};
+		9947C22B3046293E00972CEA /* WaterBuddyTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WaterBuddyTests;
+			sourceTree = "<group>";
+		};
+		9947C2353046293F00972CEA /* WaterBuddyUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WaterBuddyUITests;
+			sourceTree = "<group>";
+		};
+		AA36CF88D9D704ABB6AEC20D /* WaterBuddyWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WaterBuddyWatch;
+			sourceTree = "<group>";
+		};
+		B22D6BC9248B2BC94D56417A /* WaterBuddyWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WaterBuddyWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		59FE153483DACA58ED206359 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2183046293D00972CEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2253046293E00972CEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C22F3046293F00972CEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE3A4AF936A9786695AB73F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9947C2123046293D00972CEA = {
+			isa = PBXGroup;
+			children = (
+				9947C21D3046293D00972CEA /* WaterBuddy */,
+				B22D6BC9248B2BC94D56417A /* WaterBuddyWidget */,
+				AA36CF88D9D704ABB6AEC20D /* WaterBuddyWatch */,
+				9947C22B3046293E00972CEA /* WaterBuddyTests */,
+				9947C2353046293F00972CEA /* WaterBuddyUITests */,
+				9947C21C3046293D00972CEA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9947C21C3046293D00972CEA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9947C21B3046293D00972CEA /* WaterBuddy.app */,
+				9947C2283046293E00972CEA /* WaterBuddyTests.xctest */,
+				9947C2323046293F00972CEA /* WaterBuddyUITests.xctest */,
+				084FF4DB9E64ED71586EC608 /* WaterBuddyWidgetExtension.appex */,
+				1F6BD9F4DB0BE3AB5AB08F5E /* WaterBuddyWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C11BD948990B3709C916B8C8 /* Build configuration list for PBXNativeTarget "WaterBuddyWidgetExtension" */;
+			buildPhases = (
+				2ABC4F7F5B0F04A7C4104E8C /* Sources */,
+				59FE153483DACA58ED206359 /* Frameworks */,
+				68A68E2CB6957347B26C4E77 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B22D6BC9248B2BC94D56417A /* WaterBuddyWidget */,
+			);
+			name = WaterBuddyWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = WaterBuddyWidgetExtension;
+			productReference = 084FF4DB9E64ED71586EC608 /* WaterBuddyWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		9947C21A3046293D00972CEA /* WaterBuddy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9947C23C3046293F00972CEA /* Build configuration list for PBXNativeTarget "WaterBuddy" */;
+			buildPhases = (
+				9947C2173046293D00972CEA /* Sources */,
+				9947C2183046293D00972CEA /* Frameworks */,
+				9947C2193046293D00972CEA /* Resources */,
+				4D26257DAEFFAD43C692F3BF /* Embed Foundation Extensions */,
+				1A6876C6AC773C2E37134B39 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8397E1B23078A14DC1A26C43 /* PBXTargetDependency */,
+				F389F457FAD0B0659932C883 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9947C21D3046293D00972CEA /* WaterBuddy */,
+			);
+			name = WaterBuddy;
+			packageProductDependencies = (
+			);
+			productName = WaterBuddy;
+			productReference = 9947C21B3046293D00972CEA /* WaterBuddy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9947C2273046293E00972CEA /* WaterBuddyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9947C23F3046293F00972CEA /* Build configuration list for PBXNativeTarget "WaterBuddyTests" */;
+			buildPhases = (
+				9947C2243046293E00972CEA /* Sources */,
+				9947C2253046293E00972CEA /* Frameworks */,
+				9947C2263046293E00972CEA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9947C22A3046293E00972CEA /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9947C22B3046293E00972CEA /* WaterBuddyTests */,
+			);
+			name = WaterBuddyTests;
+			packageProductDependencies = (
+			);
+			productName = WaterBuddyTests;
+			productReference = 9947C2283046293E00972CEA /* WaterBuddyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9947C2313046293F00972CEA /* WaterBuddyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9947C2423046293F00972CEA /* Build configuration list for PBXNativeTarget "WaterBuddyUITests" */;
+			buildPhases = (
+				9947C22E3046293F00972CEA /* Sources */,
+				9947C22F3046293F00972CEA /* Frameworks */,
+				9947C2303046293F00972CEA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9947C2343046293F00972CEA /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9947C2353046293F00972CEA /* WaterBuddyUITests */,
+			);
+			name = WaterBuddyUITests;
+			packageProductDependencies = (
+			);
+			productName = WaterBuddyUITests;
+			productReference = 9947C2323046293F00972CEA /* WaterBuddyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6354942944E2767CD78B197 /* Build configuration list for PBXNativeTarget "WaterBuddyWatch" */;
+			buildPhases = (
+				9285F4541266A9AACFD53F47 /* Sources */,
+				FE3A4AF936A9786695AB73F6 /* Frameworks */,
+				4E36337B9AF579B3ADABC444 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA36CF88D9D704ABB6AEC20D /* WaterBuddyWatch */,
+			);
+			name = WaterBuddyWatch;
+			packageProductDependencies = (
+			);
+			productName = WaterBuddyWatch;
+			productReference = 1F6BD9F4DB0BE3AB5AB08F5E /* WaterBuddyWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9947C2133046293D00972CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					6273D2F7D706C59BE59C7434 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					9947C21A3046293D00972CEA = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					9947C2273046293E00972CEA = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 9947C21A3046293D00972CEA;
+					};
+					9947C2313046293F00972CEA = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 9947C21A3046293D00972CEA;
+					};
+					BFEFF83A095BBD4658E8A453 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = 9947C2163046293D00972CEA /* Build configuration list for PBXProject "WaterBuddy" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				ru,
+				uz,
+				Base,
+			);
+			mainGroup = 9947C2123046293D00972CEA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9947C21C3046293D00972CEA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9947C21A3046293D00972CEA /* WaterBuddy */,
+				9947C2273046293E00972CEA /* WaterBuddyTests */,
+				9947C2313046293F00972CEA /* WaterBuddyUITests */,
+				6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */,
+				BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4E36337B9AF579B3ADABC444 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		68A68E2CB6957347B26C4E77 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2193046293D00972CEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2263046293E00972CEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2303046293F00972CEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2ABC4F7F5B0F04A7C4104E8C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9285F4541266A9AACFD53F47 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2173046293D00972CEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C2243046293E00972CEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9947C22E3046293F00972CEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8397E1B23078A14DC1A26C43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */;
+			targetProxy = 423D952E88C50D89075DC631 /* PBXContainerItemProxy */;
+		};
+		9947C22A3046293E00972CEA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9947C21A3046293D00972CEA /* WaterBuddy */;
+			targetProxy = 9947C2293046293E00972CEA /* PBXContainerItemProxy */;
+		};
+		9947C2343046293F00972CEA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9947C21A3046293D00972CEA /* WaterBuddy */;
+			targetProxy = 9947C2333046293F00972CEA /* PBXContainerItemProxy */;
+		};
+		F389F457FAD0B0659932C883 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */;
+			targetProxy = 8F50E2EDA7146F24416BD1C9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		166749F680B0C532534134D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Water Buddy";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = sardor.WaterBuddy;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddy.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
+			};
+			name = Debug;
+		};
+		4E055122807EF3DDABB4DC02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Water Buddy";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = sardor.WaterBuddy;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddy.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
+			};
+			name = Release;
+		};
+		96C6C72A734C1D1D52DC8E1A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddyWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "WaterBuddyWidget-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 18;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddy.WaterBuddyWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		98E41F9963750E83C9070DC1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddyWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "WaterBuddyWidget-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 18;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddy.WaterBuddyWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9947C23A3046293F00972CEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9947C23B3046293F00972CEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9947C23D3046293F00972CEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddy.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9947C23E3046293F00972CEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddy.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9947C2403046293F00972CEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WaterBuddy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WaterBuddy";
+			};
+			name = Debug;
+		};
+		9947C2413046293F00972CEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WaterBuddy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WaterBuddy";
+			};
+			name = Release;
+		};
+		9947C2433046293F00972CEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = WaterBuddy;
+			};
+			name = Debug;
+		};
+		9947C2443046293F00972CEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = WaterBuddy;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9947C2163046293D00972CEA /* Build configuration list for PBXProject "WaterBuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9947C23A3046293F00972CEA /* Debug */,
+				9947C23B3046293F00972CEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9947C23C3046293F00972CEA /* Build configuration list for PBXNativeTarget "WaterBuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9947C23D3046293F00972CEA /* Debug */,
+				9947C23E3046293F00972CEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9947C23F3046293F00972CEA /* Build configuration list for PBXNativeTarget "WaterBuddyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9947C2403046293F00972CEA /* Debug */,
+				9947C2413046293F00972CEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9947C2423046293F00972CEA /* Build configuration list for PBXNativeTarget "WaterBuddyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9947C2433046293F00972CEA /* Debug */,
+				9947C2443046293F00972CEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B6354942944E2767CD78B197 /* Build configuration list for PBXNativeTarget "WaterBuddyWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				166749F680B0C532534134D7 /* Debug */,
+				4E055122807EF3DDABB4DC02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C11BD948990B3709C916B8C8 /* Build configuration list for PBXNativeTarget "WaterBuddyWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96C6C72A734C1D1D52DC8E1A /* Debug */,
+				98E41F9963750E83C9070DC1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9947C2133046293D00972CEA /* Project object */;
+}

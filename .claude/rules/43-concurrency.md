@@ -1,0 +1,89 @@
+---
+description: Isolation — @MainActor on the model, nonisolated on everything a widget must reach
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyTests/**/*.swift"]
+---
+
+# Concurrency
+
+The project compiles at `SWIFT_VERSION = 5.0` with no strict-concurrency setting, so the compiler
+will not stop you. **Treating every new warning as a failure is the only enforcement there is** — a
+warning here is a Swift 6 error later.
+
+## The model is main-actor; the read path is not
+- `DataManager` stays `@MainActor @Observable final class`. Never drop it to make a nonisolated call
+  site compile — move the callee to a `nonisolated static` instead
+- `DataManager.shared` is deliberately main-actor-isolated. That isolation is the mechanism that
+  makes a timeline provider unable to touch it by accident
+- A member the widget or a non-`@MainActor` test must reach is declared `nonisolated static` and
+  takes its inputs (`UserDefaults`, `Calendar`, `Date`) as parameters rather than reading instance
+  state: `snapshot(defaults:calendar:now:)`, `nextDayBoundary(after:calendar:)`,
+  `dayOrdinal(for:in:)`, `resolveLanguage(in:)`, `isAppExtension`, `appGroupContainerExists`, and
+  the shared constants
+- `isAppExtension` and `appGroupContainerExists` stay `nonisolated static let` lazy globals — both
+  are read during `sharedDefaults`' own lazy initialiser
+- Give the production default of every injected `DataManager` side-effect closure as a
+  `nonisolated static func`, so the parameter stays a plain non-isolated closure
+
+## Sendable, and what may cross a process
+- `WaterSnapshot` is the only **state** value handed to a widget process: `Sendable`, `Equatable`,
+  and derivable from the cache alone (`nextDayBoundary` is also called there, but it returns a
+  `Date`)
+- The widget's **draw path** never opens SwiftData, holds a `ModelContext`, or receives a
+  `WaterLog`. A `ModelContext` is not `Sendable` and `@Model` classes are reference types with no
+  conformance, so any widget-side query would fail the check or force the provider async
+- The extension's **write path** legally reaches SwiftData through `DataManager.shared.addWater` —
+  but only inside `AddWaterIntent.perform()`, which carries an explicit `@MainActor` on its
+  implementation of the nonisolated `AppIntent` requirement. Do not hop by hand
+- Every method of `HydrationProvider` stays synchronous and free of `await`, `DataManager.shared`,
+  and any `DataManager` construction
+- `ReminderPlan` stays free of actor isolation **and** of `import UserNotifications`;
+  `ReminderPlan.Slot`'s `Sendable` conformance is load-bearing — the array is captured into a `Task`
+- Never store a non-`Sendable` value in a `static let`. Expose it as a `static func` that builds a
+  fresh one, and call non-`Sendable` system singletons (`UNUserNotificationCenter.current()`,
+  `WidgetCenter.shared`) inside the closure body that uses them
+- Spell static properties on a `Sendable` type as `static let`. The one `static var` is
+  `AddWaterIntent.parameterSummary`, which the protocol requires
+- `nonisolated(unsafe)` is permitted only for a value whose thread-safety is stated in a comment on
+  the declaration; `sharedDefaults` is the sole instance
+
+## `View` is `@MainActor` — so is anything nested in one
+- A value type a non-`@MainActor` suite or the widget reads is declared **at file scope**, never
+  nested inside a `View`. `AppTab` and `ConfettiPiece` are the precedent
+- When a type genuinely must be nested (`AuroraBackground.Light`), conform it to `Sendable` **and**
+  mark the static collection exposing it `nonisolated` — both, not one
+- Any `static` inside a `View` type that a non-isolated context reads must be `nonisolated`.
+  `HomeView.servings` and `AuroraBackground.lights` carry it; `HistoryView.servingRange` /
+  `.servingStep` and `GoalSetupView.goalRange` / `.goalStep` do not — they are latent warnings the
+  moment a non-`@MainActor` suite reads them
+- The cost is documented: `@Test(arguments:)` evaluates its arguments off the main actor, which
+  produced three *"expression is 'async' but is not marked with 'await'; this is an error in the
+  Swift 6 language mode"* warnings before `HomeView.servings` was marked
+
+## Hops
+- Deliver `NotificationCenter` observations with `queue: .main` and enter isolation with
+  `MainActor.assumeIsolated` — never by wrapping the body in a `Task` or `MainActor.run`. The
+  `[weak self]` there pairs with `deinit`, which is the only thing that unregisters the observer
+- In views, run async work from `.task` or a `Task {}` inside a body modifier and assign
+  `@State`/model properties directly after the `await`. Never add `MainActor.run` or
+  `DispatchQueue.main.async`
+- A `Task {}` that sleeps and then clears view state must re-check that the state is still the one
+  it started with
+- Build non-`Sendable` collaborators **inside** the `Task {}` body and resolve values from the
+  shared suite there — never capture a scheduler, a notification centre, or `DataManager.shared`
+- A fire-and-forget `Task {}` in code an extension can reach carries
+  `guard !isAppExtension else { return }`: a detached task does not outlive `perform()`.
+  `requestReminderReschedule` is the instance of this; the `Task`s in `SettingsView` and
+  `Celebration` are app-only view work and need no guard
+- `AddWaterIntent.perform()`'s trailing `await` is what holds the extension process open. Keep it
+  the last awaited work before `return .result()`
+
+## Tests
+- Put `@MainActor` on a suite **and** on every fixture helper that constructs a `DataManager`
+- Inside a `@MainActor` closure, build helper factories as **closure literals** (`let make = { … }`),
+  not nested `func` declarations — a nested `func` does not inherit the enclosing closure's isolation
+- Tally `withObservationTracking`'s `onChange` through a `final class … : @unchecked Sendable`
+  reference box, never a captured local `var`
+- Never add `@MainActor` to `WaterSnapshotTests`, `WidgetLanguageTests`, `AppLanguageTests`,
+  `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
+  `LiquidGlassInteractionTests` or `NotificationManagerTests` to make them compile. They are
+  compile-time canaries: fix the declaration they read instead

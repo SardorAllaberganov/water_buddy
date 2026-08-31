@@ -1,0 +1,558 @@
+# STATE — the stored shape
+
+What is actually on disk in the App Group, as of the source in this tree. This is the derived
+reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
+`.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
+
+**Last updated:** 2026-09-01 (twelfth pass — **no stored shape changed**, but *who may write on
+behalf of the group* is now asked in four states rather than two. `isAppExtension` feeds
+`DataManager.role` and is read at no guard site; the section of that name is rewritten, the
+migration and reminder-seam code samples updated, and `republishHistory`'s guard renamed.
+Previously: eleventh pass — the reminder-seam claim in *Testing* was aspirational and is now true: the six fixtures that reached a real `UNUserNotificationCenter` were closed. No stored shape changed. Previously: tenth pass — `Key.all`, the roster the widget tripwires read. Previously: **an eighth key**: the three editable quick-add vessels, and the shared read that replaced `standardServing`)
+
+---
+
+## Two stores, one App Group
+
+There is no network and no server, but there **is** a database now. The App Group holds two things,
+and which is authoritative matters more than either on its own:
+
+| | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
+|---|---|---|
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | eight keys (below) |
+| Status | **source of truth** | **derived cache** |
+| Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
+| Read by | the app | the app **and the widget** |
+
+**Today's total is not stored anywhere as an authored value.** It is the sum of today's logs,
+recomputed after every mutation by `DataManager.recomputeToday()` and written through the
+`currentWater` setter — so the clamp, the equality guard and the widget doorbell all still fire
+exactly once per real change.
+
+**The widget never opens SwiftData.** A `TimelineProvider` carries no isolation and a
+`ModelContext` is not `Sendable`; reading through the cache is what keeps `HydrationProvider`
+synchronous and `nonisolated` (rule `43-concurrency`). This is the entire reason the cache exists,
+and it is why the SwiftData move required no change to the widget at all.
+
+The cache cannot drift silently: it is rewritten from the logs after every mutation, so a
+disagreement means the log side is already wrong.
+
+### Failure modes
+
+- **Store unreadable.** `recomputeToday()` writes *nothing* and the total stands. An earlier draft
+  returned `[]` from the failed fetch, which was written through as a total of zero — turning a
+  transient read failure into permanent, persisted data loss. Distinguishing "no water today" from
+  "could not tell" is load-bearing.
+- **App Group unreachable.** The SwiftData container falls back to a process-local store and
+  prints a `DEBUG` diagnostic, mirroring what `sharedDefaults` does for the suite.
+
+When the App Group container is unreachable, `DataManager.sharedDefaults` falls back to
+`.standard`, prints a `DEBUG`-only diagnostic naming the missing capability, and
+`isSharedStorageAvailable` reports `false`. The app keeps working; the widget goes blank, because
+it is reading a different container.
+
+The probe is the **container URL**, not the suite object:
+
+```swift
+FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) != nil
+```
+
+`UserDefaults(suiteName:)` returns a live, silently process-local object when the entitlement is
+missing. It only returns `nil` for the app's own bundle identifier or the global domain, so
+checking it for `nil` proves nothing.
+
+## Constants both processes agree on
+
+All `nonisolated static` on `DataManager`, so a timeline provider can reach them.
+
+| Constant | Value | Notes |
+|---|---|---|
+| `appGroupIdentifier` | `group.sardor.WaterBuddy` | also spelled in **two** entitlement files, invisible to the compiler |
+| `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
+| `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
+| `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
+| `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
+
+## The eight keys
+
+Every key is built in `DataManager.Key` from the prefix **`sardor.WaterBuddy.`**. An App Group
+domain is shared by every target that joins it, so an un-prefixed key is a collision waiting for
+the next extension.
+
+| Stored key | Type | Range / clamp | Written by | Why it exists |
+|---|---|---|---|---|
+| `sardor.WaterBuddy.currentWater` | `Int` | `0...100_000` | app + extension | Today's total in ml — **derived**, the sum of today's `WaterLog` rows. The key the widget actually reads. |
+| `sardor.WaterBuddy.dailyGoal` | `Int` | `1...100_000` | **app only** | The target. Clamped to ≥ 1 so `progress` cannot divide by zero. Materialised at app launch so a widget never reads a missing key as `0` and shows the first sip as 100%. |
+| `sardor.WaterBuddy.lastActiveDay` | `Int` | `yyyyMMdd` ordinal | **app only** | The day `currentWater` belongs to. An ordinal, not a `Date`, so travel cannot re-interpret it (see below). |
+| `sardor.WaterBuddy.isGoalSet` | `Bool` | — | app only | Whether the user has *chosen* a goal, so setup is shown once. **Deliberately never materialised — its absence carries meaning.** |
+| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs**, which is how the two front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
+| `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
+| `sardor.WaterBuddy.language` | `String` | — | app + widget | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
+| `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
+
+> Note the last key's *stored string* is `…didMigrateFromStandardDefaults` while the constant is
+> named `Key.didMigrateFromStandard`. The string is the thing that persists; do not "tidy" one to
+> match the other without a migration.
+
+Four keys are carried by the migration — `currentWater`, `dailyGoal`, `lastActiveDay`,
+`isGoalSet`. `didMigrateFromStandardDefaults` is not, because it *is* the bookkeeping; and
+`language` is not, because it did not exist before the App Group did, so there is nothing in a
+pre-capability `UserDefaults.standard` to carry.
+
+
+### `WaterLog` (SwiftData)
+
+| Property | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | Stable across edits. **Not** `@Attribute(.unique)`: two processes insert here, and a unique constraint turns a benign collision into a failed save in whichever lost the race. |
+| `amount` | `Int` | Millilitres. Positive; non-positive servings are rejected by `addLog`, not stored as zero rows. |
+| `timestamp` | `Date` | When the serving happened. |
+
+**A `Date` here does not contradict rule `30-rollover`.** That rule forbids storing *the day* as an
+instant, because an instant re-read under a different time zone moves — which is how a user flying
+west loses a day. A `timestamp` records *a moment*, which is real and does not move. The
+distinction is in the read: `fetchLogsForToday()` never compares instants to decide which day a
+serving belongs to. It derives the half-open bounds `[startOfDay, nextDayBoundary)` from
+`Calendar.waterBuddyDay` — the same calendar the ordinal uses — so the log view and the rollover
+cannot disagree. The `yyyyMMdd` ordinal remains the marker for *whether* the day turned.
+
+### The seed migration
+
+A user upgrading from the `UserDefaults`-only build has a total but no rows. `DataManager`
+seeds one `WaterLog` from the cached total on first launch, guarded three ways so it cannot
+double the water or resurrect an old day: it never runs in an extension, never runs when a log for
+today already exists, and only runs when `lastActiveDay` is **today**.
+
+This is the same discipline as the App Group migration (rule `25-shared-storage`): without it,
+adopting a new store looks exactly like data loss.
+### `Key.all` — the roster the tripwires read
+
+`DataManager.Key.all` lists all eight keys, three lines under the declarations it mirrors.
+Production code never reads it; it exists so the widget's two read-path tripwires —
+`readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys` — can prove a snapshot
+read created and altered *nothing*.
+
+Those tripwires are only ever as wide as the list they are handed, and that list used to be
+hand-written **in the test file**. It enumerated six of the seven keys for two releases, omitting
+`remindersEnabled`, so both tripwires were blind to a whole key while their own DocC claimed they
+covered "everything WaterBuddy has ever written into a suite". Rule `30-rollover` warns about
+precisely this: the helper "will not notice a new one on its own".
+
+Keeping the roster beside the declarations is what makes the omission hard rather than likely, and
+`theTripwireHelperEnumeratesEveryStoredKey` fails the moment the two disagree. It was fixed
+**before** the eighth key was added, not after.
+
+## How a value is resolved on the way out
+
+**`dailyGoal`** — `resolveDailyGoal(in:)`:
+
+```
+object(forKey:) as? Int, and >= 1   → min(stored, maximumDailyIntake)
+otherwise                           → defaultDailyGoal
+```
+
+A missing key reads as `0` through `integer(forKey:)`, and a `0` goal would make the first sip
+read as 100%. Anything below 1 is therefore "never set".
+
+**`isGoalSet`** — `resolveIsGoalSet(in:goal:)`:
+
+```
+flag present    → the stored Bool
+flag absent     → goal != defaultDailyGoal
+```
+
+A missing flag means a build from before the flag existed, not necessarily a user who never chose.
+Only `saveDailyGoal(ml:)` ever stores a goal that differs from the default, so a non-default stored
+goal can only have come from the user. A stored goal that *is* the default stays genuinely
+ambiguous, and the safe reading of an ambiguity is to ask once.
+
+`isGoalSet` cannot be inferred from the *presence* of `dailyGoal`: `init` materialises the
+resolved goal, so that key exists from first launch whether or not anybody chose it.
+
+**The inferred `true` and the stored `true` are different facts, and `saveDailyGoal(ml:)` guards on
+the store.** An instance on the upgrade path holds `isGoalSet == true` with the key *absent* — the
+inference above produced it, and materialising the key is forbidden. So the write is guarded on
+what the key says, not on what the instance believes:
+
+```swift
+if defaults.object(forKey: Key.isGoalSet) as? Bool != true {   // persistence — on the KEY
+    defaults.set(true, forKey: Key.isGoalSet)
+}
+guard !storedIsGoalSet else { return }                          // observation — still guarded
+withMutation(keyPath: \.isGoalSet) { storedIsGoalSet = true }
+```
+
+Guarding both on `storedIsGoalSet` skips the only write of that key in the product. Edit such a
+goal down to exactly `defaultDailyGoal` and the inference re-derives `false` on the next read, and
+`RootView` cross-fades the app back into setup mid-session. This was unreachable while
+`saveDailyGoal(ml:)` had one caller — `GoalSetupView` is presented only while the flag is `false`,
+so the guard could never short-circuit — and became reachable when `SettingsView`'s `GoalCard`
+became the second. `editingAnInferredGoalDownToTheDefaultPersistsTheFlag` pins it.
+
+## How a value is clamped on the way in
+
+Both setters clamp, then guard on equality before writing:
+
+```swift
+let clamped = newValue.clamped(to: 0...Self.maximumDailyIntake)   // dailyGoal: 1...
+guard clamped != storedCurrentWater else { return }                // no-op writes do not churn
+withMutation(keyPath: \.currentWater) {
+    storedCurrentWater = clamped
+    defaults.set(clamped, forKey: Key.currentWater)                // write-through in the same statement
+}
+reloadWidgets()                                                    // once, per real change
+```
+
+The equality guard is what keeps a no-op write from invalidating SwiftUI observers and from
+ringing the widget doorbell. Arithmetic in `addWater` / `removeWater` uses
+`addingReportingOverflow` / `subtractingReportingOverflow` and **saturates** — `.max` passed twice
+pins at `maximumDailyIntake` rather than trapping. Non-positive amounts are ignored in both
+directions.
+
+`addWater` and `removeWater` call `refresh()` **before** computing the new total, because the
+getter returns this instance's cached figure and two processes hold their own instance.
+
+## The rows are published too, and only reads may cross
+
+`todaysLogs` is a fourth observed property — today's servings, newest first — alongside
+`currentWater`, `dailyGoal` and `isGoalSet`. It exists because `fetchLogsForToday()` reads the
+store directly and calls no `access(keyPath:)`, so a view reading it never redraws, and a SwiftData
+`@Query` is forbidden from a view (rule `10-architecture`). `HistoryView` is its only consumer.
+
+Two properties of it are deliberate and both have tests:
+
+- **No equality guard**, where `currentWater` and `dailyGoal` both have one. `WaterLog` is a
+  `@Model` class whose `Hashable` conformance is by `persistentModelID`, so the array after an
+  *amount edit* compares equal to the array before it; a guard would swallow exactly the change a
+  history row needs to see (`editingALogInvalidatesObserversOfTodaysLogs`).
+- **Read-only**, for the reason `isGoalSet` is: it is a consequence of the logs.
+
+`refresh()` now ends in `republishTodaysLogs()` — a **read**. It re-reads the rows and does *not*
+recompute the total from them:
+
+```swift
+func refresh() {
+    loadFromStore()            // the total, out of the cache
+    resetIfNeeded()            // the day, if it turned
+    republishTodaysLogs()      // the rows — never the total
+    republishHistory()         // the last seven days — a read, app-only
+    rescheduleRemindersNow()
+}
+```
+
+Recomputing the total here was tried and rejected. `AddWaterIntent` writes a row *and* the cache
+from the extension; a cross-process SwiftData read can succeed while returning rows that do not yet
+include it, and re-deriving from those would overwrite the other process's serving with a smaller
+figure and ring the doorbell to announce it. `refreshPicksUpAnExternalWrite` is the test that
+caught it. A stale list beside a correct total is a display inconsistency the next mutation heals;
+the other way round destroys water — the failed-read rule, one step further out, because a fetch
+can be wrong without throwing.
+
+### `history` — the same shape, one store read wider
+
+`history` is a fifth observed property: `[DaySummary]`, the last `DataManager.historyWindow` (7)
+local days, oldest first, today last. `HistoryView`'s week card is its only consumer. It **stores
+nothing** — no eighth key, no schema change, no column on `WaterLog` — and is recomputed from the
+rows on every republish, so it belongs to this document only as *derived* state.
+
+It differs from `todaysLogs` in three ways, each for a stated reason:
+
+- **It carries an equality guard**, where `todaysLogs` deliberately does not. The hazard that
+  forbids one there is the element type: `WaterLog` is a `@Model` class hashed by
+  `persistentModelID`, so the array after an amount edit compares equal to the array before it.
+  `DaySummary` is a value compared by its fields, so an equal array genuinely means nothing moved —
+  and `refresh()` runs on every foreground, where an unconditional mutation would redraw the card
+  for nothing. Pinned by `aRefreshThatChangesNothingDoesNotChurnHistoryObservers`.
+- **Its republish is guarded on `role.drawsHistory`.** The four guards in the section below stop a
+  non-owner *writing* group state; this one stops it doing work it can never draw.
+  `recomputeToday()` is deliberately unguarded, so `AddWaterIntent` reaches `saveAndRecompute()` on
+  every widget tap — without the guard, that tap runs a seven-day fetch and a full roll-up inside
+  the `.appex`. Nothing about history crosses to the widget: a per-day series is derivable from
+  none of the eight keys.
+- **It is republished from three sites**, not one — `init`, `refresh()` and `saveAndRecompute()` —
+  because a mutation must show up on the card immediately, and `addLog` calls `refresh()` *before*
+  it inserts.
+
+The fetch behind it is `readLogs(from:to:)`, the first range query in the product. It reuses the
+half-open `[start, end)` predicate shape that `readTodaysLogs()` uses — which now routes through it,
+so there is still exactly **one** `#Predicate` in the codebase — and it honours the same
+`Optional` contract: a failed read returns `nil` and `republishHistory()` returns early, leaving the
+last published window standing. Publishing an empty window instead would draw a chart
+indistinguishable from a user who never drank.
+
+Grouping happens in Swift, not in the store: a `#Predicate` cannot call `Calendar` or group, and
+`WaterLog` may never gain a day column (rule `30-rollover`). So `DaySummary.series(...)` buckets by
+`DataManager.dayOrdinal(for:in:)` on the injected calendar, walks the window with
+`date(byAdding: .day,)` rather than by seconds, sums with `addingReportingOverflow`, and zero-fills
+a day nobody drank on — a window that omitted empty days would draw a seven-bar axis describing some
+other number of days.
+
+**A past day has no goal of its own, and never will retroactively.** `Key.dailyGoal` is a single
+scalar overwritten in place, and `SettingsView.GoalCard` lets the user move it at any time, so
+`DaySummary` deliberately carries **no `goal` field**: today's figure stamped onto seven days would
+look like a record of something the store cannot know. The card compares against the current goal
+and discloses that it does.
+
+## The sixth key, and the seam that reads it
+
+`remindersEnabled` is a `Bool`, **absent until the user turns reminders on**. Like `isGoalSet` and
+unlike `dailyGoal` it is never materialised: scheduling notifications for someone who never asked is
+the wrong default, so "missing" and "off" have to mean the same thing.
+
+It is settable — it is a genuine preference rather than a consequence — and carries the same
+write-through and equality guard as `currentWater` and `dailyGoal`, so a no-op write neither
+invalidates observers nor re-plans the day. Setting it re-plans **in both directions**: switching
+reminders off has to *clear* what is already filed with the system, not merely stop adding to it.
+
+`DataManager` takes a sixth injected dependency and hands out a plan; it never touches
+`UserNotifications` itself:
+
+```swift
+rescheduleReminders: @escaping ([ReminderPlan.Slot]) -> Void = DataManager.requestReminderReschedule
+```
+
+Fired from **six** places, because one is not enough:
+
+| Where | Why |
+|---|---|
+| `recomputeToday()` | every log mutation, from either process, with the fresh total in hand |
+| `applyDailyReset(on:)` | it bypasses the `currentWater` setter, so a setter-only hook would miss **midnight** |
+| `refresh()` | idempotent reconciliation on foreground — the backstop for a widget tap |
+| the `remindersEnabled` setter | the preference itself, in both directions |
+| the `dailyGoal` setter | **the goal is half of "goal reached"** — see below |
+| `init` | an instance that never mutates anything still has to arrive at a correct schedule |
+
+**The plan depends on the goal exactly as much as on the water.** `ReminderPlan` silences today
+once `currentWater >= dailyGoal`, so raising the goal un-meets a met goal and the rest of today has
+to come back; lowering it past the total has to stop the nagging. The hook sits on the `dailyGoal`
+*setter* rather than in `saveDailyGoal(ml:)` so it is symmetrical with `remindersEnabled` and so the
+setter's equality guard covers the re-plan exactly as it covers the widget doorbell — a no-op goal
+write still costs nothing. `raisingTheGoalPastAMetTotalRePlansToday` and
+`loweringTheGoalBelowTheTotalSilencesToday` pin both directions; both failed before the call
+existed.
+
+The production default returns immediately unless `role.mayFileReminders` — that is, in any process
+but the phone app. Two independent reasons now sit behind one predicate. For an extension: a
+detached `Task` does not outlive `perform()` returning, so `AddWaterIntent` awaits the reconcile
+itself instead. For a watch: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a
+second notification centre would file byte-identical identifiers it cannot dedupe against the
+phone's. Full reasoning in rule `80-notifications` — **which still describes this guard as
+`!isAppExtension` and is stale (`AI_CONTEXT.md` known issue #15).**
+
+## The seventh key, and why it crosses to the widget
+
+`language` is a `String` holding a code, **absent until the user picks one**. That makes it the
+third key whose absence carries meaning, alongside `isGoalSet` and `remindersEnabled` — and for the
+same reason: "I never chose" and "I chose to follow the device" must not be distinguishable, or a
+user who later adds a language to their phone would be stuck on whatever they were pinned to.
+Returning to *Follow device* therefore **removes** the key rather than storing a sentinel.
+
+```
+flag present  → AppLanguage(code:), falling back to .system for anything unrecognised
+flag absent   → .system
+```
+
+`AppLanguage` lives in `DataManager.swift` rather than a file of its own, because a seventh shared
+`.swift` file would change the six-file contract that `CLAUDE.md` and four rule files spell out.
+
+**The setter rings the widget doorbell**, which `remindersEnabled` does not. The widget has its own
+strings table and its own process; a timeline it has already built is an archive another process
+replays, so without the doorbell it would keep drawing the previous language indefinitely.
+`WaterSnapshot` carries the language for the same reason it carries the goal — the provider reads
+the cache and never the model (rule `40-widget`).
+
+### The language is why nothing asks `Bundle.main`
+
+iOS resolves `Bundle.main`'s localisation **once at launch and never again**, so an in-app picker
+that only wrote a preference would need a relaunch to take effect. Every user-facing string in this
+product instead resolves through `EnvironmentValues.strings`, a `Bundle` injected at each root from
+`DataManager.language`. Changing the model invalidates observers, both roots re-evaluate, a
+different bundle travels down, and the tree redraws in place.
+
+`.locale` is injected alongside it. Switching the strings without the locale leaves `4 500` wearing
+the device's grouping separator inside a Russian sentence — half-translated reads as a bug in the
+app rather than as a language it does not have.
+
+## The day ordinal
+
+```swift
+(year * 10_000) + (month * 100) + day        // 2026-08-28 → 20260828
+```
+
+Built with `Calendar.waterBuddyDay`: Gregorian, `en_US_POSIX`, `TimeZone.autoupdatingCurrent`,
+**rebuilt on every access** so a time-zone change takes effect.
+
+A stored *instant* has to be re-interpreted under whatever zone is current when it is read. A user
+who logs water at 14:00 in Paris and lands in London an hour behind would have yesterday's stored
+midnight re-read as the day before — wiping a day of water on a date that never changed. Comparing
+ordinals still rolls over correctly flying the other way, where the local date genuinely does
+advance.
+
+## The rollover
+
+`applyDailyReset(on:)` — **the order is the safety**:
+
+```swift
+defaults.set(0, forKey: Key.currentWater)      // zero FIRST
+defaults.set(day, forKey: Key.lastActiveDay)   // stamp SECOND
+```
+
+A crash between the two leaves a stale marker, which simply resets again on the next launch. The
+opposite order launders yesterday's water into today with no way back.
+
+**Since the log became the source of truth, this clears only the cache.** No `WaterLog` row is
+touched: yesterday's servings stay on disk as history, and today reads as empty because nothing
+has been logged today — not because anything was destroyed. `recomputeToday()` then refills the
+cache from the logs.
+
+`resetDailyProgress()` — the user-facing "start over" — is now the *only* path that deletes rows,
+and it deletes **today's** only. Yesterday is history and a start-over button has no business
+reaching into it.
+
+`resetIfNeeded()`:
+
+| Stored `lastActiveDay` | Behaviour | Returns |
+|---|---|---|
+| absent | **adopts today** (app only) and does not reset — a fresh install, or a build from before the marker | `false` |
+| == today | nothing | `false` |
+| != today | `applyDailyReset(on: today)` | `true` |
+
+Called from `init`, from `refresh()`, and from the `NSCalendarDayChanged` /
+`NSSystemTimeZoneDidChange` observers that catch the app sitting open across midnight or the user
+crossing a zone. Those observers register with `queue: .main` and use `MainActor.assumeIsolated`
+rather than a `Task` — the main queue *is* the main actor, and hopping would open a window where
+two notifications interleave.
+
+`resetDailyProgress()` is the user-facing "start over": unconditional, leaves `dailyGoal` alone.
+
+**The widget never resets.** `DataManager.snapshot(defaults:calendar:now:)` applies the same rule
+**in the returned value only** and leaves the store exactly as it found it, so a widget rendered at
+00:01 cannot race the app into clearing the day. It mirrors the missing-marker case with `if let`,
+not `guard let … else { water = 0 }`:
+
+```swift
+if let lastActiveDay = defaults.object(forKey: Key.lastActiveDay) as? Int,
+   lastActiveDay != dayOrdinal(for: now, in: calendar) {
+    water = 0
+}
+```
+
+## Who may write on behalf of the group
+
+`DataManager.isAppExtension` is `Bundle.main.bundleURL.pathExtension == "appex"` — the only signal
+available before any extension point has loaded, and constant for the life of the process, so it
+is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 it feeds
+`DataManager.role`, and the guards ask that instead:
+
+```swift
+nonisolated static let role: Role = {          // DataManager.swift:1032
+    #if os(watchOS)
+    return isAppExtension ? .watchExtension : .watchApp
+    #else
+    return isAppExtension ? .phoneExtension : .phoneApp
+    #endif
+}()
+```
+
+The reason is that `isAppExtension` is a **two-state answer to a four-state question**, and it
+answers it wrongly for a watch: a watchOS app is a `.app`, so `pathExtension == "appex"` is `false`
+and every `!isAppExtension` guard would *open* on the wrist — materialising the goal into a
+container the phone never sees, stamping its own day, seeding a phantom serving, burning the
+burn-once migration flag, and filing a duplicate reminder plan. Resolved from `isAppExtension` plus
+the compile-time platform rather than from a second runtime probe, because rule `25-shared-storage`
+forbids a competing detection scheme: two probes can disagree and leave one guard open.
+
+**Four writes are guarded, by three different questions:**
+
+1. **Materialising `dailyGoal` in `init`** (`:420`, `ownsSharedStorage`) — the write exists *for*
+   the extensions; a non-owner doing it to itself puts a key in the group that the migration then
+   mistakes for state the app already wrote.
+2. **Stamping `lastActiveDay` on a fresh install** (`:760`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:691`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1175`, `mayHaveLegacyStandardDefaults`).
+
+Two further sites are guarded by the same enum but are not group bookkeeping: `republishHistory`
+(`:627`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:847`,
+`mayFileReminders`, the one whose wrong answer is immediately user-visible).
+
+Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`
+with **no `default`**, so a fifth binary fails to compile until somebody answers all four for it.
+Pinned by `ProcessRoleTests` (`WaterSnapshotTests.swift:519`).
+
+## The one-shot migration
+
+`migrateIfNeeded(from:into:)` carries state written before the App Groups capability existed into
+the shared suite, once. Without it, enabling the capability looks like data loss.
+
+```swift
+guard role.mayHaveLegacyStandardDefaults else { return }
+guard !suite.bool(forKey: Key.didMigrateFromStandard) else { return }
+defer { suite.set(true, forKey: Key.didMigrateFromStandard) }
+
+for key in [Key.currentWater, Key.dailyGoal, Key.lastActiveDay, Key.isGoalSet] {
+    guard suite.object(forKey: key) == nil, let value = source.object(forKey: key) else { continue }
+    suite.set(value, forKey: key)
+}
+```
+
+Three properties are not negotiable:
+
+- **Extensions return immediately.** An extension's `UserDefaults.standard` is its own bundle's
+  domain, which has never held this app's state — a widget that resolved the suite first would
+  copy nothing while still burning the one-shot flag.
+- **The decision is per key, not per suite.** A widget tap that landed before the app was first
+  opened after the update writes `currentWater` and nothing else; probing one key to decide about
+  all of them would strand every other value or overwrite that tap.
+- **It never clobbers** — `guard suite.object(forKey: key) == nil` before every copy.
+
+`source` is a parameter only so the one-shot can be tested: it runs inside a lazy global that
+resolves the real App Group, which a test cannot stand in front of.
+
+It is driven from `WaterBuddyApp.init()` via `prepareSharedStorage()`. Every step happens anyway,
+lazily, on first touch of `sharedDefaults`; calling it deliberately fixes **when** — which for a
+one-shot only the app may run is the whole point.
+
+## Derived values, computed identically in two places
+
+`progress`, `progressUnclamped` and `percentage` exist on **both** `DataManager` and
+`WaterSnapshot`, computed the same way, because the app and the widget must round to the same
+number:
+
+```
+progress          = clamp(progressUnclamped, 0...1)
+progressUnclamped = goal > 0 ? Double(currentWater) / Double(goal) : 0
+percentage        = Int((progressUnclamped * 100).rounded())
+```
+
+A `body` that computes a displayed figure for itself is how the two start disagreeing.
+
+## Tests that pin this
+
+Ten suites, 151 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
+`ReminderSeamTests` (65 between them) cover the write path, the rollover, observation, the goal and
+the reminder seam; `WaterSnapshotTests` (24) covers the read path, the day boundary and the
+migration; `WaterLogStoreTests` (22) covers the log CRUD, the published rows and the seed migration;
+`ReminderPlanTests` (15) pins *when* to remind and `NotificationManagerTests` (10) pins what happens
+to the plan; `HomeServingTests` (6) pins the quick-add row, `AppTabTests` (5) the tab menu, and
+`HistoryServingTests` (5) the serving editor's offered range and its own fixture's reminder seam.
+
+Named cases worth knowing: `travellingWestwardDoesNotWipeTheDay`,
+`travellingEastwardAcrossTheDateStartsANewDay`, `theDayBoundaryHoldsAcrossADstTransition`,
+`aMissingDayMarkerReportsTheStoredTotal`, `readingLeavesTheStoreUntouched`,
+`readingAnEmptySuiteDoesNotCreateKeys`, `migrationFillsTheGapsAroundAValueAlreadyInTheGroup`,
+`savingAGoalRingsTheWidgetDoorbellExactlyOnce`, and — for the two rulings above —
+`editingAnInferredGoalDownToTheDefaultPersistsTheFlag`,
+`raisingTheGoalPastAMetTotalRePlansToday`, `loweringTheGoalBelowTheTotalSilencesToday`.
+
+No test ever touches `group.sardor.WaterBuddy` or `UserDefaults.standard` — every test builds a
+UUID-named throwaway suite and removes it. No test constructs a real `UNUserNotificationCenter`
+either: `ReminderScheduler` is a struct of closures precisely so one can be stood behind.
+
+**That second sentence was aspirational until 2026-08-31, and is now true.** `DataManager.init`
+ends in `rescheduleRemindersNow()`, and the `rescheduleReminders:` parameter above defaults to
+`DataManager.requestReminderReschedule`, which builds a real centre — so *merely constructing* a
+manager reconciles against it. Six fixtures omitted the argument and had been doing exactly that
+(`docs/AI_CONTEXT.md` known issue #6, now retired). All eleven construction sites in the test target
+were audited; the six were closed, and the two files that held them each carry a test that fails if
+the argument goes missing again. The same defect is still live in three `#Preview`s — known issue
+#14, deliberately deferred to its own change.

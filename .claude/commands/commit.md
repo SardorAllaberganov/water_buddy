@@ -1,0 +1,129 @@
+# /commit
+
+Group uncommitted changes by topic and create separate commits for each group, then push.
+**Read-and-commit only** — this command never authors, edits, or fixes files (no doc
+touch-ups, no "mark committed" notes, no leftover fixes). It commits exactly what the
+approved plan says and nothing else.
+
+### Step 0: Confirm there is a repository
+Run `git rev-parse --git-dir`. **This project is not a git repository yet** — there is no
+`.git` and no `.gitignore`. If that is still true, STOP and report it; do not run `git init`
+on your own. Initialising a repo and writing a `.gitignore` is a decision for the owner, and
+committing a tree that still ignores nothing would bake `xcuserdata/`, build products and
+`.DS_Store` into the first commit.
+
+### Step 1: Analyze Changes
+Run `git status` and `git diff` (staged + unstaged) to see all modified / untracked files.
+Then run the pre-commit gates for what changed:
+
+- **Any `.swift` under `WaterBuddy/` or the test targets changed** →
+  ```bash
+  xcrun simctl shutdown all
+  xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddy \
+    -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16' \
+    -only-testing:WaterBuddyTests -parallel-testing-enabled NO
+  ```
+- **Anything under `WaterBuddyWidget/`, or one of the six shared files, changed** →
+  ```bash
+  xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension \
+    -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16'
+  ```
+  The app scheme does not compile the widget's own sources, so a widget-only break passes a
+  green test run untouched.
+- **A view, a string catalog or the setup gate changed** → also
+  `-only-testing:WaterBuddyUITests`. Run it as its own invocation: the combined run exceeds
+  the 600s foreground limit.
+- **Docs / `tasks/` / `.claude/` only** → no gates.
+- Run `xcodebuild` in the **foreground**, one simulator, always `-parallel-testing-enabled NO`.
+- Skip re-running a gate only if it already ran green in this session strictly AFTER the last
+  change to those files — say so explicitly in the plan.
+- Treat every new warning as a failure.
+
+### Step 2: Group by Topic
+Classify each changed file into a topic group.
+
+**Grouping rules (in priority / dependency order — earliest groups commit first):**
+
+1. **Project & signing config** — `WaterBuddy.xcodeproj/project.pbxproj`, `Entitlements/*`,
+   `WaterBuddyWidget-Info.plist` (target membership and the App Group land with or before the
+   code that needs them)
+2. **Store & shared core** — the six files compiled into both targets: `DataManager.swift`,
+   `WaterLog.swift`, `ReminderPlan.swift`, `NotificationManager.swift`, `WaterSurface.swift`,
+   `LiquidGlassModifier.swift` — plus their tests. A change here reaches both front doors, so
+   it commits before either
+3. **App views** — `HomeView.swift`, `HistoryView.swift`, `SettingsView.swift`,
+   `GoalSetupView.swift`, `RootTabView.swift`, `WaterBuddyApp.swift` (+ their tests)
+4. **Design system** — `AuroraBackground.swift`, `Celebration.swift`, `PressStyle.swift`,
+   `Haptics.swift` (+ their tests)
+5. **Widget extension** — `WaterBuddyWidget/**`
+6. **Localization** — string catalogs and any `knownRegions` change
+7. **Tests only** — a test-side change with no production counterpart
+8. **Tools** — `Tools/**` (standalone scripts, in no target)
+9. **Docs** — `docs/**`, `HISTORY.md`, `tasks/**`
+10. **Workflow config** — `CLAUDE.md`, `.claude/**` (rules, commands — NOT `settings.local.json`)
+
+If files are tightly coupled for one logical change (a feature touching the store + a view +
+the widget; a TDD change where the tests belong with the code), group them together regardless
+of the rule numbers above — this repo's features usually commit as one `feat`/`fix` including
+their tests. Dependency order still drives commit ordering.
+
+### Step 3: Present Plan
+Show the proposed commit groups, in commit order:
+
+```
+Group 1: [topic] — N files
+  - WaterBuddy/DataManager.swift
+  - WaterBuddyTests/DataManagerTests.swift
+  Commit message: "type(scope): description"
+
+Group 2: [topic] — N files
+  - docs/STATE.md
+  Commit message: "docs: description"
+```
+
+**Wait for user approval before proceeding.** If the user wants to merge / split / reorder
+groups, adjust and re-present before committing.
+
+### Step 4: Commit Each Group
+For each approved group, in dependency order:
+1. `git add <specific files>` — explicit paths only. Use `git rm <path>` for deleted files.
+2. `git commit -m "<message>"`
+
+**Commit message format** (matches `.claude/rules/90-git.md`):
+- `type(scope): description`
+- **Types**: `feat`, `fix`, `refactor`, `style`, `chore`, `docs`, `test`
+- **Scopes**: `store` (the shared core), `app`, `widget`, `design`, `tests`, `l10n`, `project`,
+  `claude`; `docs` commits are typically unscoped
+- First line under 72 chars
+- Body wraps to 72 chars; add it when context is non-obvious or verification details are
+  worth recording
+- **NEVER** include `Co-Authored-By`, `Generated by`, "🤖", or any AI / Claude attribution
+
+### Step 5: Push
+After all approved groups are committed:
+```bash
+git push
+```
+If the branch has no upstream yet: `git push -u origin <branch>`. Then **STOP** — report the
+pushed range and any leftover unplanned files. Do not create follow-up commits.
+
+### Rules
+- **Execute exactly the approved plan** — no extra commits, no authored edits, no doc
+  synchronization (that is `/doc_sync`'s job, run BEFORE `/commit`). If follow-up work
+  surfaces mid-run (stale doc notes, missed files), report it and stop; a new commit needs
+  a newly presented and approved plan.
+- NEVER use `git add -A`, `git add .`, or `git commit -a` — always add specific paths
+- NEVER commit: `build/`, `DerivedData/`, `*.xcuserdatad/`, `xcuserdata/`, `.DS_Store`,
+  `.claude/settings.local.json`, or anything secret-looking
+- **NEVER add `CLAUDE.md` or `.claude/**` to a build target** — they are committed as files,
+  never as bundle resources (rule `15-project`)
+- NEVER include AI attribution lines in commit messages
+- NEVER skip hooks (`--no-verify`, `--no-gpg-sign`) unless the user explicitly asks
+- NEVER amend a commit that has been pushed; create a new commit instead
+- If unsure about grouping, ask the user before committing
+- If the pre-commit gates fail, stop and report — do not commit until clean
+- If a pre-commit hook fails, the commit did NOT happen; fix the root cause and create a
+  NEW commit (do not `--amend` after hook failure — the previous commit would be the wrong
+  one to amend)
+- If push hits merge conflicts, stop and report; let the user decide (rebase vs merge vs
+  branch-protection bypass)
