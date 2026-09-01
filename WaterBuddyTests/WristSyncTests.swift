@@ -245,6 +245,16 @@ struct WristIngestTests {
     /// descriptor does not retroactively fail a read through that descriptor. Only overwriting the
     /// file with garbage of its *original* size reliably corrupts the SQLite header in a way both
     /// a fresh and an existing long-lived context detect.
+    ///
+    /// **This does not isolate C1 from C2.** Corrupting the SwiftData store fails `fetch(nil)`
+    /// *and*, were the function to proceed past that guard, would fail the later `save()` too — so
+    /// this pins the combined "the store cannot be read or written" behaviour, not C1's specific
+    /// guard alone; disabling only C1's decline here would still return `folded == 0` via C2's
+    /// separate `saveAndRecompute()` guard catching the same corruption downstream. The ledger-decode
+    /// half of C1 has no such confound, since `readAppliedLedger()` reads `UserDefaults`, a
+    /// completely different store from the one this test corrupts — see
+    /// `anUndecodableLedgerDeclinesTheWholeBatch` immediately below for the test that actually
+    /// isolates C1.
     @Test
     func aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -278,6 +288,23 @@ struct WristIngestTests {
             let folded = manager.ingest([pour])
             #expect(folded == 0, "an unreadable store must decline the batch, never treat it as empty")
             #expect(manager.currentWater == 100, "a failed read must leave the total exactly as it stood")
+        }
+    }
+
+    /// C1's other half: an **undecodable** ledger (present but corrupt data under `Key.wristApplied`)
+    /// must also decline the whole batch, never collapse to "empty ledger". This is the isolated
+    /// counterpart to the test above — the SwiftData store here stays perfectly healthy, so a
+    /// failure of this test can only mean the ledger-decode guard itself regressed, not C2's
+    /// downstream save guard catching an unrelated corruption.
+    @Test
+    func anUndecodableLedgerDeclinesTheWholeBatch() {
+        withTempDefaults { defaults in
+            defaults.set(Data([0xDE, 0xAD, 0xBE, 0xEF]), forKey: DataManager.Key.wristApplied)
+            let manager = makeManager(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            let pour = WristPour(id: UUID(), amount: 250, at: Date(timeIntervalSince1970: 1_000))
+            #expect(manager.ingest([pour]) == 0, "an undecodable ledger must decline, never read as empty")
+            #expect(manager.currentWater == 0)
+            #expect(manager.allLogs().isEmpty, "nothing may be inserted against a ledger that could not be read")
         }
     }
 
