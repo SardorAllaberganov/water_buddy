@@ -14,6 +14,10 @@ import SwiftUI
 import WidgetKit
 #endif
 
+#if canImport(WatchConnectivity)
+import WatchConnectivity
+#endif
+
 /// The single source of truth for today's hydration.
 ///
 /// State lives in the WaterBuddy App Group, so the app and any extension added later
@@ -164,6 +168,7 @@ final class DataManager {
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private let reloadWidgets: () -> Void
     @ObservationIgnored private let rescheduleReminders: ([ReminderPlan.Slot]) -> Void
+    @ObservationIgnored private let publishWrist: () -> Void
     @ObservationIgnored private var dayChangeObservers: [NSObjectProtocol] = []
 
     // MARK: - State
@@ -194,6 +199,7 @@ final class DataManager {
                 defaults.set(clamped, forKey: Key.currentWater)
             }
             reloadWidgets()
+            publishWrist()
         }
     }
 
@@ -226,6 +232,7 @@ final class DataManager {
                 defaults.set(clamped, forKey: Key.dailyGoal)
             }
             reloadWidgets()
+            publishWrist()
             rescheduleRemindersNow()
         }
     }
@@ -266,6 +273,7 @@ final class DataManager {
                 defaults.set(clamped, forKey: Key.servings)
             }
             reloadWidgets()
+            publishWrist()
         }
     }
 
@@ -415,7 +423,8 @@ final class DataManager {
         calendar: Calendar = .waterBuddyDay,
         now: @escaping () -> Date = Date.init,
         reloadWidgets: @escaping () -> Void = DataManager.requestWidgetReload,
-        rescheduleReminders: @escaping ([ReminderPlan.Slot]) -> Void = DataManager.requestReminderReschedule
+        rescheduleReminders: @escaping ([ReminderPlan.Slot]) -> Void = DataManager.requestReminderReschedule,
+        publishWrist: @escaping () -> Void = DataManager.requestWristPublish
     ) {
         self.defaults = defaults
         self.modelContext = ModelContext(modelContainer)
@@ -423,6 +432,7 @@ final class DataManager {
         self.now = now
         self.reloadWidgets = reloadWidgets
         self.rescheduleReminders = rescheduleReminders
+        self.publishWrist = publishWrist
 
         storedRemindersEnabled = defaults.bool(forKey: Key.remindersEnabled)
         storedLanguage = Self.resolveLanguage(in: defaults)
@@ -999,6 +1009,7 @@ final class DataManager {
         }
         defaults.set(day, forKey: Key.lastActiveDay)
         reloadWidgets()
+        publishWrist()
 
         // Midnight is the one schedule change nobody taps for, and this path deliberately bypasses
         // the `currentWater` setter (it writes the zero *before* stamping the day, rule
@@ -1310,6 +1321,50 @@ final class DataManager {
         WidgetCenter.shared.reloadAllTimelines()
         #endif
     }
+
+    #if canImport(WatchConnectivity)
+    /// Composes the current state into a `WristMirror` — the pure half of publishing, kept separate
+    /// from the `WCSession` call so it is testable without a paired watch (`WristPublishTests`).
+    nonisolated static func composeWristMirror(from defaults: UserDefaults, calendar: Calendar, now: Date) -> WristMirror {
+        // Flattened across **every** retained day, not just today's bucket: a watch pour authored
+        // while offline, or from a day before the outbox last synced, still needs to be named in
+        // `acked` before the watch will retire it — restricting this to today's day-ordinal would
+        // strand any pour whose own day has already passed by the time it's folded.
+        let ledger = readAppliedLedger(from: defaults)
+        let acked = Array(ledger.sorted { $0.key < $1.key }.flatMap(\.value).prefix(WristMirror.maximumAckedIds))
+
+        return WristMirror(
+            schemaVersion: WristMirror.currentSchemaVersion,
+            currentWater: defaults.integer(forKey: Key.currentWater).clamped(to: 0...maximumDailyIntake),
+            dailyGoal: resolveDailyGoal(in: defaults),
+            servings: resolveServings(in: defaults),
+            languageCode: resolveLanguage(in: defaults).code,
+            isGoalSet: resolveIsGoalSet(in: defaults, goal: resolveDailyGoal(in: defaults)),
+            composedAt: now,
+            phoneDayStart: calendar.startOfDay(for: now),
+            acked: acked
+        )
+    }
+
+    /// Sends the current state to the watch. A no-op when `WCSession` isn't supported (e.g. no
+    /// paired watch) or hasn't activated yet — `updateApplicationContext` throws in both cases, and
+    /// this is a best-effort push: `refresh()`'s own reconcile-on-foreground backstop (rule
+    /// `80-notifications`'s equivalent for reminders) is not duplicated here for v1, so a push that
+    /// fails silently degrades to "the watch shows a stale mirror until the next successful one" —
+    /// stated, not hidden, per rule `75-diagnostics`.
+    nonisolated static func requestWristPublish() {
+        guard WCSession.isSupported() else { return }
+        let mirror = composeWristMirror(from: sharedDefaults, calendar: .waterBuddyDay, now: Date())
+        guard let data = try? JSONEncoder().encode(mirror) else { return }
+        do {
+            try WCSession.default.updateApplicationContext(["mirror": data])
+        } catch {
+            #if DEBUG
+            print("[WaterBuddy] Could not publish the wrist mirror: \(error.localizedDescription)")
+            #endif
+        }
+    }
+    #endif
 }
 
 // MARK: - The chosen language
@@ -1339,7 +1394,17 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
     var id: String { rawValue }
 
     /// What goes in the suite. `nil` for ``system``, which is why the setter *removes* the key.
-    var code: String? { self == .system ? nil : rawValue }
+    ///
+    /// `nonisolated` — like `resolveLanguage(in:)`, which returns the `AppLanguage` this is read
+    /// from — because `composeWristMirror(from:calendar:now:)` reads it from a `nonisolated static`
+    /// context with no `Task` to inherit isolation from. Without this, the `WaterBuddy` app
+    /// target's own `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` infers this property `@MainActor`,
+    /// and every other existing reader happens to dodge the resulting warning only by being
+    /// main-actor already or by sitting inside an unannotated `Task { }` (which the same default
+    /// isolation setting also infers as `@MainActor`) — `composeWristMirror` is the first caller
+    /// with neither escape, so the warning was latent rather than hypothetical (rule
+    /// `43-concurrency`).
+    nonisolated var code: String? { self == .system ? nil : rawValue }
 
     /// The shipped localisations, in the order the picker offers them under *Follow device*.
     ///

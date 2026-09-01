@@ -334,3 +334,62 @@ struct WristInboxReassemblyTests {
         #expect(WristInbox.reassemble([stale]) == nil)
     }
 }
+
+/// `requestWristPublish()` composes a `WristMirror` from the shared suite. `WCSession` itself is
+/// not reachable from a unit test (there is no paired watch in CI or on a bare simulator run), so
+/// these tests cover the **composition**, not the transmission — the same split
+/// `WristInboxReassemblyTests` draws between the pure half and the SDK-touching half.
+@MainActor
+struct WristPublishTests {
+
+    private func withTempDefaults<T>(_ body: (UserDefaults) throws -> T) rethrows -> T {
+        let name = "test.waterbuddy.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: name)!
+        defer { defaults.removePersistentDomain(forName: name); UserDefaults.standard.removeSuite(named: name) }
+        return try body(defaults)
+    }
+
+    @Test
+    func composesFromTheCurrentSuite() {
+        withTempDefaults { defaults in
+            defaults.set(500, forKey: DataManager.Key.currentWater)
+            defaults.set(2_000, forKey: DataManager.Key.dailyGoal)
+            defaults.set([150, 250, 500], forKey: DataManager.Key.servings)
+            defaults.set(true, forKey: DataManager.Key.isGoalSet)
+
+            let mirror = DataManager.composeWristMirror(from: defaults, calendar: .waterBuddyDay, now: .now)
+            #expect(mirror.currentWater == 500)
+            #expect(mirror.dailyGoal == 2_000)
+            #expect(mirror.servings == [150, 250, 500])
+            #expect(mirror.isGoalSet == true)
+            #expect(mirror.schemaVersion == WristMirror.currentSchemaVersion)
+        }
+    }
+
+    @Test
+    func ackedIsCappedAtTheMaximumAcrossTheWholeLedgerNotJustToday() {
+        withTempDefaults { defaults in
+            // Split across two days on purpose — `composeWristMirror` must flatten every retained
+            // day's bucket, not just today's, or a pour whose own day has already passed would
+            // never be named in `acked` and the watch could never retire it from its outbox.
+            let today = DataManager.dayOrdinal(for: .now, in: .waterBuddyDay)
+            let yesterday = today - 1
+            let todaysIds = (0..<(WristMirror.maximumAckedIds)).map { _ in UUID() }
+            let yesterdaysIds = (0..<10).map { _ in UUID() }
+            let encoded = try! JSONEncoder().encode([yesterday: yesterdaysIds, today: todaysIds])
+            defaults.set(encoded, forKey: DataManager.Key.wristApplied)
+
+            let mirror = DataManager.composeWristMirror(from: defaults, calendar: .waterBuddyDay, now: .now)
+            #expect(mirror.acked.count == WristMirror.maximumAckedIds)
+        }
+    }
+
+    @Test
+    func aSystemLanguageComposesAsNil() {
+        withTempDefaults { defaults in
+            // Key.language absent == follow the device (rule `70-privacy`) — must round-trip as nil.
+            let mirror = DataManager.composeWristMirror(from: defaults, calendar: .waterBuddyDay, now: .now)
+            #expect(mirror.languageCode == nil)
+        }
+    }
+}
