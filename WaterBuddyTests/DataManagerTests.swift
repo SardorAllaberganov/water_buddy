@@ -124,7 +124,8 @@ struct DataManagerTests {
     /// `WaterSnapshotTests` is deliberately not `@MainActor` (rule `85-testing`).
     @Test func everyKeyTheProductWritesIsOnTheRoster() throws {
         try withTempDefaults { defaults in
-            let manager = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            let now = { utc(2026, 8, 28, 12) }
+            let manager = makeManager(defaults, now: now)
 
             // Every public mutator that persists, plus the one-shot migration — which is
             // `nonisolated static` and takes both suites, so it is drivable without going
@@ -134,6 +135,7 @@ struct DataManagerTests {
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
             manager.addLog(amount: 250)               // currentWater
+            _ = manager.ingest([WristPour(id: UUID(), amount: 100, at: now())])  // wristApplied
             _ = manager.resetIfNeeded()               // lastActiveDay
 
             let sourceName = "test.waterbuddy.\(UUID().uuidString)"
@@ -154,7 +156,7 @@ struct DataManagerTests {
             )
             // Guards the guard: if the writers above stopped writing, the subtraction above would
             // be vacuously empty and this test would pass while proving nothing.
-            #expect(live.count >= 7, "only \(live.count) keys landed — the writers above are not exercising the store")
+            #expect(live.count >= 8, "only \(live.count) keys landed — the writers above are not exercising the store")
         }
     }
 

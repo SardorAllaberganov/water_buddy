@@ -88,7 +88,7 @@ final class DataManager {
     /// UserDefaults keys, namespaced because an App Group domain is shared by every
     /// target that joins the group.
     enum Key {
-        private static let prefix = "sardor.WaterBuddy."
+        nonisolated private static let prefix = "sardor.WaterBuddy."
 
         static let currentWater = prefix + "currentWater"
         static let dailyGoal = prefix + "dailyGoal"
@@ -115,6 +115,21 @@ final class DataManager {
         /// per-key fallback could resolve a triple nobody wrote — Cup stored at 500 beside a Glass
         /// that fell back to 250.
         static let servings = prefix + "servings"
+        /// The watch's own pending pours, JSON-encoded `[WristPour]`. Written only by `WristModel`, in
+        /// the watch's local App Group suite — never read or written from the phone.
+        static let wristOutbox = prefix + "wristOutbox"
+        /// The watch's last-received `WristMirror`, JSON-encoded. Written only by `WristModel`, so the
+        /// watch has something to draw before the first `updateApplicationContext` of a fresh launch.
+        static let wristMirror = prefix + "wristMirror"
+        /// The phone's per-day applied ledger, JSON-encoded `[Int: [UUID]]` (day ordinal → ids already
+        /// folded into `WaterLog`). Written only by `ingest(_:)`, in the phone's App Group suite.
+        ///
+        /// `nonisolated` — unlike its neighbours above — because `readAppliedLedger(from:)` and
+        /// `writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` (see
+        /// `readAppliedLedger(from:)` for why), and a nested type's members otherwise infer the
+        /// enclosing `@MainActor` class's isolation. The older keys above go unmarked only because
+        /// nothing nonisolated has needed to read them by name yet — not because they differ.
+        nonisolated static let wristApplied = prefix + "wristApplied"
 
         /// Every key above, for a test that has to prove a read wrote nothing.
         ///
@@ -132,6 +147,7 @@ final class DataManager {
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
             didMigrateFromStandard, remindersEnabled, language, servings,
+            wristOutbox, wristMirror, wristApplied,
         ]
     }
 
@@ -499,6 +515,77 @@ final class DataManager {
         modelContext.insert(WaterLog(amount: amount, timestamp: date ?? now()))
         saveAndRecompute()
     }
+
+    #if canImport(WatchConnectivity)
+    /// Folds pours received from the watch into the ledger.
+    ///
+    /// The guard is a **conjunction**, and each half closes a hole the other leaves open
+    /// (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §4):
+    /// - Without the applied ledger, an ordinary swipe-to-delete un-acks a pour still in the
+    ///   watch's outbox; the resend finds nothing and re-inserts it. The deletion undoes itself.
+    /// - Without a full-history existence check, a resend past the ledger's own day-bucket inserts
+    ///   a **second** `WaterLog` with the same id — legal, since `WaterLog.id` is deliberately not
+    ///   `@Attribute(.unique)` (two processes insert here) — and the serving counts twice, forever.
+    ///
+    /// The ledger is keyed by **the pour's own day**, not "today": its job is "was this specific
+    /// pour already applied", which does not depend on what day it happens to be on the phone right
+    /// now.
+    ///
+    /// - Returns: how many pours were actually folded. `0` — the expected steady state once the
+    ///   watch's outbox and this ledger agree — writes nothing and rings no doorbell.
+    @discardableResult
+    func ingest(_ pours: [WristPour]) -> Int {
+        refresh()
+
+        var appliedByDay = readAppliedLedger()
+        let existingIds = Set(allLogs().map(\.id))
+        var foldedCount = 0
+
+        for pour in pours where pour.amount > 0 && pour.amount <= Self.maximumDailyIntake {
+            let day = Self.dayOrdinal(for: pour.at, in: calendar)
+            guard !(appliedByDay[day]?.contains(pour.id) ?? false),
+                  !existingIds.contains(pour.id) else { continue }
+            modelContext.insert(WaterLog(id: pour.id, amount: pour.amount, timestamp: pour.at))
+            appliedByDay[day, default: []].insert(pour.id)
+            foldedCount += 1
+        }
+
+        guard foldedCount > 0 else { return 0 }
+        let cutoff = Self.dayOrdinal(for: now(), in: calendar) - Self.appliedLedgerRetentionDays
+        Self.writeAppliedLedger(appliedByDay, to: defaults, keepingDaysSince: cutoff)
+        saveAndRecompute()
+        return foldedCount
+    }
+
+    /// How many days of the applied ledger to keep. Unbounded growth is bounded because every
+    /// day's array only ever holds the ids the watch resent while offline for that long — but a
+    /// number here is still safer than none, matching the spirit of the wire protocol's own
+    /// construction bounds (`WristBatch.maximumPoursPerChunk`, `WristMirror.maximumAckedIds`).
+    private static let appliedLedgerRetentionDays = 90
+
+    /// `nonisolated static`, not a private instance method, so `requestWristPublish()` (Task 7) —
+    /// which composes a `WristMirror`'s `acked` list — can read the same ledger from a context that
+    /// holds no `DataManager` instance, exactly as `WaterSnapshot.snapshot(defaults:calendar:now:)`
+    /// reads `currentWater` without one.
+    nonisolated static func readAppliedLedger(from defaults: UserDefaults) -> [Int: Set<UUID>] {
+        guard let data = defaults.data(forKey: Key.wristApplied),
+              let raw = try? JSONDecoder().decode([Int: [UUID]].self, from: data) else { return [:] }
+        return raw.mapValues(Set.init)
+    }
+
+    private func readAppliedLedger() -> [Int: Set<UUID>] {
+        Self.readAppliedLedger(from: defaults)
+    }
+
+    nonisolated private static func writeAppliedLedger(
+        _ ledger: [Int: Set<UUID>], to defaults: UserDefaults, keepingDaysSince cutoff: Int
+    ) {
+        let trimmed = ledger.filter { $0.key >= cutoff }
+        let raw = trimmed.mapValues(Array.init)
+        guard let data = try? JSONEncoder().encode(raw) else { return }
+        defaults.set(data, forKey: Key.wristApplied)
+    }
+    #endif
 
     /// Today's servings, newest first.
     ///
