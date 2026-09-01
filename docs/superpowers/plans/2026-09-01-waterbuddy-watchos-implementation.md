@@ -1464,13 +1464,19 @@ if reachable, a counter of `didReceiveUserInfo` calls, and a `Text` updated by
 - [ ] **Step 2: Run it — paired iPhone + Apple Watch simulators**
 
 ```
-xcrun simctl list devicetypes | grep -i watch
 xcrun simctl list devices | grep -i "iPhone 17\|Apple Watch"
 ```
 
-Pair an iPhone 17 simulator with an Apple Watch Series 11 (46mm) simulator via Xcode's
-Devices & Simulators pairing UI (simulator pairing is not exposed through `simctl` directly). Launch
-both apps.
+Pair an iPhone 17 simulator with an Apple Watch Series 11 (46mm) simulator via the CLI — corrected
+from this plan's first draft, which wrongly assumed pairing needs Xcode's GUI:
+
+```
+xcrun simctl pair <watch-udid> <phone-udid>
+xcrun simctl bootstatus <phone-udid> -b
+xcrun simctl bootstatus <watch-udid> -b
+```
+
+Build and install the throwaway app on both, then launch both.
 
 - [ ] **Step 3: Observe, and record exactly what happened — not what should have happened**
 
