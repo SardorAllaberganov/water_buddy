@@ -19,6 +19,13 @@
 			remoteGlobalIDString = 6273D2F7D706C59BE59C7434;
 			remoteInfo = WaterBuddyWidgetExtension;
 		};
+		5BDEE20387D2F666E60A3E32 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9947C2133046293D00972CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BFEFF83A095BBD4658E8A453;
+			remoteInfo = WaterBuddyWatch;
+		};
 		8F50E2EDA7146F24416BD1C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9947C2133046293D00972CEA /* Project object */;
@@ -39,13 +46,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 9947C21A3046293D00972CEA;
 			remoteInfo = WaterBuddy;
-		};
-		5BDEE20387D2F666E60A3E32 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9947C2133046293D00972CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BFEFF83A095BBD4658E8A453;
-			remoteInfo = WaterBuddyWatch;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -84,18 +84,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4D91E460176EB1EE87230C86 /* Exceptions for "WaterBuddy" folder in "WaterBuddyWidgetExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				DataManager.swift,
-				LiquidGlassModifier.swift,
-				NotificationManager.swift,
-				ReminderPlan.swift,
-				WaterLog.swift,
-				WaterSurface.swift,
-			);
-			target = 6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */;
-		};
 		3B60BAE6703F44AE6C46153F /* Exceptions for "WaterBuddy" folder in "WaterBuddyWatch" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -108,9 +96,26 @@
 			);
 			target = BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */;
 		};
+		4D91E460176EB1EE87230C86 /* Exceptions for "WaterBuddy" folder in "WaterBuddyWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DataManager.swift,
+				LiquidGlassModifier.swift,
+				NotificationManager.swift,
+				ReminderPlan.swift,
+				WaterLog.swift,
+				WaterSurface.swift,
+			);
+			target = 6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		276C3683D8F5A527885E5BD5 /* WaterBuddyWatchTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WaterBuddyWatchTests;
+			sourceTree = "<group>";
+		};
 		9947C21D3046293D00972CEA /* WaterBuddy */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -133,11 +138,6 @@
 		AA36CF88D9D704ABB6AEC20D /* WaterBuddyWatch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = WaterBuddyWatch;
-			sourceTree = "<group>";
-		};
-		276C3683D8F5A527885E5BD5 /* WaterBuddyWatchTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = WaterBuddyWatchTests;
 			sourceTree = "<group>";
 		};
 		B22D6BC9248B2BC94D56417A /* WaterBuddyWidget */ = {
@@ -176,14 +176,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE3A4AF936A9786695AB73F6 /* Frameworks */ = {
+		AE44B8280DA4486FB085CC7D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AE44B8280DA4486FB085CC7D /* Frameworks */ = {
+		FE3A4AF936A9786695AB73F6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -222,6 +222,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1D32EA877A3E52E18AB4EDAF /* WaterBuddyWatchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 64F729822A17C6F165E23DDE /* Build configuration list for PBXNativeTarget "WaterBuddyWatchTests" */;
+			buildPhases = (
+				3EBE7CE2F43C6CFA0C8CC79B /* Sources */,
+				AE44B8280DA4486FB085CC7D /* Frameworks */,
+				576D4B98E86CC9E166272A27 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				33CAC42545952CC094C9B970 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				276C3683D8F5A527885E5BD5 /* WaterBuddyWatchTests */,
+			);
+			name = WaterBuddyWatchTests;
+			packageProductDependencies = (
+			);
+			productName = WaterBuddyWatchTests;
+			productReference = 9B845F8E9AAEB910C75A2CE7 /* WaterBuddyWatchTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C11BD948990B3709C916B8C8 /* Build configuration list for PBXNativeTarget "WaterBuddyWidgetExtension" */;
@@ -338,29 +361,6 @@
 			productReference = 1F6BD9F4DB0BE3AB5AB08F5E /* WaterBuddyWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1D32EA877A3E52E18AB4EDAF /* WaterBuddyWatchTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 64F729822A17C6F165E23DDE /* Build configuration list for PBXNativeTarget "WaterBuddyWatchTests" */;
-			buildPhases = (
-				3EBE7CE2F43C6CFA0C8CC79B /* Sources */,
-				AE44B8280DA4486FB085CC7D /* Frameworks */,
-				576D4B98E86CC9E166272A27 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				33CAC42545952CC094C9B970 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				276C3683D8F5A527885E5BD5 /* WaterBuddyWatchTests */,
-			);
-			name = WaterBuddyWatchTests;
-			packageProductDependencies = (
-			);
-			productName = WaterBuddyWatchTests;
-			productReference = 9B845F8E9AAEB910C75A2CE7 /* WaterBuddyWatchTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -371,6 +371,10 @@
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					1D32EA877A3E52E18AB4EDAF = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = BFEFF83A095BBD4658E8A453;
+					};
 					6273D2F7D706C59BE59C7434 = {
 						CreatedOnToolsVersion = 26.6;
 					};
@@ -387,10 +391,6 @@
 					};
 					BFEFF83A095BBD4658E8A453 = {
 						CreatedOnToolsVersion = 26.6;
-					};
-					1D32EA877A3E52E18AB4EDAF = {
-						CreatedOnToolsVersion = 26.6;
-						TestTargetID = BFEFF83A095BBD4658E8A453;
 					};
 				};
 			};
@@ -428,6 +428,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		576D4B98E86CC9E166272A27 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		68A68E2CB6957347B26C4E77 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -456,17 +463,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		576D4B98E86CC9E166272A27 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2ABC4F7F5B0F04A7C4104E8C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		2ABC4F7F5B0F04A7C4104E8C /* Sources */ = {
+		3EBE7CE2F43C6CFA0C8CC79B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -501,16 +508,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3EBE7CE2F43C6CFA0C8CC79B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		33CAC42545952CC094C9B970 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */;
+			targetProxy = 5BDEE20387D2F666E60A3E32 /* PBXContainerItemProxy */;
+		};
 		8397E1B23078A14DC1A26C43 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */;
@@ -530,11 +535,6 @@
 			isa = PBXTargetDependency;
 			target = BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */;
 			targetProxy = 8F50E2EDA7146F24416BD1C9 /* PBXContainerItemProxy */;
-		};
-		33CAC42545952CC094C9B970 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */;
-			targetProxy = 5BDEE20387D2F666E60A3E32 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -936,29 +936,6 @@
 			};
 			name = Release;
 		};
-		E7DEC8FDC293EF8377B4022B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4DT6XGJF29;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddyWatchTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WaterBuddyWatch.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WaterBuddyWatch";
-				WATCHOS_DEPLOYMENT_TARGET = 26.5;
-			};
-			name = Debug;
-		};
 		AD050E9E74F1CEE218FB1167 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -982,9 +959,41 @@
 			};
 			name = Release;
 		};
+		E7DEC8FDC293EF8377B4022B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DT6XGJF29;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sardor.WaterBuddyWatchTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WaterBuddyWatch.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WaterBuddyWatch";
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		64F729822A17C6F165E23DDE /* Build configuration list for PBXNativeTarget "WaterBuddyWatchTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E7DEC8FDC293EF8377B4022B /* Debug */,
+				AD050E9E74F1CEE218FB1167 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9947C2163046293D00972CEA /* Build configuration list for PBXProject "WaterBuddy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1035,15 +1044,6 @@
 			buildConfigurations = (
 				96C6C72A734C1D1D52DC8E1A /* Debug */,
 				98E41F9963750E83C9070DC1 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		64F729822A17C6F165E23DDE /* Build configuration list for PBXNativeTarget "WaterBuddyWatchTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E7DEC8FDC293EF8377B4022B /* Debug */,
-				AD050E9E74F1CEE218FB1167 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
