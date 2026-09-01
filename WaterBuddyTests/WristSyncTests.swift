@@ -267,3 +267,70 @@ struct WristPlanTests {
         #expect(total == 200)
     }
 }
+
+/// `WristInbox`'s only reference to `DataManager` is `.shared`, which cannot be swapped in a test —
+/// so these tests drive `WristInbox` against a throwaway suite by constructing `DataManager.shared`
+/// is not possible from a test at all (rule `85-testing` forbids reaching the real App Group). Test
+/// the reassembly logic directly instead: `WristInbox.reassemble(_:)` is the pure half (sorts and
+/// concatenates chunks, decides completeness) and is `nonisolated static` for exactly this reason —
+/// it takes no dependency on `DataManager.shared` and so needs no fixture at all.
+struct WristInboxReassemblyTests {
+
+    private func chunk(_ batchId: UUID, _ index: Int, of count: Int, pours: [WristPour]) -> WristBatch {
+        WristBatch(schemaVersion: WristBatch.currentSchemaVersion, batchId: batchId, chunkIndex: index, chunkCount: count, pours: pours)
+    }
+
+    @Test
+    func aSingleChunkBatchIsCompleteImmediately() {
+        let id = UUID()
+        let pour = WristPour(id: UUID(), amount: 250, at: .now)
+        let result = WristInbox.reassemble([chunk(id, 0, of: 1, pours: [pour])])
+        #expect(result?.map(\.id) == [pour.id])
+    }
+
+    @Test
+    func aPartialBatchIsNotYetComplete() {
+        let id = UUID()
+        let pour = WristPour(id: UUID(), amount: 250, at: .now)
+        let result = WristInbox.reassemble([chunk(id, 0, of: 2, pours: [pour])])
+        #expect(result == nil)
+    }
+
+    /// `transferUserInfo` promises no ordering — chunks must be sorted by `chunkIndex`, not by
+    /// arrival order, before concatenation.
+    @Test
+    func chunksArriveOutOfOrderButReassembleInOrder() {
+        let id = UUID()
+        let first = WristPour(id: UUID(), amount: 150, at: .now)
+        let second = WristPour(id: UUID(), amount: 250, at: .now)
+        let result = WristInbox.reassemble([
+            chunk(id, 1, of: 2, pours: [second]),
+            chunk(id, 0, of: 2, pours: [first]),
+        ])
+        #expect(result?.map(\.amount) == [150, 250])
+    }
+
+    /// Chunks from a different `batchId` must never be mixed into this one's reassembly.
+    @Test
+    func chunksFromADifferentBatchAreIgnored() {
+        let idA = UUID(); let idB = UUID()
+        let pourA = WristPour(id: UUID(), amount: 150, at: .now)
+        let pourB = WristPour(id: UUID(), amount: 999, at: .now)
+        let result = WristInbox.reassemble([
+            chunk(idA, 0, of: 1, pours: [pourA]),
+            chunk(idB, 0, of: 1, pours: [pourB]),
+        ])
+        // Both are individually complete single-chunk batches — reassemble(_:) operates on
+        // exactly one batch's accumulated chunks at a time; see Step 3's DocC for how the buffer
+        // partitions by batchId before calling this.
+        #expect(result?.map(\.amount) == [150])
+    }
+
+    @Test
+    func anUnrecognisedSchemaVersionIsExcludedFromReassembly() {
+        let id = UUID()
+        let pour = WristPour(id: UUID(), amount: 250, at: .now)
+        let stale = WristBatch(schemaVersion: WristBatch.currentSchemaVersion + 1, batchId: id, chunkIndex: 0, chunkCount: 1, pours: [pour])
+        #expect(WristInbox.reassemble([stale]) == nil)
+    }
+}
