@@ -30,6 +30,20 @@ struct WaterBuddyApp: App {
         // Constructing the singleton adopts today, materialises the goal, and rolls the day over
         // if the app was last open yesterday — all against the store resolved on the line above.
         manager = DataManager.shared
+
+        #if canImport(WatchConnectivity)
+        // `WristLink.session(_:didReceiveUserInfo:)` posts `didReceiveBatchNotification` rather
+        // than calling `WristInbox` directly (see that notification's own DocC in
+        // `DataManager.swift`), and `WristInbox.init` is where the observer for it gets
+        // registered. Touching the singleton here — before `activate()` below can let anything
+        // arrive — is what guarantees an early batch is never dropped for lack of a listener.
+        _ = WristInbox.shared
+
+        // Installs `WristLink.live` as the session's delegate and activates it, so a paired watch's
+        // wrist pours (and this phone's own mirror, once Task 14/16 send one) have somewhere to
+        // land the moment the session comes up.
+        WristLink.live.activate()
+        #endif
     }
 
     var body: some Scene {
