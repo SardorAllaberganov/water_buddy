@@ -1549,6 +1549,72 @@ struct WaterSnapshot: Sendable, Equatable {
     }
 }
 
+// MARK: - WatchConnectivity wire protocol
+
+#if canImport(WatchConnectivity)
+
+/// One pour, as the watch authored it. `id` becomes `WaterLog.id` verbatim on the phone — the merge
+/// key already exists (`WaterLog.swift:33-37`, deliberately not `@Attribute(.unique)`), so this
+/// struct invents no identity scheme of its own.
+struct WristPour: Codable, Sendable, Equatable, Identifiable {
+    let id: UUID
+    /// Millilitres, like every other volume in this product (Global Constraints).
+    let amount: Int
+    /// An **instant**. Deliberately no `dayOrdinal` — a day stamped on one device and re-read on
+    /// another names a day neither device may still be in (rule `30-rollover`, one device further
+    /// out: `WristPlan` derives "today" itself, on read, from this instant).
+    let at: Date
+}
+
+/// A batch of pours, wrist → phone. Chunked at ``maximumPoursPerChunk`` because
+/// `WCErrorCodePayloadTooLarge` has no numeric threshold anywhere in the SDK — the cap is by
+/// construction, not by catching the error after the fact.
+struct WristBatch: Codable, Sendable, Equatable {
+    /// An unrecognised version is **not** acked by the phone, so the watch keeps retrying rather
+    /// than silently losing pours to a binary that doesn't understand them yet.
+    let schemaVersion: Int
+    /// Groups this batch's chunks back together and doubles as the coalescing key if the same
+    /// batch is ever re-sent.
+    let batchId: UUID
+    let chunkIndex: Int
+    let chunkCount: Int
+    let pours: [WristPour]
+
+    static let currentSchemaVersion = 1
+    static let maximumPoursPerChunk = 64
+}
+
+/// What the phone last told the watch, phone → wrist. Delivered as a **property**
+/// (`updateApplicationContext`/`receivedApplicationContext`), never an event stream — the watch
+/// reads whatever the phone most recently composed, with no ordering dependency and no callback
+/// needed on wake.
+struct WristMirror: Codable, Sendable, Equatable {
+    let schemaVersion: Int
+    let currentWater: Int
+    let dailyGoal: Int
+    /// All three quick-add vessels, positional, so the wrist's row is the phone's row
+    /// (`DataManager.servings`, `:238-253`) — never a single "the" serving.
+    let servings: [Int]
+    /// `nil` means "follow the device" — the same absence-carries-meaning rule
+    /// `AppLanguage`/`Key.language` already follow (rule `70-privacy`). Never a sentinel string.
+    let languageCode: String?
+    let isGoalSet: Bool
+    /// An instant: when the phone composed this mirror, for the watch's "Synced Nm ago" line.
+    let composedAt: Date
+    /// The phone's `startOfDay`, **as an instant** — compared against the watch's own day, never
+    /// stored as an ordinal the watch would have to re-interpret under its own time zone
+    /// (rule `30-rollover`, spec §5).
+    let phoneDayStart: Date
+    /// Pour ids the phone has already folded, oldest-applied first, capped at
+    /// ``maximumAckedIds`` — this is what lets the watch retire a pour from its own outbox.
+    let acked: [UUID]
+
+    static let currentSchemaVersion = 1
+    static let maximumAckedIds = 256
+}
+
+#endif
+
 extension DataManager {
 
     /// Reads today's hydration out of the shared suite without mutating anything.
