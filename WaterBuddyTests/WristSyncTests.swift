@@ -393,3 +393,85 @@ struct WristPublishTests {
         }
     }
 }
+
+/// The half of `WristLink` worth testing without a paired watch: decoding the two payload shapes
+/// WatchConnectivity hands a delegate — a `[String: Any]` dictionary, which `WCSession` itself is
+/// never reachable to produce in a unit test.
+struct WristLinkDecodingTests {
+
+    @Test
+    func decodesAWellFormedBatch() throws {
+        let batch = WristBatch(schemaVersion: WristBatch.currentSchemaVersion, batchId: UUID(), chunkIndex: 0, chunkCount: 1, pours: [])
+        let data = try JSONEncoder().encode(batch)
+        let decoded = WristLink.decodeBatch(from: ["batch": data])
+        #expect(decoded == batch)
+    }
+
+    @Test
+    func rejectsUserInfoWithNoBatchKey() {
+        #expect(WristLink.decodeBatch(from: [:]) == nil)
+    }
+
+    @Test
+    func rejectsMalformedBatchData() {
+        #expect(WristLink.decodeBatch(from: ["batch": Data([0xFF, 0x00])]) == nil)
+    }
+
+    @Test
+    func decodesAWellFormedMirror() throws {
+        let mirror = WristMirror(
+            schemaVersion: WristMirror.currentSchemaVersion, currentWater: 500, dailyGoal: 2_000,
+            servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
+            composedAt: .now, phoneDayStart: .now, acked: []
+        )
+        let data = try JSONEncoder().encode(mirror)
+        let decoded = WristLink.decodeMirror(from: ["mirror": data])
+        #expect(decoded == mirror)
+    }
+
+    @Test
+    func rejectsContextWithNoMirrorKey() {
+        #expect(WristLink.decodeMirror(from: [:]) == nil)
+    }
+}
+
+/// The pure half of sending: how `[WristPour]` splits into one or more `WristBatch`es. The actual
+/// `WCSession.transferUserInfo` call is not reachable from a unit test — no paired watch exists in
+/// this environment — so this is the half worth pinning, the same split every other WCSession-facing
+/// piece in this design draws.
+struct WristLinkChunkingTests {
+
+    @Test
+    func aSinglePourIsOneChunk() {
+        let pours = [WristPour(id: UUID(), amount: 250, at: .now)]
+        let batches = WristLink.chunk(pours, batchId: UUID())
+        #expect(batches.count == 1)
+        #expect(batches[0].chunkIndex == 0)
+        #expect(batches[0].chunkCount == 1)
+        #expect(batches[0].pours == pours)
+    }
+
+    @Test
+    func moreThanTheMaximumSplitsIntoMultipleChunks() {
+        let pours = (0..<(WristBatch.maximumPoursPerChunk + 10)).map { _ in WristPour(id: UUID(), amount: 100, at: .now) }
+        let batches = WristLink.chunk(pours, batchId: UUID())
+        #expect(batches.count == 2)
+        #expect(batches[0].pours.count == WristBatch.maximumPoursPerChunk)
+        #expect(batches[1].pours.count == 10)
+        #expect(batches.allSatisfy { $0.chunkCount == 2 })
+        #expect(batches.map(\.chunkIndex) == [0, 1])
+    }
+
+    @Test
+    func everyChunkSharesTheSameBatchIdAndSchemaVersion() {
+        let batchId = UUID()
+        let pours = [WristPour(id: UUID(), amount: 150, at: .now)]
+        let batches = WristLink.chunk(pours, batchId: batchId)
+        #expect(batches.allSatisfy { $0.batchId == batchId && $0.schemaVersion == WristBatch.currentSchemaVersion })
+    }
+
+    @Test
+    func emptyPoursProducesNoChunks() {
+        #expect(WristLink.chunk([], batchId: UUID()).isEmpty)
+    }
+}

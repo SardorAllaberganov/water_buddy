@@ -1784,6 +1784,159 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
 
 #endif
 
+#if canImport(WatchConnectivity)
+import WatchConnectivity
+
+/// The WatchConnectivity session, wrapped the way `NotificationManager.ReminderScheduler` wraps
+/// `UNUserNotificationCenter` — but as a class, not a struct of closures: `WCSessionDelegate` is a
+/// real delegate protocol a type conforms to, not a sealed-`init` singleton that forbids
+/// subclassing the way `UNUserNotificationCenter` does.
+///
+/// **Never `@MainActor`.** `WCSession`'s own header states delegate callbacks land on "a non-main
+/// serial queue" — a `@MainActor` type conforming to a nonisolated delegate protocol produces
+/// `#ConformanceIsolation`, a warning at this project's `SWIFT_VERSION = 5.0` and an error at Swift
+/// 6, and rule `43-concurrency` treats a new warning as a gate failure today (spec §6). Every hop to
+/// the main actor below is an explicit `Task { @MainActor in }`, never `MainActor.assumeIsolated` —
+/// that traps unless the call is already guaranteed on the main queue, which a WatchConnectivity
+/// callback is not.
+///
+/// One type, one behaviour that **branches by platform** rather than one instance configured
+/// differently per side — `Sendable` is earned by holding zero stored properties, so there is
+/// nothing for the compiler to reject, and exactly one `static let live` retains it for the whole
+/// process, on either side of the pairing.
+final class WristLink: NSObject, WCSessionDelegate, Sendable {
+
+    /// The **strong** retainer. `WCSession.delegate` is `weak` (`WCSession.h:43`) and nothing else
+    /// in this design holds one — without this, ARC frees the delegate the instant `activate()`
+    /// returns, and every transfer afterward fails `SessionMissingDelegate` (7003) with no
+    /// diagnostic in Debug or Release.
+    static let live = WristLink()
+
+    private override init() { super.init() }
+
+    /// Activates the session and installs `self` as its delegate. `WCSession` tolerates redundant
+    /// `activate()` calls, so this is safe to call more than once.
+    func activate() {
+        guard WCSession.isSupported() else { return }
+        let session = WCSession.default
+        session.delegate = self
+        session.activate()
+    }
+
+    // MARK: - Sending (wrist → phone)
+
+    /// Splits `pours` into one or more `WristBatch`es of at most `WristBatch.maximumPoursPerChunk`
+    /// each, all sharing `batchId`. The pure half of sending — no `WCSession`, testable with no
+    /// paired watch.
+    nonisolated static func chunk(_ pours: [WristPour], batchId: UUID) -> [WristBatch] {
+        guard !pours.isEmpty else { return [] }
+        let groups = stride(from: 0, to: pours.count, by: WristBatch.maximumPoursPerChunk).map {
+            Array(pours[$0..<min($0 + WristBatch.maximumPoursPerChunk, pours.count)])
+        }
+        return groups.enumerated().map { index, chunkPours in
+            WristBatch(
+                schemaVersion: WristBatch.currentSchemaVersion, batchId: batchId,
+                chunkIndex: index, chunkCount: groups.count, pours: chunkPours
+            )
+        }
+    }
+
+    /// Sends pours to the phone. `WristModel.requestSend` (Task 11) is this function's only caller —
+    /// wired for real in Task 12's own Step 5, replacing that task's no-op default.
+    ///
+    /// `transferUserInfo` is the carrier of record: durable across sender exit, survives the
+    /// process being killed, needs no reachability (spec §4's wire table). `sendMessage` alongside
+    /// it is "a deliberate heresy" — the only documented way to wake the phone app — and its
+    /// failure is swallowed on purpose: the identical batch is already durably queued above, and
+    /// folding is idempotent under `WaterLog.id`, so both landing produces exactly one serving.
+    nonisolated static func send(_ pours: [WristPour]) {
+        guard WCSession.isSupported() else { return }
+        let session = WCSession.default
+        for batch in chunk(pours, batchId: UUID()) {
+            guard let data = try? JSONEncoder().encode(batch) else { continue }
+            session.transferUserInfo(["batch": data])
+        }
+        if session.activationState == .activated, session.isReachable {
+            session.sendMessage(["wake": true], replyHandler: nil, errorHandler: { _ in })
+        }
+    }
+
+    // MARK: - Decoding (the pure half — testable with no paired watch)
+
+    nonisolated static func decodeBatch(from userInfo: [String: Any]) -> WristBatch? {
+        guard let data = userInfo["batch"] as? Data else { return nil }
+        return try? JSONDecoder().decode(WristBatch.self, from: data)
+    }
+
+    nonisolated static func decodeMirror(from context: [String: Any]) -> WristMirror? {
+        guard let data = context["mirror"] as? Data else { return nil }
+        return try? JSONDecoder().decode(WristMirror.self, from: data)
+    }
+
+    /// Posted with the decoded `WristBatch`, wrist → phone, in lieu of `WristLink` naming
+    /// `WristInbox` directly.
+    ///
+    /// **Why the indirection:** `WristLink` lives in `DataManager.swift`, which is also compiled
+    /// into `WaterBuddyWidgetExtension` (already in that target's exception set, for the wire
+    /// structs and `WaterSnapshot` above) — but `WristInbox` is deliberately app-only
+    /// (`WristInbox.swift`'s own header), absent from the widget's exception set. `#if !os(watchOS)`
+    /// is true for *both* the phone app and the widget extension, so a direct
+    /// `WristInbox.shared.receive(batch)` call at this call site fails with "cannot find 'WristInbox'
+    /// in scope" the moment the widget extension is built — `os(watchOS)` alone cannot distinguish
+    /// "the container app" from "an iOS app extension"; only target membership can, and Swift has no
+    /// `#if` conditional for that. Posting through `NotificationCenter` — the same decoupling point
+    /// `startObservingDayChanges()` already reaches for above — lets this file name only Foundation
+    /// symbols, so it compiles identically in both targets. The widget extension posts this exactly
+    /// as often as it calls `activate()`: never, so having no observer there is inert, not a bug.
+    ///
+    /// `WristInbox.shared` must exist (and so have registered its observer) before this can ever
+    /// fire — the app's entry point wiring `WristLink.live.activate()` (Task 13) must also touch
+    /// `WristInbox.shared` once, so construction — and observer registration — happens no later than
+    /// activation.
+    static let didReceiveBatchNotification = Notification.Name("sardor.WaterBuddy.wristLink.didReceiveBatch")
+
+    // MARK: - WCSessionDelegate
+
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        #if DEBUG
+        if let error {
+            print("[WaterBuddy] WCSession activation failed: \(error.localizedDescription)")
+        }
+        #endif
+    }
+
+    #if os(iOS)
+    func sessionDidBecomeInactive(_ session: WCSession) {}
+
+    /// A different watch may be paired next — Apple's own documented recovery is to reactivate.
+    func sessionDidDeactivate(_ session: WCSession) {
+        session.activate()
+    }
+    #endif
+
+    /// Wrist → phone. Only meaningful on `iOS` — the watch never receives a batch, it authors one.
+    /// Posts `Self.didReceiveBatchNotification` rather than calling `WristInbox` directly — see that
+    /// constant's DocC for why.
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        #if !os(watchOS)
+        guard let batch = Self.decodeBatch(from: userInfo), batch.schemaVersion == WristBatch.currentSchemaVersion else { return }
+        NotificationCenter.default.post(name: Self.didReceiveBatchNotification, object: nil, userInfo: ["batch": batch])
+        #endif
+    }
+
+    /// Phone → wrist. Only meaningful on `watchOS` — the phone composes a mirror, it never applies
+    /// one to itself.
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        #if os(watchOS)
+        guard let mirror = Self.decodeMirror(from: applicationContext), mirror.schemaVersion == WristMirror.currentSchemaVersion else { return }
+        Task { @MainActor in
+            WristModel.shared.apply(mirror)
+        }
+        #endif
+    }
+}
+#endif
+
 extension DataManager {
 
     /// Reads today's hydration out of the shared suite without mutating anything.

@@ -18,14 +18,44 @@ import Foundation
 final class WristInbox {
 
     static let shared = WristInbox()
-    private init() {}
+
+    /// Registered against `WristLink.didReceiveBatchNotification` here in `init`, not lazily on
+    /// first `receive(_:)` — `WristLink.session(_:didReceiveUserInfo:)` posts that notification
+    /// rather than naming `WristInbox` directly (see the notification's own DocC in
+    /// `DataManager.swift` for why: this file is deliberately absent from
+    /// `WaterBuddyWidgetExtension`'s membership exceptions, and `DataManager.swift` — where
+    /// `WristLink` lives — is not). That means this singleton must be touched once, before any batch
+    /// can arrive, for its observer to be listening in time: the app's entry point wiring
+    /// `WristLink.live.activate()` (Task 13) must also reach `WristInbox.shared` at launch.
+    private var batchObserver: NSObjectProtocol?
+
+    private init() {
+        batchObserver = NotificationCenter.default.addObserver(
+            forName: WristLink.didReceiveBatchNotification, object: nil, queue: .main
+        ) { [weak self] note in
+            guard let batch = note.userInfo?["batch"] as? WristBatch else { return }
+            // `queue: .main` guarantees the main thread, which is the main actor — the same
+            // reasoning `DataManager.startObservingDayChanges()` documents for its own observers.
+            MainActor.assumeIsolated {
+                self?.receive(batch)
+            }
+        }
+    }
+
+    deinit {
+        if let batchObserver {
+            NotificationCenter.default.removeObserver(batchObserver)
+        }
+    }
 
     /// Chunks accumulated so far, keyed by `batchId`. A batch missing a chunk stays here
     /// indefinitely — see the file's own header comment for why that's the right default rather
     /// than a ticking timeout.
     private var pending: [UUID: [WristBatch]] = [:]
 
-    /// Called from `WristLink.session(_:didReceiveUserInfo:)`, already hopped onto the main actor.
+    /// Folds one chunk into the buffer for its batch, and — once every chunk of that batch has
+    /// arrived — ingests the reassembled pours. Reached either directly (a test) or via
+    /// `WristLink.didReceiveBatchNotification`, already hopped onto the main actor either way.
     func receive(_ chunk: WristBatch) {
         pending[chunk.batchId, default: []].append(chunk)
         guard let pours = Self.reassemble(pending[chunk.batchId] ?? []) else { return }

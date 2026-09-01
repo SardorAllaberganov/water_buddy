@@ -134,10 +134,11 @@ final class WristModel {
         return try? JSONDecoder().decode(WristMirror.self, from: data)
     }
 
-    /// The production default for `send:` — installed by `WristLink` once it exists (Task 12).
-    /// A placeholder that does nothing is correct *here*: this task has no transport yet, and
-    /// `pour(amount:)`'s own test (`pouringAppendsToTheOutboxAndCallsSend`) injects its own `send`
-    /// rather than relying on this one.
+    /// The production default for `send:`. `pour(amount:)`'s own tests inject their own `send`
+    /// (`WristModelTests.pouringAppendsToTheOutboxAndCallsSend` and its siblings), so this wiring
+    /// has no behavioural test of its own beyond Task 12's `WristLinkChunkingTests` — the same split
+    /// every WCSession-facing seam in this design draws between "the pure logic, tested" and "the
+    /// one line that hands it to the SDK, verified by inspection and the simulator run below."
     ///
     /// `nonisolated` — like `DataManager`'s own `requestWidgetReload`/`requestReminderReschedule`/
     /// `requestWristPublish` (rule `43-concurrency`) — so this reference stays a plain non-isolated
@@ -145,5 +146,7 @@ final class WristModel {
     /// `@MainActor` makes this a `@MainActor` function value implicitly, and using it to default a
     /// `([WristPour]) -> Void` parameter drops that isolation silently — a warning today, a Swift 6
     /// error tomorrow.
-    nonisolated static func requestSend(_ pours: [WristPour]) {}
+    nonisolated static func requestSend(_ pours: [WristPour]) {
+        WristLink.send(pours)
+    }
 }
