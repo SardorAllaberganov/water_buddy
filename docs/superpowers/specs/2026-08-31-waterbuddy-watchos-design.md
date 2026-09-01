@@ -711,3 +711,72 @@ build-configuration list already exist and only need the exception set, the enti
 
 **Next step:** an implementation plan for steps 2, 3′, 4, 5, 6 (as reconciled above), 7, 8, 9 and 10,
 via the `writing-plans` skill.
+
+---
+
+## 15. The paired-simulator probe, 2026-09-01
+
+Observed on iPhone 17 / Apple Watch Series 11 (46mm) simulators (iOS 26.5 / watchOS 26.5 runtimes),
+Xcode 26.6 (17F113). Paired via `xcrun simctl pair <watch-udid> <phone-udid>` — the corrected,
+CLI-only Step 2 worked exactly as predicted; no GUI automation was needed or available.
+
+**Method note:** this sandbox has no GUI automation to tap the probe app's on-screen "Send ping"
+button, so both probe apps called the identical `sendPing()` / `transferUserInfo()` code the button
+would call, on an 8–10s timer, instead of a literal tap. Functionally identical for what's being
+measured (whether `sendMessage`/`transferUserInfo` wake and deliver); noted here since it is a
+deviation from a literal reading of Step 3.
+
+- **Reachability while both apps foregrounded: true** on both sides at first launch — screenshot-
+  confirmed within ~5s of both processes starting. This did **not** stay reliable: later in the
+  session, after the watch app was sent to the background and back, the two sides' `isReachable`
+  went **out of sync** — the watch kept reporting the phone reachable (`true`) while the phone
+  reported the watch unreachable (`false`), continuously, for 4+ minutes, surviving three fresh
+  relaunches of the phone app (`activationDidComplete` returned `reachable=false` immediately each
+  time). It never self-corrected inside this session's observation window. Take-away for later
+  tasks: `isReachable` cannot be assumed symmetric or self-healing on this simulator setup.
+
+- **`sendMessage` after force-quitting the phone app: did not deliver — but does appear to trigger a
+  relaunch.** `sendMessage` **never once succeeded** anywhere in this session (48 attempts total,
+  spanning both-foregrounded, phone-backgrounded, and phone-force-quit-then-relaunched states).
+  Every attempt's `errorHandler` fired — predominantly `WCErrorDomain` code **7014** ("Payload could
+  not be delivered"), with some **7012** (reply timed out) — even while `isReachable` read `true` on
+  the sender. `didReceiveMessage`/`didReceiveUserInfo` were never invoked on either side, in the
+  entire session (checked against the full unified log). That said: immediately after
+  `xcrun simctl terminate` on the phone app (confirmed gone from `launchctl list`), the next
+  watch-side `sendMessage` attempt (07:12:18.942) was followed **~0.76s later** (07:12:19.703) by a
+  **new phone process spawning with no external launch command issued** —
+  `SessionManager init` → `activationDidComplete reachable=true`. That timing is the strongest
+  evidence this session gathered that `sendMessage` **does** trigger an OS-level background launch
+  of a force-quit companion app here — but the specific message that triggered it still failed with
+  the same 7014 error, and since `sendMessage` never succeeded even between two already-foregrounded
+  apps, this session **cannot** cleanly separate "the wake mechanism is broken" from "message
+  delivery is broken independent of wake, on this Xcode 26.6 simulator pairing." Both look true;
+  only the second is certain.
+
+- **`.backgroundTask(.watchConnectivity)`: does not exist on iOS at all, and never observed firing on
+  watchOS.** Confirmed directly from the SDK: the iOS 26.5 SwiftUI `.swiftinterface` declares
+  `BackgroundTask.watchConnectivity` as `@available(watchOS 9.0, *)` / `@available(iOS,
+  unavailable, ...)`, and a real build of the iOS target failed with `error: 'watchConnectivity' is
+  unavailable in iOS` until the modifier was removed from the iOS scene. It compiled fine on the
+  watchOS target. With the watch app backgrounded for ~2 continuous minutes while the phone queued
+  10 unconditional `transferUserInfo` calls toward it (chosen because, unlike `sendMessage`,
+  `transferUserInfo` is queued and not gated on `isReachable` — the more direct probe of the path
+  `.backgroundTask(.watchConnectivity)` exists for), the watch's background-task closure **never
+  fired**: no log line, and the watch's `UserDefaults` domain for the probe app never even came into
+  existence. Since `transferUserInfo` was itself never observed being delivered anywhere in this
+  session (consistent with the same broken-delivery symptom seen in `sendMessage`), this session
+  cannot separate "the background task doesn't fire" from "nothing ever arrived for it to fire on" —
+  but the fact that matters for later tasks is the same either way: zero observed firings, and the
+  API is unavailable on iOS by construction, not by convention.
+
+**Decision:** the design's reliance on `sendMessage` as a wake/delivery mechanism is downgraded to
+"best effort, unverified on simulator" — not contradicted (a device test is outside this spike's
+scope), but not confirmed either: 0/48 successful deliveries, and only correlational evidence for
+the wake side-effect. `updateApplicationContext` (delivers the most-recently-set state, readable
+whenever the counterpart next wakes on its own, independent of reachability or a live send) remains
+the real delivery path, exactly as spec §13 already anticipated as the fallback. Task 17's
+`.backgroundTask(.watchConnectivity)` handler must be implemented on the **watch** target only — it
+cannot exist on iOS, confirmed by the SDK and a real compiler error, not merely by this design's
+intent — and no user-visible behavior should depend on it firing, since this environment never
+observed it firing even once. This is not a blocker: proceed with Task 9 onward as designed, per the
+brief's own guidance that an unresolved-on-simulator result is not a "device only" conclusion.
