@@ -88,6 +88,18 @@
 			);
 			target = 6273D2F7D706C59BE59C7434 /* WaterBuddyWidgetExtension */;
 		};
+		3B60BAE6703F44AE6C46153F /* Exceptions for "WaterBuddy" folder in "WaterBuddyWatch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DataManager.swift,
+				LiquidGlassModifier.swift,
+				ReminderPlan.swift,
+				WaterLog.swift,
+				WaterSurface.swift,
+				WristPlan.swift,
+			);
+			target = BFEFF83A095BBD4658E8A453 /* WaterBuddyWatch */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -95,6 +107,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				4D91E460176EB1EE87230C86 /* Exceptions for "WaterBuddy" folder in "WaterBuddyWidgetExtension" target */,
+				3B60BAE6703F44AE6C46153F /* Exceptions for "WaterBuddy" folder in "WaterBuddyWatch" target */,
 			);
 			path = WaterBuddy;
 			sourceTree = "<group>";
@@ -462,6 +475,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddyWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4DT6XGJF29;
@@ -495,6 +509,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddyWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4DT6XGJF29;

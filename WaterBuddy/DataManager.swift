@@ -950,9 +950,17 @@ final class DataManager {
     /// of *awaited* work inside `perform()`, so the detached `Task` below would be torn down before
     /// it finished — `AddWaterIntent` awaits ``NotificationManager/reconcile(_:calendar:strings:using:)``
     /// directly instead, which is the only place that work can be held open.
+    ///
+    /// `role.mayFileReminders` is already `false` on both watch roles, so the body below never runs
+    /// there — but `NotificationManager.swift` is deliberately excluded from the watch target's
+    /// membership exceptions (rule `80-notifications`, Task 9), so `NotificationManager` and
+    /// `ReminderScheduler` are types this file's module does not have on watchOS. The runtime guard
+    /// alone does not stop the compiler from needing those types to exist, so the reference itself —
+    /// not just the call — is compiled out with `#if !os(watchOS)`, the same pattern ``role`` uses.
     nonisolated static func requestReminderReschedule(_ slots: [ReminderPlan.Slot]) {
         guard role.mayFileReminders else { return }
 
+        #if !os(watchOS)
         let calendar = Calendar.waterBuddyDay
         Task {
             // Built inside the closure: `UNUserNotificationCenter` is not `Sendable` and the
@@ -966,6 +974,7 @@ final class DataManager {
                 using: ReminderScheduler.live()
             )
         }
+        #endif
     }
 
     // MARK: - Store
