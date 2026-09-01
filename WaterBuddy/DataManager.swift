@@ -551,7 +551,15 @@ final class DataManager {
         }
 
         guard foldedCount > 0 else { return 0 }
-        let cutoff = Self.dayOrdinal(for: now(), in: calendar) - Self.appliedLedgerRetentionDays
+        // Calendar-space subtraction, not ordinal arithmetic: `dayOrdinal` is a mixed-radix
+        // `year*10_000 + month*100 + day` encoding, and subtracting a plain day count from it
+        // borrows incorrectly across the month/day radix the moment the count exceeds a
+        // month's length — which 90 always does. `20260901 - 90 = 20260811` ("Aug 11 2026"),
+        // not the real 90-calendar-days-ago date of June 3 2026. Falling through to `now()` on
+        // a failed computation matches rule `30-rollover`'s convention of degrading toward
+        // over-retention (harmless) rather than under-retention (the bug this guards against).
+        let cutoffDate = calendar.date(byAdding: .day, value: -Self.appliedLedgerRetentionDays, to: now()) ?? now()
+        let cutoff = Self.dayOrdinal(for: cutoffDate, in: calendar)
         Self.writeAppliedLedger(appliedByDay, to: defaults, keepingDaysSince: cutoff)
         saveAndRecompute()
         return foldedCount

@@ -798,7 +798,14 @@ In `WaterBuddy/DataManager.swift`, immediately after `addLog(amount:at:)` (`:493
         }
 
         guard foldedCount > 0 else { return 0 }
-        let cutoff = Self.dayOrdinal(for: now(), in: calendar) - Self.appliedLedgerRetentionDays
+        // Real calendar-day subtraction, never arithmetic on the encoded ordinal: `dayOrdinal` is
+        // `year*10_000 + month*100 + day`, and subtracting 90 from that integer is not "90 days
+        // ago" — it borrows across the month/day radix incorrectly on every call, since 90 always
+        // exceeds the maximum day-of-month, silently shortening retention to as little as a few
+        // weeks. (Caught by task review, not by the six ingest tests, none of which exercised
+        // trimming across a boundary — the fix task must add one that does.)
+        let cutoffDate = calendar.date(byAdding: .day, value: -Self.appliedLedgerRetentionDays, to: now()) ?? now()
+        let cutoff = Self.dayOrdinal(for: cutoffDate, in: calendar)
         Self.writeAppliedLedger(appliedByDay, to: defaults, keepingDaysSince: cutoff)
         saveAndRecompute()
         return foldedCount

@@ -183,4 +183,52 @@ struct WristIngestTests {
             #expect(reloadCount == countAfterFirst, "a fully-applied batch must not write, and must not reload widgets")
         }
     }
+
+    /// Regression for the retention cutoff: `dayOrdinal` encodes a date as
+    /// `year*10_000 + month*100 + day`, and subtracting a plain day count from that encoded value
+    /// is not "N calendar days ago" — it borrows across the month/day radix as though a month were
+    /// 100 days long. With `now` pinned to Sept 1 2026 (ordinal `20260901`), the old
+    /// `dayOrdinal(now) - 90` formula produced cutoff `20260811` ("Aug 11 2026") — 69 days later
+    /// than the real 90-days-ago date, June 3 2026 (ordinal `20260603`). Anything dated between
+    /// those two — real calendar days well inside the documented 90-day window — was wrongly
+    /// trimmed off the ledger by the old formula, silently shortening retention to about three
+    /// weeks.
+    ///
+    /// July 1 2026 (ordinal `20260701`) is exactly such a date: only 62 real days before `now`
+    /// (inside the true window), but below the old buggy cutoff (so the old formula discarded its
+    /// ledger entry) and at or above the real one (so the fix must keep it). Deleting the row and
+    /// forcing a second `writeAppliedLedger` (via an unrelated fold) is what makes the trim actually
+    /// run — this is the same delete-then-resend shape `aDeletedPourStillOnTheLedgerIsNotResurrected`
+    /// covers, but for a ledger entry old enough for retention trimming to matter.
+    ///
+    /// Under the old formula this test fails exactly here: the July entry is trimmed the moment it
+    /// is first written, so the resend below finds no ledger entry and no existing row, and
+    /// re-inserts the deleted pour — `resend` comes back `1`, not `0`, and the log count comes back
+    /// `2`, not `1`.
+    @Test
+    func aLedgerEntryWithinNinetyRealDaysSurvivesTrimmingAcrossAMonthBoundary() {
+        withTempDefaults { defaults in
+            let now = { Self.utc.date(from: DateComponents(year: 2026, month: 9, day: 1, hour: 12))! }
+            let manager = makeManager(defaults, now: now)
+
+            let sixtyTwoDaysAgo = Self.utc.date(from: DateComponents(year: 2026, month: 7, day: 1, hour: 12))!
+            let oldPour = WristPour(id: UUID(), amount: 200, at: sixtyTwoDaysAgo)
+            _ = manager.ingest([oldPour])
+
+            // Simulate a swipe-to-delete: the row is gone, so only the ledger entry stands between
+            // a resend and a resurrection.
+            let loggedRow = manager.allLogs().first { $0.id == oldPour.id }!
+            manager.deleteLog(loggedRow)
+
+            // A second, unrelated fold — the only thing that makes `ingest` call
+            // `writeAppliedLedger` again, which is where the trimming bug bites.
+            let freshPour = WristPour(id: UUID(), amount: 50, at: now())
+            let folded = manager.ingest([freshPour])
+            #expect(folded == 1)
+
+            let resend = manager.ingest([oldPour])
+            #expect(resend == 0, "a ledger entry inside the real 90-day window must survive trimming")
+            #expect(manager.allLogs().count == 1, "the deleted pour must not have been resurrected")
+        }
+    }
 }
