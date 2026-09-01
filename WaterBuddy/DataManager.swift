@@ -1895,6 +1895,32 @@ final class WristLink: NSObject, WCSessionDelegate, Sendable {
     /// activation.
     static let didReceiveBatchNotification = Notification.Name("sardor.WaterBuddy.wristLink.didReceiveBatch")
 
+    /// Posted with the decoded `WristMirror`, phone → wrist, in lieu of `WristLink` naming
+    /// `WristModel` directly.
+    ///
+    /// **Why the indirection, the same shape as `didReceiveBatchNotification` above, mirrored:**
+    /// `WristLink` lives in `DataManager.swift`, which — since Task 16 — is also compiled into
+    /// `WaterBuddyWatchWidget` (in that target's own exception set, for `sharedDefaults`/`Key`/
+    /// `WristMirror`, rule `40-widget` one platform over) — but `WristModel` sits in
+    /// `WaterBuddyWatch/`, outside every exception set that reaches `WaterBuddyWatchWidget` (and
+    /// deliberately so: the widget's `TimelineProvider` must never touch `WristModel.shared`, the
+    /// same rule that keeps `HydrationProvider` off `DataManager.shared`). `#if os(watchOS)` is true
+    /// for *both* the watch app and the watch widget extension, so a direct
+    /// `WristModel.shared.apply(mirror)` call at this call site fails with "cannot find 'WristModel'
+    /// in scope" the moment the widget extension is built. Posting through `NotificationCenter` lets
+    /// this file name only Foundation/WatchConnectivity symbols, so it compiles identically in both
+    /// targets. The widget extension never calls `WristLink.live.activate()`, so it never receives an
+    /// application context and never posts this — having no observer there is inert, not a bug.
+    ///
+    /// `WristModel.shared` must exist (and so have registered its observer) before this can ever
+    /// fire. `WaterBuddyWatchApp.init()` calls `WristLink.live.activate()` first, but `WCSession`
+    /// activation itself is asynchronous — the earliest a real delegate callback can arrive is well
+    /// after `WristView`'s own `@State private var model = WristModel.shared` has run, which SwiftUI
+    /// evaluates while building the very same launch's window content. Unlike `WristInbox`, which
+    /// needs an explicit extra touch at the phone's entry point (Task 13) because nothing else on
+    /// that side constructs it, `WristModel.shared` has no such gap to close here.
+    static let didReceiveMirrorNotification = Notification.Name("sardor.WaterBuddy.wristLink.didReceiveMirror")
+
     // MARK: - WCSessionDelegate
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -1929,9 +1955,7 @@ final class WristLink: NSObject, WCSessionDelegate, Sendable {
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         #if os(watchOS)
         guard let mirror = Self.decodeMirror(from: applicationContext), mirror.schemaVersion == WristMirror.currentSchemaVersion else { return }
-        Task { @MainActor in
-            WristModel.shared.apply(mirror)
-        }
+        NotificationCenter.default.post(name: Self.didReceiveMirrorNotification, object: nil, userInfo: ["mirror": mirror])
         #endif
     }
 }

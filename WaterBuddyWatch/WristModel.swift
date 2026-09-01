@@ -32,6 +32,13 @@ final class WristModel {
     private var storedMirror: WristMirror?
     private var storedOutbox: [WristPour]
 
+    /// Registered against `WristLink.didReceiveMirrorNotification` here in `init`, not lazily on
+    /// first `apply(_:)` — see that notification's own DocC in `DataManager.swift` (Task 16) for why
+    /// `WristLink.session(_:didReceiveApplicationContext:)` posts rather than naming `WristModel`
+    /// directly: `WaterBuddyWatchWidget` also compiles `DataManager.swift` and has no access to this
+    /// file at all.
+    @ObservationIgnored private var mirrorObserver: NSObjectProtocol?
+
     init(
         defaults: UserDefaults = DataManager.sharedDefaults,
         calendar: Calendar = .waterBuddyDay,
@@ -44,6 +51,22 @@ final class WristModel {
         self.send = send
         self.storedOutbox = Self.readOutbox(from: defaults)
         self.storedMirror = Self.readMirror(from: defaults)
+        mirrorObserver = NotificationCenter.default.addObserver(
+            forName: WristLink.didReceiveMirrorNotification, object: nil, queue: .main
+        ) { [weak self] note in
+            guard let mirror = note.userInfo?["mirror"] as? WristMirror else { return }
+            // `queue: .main` guarantees the main thread, which is the main actor — the same
+            // reasoning `WristInbox.init()` documents for its own observer.
+            MainActor.assumeIsolated {
+                self?.apply(mirror)
+            }
+        }
+    }
+
+    deinit {
+        if let mirrorObserver {
+            NotificationCenter.default.removeObserver(mirrorObserver)
+        }
     }
 
     /// Pending pours not yet acked by the phone. Exposed (not just `todaysTotal`) so `WristView`
