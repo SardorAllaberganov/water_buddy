@@ -74,25 +74,6 @@ struct HomeView: View {
         }
     }
 
-    /// The three slots' fixed identity: what each vessel is called and what it looks like.
-    ///
-    /// Deliberately not the amounts — those are stored. Order is load-bearing: slot 1 is the vessel
-    /// the widget draws and logs, and it is what index 1 of ``DataManager/servings`` means.
-    ///
-    /// `mug.fill` stands in for a drinking glass because **SF Symbols has no drinking glass.**
-    /// Checked against `CoreGlyphs.bundle/name_availability.plist` rather than guessed: the entire
-    /// drink set is `cup.and.saucer`, `mug`, `waterbottle`, `wineglass` and
-    /// `takeoutbag.and.cup.and.straw`. `wineglass.fill` is the only other vessel-shaped candidate
-    /// and it is wrong for a hydration app. What the row has to communicate is three *sizes*, and
-    /// cup → mug → bottle reads as that even though the middle glyph is not literally a tumbler.
-    /// `HomeServingTests.everyServingSymbolResolves` proves each one resolves, because an unknown
-    /// symbol draws **nothing at all** — no glyph, no warning, no failed build.
-    nonisolated static let vesselSlots: [(nameKey: String, symbol: String)] = [
-        (nameKey: "Cup", symbol: "cup.and.saucer.fill"),
-        (nameKey: "Glass", symbol: "mug.fill"),
-        (nameKey: "Bottle", symbol: "waterbottle.fill"),
-    ]
-
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
 

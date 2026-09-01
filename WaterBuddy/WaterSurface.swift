@@ -159,6 +159,18 @@ enum Aurora {
     }
 }
 
+/// The three quick-add vessels' presentation — names and SF Symbols, smallest first: Cup, Glass,
+/// Bottle. The **amounts** live on `DataManager.servings` (state); this is presentation, and lives
+/// here — a shared design-token file, not `DataManager.swift` — because `HomeView`, which used to
+/// own it, is app-only and unreachable from the watch (`WristView`, Task 15, is the second
+/// consumer). Order is load-bearing the same way `DataManager.servings`' order is: index 1 is the
+/// vessel the widget's own button draws and logs.
+nonisolated let vesselSlots: [(nameKey: String, symbol: String)] = [
+    (nameKey: "Cup", symbol: "cup.and.saucer.fill"),
+    (nameKey: "Glass", symbol: "mug.fill"),
+    (nameKey: "Bottle", symbol: "waterbottle.fill"),
+]
+
 // MARK: - Preview
 
 #Preview("Water") {

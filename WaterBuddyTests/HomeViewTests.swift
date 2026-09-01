@@ -140,16 +140,16 @@ struct HomeServingTests {
     /// An SF Symbol that does not resolve renders as **nothing at all** — no glyph, no warning, no
     /// failed build. Nothing else in the gate can see it, and a screenshot only catches it if
     /// somebody happens to take one.
-    @Test(arguments: HomeView.vesselSlots.map(\.symbol))
+    @Test(arguments: vesselSlots.map(\.symbol))
     func everyServingSymbolResolves(symbol: String) {
         #expect(UIImage(systemName: symbol) != nil,
                 "an unresolved SF Symbol draws an empty button")
     }
 
     @Test func everySlotIsNamedAndDrawn() {
-        #expect(HomeView.vesselSlots.count == DataManager.defaultServings.count,
+        #expect(vesselSlots.count == DataManager.defaultServings.count,
                 "a slot without an amount, or an amount without a slot, silently truncates the row")
-        for slot in HomeView.vesselSlots {
+        for slot in vesselSlots {
             #expect(!slot.nameKey.isEmpty, "the key is the button's accessibility label")
             #expect(!slot.symbol.isEmpty)
         }

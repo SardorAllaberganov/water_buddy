@@ -531,7 +531,7 @@ private struct ServingsCard: View {
                 .font(.headline)
                 .foregroundStyle(.white)
 
-            ForEach(Array(HomeView.vesselSlots.enumerated()), id: \.element.nameKey) { index, slot in
+            ForEach(Array(vesselSlots.enumerated()), id: \.element.nameKey) { index, slot in
                 vessel(at: index, slot: slot)
             }
 
