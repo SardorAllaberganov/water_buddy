@@ -647,7 +647,9 @@ private func previewManager(named name: String) -> DataManager {
         // The production default builds a real `UNUserNotificationCenter`; a canvas rebuild must
         // not reconcile the user's actual reminders, and this screen can write water (rule
         // `85-testing`, `tasks/lessons.md`).
-        rescheduleReminders: { _ in }
+        rescheduleReminders: { _ in },
+        // The production default reaches a real `WCSession`; same reasoning as above.
+        publishWrist: { _ in }
     )
 }
 

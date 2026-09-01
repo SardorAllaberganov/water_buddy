@@ -43,6 +43,22 @@ struct WristModelTests {
         }
     }
 
+    /// I5: a pour must hand the transport the **whole current outbox**, not just the newest pour —
+    /// or a dropped/stranded pour is lost silently, and the multi-chunk path
+    /// (`WristLink.chunk(_:batchId:)`, >64 pours) never actually exercises in production. Sending
+    /// only `[pour]` each time would leave every earlier un-acked pour permanently un-resent,
+    /// because nothing else in this design ever retries on its own.
+    @Test
+    func pouringASecondTimeResendsTheWholeOutboxNotJustTheNewestPour() {
+        withTempDefaults { defaults in
+            var sent: [[WristPour]] = []
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) }, sent: { sent.append($0) })
+            model.pour(amount: 150)
+            model.pour(amount: 250)
+            #expect(sent.last?.map(\.amount) == [150, 250], "the second send must carry the first, still-unacked pour along with the new one")
+        }
+    }
+
     @Test
     func applyingAMirrorRetiresAckedPoursFromTheOutbox() {
         withTempDefaults { defaults in

@@ -91,7 +91,7 @@ struct WristIngestTests {
     private func makeManager(_ defaults: UserDefaults, now: @escaping () -> Date) -> DataManager {
         DataManager(
             defaults: defaults, modelContainer: inMemoryContainer(), calendar: Self.utc, now: now,
-            reloadWidgets: {}, rescheduleReminders: { _ in }
+            reloadWidgets: {}, rescheduleReminders: { _ in }, publishWrist: { _ in }
         )
     }
 
@@ -174,7 +174,8 @@ struct WristIngestTests {
             let manager = DataManager(
                 defaults: defaults, modelContainer: inMemoryContainer(), calendar: Self.utc,
                 now: { Date(timeIntervalSince1970: 1_000) },
-                reloadWidgets: { reloadCount += 1 }, rescheduleReminders: { _ in }
+                reloadWidgets: { reloadCount += 1 }, rescheduleReminders: { _ in },
+                publishWrist: { _ in }
             )
             let pour = WristPour(id: UUID(), amount: 250, at: Date(timeIntervalSince1970: 1_000))
             _ = manager.ingest([pour])
@@ -229,6 +230,128 @@ struct WristIngestTests {
             let resend = manager.ingest([oldPour])
             #expect(resend == 0, "a ledger entry inside the real 90-day window must survive trimming")
             #expect(manager.allLogs().count == 1, "the deleted pour must not have been resurrected")
+        }
+    }
+
+    /// C1: a failed read of the full history must **decline the whole batch**, never collapse to
+    /// "no existing rows" — that collapse is exactly what let a re-sent pour insert a permanent
+    /// duplicate the moment the store degrades (rule `20-state`, `fetch(_:)`'s own DocC).
+    ///
+    /// Forces a genuine SwiftData fetch failure by corrupting the on-disk store with same-size
+    /// random bytes *after* the container is already open and the manager already holds a
+    /// long-lived `ModelContext` on it — the only technique of three tried that actually makes
+    /// `try context.fetch(...)` throw. Truncating to zero bytes makes SQLite treat the file as a
+    /// fresh, valid, empty database (no error); revoking read permission on an already-open file
+    /// descriptor does not retroactively fail a read through that descriptor. Only overwriting the
+    /// file with garbage of its *original* size reliably corrupts the SQLite header in a way both
+    /// a fresh and an existing long-lived context detect.
+    @Test
+    func aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let storeURL = dir.appendingPathComponent("corrupt.store")
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let schema = Schema([WaterLog.self])
+        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: storeURL))
+
+        try withTempDefaults { defaults in
+            let manager = DataManager(
+                defaults: defaults, modelContainer: container, calendar: Self.utc,
+                now: { Date(timeIntervalSince1970: 1_000) },
+                reloadWidgets: {}, rescheduleReminders: { _ in }, publishWrist: { _ in }
+            )
+            manager.addLog(amount: 100, at: Date(timeIntervalSince1970: 1_000))
+            #expect(manager.currentWater == 100, "the store must be healthy before it is corrupted")
+
+            // Corrupt the file the manager's own long-lived `ModelContext` is already open on.
+            let size = try FileManager.default.attributesOfItem(atPath: storeURL.path)[.size] as? Int ?? 4_096
+            try Data((0..<size).map { _ in UInt8.random(in: 0...255) }).write(to: storeURL)
+            for suffix in ["-wal", "-shm"] {
+                let path = storeURL.path + suffix
+                if FileManager.default.fileExists(atPath: path) {
+                    try? FileManager.default.removeItem(atPath: path)
+                }
+            }
+
+            let pour = WristPour(id: UUID(), amount: 250, at: Date(timeIntervalSince1970: 1_000))
+            let folded = manager.ingest([pour])
+            #expect(folded == 0, "an unreadable store must decline the batch, never treat it as empty")
+            #expect(manager.currentWater == 100, "a failed read must leave the total exactly as it stood")
+        }
+    }
+
+    /// C2: the applied ledger may only be written **after** a successful save, never before — a
+    /// crash or a save failure between the two previously marked ids permanently applied with no
+    /// `WaterLog` row behind them, so every future resend of the same ids was blocked by the
+    /// ledger with nothing for `existingIds` to find either: the user's watch-authored water lost
+    /// silently and irrecoverably.
+    ///
+    /// `ModelConfiguration(schema:url:allowsSave:)`'s `allowsSave: false` is the seam that forces
+    /// `modelContext.save()` to throw — reads still succeed, isolating this from C1's read
+    /// failure. It has to be file-backed, not `isStoredInMemoryOnly`: SwiftData opens a read-only
+    /// configuration by attaching an *existing* store, and an in-memory store combined with
+    /// `allowsSave: false` fails at container construction (`SwiftDataError.loadIssueModelContainer`
+    /// — verified by hand) rather than at `save()`. Seed the file with a normal, writable container
+    /// first, then reopen the same URL read-only for the manager under test.
+    @Test
+    func aFailedSaveDoesNotUpdateTheAppliedLedgerOrReportThePourAsFolded() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let storeURL = dir.appendingPathComponent("readonly.store")
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let schema = Schema([WaterLog.self])
+        let seedContainer = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: storeURL))
+        try ModelContext(seedContainer).save() // materialise the file even with zero rows
+
+        try withTempDefaults { defaults in
+            let container = try ModelContainer(
+                for: schema,
+                configurations: ModelConfiguration(schema: schema, url: storeURL, allowsSave: false)
+            )
+            let manager = DataManager(
+                defaults: defaults, modelContainer: container, calendar: Self.utc,
+                now: { Date(timeIntervalSince1970: 1_000) },
+                reloadWidgets: {}, rescheduleReminders: { _ in }, publishWrist: { _ in }
+            )
+            let pour = WristPour(id: UUID(), amount: 250, at: Date(timeIntervalSince1970: 1_000))
+            let folded = manager.ingest([pour])
+            #expect(folded == 0, "a failed save must not be reported as an applied pour")
+
+            let day = DataManager.dayOrdinal(for: pour.at, in: Self.utc)
+            let ledger = DataManager.readAppliedLedger(from: defaults)
+            #expect(
+                ledger?[day]?.contains(pour.id) != true,
+                "the ledger must not mark an unsaved pour as applied — a resend once the store recovers must still fold it"
+            )
+        }
+    }
+
+    /// A7 (final review): `readAppliedLedger`/`writeAppliedLedger` insert a folded pour under **its
+    /// own day**, then the retention trim filters by `$0.key >= cutoff` where `cutoff` is derived
+    /// from `now()`. A pour whose own day already precedes the 90-day cutoff — a watch that was
+    /// offline a long time, or a system-daemon-held `transferUserInfo` delivered late — was
+    /// previously inserted and then immediately trimmed by the **same write**, leaving it protected
+    /// only by the full-history existence check: exactly what a user's `deleteLog` removes,
+    /// reopening the resurrection hole the ledger exists to close.
+    @Test
+    func aPourOlderThanTheRetentionWindowStillGetsItsLedgerEntryOnTheWriteThatFoldsIt() {
+        withTempDefaults { defaults in
+            let now = Date(timeIntervalSince1970: 1_000_000_000)
+            let oldPourDate = Self.utc.date(byAdding: .day, value: -100, to: now)!
+            let manager = makeManager(defaults, now: { now })
+
+            let pour = WristPour(id: UUID(), amount: 250, at: oldPourDate)
+            let folded = manager.ingest([pour])
+            #expect(folded == 1, "a pour older than the retention window is still a genuinely new pour and must fold")
+
+            let day = DataManager.dayOrdinal(for: oldPourDate, in: Self.utc)
+            let ledger = DataManager.readAppliedLedger(from: defaults)
+            #expect(
+                ledger?[day]?.contains(pour.id) == true,
+                "the write that folds an old pour must not trim its own ledger entry in the same pass"
+            )
         }
     }
 }
@@ -381,6 +504,12 @@ struct WristPublishTests {
 
             let mirror = DataManager.composeWristMirror(from: defaults, calendar: .waterBuddyDay, now: .now)
             #expect(mirror.acked.count == WristMirror.maximumAckedIds)
+            // C3: the truncation must drop the ids the watch retired long ago (yesterday's), never
+            // the ones still sitting in its outbox (today's). Today's 256 ids alone already fill
+            // the cap, so a correct newest-first sort keeps every one of them and none of
+            // yesterday's; an ascending sort instead keeps all 10 of yesterday's and drops 10 of
+            // today's, and the count alone cannot tell the two apart.
+            #expect(Set(mirror.acked) == Set(todaysIds), "the cap must keep the newest day's ids, not the oldest")
         }
     }
 
@@ -473,5 +602,33 @@ struct WristLinkChunkingTests {
     @Test
     func emptyPoursProducesNoChunks() {
         #expect(WristLink.chunk([], batchId: UUID()).isEmpty)
+    }
+}
+
+/// Compile-time reachability check, the same honest framing `WristLinkChunkingTests`/
+/// `WristLinkDecodingTests` above already use ("proven to compile, not proven correct") —
+/// **not** a regression canary for `WristLink`'s `nonisolated` keyword, despite an earlier
+/// version of this comment claiming otherwise. Three separate techniques were tried empirically
+/// against this exact toolchain, with and without the keyword present, looking for any compiler
+/// diagnostic that distinguishes the two states: an unapplied reference to `activate()`, a direct
+/// synchronous call to `activate()`, and — as a control, ruling out something specific to
+/// `WristLink` itself — reading a plain `static let Notification.Name` the identical shape as
+/// `didReceiveBatchNotification` on a freshly-added, otherwise-unrelated `NSObject` subclass. All
+/// three produced **zero** warnings and **zero** errors in every configuration, including with the
+/// keyword removed. The likely cause is `SWIFT_APPROACHABLE_CONCURRENCY = YES`, set on every
+/// target alongside `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, which is documented to relax
+/// several categories of exactly this diagnostic — but that is inference about the compiler's
+/// behaviour, not proof the underlying isolation is safe to leave unmarked. The keyword stays, on
+/// the same reasoning as `Key.wristApplied`/`AppLanguage.code`/`vesselSlots`/
+/// `WristModel.requestSend` and because `WCSession`'s own header is unambiguous that a delegate
+/// callback lands off-main — it is simply not something this suite can currently prove will
+/// regress loudly if removed. A future toolchain or build-setting change may make that provable
+/// again; if so, replace this test with one that actually fails without the keyword, rather than
+/// trusting this comment's account of what did not work.
+struct WristLinkReachabilityTests {
+    @Test
+    func wristLinkIsReachableFromANonMainActorContext() {
+        let name = WristLink.didReceiveBatchNotification
+        #expect(name.rawValue == "sardor.WaterBuddy.wristLink.didReceiveBatch")
     }
 }

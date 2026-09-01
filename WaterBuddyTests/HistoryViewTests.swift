@@ -54,7 +54,9 @@ private func withTempStore<T>(
         // default builds a real `UNUserNotificationCenter` — so without this, constructing the
         // fixture reconciles against the user's actual reminders. This suite only reads a range,
         // which is exactly why it went unnoticed (rule `85-testing`).
-        rescheduleReminders: onReschedule
+        rescheduleReminders: onReschedule,
+        // Same hazard, a second seam: the production default reaches a real `WCSession`.
+        publishWrist: { _ in }
     )
     return try body(manager, defaults)
 }

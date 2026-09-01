@@ -55,9 +55,16 @@ struct WristView: View {
                                 }
                                 .frame(minHeight: 44)
                                 .contentShape(Rectangle())
+                                // The pane is the row, `HistoryView.ServingRow`'s own pattern:
+                                // `.sheer` because this carries a short label and a control, not
+                                // sentence-length text (rule `60-design-system`). Replaces a
+                                // hand-rolled `Color.white.opacity(0.08))` `.listRowBackground` —
+                                // every colour in this system comes from `Aurora` or `.liquidGlass`,
+                                // and that literal was neither.
+                                .liquidGlass(in: Capsule(), density: .sheer)
                             }
                             .buttonStyle(.plain)
-                            .listRowBackground(Color.white.opacity(0.08))
+                            .listRowBackground(Color.clear)
                         }
                     }
 

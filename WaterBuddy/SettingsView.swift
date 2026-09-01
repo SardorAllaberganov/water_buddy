@@ -645,7 +645,9 @@ private struct ServingsCard: View {
         ),
         reloadWidgets: {},
         // Never ring the real notification centre from a canvas.
-        rescheduleReminders: { _ in }
+        rescheduleReminders: { _ in },
+        // Never reach a real WCSession from a canvas.
+        publishWrist: { _ in }
     )
 
     // A goal that is *not* the default, so the canvas shows `GoalCard` seeding from the model

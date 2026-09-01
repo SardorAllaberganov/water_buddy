@@ -49,6 +49,7 @@ private func makeManager(
     calendar: Calendar = utcDay,
     onReload: @escaping () -> Void = {},
     onReschedule: @escaping ([ReminderPlan.Slot]) -> Void = { _ in },
+    onPublish: @escaping (UserDefaults) -> Void = { _ in },
     now: @escaping () -> Date
 ) -> DataManager {
     DataManager(
@@ -63,7 +64,8 @@ private func makeManager(
         calendar: calendar,
         now: now,
         reloadWidgets: onReload,
-        rescheduleReminders: onReschedule
+        rescheduleReminders: onReschedule,
+        publishWrist: onPublish
     )
 }
 
@@ -757,6 +759,63 @@ struct ReminderSeamTests {
 
             #expect(plans == after,
                     "the setter's equality guard has to cover the re-plan exactly as it covers the doorbell")
+        }
+    }
+}
+
+// MARK: - The wrist publish seam
+
+/// I7: the fixture's own tripwire, the same shape as `WaterLogTests`' and `HistoryViewTests`' for
+/// `rescheduleReminders:` — proves `makeManager` actually injects `publishWrist:` rather than
+/// letting it default.
+///
+/// `DataManager.currentWater`'s setter (and `dailyGoal`'s, and `servings`') calls `publishWrist`
+/// on every real change, and the production default is `DataManager.requestWristPublish(from:)`,
+/// which reaches a real `WCSession`. So a fixture that omits the argument makes an ordinary
+/// `addLog` reach real WatchConnectivity infrastructure from every test in this file — exactly the
+/// previously-tracked-and-closed hazard `rescheduleReminders:` already had, recurring on a second
+/// seam nothing caught until this pass.
+@MainActor
+struct WristPublishSeamTests {
+
+    @Test func theManagerFixtureRoutesTheWristPublishToTheInjectedSeam() {
+        withTempDefaults { defaults in
+            var publishes = 0
+            let manager = makeManager(defaults, onPublish: { _ in publishes += 1 }) { utc(2026, 8, 28) }
+
+            manager.addLog(amount: 250)
+
+            #expect(publishes > 0, "the fixture is reaching a real WCSession")
+        }
+    }
+
+    /// The production default takes the suite to publish from **as a parameter** rather than
+    /// reading `DataManager.sharedDefaults` itself — so even a test that forgets the no-op
+    /// override cannot leak a *read* of the real App Group suite merely by composing a mirror.
+    @Test func theInjectedClosureReceivesTheManagersOwnSuiteNotTheSharedOne() {
+        withTempDefaults { defaults in
+            var seenSuites: [UserDefaults] = []
+            let manager = makeManager(defaults, onPublish: { seenSuites.append($0) }) { utc(2026, 8, 28) }
+
+            manager.addLog(amount: 250)
+
+            #expect(seenSuites.allSatisfy { $0 === defaults }, "must publish from this instance's own throwaway suite, never DataManager.sharedDefaults")
+        }
+    }
+
+    /// Final review, A3: a user who accepts `GoalSetupView`'s slider **unchanged** saves exactly
+    /// `DataManager.defaultDailyGoal`, which the `dailyGoal` setter's own equality guard treats as
+    /// a no-op — so `saveDailyGoal(ml:)` cannot rely on that setter's publish alone, or this user's
+    /// watch never receives a mirror at all and `WristView` (gated on `mirror.isGoalSet`) sits on
+    /// the empty state forever.
+    @Test func savingTheDefaultGoalUnchangedStillPublishesToTheWrist() {
+        withTempDefaults { defaults in
+            var publishes = 0
+            let manager = makeManager(defaults, onPublish: { _ in publishes += 1 }) { utc(2026, 8, 28) }
+
+            manager.saveDailyGoal(ml: DataManager.defaultDailyGoal)
+
+            #expect(publishes > 0, "isGoalSet flipped even though dailyGoal itself did not change, and that alone is wire-relevant")
         }
     }
 }

@@ -106,10 +106,22 @@ final class WristModel {
         return base + WristPlan.todaysTotal(from: pendingOutbox, now: now(), calendar: calendar)
     }
 
-    /// Records a pour the user just made, and hands it to the transport. Non-positive amounts are
-    /// rejected — the same floor `DataManager.addLog` holds, even though nothing here shares its
-    /// code (rule `20-state`'s clamp-on-the-way-in, restated for the second writer this design
-    /// introduces — see spec §7's "one honest weakening").
+    /// Records a pour the user just made, and hands the transport the **whole current outbox** —
+    /// not just this pour. Non-positive amounts are rejected — the same floor `DataManager.addLog`
+    /// holds, even though nothing here shares its code (rule `20-state`'s clamp-on-the-way-in,
+    /// restated for the second writer this design introduces — see spec §7's "one honest
+    /// weakening").
+    ///
+    /// **Sending only `[pour]` would make the outbox a write-only log, not the retry queue the
+    /// rest of the design already assumes it is.** `WristLink.chunk(_:batchId:)`'s multi-chunk
+    /// path, `WristInbox.reassemble`'s promise that a batch pinned to an unrecognised
+    /// `schemaVersion` "will eventually retry," and a pour tapped while `WCSession` isn't yet
+    /// activated all depend on *something* re-sending an already-queued pour later — and nothing
+    /// else in this design ever does. Sending the whole outbox here is what makes every earlier
+    /// un-acked pour ride along on the next tap, cheaply, with no separate retry timer or
+    /// reachability observer. `WristLink.send(_:)` re-chunks and the phone's applied-ledger
+    /// conjunction guard (`DataManager.ingest(_:)`) makes re-sending an already-applied pour a
+    /// no-op, so resending is always safe.
     func pour(amount: Int) {
         guard amount > 0 else { return }
         let pour = WristPour(id: UUID(), amount: amount, at: now())
@@ -117,7 +129,7 @@ final class WristModel {
             storedOutbox.append(pour)
         }
         persistOutbox()
-        send([pour])
+        send(storedOutbox)
     }
 
     /// The one entry point for a fresh `WristMirror`: replaces it and retires every outbox pour the

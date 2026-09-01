@@ -55,11 +55,38 @@ struct AddWaterIntent: AppIntent {
 
     init() {
         amount = DataManager.defaultServing
+        Self.activateWristLinkIfNeeded()
     }
 
     init(amount: Int) {
         self.amount = amount
+        Self.activateWristLinkIfNeeded()
     }
+
+    /// Without this, `perform()`'s call to ``DataManager/addWater(amount:)`` — through
+    /// `currentWater`'s setter — reaches `publishWrist(defaults)`, whose production default is
+    /// `DataManager.requestWristPublish(from:)`. That calls `WCSession.default.updateApplicationContext`,
+    /// which throws `sessionNotActivated` in this process: nothing in the widget extension has ever
+    /// called `WCSession.default.activate()`, unlike the app, whose own `init()`
+    /// (`WaterBuddyApp.swift`) does exactly this before its first mutation is possible. The throw
+    /// lands in `requestWristPublish`'s own `#if DEBUG`-only catch, so today it fails **silently** —
+    /// water logged from the Home Screen widget never reaches the watch, with no signal anywhere.
+    ///
+    /// Called from **both** initialisers rather than once in `perform()`: the widget's own button
+    /// constructs `AddWaterIntent(amount:)` while the widget's view tree is built — which happens on
+    /// every timeline render, well before any tap — so activating here, rather than at the top of
+    /// `perform()`, gives `WCSession`'s asynchronous activation the most possible time to complete
+    /// before a user actually taps and `perform()` tries to publish. `init()` is covered too, for
+    /// the Shortcuts/Siri/Back Tap path, which never goes through `init(amount:)` at all.
+    /// `WristLink.activate()` tolerates being called repeatedly, so there is no cost to calling it
+    /// from a process that may run this intent many times without ever being relaunched.
+    #if canImport(WatchConnectivity)
+    private static func activateWristLinkIfNeeded() {
+        WristLink.live.activate()
+    }
+    #else
+    private static func activateWristLinkIfNeeded() {}
+    #endif
 
     /// `@MainActor` on the implementation of a `nonisolated` protocol requirement is legal and
     /// warning-free in both the Swift 5 and Swift 6 language modes — verified by compiling it

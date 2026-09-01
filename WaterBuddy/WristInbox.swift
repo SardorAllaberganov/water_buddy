@@ -63,7 +63,10 @@ final class WristInbox {
 
         let folded = DataManager.shared.ingest(pours)
         if folded > 0 {
-            DataManager.requestWristPublish()
+            // The real App Group suite: this is production invocation code, not a test seam — the
+            // `publishWrist` closure parameter exists to keep a *fixture* off this suite, and
+            // `DataManager.shared` is already bound to it.
+            DataManager.requestWristPublish(from: DataManager.sharedDefaults)
         }
     }
 

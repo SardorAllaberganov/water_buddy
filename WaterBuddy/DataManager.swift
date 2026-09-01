@@ -168,7 +168,12 @@ final class DataManager {
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private let reloadWidgets: () -> Void
     @ObservationIgnored private let rescheduleReminders: ([ReminderPlan.Slot]) -> Void
-    @ObservationIgnored private let publishWrist: () -> Void
+    /// Takes the suite to publish from **as a parameter**, like `rescheduleReminders` takes its
+    /// slots — never reading a global — so a test or preview that omits an override still cannot
+    /// leak into the real App Group suite merely by publishing from the instance's own throwaway
+    /// one (rule `85-testing`; the same fix already applied to `rescheduleReminders`/
+    /// `reloadWidgets`, generalised here to the case where the closure itself needs an input).
+    @ObservationIgnored private let publishWrist: (UserDefaults) -> Void
     @ObservationIgnored private var dayChangeObservers: [NSObjectProtocol] = []
 
     // MARK: - State
@@ -199,7 +204,7 @@ final class DataManager {
                 defaults.set(clamped, forKey: Key.currentWater)
             }
             reloadWidgets()
-            publishWrist()
+            publishWrist(defaults)
         }
     }
 
@@ -232,7 +237,7 @@ final class DataManager {
                 defaults.set(clamped, forKey: Key.dailyGoal)
             }
             reloadWidgets()
-            publishWrist()
+            publishWrist(defaults)
             rescheduleRemindersNow()
         }
     }
@@ -273,7 +278,7 @@ final class DataManager {
                 defaults.set(clamped, forKey: Key.servings)
             }
             reloadWidgets()
-            publishWrist()
+            publishWrist(defaults)
         }
     }
 
@@ -368,6 +373,11 @@ final class DataManager {
     /// **It rings the widget doorbell**, which ``remindersEnabled`` does not. The widget draws
     /// localised strings of its own, and a timeline it has already built would otherwise keep the
     /// old language until something else happened to change.
+    ///
+    /// **It also publishes to the wrist**, which ``remindersEnabled`` again does not — unlike a
+    /// reminder, `languageCode` is a field on the wire protocol (`WristMirror.languageCode`), so a
+    /// language change is state the watch has to hear about too, the same way `currentWater`,
+    /// `dailyGoal` and `servings` already do on their own setters below.
     var language: AppLanguage {
         get {
             access(keyPath: \.language)
@@ -385,6 +395,7 @@ final class DataManager {
                 }
             }
             reloadWidgets()
+            publishWrist(defaults)
         }
     }
 
@@ -424,7 +435,7 @@ final class DataManager {
         now: @escaping () -> Date = Date.init,
         reloadWidgets: @escaping () -> Void = DataManager.requestWidgetReload,
         rescheduleReminders: @escaping ([ReminderPlan.Slot]) -> Void = DataManager.requestReminderReschedule,
-        publishWrist: @escaping () -> Void = DataManager.requestWristPublish
+        publishWrist: @escaping (UserDefaults) -> Void = DataManager.requestWristPublish
     ) {
         self.defaults = defaults
         self.modelContext = ModelContext(modelContainer)
@@ -547,9 +558,23 @@ final class DataManager {
     func ingest(_ pours: [WristPour]) -> Int {
         refresh()
 
-        var appliedByDay = readAppliedLedger()
-        let existingIds = Set(allLogs().map(\.id))
+        // Both halves of the conjunction guard must **decline the whole batch** on a failed read,
+        // never collapse "could not read" into "empty" (rule `20-state`, `fetch(_:)`'s own DocC).
+        // Falling back to `[:]` on a ledger-decode failure, or to `[]` on a failed existence read
+        // (`allLogs()`'s own `?? []`, which this deliberately bypasses in favour of `fetch(nil)`
+        // directly), would let a re-sent pour insert a permanent duplicate the moment the store
+        // degrades: with both halves reading as empty, `existingIds` and the ledger would both
+        // wave every incoming id through. Declining here costs nothing real: the watch's own copy
+        // is untouched and simply stays in its outbox for the next attempt.
+        guard let appliedLedgerOnDisk = readAppliedLedger(), let existingLogs = fetch(nil) else { return 0 }
+
+        var appliedByDay = appliedLedgerOnDisk
+        let existingIds = Set(existingLogs.map(\.id))
         var foldedCount = 0
+        // Which days this **pass** actually inserted into, as opposed to a day the ledger already
+        // held from an earlier write — see the cutoff computation below for why the distinction
+        // matters.
+        var foldedDaysThisPass: Set<Int> = []
 
         for pour in pours where pour.amount > 0 && pour.amount <= Self.maximumDailyIntake {
             let day = Self.dayOrdinal(for: pour.at, in: calendar)
@@ -557,21 +582,38 @@ final class DataManager {
                   !existingIds.contains(pour.id) else { continue }
             modelContext.insert(WaterLog(id: pour.id, amount: pour.amount, timestamp: pour.at))
             appliedByDay[day, default: []].insert(pour.id)
+            foldedDaysThisPass.insert(day)
             foldedCount += 1
         }
 
         guard foldedCount > 0 else { return 0 }
+
+        // The ledger is written only **after** a successful save, never before. A crash or a save
+        // failure between the two previously left ids marked applied with no `WaterLog` row behind
+        // them — every future resend of the same ids was then blocked by the ledger, with nothing
+        // for `existingIds` to find either, and the user's watch-authored water was lost silently
+        // and irrecoverably. `saveAndRecompute()` reports whether the save actually succeeded; on
+        // `false` this declines exactly like a failed read above, leaving the ledger untouched so a
+        // resend once the store recovers still folds the pour.
+        guard saveAndRecompute() else { return 0 }
+
         // Calendar-space subtraction, not ordinal arithmetic: `dayOrdinal` is a mixed-radix
         // `year*10_000 + month*100 + day` encoding, and subtracting a plain day count from it
-        // borrows incorrectly across the month/day radix the moment the count exceeds a
-        // month's length — which 90 always does. `20260901 - 90 = 20260811` ("Aug 11 2026"),
-        // not the real 90-calendar-days-ago date of June 3 2026. Falling through to `now()` on
-        // a failed computation matches rule `30-rollover`'s convention of degrading toward
-        // over-retention (harmless) rather than under-retention (the bug this guards against).
+        // borrows incorrectly across the month/day radix the moment the count exceeds a month's
+        // length — which 90 always does.
         let cutoffDate = calendar.date(byAdding: .day, value: -Self.appliedLedgerRetentionDays, to: now()) ?? now()
-        let cutoff = Self.dayOrdinal(for: cutoffDate, in: calendar)
+        let normalCutoff = Self.dayOrdinal(for: cutoffDate, in: calendar)
+        // A pour whose own day already precedes the 90-day retention window (a watch that was
+        // offline a long time, or a system-daemon-held `transferUserInfo` delivered late) must not
+        // be trimmed by the **same write** that just folded it — that would leave it protected only
+        // by the full-history existence check, which is exactly what `deleteLog(_:)` removes,
+        // reopening the resurrection hole this ledger exists to close. Extending the floor back to
+        // the oldest day actually folded *this pass* — never to a pre-existing ledger day the
+        // ledger already held, which is free to age out on schedule — costs nothing in the ordinary
+        // case: `foldedDaysThisPass` is almost always within the window already, so `min` leaves
+        // `normalCutoff` unchanged.
+        let cutoff = min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)
         Self.writeAppliedLedger(appliedByDay, to: defaults, keepingDaysSince: cutoff)
-        saveAndRecompute()
         return foldedCount
     }
 
@@ -581,17 +623,27 @@ final class DataManager {
     /// construction bounds (`WristBatch.maximumPoursPerChunk`, `WristMirror.maximumAckedIds`).
     private static let appliedLedgerRetentionDays = 90
 
-    /// `nonisolated static`, not a private instance method, so `requestWristPublish()` (Task 7) —
+    /// `nonisolated static`, not a private instance method, so `requestWristPublish(from:)` —
     /// which composes a `WristMirror`'s `acked` list — can read the same ledger from a context that
     /// holds no `DataManager` instance, exactly as `WaterSnapshot.snapshot(defaults:calendar:now:)`
     /// reads `currentWater` without one.
-    nonisolated static func readAppliedLedger(from defaults: UserDefaults) -> [Int: Set<UUID>] {
-        guard let data = defaults.data(forKey: Key.wristApplied),
-              let raw = try? JSONDecoder().decode([Int: [UUID]].self, from: data) else { return [:] }
+    ///
+    /// Returns `nil` when the ledger could not be read — which is **not** the same as "no pours
+    /// applied yet". A missing key legitimately means an empty ledger (a fresh install, or a
+    /// device that has never folded a wrist pour); data *present but undecodable* means the read
+    /// failed, and `ingest(_:)` must treat that failure exactly as `fetch(_:)`'s own `nil` is
+    /// treated — decline the batch rather than fold it against a ledger it never actually
+    /// confirmed was empty (rule `20-state`). An earlier version returned `[:]` on either cause,
+    /// which is indistinguishable from "nothing has ever been applied" to a caller deciding
+    /// whether to insert — exactly the failed-read-as-data-loss shape `fetch(_:)`'s own DocC warns
+    /// against, one layer up.
+    nonisolated static func readAppliedLedger(from defaults: UserDefaults) -> [Int: Set<UUID>]? {
+        guard let data = defaults.data(forKey: Key.wristApplied) else { return [:] }
+        guard let raw = try? JSONDecoder().decode([Int: [UUID]].self, from: data) else { return nil }
         return raw.mapValues(Set.init)
     }
 
-    private func readAppliedLedger() -> [Int: Set<UUID>] {
+    private func readAppliedLedger() -> [Int: Set<UUID>]? {
         Self.readAppliedLedger(from: defaults)
     }
 
@@ -751,17 +803,29 @@ final class DataManager {
         withMutation(keyPath: \.history) { storedHistory = series }
     }
 
-    private func saveAndRecompute() {
+    /// - Returns: whether the save actually succeeded. `ingest(_:)` is the one caller that acts on
+    ///   this — the applied ledger may only be written once the rows it names are confirmed on
+    ///   disk, never before (rule `20-state`; see `ingest(_:)`'s own DocC for what writing it
+    ///   first cost). Every other caller discards it via `@discardableResult`: a save failure
+    ///   there already degrades safely on its own — the in-memory state is not rolled back, and
+    ///   the next successful save catches the store back up — which is why this stayed a
+    ///   `print`-only `catch` for every path except this one.
+    @discardableResult
+    private func saveAndRecompute() -> Bool {
+        let saved: Bool
         do {
             try modelContext.save()
+            saved = true
         } catch {
             #if DEBUG
             // Names the condition, never the user's water (rule `75-diagnostics`).
             print("[WaterBuddy] Could not save the water log; today's total may be stale.")
             #endif
+            saved = false
         }
         recomputeToday()
         republishHistory()
+        return saved
     }
 
     /// Returns `nil` when the store could not be read — which is **not** the same as "no water".
@@ -844,6 +908,15 @@ final class DataManager {
             defaults.set(true, forKey: Key.isGoalSet)
         }
 
+        // Unconditional, unlike the `dailyGoal` setter's own guarded publish above: a user who
+        // accepts `GoalSetupView`'s slider unchanged saves exactly `defaultDailyGoal`, which the
+        // setter's equality guard treats as a no-op — no mirror is ever published for that user,
+        // and `WristView` gates its whole UI on `mirror.isGoalSet`, so their watch would be stuck on
+        // the empty state forever. `isGoalSet` genuinely changed here even when `dailyGoal` did not,
+        // and that change alone is wire-relevant (`WristMirror.isGoalSet`), so this call cannot rely
+        // on the setter's guard the way every other publish site in this file does.
+        publishWrist(defaults)
+
         // Observation: separate, and still guarded, so a no-op save neither invalidates observers
         // nor redraws the root gate.
         guard !storedIsGoalSet else { return }
@@ -916,6 +989,19 @@ final class DataManager {
         // that could not be verified ahead of time — so the app re-reconciles every time it comes
         // forward. `reconcile` is idempotent, so when the extension did its job this costs nothing.
         rescheduleRemindersNow()
+
+        // The backstop for the watch, the identical shape as the reminder reconcile just above:
+        // every setter below already publishes on a real *change*, but a watch paired onto an
+        // **existing** phone install, or one that was simply out of Bluetooth range for every
+        // mutation that happened while it was away, has no mutation of its own to piggyback on —
+        // there is no launch-time or activation-time publish anywhere else in this file, so without
+        // this such a watch would never receive a first mirror at all and would sit on `WristView`'s
+        // empty state forever. `refresh()` runs on every foreground and every `.onAppear` of a
+        // model-drawing tab (rule `50-views`), which is exactly the cadence "the app just became
+        // reachable, tell the watch what's true" wants — and `updateApplicationContext` is a
+        // last-write-wins property update, not a queued send, so a call that changes nothing costs
+        // nothing on the wire and is safe to repeat as often as this method already runs.
+        publishWrist(defaults)
     }
 
     // MARK: - Reminders
@@ -1018,7 +1104,7 @@ final class DataManager {
         }
         defaults.set(day, forKey: Key.lastActiveDay)
         reloadWidgets()
-        publishWrist()
+        publishWrist(defaults)
 
         // Midnight is the one schedule change nobody taps for, and this path deliberately bypasses
         // the `currentWater` setter (it writes the zero *before* stamping the day, rule
@@ -1339,8 +1425,16 @@ final class DataManager {
         // while offline, or from a day before the outbox last synced, still needs to be named in
         // `acked` before the watch will retire it — restricting this to today's day-ordinal would
         // strand any pour whose own day has already passed by the time it's folded.
-        let ledger = readAppliedLedger(from: defaults)
-        let acked = Array(ledger.sorted { $0.key < $1.key }.flatMap(\.value).prefix(WristMirror.maximumAckedIds))
+        // A failed read degrades to an empty acked list rather than blocking the mirror
+        // entirely — the watch just carries its outbox one round trip longer, which is safe;
+        // `ingest(_:)` is the path that must decline outright, because it is the one deciding
+        // whether to *apply* a pour rather than merely report what has been.
+        let ledger = readAppliedLedger(from: defaults) ?? [:]
+        // Newest day **first**: the ids the watch is still holding in its outbox must win the cap,
+        // not the ones it retired long ago. An ascending sort here previously kept the OLDEST ids
+        // once the ledger exceeded `maximumAckedIds` and silently dropped the newest — which
+        // happens in steady state — permanently stranding every pour still genuinely in flight.
+        let acked = Array(ledger.sorted { $0.key > $1.key }.flatMap(\.value).prefix(WristMirror.maximumAckedIds))
 
         return WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion,
@@ -1361,9 +1455,16 @@ final class DataManager {
     /// `80-notifications`'s equivalent for reminders) is not duplicated here for v1, so a push that
     /// fails silently degrades to "the watch shows a stale mirror until the next successful one" —
     /// stated, not hidden, per rule `75-diagnostics`.
-    nonisolated static func requestWristPublish() {
+    ///
+    /// Takes `defaults` as a parameter rather than reading ``sharedDefaults`` itself — the same
+    /// fix rule `85-testing` already required of `reloadWidgets`/`rescheduleReminders`. Every call
+    /// site hands this the instance's own injected `defaults`, so a test or preview that forgets
+    /// to override `publishWrist:` still cannot leak a read of the real App Group suite merely by
+    /// composing a mirror — only the un-guardable `WCSession.default` call below still touches a
+    /// real system object, which is why fixtures must still pass a no-op explicitly.
+    nonisolated static func requestWristPublish(from defaults: UserDefaults) {
         guard WCSession.isSupported() else { return }
-        let mirror = composeWristMirror(from: sharedDefaults, calendar: .waterBuddyDay, now: Date())
+        let mirror = composeWristMirror(from: defaults, calendar: .waterBuddyDay, now: Date())
         guard let data = try? JSONEncoder().encode(mirror) else { return }
         do {
             try WCSession.default.updateApplicationContext(["mirror": data])
@@ -1774,8 +1875,11 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
     /// stored as an ordinal the watch would have to re-interpret under its own time zone
     /// (rule `30-rollover`, spec §5).
     let phoneDayStart: Date
-    /// Pour ids the phone has already folded, oldest-applied first, capped at
-    /// ``maximumAckedIds`` — this is what lets the watch retire a pour from its own outbox.
+    /// Pour ids the phone has already folded, capped at ``maximumAckedIds``. Once the ledger holds
+    /// more ids than the cap, ``DataManager/composeWristMirror(from:calendar:now:)`` keeps the
+    /// **newest**-folded ids, not the oldest — the watch's own outbox only ever holds recently
+    /// authored pours, so those are the ones the cap must never strand. This is what lets the watch
+    /// retire a pour from its own outbox.
     let acked: [UUID]
 
     static let currentSchemaVersion = 1
@@ -1792,19 +1896,48 @@ import WatchConnectivity
 /// real delegate protocol a type conforms to, not a sealed-`init` singleton that forbids
 /// subclassing the way `UNUserNotificationCenter` does.
 ///
-/// **Never `@MainActor`.** `WCSession`'s own header states delegate callbacks land on "a non-main
-/// serial queue" — a `@MainActor` type conforming to a nonisolated delegate protocol produces
-/// `#ConformanceIsolation`, a warning at this project's `SWIFT_VERSION = 5.0` and an error at Swift
-/// 6, and rule `43-concurrency` treats a new warning as a gate failure today (spec §6). Every hop to
-/// the main actor below is an explicit `Task { @MainActor in }`, never `MainActor.assumeIsolated` —
-/// that traps unless the call is already guaranteed on the main queue, which a WatchConnectivity
-/// callback is not.
+/// **Never `@MainActor`, and marked `nonisolated` explicitly rather than left to infer.**
+/// `WCSession`'s own header states delegate callbacks land on "a non-main serial queue" — a
+/// `@MainActor` type conforming to a nonisolated delegate protocol produces `#ConformanceIsolation`,
+/// a warning at this project's `SWIFT_VERSION = 5.0` and an error at Swift 6, and rule
+/// `43-concurrency` treats a new warning as a gate failure today (spec §6).
+///
+/// **The explicit `nonisolated` documents intent even though this project's current build settings
+/// cannot demonstrate its absence via a compiler diagnostic.** Every native target sets
+/// `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, which is exactly the mechanism that silently
+/// inferred `@MainActor` onto `Key.wristApplied`, `AppLanguage.code`, `vesselSlots` and
+/// `WristModel.requestSend` before each needed the identical explicit keyword — every one of those
+/// is a plain Swift declaration, and removing the keyword from any of them does reproduce a real
+/// "main actor-isolated … can not be referenced from a nonisolated context" warning on this
+/// toolchain. `WristLink` was probed the same way, three separate times — an unapplied reference to
+/// `activate()`, a direct synchronous call to it, and a control experiment with a freshly-added,
+/// unrelated `NSObject` subclass exposing one plain unmarked method, all read from a non-`@MainActor`
+/// `@Test` context — and **none of the three reproduced a warning, with or without this keyword**.
+/// The most likely explanation is `SWIFT_APPROACHABLE_CONCURRENCY = YES` (also set on every target),
+/// which relaxes several categories of this exact class of diagnostic; it does not by itself prove
+/// the underlying isolation was ever safe to omit; a class conforming to `NSObject` and an `@objc
+/// optional` delegate protocol may simply route isolation checking differently than a plain
+/// declaration does, in a way this probe could not distinguish either. Kept explicit regardless,
+/// on the same reasoning as its four siblings above and because `WCSession`'s own header is
+/// unambiguous that a callback lands off-main — this is the safe, self-documenting spelling of
+/// "never `@MainActor`" whether or not the compiler currently enforces it, and it costs nothing to
+/// state.
+///
+/// **This type itself never hops to the main actor.** Its delegate methods post a `Notification`
+/// synchronously, straight from whatever queue `WCSession` calls them on — that is what "never
+/// `@MainActor`" buys, and it needs no hop of its own to stay correct, because posting is
+/// thread-safe and every observer is responsible for its own isolation. The hop happens one step
+/// further out, on the *receiving* side: `WristInbox`/`WristModel` register their observers with
+/// `queue: .main` and enter isolation with `MainActor.assumeIsolated` — the same idiom
+/// `DataManager.startObservingDayChanges()` already established for `NotificationCenter`
+/// observations, not the `Task { @MainActor in }` shape this file's own header comment once claimed
+/// for this class (rule `43-concurrency` is corrected to match, `.claude/rules/43-concurrency.md`).
 ///
 /// One type, one behaviour that **branches by platform** rather than one instance configured
 /// differently per side — `Sendable` is earned by holding zero stored properties, so there is
 /// nothing for the compiler to reject, and exactly one `static let live` retains it for the whole
 /// process, on either side of the pairing.
-final class WristLink: NSObject, WCSessionDelegate, Sendable {
+nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
 
     /// The **strong** retainer. `WCSession.delegate` is `weak` (`WCSession.h:43`) and nothing else
     /// in this design holds one — without this, ARC frees the delegate the instant `activate()`

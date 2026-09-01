@@ -304,7 +304,8 @@ private func withHistoryStore<T>(
         calendar: utcDay,
         now: now,
         reloadWidgets: onReload,
-        rescheduleReminders: { _ in }
+        rescheduleReminders: { _ in },
+        publishWrist: { _ in }
     )
     return try body(manager, defaults)
 }
@@ -340,7 +341,8 @@ private func makeHistoryManager(
         calendar: utcDay,
         now: now,
         reloadWidgets: {},
-        rescheduleReminders: { _ in }
+        rescheduleReminders: { _ in },
+        publishWrist: { _ in }
     )
 }
 

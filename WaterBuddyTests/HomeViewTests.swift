@@ -54,7 +54,9 @@ private func withTempStore<T>(_ body: (DataManager, UserDefaults) throws -> T) t
         // remove real pending requests under `ReminderPlan.identifierPrefix`. Rule `85-testing`
         // forbids a test that constructs a real centre outright, and the same defaulted-dependency
         // trap already pointed all 74 tests at the live store once (`tasks/lessons.md`).
-        rescheduleReminders: { _ in }
+        rescheduleReminders: { _ in },
+        // Same hazard, a second seam: the production default reaches a real `WCSession`.
+        publishWrist: { _ in }
     )
     return try body(manager, defaults)
 }

@@ -55,7 +55,8 @@ private func makeManager(
         calendar: utcDay,
         now: now,
         reloadWidgets: onReload,
-        rescheduleReminders: onReschedule
+        rescheduleReminders: onReschedule,
+        publishWrist: { _ in }
     )
 }
 
