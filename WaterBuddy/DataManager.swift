@@ -1556,7 +1556,7 @@ struct WaterSnapshot: Sendable, Equatable {
 /// One pour, as the watch authored it. `id` becomes `WaterLog.id` verbatim on the phone — the merge
 /// key already exists (`WaterLog.swift:33-37`, deliberately not `@Attribute(.unique)`), so this
 /// struct invents no identity scheme of its own.
-struct WristPour: Codable, Sendable, Equatable, Identifiable {
+nonisolated struct WristPour: Codable, Sendable, Equatable, Identifiable {
     let id: UUID
     /// Millilitres, like every other volume in this product (Global Constraints).
     let amount: Int
@@ -1569,7 +1569,7 @@ struct WristPour: Codable, Sendable, Equatable, Identifiable {
 /// A batch of pours, wrist → phone. Chunked at ``maximumPoursPerChunk`` because
 /// `WCErrorCodePayloadTooLarge` has no numeric threshold anywhere in the SDK — the cap is by
 /// construction, not by catching the error after the fact.
-struct WristBatch: Codable, Sendable, Equatable {
+nonisolated struct WristBatch: Codable, Sendable, Equatable {
     /// An unrecognised version is **not** acked by the phone, so the watch keeps retrying rather
     /// than silently losing pours to a binary that doesn't understand them yet.
     let schemaVersion: Int
@@ -1588,7 +1588,7 @@ struct WristBatch: Codable, Sendable, Equatable {
 /// (`updateApplicationContext`/`receivedApplicationContext`), never an event stream — the watch
 /// reads whatever the phone most recently composed, with no ordering dependency and no callback
 /// needed on wake.
-struct WristMirror: Codable, Sendable, Equatable {
+nonisolated struct WristMirror: Codable, Sendable, Equatable {
     let schemaVersion: Int
     let currentWater: Int
     let dailyGoal: Int
