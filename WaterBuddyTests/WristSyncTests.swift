@@ -232,3 +232,38 @@ struct WristIngestTests {
         }
     }
 }
+
+/// Pure day-bucketing, `ReminderPlan`'s twin — no `UserNotifications`, no `WatchConnectivity`, no
+/// `DataManager`. A compile-time canary in the same spirit as `ReminderPlanTests`: if a future edit
+/// makes this suite need `@MainActor` or a store, something has leaked into the wrong layer.
+struct WristPlanTests {
+
+    private static let utc = { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c }()
+
+    @Test
+    func sumsOnlyTodaysPours() {
+        let now = Date(timeIntervalSince1970: 1_756_800_000) // an arbitrary fixed instant
+        let today = WristPour(id: UUID(), amount: 250, at: now)
+        let yesterday = WristPour(id: UUID(), amount: 500, at: now.addingTimeInterval(-86_400))
+        let total = WristPlan.todaysTotal(from: [today, yesterday], now: now, calendar: Self.utc)
+        #expect(total == 250)
+    }
+
+    @Test
+    func emptyOutboxSumsToZero() {
+        let total = WristPlan.todaysTotal(from: [], now: .now, calendar: Self.utc)
+        #expect(total == 0)
+    }
+
+    /// A pour stamped just before midnight and one just after both count on their own day, never
+    /// the other's — this is the seam a naive "within the last 24 hours" filter would get wrong.
+    @Test
+    func aPourAtTheDayBoundaryCountsOnItsOwnDay() {
+        // 2026-01-02 00:00:00 UTC
+        let midnight = Date(timeIntervalSince1970: 1_767_312_000)
+        let justBefore = WristPour(id: UUID(), amount: 100, at: midnight.addingTimeInterval(-1))
+        let justAfter = WristPour(id: UUID(), amount: 200, at: midnight)
+        let total = WristPlan.todaysTotal(from: [justBefore, justAfter], now: midnight, calendar: Self.utc)
+        #expect(total == 200)
+    }
+}
