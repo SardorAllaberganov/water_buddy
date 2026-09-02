@@ -1,6 +1,6 @@
 ---
 description: Liquid glass, aurora, water and haptics — one system, no ad-hoc literals
-globs: ["WaterBuddy/LiquidGlassModifier.swift", "WaterBuddy/AuroraBackground.swift", "WaterBuddy/WaterSurface.swift", "WaterBuddy/Celebration.swift", "WaterBuddy/PressStyle.swift", "WaterBuddy/Haptics.swift", "WaterBuddy/*View.swift", "WaterBuddyWidget/**/*.swift"]
+globs: ["WaterBuddy/LiquidGlassModifier.swift", "WaterBuddy/AuroraBackground.swift", "WaterBuddy/WaterSurface.swift", "WaterBuddy/Celebration.swift", "WaterBuddy/PressStyle.swift", "WaterBuddy/Haptics.swift", "WaterBuddy/*View.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift"]
 ---
 
 # Design System
@@ -33,6 +33,14 @@ one by eye breaks a contrast figure somebody measured.
 - The contrast boost and the press boost multiply, and each is clamped
 
 ## Interaction
+- **Currently unreachable on the watch.** This glob widened to `WaterBuddyWatch/**/*.swift`, but
+  `PressStyle.swift` and `Haptics.swift` (below) are neither of them in the watch's own
+  `PBXFileSystemSynchronizedBuildFileExceptionSet` (confirmed by a `project.pbxproj` grep — zero
+  hits for either filename outside the phone app's own synchronized root group), so `WristView`'s
+  pour buttons compile against `.buttonStyle(.plain)` and fire no press animation and no haptic at
+  all. Known and, for v1, deliberate — haptics were not in the approved watch scope — not a defect
+  to fix under this rule; a future task that wants either on the watch adds the file to that
+  exception set first
 - Every app `Button` whose label is a glass pane carries `.buttonStyle(PressStyle())`, and
   `PressStyle` stays the only writer of `EnvironmentValues.glassIsPressed`
 - Keep `interactive` opt-in (`false` by default). Pass `interactive: true` only where the glass
@@ -47,13 +55,20 @@ one by eye breaks a contrast figure somebody measured.
 - Every colour comes from `Aurora` — `top`, `bottom`, `blue`, `magenta`, `cyan`, `gradient`. The
   only permitted literals outside it are the two `WaterSurface` wave gradients and
   `LiquidGlass.Base.archived`
-- Share `Aurora`'s colours between app and widget, but **never** its geometry: absolute offsets
-  belong to `AuroraBackground`, proportional `UnitPoint`s to `WidgetAurora`
+- Share `Aurora`'s colours between app, widget and watch, but **never** the geometry: absolute
+  offsets belong to `AuroraBackground`, proportional `UnitPoint`s to `WidgetAurora` **and to
+  `WaterBuddyWatch/WristAurora.swift`** — a watch face is a small, fixed canvas with no wallpaper to
+  sample, exactly `WidgetAurora`'s own reason, so `WristAurora` follows `WidgetAurora`'s
+  proportional-geometry approach rather than `AuroraBackground`'s absolute one
 - `Base.archived`'s two fills and the `saturation(1.1)` on `WidgetCardBackdrop` are a **derivation**
   from the dark ultra-thin material recipe. If an `Aurora` colour changes, re-derive them — and never
   delete the derivation comment
-- Every full-screen view stands its own `AuroraBackground()` at the bottom of its `ZStack`, and
-  there is exactly one definition of it
+- Every full-screen view on the **phone** stands its own `AuroraBackground()` at the bottom of its
+  `ZStack`, and there is exactly one definition of it. `WristAurora` is a deliberate second,
+  proportional-geometry definition for the watch's own screen — its own twin, not a duplicate of
+  `AuroraBackground` — for the identical reason `WidgetAurora` is already a second definition for the
+  phone widget; "exactly one" is a claim about `AuroraBackground` specifically, not about the whole
+  system having a single aurora view
 - An aurora light may never drift off its own footprint, and the three periods stay pairwise
   non-harmonic — otherwise the field visibly repeats
 - Colour on a light is cross-faded as two stacked fills with opposed opacities, never animated as

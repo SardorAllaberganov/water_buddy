@@ -123,4 +123,50 @@ struct WristModelTests {
             #expect(second.pendingOutbox.map(\.amount) == [250], "the outbox is persisted, not just in-memory")
         }
     }
+
+    // MARK: - Standalone operation before the first sync
+
+    /// The watch draws a real screen before it has ever heard from the phone, so it needs a goal to
+    /// draw against. `DataManager.defaultDailyGoal` is the same figure the phone itself materialises
+    /// for a fresh install, so the two agree the moment a mirror does arrive.
+    @Test
+    func withNoMirrorTheGoalFallsBackToTheSharedDefault() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            #expect(model.mirror == nil)
+            #expect(model.displayGoal == DataManager.defaultDailyGoal)
+        }
+    }
+
+    @Test
+    func aMirrorsOwnGoalWinsOverTheDefault() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            model.apply(WristMirror(
+                schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 3_500,
+                servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
+                composedAt: Date(timeIntervalSince1970: 1_000),
+                phoneDayStart: Self.utc.startOfDay(for: Date(timeIntervalSince1970: 1_000)), acked: []
+            ))
+            #expect(model.displayGoal == 3_500)
+        }
+    }
+
+    /// The deadlock this breaks: the only watch-side action that makes the phone publish is a pour,
+    /// and the pour rows used to sit behind a gate that required a mirror to open. A pour authored
+    /// before any sync must be recorded and survive, so it can ride along the moment the phone appears.
+    @Test
+    func aPourAuthoredBeforeAnySyncIsRecordedAndPersisted() {
+        withTempDefaults { defaults in
+            let now = Date(timeIntervalSince1970: 1_000)
+            let model = makeModel(defaults, now: { now })
+            #expect(model.mirror == nil, "precondition: never synced")
+
+            model.pour(amount: 250)
+
+            #expect(model.todaysTotal == 250)
+            #expect(model.displayGoal == DataManager.defaultDailyGoal)
+            #expect(makeModel(defaults, now: { now }).pendingOutbox.map(\.amount) == [250])
+        }
+    }
 }

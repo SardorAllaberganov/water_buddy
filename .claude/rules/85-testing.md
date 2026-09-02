@@ -1,12 +1,13 @@
 ---
 description: swift-testing, one simulator, and fixtures that cannot reach real data
-globs: ["WaterBuddyTests/**/*.swift", "WaterBuddyUITests/**/*.swift"]
+globs: ["WaterBuddyTests/**/*.swift", "WaterBuddyUITests/**/*.swift", "WaterBuddyWatchTests/**/*.swift"]
 ---
 
 # Testing
 
-`WaterBuddyTests` is swift-testing (206 `@Test` functions across 10 suites); `WaterBuddyUITests` is
-XCTest (9 cases). Both are live targets — neither is a stub.
+`WaterBuddyTests` is swift-testing (phone side); `WaterBuddyUITests` is XCTest (phone side);
+`WaterBuddyWatchTests` is swift-testing (watch side). All three are live targets — none is a stub.
+Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Counting* below.
 
 ## Tests first
 - Write the failing test, **run it and verify RED**, then implement, then run it GREEN. A test first
@@ -32,6 +33,24 @@ XCTest (9 cases). Both are live targets — neither is a stub.
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process
 
+## The watch side follows the identical fixture discipline
+`WaterBuddyWatchTests` is a **third**, separately-gated suite (`WaterBuddyWatch` scheme,
+`-only-testing:WaterBuddyWatchTests`), not a subset of the two above — see *The gate* below. It is
+held to the same non-negotiables, adapted for `WristModel` in place of `DataManager`:
+- Every fixture that constructs a `WristModel` builds its own **throwaway** `UserDefaults` suite,
+  UUID-named exactly the way the phone side does, and tears it down the same way. `WristModel` never
+  runs against the real watch-local App Group suite from a test
+- Every fixture injects the **clock**: `WristModel`/`WristPlan` take `now: () -> Date` the way
+  `DataManager`/`ReminderPlan` do, so a boundary test never waits for a real day to turn
+- `WristLinkCompileTests` and `WristPlanCompileTests` are compile-time canaries, the watch-side
+  precedent for the same idiom `ReminderPlanTests` already sets on the phone: they exist to prove a
+  declaration's isolation or import list stays what it should, not to assert behaviour. Fix the
+  declaration they read rather than reshaping the canary
+- No watch-side test constructs a real `WCSession` or reaches an actual paired device — `WristLink`'s
+  pure halves (`chunk(_:batchId:)`, `decodeBatch(from:)`, `decodeMirror(from:)`) are what is tested;
+  the live session is exercised only by hand, on paired simulators (Task 8's spike), never by the
+  automated gate
+
 ## Isolation
 - Put `@MainActor` on the suite **and** on every helper that constructs a `DataManager`
 - Inside a `@MainActor` closure, build factories as **closure literals**, not nested `func`s — a
@@ -56,45 +75,71 @@ Run `xcodebuild` in the **foreground**. A build you did not watch finish is not 
 report on. One simulator at a time, and always `-parallel-testing-enabled NO` — a cloned run writes
 into a container you cannot then read back, which is how a real bug gets mistaken for a broken test.
 
+**Five invocations, not three** — two platforms, and no scheme compiles a sibling's sources:
+
 ```bash
 xcrun simctl shutdown all
 
 xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddy \
-  -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17' \
   -only-testing:WaterBuddyTests -parallel-testing-enabled NO
 
 xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddy \
-  -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17' \
   -only-testing:WaterBuddyUITests -parallel-testing-enabled NO
 
+xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddyWatch \
+  -destination 'platform=watchOS Simulator,OS=26.5,name=Apple Watch Series 11 (46mm)' \
+  -only-testing:WaterBuddyWatchTests -parallel-testing-enabled NO
+
 xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension \
-  -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16'
+  -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17'
+
+xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
+  -destination 'platform=watchOS Simulator,OS=26.5,name=Apple Watch Series 11 (46mm)'
 ```
 
-- **`OS=18.6` is load-bearing — do not simplify it away.** `IPHONEOS_DEPLOYMENT_TARGET` is 18.5 and
-  the only installed runtime is 18.6, so a bare `platform=iOS Simulator,name=iPhone 16` fails with
-  *"Unable to find a device matching the provided destination specifier"*. `OS=latest` fails too.
-  Pin the runtime by number, and update it when the installed runtime changes — never by swapping in
-  a device `id=`, which resolves nothing on anybody else's machine
-- **`-dry-run` is not a probe for this.** A dry-run *build* against the broken spelling reports no
-  error at all; only a real `test` invocation surfaces it. Verify a destination by running one test,
-  not by asking whether it resolves
-- **The test half is two invocations, not one.** The combined run exceeds the 600s foreground limit
-- The widget build is not optional: the app scheme never compiles the extension's sources
-- Treat every new warning as a failure. This codebase compiles clean, and a concurrency warning here
-  is a Swift 6 error later
+- **`OS=26.5` is load-bearing on both platforms — do not simplify it away.**
+  `IPHONEOS_DEPLOYMENT_TARGET`/`WATCHOS_DEPLOYMENT_TARGET` are both 26.5, and an unpinned or
+  `OS=latest` destination is ambiguous the moment more than one runtime of that platform is
+  installed — which is routinely true on both iOS and watchOS on this machine. Pin the runtime by
+  number, and update it when the installed runtime changes — never by swapping in a device `id=`,
+  which resolves nothing on anybody else's machine
+- **The watch widget scheme is `WaterBuddyWatchWidget`, with no "Extension" suffix.** Do not
+  copy-paste the phone widget's `WaterBuddyWidgetExtension` spelling and assume a parallel name —
+  `xcodebuild -list` is the source of truth for every scheme name in this list
+- **`-dry-run` is not a probe for a destination.** A dry-run *build* against a broken spelling
+  reports no error at all; only a real `test` (or, for the two build-only invocations, a full build)
+  surfaces it. Verify a destination by actually running it, not by asking whether it resolves
+- **The test half is three invocations, not one.** iOS unit and iOS UI together already exceed the
+  600s foreground limit on their own; the watch unit run is gated separately again for the same
+  reason and because it is a different scheme entirely
+- **The watch invocations are simulator builds, not device-signed ones.** Nothing in this repo's
+  toolchain here provisions a device build for either watch target, so these five invocations are
+  the full gate available in this environment — a device-signed build remains unproven (see
+  `docs/AI_CONTEXT.md`'s known issues)
+- Neither widget build is optional: no container scheme compiles either extension's sources
+- Treat every new warning as a failure, on **every** invocation above, not just the two inherited
+  from before the watch. This codebase compiles clean, and a concurrency warning here is a Swift 6
+  error later
 - A non-parallel run prints `✔ Test run with N tests passed`; a parallel one does not
 
 ## A green suite is not proof the product works
 The suite injects its own `UserDefaults`, `Calendar` and clock, so it structurally **cannot** see an
-entitlement that was not added, a file missing from a target, or a widget that renders blank. The
-widget's rendering has no automated coverage at all.
+entitlement that was not added, a file missing from a target, or a widget that renders blank.
+**Neither widget's rendering has any automated coverage, on either platform** — the phone widget and
+the watch's `.accessoryCircular` face are both proved only by placing them and looking.
 
 After any change to storage, entitlements, target membership or the widget's view tree: run the app
-on the simulator and put the widget on the Home Screen — in light, in dark, and tinted.
+on the simulator and put the widget on the Home Screen — in light, in dark, and tinted. The same
+applies to the watch face: install `WaterBuddyWatch` and add the widget to a watch face by hand: no
+part of the automated gate renders it.
 
 ## Counting
 Count the attribute in the only position it can be one; `@Test` also appears inside DocC comments:
 ```bash
 grep -chE '^[[:space:]]*@Test' WaterBuddyTests/*.swift | awk '{s+=$1} END {print s}'
+grep -chE '^[[:space:]]*@Test' WaterBuddyWatchTests/*.swift | awk '{s+=$1} END {print s}'
 ```
+Count each target separately — they are two different gates on two different platforms, and a
+combined figure obscures which one moved when only one changed.

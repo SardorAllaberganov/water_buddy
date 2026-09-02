@@ -2,15 +2,18 @@
 
 > Project-specific rules live in `.claude/rules/` (auto-loaded by Claude Code).
 >
-> **Repo layout — one Xcode project, four targets:**
+> **Repo layout — one Xcode project, seven targets:**
 >
 > | Target | Status |
 > |---|---|
-> | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 18.5, `@Observable` `DataManager` over SwiftData |
+> | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 26.5, `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: `StaticConfiguration` + interactive `AddWaterIntent` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | stub — the Xcode template's launch and launch-performance tests, nothing more |
-> | `Entitlements/` | the App Group entitlement, one file per signed target |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage) plus the Xcode template's launch tests |
+> | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
+> | `WaterBuddyWatchWidget/` | **LIVE** — `.accessoryCircular` percentage-ring complication, reads the watch's own suite directly, never `WristModel.shared` |
+> | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
+> | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets) |
 >
 > **`DataManager.swift`, `WaterLog.swift`, `WaterSurface.swift`, `LiquidGlassModifier.swift`,
 > `ReminderPlan.swift` and `NotificationManager.swift` are compiled into both the app and the
@@ -19,22 +22,38 @@
 > Everything else under `WaterBuddy/` is app-only. That shared set is a contract, not a
 > convenience: it is what keeps the two front doors logging the same serving and drawing the same
 > water.
+>
+> **The watch is a third, separately-signed process pair with its own local App Group suite** — same
+> identifier string (`group.sardor.WaterBuddy`), a different physical container, because the watch
+> is a different device. `WaterBuddyWatch` and `WaterBuddyWatchWidget` each carry their own
+> `PBXFileSystemSynchronizedBuildFileExceptionSet` (six files each — not the widget extension's own
+> six, and not each other's) to reach into `WaterBuddy/` for the parts they need:
+> `DataManager.swift`, `LiquidGlassModifier.swift`, `ReminderPlan.swift`, `WaterLog.swift`,
+> `WaterSurface.swift`, plus `WristPlan.swift` — which the watch widget gained on 2026-09-01 when
+> spec §16 made its complication count pending outbox pours. They exchange data with the
+> phone solely through `WristLink`'s `WatchConnectivity` session, never through the phone's own App
+> Group container (rule `70-privacy`, rule `25-shared-storage`).
 
 ## Product context
 This repo builds **WaterBuddy** — an iPhone hydration tracker on the arc *log → see → log again
 without opening the app*. There is no account and no server.
 
-**Storage is two stores in one App Group, and which is authoritative is the whole design:**
+**Storage is two stores in one App Group on the phone, and which is authoritative is the whole
+design:**
 
 | Store | Holds | Read by |
 |---|---|---|
 | SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app only |
-| `UserDefaults` — eight keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts — a **derived cache** | the app *and* the widget |
+| `UserDefaults` — nine keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget never opens SwiftData** — a
 timeline provider is `nonisolated` and a `ModelContext` is not `Sendable`, so reading the cache is
-what keeps the widget's read path synchronous. `DataManager` is the only writer to either store.
+what keeps the widget's read path synchronous. **`DataManager` is the only writer to either of
+these two stores** — the one honest weakening (rule `20-state`): the watch is a **third**,
+physically separate store (its own local App Group suite of two keys, on the watch device), written
+only by `WristModel`, never by `DataManager`. See the target table above and rule
+`25-shared-storage`.
 
 Authority for what to build, in order: **the DocC comments on the type you are changing** (they
 carry the rulings — why the day is stored as an ordinal and not a `Date`, why a widget process may
@@ -97,19 +116,26 @@ something to record.
 
 ## Verification Before Done
 - Never mark a task complete without proving it works
-- Run the unit gate — **one simulator, never a cloned parallel run** (rule `85-testing`):
-  `xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddy -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16' -parallel-testing-enabled NO`
-- Build the extension separately:
-  `xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16'`
-  — **the app scheme does not compile the widget's own sources**, so a widget-only break passes a
-  green test run untouched
-- Treat every new warning as a failure. This codebase compiles clean, and a concurrency warning
-  here is a Swift 6 error later
+- Run the full gate — **five invocations, not two, since the watch shipped** (rule `85-testing` has
+  the exact, current commands; do not re-derive them by hand or copy stale ones from memory). One
+  simulator at a time, never a cloned parallel run, `xcrun simctl shutdown all` first:
+  1. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyTests` — phone unit tests
+  2. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyUITests` — phone UI tests
+  3. `xcodebuild test -scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests` — watch unit tests
+  4. `xcodebuild build -scheme WaterBuddyWidgetExtension` — the phone widget, its own scheme
+  5. `xcodebuild build -scheme WaterBuddyWatchWidget` — the watch widget, its own scheme (no
+     "Extension" suffix — not parallel to the phone widget's scheme name)
+  — **no scheme compiles a sibling's sources**, so a widget-only or watch-only break passes a
+  green `WaterBuddy`-scheme test run untouched. Both widget builds are as mandatory as the three
+  test runs
+- Treat every new warning as a failure, on **every** invocation. This codebase compiles clean, and
+  a concurrency warning here is a Swift 6 error later
 - **A green suite is not proof the product works.** The suite injects its own `UserDefaults`,
   `Calendar` and clock, so it structurally cannot see an entitlement that was not added, a file
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
   widget on the Home Screen after any change to storage, entitlements, target membership or the
-  widget's view tree
+  widget's view tree — and the same for the watch face's complication, which no part of the
+  automated gate renders
 - Ask yourself: "Would a staff engineer approve this?"
 
 ## Demand Elegance (Balanced)

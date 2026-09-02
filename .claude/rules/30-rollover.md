@@ -1,6 +1,6 @@
 ---
 description: The daily rollover — the day is an ordinal, and the zero is written before the stamp
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift"]
 ---
 
 # Rollover
@@ -16,6 +16,12 @@ changed.
 - `WaterLog.timestamp` stays a plain `Date`, and no stored day column, ordinal or `startOfDay` field
   is ever added to the model. These are not in conflict: an instant records a moment, which does not
   move; a stored *day* would be re-read under a different zone
+- `WristPour.at` and `WristPlan` follow the identical split, one device further out. There is
+  deliberately no stored `dayOrdinal` on a `WristPour` — a stamp made in one time zone and re-read
+  in another names a day the watch is no longer in, and the pour vanishes from a display that should
+  show it. `WristPlan` buckets the watch's outbox from each pour's own instant, on the **watch's**
+  own `Calendar.waterBuddyDay`, only when read — never stored as a day. The watch never rolls
+  anything over the way `resetIfNeeded()` does; it filters
 - `Calendar.waterBuddyDay` stays a computed `static var` building a fresh Gregorian calendar with
   `timeZone = .autoupdatingCurrent` and `locale = Locale(identifier: "en_US_POSIX")`. A `static let`
   would freeze the launch time zone and defeat the whole point. Never use `Calendar.current` for a
@@ -59,8 +65,11 @@ changed.
 ## Detecting the turn
 - Read `Key.lastActiveDay` as `defaults.object(forKey:) as? Int`, never `integer(forKey:)`. A
   missing marker means a fresh install: adopt today and return `false`, never report a rollover
-- Guard the stamp with `!Self.isAppExtension`. An extension that stamped an empty group manufactures
-  exactly the state the migration reads as "already migrated" (rule `25-shared-storage`)
+- Guard the stamp with `Self.role.ownsSharedStorage` — corrected from the `!Self.isAppExtension`
+  this line read until 2026-09-01, the third live instance of the same stale-guard-text pattern
+  fixed in `40-widget.md` and `80-notifications.md`. A non-owner that stamped an empty group
+  manufactures exactly the state the migration reads as "already migrated" (rule
+  `25-shared-storage`); `.watchApp`/`.watchExtension` both answer `ownsSharedStorage == false` too
 - `resetIfNeeded()` stays idempotent and returns `true` exactly once per real day change — safe to
   call from any lifecycle hook without a caller-side "already reset today" flag
 - Keep both observers in `startObservingDayChanges()`: `NSCalendarDayChanged` **and**

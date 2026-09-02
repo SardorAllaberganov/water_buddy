@@ -780,3 +780,53 @@ cannot exist on iOS, confirmed by the SDK and a real compiler error, not merely 
 intent — and no user-visible behavior should depend on it firing, since this environment never
 observed it firing even once. This is not a blocker: proceed with Task 9 onward as designed, per the
 brief's own guidance that an unresolved-on-simulator result is not a "device only" conclusion.
+
+---
+
+## 16. Amendment (2026-09-01): the watch is usable before its first sync
+
+**Owner-approved**, reversing one line of §12's *Not in v1* list: *"a watch-only independent mode."*
+That exclusion still holds for everything it was written to exclude — a watch-authored goal, watch
+settings, watch history, watch delete/edit, a watch-local SwiftData store. What it should not have
+excluded, and what this amendment permits, is the watch **drawing its own screen before a mirror has
+ever arrived**.
+
+### Why the original wording was wrong in practice
+
+§8 specified one sentence — *"Open WaterBuddy on your iPhone"* — for the case `isGoalSet == false`.
+The implementation gated on `mirror != nil && mirror.isGoalSet`, so two unrelated states fell
+through to it, and only one of them was fixable by doing what the sentence said. Worse, it produced
+a **first-mirror deadlock**: the only watch-side action that causes the phone to publish is a pour,
+and the pour rows sat behind the gate that a mirror was needed to open. A watch that had never
+synced could not do the one thing that would make it sync.
+
+It also stranded work this design had already paid for: `WristView.resolveServings(from: nil)` and
+`syncedCaption(composedAt: nil, …)` were both written, documented and unit-tested *for the pre-sync
+case*, and the gate made them unreachable in production while their tests stayed green.
+
+### What changes
+
+- `WristView` is no longer gated. The vessel and the three pour rows are always drawn.
+- The goal drawn against is `WristModel.displayGoal` — the mirror's `dailyGoal` when one has
+  arrived, `DataManager.defaultDailyGoal` before that. The fallback is not a guess: it is the same
+  figure the phone materialises into its own suite for a fresh install, so the two devices already
+  agree on it before they have ever spoken.
+- The attribution line moves **outside** every branch, as §8 always said it should be
+  (*"always present, never an alert"*), and now distinguishes three states rather than collapsing
+  them: `"Not yet synced · default goal"`, `"Set your goal in WaterBuddy on iPhone"` (the one case
+  where reaching for the phone genuinely is the fix), and the ordinary `"Synced Nm ago"`.
+- `WaterBuddyWatchWidget` takes the same fallback and the same outbox arithmetic, so the
+  complication cannot read 0% while the app beside it shows real water. This adds `WristPlan.swift`
+  to that target's exception set, which §7's target-membership table must now show as **six** files.
+
+### What this deliberately does not change
+
+Pours remain the only thing the watch authors, they remain UUID-keyed, and they remain reconciled by
+the phone's applied-ledger conjunction guard — so **pours cannot diverge**. The only value that can
+differ between the two devices is the *displayed percentage*, for as long as the watch is drawing
+against the default goal and the phone's real goal is something else; it converges on the first
+mirror, and the attribution line says so while it lasts. This is §5's *"withheld and attributed,
+never a confident zero"* extended from the stale-day case to the never-synced case, which is the
+same argument, one state further out.
+
+§12's remaining exclusions are unaffected and were re-confirmed, not relaxed.

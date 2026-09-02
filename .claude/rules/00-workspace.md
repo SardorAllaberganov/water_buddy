@@ -10,22 +10,32 @@ globs: ["**/*"]
   cannot see the difference
 - Check `tasks/lessons.md` for past mistakes on similar work
 - Read `docs/AI_CONTEXT.md` for where the work stands, then the sheet that owns your subject
-- Decide which target(s) you are touching, and whether the file is one of the six compiled into both
+- Decide which target(s) you are touching, and whether the file sits in one of the **three**
+  `PBXFileSystemSynchronizedBuildFileExceptionSet`s that reach into `WaterBuddy/` from elsewhere —
+  `WaterBuddyWidgetExtension` (six files), `WaterBuddyWatch` (six files), `WaterBuddyWatchWidget`
+  (six files), each its own contract (rule `15-project`, rule `40-widget`) — not "the six compiled
+  into both," which stopped being the whole picture the moment the watch shipped
 
 # After Task
-- Run the gate — both test invocations **and** the widget extension build (rule `85-testing`)
+- Run the full gate — **five invocations, not two**, since the watch shipped: phone unit tests,
+  phone UI tests, watch unit tests, the phone widget build, the watch widget build (rule
+  `85-testing` has the exact current commands)
 - Run the app on the simulator, and put the widget on the Home Screen, if this touched storage,
-  entitlements, target membership or the widget's view tree
+  entitlements, target membership or the widget's view tree — and the watch face's complication too,
+  for the identical reason
 - Checkpoint in `HISTORY.md` and run `/doc_sync` (rule `99-docs-cascade`)
 - Stage the work and stop. **Never commit** until the owner runs `/commit` (rule `90-git`)
 
 # Layout
 ```
-WaterBuddy/              the app — SwiftUI, iOS 18.5, @Observable DataManager over SwiftData
-WaterBuddyWidget/        the WidgetKit extension — StaticConfiguration + interactive AddWaterIntent
-WaterBuddyTests/         swift-testing (@Test / #expect), own suite per test
+WaterBuddy/              the app — SwiftUI, iOS 26.5, @Observable DataManager over SwiftData
+WaterBuddyWidget/        the phone WidgetKit extension — StaticConfiguration + interactive AddWaterIntent
+WaterBuddyTests/         swift-testing (@Test / #expect), own suite per test, phone side
 WaterBuddyUITests/       XCTest — the setup gate, the accessibility tree, the tab swap
-Entitlements/            one App Group entitlement file per signed target
+WaterBuddyWatch/         the watch app — WristView, @Observable WristModel over its own local suite
+WaterBuddyWatchWidget/   the watch WidgetKit extension — .accessoryCircular percentage ring
+WaterBuddyWatchTests/    swift-testing, watch side
+Entitlements/            one App Group entitlement file per signed target (four signed targets)
 Tools/                   standalone scripts, in no target
 docs/                    AI_CONTEXT · STATE · WIDGET · DESIGN
 tasks/                   lessons.md, append-only

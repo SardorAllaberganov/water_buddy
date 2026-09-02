@@ -1,12 +1,24 @@
 ---
 description: State ownership — DataManager is the only writer, and today's total is derived
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift"]
 ---
 
 # State
 
 `DataManager` is a `@MainActor @Observable final class` and the **only writer** to either store.
 Views, App Intents and timeline providers read it and call it; they never write a key.
+
+**The one honest weakening.** Since the watch shipped, *"`DataManager` is the only writer"* is no
+longer literally true across the whole product, and this file says so plainly rather than hiding
+it: it is now **one writer per store** — `DataManager` for the phone's SwiftData/`UserDefaults`
+pair, `WristModel` for the watch's own local `UserDefaults` suite (rule `25-shared-storage`).
+`WristModel` never touches SwiftData, never touches the phone's App Group container (it resolves
+the identical App Group *identifier* on a different physical device), and never writes a key
+`DataManager` also writes — the two writers own disjoint key sets. Everything below this line still
+holds for `DataManager`'s own store; it is the *scope* of "only writer" that narrowed, not the
+discipline. Rule `10-architecture` states the identical weakening — spec §9.1 requires it in both
+files, not one, because the earlier draft's Forbidden list still asserted the stronger sentence
+after the body above had already conceded it.
 
 ## One writer
 - No production code outside `DataManager.swift` calls `defaults.set(_:forKey:)` or

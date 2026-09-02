@@ -82,6 +82,23 @@ final class WristModel {
         return storedMirror
     }
 
+    /// The goal the screen draws against: the phone's when a mirror has arrived, and
+    /// ``DataManager/defaultDailyGoal`` before it ever has.
+    ///
+    /// The fallback is not a guess dressed as a fact. It is the identical figure the phone
+    /// materialises into its own suite for a fresh install (`DataManager.init`), so the two devices
+    /// already agree on it before they have ever spoken — and the moment a real mirror lands, this
+    /// switches to the phone's own number with no reconciliation needed, because nothing was ever
+    /// *stored* here. `WristView.attribution(mirror:now:)` names which of the two is on screen, so
+    /// the number is attributed rather than asserted (spec §5's "withheld and attributed, never a
+    /// confident zero", read across to the never-synced case).
+    ///
+    /// Reads through `self.mirror` for the same reason `isMirrorStale` and `todaysTotal` do — it
+    /// needs no tracking of its own, because `mirror` is the only tracked state it touches.
+    var displayGoal: Int {
+        mirror?.dailyGoal ?? DataManager.defaultDailyGoal
+    }
+
     /// `true` when the mirror's own day and the watch's own day disagree — the phone may not have
     /// rolled over yet, or the two devices are in different time zones right now. The number is
     /// still shown; this only tells the UI to soften how confidently it presents it (spec §5:
@@ -154,8 +171,17 @@ final class WristModel {
     }
 
     private func persistMirror() {
-        guard let mirror = storedMirror, let data = try? JSONEncoder().encode(mirror) else { return }
-        defaults.set(data, forKey: DataManager.Key.wristMirror)
+        guard let mirror = storedMirror else { return }
+        do {
+            defaults.set(try JSONEncoder().encode(mirror), forKey: DataManager.Key.wristMirror)
+        } catch {
+            // Rule `75-diagnostics`: every fallback in this product announces itself. A silent
+            // `try?` here meant a watch that had genuinely received a mirror could still come back
+            // from a relaunch showing the pre-sync screen, with nothing anywhere saying why.
+            #if DEBUG
+            print("[WaterBuddy] Could not persist the wrist mirror: \(error.localizedDescription)")
+            #endif
+        }
     }
 
     private static func readOutbox(from defaults: UserDefaults) -> [WristPour] {
@@ -165,8 +191,17 @@ final class WristModel {
     }
 
     private static func readMirror(from defaults: UserDefaults) -> WristMirror? {
+        // An absent key is the ordinary never-synced case, not a failure — only a *present but
+        // undecodable* value is worth announcing (rule `75-diagnostics`).
         guard let data = defaults.data(forKey: DataManager.Key.wristMirror) else { return nil }
-        return try? JSONDecoder().decode(WristMirror.self, from: data)
+        do {
+            return try JSONDecoder().decode(WristMirror.self, from: data)
+        } catch {
+            #if DEBUG
+            print("[WaterBuddy] Stored wrist mirror could not be decoded: \(error.localizedDescription)")
+            #endif
+            return nil
+        }
     }
 
     /// The production default for `send:`. `pour(amount:)`'s own tests inject their own `send`

@@ -2383,3 +2383,928 @@ docs/WIDGET.md          one sentence: the reminder hook's early return; Last upd
 ```
 
 Gate unaffected — no source file was touched by either entry. The results recorded above stand.
+
+## [2026-09-01] — The watchOS plan lands: Task 17, the doc and rule cascade
+
+**No source, test or project file was written this session.** Tasks 1–16 of
+`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md`'s implementation plan
+(`docs/superpowers/sdd/2026-09-01-waterbuddy-watchos-implementation/`, no relation to the sdd
+location naming — see `.superpowers/sdd/...`) landed in prior sessions, each independently reviewed,
+ending at `6cee506`. This is the plan's seventeenth and final task: reconcile `.claude/rules/`,
+`CLAUDE.md` and `docs/` against the tree as Task 16 actually left it. Every claim below was
+re-derived against the checked-out tree this session — `xcodebuild -list`, `grep -c` over
+`project.pbxproj`, direct reads of `DataManager.swift`, `WaterBuddyWatch/`, `WaterBuddyWatchTests/`
+and `WaterBuddyWatchWidget/` — not copied from the plan's own task-17 brief, which itself proved
+stale in two places (below).
+
+### What actually shipped, product-side (for this doc pass to describe accurately)
+
+Apple Watch support: `WaterBuddyWatch` (the watch app, `WristView` — one screen, no settings, no
+history), `WaterBuddyWatchWidget` (`.accessoryCircular` percentage-ring complication), and
+`WaterBuddyWatchTests`. The watch pours through `WristModel` into its own **local** App Group suite
+(same identifier string as the phone's, `group.sardor.WaterBuddy` — a physically different
+container, since it's a different device) and exchanges data with the phone exclusively over
+`WatchConnectivity` (`WristLink`, a `WCSessionDelegate`), never through the phone's own App Group.
+Three new keys: `Key.wristOutbox`/`Key.wristMirror` (watch-local) and `Key.wristApplied`
+(phone-local, the apply ledger that makes a re-sent, already-deleted pour a no-op rather than a
+resurrection). `DataManager.role` — landed the day *before* this plan, on 2026-08-31 — gained its
+two watch cases, `.watchApp`/`.watchExtension`, both answering `false` to all four of its questions.
+
+### Where the plan's own brief was stale, and had to be re-derived rather than trusted
+
+The task-17 brief this session executed from was itself written before Tasks 9–16 ran, and its own
+framing warned of this explicitly. Two concrete places it was wrong, caught only by reading the
+actual tree:
+
+- **"Two exception sets" was undercounting; the watch app's own set is six files, not five.**
+  `project.pbxproj` carries **three** `PBXFileSystemSynchronizedBuildFileExceptionSet`s, not two:
+  the pre-existing phone widget's (six files, unchanged), `WaterBuddyWatch`'s own (**six** files —
+  `DataManager.swift`, `LiquidGlassModifier.swift`, `ReminderPlan.swift`, `WaterLog.swift`,
+  `WaterSurface.swift`, and `WristPlan.swift`, added because `WristModel` buckets pours through it —
+  not the five the brief described from an earlier state of the plan), and `WaterBuddyWatchWidget`'s
+  own (five files, confirmed minimal and independently verified against its `#if !os(watchOS)`
+  compile-visibility precedent, per the plan's own Task 16 ledger).
+- **The gate's watch-widget scheme name.** The brief's own fenced Step 10 block names
+  `WaterBuddyWatchWidgetExtension`; `xcodebuild -list` reports the real scheme as
+  `WaterBuddyWatchWidget`, no "Extension" suffix — a discrepancy the plan's own Task 16 ledger had
+  already caught in the brief text and flagged forward. Used the real name to run the gate; corrected
+  it in rule `85-testing` and `docs/AI_CONTEXT.md` rather than the brief's spelling.
+
+### The rule cascade
+
+- **`70-privacy.md`** — inserted the WatchConnectivity ruling verbatim from spec §9 (owner-approved
+  per spec §14), after the existing "Nothing leaves the device" bullets.
+- **`40-widget.md`** — new *Target membership* section naming all three exception sets and their
+  real membership; fixed the `guard !isAppExtension else { return }` sentence (twice in this file —
+  once in the new section's own citation, once at the pre-existing site spec §9.2 named) to
+  `guard role.mayFileReminders else { return }`.
+- **`80-notifications.md`** — the identical stale sentence, same fix, per spec §9.2's "two rule
+  files quote the same sentence."
+- **`25-shared-storage.md`** — the largest single edit. The six-site census (spec §3.1: it was four
+  in the rule text, six in the tree) rewritten as four questions over six sites; new *The watch's
+  own, separate suite* section with the three keys; *Target membership* rewritten for three
+  exception sets instead of one.
+- **`30-rollover.md`** — `WristPour.at`/`WristPlan` documented as the same instant-vs-ordinal split
+  `WaterLog.timestamp` already makes, one device further out.
+- **`43-concurrency.md`** — `WristLink` added as a second "never `@MainActor`" instance (alongside
+  `NotificationManager`'s own design), and the `Task { @MainActor in }` hop recorded as the
+  sanctioned pattern for a `WCSessionDelegate` callback — distinct from the `queue: .main` +
+  `MainActor.assumeIsolated` idiom `WristInbox`/`WristModel` correctly keep instead, per
+  `WristLink`'s own DocC. Also fixed a second, brief-unmentioned stale `!isAppExtension` reference in
+  the *Hops* section.
+- **`20-state.md`** and **`10-architecture.md`** — the "one honest weakening" from spec §7: "the
+  only writer" becomes "one writer per store" — stated in **both** files, per spec §9.1's finding
+  that an earlier draft left this in only one.
+- **`50-views.md`** — `vesselSlots`' new home (`WaterSurface.swift`, file scope, moved in Task 14)
+  and why: `WristView` became a second, non-view consumer.
+- **`15-project.md`** — every count re-derived, not incremented: **seven** targets (not four),
+  **four** signed (not two), **three** exception sets (not one), **four** schemes reported by
+  `xcodebuild -list` for seven targets, `26.5` deployment targets on both platforms (was documented
+  as iOS `18.5`, already stale before this plan for unrelated reasons — corrected here since this
+  pass was already re-deriving every number in this file).
+- **`85-testing.md`** — the three-invocation gate replaced with the five spec §9.1/§10 describes,
+  exact `-destination` strings including both watchOS ones, the corrected `WaterBuddyWatchWidget`
+  scheme name, and watch-fixture guidance (throwaway suite, injected clock, compile-time canaries —
+  the identical discipline the phone side already has).
+- **Every rule's `globs:` frontmatter** widened per spec §9.1's "glob problem" — 13 rules gained
+  `WaterBuddyWatch/**`, `WaterBuddyWatchTests/**` and/or `WaterBuddyWatchWidget/**` entries (scoped
+  per rule, not identical everywhere); `00-workspace`, `90-git` and `95-dependencies` needed no
+  change, already `**/*`-equivalent.
+
+### Docs
+
+- **`CLAUDE.md`** — target table gained three rows (not two — `WaterBuddyWatchTests` included for
+  consistency with the table's own existing per-target-folder pattern), the watch's separate local
+  suite documented, the storage table's key count corrected (eight → nine, the phone's own suite
+  gaining `wristApplied`), and the one-writer-per-store weakening stated in the Product Context
+  section.
+- **`docs/AI_CONTEXT.md`** — full file list for `WaterBuddyWatch/`, `WaterBuddyWatchTests/`,
+  `WaterBuddyWatchWidget/` plus the two new phone-side files (`WristPlan.swift`, `WristInbox.swift`);
+  `DataManager.swift`'s line count (1544 → 2040); test counts re-derived with the `@Test`-attribute
+  grep rule `85-testing` specifies (**292** across **31** suites, phone side; **15** across **5**
+  suites, watch side — not carried over from any prior task's report); the five-invocation gate
+  result; known issues #15 and #17 retired on evidence, #16's line numbers corrected for the same
+  ~500-line shift, one new known issue (#18: the watch draws two hardcoded English strings, no
+  `\.strings` injection anywhere in `WaterBuddyWatch/`, not named in spec §12's "Not in v1").
+- **`docs/STATE.md`** — the three new keys added to the key table/a new dedicated section, in the
+  file's own existing per-key format; the "Who may write on behalf of the group" site line numbers
+  corrected for the same shift; the stale `!isAppExtension` reference in *Who reschedules* fixed.
+- **`docs/WIDGET.md`** — **not touched.** `grep -c 'Wrist\|WatchConnectivity' docs/WIDGET.md` → 0,
+  and the phone widget's own contract did not change in this plan. Rule `99-docs-cascade`'s "never
+  publish a doc change nothing required" — the exact miss a prior checkpoint in this file had to
+  correct in a second entry.
+
+### One thing this task's file list did not cover, left for the owner
+
+`grep -rn "isAppExtension" .claude/ CLAUDE.md docs/` (below) is **not** fully clean: two files carry
+the identical stale predicate as a live, forward-looking instruction rather than a historical quote
+— `.claude/commands/add_feature.md:23` ("guard anything that writes on behalf of the group with
+`isAppExtension`") and `.claude/commands/review.md:19` ("Writes on behalf of the group guarded by
+`isAppExtension`"). Neither file is in this task's own declared file list (`.claude/rules/*`,
+`CLAUDE.md`, `docs/*`, `HISTORY.md`, `tasks/lessons.md`), and that list is this task's authorization
+boundary, not merely a suggestion — so they were **not** edited. Recorded here rather than silently
+left, because the whole point of this task's own closing check is to catch exactly this shape of
+gap.
+
+### Verification
+
+Five invocations, foreground, one simulator at a time, `xcrun simctl shutdown all` before and after:
+
+| Command | Result |
+|---|---|
+| `xcodebuild test -scheme WaterBuddy … -only-testing:WaterBuddyTests` | `✔ Test run with 292 tests in 31 suites passed` |
+| `xcodebuild test -scheme WaterBuddy … -only-testing:WaterBuddyUITests` | `** TEST SUCCEEDED **` — 25 executed (7 + 2 + 16), 0 failures |
+| `xcodebuild test -scheme WaterBuddyWatch … -only-testing:WaterBuddyWatchTests` | `✔ Test run with 15 tests in 5 suites passed` |
+| `xcodebuild build -scheme WaterBuddyWidgetExtension …` | `** BUILD SUCCEEDED **` |
+| `xcodebuild build -scheme WaterBuddyWatchWidget …` | `** BUILD SUCCEEDED **` |
+
+`grep -c "warning:"` over each invocation's own captured log: **0** on all five. These were
+incremental builds against `DerivedData` warm from Task 16's own work, not a forced-clean rebuild —
+this task changed no source, so there is nothing for a clean rebuild to newly implicate, but the
+figure above is "zero new," not independently re-proven as "zero anywhere" the way Task 2's ledger
+established the true baseline is not.
+
+`grep -rn "isAppExtension" .claude/ CLAUDE.md docs/`: clean except the two `.claude/commands/` hits
+above (live instructions, out of this task's file list) and hits that are self-evidently historical
+or quoted-for-contrast within `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `CLAUDE.md`,
+and the two `docs/superpowers/` planning artifacts (the design spec and the plan document, both
+narrating past states of the code on purpose, neither a maintained reference doc).
+
+### Files touched
+
+```
+.claude/rules/10-architecture.md    globs widened; the one-writer-per-store weakening; isAppExtension -> role.*; three exception sets noted
+.claude/rules/15-project.md         every target/scheme/exception-set/signing count re-derived
+.claude/rules/20-state.md           globs widened; the one-writer-per-store weakening
+.claude/rules/25-shared-storage.md  globs widened; six-site census rewritten; the watch's own suite section; target membership rewritten
+.claude/rules/30-rollover.md        globs widened; WristPour.at/WristPlan instant-vs-ordinal split
+.claude/rules/40-widget.md          globs widened; Target membership section added; isAppExtension -> role.mayFileReminders (x2)
+.claude/rules/43-concurrency.md     globs widened; WristLink never-@MainActor + Task{@MainActor in} pattern; isAppExtension fix
+.claude/rules/50-views.md           globs widened; vesselSlots' new home
+.claude/rules/60-design-system.md   globs widened only
+.claude/rules/65-accessibility.md   globs widened only
+.claude/rules/70-privacy.md         globs widened; WatchConnectivity ruling inserted
+.claude/rules/80-notifications.md   globs widened; isAppExtension -> role.mayFileReminders
+.claude/rules/85-testing.md         globs widened; five-invocation gate; watch-fixture guidance
+CLAUDE.md                           target table +3 rows; watch's own suite line; storage table key count; one-writer-per-store
+docs/AI_CONTEXT.md                  full watch file list; counts re-derived; gate result; #15/#17 retired, #16 corrected, #18 added
+docs/STATE.md                       three new keys, own section; site line numbers corrected; isAppExtension fix
+HISTORY.md                          this entry
+```
+
+`tasks/lessons.md` gains one entry below this checkpoint, for the one genuinely new pitfall this
+task's own execution hit (not a restatement of the spec's already-recorded lessons).
+
+### Not verified
+
+- **Real device behaviour, on either the phone or the watch.** Task 8's paired-simulator probe is
+  the closest this plan came, and it explicitly could not distinguish "the simulator doesn't model
+  `WatchConnectivity`" from "the transport genuinely failed" — see `docs/AI_CONTEXT.md`'s expanded
+  "Still not verified" list.
+- **The watch widget's on-face rendering.** No automated coverage exists for widget rendering on
+  either platform, per rule `85-testing`'s standing note — the `.accessoryCircular` face has never
+  been placed on a real or simulated watch face and looked at.
+- **A device-signed build of either watch target.** The five-invocation gate is entirely
+  simulator-side; nothing in this environment's toolchain provisions a device build for
+  `WaterBuddyWatch` or `WaterBuddyWatchWidget`.
+- **A true clean-build warning count**, as opposed to the "zero new" figure above.
+
+### Next steps
+
+- The owner may run `/commit` — everything in *Files touched* above is staged, not committed
+  (rule `90-git`). This is the plan's seventeenth and final task; nothing further is queued behind
+  it.
+- Worth a deliberate, separate decision: known issue #18 (the watch's two hardcoded English
+  strings) and the `.claude/commands/` residual noted above are both small, both outside this task's
+  own authorization, and both genuinely worth a future one-line pass.
+
+## [2026-09-01] — Task 17, fix round 1: four accuracy defects the review caught, this checkpoint missed
+
+**No source, test or project file was written this session** — same scope as the checkpoint above.
+Independent review of that checkpoint's diff found four Important accuracy defects, all confirmed
+against the live tree before fixing. Superseding, not rewriting, the entry above.
+
+1. **A third live instance of the stale-guard-text pattern, missed in the original sweep.**
+   `.claude/rules/30-rollover.md`'s *Detecting the turn* section still read `Guard the stamp with
+   \`!Self.isAppExtension\`` — the identical fresh-install day-stamp guard in `resetIfNeeded()` that
+   `40-widget.md` and `80-notifications.md` were fixed for in the checkpoint above, but this third
+   file was not checked. Now reads `Guard the stamp with \`Self.role.ownsSharedStorage\``, with the
+   same "corrected from … until 2026-09-01" framing and the watch-exclusion reason. Re-ran the full
+   `grep -rn "isAppExtension" .claude/ CLAUDE.md docs/` sweep by hand against every remaining hit,
+   not just the files remembered from the first pass — confirmed clean now except the same two
+   `.claude/commands/*.md` files, correctly out of this task's declared scope (the review agreed).
+2. **`docs/AI_CONTEXT.md`'s "The process role" section cited stale line numbers.** `DataManager.role`
+   and `enum Role` were cited at `:1032`/`:1041`, left over from before the section was last touched;
+   the live file has them at `:1149`/`:1158` — `docs/STATE.md`'s parallel section already had this
+   right. Both citations corrected to match.
+3. **`docs/AI_CONTEXT.md`'s "Files on disk" table carried ten stale line counts**, caught by the
+   review's spot-check and confirmed by re-running `wc -l` on every single file in the table, not
+   just the flagged ones (no further discrepancies found beyond the ten named): `GoalSetupView.swift`
+   (277→281), `HistoryView.swift` (666→670), `LiquidGlassModifier.swift` (494→501),
+   `WaterBuddyApp.swift` (94→108 — its own row's description already named the new watch-launch code
+   from the original pass, but the count itself had not been re-derived), `DataManagerTests.swift`
+   (1115→1173), `LiquidGlassTests.swift` (113→135), `LocalizationTests.swift` (277→345),
+   `WaterLogTests.swift` (490→503), `WaterSnapshotTests.swift` (496→565), `GoalSetupUITests.swift`
+   (238→245).
+4. **Known issue #15's own retirement text was wrong about `43-concurrency.md`.** It said that file
+   "was already accurate" — but the original checkpoint's own diff, and its own *Files touched* list,
+   record fixing a stale `guard !isAppExtension else { return }` quote in that file's *Hops* section
+   in the same pass. `HISTORY.md`'s prior checkpoint had this right; `docs/AI_CONTEXT.md` did not.
+   Corrected to match, and to record the `30-rollover.md` miss found in this same fix round.
+
+**Also fixed, optional per the review, confirmed present:** `CLAUDE.md` carried a stray orphaned
+`> water.` line immediately after the newly-inserted WatchConnectivity/watch-suite paragraph — a
+leftover from the original paragraph's own trailing sentence, duplicated when the new paragraph was
+inserted between it and the following section. Removed the stray line; the original sentence's own
+single "…drawing the same / water." remains intact one paragraph earlier.
+
+### Files touched (fix round 1)
+
+```
+.claude/rules/30-rollover.md   the third live !isAppExtension instance, fixed
+CLAUDE.md                      stray duplicated "water." line removed
+docs/AI_CONTEXT.md             process-role line citations corrected; Files-on-disk table
+                                re-derived in full (10 stale counts fixed); known issue #15 text
+                                corrected to match HISTORY.md
+HISTORY.md                     this entry
+```
+
+`tasks/lessons.md` — not touched this round; no new pitfall distinct from the one already recorded.
+
+### Verification
+
+- `grep -rn "isAppExtension" .claude/ CLAUDE.md docs/` — every rule-file hit manually re-classified
+  (see above): all seven remaining rule-file hits are historical/quoted or factual property
+  mentions, none a live guard instruction. Only `.claude/commands/add_feature.md` and
+  `.claude/commands/review.md` remain live and out of scope, unchanged from the original checkpoint.
+- `wc -l` re-run on every one of the ~52 files in `docs/AI_CONTEXT.md`'s Files-on-disk table, not
+  just the ten the review flagged — no further discrepancies found.
+- `grep -n "DataManager.swift:1149\|:1158"` in `docs/AI_CONTEXT.md` confirms both corrected
+  citations now match `docs/STATE.md`'s own (already-correct) citations and the live file.
+- No `xcodebuild` invocation was re-run this round — no source changed, and the five-invocation gate
+  the prior checkpoint already ran in full stands unaffected by a documentation-only fix round.
+
+### Not staged as a commit
+
+Everything above is staged with the same explicit-paths `git add` the task brief requires; no
+`git commit` was run (rule `90-git`, and this fix round's own scope instruction).
+
+## [2026-09-01] — Final whole-branch review, fix round: 3 Critical data-integrity bugs in the sync path, plus 2 Important, closed
+
+### What
+
+The plan's final whole-branch review (the last checkpoint before the branch is considered finished,
+run on the most capable available model) found three Critical correctness bugs and ten Important
+findings in the WatchConnectivity sync mechanism that no single per-task review could see, because
+each only becomes visible reading the whole arc at once. This entry closes the load-bearing subset:
+three Critical bugs, plus two Important findings the reviewer flagged as belonging in the same pass
+(a missing outbox-resend path, and test fixtures reaching real storage). The remaining Important and
+Minor findings are recorded as new known issues below, deliberately deferred rather than fixed here,
+per this repo's own established practice and the reviewer's explicit recommendation that each is a
+self-contained follow-up.
+
+**Process note, disclosed because it shaped how this pass happened:** a context compaction during
+this session caused the controller to lose track of an already-dispatched fix agent and re-run the
+entire final-review process a second time, producing two overlapping fix dispatches against the same
+working tree concurrently. This was caught before either committed anything (verified via `git
+reflog` — HEAD stayed at `6cee506` throughout), the two dispatches were consolidated onto one agent,
+and the combined result was independently re-verified by a fresh reviewer with no connection to
+either original dispatch before anything below was queued to commit. Nothing was lost; the collision
+cost time, not correctness — but it is recorded here because it is exactly the kind of coordination
+failure this project's own single-writer discipline (rule `20-state`) argues against, applied for
+once to the development process itself rather than to `UserDefaults`.
+
+### Fixed, with real RED-then-GREEN evidence, independently re-verified against the live source (not
+just the diff) by a reviewer uninvolved in either original fix dispatch
+
+1. **The applied-ledger conjunction guard failed OPEN on a read failure.** `ingest(_:)`'s
+   existence-check went through `allLogs()` — `fetch(nil) ?? []` — which collapses "could not read"
+   into "no rows exist." A read failure during a resend could produce a permanent duplicate
+   `WaterLog` insert. Fixed: `ingest(_:)` now calls `fetch(nil)` directly and declines the whole
+   batch (returns 0 folded) on `nil`, rather than treating "unreadable" as "safe to insert." The
+   ledger-decode half has the same shape: a present-but-undecodable ledger now returns `nil` and
+   declines the batch; a genuinely absent ledger still returns `[:]` (empty, correctly).
+   **Correction, found by a second independent re-verification pass after this checkpoint was first
+   drafted:** the existing regression test for the `fetch(nil)` half
+   (`aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew`) does not
+   actually isolate that guard — corrupting the on-disk SwiftData store to force the read failure
+   also makes the later `save()` fail, so item 2's separate guard independently produces the same
+   `folded == 0` result even with this guard disabled, and the "RED" originally reported for this
+   half was not real. The ledger-decode half's own test
+   (`anUndecodableLedgerDeclinesTheWholeBatch`, added in this correction) has no such confound —
+   `readAppliedLedger()` reads `UserDefaults`, an unrelated store — and its RED-then-GREEN evidence
+   is genuine, independently re-run twice. The `fetch(nil)` half's code is still correct (confirmed
+   by direct reading, and it is exercised correctly as part of item 2's own isolated test), but no
+   test in this codebase currently proves it would be caught if it regressed on its own; that gap
+   is recorded honestly rather than left implied-covered.
+2. **`ingest(_:)` wrote the applied-ledger entry before the SwiftData save, with no rollback on save
+   failure.** A save failure could permanently mark pours as applied with no row to back them,
+   silently and irrecoverably losing watch-authored water — every future resend of the same ids was
+   then blocked by the ledger half of the very guard meant to protect against duplication. Fixed:
+   `saveAndRecompute()` now returns a `Bool`; `ingest(_:)` gates the ledger write on that result and
+   returns early on failure, before ever reaching the ledger write.
+3. **The wire mirror's `acked` id list was sorted oldest-first and truncated at 256** — the newest
+   (still genuinely unacked) ids were the ones dropped once the applied ledger exceeded 256 entries,
+   which happens in ordinary steady-state use under the existing 90-day retention window. Acking
+   permanently stopped working for new pours past that point, and the watch would have double-counted
+   every wrist-authored pour forever. The regression test that should have caught this asserted only
+   `acked.count == 256`, which passes under either sort direction. Fixed: sort descending by ledger
+   day before truncating, so the cap drops retired ids rather than in-flight ones; the test now
+   asserts `Set(mirror.acked) == Set(todaysIds)`, which only passes under the correct ordering.
+4. **The watch's outbox had no resend path.** `WristModel.pour(amount:)` sent only the single newly
+   -added pour, never the accumulated outbox — stranding any earlier un-acked pour, leaving the
+   >64-pour chunking path and the `schemaVersion`-mismatch retry design unreachable in production.
+   Fixed: a pour now sends the full current `storedOutbox`, making the outbox the retry queue the
+   rest of the design (chunking, `schemaVersion` gating, the applied-ledger idempotency guard) always
+   assumed it was.
+5. **Every `DataManager` test fixture and `#Preview` omitted the WatchConnectivity-publish no-op**,
+   so tests and canvases silently reached the real `group.sardor.WaterBuddy` App Group suite and a
+   real `WCSession` — a verbatim repeat of a previously-tracked-and-closed known issue for
+   `rescheduleReminders:`. Fixed: the injected closure (`publishWrist`) now takes its `UserDefaults`
+   as a parameter instead of reading the shared global internally, every one of the 11 test
+   construction sites and 5 `#Preview` sites now passes an explicit `{ _ in }`, and four production
+   call sites that had been missing the publish call entirely (`saveDailyGoal`, `refresh()`'s
+   backstop, the `language` setter, `AddWaterIntent`'s two initialisers) were closed at the same time.
+
+**Also fixed in the same pass, from an overlapping earlier review round, each with its own
+RED-then-GREEN evidence:** the applied-ledger retention trim no longer strips a just-folded old pour
+in the same write that added it; `WristModel.shared` is now eagerly constructed on both the watch
+app's `init()` and its `.backgroundTask(.watchConnectivity)` closure (closing the headless-launch
+observer gap — see known issue list below, previously this would have been deferred, but it turned
+out to be a small, self-contained fix); `WristAurora` gained the `if !reduceTransparency` branch its
+declared sibling `WidgetAurora` already had; a bare colour literal in `WristView` now goes through
+`.liquidGlass(in:density:)`; `WristLink`'s `nonisolated` annotation was made explicit as defensive
+practice, with an honest disclosure that this toolchain's `SWIFT_APPROACHABLE_CONCURRENCY = YES`
+suppresses the compiler diagnostic that would otherwise prove the regression if removed — three probe
+techniques were tried, none reproduced a warning, and that failure is recorded honestly
+(`WristLinkReachabilityTests`) rather than papered over with a canary that doesn't actually work.
+
+### New known issues (deliberately deferred, not fixed this pass)
+
+Per the final review's own explicit recommendation — each is real and user-visible, but small and
+self-contained enough to scope as an independent follow-up rather than block this pass further:
+
+- The watch widget's `TimelineProvider` never applies the day-ordinal rollover and has no
+  midnight-dated entry, unlike the phone widget's equivalent — it can display a stale, wrong
+  percentage across a midnight boundary.
+- `WristVessel.diameter(fitting:reserving:)` is called with `reserving: 0` at both call sites in
+  `WristView.swift`, so the vessel overflows its allotted row height on every real watch size — the
+  populated `WristView` screen (vessel + pour rows together) has never actually been rendered on any
+  simulator or device, only its empty state.
+- `WristModel.isMirrorStale` is computed and tested but has no production consumer — `WristView`
+  shows the mirror's total with no staleness treatment, so a stale (pre-midnight) mirror can display
+  as a confident, wrong "today's total."
+
+### Files touched
+
+```
+WaterBuddy/DataManager.swift            C1, C2, C3, I5's production seam, I7's publishWrist rewire
+WaterBuddy/WristInbox.swift             publishWrist call-site update
+WaterBuddy/GoalSetupView.swift          #Preview publishWrist no-op
+WaterBuddy/HistoryView.swift            #Preview publishWrist no-op
+WaterBuddy/HomeView.swift               #Preview publishWrist no-op
+WaterBuddy/RootTabView.swift            #Preview publishWrist no-op
+WaterBuddy/SettingsView.swift           #Preview publishWrist no-op
+WaterBuddy/WaterBuddyWidget/AddWaterIntent.swift   two missing publishWrist call sites closed
+WaterBuddyWatch/WaterBuddyWatchApp.swift   WristModel.shared eager construction
+WaterBuddyWatch/WristAurora.swift       reduceTransparency branch added
+WaterBuddyWatch/WristModel.swift        I5's outbox resend, retention-trim fix
+WaterBuddyWatch/WristView.swift         bare colour literal replaced with .liquidGlass
+WaterBuddyTests/DataManagerTests.swift  publishWrist no-op wiring, new regression tests
+WaterBuddyTests/HistoryRangeTests.swift publishWrist no-op wiring
+WaterBuddyTests/HistoryViewTests.swift  publishWrist no-op wiring
+WaterBuddyTests/HomeViewTests.swift     publishWrist no-op wiring
+WaterBuddyTests/ServingSeamTests.swift  publishWrist no-op wiring
+WaterBuddyTests/WaterLogTests.swift     publishWrist no-op wiring
+WaterBuddyTests/WristSyncTests.swift    C1/C2/C3 regression tests, WristLinkReachabilityTests
+WaterBuddyWatchTests/WristModelTests.swift   I5 regression test
+CLAUDE.md, .claude/rules/00-workspace.md, .claude/rules/90-git.md,
+.claude/rules/95-dependencies.md, .claude/rules/75-diagnostics.md,
+.claude/rules/99-docs-cascade.md, .claude/rules/30-rollover.md,
+.claude/rules/43-concurrency.md, .claude/rules/60-design-system.md,
+.claude/rules/65-accessibility.md, .claude/rules/70-privacy.md   doc/rule corrections (see below)
+docs/AI_CONTEXT.md, docs/STATE.md       gate table refreshed, git-repo section corrected,
+                                         allLogs() note corrected, new known issues appended
+HISTORY.md                              this entry
+```
+
+### Doc/rule corrections folded into the same pass
+
+- `CLAUDE.md` and `.claude/rules/00-workspace.md` no longer describe the pre-watch two-invocation
+  gate or the four-folder layout — both now match the current five-invocation gate and seven-target
+  layout.
+- `.claude/rules/95-dependencies.md`'s synchronized-folder count corrected to seven.
+- `.claude/rules/75-diagnostics.md`, `.claude/rules/99-docs-cascade.md`, `.claude/rules/30-rollover.md`
+  — `globs:` frontmatter widened to include the watch folders, closing the gap the prior fix round
+  left (two rules unwidened entirely, one missing `WaterBuddyWatchWidget/**` specifically).
+- `.claude/rules/90-git.md` no longer opens with "this project is not a git repository yet" — it now
+  states the real current state (a real repository, initialised under scoped owner authorization,
+  27 commits at the time of this pass) while keeping the substantive rules below unchanged.
+- `docs/AI_CONTEXT.md`'s "There is no git repository" section and matching known-issue entry
+  corrected to describe reality; its `allLogs()` known-issue entry corrected to match what the code
+  actually does (`ingest(_:)` calls `fetch(nil)` directly, not through `allLogs()`); its Gate table
+  refreshed from 292/31 phone and 15/5 watch to 299/33 and 16/5, with a superseding note rather than
+  a silent rewrite.
+
+### Verification
+
+- All five gate invocations re-run in the foreground after every fix: `xcrun simctl shutdown all`
+  first, one simulator, `-parallel-testing-enabled NO`. `✔ Test run with 299 tests in 33 suites
+  passed` (phone unit — up from 292/31: one new test, `savingTheDefaultGoalUnchangedStillPublishesToTheWrist`,
+  one new suite, `WristLinkReachabilityTests`), `Executed 25 tests, with 0 failures` (phone UI,
+  unchanged), `✔ Test run with 16 tests in 5 suites passed` (watch unit — up from 15:
+  `pouringASecondTimeResendsTheWholeOutboxNotJustTheNewestPour`), both widget builds
+  `** BUILD SUCCEEDED **`. Zero new warnings, checked via a clean-build diff against an isolated
+  worktree rather than an incremental-build grep.
+- An independent reviewer, uninvolved in either of the two original overlapping fix dispatches,
+  re-read the live source (not the diff) for each of the five fixes above and confirmed each by file
+  and line against `WaterBuddy/DataManager.swift`, `WaterBuddyWatch/WristModel.swift`, and
+  `WaterBuddy/WristInbox.swift`, plus their regression tests — verdict: all five genuinely and
+  correctly implemented, doc corrections landed and internally consistent.
+- `git reflog` confirmed HEAD never moved during the whole collision-and-consolidation episode —
+  `6cee506` throughout, nothing committed by either of the two colliding dispatches.
+
+### Not verified
+
+Everything this plan's own `HISTORY.md` entries have already disclosed as unverified remains
+unverified here too: real-device behaviour beyond the simulator, the watch widget's on-face
+rendering (no automated coverage exists for widget rendering on either platform), and — newly, from
+this pass's own deferred known issues — the populated `WristView` screen (vessel + pour rows
+together) has still never been rendered on any simulator or device, only its empty state.
+
+### Staged, not committed
+
+Documentation and rule-file changes above are staged with the same explicit-paths `git add` this
+plan's every prior task has used; no `git commit` was run for them (rule `90-git` — only the owner
+runs `/commit`). The source and test changes (C1/C2/C3/I5/I7 and the additional fixes named above)
+are committed separately, under this plan's existing scoped git authorization for source-touching
+work (the same authorization Tasks 1–16 used) — see the commit(s) immediately following this entry
+in `git log`.
+
+## [2026-09-01] — Test-isolation fix: C1's regression test didn't distinguish its own guard from C2's
+
+### What
+
+A follow-up check found that `aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew`
+(C1's regression test, added in the prior entry) corrupts the SwiftData store to force `fetch(nil)`
+to fail — but if *only* C1's guard were reverted (the `fetch(nil)` failure papered over with a
+fallback), the same store corruption would still fail the later `saveAndRecompute()` call, and C2's
+independent guard would catch it downstream. The test would still pass, for the wrong reason — it
+pins "the store cannot be read or written" as a whole, not C1's specific decline.
+
+Documented the confound directly on the existing test, and added
+`anUndecodableLedgerDeclinesTheWholeBatch`: it corrupts only the `UserDefaults`-backed applied
+ledger (`readAppliedLedger()`'s data source, entirely separate from the SwiftData store `fetch(nil)`
+reads), leaving the store perfectly healthy — a failure of this test can only mean the ledger-decode
+half of C1's guard regressed, not C2's guard catching something unrelated. Verified RED (guard
+weakened to `readAppliedLedger() ?? [:]`) then GREEN (restored) by hand before committing. Purely
+additive — one new test, one doc comment on the existing test, no production code touched.
+
+### Verification
+
+- `xcodebuild test -scheme WaterBuddy -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17' -only-testing:WaterBuddyTests -parallel-testing-enabled NO` — `✔ Test run with 300 tests in 33 suites passed` (up from 299: the one new test).
+- All five gate invocations re-run in full, fresh, directly against this exact commit: phone unit
+  (300/33, above), phone UI (`Executed 25 tests, with 0 failures`), watch unit
+  (`✔ Test run with 16 tests in 5 suites passed`), phone widget build
+  (`** BUILD SUCCEEDED **`), watch widget build (`** BUILD SUCCEEDED **`).
+
+### Files touched
+
+```
+WaterBuddyTests/WristSyncTests.swift   confound documented on the existing test; new isolated test added
+HISTORY.md                             this entry
+```
+
+### Not staged as a commit
+
+This entry is staged with the same explicit-paths `git add` as every other doc/rule file from this
+plan's final pass; the source change (`WaterBuddyTests/WristSyncTests.swift`) was committed
+separately, following this plan's existing scoped git authorization for source-touching work.
+
+## [2026-09-01] — The watch schemes vanished, and the watch became usable before its first sync
+
+### What
+
+Two problems, reported together by the owner: *"in build schemas there is only watchwidget and
+widget extension … i can't build it in my phone and there is apple watch app is not working and only
+says open water buddy in you phone."*
+
+**1 — the missing schemes (a build blocker, not a code bug).** `xcodebuild -list` reported only
+`WaterBuddyWatchWidget` and `WaterBuddyWidgetExtension`. Marking those two Shared in Xcode had
+written `SuppressBuildableAutocreation` for **all four** native targets into
+`xcuserdata/…/xcschememanagement.plist`, which stops Xcode auto-creating the schemes it previously
+generated — and no `.xcscheme` existed on disk for `WaterBuddy` or `WaterBuddyWatch`, so those two
+schemes simply ceased to exist. With no phone-app scheme there is no way to build to a device, and
+therefore no way to install the watch app, which reaches the watch only as the copy embedded at
+`WaterBuddy.app/Watch/WaterBuddyWatch.app`. Fixed by writing both missing shared schemes by hand,
+each with its own test target(s) wired into the `TestAction`. All four `.xcscheme` files are now
+checked in and must stay so — once autocreation is suppressed, a missing file is a missing scheme.
+
+**2 — the watch's dead-end screen.** `WristView` gated everything on
+`if let mirror = model.mirror, mirror.isGoalSet`, and **both** halves fell through to the single
+sentence "Open WaterBuddy on your iPhone" — advice that only helps in one of the two states, and
+which produced a first-mirror deadlock: the only watch-side action that makes the phone publish is a
+pour, and the pour rows sat behind the gate a mirror was needed to open. Owner approved reversing
+one line of spec §12 (*"a watch-only independent mode"*); recorded as spec §16.
+
+### Rulings this rests on
+
+- Spec §16 (new, owner-approved): the watch draws its own screen before any mirror, against
+  `DataManager.defaultDailyGoal`, with the goal in use **named** on screen rather than asserted —
+  §5's *"withheld and attributed, never a confident zero"* extended one state further out. §12's
+  other exclusions (watch-authored goal, settings, history, delete/edit, watch-local SwiftData)
+  were re-confirmed, not relaxed.
+- Pours cannot diverge: UUID-keyed, reconciled by the phone's applied-ledger conjunction guard. The
+  only value that can differ across devices is the displayed percentage while the watch is still on
+  the default goal, and it converges on the first mirror.
+
+### Changed
+
+```
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddy.xcscheme          new (restores the scheme)
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme     new (restores the scheme)
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatchWidget.xcscheme      now tracked
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWidgetExtension.xcscheme  now tracked
+WaterBuddy.xcodeproj/project.pbxproj   WristPlan.swift added to WaterBuddyWatchWidget's exception
+                                        set (five files → six); WATCHOS_DEPLOYMENT_TARGET on that
+                                        target corrected 11.6 → 26.5 in both configurations, the
+                                        only target that disagreed with rule 15-project's 26.5
+WaterBuddyWatch/WristView.swift        ungated; draws against WristModel.displayGoal; attribution
+                                        moved outside every branch and split three ways; vessel
+                                        sized with diameter(fitting:within:)
+WaterBuddyWatch/WristModel.swift       displayGoal added; persistMirror/readMirror now announce
+                                        failure in DEBUG (rule 75-diagnostics)
+WaterBuddyWatch/WristVessel.swift      diameter(fitting:within:) added, clamping both dimensions
+WaterBuddy/DataManager.swift           WristLink: publishes on activation and on
+                                        sessionWatchStateDidChange (iOS); reads
+                                        receivedApplicationContext on watch activate (watchOS)
+WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift   same default-goal fallback and outbox
+                                        arithmetic as the app, so the face cannot read 0% while
+                                        the app shows real water
+WaterBuddyWatchTests/                  WristViewLogicTests (+3 attribution), WristVesselLayoutTests
+                                        (+2, five real watch sizes), WristModelTests (+3 standalone)
+docs/superpowers/specs/…-watchos-design.md   §16, the amendment
+CLAUDE.md, .claude/rules/00-workspace, 15-project, 25-shared-storage, 40-widget, 90-git   counts
+                                        and the shared-scheme situation corrected
+docs/AI_CONTEXT.md                     known issues 8 and 21 superseded (both now resolved)
+HISTORY.md, tasks/lessons.md           this entry, and the two lessons from the same investigation
+```
+
+### Verification
+
+- Full five-invocation gate, run in the foreground, one simulator at a time, after every change:
+  `✔ Test run with 300 tests in 33 suites passed` (phone unit), `Executed 25 tests, with 0 failures`
+  (phone UI), `✔ Test run with 24 tests in 5 suites passed` (watch unit — up from 16), and
+  `** BUILD SUCCEEDED **` for both the phone and watch widget schemes. No new warnings in any
+  changed file; the `DataManager.swift` isolation warnings are the pre-existing baseline.
+- TDD: RED verified first (`type 'WristView' has no member 'attribution'`), then GREEN.
+- **The populated `WristView` has now actually been rendered** — a 46mm watch simulator, erased to
+  guarantee no persisted mirror, with the phone app never launched: the aurora, the vessel at
+  `0 / 2 000 ml`, and the pour rows all draw, and the vessel fits its frame. This is the first time
+  the non-empty state has been looked at on any device (known issue 21's own caveat, now closed).
+- Device readiness re-proved after the scheme repair: `xcodebuild build -scheme WaterBuddy
+  -destination 'generic/platform=iOS'` succeeds with real signing, and the built product embeds
+  `Watch/WaterBuddyWatch.app`, its `PlugIns/WaterBuddyWatchWidget.appex`, and the phone widget.
+
+### Not verified
+
+- Nothing here was run on physical hardware: the owner's iPhone reported `unavailable` throughout.
+  The phone↔watch sync fixes (activation publish, watch-state publish, `receivedApplicationContext`)
+  are argued from the SDK's own contract and verified only to compile and pass the gate.
+- Neither widget's rendering, on either platform — no automated coverage exists (rule `85-testing`).
+- `WristModel.isMirrorStale` is still computed, tested, and unread by any view. Left deliberately:
+  this pass widened what the attribution says, and wiring staleness into it is a separate decision.
+
+### Staged, not committed
+
+Everything above is staged with explicit paths. No `git commit` was run (rule `90-git`).
+
+## [2026-09-01] — `/doc_sync`: the docs had drifted a whole pass behind the code
+
+### What
+
+Ran `/doc_sync` at the owner's request, diff-first as the command requires. The code changes it was
+syncing (the scheme repair and spec §16) are recorded in the checkpoint immediately above; this
+entry records only what the **sync itself** found and fixed.
+
+### Drift found and fixed
+
+- **24 of the 52 line counts in `docs/AI_CONTEXT.md`'s *Files on disk* table were stale**, some by a
+  lot: `DataManager.swift` 2040 → 2223, `WristSyncTests.swift` 477 → 661,
+  `DataManagerTests.swift` 1173 → 1232, `WaterBuddyWatchApp.swift` 28 → 54. Most predate this
+  session — the previous pass's fix round changed code without re-deriving the table. All 52 now
+  match `wc -l`, re-derived mechanically rather than by hand.
+- **The gate table was a pass behind**: phone unit `299` → **300**, watch unit `16` → **24**.
+- **The targets table carried four stale figures**: `WaterBuddyTests` "292 `@Test` in 31 suites" →
+  **300 in 33**; `WaterBuddyUITests` "15 executed" → **25**; `WaterBuddyWatchTests` "15 `@Test`" →
+  **24**; `WaterBuddyWatchWidget` "+ 5 shared files" → **+ 6**.
+- **Two per-suite counts were wrong**: `LocalizationTests` 11 → **13**, `HomeServingTests` 6 → **7**.
+  Found by parsing `@Test` per *suite declaration* rather than per file — several files hold more
+  than one suite, and `@Suite struct` needs matching too or the suite reads as absent entirely.
+- **`docs/STATE.md`'s `wristMirror` row** described the key's absence as leaving the watch with
+  nothing to draw. Since spec §16 that is no longer what absence means: `displayGoal` falls back to
+  `DataManager.defaultDailyGoal` and the screen is usable and attributed. The row now says so, and
+  records that the complication takes the same fallback plus `Key.wristOutbox`.
+
+### Checked and already accurate — no change made
+
+- **Every `.swift` file on disk is documented**: `find` over all seven target folders returns 52
+  files, and all 52 appear in *Files on disk*. The only name documented but not found is
+  `GenerateAppIcon.swift`, correctly, because it lives in `Tools/` and belongs to no target.
+- **The key count is consistent everywhere**: `DataManager.Key` declares eleven, `Key.all` lists all
+  eleven, and `CLAUDE.md` and `docs/STATE.md` both say nine phone-side plus the watch's two.
+- **`membershipExceptions` totals 18 `.swift` lines** across the three exception sets — 6 + 6 + 6,
+  agreeing with `CLAUDE.md` and rules `15-project`/`40-widget`/`25-shared-storage` as updated.
+- **Every `` rule `nn-name` `` citation resolves** to a file in `.claude/rules/` (the command's own
+  sweep, run over `CLAUDE.md`, `docs/`, `tasks/` and all four source folders).
+- **`docs/WIDGET.md` and `docs/DESIGN.md` were deliberately not touched.** WIDGET.md documents the
+  *phone* widget's contract, which did not change; its only two "watch" matches are unrelated prose.
+  DESIGN.md has no watch content and no token moved. Rule `99-docs-cascade` forbids publishing a doc
+  change nothing required, so neither `Last updated:` was bumped either.
+
+### Scope
+
+Wrote only `docs/AI_CONTEXT.md`, `docs/STATE.md`, `tasks/lessons.md` and this entry — verified with
+`git diff --name-only` while the sync ran. No source or test file was touched by the sync; the code
+files in this session's staged set come from the work the checkpoint above describes. `.claude/` was
+left alone, per rule `99-docs-cascade`: it is not derived.
+
+### Verification
+
+No gate was run *by this sync* — it changed no code. The figures published above come from the full
+five-invocation gate run earlier in this same session, immediately before the sync: 300/33 phone
+unit, 25 phone UI, 24/5 watch unit, both widget builds `** BUILD SUCCEEDED **`.
+
+### Staged, not committed
+
+`git add` with explicit paths. No `git commit` (rule `90-git`).
+
+## [2026-09-01] — `WristView`: the vessel becomes the pour button, one menu button below it
+
+### What
+
+Owner-directed redesign of the watch's one screen. The three equal-weight pour rows under the vessel
+are gone. The **vessel itself** is now the pour button for one serving, and the other two sit behind
+a single button at the bottom of the viewport. Owner's brief, verbatim: *"at the bottom of the view
+port in apple watch should be one button with menu, and the drink water button should be circle
+itself with configurable button of cup, but one cup, in menu all other things and fix the button
+horizontal padding."*
+
+Three decisions were put to the owner before any code was written, and all three took the
+recommended option:
+
+- **"Configurable" means configured on the phone, not on the watch.** The circle pours
+  `mirror.servings[1]` — the middle quick-add vessel, the same index `AddWaterIntent` logs from the
+  Home Screen widget (rule `40-widget`). No new key, no new watch-local state, no rule cascade; the
+  watch and the phone widget cannot drift into following different vessels. Note the middle slot is
+  **"Glass"** (`mug.fill`, 250 ml by default), not "Cup" (index 0, 150 ml) — flagged to the owner at
+  the time and confirmed.
+- **The attribution line stays on screen**, between vessel and button, so spec §8's "always present,
+  never an alert" needed no amendment.
+- **The menu holds the other two vessels only** — a reorganisation of the three pour actions that
+  already existed, not a new capability. Nothing was added to what the watch can author.
+
+### Two defects found on the way, both by rendering rather than by testing
+
+- **`Menu` does not exist on watchOS.** The design named `Menu` with a `.sheet` as the stated
+  fallback; the compiler settled it (*"'Menu' is unavailable in watchOS"*), so the button presents a
+  sheet holding the other servings.
+- **`.safeAreaInset(edge: .bottom)` was the wrong mount and had to be rendered to see it.** It
+  reserves the bar's height *for scrolling*, not for the resting layout — rule `50-views` says so in
+  as many words, and the first implementation quoted that rule and then did it anyway. On a 46mm the
+  capsule drew straight over the bottom of the vessel and pushed the attribution *below* it,
+  inverting the order the owner had just approved. Replaced with rule `65-accessibility`'s own
+  prescribed shape: `GeometryReader` + `ScrollView` + `.frame(minHeight:)` +
+  `.scrollBounceBehavior(.basedOnSize)`, with the button in the flow behind a `Spacer(minLength: 0)`.
+
+A third round was needed after that: a **fixed** vessel height cannot work across 40mm–49mm. 140
+overflowed, 120 still overflowed by ~23pt, and the button — the one element that must stay reachable
+— was what the screen edge clipped. The vessel's box is now a **fraction** of the safe area
+(`vesselHeightFraction = 0.5`), derived from the fixed furniture beneath it (~96pt against a 46mm's
+~193pt).
+
+### Changed
+
+```
+WaterBuddyWatch/WristView.swift        restructured; WristServing (file-scope, Equatable,
+                                        Identifiable); servings(from:)/primary(from:)/secondary(from:);
+                                        WristServingMenu, the sheet; four named layout constants
+                                        replacing the rows' zero horizontal padding
+WaterBuddyWatch/WristVessel.swift      its three accessibility modifiers removed and moved onto the
+                                        Button in WristView (rule 65-accessibility forbids an
+                                        .accessibilityElement(children: .ignore) wrapper around a
+                                        control); DocC records why, and that the type is no longer
+                                        self-describing
+WaterBuddyWatchTests/WristViewLogicTests.swift   +5 tests; the private mirror(...) fixture gained a
+                                        servings: parameter so a test can supply a malformed triple
+```
+
+### The hardening this required
+
+`WristMirror.servings` crosses the wire as a bare `[Int]`. `DataManager`'s setter rejects any triple
+that is not exactly three long (`:273`), but **nothing re-checks it on the watch side** — and while
+the rows were built with `zip` a short array was harmless, because it truncated and a row vanished.
+Indexing `[1]` for the vessel turns the same mirror into a trap. `primary(from:)` is therefore
+non-optional by construction and falls back to `DataManager.defaultServing`;
+`aMirrorTooShortToNameAMiddleVesselStillPoursTheDefault` pins it.
+
+### Verification
+
+- **TDD, RED verified first**: `type 'WristView' has no member 'primary'`, `no member 'secondary'`,
+  `cannot find 'WristServing' in scope` — then GREEN.
+- Full five-invocation gate, foreground, one simulator at a time, re-run in full after the last
+  source change: `✔ Test run with 300 tests in 33 suites passed` (phone unit),
+  `Executed 25 tests, with 0 failures` (phone UI), `✔ Test run with 29 tests in 5 suites passed`
+  (watch unit — up from 24), `** BUILD SUCCEEDED **` for both widget schemes. No new warning in any
+  changed file; the `DataManager.swift` isolation warnings are the pre-existing baseline and that
+  file is not in this diff.
+- **Four `main actor-isolated static property 'primaryIndex'` warnings were introduced and fixed**,
+  not tolerated — `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` infers `@MainActor` onto the constant
+  and the `nonisolated static func`s read it. `nonisolated` added. Rule `43-concurrency`'s
+  `HomeView.servings` case, third instance.
+- **Rendered on two real watch sizes**, which no part of the automated gate does: a 46mm Series 11
+  (correct — vessel, caption, full-width capsule inset off the bezel) and a 40mm SE 3.
+- A spurious-pour scare was **investigated and cleared by experiment**, not by assumption: the
+  outbox gained four 250 ml pours between two screenshots. Their encoded instants (16:51:48–16:51:54)
+  and a ~1.6s/1.05s/3.4s cadence indicated real taps, and a controlled relaunch-and-idle window with
+  zero input left the count at exactly 4 — so the vessel button does not self-fire. The watch test
+  fixtures were checked at the same time and do pass a throwaway suite (rule `85-testing`).
+
+### Not verified
+
+- **The sheet's own rendering.** `simctl` has no tap primitive for watchOS, so the "More" button was
+  never pressed by this session and `WristServingMenu` has been compiled and reasoned about but not
+  looked at. It needs a human tap on a simulator or a watch.
+- **Scrolling on the 40mm/42mm.** Those sizes cannot fit vessel + caption + button at any legal
+  vessel size (the fixed furniture is ~95pt against ~134pt of safe area), so the screen scrolls
+  there by design. That the button is reachable by turning the crown follows from `ScrollView`'s own
+  contract; it was not observed, for the same lack of an input primitive.
+- Nothing here ran on physical hardware, and no `WatchConnectivity` path was exercised — this change
+  touches none, so the standalone `WaterBuddyWatch` scheme was legitimate for the loop
+  (`tasks/lessons.md` lesson (c)).
+- `docs/` is **not** updated by this entry: the watch unit count moved 24 → 29 and
+  `WristView.swift`'s line count changed, both of which `docs/AI_CONTEXT.md` carries. `/doc_sync` is
+  the remaining step.
+
+### Staged, not committed
+
+Staged with explicit paths. No `git commit` was run (rule `90-git`).
+
+## [2026-09-01] — `WristView`: the vessel enlarged twice, at the owner's direction
+
+### What
+
+Two successive owner instructions — *"make centered circle 25% bigger"*, then *"make 25% bigger
+again"* — applied to the screen the checkpoint immediately above describes. This entry
+**supersedes that one's vessel figures**; everything else in it still stands. Appended rather than
+edited, per rule `90-git`.
+
+`WristView.vesselHeightFraction` went **0.5 → 0.625 → 0.78125**. The steps compound, and they are a
+true multiplication of the drawn diameter: the vessel is height-bound on every watch (its box is far
+narrower than the screen), so `diameter = min(width, box)` resolves to the box on all six sizes and
+the fraction *is* the diameter. Measured on a 46mm: ~80pt → ~100pt → ~125pt, **+56% overall**.
+
+`VStack(spacing:)` went 10 → 6 at the first step. That is the only compensation made, and it was
+made deliberately in preference to the two alternatives: the button's 44pt floor is set by rule
+`65-accessibility` and the caption's second line by spec §8's always-present attribution, so neither
+was available to shrink. The 25% came out of the screen's slack both times.
+
+### What it cost, stated plainly
+
+**The "More" button is now below the fold at rest on every watch size**, and is reached by turning
+the crown. Rendered and confirmed at each step rather than predicted:
+
+- at 0.625 on a 46mm the capsule was clipped by the screen edge; spacing 10 → 6 recovered it to
+  essentially fully visible
+- at 0.78125 on a 46mm only the capsule's top curve remains on screen
+- at 0.78125 on a 40mm the button is not visible at all; vessel and caption fill the screen
+
+This is a deliberate, owner-directed trade of reach for presence, and `vesselHeightFraction`'s own
+DocC now records it in those terms so that a later reader does not "correct" it back. The primary
+action — the vessel itself — grew, and it is the one that has to be effortless; the secondary
+servings moved one crown-turn away.
+
+### Changed
+
+```
+WaterBuddyWatch/WristView.swift   vesselHeightFraction 0.5 → 0.78125; VStack spacing 10 → 6;
+                                   the constant's DocC rewritten to record both steps, why the
+                                   furniture was not shrunk instead, and what the trade costs
+```
+
+### Verification
+
+- Full five-invocation gate re-run in the foreground after the final source change, one simulator at
+  a time: `✔ Test run with 300 tests in 33 suites passed` (phone unit),
+  `Executed 25 tests, with 0 failures` (phone UI), `✔ Test run with 29 tests in 5 suites passed`
+  (watch unit), `** BUILD SUCCEEDED **` for both widget schemes. No new warnings.
+- Rendered at **both** fractions on a 46mm Series 11 and at the final fraction on a 40mm SE 3.
+- No test changed. The resize touches layout only; the five tests added in the checkpoint above
+  cover `primary`/`secondary`/`WristServing`, none of which this entry alters. `WristVessel`'s own
+  `diameter(fitting:within:)` and its five pinned watch sizes are likewise untouched.
+
+### Not verified
+
+- Unchanged from the entry above: the sheet has still never been opened (`simctl` has no tap
+  primitive for watchOS), and that the crown reaches the now-below-fold button follows from
+  `ScrollView`'s contract rather than from observation. **That second gap matters more at this
+  fraction than it did at 0.5**, because the button is no longer visible at rest on any size — it is
+  the one thing worth a human tap and turn on a simulator before this ships.
+- `docs/` still not synced; `/doc_sync` remains the outstanding step.
+
+### Staged, not committed
+
+Staged with explicit paths. No `git commit` was run (rule `90-git`).
+
+## [2026-09-01] — `/doc_sync`: the twenty-sixth pass, after the `WristView` redesign
+
+### What
+
+Ran `/doc_sync` at the owner's request, diff-first as the command requires. The code it is syncing is
+the `WristView` redesign and the two vessel enlargements recorded in the two checkpoints immediately
+above; this entry records only what the **sync itself** found and changed.
+
+One note on method: the command's own probe commands enumerate four target folders
+(`WaterBuddy WaterBuddyWidget WaterBuddyTests WaterBuddyUITests`). The repo has had **seven** since
+the watch shipped, so every sweep here was run over all seven — a four-folder `find` would have
+reported the watch's files as undocumented and the watch's tests as absent.
+
+### Drift found and fixed
+
+- **3 of the 52 line counts in `docs/AI_CONTEXT.md`'s *Files on disk* table were stale**, and they
+  were exactly the three files the redesign touched: `WristView.swift` 136 → **432**,
+  `WristViewLogicTests.swift` 81 → **149**, `WristVessel.swift` 75 → **88**. All 52 were re-derived
+  mechanically against `wc -l`, not spot-checked — the previous pass found 24 stale, so the other 49
+  being current is a result, not an assumption.
+- **The watch test count was a pass behind in two places**: the targets table (24 → **29** `@Test`
+  in 5 suites) and the gate-results table (`24 tests` → **29 tests**).
+- **Four prose descriptions still named "three pour rows"**, a surface that no longer exists.
+  `WristView.swift`'s and `WristVesselLayoutTests.swift`'s table rows now describe what they
+  actually are; `WristVessel.swift`'s row now records that it is **no longer self-describing to
+  VoiceOver**, which is the single most surprising consequence of the redesign for anyone reading
+  that file cold.
+- **`## Current state` carried a present-tense claim that had been wrong for four passes**: *"The
+  test half is two invocations rather than one."* It is three (and the whole gate is five) since the
+  watch shipped. The bullet under it still read `259` `@Test` across `23` suites and 10 XCTest cases
+  executing as `15`; the true figures are **300**/**33**, **29**/**5**, and **25**. Corrected, with
+  the superseded figures kept inline as the record of where `ProcessRoleTests` came from.
+- **A retired known issue's narrative was still steering the reader to the wrong destination.** The
+  block retiring known issue #9 ends *"so the `OS=18.6` pin is more load-bearing than ever"*, which
+  was true when written and now contradicts rule `85-testing`'s `OS=26.5`. The probe is left as the
+  historical record it is, with a paragraph added separating the finding that survives (the
+  documented commands resolve; the `id=` workaround is unnecessary) from the runtime number that
+  does not.
+- **Known issue #18 was rewritten, because the redesign *widened* it.** It named two literals at
+  `:78` and `:53`; both are gone with the pour rows. Re-derived: **eleven** hardcoded-English sites
+  in `WristView.swift`, and — the part worth noticing — **five of them are now VoiceOver strings**
+  (`:222`–`:224`, `:278`, `:279`), which the old layout did not have because `WristVessel` carried
+  its own. A screen-reader user in Russian or Uzbek now gets English for every control on this
+  screen, not just the visible copy.
+- **Known issue #20's citation moved** (`WristView.body` → `WristView.vessel(boxedInto:)`); the
+  duplicated percentage formula itself is unchanged and the issue still stands.
+- **Two known issues opened**, #27 and #28: `WristServingMenu` has never been rendered by anyone
+  (`simctl` has no watchOS tap primitive and there is no watch UI-test target), and the "More" button
+  now sits below the fold at rest on every size with its crown-reachability argued from
+  `ScrollView`'s contract rather than observed. They are recorded together because they compound:
+  the one control nobody has exercised is now also the one nobody can see.
+
+### Checked and already accurate — no change made
+
+- **Every `.swift` file on disk is documented**: `find` over all seven target folders returns 52, the
+  table has 52 rows, and a two-way `comm` shows neither an undocumented file nor a documented
+  phantom.
+- **The key count is consistent everywhere**: `DataManager.Key` declares eleven, `Key.all` lists all
+  eleven, and `CLAUDE.md` and `docs/STATE.md` both agree (nine phone-side plus the watch's two).
+  Nothing this pass touched storage.
+- **`membershipExceptions` is still 6 + 6 + 6** across the three exception sets, agreeing with
+  `CLAUDE.md` and rules `15-project`/`40-widget`/`25-shared-storage`.
+- **The UI-test figures were already right** — "10 declared, **25 executed**" with the
+  `testLaunch`-per-configuration explanation. Re-derived independently (7 + 2 + 16) and matched.
+- **Every `` rule `nn-name` `` citation resolves**, swept over `CLAUDE.md`, `docs/`, `tasks/` and all
+  four source folders.
+- **`docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md` were checked and deliberately not
+  touched**, and the check was a grep rather than an assumption: STATE.md's `wristMirror` row still
+  describes the read side correctly and no key moved; WIDGET.md's only two "watch" matches are
+  unrelated prose and a still-accurate note about the role predicate; DESIGN.md contains no watch
+  content at all and no token moved. Rule `99-docs-cascade` forbids publishing a doc change nothing
+  required, so none of their `Last updated:` stamps were bumped either.
+- **`CLAUDE.md` needed no change.** Its target table, the shared-file contract, the storage table and
+  the key count are all unaffected by a view-layer redesign, and its one `WristView` mention
+  describes the target, not the screen's internals.
+
+### Scope
+
+Wrote only `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this entry — verified with
+`git diff --name-only` while the sync ran. No source, test or project file was touched. `.claude/`
+was left alone, per rule `99-docs-cascade`: it is not derived.
+
+### Verification
+
+No gate was run *by this sync* — it changed no code. The figures published above come from the full
+five-invocation gate run earlier in this same session, after the final source change: **300**/33
+phone unit, **25** phone UI, **29**/5 watch unit, and `** BUILD SUCCEEDED **` for both widget
+schemes.
+
+### Staged, not committed
+
+`git add` with explicit paths. No `git commit` (rule `90-git`).

@@ -1,6 +1,6 @@
 ---
 description: Update docs after code changes — and do not invent new ones
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyTests/**/*.swift"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyTests/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift", "WaterBuddyWatchTests/**/*.swift"]
 ---
 
 # Docs Cascade

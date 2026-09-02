@@ -1,6 +1,6 @@
 ---
 description: Fail soft, loudly — DEBUG-only, condition-named, never carrying user data
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift"]
 ---
 
 # Diagnostics

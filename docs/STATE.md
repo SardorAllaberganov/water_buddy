@@ -4,7 +4,21 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-09-01 (twelfth pass — **no stored shape changed**, but *who may write on
+**Last updated:** 2026-09-01 (fourteenth pass — `/doc_sync` after spec §16. **No key added, removed
+or renamed**: the stored shape is unchanged at eleven, and `Key.all` still lists all eleven. What
+changed is what the *absence* of `Key.wristMirror` means on the read side — it used to leave the
+watch on a dead-end "Open WaterBuddy on your iPhone" screen, and now falls back to
+`DataManager.defaultDailyGoal` so the watch draws a usable screen and attributes the goal it is
+using. `WaterBuddyWatchWidget` takes the same fallback and additionally reads `Key.wristOutbox`.
+Both are recorded in the `wristMirror` row below. Previously: thirteenth pass — the watchOS plan's
+final task. **Three new keys**,
+the first stored shape change since the eighth key: `Key.wristOutbox` and `Key.wristMirror` in the
+watch's own local App Group suite, `Key.wristApplied` in the phone's. `Key.all` grows from eight to
+**eleven**. A new section below documents the watch's suite as a physically separate container
+under the identical App Group *identifier*, never to be confused with the phone's two stores. The
+stale `!isAppExtension` reference in *Who reschedules* is corrected, and the two rule files it
+pointed at as still wrong (`AI_CONTEXT.md` known issue #15) are themselves fixed in this same pass.
+Previously: twelfth pass — **no stored shape changed**, but *who may write on
 behalf of the group* is now asked in four states rather than two. `isAppExtension` feeds
 `DataManager.role` and is read at no guard site; the section of that name is rewritten, the
 migration and reminder-seam code samples updated, and `republishHistory`'s guard renamed.
@@ -19,7 +33,7 @@ and which is authoritative matters more than either on its own:
 
 | | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
 |---|---|---|
-| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | eight keys (below) |
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | nine keys (below) |
 | Status | **source of truth** | **derived cache** |
 | Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
 | Read by | the app | the app **and the widget** |
@@ -73,11 +87,12 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
-## The eight keys
+## The eight phone keys, plus a ninth shared with the watch's side of the wire
 
 Every key is built in `DataManager.Key` from the prefix **`sardor.WaterBuddy.`**. An App Group
 domain is shared by every target that joins it, so an un-prefixed key is a collision waiting for
-the next extension.
+the next extension. `Key.all` — the roster the widget tripwires read — now lists **eleven** keys in
+total; the eight below plus three more, all documented in *The watch's own suite* further down.
 
 | Stored key | Type | Range / clamp | Written by | Why it exists |
 |---|---|---|---|---|
@@ -89,10 +104,38 @@ the next extension.
 | `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
 | `sardor.WaterBuddy.language` | `String` | — | app + widget | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
+| `sardor.WaterBuddy.wristApplied` | `Data` (JSON `[Int: [UUID]]`) | **unbounded per day, until the 90-day trim** — see note below | **app only, via `ingest(_:)`** | The phone's per-day applied ledger for wrist-authored pours — day ordinal → the `WaterLog.id`s already folded in. `nonisolated`, unlike its seven neighbours above, because `readAppliedLedger(from:)`/`writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` and a nested type's members otherwise infer the enclosing `@MainActor` class's isolation. Trimmed to the last `appliedLedgerRetentionDays` (90) real calendar days on every write — never by subtracting a raw integer from the `yyyyMMdd` ordinal, which borrows across the month/day radix incorrectly (a real bug this plan introduced and fixed in its own Task 4, before it shipped). A write also protects any day it just folded into, even one already older than the 90-day cutoff, so the same write that adds an entry can never be the write that trims it (final review, `ingest(_:)`'s cutoff is `min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)`). |
 
-> Note the last key's *stored string* is `…didMigrateFromStandardDefaults` while the constant is
+> **This ledger is not capped at `maximumAckedIds` (256).** That cap belongs to a different, related
+> but distinct thing: `WristMirror.acked`, the wire mirror's own array, sent phone → wrist on every
+> publish. The mirror flattens *this* ledger across every retained day and truncates the result to
+> 256 ids, newest day first, so the cap is a property of what goes out over `WatchConnectivity`, not
+> of what this key holds on disk. Conflating the two is exactly the shape of the bug the final
+> whole-branch review found: an ascending flatten kept the ledger's *oldest* ids under the mirror's
+> cap instead of the newest, permanently stranding freshly-folded pours the ledger itself had
+> recorded correctly the whole time.
+
+> Note the ninth key's *stored string* is `…didMigrateFromStandardDefaults` while the constant is
 > named `Key.didMigrateFromStandard`. The string is the thing that persists; do not "tidy" one to
 > match the other without a migration.
+
+## The watch's own suite
+
+`WaterBuddyWatch` and `WaterBuddyWatchWidget` resolve the identical App Group *identifier string*,
+`group.sardor.WaterBuddy`, through the same `DataManager.sharedDefaults` accessor the phone uses —
+but the watch is a **different physical device**, so this is a different container on disk, holding
+none of the phone's nine keys above and read by none of the phone-side code. Never confuse "same
+identifier" with "same storage": nothing written on one device is visible on the other except
+through an explicit `WatchConnectivity` transfer (rule `70-privacy`).
+
+| Stored key | Type | Range / clamp | Written by | Read by | Why it exists |
+|---|---|---|---|---|---|
+| `sardor.WaterBuddy.wristOutbox` | `Data` (JSON `[WristPour]`) | at most 64 pours per chunk sent, unbounded at rest | `WristModel`, **watch only** | `WristModel`, watch only | The watch's own pending pours not yet durably queued to the phone (or queued but not yet acknowledged back). Local to the watch; the phone never reads or writes this key. |
+| `sardor.WaterBuddy.wristMirror` | `Data` (JSON `WristMirror`) | one value, no clamp — the phone's own values are already clamped when composed | `WristModel`, **watch only**, from a decoded `WCSession` application context | `WristModel` **and** `WaterBuddyWatchWidget`, watch only | The last mirror received from the phone — `currentWater`, `dailyGoal`, `servings`, `languageCode`, `isGoalSet`, `composedAt`, `phoneDayStart`, `acked`. What the watch draws before its first `updateApplicationContext` of a fresh launch. **Its absence is no longer a dead end (spec §16, 2026-09-01):** `WristModel.displayGoal` falls back to `DataManager.defaultDailyGoal` and `WristView` draws a usable screen anyway, saying so in its attribution line — the key's absence now means "nothing from the phone yet", not "show a nag instead of a screen". `WaterBuddyWatchWidget` reads it directly, never through `WristModel.shared` (the identical discipline rule `40-widget` holds the phone widget to), and now takes the same fallback and adds `Key.wristOutbox`'s pending pours, so the face cannot read 0% while the app beside it shows real water. |
+
+Both are written **only** by `WristModel`, never by `DataManager` — the one honest weakening rule
+`20-state` now states plainly: one writer per store, not one writer full stop. `WristModel` never
+opens SwiftData and never touches the phone's own App Group container.
 
 Four keys are carried by the migration — `currentWater`, `dailyGoal`, `lastActiveDay`,
 `isGoalSet`. `didMigrateFromStandardDefaults` is not, because it *is* the bookkeeping; and
@@ -127,7 +170,8 @@ This is the same discipline as the App Group migration (rule `25-shared-storage`
 adopting a new store looks exactly like data loss.
 ### `Key.all` — the roster the tripwires read
 
-`DataManager.Key.all` lists all eight keys, three lines under the declarations it mirrors.
+`DataManager.Key.all` lists all eleven keys — the phone's own nine plus the watch's two
+(`wristOutbox`, `wristMirror`) — three lines under the declarations it mirrors.
 Production code never reads it; it exists so the widget's two read-path tripwires —
 `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys` — can prove a snapshot
 read created and altered *nothing*.
@@ -268,7 +312,7 @@ It differs from `todaysLogs` in three ways, each for a stated reason:
   `recomputeToday()` is deliberately unguarded, so `AddWaterIntent` reaches `saveAndRecompute()` on
   every widget tap — without the guard, that tap runs a seven-day fetch and a full roll-up inside
   the `.appex`. Nothing about history crosses to the widget: a per-day series is derivable from
-  none of the eight keys.
+  none of the phone's nine keys.
 - **It is republished from three sites**, not one — `init`, `refresh()` and `saveAndRecompute()` —
   because a mutation must show up on the card immediately, and `addLog` calls `refresh()` *before*
   it inserts.
@@ -336,8 +380,9 @@ but the phone app. Two independent reasons now sit behind one predicate. For an 
 detached `Task` does not outlive `perform()` returning, so `AddWaterIntent` awaits the reconcile
 itself instead. For a watch: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a
 second notification centre would file byte-identical identifiers it cannot dedupe against the
-phone's. Full reasoning in rule `80-notifications` — **which still describes this guard as
-`!isAppExtension` and is stale (`AI_CONTEXT.md` known issue #15).**
+phone's. Full reasoning in rule `80-notifications`, corrected in this same pass to name
+`role.mayFileReminders` rather than the `!isAppExtension` it described until 2026-09-01
+(`AI_CONTEXT.md`'s retired known issue #15).
 
 ## The seventh key, and why it crosses to the widget
 
@@ -445,7 +490,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1032
+nonisolated static let role: Role = {          // DataManager.swift:1149
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -462,17 +507,18 @@ burn-once migration flag, and filing a duplicate reminder plan. Resolved from `i
 the compile-time platform rather than from a second runtime probe, because rule `25-shared-storage`
 forbids a competing detection scheme: two probes can disagree and leave one guard open.
 
-**Four writes are guarded, by three different questions:**
+**Four writes are guarded, by three different questions** (line numbers re-verified 2026-09-01,
+after the watchOS plan's ~500-line addition shifted every one of them):
 
-1. **Materialising `dailyGoal` in `init`** (`:420`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:448`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:760`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:691`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1175`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:867`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:798`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1293`, `mayHaveLegacyStandardDefaults`).
 
 Two further sites are guarded by the same enum but are not group bookkeeping: `republishHistory`
-(`:627`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:847`,
+(`:734`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:961`,
 `mayFileReminders`, the one whose wrong answer is immediately user-visible).
 
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`

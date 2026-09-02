@@ -17,9 +17,10 @@ framework, and the project file carries no package references at all.
   the glass are all this
 - No file under `WaterBuddyWidget/` may `import SwiftData`. The extension's own sources import only
   `AppIntents`, `WidgetKit` and `SwiftUI` (rule `40-widget`)
-- A Swift file importing a framework unavailable to iOS (`AppKit`, or any macOS-only module) must
-  live **outside** the four synchronized root-group folders — put it in `Tools/` at the repository
-  root, where it belongs to no target
+- A Swift file importing a framework unavailable to iOS or watchOS (`AppKit`, or any macOS-only
+  module) must live **outside** all seven synchronized root-group folders — verified against
+  `project.pbxproj`'s own `PBXFileSystemSynchronizedRootGroup` count, one per native target — put it
+  in `Tools/` at the repository root, where it belongs to no target
 - Do not create `docs/dependencies.md`. It is created the moment the first third-party dependency is
   added, and not before (rule `99-docs-cascade`)
 - Adding a dependency is a decision for the owner, argued in writing before the diff exists

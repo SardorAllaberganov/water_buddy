@@ -5,8 +5,12 @@ globs: ["**/*"]
 
 # Git & Workflow
 
-**This project is not a git repository yet** — there is no `.git` and no `.gitignore`. Initialising
-one is the owner's call. Everything below applies from the moment it is.
+**This project is a git repository**, initialised under scoped, explicit owner authorization to
+enable the watchOS plan's SDD execution process — a real `.git` and a real `.gitignore` both exist,
+and the tree currently carries 27 real commits (root `69c5a39` through the watchOS plan's own work).
+The rules below were written before that authorization and speak as though they apply "from the
+moment" a repository exists; that moment has passed, and everything below is now live, ordinary
+policy — not a hypothetical.
 
 ## Never commit on your own
 - **Never commit.** Stage the work and stop — a commit happens only when the owner runs `/commit`
@@ -27,10 +31,11 @@ one is the owner's call. Everything below applies from the moment it is.
 
 ## What never enters the tree
 - `build/`, `DerivedData/`, `**/xcuserdata/`, `.DS_Store`, `.claude/settings.local.json`
-- **Do not ignore `xcshareddata/`.** No shared schemes are checked in today, which is fine while both
-  schemes stay at their defaults — but the moment one carries a test plan or an environment variable,
-  tick *Manage Schemes → Shared* so the `.xcscheme` lands there and the gate commands stay
-  reproducible
+- **Do not ignore `xcshareddata/`.** All four schemes are checked in there as of 2026-09-01 and
+  must stay that way. Marking even one scheme Shared writes `SuppressBuildableAutocreation` for
+  every target into `xcuserdata/…/xcschememanagement.plist`, so Xcode stops auto-creating the
+  others — a scheme with no checked-in `.xcscheme` then simply vanishes from the picker, which is
+  exactly how the `WaterBuddy` and `WaterBuddyWatch` schemes were lost (rule `15-project`)
 - `CLAUDE.md` and `.claude/**` are committed as files and **never** as members of a build target
   (rule `15-project`)
 

@@ -1,6 +1,6 @@
 ---
 description: Reduce Motion, Reduce Transparency, Dynamic Type, VoiceOver and contrast
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyUITests/**/*.swift"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyUITests/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift", "WaterBuddyWatchTests/**/*.swift"]
 ---
 
 # Accessibility
@@ -32,6 +32,12 @@ rather than re-deriving it.
   neutral system grey
 - In the widget, `WidgetCardBackdrop` draws `Color.clear` when the setting is on, and `WidgetAurora`
   keeps its three light blobs inside `if !reduceTransparency`, leaving only `Aurora.gradient`
+- On the watch, `WristAurora` — `WidgetAurora`'s own proportional-geometry twin (rule
+  `60-design-system`) — keeps the identical branch: its three blobs sit inside `if
+  !reduceTransparency`, leaving only `Aurora.gradient` behind the list. It shipped without one for a
+  time, a real gap this rule's own widening to the watch exists to catch: `WristAurora` is a
+  self-declared sibling of `WidgetAurora`, and a sibling that skips the branch its own doc claims to
+  follow is a defect, not a stylistic difference
 
 ## Dynamic Type
 - `@ScaledMetric` always scales a **real magnitude**, never a unitless `1` that is then multiplied —

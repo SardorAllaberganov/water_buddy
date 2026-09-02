@@ -1,11 +1,43 @@
 ---
 description: The widget — a read-only draw path over the cache, and glass that survives templating
-globs: ["WaterBuddyWidget/**/*.swift", "WaterBuddy/WaterSurface.swift", "WaterBuddy/LiquidGlassModifier.swift"]
+globs: ["WaterBuddyWidget/**/*.swift", "WaterBuddy/WaterSurface.swift", "WaterBuddy/LiquidGlassModifier.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift"]
 ---
 
 # Widget
 
 The widget is the second front door. Its provider **draws**; it does not manage state.
+
+## Target membership
+
+`WaterBuddyWidgetExtension`'s exception set (`project.pbxproj`, six files:
+`DataManager.swift`, `LiquidGlassModifier.swift`, `NotificationManager.swift`, `ReminderPlan.swift`,
+`WaterLog.swift`, `WaterSurface.swift`) is a **separate contract** from `WaterBuddyWatch`'s own
+(`3B60BAE6703F44AE6C46153F`, Task 9 of the watchOS plan). The `target` field on a
+`PBXFileSystemSynchronizedBuildFileExceptionSet` is scalar, so one set can never serve two targets —
+each of the four native targets under `WaterBuddy.xcodeproj` that reaches into `WaterBuddy/` (the
+widget, the watch app, and the watch widget; the phone app owns the folder outright) has to name its
+own membership. The watch's exception set is currently **six** files, not five —
+`DataManager.swift`, `LiquidGlassModifier.swift`, `ReminderPlan.swift`, `WaterLog.swift`,
+`WaterSurface.swift`, **and `WristPlan.swift`**, added because `WristModel` buckets pours through it
+— and it deliberately omits `NotificationManager.swift`: `role.mayFileReminders` is `false` on both
+watch roles, so shipping the notification surface to a process that can never file one is pointless
+(rule `80-notifications`). The watch's own files (`WristModel.swift`, `WristView.swift`,
+`WristAurora.swift`, `WristVessel.swift`, `WaterBuddyWatchApp.swift`) are invisible to the widget
+extension and vice versa — reaching one from the other is a target-membership error, not an import
+one, and the app scheme's green test run cannot show it (rule `15-project`).
+
+`WaterBuddyWatchWidget` has a third, independently-minimal exception set: **six** files —
+`DataManager.swift`, `LiquidGlassModifier.swift`, `ReminderPlan.swift`, `WaterLog.swift`,
+`WaterSurface.swift`, **and `WristPlan.swift`** — omitting only `NotificationManager.swift` (same
+reason as the watch app). It was five until 2026-09-01, when the complication stopped reading the
+mirror alone: spec §16 made `WristView` usable before its first sync, drawing pending outbox pours
+against `DataManager.defaultDailyGoal`, and a complication that still read only `Key.wristMirror`
+would have sat at 0% while the app beside it showed real water. Counting the outbox means bucketing
+it by day, which is `WristPlan`'s job — so the widget now *does* bucket pours, and the sentence that
+said it never would is retired rather than reworded. `LiquidGlassModifier.swift` is still required
+only **transitively**: nothing in the watch widget calls `.liquidGlass(...)` directly, but
+`WaterSurface.swift`'s own `#Preview` does, and a `#Preview` still has to compile into whatever
+target the file joins.
 
 ## The read path
 - Every member of `HydrationProvider` stays `nonisolated` and reads only through
@@ -14,9 +46,9 @@ The widget is the second front door. Its provider **draws**; it does not manage 
 - A timeline provider carries no isolation and a `ModelContext` is not `Sendable`, so reading the
   cache is what keeps the read path synchronous (rule `43-concurrency`)
 - Constructing a `DataManager` would materialise the goal, seed the cached total, stamp the day,
-  recompute today and ring the widget doorbell — writes from a process whose job is to draw. Four of
-  those are guarded by `!isAppExtension`; `recomputeToday()` is not, which is exactly why the
-  provider must never build one
+  recompute today and ring the widget doorbell — writes from a process whose job is to draw. Several
+  of those are guarded by `DataManager.role` (`.ownsSharedStorage`, `.mayHaveLegacyStandardDefaults`);
+  `recomputeToday()` is not, which is exactly why the provider must never build one
 - `WaterSnapshot` stays a `Sendable`, `Equatable` plain value with no isolation and no reference to
   `DataManager.shared`. Every field it exposes is derivable from the `UserDefaults` cache alone
 - `WaterBuddyWidget/` must never gain an `import SwiftData`. The cache is the widget's only read
@@ -74,7 +106,13 @@ The widget is the second front door. Its provider **draws**; it does not manage 
   nonisolated global mutable state
 - It is compiled into the **widget extension only**. A second copy in the app binary registers the
   same action twice in Shortcuts
-- `DataManager.requestReminderReschedule` keeps its `guard !isAppExtension else { return }`
+- `DataManager.requestReminderReschedule` keeps its `guard role.mayFileReminders else { return }` —
+  corrected from the `guard !isAppExtension else { return }` this line named until 2026-09-01
+  (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §9.2). `.watchApp` and
+  `.watchExtension` both answer `mayFileReminders == false`, for the same reason the widget
+  extension does: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a second
+  notification centre filing the identical plan cannot dedupe against the first — a watch buzzing
+  twice per slot, or 28 silent `add` failures into a discarded `ReconcileOutcome`
 
 ## Glass and rendering
 - **Never pass a `Material` as the `base` of a glass pane drawn in the widget** — use

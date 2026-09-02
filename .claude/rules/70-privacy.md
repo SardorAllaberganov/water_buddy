@@ -1,6 +1,6 @@
 ---
 description: No network, no analytics, no account — and nothing on a lock screen the user did not consent to
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "Entitlements/**"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "Entitlements/**", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift"]
 ---
 
 # Privacy
@@ -16,6 +16,43 @@ That is a property to defend, not a phase.
   any other capability requires a written justification in this file first
 - Add no `NS*UsageDescription` key to any Info.plist. The project carries zero, and notification
   authorization is the only permission this product ever asks for
+
+## WatchConnectivity is a ruling, not an omission
+
+The banned list names `URLSession`, `Network`, `CloudKit`, `HealthKit`. It does not name
+`WatchConnectivity`, and that absence is not permission — this rule's bar is *"Adding any other
+capability requires a written justification in this file first."* Here is the justification.
+
+`WatchConnectivity` links two devices the same person owns and has personally paired. There is
+no account, no server, no third party, and **no entitlement** — it is the only inter-device
+transport in the Apple SDK that needs none. Nothing is transmitted that the user did not author
+on one of the two devices. On that basis it is inside the principle "nothing leaves the device",
+read as "nothing reaches anyone else", and it is permitted.
+
+Three limits are conditions of the permission:
+- **The system's transfer queue is outside the App Group.** A payload handed to
+  `transferUserInfo` lives in a system daemon until the counterpart runs and **survives app
+  termination**. `deleteLog(_:)` removes the row and does not cancel the transfer. The apply
+  ledger is what makes a re-sent copy of a deleted serving a no-op rather than a resurrection —
+  a privacy mechanism as much as a correctness one.
+- **No wire field may reach a notification, a Live Activity, or any surface outside the two
+  apps' own screens — with one named carve-out: the watch's own complication, on the watch's own
+  face.** `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` renders a percentage derived from the
+  stored `WristMirror` as an `.accessoryCircular` complication, which is a wire-derived value
+  reaching a surface other than `WristView`'s own screen — but it is the exact precedent the phone
+  side already permits for its own Home Screen widget (`WaterBuddyWidget`, drawing from
+  `WaterSnapshot`, which is itself the phone's own non-screen surface for the identical class of
+  state). The underlying protection is unchanged and still absolute: a notification and a Live
+  Activity remain forbidden on both devices, in both directions, with no carve-out of any kind — this
+  amendment only recognises that each device's own face-level complication was always meant to sit
+  beside its device's own Home Screen widget as the one sanctioned "outside the app's own screen,
+  inside the device's own ambient surfaces" reading, and the original wording simply never said so
+- **No third framework rides in behind it.** `HealthKit`, `CoreLocation` and `CloudKit` remain
+  banned by name, and a watch app is exactly where someone will propose all three.
+
+Approved by the owner: `docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §14 records
+the explicit ruling ("§9's `70-privacy` amendment is approved as written") that made this text live
+policy rather than a draft, closing that document's own §9.3.
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a
@@ -46,6 +83,13 @@ That is a property to defend, not a phase.
   by writing the cache directly, and keep `resetDailyProgress()` scoped to today's rows only
 
 ## Localization
+
+**Known gap, tracked, not fixed here:** this glob widened to `WaterBuddyWatch/**/*.swift`, and every
+string `WristView` draws is currently a hard-coded English literal — none of them route through
+`\.strings`, unlike every rule below. `docs/AI_CONTEXT.md`'s known issue #18 records it. Out of scope
+for this pass; this note exists so the rule does not silently claim compliance the watch does not
+have.
+
 - Route every user-facing string through `@Environment(\.strings)` and
   `bundle.localizedString(forKey:value:table:)`. No view, intent or notification composer may read
   `Bundle.main` for copy

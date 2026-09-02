@@ -1270,3 +1270,161 @@ rule `85-testing` names for cloned parallel runs.
 
 **The habit:** run the gate in the documented order, shut the simulator down first, and re-run a
 lone UI failure from a clean simulator before believing it.
+
+## 2026-09-01 — A task brief's own counts decay across the sequential plan it belongs to, not just across a single refactor
+
+The final task of the watchOS plan (Task 17, the doc/rule cascade) was dispatched with a brief that
+described `WaterBuddyWatch`'s `PBXFileSystemSynchronizedBuildFileExceptionSet` as "a five-file set
+added in Task 9." Reading `project.pbxproj` directly showed **six** files — `WristPlan.swift` was in
+it too. Nobody's claim was dishonest: Task 9's own review genuinely recorded "6-file exception set
+exact" at the time it ran, and Task 5 (`WristPlan`, which predates Task 9 in sequence) had already
+put the file there. The dispatch's "five-file" phrasing was simply carrying an earlier draft's
+memory of what Task 9 *would* add, frozen at plan-authoring time, never re-read against what Task 9
+actually shipped. The same brief also undercounted the number of exception sets ("two," when the
+tree already carried three by the time Task 16 had run) for the identical reason.
+
+This is a different failure from "A design document's line citations rot the moment the code
+moves" (above): that one is a single document overtaken by one refactor eighteen minutes later. This
+one is a **plan's own dispatch text for step 17** silently describing step 9's artifact as it stood
+*when the plan was written*, not as it stood after nine more numbered tasks — including at least one
+(Task 5) that ran *before* Task 9 and fed it — had each had their own chance to change it. A
+sequential plan's step-N brief is not a live view of step N's own output; it is a snapshot taken once,
+at authoring time, of a prediction about what step N would produce.
+
+**The habit:** for the *last* task in a plan — the one whose whole job is to describe the finished
+tree — treat every specific count, file list, or membership claim in its own dispatch brief as a
+hypothesis to re-derive, not a fact to transcribe, with extra suspicion for any claim about an
+artifact multiple earlier tasks touched in sequence. `grep`, `xcodebuild -list`, and a direct read of
+`project.pbxproj` are the only sources of truth; a brief written before the tree existed in its
+current shape is not one, no matter how recently it was dispatched.
+
+## 2026-09-01 — Two lessons from the final whole-branch review's fix round
+
+**(a) A build-setting-driven isolation inference is silent and target-specific, and "verify it" can
+itself mean three different, contradictory things until you actually run each one.** The final
+review's Critical 1 was `WristLink` silently inheriting `@MainActor` from
+`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` — the identical pattern already fixed on
+`Key.wristApplied`, `AppLanguage.code`, `vesselSlots` and `WristModel.requestSend`, each of which
+*does* reproduce a real compiler warning when its `nonisolated` is removed. Assuming `WristLink`
+would behave the same way and writing a DocC/test claiming "confirmed by a real compiler probe"
+without actually reverting the keyword and watching the probe fail was the near-miss here — it
+didn't. Three different techniques were tried before the truth came out: an unapplied reference to
+an instance method (produces nothing, called or not), a direct synchronous call to it (also nothing,
+on this project), and reading a plain `static let` (the technique that *does* work for the four
+siblings above — still nothing, for `WristLink`). The likely cause, found only by checking
+`xcodebuild -showBuildSettings` a second time with fresh eyes, was a setting nobody had looked at
+yet: `SWIFT_APPROACHABLE_CONCURRENCY = YES`, set on every target alongside the isolation default,
+documented to relax exactly this diagnostic category. **The habit:** when a fix's justification rests
+on "the compiler will warn if this regresses," don't write that claim until you've actually reverted
+the fix and watched a warning appear with your own eyes, in *this* file, on *this* toolchain — a
+sibling declaration behaving one way is evidence, not proof, for a declaration with a materially
+different shape (here: `NSObject` subclass, `@objc optional` protocol conformance). When the probe
+doesn't reproduce, the honest move is to say so in the DocC and keep the fix anyway on architectural
+grounds, not to quietly delete the finding or paper over it with a probe that was never actually run
+to failure.
+
+**(b) A spec can encode a real bug that then gets faithfully implemented and reviewed clean, because
+the regression test checked the wrong property of the result.** The applied ledger's `acked` list was
+specified as "oldest-applied first," sorted ascending before truncating at 256 — which is exactly
+backwards: once the ledger exceeds the cap (normal after ~90 days at ordinary use), an ascending sort
+keeps the *oldest* ids under the cap and permanently strands the newest ones, which are the only ones
+still sitting in the watch's outbox waiting to be acked. Every per-task review of this code passed,
+because the one test guarding the cap (`ackedIsCappedAtTheMaximumAcrossTheWholeLedgerNotJustToday`)
+asserted `mirror.acked.count == 256` and stopped there — true under either sort direction, so it
+passed the bug just as happily as the fix. **The habit:** a test guarding a *cap* or *truncation* must
+assert **membership**, not just cardinality — construct a scenario where the correct and incorrect
+implementations produce sets of the *same size* but *different content* (here: two full days' worth
+of ids, more than the cap between them, asserting the newer day's ids survive and the older day's
+don't), or the test cannot distinguish them and a reviewer reading "the test passes" has learned
+nothing about which one shipped. This generalizes past this one bug: task-level review that checks
+"does the code match the spec" cannot catch a bug the spec itself encoded — only an independent,
+concrete-scenario probe of the actual wire behavior (not the stated behavior) can, and that has to be
+a property of the *test*, not of how carefully a reviewer reads the diff against the brief.
+
+**(c) A watch companion app installed by any path other than the phone app's own embedded copy is invisible to `WCSession`, even though the bundle is genuinely present on disk.** Debugging a real user report ("no app icon on the watch, it just says connect to iPhone") on paired simulators found: `xcrun simctl listapps` showed `sardor.WaterBuddy.watchkitapp` correctly installed on the watch, entitlements and App Group container intact — but the phone's own `WCSession` state read `appInstalled: NO`, and `updateApplicationContext` failed with `WCErrorCodeWatchAppNotInstalled`. The cause: the watch app had been installed via a build/install of the `WaterBuddyWatch` scheme directly (its own standalone `Debug-watchsimulator` product) rather than through the `WaterBuddy` phone scheme, which embeds an identical-looking copy at `WaterBuddy.app/Watch/WaterBuddyWatch.app`. Only installing *that* embedded copy made `WCSession` report `appInstalled: YES` and let `updateApplicationContext` succeed. **The habit:** when iterating on watch-only Swift code it is tempting to build and run the `WaterBuddyWatch` scheme directly for a fast loop — that is fine for UI/logic work with no WatchConnectivity involved, but any test of the actual phone↔watch sync must install through the `WaterBuddy` scheme's embedded product (or, on a physical pair, actually let the paired iPhone's Watch app perform the install) — a bundle "being there" on the watch's filesystem is not the same claim as the OS's WatchConnectivity daemon considering it installed. Verified by direct experiment: reinstalling the embedded copy on an otherwise-untouched pair flipped `appInstalled` from `NO` to `YES` and made a previously-failing `updateApplicationContext` call succeed with no other change.
+
+**(d) Two, unrelated pre-conditions can share one on-screen message, and that overlap is easy to mistake for "still broken."** `WristView`'s single `if let mirror = model.mirror, mirror.isGoalSet` branch shows the identical "Open WaterBuddy on your iPhone" empty state for two different reasons: no mirror has ever arrived, **or** a mirror arrived but the phone's own goal hasn't been set up yet (`isGoalSet == false`, the correct state for a fresh phone install). Confirmed by direct inspection during the same investigation: after fixing (c), the wire delivery genuinely succeeded — `updateApplicationContext` returned success and `Key.wristMirror` was persisted with real bytes on the watch's own disk, decodable and everything — yet the watch still showed the identical empty-state screen, because the freshly-erased test phone had no goal configured yet. Not a defect in the sync path; a reminder that "same screen looks broken" needs the underlying state checked (here: read the actual persisted `UserDefaults` plist on the watch's App Group container) before concluding a fix didn't work.
+
+## 2026-09-01 — Marking one scheme Shared can delete the others
+
+**(e) Ticking *Manage Schemes → Shared* on any scheme silently suppresses autocreation for
+**every** target, and a target with no checked-in `.xcscheme` then has no scheme at all.** The owner
+reported only `WaterBuddyWatchWidget` and `WaterBuddyWidgetExtension` in the scheme picker and no way
+to build to their phone. `xcodebuild -list` agreed — two schemes, not four. The cause was not a lost
+file or a corrupt project: `xcuserdata/…/xcschememanagement.plist` had gained a
+`SuppressBuildableAutocreation` entry for **all four** native target UUIDs the moment two schemes
+were shared, and since `WaterBuddy` and `WaterBuddyWatch` had never had `.xcscheme` files written to
+`xcshareddata/xcschemes/`, they simply ceased to exist. The blast radius is larger than it looks: no
+phone-app scheme means no device build, and the watch app reaches a real Watch *only* as the copy
+embedded inside the phone app's bundle — so one checkbox took out the watch too. **The habit:** treat
+`xcshareddata/xcschemes/` as all-or-nothing. The moment one scheme is shared, write and commit them
+all, and make `xcodebuild -list` reporting the expected count part of the check — it is the only
+place this failure is visible, since Xcode's own picker just quietly shows fewer rows. Rule
+`15-project` and rule `90-git` now say so.
+
+**(f) A gate that draws its condition from two unrelated states will hide one of them behind the
+other.** `WristView` gated on `if let mirror = model.mirror, mirror.isGoalSet` and fell through to a
+single sentence — "Open WaterBuddy on your iPhone" — for both halves. Opening the phone was the fix
+for exactly one of them, and there was no way to tell which you had. It also produced a genuine
+deadlock: the only watch-side action that makes the phone publish a mirror is a pour, and the pour
+rows were inside the branch a mirror was required to open, so a watch that had never synced could
+not perform the one action that would sync it. Two helpers written and unit-tested *for* the
+pre-sync case (`resolveServings(from: nil)`, `syncedCaption(composedAt: nil, …)`) were unreachable
+in production the whole time, with green tests. **The habit:** when one branch serves more than one
+precondition, say which precondition you are in — and check whether the branch you are hiding
+contains the only escape from it. A test suite cannot see this: every one of those tests passed
+against code no user could reach.
+
+## 2026-09-01 — Four lessons from the `WristView` redesign
+
+**(g) Quoting a rule in a design is not the same as applying it, and the gap survives review because
+the citation reads as compliance.** The approved design for this change said, in its own words, that
+`.safeAreaInset` is this project's pattern for a bottom-mounted bar — and rule `50-views` says, in
+*its* own words, that `.safeAreaInset` "reserves the bar's height for **scrolling**, not for the
+resting layout. A screen whose last card sits under the bar needs its own bottom padding." Both
+sentences were in front of me; the implementation used `safeAreaInset` and supplied no bottom
+padding. What shipped to the first screenshot drew the capsule straight over the bottom of the
+vessel and pushed the attribution line *below* it, inverting the exact element order the owner had
+approved twenty minutes earlier. Nothing caught it but rendering: the gate was fully green, because
+no test in this project draws a view. **The habit:** when you cite a rule that names a failure mode,
+check the diff against the *failure mode*, not against the rule's name — "I used the sanctioned
+modifier" and "I avoided the thing the rule warns about" are different claims, and only the second
+one is worth anything. A rule that comes with a stated remedy ("needs its own bottom padding") is
+telling you the remedy is not automatic.
+
+**(h) A platform-availability assumption has to be compiled, never reasoned about — and the cost of
+being wrong is smallest when you have already named the fallback.** The design asserted `Menu` is
+"available on watchOS 26.5" and planned around it. It is not available on watchOS at all, at any
+version, and the compiler said so in four words. This cost almost nothing only because the design
+had also written down what to do if it turned out badly ("fall back to a `.sheet` with a two-row
+list"), so the failure resolved into a decision already made rather than a re-open. **The habit:**
+for any SDK type you have not personally used *on that platform*, state the fallback in the design
+next to the assumption, and let the build settle it. SwiftUI's API surface is not uniform across
+Apple's platforms, and watchOS is where it is least uniform — availability intuitions carried over
+from iOS are worth less there than anywhere else.
+
+**(i) A fixed point size cannot serve a device family that spans 40mm to 49mm; the giveaway is
+needing a second fixed number after the first one fails.** Three attempts: 140 (inherited from the
+previous layout) overflowed and clipped the button; 120 still overflowed, by ~23pt; only a
+*fraction* of the measured container worked. The tell was that the first fix was the same *kind* of
+thing as the bug. Note also what the arithmetic showed once it was written down: the furniture below
+the vessel (a 44pt button, a two-line caption, the gaps) is **fixed** at ~95pt and does not scale, so
+on a 40mm's ~134pt of safe area no legal vessel size fits beside it — meaning that screen was always
+going to scroll and no amount of tuning would have changed it. **The habit:** when a layout constant
+has to be retuned per screen size, stop tuning and derive it from the container — and separately,
+add up the *non*-scaling parts first, because they tell you whether a static layout is achievable at
+all before you spend three builds discovering it isn't. `WristVessel.diameter(fitting:within:)` and
+`MiniVessel.radius(fitting:besides:gap:)` were already this lesson, one level down.
+
+**(j) When persisted state changes unexpectedly, run the controlled experiment before deciding
+whether it is a bug — and design the experiment so both answers are visible.** The watch's outbox
+gained four 250 ml pours between two screenshots during which nothing was tapped, and 250 ml is
+exactly the amount the newly-tappable vessel logs — a shape entirely consistent with "the Button
+self-fires during layout", which would have been critical. Two cheap checks settled it instead of a
+guess: decoding the stored `at` instants gave a ~1.6s/1.05s/3.4s spacing (a human poking a new
+button, not a render loop, which would have been milliseconds apart and hundreds of events), and a
+relaunch-plus-idle window with zero input left the count at exactly 4. **The habit:** an anomaly in
+persisted data has a timestamp in it — read the timestamps before forming a theory, because cadence
+distinguishes human input from machine repetition almost every time. And prefer the non-destructive
+experiment: `simctl erase` was the first instinct here and was correctly refused, but re-reading a
+counter across an idle window answered the identical question and destroyed nothing.

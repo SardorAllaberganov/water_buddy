@@ -1,6 +1,6 @@
 ---
 description: Reminders — a pure plan decides when, and only the applier touches UserNotifications
-globs: ["WaterBuddy/ReminderPlan.swift", "WaterBuddy/NotificationManager.swift", "WaterBuddy/SettingsView.swift", "WaterBuddyWidget/AddWaterIntent.swift"]
+globs: ["WaterBuddy/ReminderPlan.swift", "WaterBuddy/NotificationManager.swift", "WaterBuddy/SettingsView.swift", "WaterBuddyWidget/AddWaterIntent.swift", "WaterBuddyWatch/WaterBuddyWatchApp.swift"]
 ---
 
 # Notifications
@@ -98,9 +98,16 @@ system.
   `applyDailyReset(on:)` and `refresh()`. A new mutation path without that call is incomplete
 - Never guard the reschedule on `remindersEnabled` — always call through and let `slots` return `[]`.
   **An empty plan is the instruction to clear the schedule**
-- `DataManager.requestReminderReschedule` keeps its `guard !isAppExtension else { return }`. The
-  extension reaches `reconcile` by awaiting it directly inside `AddWaterIntent.perform()` — never
-  through the injected hook, and never from a detached `Task` that would not outlive `perform()`
+- `DataManager.requestReminderReschedule` keeps its `guard role.mayFileReminders else { return }` —
+  corrected from the `guard !isAppExtension else { return }` this line named until 2026-09-01
+  (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §9.2; the same stale sentence
+  was quoted verbatim in rule `40-widget`, and both are fixed together). `.watchApp` and
+  `.watchExtension` both answer `mayFileReminders == false`: `ReminderPlan.Slot.identifier` is a
+  pure function of day and hour, so a watch constructing a `DataManager` would file
+  byte-identical identifiers into a second notification centre that cannot dedupe against the
+  phone's. The extension reaches `reconcile` by awaiting it directly inside
+  `AddWaterIntent.perform()` — never through the injected hook, and never from a detached `Task`
+  that would not outlive `perform()`
 - `refresh()`'s unconditional reconcile on every foreground is the backstop for a widget tap the
   extension sandbox may not have permitted. Do not remove it as redundant
 

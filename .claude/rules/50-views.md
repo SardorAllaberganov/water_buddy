@@ -1,6 +1,6 @@
 ---
 description: Views own presentation state and nothing else
-globs: ["WaterBuddy/*View.swift", "WaterBuddy/WaterBuddyApp.swift", "WaterBuddy/Celebration.swift"]
+globs: ["WaterBuddy/*View.swift", "WaterBuddy/WaterBuddyApp.swift", "WaterBuddy/Celebration.swift", "WaterBuddyWatch/*View.swift", "WaterBuddyWatch/WaterBuddyWatchApp.swift"]
 ---
 
 # Views
@@ -47,8 +47,17 @@ persist anything.
 - A menu is what a screen *offers*; a **preference is what the user chose**, and rule `20-state`
   makes `DataManager` the only thing allowed to persist one. `dailyGoal` is the precedent: its range
   still lives on `GoalSetupView` while its value lives on the model. The quick-add vessels are the
-  same split — `HomeView.vesselSlots` owns the names, glyphs and order, `DataManager.servings` owns
-  the three amounts, and `HomeView.servings(amounts:)` is the pure function that joins them
+  same split — `vesselSlots` owns the names, glyphs and order, `DataManager.servings` owns the three
+  amounts, and `HomeView.servings(amounts:)` is the pure function that joins them.
+  **`vesselSlots` no longer lives on `HomeView`.** It moved to file scope in `WaterSurface.swift` as
+  a `nonisolated let` — the "menu belongs to the screen that offers it" default from the previous
+  paragraph holds only while exactly one screen asks the question, and the watch's `WristView`
+  became a second, **non-view** consumer that needs the identical three names, glyphs and order
+  without depending on `HomeView`'s own type. Reaching into another view's file-private state to
+  share a menu is worse than promoting the menu once it has two askers; `WaterSurface.swift` is the
+  file both `HomeView` and `WristView` already need for the vessel geometry itself, so the menu
+  followed it rather than becoming a new shared file of its own (rule `15-project`'s seventh-file
+  cost)
 - A `static` that projects model state takes the state **as a parameter**. Reaching a `@MainActor`
   property from a `nonisolated` static needs `MainActor.assumeIsolated`, which traps when the
   assumption is wrong — a `precondition` in all but name, and rule `75-diagnostics` records that this

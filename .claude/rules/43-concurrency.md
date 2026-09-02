@@ -1,6 +1,6 @@
 ---
 description: Isolation — @MainActor on the model, nonisolated on everything a widget must reach
-globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyTests/**/*.swift"]
+globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyTests/**/*.swift", "WaterBuddyWatch/**/*.swift", "WaterBuddyWatchWidget/**/*.swift", "WaterBuddyWatchTests/**/*.swift"]
 ---
 
 # Concurrency
@@ -41,6 +41,46 @@ warning here is a Swift 6 error later.
 - Never store a non-`Sendable` value in a `static let`. Expose it as a `static func` that builds a
   fresh one, and call non-`Sendable` system singletons (`UNUserNotificationCenter.current()`,
   `WidgetCenter.shared`) inside the closure body that uses them
+- **`WristLink` is `nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable`, and
+  is never `@MainActor` — the second instance of this codebase deliberately keeping a
+  system-callback surface off the main actor, alongside `NotificationManager`'s own
+  struct-of-closures design around `UNUserNotificationCenter`.** `WCSession`'s header states its
+  delegate callbacks land on "a non-main serial queue," and a `@MainActor` type conforming to a
+  nonisolated delegate protocol produces `#ConformanceIsolation` — a warning at this project's
+  `SWIFT_VERSION = 5.0`, an error at Swift 6 — so `DataManager` is disqualified as the delegate by
+  the SDK itself, not by preference. The explicit `nonisolated` on the class declaration matches
+  the pattern already established for `Key.wristApplied`, `AppLanguage.code`, `vesselSlots` and
+  `WristModel.requestSend`, all of which needed it because `SWIFT_DEFAULT_ACTOR_ISOLATION =
+  MainActor` (set on every native target) infers `@MainActor` onto an unmarked declaration —
+  **for those four, removing the keyword reproducibly regresses a real "main actor-isolated …
+  cannot be referenced from a nonisolated context" warning; for `WristLink` it does not.** Three
+  separate probes against this exact toolchain (an unapplied reference to `activate()`, a direct
+  synchronous call to it, and a control test on an unrelated `NSObject` subclass with one plain
+  method) produced no diagnostic difference with or without the keyword — most likely because
+  `SWIFT_APPROACHABLE_CONCURRENCY = YES` (also set on every target) relaxes this diagnostic
+  category, though that is an inference about the compiler's behaviour, not proof the underlying
+  isolation was ever safe to omit. The keyword is kept regardless, as explicit documentation of
+  intent consistent with its four siblings and with `WCSession`'s own unambiguous statement that a
+  callback lands off-main — it is just not, on this toolchain, something the automated gate can
+  currently prove will regress loudly if removed (`WaterBuddyTests/WristSyncTests.swift`'s
+  `WristLinkReachabilityTests` records the three failed probe attempts, honestly, rather than
+  claiming to be a working canary). `WristLink`'s `Sendable` is **earned**: zero stored properties,
+  only immutable
+  references to global-actor-isolated classes reached through it
+- **`WristLink` itself never hops to the main actor at all.** Its `WCSessionDelegate` methods post a
+  `Notification` synchronously, straight from whatever queue `WCSession` calls them on — posting is
+  thread-safe, and isolation is each observer's own responsibility, not the poster's. There is no
+  `Task { @MainActor in }` anywhere in this class, and there never has been one shipped — an earlier
+  draft of this rule described that shape and cited "`WristLink`'s own DocC states this ruling in
+  full," but no such hop exists in the DocC or the code it describes. The hop happens one step
+  further out, on the *receiving* side: `WristInbox` and `WristModel` register their observers with
+  `queue: .main` and enter isolation with `MainActor.assumeIsolated` — the same `NotificationCenter`
+  idiom this file already sanctions below for `DataManager.startObservingDayChanges()`.
+  `assumeIsolated` is correct there specifically because `queue: .main` is what guarantees the
+  callback is already on the main queue by the time it runs; it would be wrong inside `WristLink`
+  itself, where a `WCSessionDelegate` callback is explicitly **not** guaranteed to be on the main
+  queue and `assumeIsolated` would trap rather than merely warn — which is exactly why `WristLink`
+  posts instead of hopping, and leaves the hop to callers who can actually make that guarantee
 - Spell static properties on a `Sendable` type as `static let`. The one `static var` is
   `AddWaterIntent.parameterSummary`, which the protocol requires
 - `nonisolated(unsafe)` is permitted only for a value whose thread-safety is stated in a comment on
@@ -70,8 +110,8 @@ warning here is a Swift 6 error later.
   it started with
 - Build non-`Sendable` collaborators **inside** the `Task {}` body and resolve values from the
   shared suite there — never capture a scheduler, a notification centre, or `DataManager.shared`
-- A fire-and-forget `Task {}` in code an extension can reach carries
-  `guard !isAppExtension else { return }`: a detached task does not outlive `perform()`.
+- A fire-and-forget `Task {}` in code a non-owner process can reach carries
+  `guard role.mayFileReminders else { return }`: a detached task does not outlive `perform()`.
   `requestReminderReschedule` is the instance of this; the `Task`s in `SettingsView` and
   `Celebration` are app-only view work and need no guard
 - `AddWaterIntent.perform()`'s trailing `await` is what holds the extension process open. Keep it

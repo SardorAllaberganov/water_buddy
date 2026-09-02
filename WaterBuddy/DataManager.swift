@@ -1954,7 +1954,31 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
         let session = WCSession.default
         session.delegate = self
         session.activate()
+
+        #if os(watchOS)
+        // Spec §4 chose `updateApplicationContext` precisely because its payload is **a property,
+        // readable on the watch's own wake with no callback and no ordering dependency** — and yet
+        // nothing in this app ever read that property, so the watch depended entirely on
+        // `didReceiveApplicationContext` firing while it happened to be running. A context that
+        // landed while the watch app was not running was therefore invisible until the phone
+        // published again, which (before the activation publish added below) could be never.
+        //
+        // Reading it here closes that hole from the receiving side, and is safe to do unconditionally:
+        // it is last-write-wins state, `WristModel.apply(_:)` is idempotent, and an empty dictionary
+        // before the first sync simply decodes to nil.
+        applyPersistedContext(from: session)
+        #endif
     }
+
+    #if os(watchOS)
+    /// Decodes whatever the system is already holding for us and posts it on the same channel a live
+    /// delegate callback would. Separate from `activate()` only so the intent reads at the call site.
+    private func applyPersistedContext(from session: WCSession) {
+        guard let mirror = Self.decodeMirror(from: session.receivedApplicationContext),
+              mirror.schemaVersion == WristMirror.currentSchemaVersion else { return }
+        NotificationCenter.default.post(name: Self.didReceiveMirrorNotification, object: nil, userInfo: ["mirror": mirror])
+    }
+    #endif
 
     // MARK: - Sending (wrist → phone)
 
@@ -2062,9 +2086,35 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
             print("[WaterBuddy] WCSession activation failed: \(error.localizedDescription)")
         }
         #endif
+
+        #if os(iOS)
+        // Activation is asynchronous, and every publish site in `DataManager` is a foreground or
+        // mutation event that can fire *before* it completes: `requestWristPublish` guards only
+        // `WCSession.isSupported()`, so a pre-activation call throws `WCErrorCodeSessionNotActivated`
+        // into a DEBUG-only catch and is gone, with nothing to retry it. On a cold launch that is a
+        // real race — `DataManager.shared` is built before `WristLink.live.activate()` runs — and
+        // losing it leaves the watch on its pre-sync screen until the user foregrounds the phone a
+        // second time.
+        //
+        // Publishing from the completion callback is the one moment guaranteed to be after
+        // activation, and it costs nothing when a publish already succeeded: the context is
+        // last-write-wins, so a redundant identical write is a no-op on the wire.
+        guard activationState == .activated else { return }
+        DataManager.requestWristPublish(from: DataManager.sharedDefaults)
+        #endif
     }
 
     #if os(iOS)
+    /// The watch app was just installed, or a different watch was paired. Either way the counterpart
+    /// has no mirror yet and nothing else in this design would send one: every other publish site is
+    /// a phone-side foreground or mutation, and the user has no reason to touch their phone right
+    /// after installing something on their watch. Without this, a freshly installed watch app waits
+    /// for an unrelated phone interaction before it can show anything real.
+    func sessionWatchStateDidChange(_ session: WCSession) {
+        guard session.isPaired, session.isWatchAppInstalled else { return }
+        DataManager.requestWristPublish(from: DataManager.sharedDefaults)
+    }
+
     func sessionDidBecomeInactive(_ session: WCSession) {}
 
     /// A different watch may be paired next — Apple's own documented recovery is to reactivate.
