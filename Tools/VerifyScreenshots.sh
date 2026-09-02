@@ -22,6 +22,7 @@ SHOTS="$ROOT/Screenshots"
 
 IPHONE_69="1260x2736 1290x2796 1320x2868"
 IPHONE_65="1242x2688 1284x2778"
+IPAD_13="2064x2752 2048x2732"
 WATCH="422x514 410x502 416x496 396x484 368x448 312x390"
 
 fail=0
@@ -51,6 +52,7 @@ while IFS= read -r file; do
     */Screenshots/census/*) accepted=""; slot="census (size unchecked)" ;;
     *"/iPhone-6.9/"*)       accepted="$IPHONE_69"; slot="iPhone 6.9\"" ;;
     *"/iPhone-6.5/"*)       accepted="$IPHONE_65"; slot="iPhone 6.5\"" ;;
+    *"/iPad-13/"*)          accepted="$IPAD_13";   slot="iPad 13\""    ;;
     *"/AppleWatch/"*)       accepted="$WATCH";     slot="Apple Watch"  ;;
     *)                      accepted="";           slot="(unknown slot)" ;;
   esac
