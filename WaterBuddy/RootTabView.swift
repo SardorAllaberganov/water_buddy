@@ -159,10 +159,18 @@ private struct GlassTabBar: View {
             density: .frosted,
             elevation: .floating
         )
-        // Capped, then centred. `.padding(.horizontal, 44)` alone is a phone measurement: on an
-        // iPad in landscape it left a 1,120pt bar with a 553pt-wide *History* button, which reads
-        // as a stretched toolbar rather than as the floating pill this is meant to be. Measured on
-        // an iPad Pro 11-inch, where the app is 1,210 x 834.
+        // Capped, then centred. `.padding(.horizontal, 44)` alone is a *proportional* inset, so the
+        // bar grows with the container: the wider the screen, the wider each of the three slots.
+        // The cap is what keeps this a floating pill rather than a stretched toolbar.
+        //
+        // The measurement that produced 420 was taken on an iPad Pro 11-inch, where the app ran
+        // 1,210 x 834 in landscape and the bar came out 1,120pt wide with a 553pt *History*
+        // button. iPad support was dropped on 2026-09-02 (`TARGETED_DEVICE_FAMILY = 1`), so that
+        // device can no longer produce the failure — but the cap is kept rather than reverted,
+        // because it is not iPad-specific: 420 is below the widest iPhone's own content width, so
+        // removing it would visibly widen the bar on every large phone in landscape. Keeping it
+        // changes nothing on any shipping device; removing it is a layout change needing its own
+        // verification pass. `theBarHoldsThreeTabs` still pins the 44pt floor inside this cap.
         .frame(maxWidth: 420)
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 44)
