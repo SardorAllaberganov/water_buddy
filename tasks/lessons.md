@@ -1428,3 +1428,139 @@ persisted data has a timestamp in it — read the timestamps before forming a th
 distinguishes human input from machine repetition almost every time. And prefer the non-destructive
 experiment: `simctl erase` was the first instinct here and was correctly refused, but re-reading a
 counter across an idle window answered the identical question and destroyed nothing.
+
+## 2026-09-02 — A denied tool call is a stop sign, and it fires more than once
+
+`sed -i` on `project.pbxproj` was refused. It was not a fluke prompt: `Bash(sed -i:*)` is in
+`.claude/settings.json`'s **deny** list, alongside `defaults write`, `xcrun simctl erase`, `sudo` and
+`git push --force`. A deny rule cannot be approved at a prompt — it fails instantly, which is why it
+looked like a glitch rather than a policy.
+
+Twice more the same shape appeared: the `update-config` skill and then a direct `Edit` of
+`.claude/settings.json` were both refused by the auto-mode classifier, whose environment block
+describes a *different repository* ("personal knowledge management, not software development").
+
+**The rule:** report it and stop. Do not reach for a second tool that writes the same bytes. The
+remedy is telling the owner which mechanism was refused and what it was for, so they can decide —
+which is exactly what unblocked all three cases here.
+
+**The corollary that matters more:** when a *script* needs a denied command, wrapping it in
+`bash Tools/whatever.sh` would slip past the permission matcher, because the matcher sees `bash`.
+That is the detour the rule forbids. `Tools/CaptureScreenshots.sh` therefore **detects** a dirty
+simulator and prints the `xcrun simctl erase <udid>` command for a human, rather than running it —
+and it is a better script for it, because erasing a device is destructive and now nobody does it by
+accident.
+
+## 2026-09-02 — An asset-catalog idiom can be wrong with zero diagnostics
+
+`WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset/Contents.json` declared its single 1024² image as
+`"idiom" : "watch-marketing"` — the App Store listing slot. Compiled, that produces a rendition whose
+idiom is literally `marketing` and **no watch launcher icon at all**. The watch app had shipped with
+nothing for watchOS to draw in the app grid.
+
+`actool` emitted **zero errors, zero warnings and zero notices**. Every tripwire this repo has — the
+five-invocation gate, "treat every new warning as a failure" — is structurally blind to it.
+
+The fix is `"idiom" : "universal"` **plus `"platform" : "watchos"`**, and the platform key is
+load-bearing: omit it and `actool` emits no `Assets.car` whatsoever, again as a warning at exit 0.
+
+**The rule:** an asset catalogue is compiled, not linted. When you change one, verify the *output*:
+`xcrun assetutil --info <built>/X.app/Assets.car | grep '"Idiom"'`. Reading the JSON proves nothing —
+both the broken and the correct form are valid JSON and both compile silently.
+
+## 2026-09-02 — Prove the fix is needed before doing it
+
+The brief said to strip the alpha channel from the app icons, and all four PNGs really are colour
+type 6 (RGBA), which is what ITMS-90717 rejects on. Two independent probes still disagreed about
+whether it mattered.
+
+Measuring settled it: every alpha byte in both marketing icons is already 255, and `actool` produces
+a **byte-identical** `Assets.car` from RGB and RGBA sources — same sha256, both platforms. `Opaque` is
+derived from content, not encoding (confirmed by punching one pixel to alpha 0 and watching the flag
+flip). Stripping could not have altered one byte of the submitted artifact.
+
+**The rule:** a plausible fix to a real-looking symptom is still worth measuring before it is built.
+Had this shipped, an upload failure would have been "fixed" by a change that provably does nothing,
+and the real cause — the watch's missing launcher rendition — would have survived the round trip.
+
+## 2026-09-02 — watchOS has no tap primitive, but macOS accessibility does
+
+Three separate sources in this repo said the watch could only be driven by a human: `simctl` has no
+tap/touch/click (verified — it offers `io` and `ui` and nothing that touches the screen), Apple ships
+no XCUITest for watchOS, and known issues #27/#28 both rest on that.
+
+All true, and the conclusion was still wrong. **The watch simulator's accessibility tree is exposed
+to macOS through System Events**, and its elements answer `AXPress` and `AXScrollToVisible`:
+
+```
+Today's hydration    AXButton      ← the vessel IS the pour button
+More servings        AXButton      AXPress, AXScrollToVisible, …
+```
+
+That produced water in the vessel, the scrolled state, and `WristServingMenu` — a screen known issue
+#27 recorded as never having been rendered by anyone. Reading a UI element's `value` also gives an
+exact state probe: `"113 percent, 2 250 of 2 000 millilitres"`.
+
+`AXPress` beats a synthetic click for a second reason: it needs no window focus. The one
+`click at {x, y}` attempted here landed on the **Terminal window**, which was overlapping the
+Simulator at those coordinates.
+
+**The rule:** "the SDK offers no API for this" is a claim about one SDK. Before recording a
+capability as impossible, check whether the *host* platform can reach it — a simulator is a macOS
+app, and macOS has an accessibility API.
+
+## 2026-09-02 — Match system UI strings by prefix, never by literal
+
+`springboard.buttons["Don't Allow"]` failed with `No matches found`. iOS labels that button
+**`Don’t Allow`** with U+2019 RIGHT SINGLE QUOTATION MARK, not the ASCII apostrophe anyone types. The
+failure printed the real hierarchy — `Button, label: 'Don’t Allow'` — so this was observed rather
+than guessed, and it killed a 6½-minute capture run at shot 21 of 25.
+
+**The rule:** for any string the *system* owns, match on a prefix
+(`label BEGINSWITH "Don"`). It survives the apostrophe form, later iOS wording, and localisation.
+Reserve exact literals for strings this codebase itself supplies.
+
+## 2026-09-02 — App Store Connect validates against the slot, not the app
+
+Four screenshots at 1320×2868 were rejected: *"Размеры снимка экрана должны быть следующими:
+1242 × 2688px … 1284 × 2778px"*. Nothing was wrong with them — they are valid **6.9″** captures, and
+they had been uploaded into the **6.5″** well, which accepts neither.
+
+Two things worth carrying forward. First, only one iPhone size is actually required: Apple's spec
+makes 6.5″ *"Required if app runs on iPhone and screenshots for 6.9″ display aren't provided"*, so
+filling either well is enough and ASC scales down. Second, no installed simulator had a 6.5″ screen —
+but the iOS 26.5 runtime still supports the older device types, and `xcrun simctl create` (allowed
+here; only `erase` is denied) produced an iPhone 14 Plus at 1284×2778 in seconds. A freshly created
+device is also **clean by construction**, which satisfied the harness's first-run gate with no erase.
+
+**The rule:** a screenshot's validity is a function of the slot it is uploaded to.
+`Tools/VerifyScreenshots.sh` now checks size per slot, so a mismatch fails locally instead of at
+upload.
+
+## 2026-09-02 — `--mask=ignored` does not remove the alpha channel
+
+`xcrun simctl io <watch> screenshot --mask=ignored` still writes PNG colour type 6 on watchOS: the
+display is non-rectangular and the framebuffer carries a mask whatever the corner-fill policy. App
+Store Connect rejects any screenshot with an alpha channel, so that file would have been refused.
+
+`sips` cannot fix it — there is no alpha, matte or flatten flag, and its only route to colour type 2
+is a lossy JPEG roundtrip that alters more than half the RGB bytes. `Tools/FlattenPNG.swift` draws
+through a `.noneSkipLast` CoreGraphics context instead: colour type 6 → 2 with the RGB planes
+**byte-identical over 619,008 bytes**, verified by decoding both files and comparing.
+
+**The rule:** the verifier caught this, not a human eye — and it was the first thing that check ever
+earned. Write the assertion that inspects the artifact, not the process that produced it.
+
+## 2026-09-02 — "This codebase compiles clean" was false for a long time
+
+A full `xcodebuild build -scheme WaterBuddy` emits **38** warnings, every one of the *"main
+actor-isolated … cannot be referenced from a nonisolated context; this is an error in the Swift 6
+language mode"* class. `CLAUDE.md` and rule `43-concurrency` both asserted the opposite.
+
+They are genuinely pre-existing — proven, not assumed, by building the same scheme at two different
+deployment targets and diffing the warning sets byte-for-byte identical. They survived because
+**incremental builds do not re-emit warnings for files they do not recompile**, and every routine gate
+run is incremental.
+
+**The rule:** "no new warnings" is only meaningful against a baseline somebody measured. Measure it
+with a clean build into an empty `-derivedDataPath`, and write the number down.

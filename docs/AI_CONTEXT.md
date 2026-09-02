@@ -4,6 +4,23 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-09-02 (twenty-seventh pass — `/doc_sync` after the App Store preparation
+work: iPad dropped to `TARGETED_DEVICE_FAMILY = 1`, `IPHONEOS_DEPLOYMENT_TARGET` 26.5/18.6 → **17.0**
+and `WATCHOS_DEPLOYMENT_TARGET` 26.5 → **26.0** (both compile- and link-verified, neither ever *run* —
+no matching runtime is installed), the watch's missing launcher icon fixed, four `PrivacyInfo.xcprivacy`
+manifests added, export compliance declared, and a screenshot harness built that captured 37 verified
+images. HEAD is still `7f55364`; **nothing is committed**, and the index continues to hold the watchOS
+docs pass's own 39 paths, so this session's work was deliberately left unstaged to keep the two
+separable (rule `90-git`). Drift fixed this pass: one stale line count, one undocumented file, the
+UI-test declared count 10 → 12, and a build command in `docs/WIDGET.md` still pinned to
+`OS=18.6,name=iPhone 16`. Six known issues opened, **#29–#35**; two closed by observation, **#27**
+(`WristServingMenu` had never been rendered by anyone — it has now, and it is correct) and **#28** (the
+"More" button's below-the-fold position *and* its crown reachability, both previously argued rather
+than seen). Superseding note for the twenty-sixth pass below, which is retained as written.)
+
+<details>
+<summary>Twenty-sixth pass — 2026-09-01, retained</summary>
+
 **Last updated:** 2026-09-01 (twenty-sixth pass — `/doc_sync` after the `WristView` redesign.
 HEAD is still `7f55364`; nothing this pass is committed. **The watch's one screen was reorganised at
 the owner's direction**: the three equal-weight pour rows under the vessel are gone, the **vessel
@@ -106,6 +123,8 @@ compile-time half is unbuilt (#17). Previously: twenty-first pass — cascade af
 
 ---
 
+
+</details>
 ## What this is
 
 An iPhone hydration tracker on the arc *log → see → log again without opening the app*.
@@ -144,7 +163,7 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
 | `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 300 `@Test` functions in 33 suites |
-| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests) plus the Xcode template's 3. 10 declared, **25 executed** — `testLaunch` runs once per launch configuration |
+| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
 | `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 29 `@Test` functions in 5 suites |
@@ -235,7 +254,7 @@ WaterBuddy/LiquidGlassModifier.swift             501   shared — design tokens 
 WaterBuddy/NotificationManager.swift             203   shared — ReminderScheduler + reconcile; the only UN caller
 WaterBuddy/PressStyle.swift                       31   app only — the shared press recoil
 WaterBuddy/ReminderPlan.swift                    121   shared — WHEN to remind, as a pure value
-WaterBuddy/RootTabView.swift                     252   app only — AppTab (3 cases), the container, the glass tab bar
+WaterBuddy/RootTabView.swift                     260   app only — AppTab (3 cases), the container, the glass tab bar (the 420pt cap's comment rewritten 2026-09-02: it justified itself in iPad measurements, and iPad is gone — the cap is kept, because 420 is below the widest iPhone's content width)
 WaterBuddy/SettingsView.swift                    658   app only — the goal editor, the vessel editor, reminders, the language picker
 WaterBuddy/WaterBuddyApp.swift                   108   app only — RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
@@ -258,6 +277,7 @@ WaterBuddyTests/ServingSeamTests.swift           279   ServingResolutionTests (p
 WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WristSyncTests.swift             661   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristLinkDecodingTests + WristLinkChunkingTests
+WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set and the 25-shot full census
 WaterBuddyUITests/GoalSetupUITests.swift         245   setup, the a11y tree, the tab swap, the Settings tab, the week card
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
@@ -277,6 +297,48 @@ WaterBuddyWatchTests/WristViewLogicTests.swift   149   the pure logic WristView 
 WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 71   .accessoryCircular percentage ring — reads DataManager.sharedDefaults/Key.wristMirror directly, never WristModel.shared
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
+
+**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-09-02 with
+`find` over all seven and a two-way `comm` against the table: no undocumented file, no phantom row.
+Every line count above was re-checked against `wc -l`, not spot-checked — one was stale
+(`RootTabView.swift`, 252 → 260) and 51 were current.
+
+### Outside every target
+
+`Tools/` sits outside all seven `PBXFileSystemSynchronizedRootGroup`s, so nothing in it is compiled
+into anything (rule `15-project`). It is **not** part of the 53 above, which is why earlier passes'
+"every file is documented" claim was true while omitting it:
+
+```
+Tools/GenerateAppIcon.swift                      267   generates the three iOS icon variants at 1024². Run: swift Tools/GenerateAppIcon.swift. Does NOT own the watch icon — see known issue #34
+Tools/FlattenPNG.swift                            99   re-encodes a PNG to colour type 2, RGB untouched. Required for every watch capture: simctl writes RGBA on watchOS even with --mask=ignored
+Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5
+Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position
+Tools/CaptureWatchScreenshot.sh                    —   the watch capture. WATERBUDDY_SCREENSHOT_NOWAIT=1 shoots the empty state unattended
+Tools/VerifyScreenshots.sh                         —   proves each capture's size/alpha/format against the slot it will be uploaded to
+Tools/RenameScreenshots.py                         —   xcresult attachment UUIDs → slot names, via manifest.json
+```
+
+None of these carries the executable bit: `Bash(chmod:*)` is on this project's permission deny list,
+so they are invoked as `bash Tools/<name>.sh` and `swift Tools/<name>.swift`.
+
+### Shipped, but not Swift
+
+```
+WaterBuddy/PrivacyInfo.xcprivacy                  —   \
+WaterBuddyWidget/PrivacyInfo.xcprivacy            —    | four byte-identical manifests, one per shipping
+WaterBuddyWatch/PrivacyInfo.xcprivacy             —    | bundle. Each target's synchronized root group
+WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with NO project.pbxproj edit
+Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868
+Screenshots/en-US/iPhone-6.5/*.png                4    the 6.5" store set, 1284x2778
+Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32)
+Screenshots/census/iPhone-6.9/*.png              19    coverage run, 1260x2736 — NOT store assets
+Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states
+```
+
+The four `PrivacyInfo.xcprivacy` files are a **submission blocker**, not paperwork: `UserDefaults` is
+a required-reason API and Apple does not accept an upload that fails to declare one. See rule
+`15-project`'s *Submission* section for the reason codes and why all four bundles need their own.
 
 `AuroraBackground` and `PressStyle` were `private` inside `HomeView.swift` until `GoalSetupView`
 became a second consumer. They are **app-only**: the widget re-expresses the same lights itself in
@@ -424,6 +486,48 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five re-run 2026-09-02**, after the App Store preparation pass (iPad dropped,
+`IPHONEOS_DEPLOYMENT_TARGET` 26.5/18.6 → **17.0**, `WATCHOS_DEPLOYMENT_TARGET` 26.5 → **26.0**, the
+watch launcher icon fixed, four privacy manifests added, export compliance declared). Foreground,
+one simulator at a time, `xcrun simctl shutdown all` before each, `-parallel-testing-enabled NO`.
+
+| Command | Result | Warnings |
+|---|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 300 tests in 33 suites passed` | 31 |
+| `-only-testing:WaterBuddyUITests` | `** TEST SUCCEEDED **` — `Executed 25 tests, with 0 failures` | 0 |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 29 tests in 5 suites passed` | 0 |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` | 38 |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` | 0 |
+
+Test counts are unchanged from the 2026-09-01 run — this pass added no `@Test` and no XCTest case
+that the gate runs. `AppStoreScreenshotUITests` **is** a new XCTest class in `WaterBuddyUITests`, but
+it is a capture harness rather than a test and the gate skips it explicitly
+(`-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests`, rule `85-testing`) — which is why the
+UI figure is still 25 and not 26.
+
+**On the warning counts: 31 and 38 are not new.** They are the pre-existing concurrency baseline now
+recorded as known issue #29, and this pass proved it is pre-existing rather than assuming so —
+the same scheme was built at the old floor and the new one and the warning sets diffed byte-for-byte
+identical. Zero **new** warnings is the honest claim; zero warnings is not, and the older text below
+that says this codebase compiles clean is superseded.
+
+**Artifact-level verification, which the gate structurally cannot do** — read off a clean build into
+empty DerivedData:
+
+| Claim | Proof |
+|---|---|
+| iPhone-only | `UIDeviceFamily` → `[1]`; `Assets.car` → 4 `phone` renditions, 0 `pad` |
+| iOS floor | `MinimumOSVersion` → `17.0`; `vtool -show-build` → `minos 17.0` on the app **and** the widget appex |
+| watchOS floor | `vtool -show-build` → `minos 26.0` on the watch app **and** the watch widget appex |
+| Watch launcher icon | `assetutil --info` on the watch `Assets.car` → `"Idiom" : "watch"` (was `"marketing"`) |
+| Export compliance | `ITSAppUsesNonExemptEncryption` → `false` |
+| Privacy manifests | `PrivacyInfo.xcprivacy` present in all four shipping bundles |
+
+**Still unproven, and the gate cannot close it:** no iOS 17.x runtime and no watchOS 26.0 runtime is
+installed on this machine, so neither floor has ever been *executed* — only compiled and linked.
+
+*(The 2026-09-01 gate table below is retained as the record of the watchOS plan's own final run.)*
 
 **Gate — all five run 2026-09-01, from the project directory, one simulator at a time,
 `xcrun simctl shutdown all` before and after, no parallel cloning.** This is the watchOS plan's
@@ -825,6 +929,31 @@ and the tab bar fell off-screen. `INFOPLIST_KEY_UISupportedInterfaceOrientations
 Restricting the iPad would also require `UIRequiresFullScreen`, which would disable Split View —
 a much larger decision than this one, and unnecessary since nothing there is broken.*
 
+> **Superseded 2026-09-02, on both of its claims.** The paragraph above is kept as the record of
+> what was decided on 2026-08-29; neither sentence is true of the tree now, and one of them was
+> never true.
+>
+> 1. **"iPad is deliberately left at all four" — reversed by owner decision.** iPad support was
+>    dropped: `TARGETED_DEVICE_FAMILY` is `1` on all four phone-side targets (was `"1,2"`), and both
+>    `INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad` settings were deleted. The
+>    `UIRequiresFullScreen`/Split View objection above no longer applies, because the app does not
+>    run on iPad at all rather than running there in a restricted way. Built proof:
+>    `UIDeviceFamily` reads `[1]` in the built `Info.plist`, and the compiled `Assets.car` carries 4
+>    `phone` renditions and zero `pad`. The app had never been submitted (`MARKETING_VERSION = 1.0`,
+>    no App Store Connect record), so there is no existing-user cost.
+> 2. **"`…_iPhone` is now `UIInterfaceOrientationPortrait` in both configurations" was wrong when
+>    written, and is still wrong.** Both configurations read
+>    `"UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft
+>    UIInterfaceOrientationLandscapeRight"` — at HEAD, in the index, and today. Three independent
+>    probes found this on 2026-09-02. **The iPhone was never portrait-locked.** Consequences worth
+>    knowing: `GoalSetupUITests.setUpWithError`'s comment calls its forced portrait "belt and braces
+>    rather than the fix", which is backwards — that line is the only thing pinning orientation, and
+>    `AppStoreScreenshotUITests` depends on it for the same reason (a landscape capture comes out
+>    2868x1320, a size App Store Connect rejects for the portrait slot). Known issue #12's
+>    parenthetical "lower risk than it was, since the iPhone is portrait-only now" rests on the same
+>    false premise. **Whether to actually portrait-lock the iPhone is an open product decision, not
+>    a documentation fix**, and is deliberately out of scope here — see known issue #31.
+
 *Resolved on 2026-08-29: **the goal is editable after setup**, which was #1 and the largest product
 gap on this list. `SettingsView` gained `GoalCard` — the same 1,000–4,000 range setup offers, read
 from `GoalSetupView.goalRange` rather than re-declared, committing on drag-end so one gesture is one
@@ -1119,6 +1248,92 @@ rather than fixed — the review's own explicit call, not an oversight:**
    constant's DocC records why the button's 44pt floor and the caption's second line were *not* the
    things shrunk instead), but it makes #27 more pressing rather than less: the one control nobody
    has exercised is now also the one nobody can see.
+
+**Opened by the 2026-09-02 App Store preparation pass:**
+
+29. **`CLAUDE.md`'s "this codebase compiles clean" was false, and is now retired.** A full
+    `xcodebuild build -scheme WaterBuddy` emits **38** warnings, every one of the *"main
+    actor-isolated … cannot be referenced from a nonisolated context; this is an error in the Swift 6
+    language mode"* class — 72 hits in `DataManager.swift` plus `NotificationManager.swift`,
+    `ReminderPlan.swift`, `WaterLog.swift`, `WaterSurface.swift`, `LiquidGlassModifier.swift` and
+    `WristPlan.swift` as those are recompiled for the other targets. They are **pre-existing and
+    unrelated** to this pass, proven by building the same scheme at two different deployment targets
+    and diffing the warning sets: identical. They are invisible to an incremental build, which is how
+    the claim survived. `CLAUDE.md` now states the rule as *no **new** warnings against a
+    38-warning baseline*. Closing the baseline is real work — every one is a Swift 6 error later —
+    and it is its own task, deliberately not folded in (rule `90-git`).
+
+30. **`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` is set on the app target only, not on all seven.**
+    Rule `43-concurrency` asserts it is "set on every native target" and builds a long argument on
+    top of that: the explicit `nonisolated` keywords on `WristLink`, `vesselSlots`,
+    `WristModel.requestSend` and `Key.wristApplied` exist because the setting would otherwise infer
+    `@MainActor` onto them. If the setting is absent on the watch targets, that reasoning does not
+    apply there — which may be the real explanation for the three failed probes that rule already
+    records honestly under `WristLinkReachabilityTests` ("no diagnostic difference with or without
+    the keyword"). The keywords are harmless either way; the *rule's stated justification* is what
+    needs re-deriving. Found by two independent probes this pass. Not fixed here: it is a claim in
+    `.claude/`, and correcting it properly means re-running those probes rather than editing prose.
+
+31. **The iPhone is not portrait-locked, and two documents said it was.** Both app configurations
+    carry `INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait
+    UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"`, unchanged at HEAD.
+    See the superseding note above the resolved-issues list for the full consequences. The open
+    question is a product one — *should* it be portrait-locked? The 2026-08-29 pass argued yes for
+    iPhone on the evidence that a 393pt canvas cannot hold a 280pt vessel, then apparently never
+    applied it. Deliberately out of scope for the App Store pass, which needed only that the
+    *capture* be pinned, and it is (`XCUIDevice.shared.orientation = .portrait` in both UI suites).
+
+32. **The shipped watch screenshot is the empty state, and that is a knowing trade.**
+    `Screenshots/en-US/AppleWatch/01-wrist.png` exists, is 416x496, carries no alpha and is
+    acceptable to App Store Connect — but it shows a 0% vessel captioned "Not yet synced · default
+    goal". **App Review guideline 2.3.3** says screenshots "should show the app in use, and not
+    merely the title art, login page, or splash screen", and a 0% vessel is a weak reading of "in
+    use". The owner was shown this and chose the empty state on 2026-09-02. If review pushes back,
+    the remedy is already built: drop `WATERBUDDY_SCREENSHOT_NOWAIT=1` and
+    `bash Tools/CaptureWatchScreenshot.sh` pauses for a human to tap the pour button.
+    - **Why a human is unavoidable.** `simctl` has no tap, touch or click primitive for watchOS —
+      re-verified against `simctl help` this pass, which offers `io` (screenshot, recordVideo,
+      enumerate, poll) and `ui` (appearance, contrast, content size) and nothing that touches the
+      screen — and Apple has never shipped XCUITest for watchOS, so there is no UI-test target to
+      write. Same root cause as #27.
+    - **Getting rid of the caption is a further step still.** Pouring locally raises the number but
+      not the caption; only a real `WristMirror` arriving from a paired, booted iPhone simulator
+      clears it, which is a manual setup no part of the gate performs.
+    - **A capture-side trap worth knowing:** `simctl io … screenshot` writes PNG colour type 6
+      (RGBA) on watchOS **even with `--mask=ignored`**, because the display is non-rectangular and
+      the framebuffer carries a mask regardless of corner fill. App Store Connect rejects any
+      screenshot with an alpha channel, so `Tools/FlattenPNG.swift` re-encodes to colour type 2 —
+      proven lossless, RGB planes byte-identical over 619,008 bytes. `sips` cannot do this: it has
+      no alpha/matte/flatten flag, and its only path to colour type 2 is a lossy JPEG roundtrip.
+
+33. **Two iPad artifacts survive the device-family change and cannot be removed.** Xcode 26.6's
+    `actool` emits `AppIcon76x76@2x~ipad.png` and a `CFBundleIcons~ipad` Info.plist key from a modern
+    single-size universal icon unconditionally — with `TARGETED_DEVICE_FAMILY = 1`, with
+    `--target-device iphone` alone, and on a clean build into empty DerivedData. The compiled
+    `Assets.car` is correct (4 `phone` renditions, 0 `pad`), and iOS never reads `CFBundleIcons~ipad`
+    on a family-1 app, so this is ~50KB of dead payload rather than a defect. Recorded so the next
+    person does not mistake it for an incomplete iPad removal.
+
+34. **`Tools/GenerateAppIcon.swift` does not own the watch icon, and the gap widened on 2026-09-02.**
+    The script writes only `WaterBuddy/Assets.xcassets/AppIcon.appiconset` (three iOS variants at
+    1024², plus that set's `Contents.json`). `WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset` is
+    hand-managed. Until this pass the two were at least *related* — the watch icon was a byte-identical
+    copy of the phone's **dark** variant. It is now a copy of the **light** one, which is the right
+    artwork, but it is still a copy: re-running the generator regenerates the phone's three icons and
+    silently leaves the watch's stale. `GenerateAppIcon.swift:5-6` claims "the icon and the product
+    cannot drift apart"; that holds for the phone and has never held for the watch. Fixing it means
+    teaching the script to emit the watch set **in the modern `universal` + `"platform" : "watchos"`
+    form** — not the `watch-marketing` form it had, which compiles silently to no launcher icon at all.
+
+35. **The watch vessel does not scale its readability scrim, and it shipped that way.**
+    `WristVessel.swift:39` passes `WaterReadabilityScrim` at the default `intensity: 1` — the
+    full-strength *app* value. Rule `60-design-system` says a small canvas scales the scrim with the
+    level (`min(1, level * 1.6)`), and `WaterSurface.swift`'s own DocC gives the reason: "at 0% there
+    is nothing bright to hold back and a full scrim only turns the vessel into a black hole." The
+    phone widget's `MiniVessel` does scale it. The watch does not, and the consequence is visible in
+    a shipped asset: compare `Screenshots/census/AppleWatch/01-series11-46mm.png` (0%, a near-black
+    disc) against `06-wrist-water-63pct.png` (bright and legible). Found by looking at the captures,
+    which is exactly the class of defect rule `85-testing` says no green suite can see.
 
 ## Where the rest is written down
 

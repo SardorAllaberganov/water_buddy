@@ -3,7 +3,7 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-09-01 (ninth pass — one sentence: the reminder hook's early return is
+**Last updated:** 2026-09-02 (tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
 `role.mayFileReminders`, not `isAppExtension`. No widget contract changed. Previously: eighth pass — every `WaterSnapshot` field documented, and the timeline's code sample corrected: it still showed the memberwise midnight entry that was fixed. Previously: the button now logs `entry.snapshot.serving`, and `rolledOver()` fixes the midnight entry that dropped the chosen language)
 
 ---
@@ -333,10 +333,22 @@ test run completely untouched:
 
 ```
 xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension \
-                 -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16'
+                 -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17'
 ```
 
-Last run 2026-08-28: `** BUILD SUCCEEDED **`, 0 warnings.
+Last run 2026-09-02: `** BUILD SUCCEEDED **`, 38 warnings — the pre-existing concurrency baseline in
+`DataManager.swift`/`NotificationManager.swift`, **not** widget code (`docs/AI_CONTEXT.md` known
+issue #29). Zero warnings originate in `WaterBuddyWidget/`.
+
+*(Corrected 2026-09-02: this command read `OS=18.6,name=iPhone 16` until then, which had been stale
+since the runtime pin moved. Rule `85-testing` is the authority for every gate destination; when the
+two disagree, the rule wins and this file changes.)*
+
+**The extension's deployment target is `IPHONEOS_DEPLOYMENT_TARGET = 17.0`** as of 2026-09-02, down
+from 26.5 — and it moved because it *had* to. The app target had drifted to 18.6 while the extension
+stayed at 26.5, which meant the widget did not exist on any device between those versions: a live
+defect in a shipped configuration, invisible to every build and test. Both are now 17.0. The drop
+cost no source changes at all, proven by building at both floors and diffing the warning sets.
 
 Neither this nor the unit suite can see a widget that renders blank. After any change to the
 widget's view tree, entitlements or target membership, place it on a Home Screen.

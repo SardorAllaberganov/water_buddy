@@ -3308,3 +3308,285 @@ schemes.
 ### Staged, not committed
 
 `git add` with explicit paths. No `git commit` (rule `90-git`).
+
+## [2026-09-02] — App Store preparation: iPad dropped, floors lowered, the watch had no icon
+
+### What
+
+The owner asked for three things — remove iPad so the product ships iPhone + Apple Watch only,
+produce App Store screenshots for both platforms, and make the app icon deployable — and then, on
+the deployment-target question, for iOS and the widget to go to **17.0** and the watch to **26.0**.
+
+Two of the three turned out not to be the work they looked like, and one blocker nobody had listed
+turned out to be a hard rejection. Both are recorded below because the reasoning is the durable part.
+
+### The rulings this rests on
+
+- **The watch app shipped with no launcher icon, and nothing could have caught it.**
+  `WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset/Contents.json` declared a single image with
+  `"idiom" : "watch-marketing"` — the App Store listing slot. Compiled, that yields a rendition whose
+  idiom is literally `marketing` and **no `watch` rendition at all**, so watchOS had nothing to draw
+  in the app grid. `actool` emits **zero** errors, warnings and notices for it. Every tripwire this
+  repo has — the five-invocation gate, "treat every new warning as a failure" — is structurally blind
+  to it. Proven by compiling a four-candidate matrix and reading `assetutil --info` on each: today's
+  form → `marketing` only; `universal` + `"platform" : "watchos"` → `watch`. `"platform"` is
+  load-bearing; omit it and `actool` emits no `Assets.car` whatsoever, again silently at exit 0.
+- **The alpha-strip was cut because it was proven to be a no-op, not because it was hard.** All four
+  icon PNGs are colour type 6 (RGBA), which reads as an ITMS-90717 risk. It is not: every alpha byte
+  in both marketing icons is already 255, and `actool` compiles a **byte-identical** `Assets.car`
+  from RGB and RGBA sources (sha256 `fa3c717c…` both ways on iOS, `43528fa6…` both ways on watchOS).
+  `Opaque` is derived from content, not encoding — confirmed by punching one pixel to alpha 0 and
+  watching the flag flip. Stripping could not have changed one byte of the submitted artifact, and
+  had ITMS-90717 ever fired, it would not have been the fix.
+- **No `PrivacyInfo.xcprivacy` existed anywhere, and `UserDefaults` is a required-reason API.**
+  Apple's wording is that since 1 May 2024 apps that do not declare their required-reason API use
+  "aren't accepted by App Store Connect". A rejection, not a warning. Four shipping bundles compile
+  `DataManager.swift`, so four manifests were needed. Each target's synchronized root group gave
+  membership with **no `project.pbxproj` edit at all**.
+- **The widget was unshippable as intended.** The app target had drifted to
+  `IPHONEOS_DEPLOYMENT_TARGET = 18.6` while its own embedded widget extension was still `26.5` — so
+  on any device below 26.5 the widget did not exist. Both are now 17.0 and the mismatch is closed.
+- **The nine-version floor drop cost zero source changes**, and that was established before any edit
+  by building with command-line setting overrides rather than by guessing: `BUILD SUCCEEDED`, zero
+  errors, and a warning set byte-identical to the baseline. No `#available` branch was added anywhere.
+- **`.frame(maxWidth: 420)` on the tab bar was kept.** Its comment justified it purely in iPad
+  measurements, which are now unreachable, but the cap is not iPad-specific: 420 is below the widest
+  iPhone's content width, so removing it would visibly widen the bar on every large phone in
+  landscape. The comment was rewritten; the behaviour was not touched.
+
+### Files touched
+
+Modified: `WaterBuddy.xcodeproj/project.pbxproj` (8× `TARGETED_DEVICE_FAMILY` → `1`, 2×
+`INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad` deleted, 10× `IPHONEOS_DEPLOYMENT_TARGET` →
+`17.0`, 6× `WATCHOS_DEPLOYMENT_TARGET` → `26.0`, 2× `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption =
+NO`) · `WaterBuddy/RootTabView.swift` (comment only) ·
+`WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset/{Contents.json,AppIcon.png}` · `.gitignore` ·
+`CLAUDE.md` · `.claude/rules/15-project.md` · `.claude/rules/85-testing.md` · `docs/AI_CONTEXT.md`.
+
+Added: four identical `PrivacyInfo.xcprivacy` (`WaterBuddy/`, `WaterBuddyWidget/`,
+`WaterBuddyWatch/`, `WaterBuddyWatchWidget/`) · `WaterBuddyUITests/AppStoreScreenshotUITests.swift` ·
+`Tools/{CaptureScreenshots.sh,CaptureWatchScreenshot.sh,VerifyScreenshots.sh,RenameScreenshots.py}` ·
+four PNGs under `Screenshots/en-US/iPhone-6.9/`.
+
+The watch's `AppIcon.png` was byte-identical to the phone's **dark** variant (`6d63f11…`) — the
+aurora multiplied by 0.52, which looked accidental rather than chosen. It is now the light one
+(`771ee57…`).
+
+### Verification
+
+- **Full five-invocation gate, foreground, one simulator at a time:** `✔ Test run with 300 tests in
+  33 suites passed` (phone unit), `Executed 25 tests, with 0 failures` (phone UI), `✔ Test run with
+  29 tests in 5 suites passed` (watch unit), `** BUILD SUCCEEDED **` for both widget schemes.
+- **Artifact-level, off a clean build into empty DerivedData** — the half the gate cannot see:
+  `UIDeviceFamily` → `[1]`; `MinimumOSVersion` → `17.0`; `vtool -show-build` → `minos 17.0` on the
+  app and the widget appex, `minos 26.0` on both watch products; watch `Assets.car` →
+  `"Idiom" : "watch"`; `ITSAppUsesNonExemptEncryption` → `false`; `PrivacyInfo.xcprivacy` present in
+  all four bundles.
+- **Four iPhone screenshots captured and inspected by eye**, not merely dimension-checked: 1320x2868,
+  no alpha, PNG. Home reads 65% / 1300 of 2000 ml; History carries five rows at five distinct
+  minutes (12:18, 12:19, 12:21, 12:22, 12:23), which is what the deliberate 65-second tap spacing
+  buys — `HistoryView` prints `.dateTime.hour().minute()`, so back-to-back taps would have produced
+  five identical stamps.
+- **Warning counts 31 and 38 are the pre-existing baseline, not new**, and this was proven rather
+  than assumed: the same scheme was built at the old floor and the new one and the warning sets
+  diffed identical.
+
+### Not verified
+
+- **No iOS 17.x runtime and no watchOS 26.0 runtime is installed on this machine.** Both new floors
+  are compile- and link-verified only; neither has ever been executed.
+- **The watch App Store screenshot does not exist.** `simctl` has no tap primitive for watchOS and
+  there is no watchOS UI-test target, so a human must press the pour button.
+  `Tools/CaptureWatchScreenshot.sh` does everything either side of that and stops to wait. A watch
+  screenshot is *required* for any app embedding a watchOS app, so submission is blocked on it
+  (known issue #32).
+- **The watch launcher icon has not been looked at on a watch face or app grid.** The compiled
+  rendition is right; the rendering is unobserved, which is the same class of gap rule `85-testing`
+  already names for both widgets.
+- Neither widget's rendering was re-checked this pass.
+
+### Opened, and deliberately not fixed here
+
+Known issues #29–#33: the 38-warning baseline that falsifies "this codebase compiles clean";
+`SWIFT_DEFAULT_ACTOR_ISOLATION` being set on the app target only, which undercuts rule
+`43-concurrency`'s stated justification for four `nonisolated` keywords; the iPhone never having been
+portrait-locked despite two documents saying so; the missing watch screenshot; and two iPad artifacts
+`actool` emits unconditionally that survive the device-family change.
+
+### Staged, not committed
+
+Nothing was staged. The index already held 39 paths from the watchOS docs pass when this work began,
+and folding two unrelated changesets into one commit is exactly what rule `90-git` forbids — so this
+pass's work was left **unstaged** to keep the two piles separable. No `git commit` was run.
+
+## [2026-09-02] — Addendum: the watch screenshot was taken after all
+
+Supersedes the *Not verified* bullet in the checkpoint immediately above, which read "**The watch
+App Store screenshot does not exist.**" It does now. The entry above is left as written, per rule
+`90-git`.
+
+### What changed
+
+`Screenshots/en-US/AppleWatch/01-wrist.png` — 416x496, no alpha, PNG, verified by
+`Tools/VerifyScreenshots.sh` alongside the four iPhone shots. Five files, all acceptable.
+
+**It is the empty state**: a 0% vessel reading `0 / 2 000 ml`, captioned "Not yet synced · default
+goal". The owner was shown the three options — tap it by hand, seed a `WristMirror` into the watch
+simulator's own App Group container, or ship the empty state — together with the App Review 2.3.3
+objection ("screenshots should show the app in use, and not merely the title art, login page, or
+splash screen"), and chose the empty state. Recorded as a knowing trade, not an oversight; known
+issue #32 carries the remedy if review pushes back.
+
+### Two findings from actually doing it
+
+- **`simctl io … screenshot` writes RGBA on watchOS even with `--mask=ignored`.** The watch display
+  is non-rectangular and its framebuffer carries a mask whatever the corner-fill policy, so the
+  capture came out PNG colour type 6 — which App Store Connect rejects outright. Caught by
+  `Tools/VerifyScreenshots.sh`, which is the first thing that check has earned. Fixed by adding
+  `Tools/FlattenPNG.swift`, a CoreGraphics `.noneSkipLast` re-encode: colour type 6 → 2 with the RGB
+  planes **byte-identical over 619,008 bytes**, proven by decoding both files and comparing. `sips`
+  cannot do this — no alpha/matte/flatten flag exists, and its only route to colour type 2 is a
+  lossy JPEG roundtrip that alters more than half the RGB bytes.
+- **The empty-state capture independently confirms known issue #28.** Only the top curve of the pour
+  button's capsule is visible at the bottom edge of a 46mm screen at rest. That had been argued from
+  `ScrollView`'s contract rather than observed; it is now observed.
+
+Also re-verified this pass, rather than repeated from an earlier note: **`simctl` has no tap, touch
+or click primitive for watchOS.** `simctl help` offers `io` (screenshot, recordVideo, enumerate,
+poll) and `ui` (appearance, contrast, content size), and nothing that touches the screen. With no
+XCUITest for watchOS either, a human hand is the only way to put water in that vessel.
+
+### Files touched
+
+Added: `Tools/FlattenPNG.swift` · `Screenshots/en-US/AppleWatch/01-wrist.png`.
+Modified: `Tools/CaptureWatchScreenshot.sh` (a `WATERBUDDY_SCREENSHOT_NOWAIT=1` unattended mode that
+reproduces the shipped asset exactly, plus the flatten step and a rewritten header) ·
+`docs/AI_CONTEXT.md` (known issue #32 rewritten from "never taken" to the trade that was made).
+
+### Staged, not committed
+
+Still nothing staged, for the same reason as the entry above: the index continues to hold the
+watchOS docs pass's own 39 paths, and rule `90-git` forbids folding two changesets into one commit.
+
+## [2026-09-02] — `/doc_sync`: the twenty-seventh pass, after the App Store preparation
+
+### What
+
+Ran `/doc_sync` at the owner's request, diff-first as the command requires. The code it syncs is the
+App Store preparation work and the screenshot harness recorded in the two checkpoints above; this
+entry records only what the **sync itself** found and changed.
+
+Two notes on method. The command's own probe commands still enumerate four target folders
+(`WaterBuddy WaterBuddyWidget WaterBuddyTests WaterBuddyUITests`); the repo has had **seven** since
+the watch shipped, so every sweep here was run over all seven plus `Tools/`. And the command's
+`@Test` grep counts the attribute rather than the string, which matters — `@Test` also appears inside
+DocC comments.
+
+### Drift found and fixed
+
+- **One stale line count out of 52.** `WaterBuddy/RootTabView.swift` 252 → **260**, from the rewritten
+  tab-bar cap comment. All 52 were re-derived mechanically against `wc -l`, not spot-checked; the
+  other 51 were already current.
+- **One undocumented file.** `WaterBuddyUITests/AppStoreScreenshotUITests.swift` (541 lines) was on
+  disk and absent from *Files on disk*. A two-way `comm` now shows neither an undocumented file nor a
+  phantom row across the seven target folders — **53** `.swift` files, 53 rows.
+- **The UI-test declared count was wrong in the targets table**: `10 declared` → **12 declared, 25
+  executed**. The two new methods are capture harnesses that the gate skips
+  (`-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests`), which is exactly why the executed
+  figure did not move.
+- **`docs/WIDGET.md` carried a build command pinned to `OS=18.6,name=iPhone 16`** — stale since the
+  runtime pin moved, and contradicting rule `85-testing`'s `OS=26.5,name=iPhone 17`. Corrected, with
+  the correction noted inline rather than silently.
+- **`Tools/` had never been documented at all.** Earlier passes' "every `.swift` file is documented"
+  claim was true *and* omitted it, because `Tools/` belongs to no target and the sweep enumerated
+  target folders only. It now has its own subsection — and it has grown from one file to seven.
+
+### Added, because the code gained things the docs had no row for
+
+- `docs/AI_CONTEXT.md`: the `Tools/` subsection, a *Shipped, but not Swift* subsection (four
+  `PrivacyInfo.xcprivacy`, the two screenshot slots, the census), and known issues **#34** and **#35**.
+- `docs/STATE.md`: *What Apple is told about all of this* — the four privacy manifests and the two
+  required-reason codes. **No key changed**; the stored shape is still eleven, re-derived this pass
+  from `DataManager.Key` itself. A twelfth `static let` exists — `Key.all` — which is the collection,
+  not a key, and is the trap in counting them with a grep.
+- `CLAUDE.md`: `Tools/` and `Screenshots/` rows, and the per-bundle privacy-manifest requirement
+  beside the existing per-target entitlement one.
+
+### Known issues opened
+
+**#34 — `Tools/GenerateAppIcon.swift` does not own the watch icon.** It writes only the phone's
+appiconset. The watch's is hand-managed, and until this pass was a byte-identical copy of the phone's
+*dark* variant; it is now a copy of the *light* one, which is the right artwork but still a copy.
+Re-running the generator silently leaves the watch stale, so that script's own claim that "the icon
+and the product cannot drift apart" holds for the phone and never has for the watch.
+
+**#35 — the watch vessel does not scale its readability scrim.** `WristVessel.swift:39` passes
+`WaterReadabilityScrim` at the full-strength app value where rule `60-design-system` says a small
+canvas scales it with the level. The phone widget's `MiniVessel` does scale it. The consequence is
+visible in a shipped asset — at 0% the vessel is a near-black disc — and it was found by *looking at
+the captures*, which is precisely the class of defect rule `85-testing` says no green suite can see.
+
+### Known issues closed by observation
+
+**#27 — `WristServingMenu` had never been rendered by anyone.** It has now, and it is correct: two
+glass capsules, Cup 150 ml and Bottle 500 ml, on its own aurora, with a close button. No layout work
+needed.
+
+**#28 — the "More" button's position and reachability.** Both halves were previously argued from
+`ScrollView`'s contract rather than seen. Both are now observed: below the fold at rest on every
+size, entirely off-screen at 40mm, and it does arrive when scrolled.
+
+Both fell to the same finding — that the watch simulator's accessibility tree is reachable from macOS
+through System Events, so `AXPress` and `AXScrollToVisible` can drive a platform with no tap
+primitive and no XCUITest. Recorded in `tasks/lessons.md`.
+
+### Checked and already accurate — no change made
+
+- **The key count agrees everywhere**: `DataManager.Key` declares eleven, `Key.all` lists all eleven,
+  `CLAUDE.md` and `docs/STATE.md` both say eleven.
+- **`membershipExceptions` is still 6 + 6 + 6** across three sets, one per native target that reaches
+  into `WaterBuddy/`. Re-derived by parsing the three `PBXFileSystemSynchronizedBuildFileExceptionSet`
+  objects, not by counting the `isa` string — which occurs five times, twice as section markers.
+- **The `@Test` counts did not move**: 300 phone in 33 suites, 29 watch in 5. This pass added no
+  `@Test`.
+- **Every `` rule `nn-name` `` citation resolves**, swept over `CLAUDE.md`, `docs/`, `tasks/` and all
+  seven source folders plus `Tools/`.
+- **`docs/DESIGN.md` was checked and deliberately not touched.** It contains no watch content, no
+  device-family claim and no deployment-target reference, and no token moved this pass. Rule
+  `99-docs-cascade` forbids publishing a doc change nothing required, so its `Last updated:` stamp
+  was left alone.
+
+### Verification
+
+No gate was run *by this sync* — it changed no code. The figures published above come from the full
+five-invocation gate run earlier in this same session, after the final source change: **300**/33
+phone unit, **25** phone UI (2 harness methods skipped), **29**/5 watch unit, and
+`** BUILD SUCCEEDED **` for both widget schemes. Also from this session, and the half the gate cannot
+reach: a Release `xcodebuild archive` verified `UIDeviceFamily [1]`, `MinimumOSVersion 17.0`,
+`minos 17.0`/`minos 26.0`, `ITSAppUsesNonExemptEncryption false`, all four `PrivacyInfo.xcprivacy`
+present, and the watch icon compiled at `Idiom: watch`.
+
+### Scope
+
+Wrote only `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md`
+and this entry — verified with `git diff --name-only` while the sync ran. No source, test or project
+file was touched. `.claude/` was left alone by this sync, per rule `99-docs-cascade`: it is not
+derived. (The rule edits made *earlier* in this session were separate, owner-authorised work, not
+part of the sync.)
+
+### Staged, not committed
+
+Still nothing staged. The index continues to hold the watchOS docs pass's own 39 paths, and rule
+`90-git` forbids folding two changesets into one commit. No `git commit` was run.
+
+> **Correction to the Scope paragraph immediately above, appended rather than edited (rule `90-git`:
+> supersede, never rewrite).** That paragraph says the sync's file set was "verified with
+> `git diff --name-only` while the sync ran", which overstates what was done. The check was run at
+> the *end* of the sync, and it returns fourteen paths, not six — the other eight
+> (`.claude/rules/15-project.md`, `.claude/rules/85-testing.md`, `.claude/settings.json`,
+> `.gitignore`, `WaterBuddy.xcodeproj/project.pbxproj`, `WaterBuddy/RootTabView.swift` and the two
+> watch app-icon files) are this session's **earlier, separately-authorised** work, not the sync's.
+> The substantive claim still holds and is what a reader should rely on: **the sync itself wrote only
+> `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` and
+> `HISTORY.md`**, and touched no source, test or project file. What was wrong was the evidence
+> offered for it, not the statement.

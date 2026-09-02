@@ -4,7 +4,15 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-09-01 (fourteenth pass — `/doc_sync` after spec §16. **No key added, removed
+**Last updated:** 2026-09-02 (fifteenth pass — `/doc_sync` after the App Store preparation work.
+**No key added, removed or renamed**: the stored shape is unchanged at **eleven**, re-derived this
+pass from `DataManager.Key` itself (a twelfth `static let` exists, `Key.all`, which is the collection
+rather than a key) and confirmed against `Key.all`'s own eleven entries and `CLAUDE.md`'s count. One
+section added — *What Apple is told about all of this* — documenting the four `PrivacyInfo.xcprivacy`
+manifests that declare this product's `UserDefaults` access as a required-reason API. That is a
+declaration **about** the keys, not a change **to** them, and it is recorded here because anyone
+adding a key has to ask whether it drags a new required-reason category in with it. Previously:
+fourteenth pass — `/doc_sync` after spec §16. **No key added, removed
 or renamed**: the stored shape is unchanged at eleven, and `Key.all` still lists all eleven. What
 changed is what the *absence* of `Key.wristMirror` means on the read side — it used to leave the
 watch on a dead-end "Open WaterBuddy on your iPhone" screen, and now falls back to
@@ -524,6 +532,43 @@ Two further sites are guarded by the same enum but are not group bookkeeping: `r
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`
 with **no `default`**, so a fifth binary fails to compile until somebody answers all four for it.
 Pinned by `ProcessRoleTests` (`WaterSnapshotTests.swift:519`).
+
+## What Apple is told about all of this
+
+Added 2026-09-02. **No key changed** — this section documents a *declaration* about the keys, not a
+change to them, and it is here because anyone adding a key needs to know the declaration exists.
+
+`UserDefaults` is one of Apple's **required-reason APIs**. Since 1 May 2024, an upload that uses one
+without declaring it in a privacy manifest is *not accepted by App Store Connect* — a rejection, not
+a warning. Every store on this page is reached through `DataManager.sharedDefaults`, so the whole
+product depends on that declaration being right.
+
+Four byte-identical `PrivacyInfo.xcprivacy` files carry it, one per shipping bundle — `WaterBuddy/`,
+`WaterBuddyWidget/`, `WaterBuddyWatch/`, `WaterBuddyWatchWidget/`. All four are needed because all
+four compile `DataManager.swift` and therefore all four touch `UserDefaults`; declaring only the two
+iOS bundles would still be rejected. Each target's `PBXFileSystemSynchronizedRootGroup` grants
+membership, so **no `project.pbxproj` edit was required** — verified by finding all four in the built
+bundles and in the Release archive.
+
+Two reason codes, and they map onto the two-store split this document opens with:
+
+| Code | Apple's meaning | This app |
+|---|---|---|
+| `1C8F.1` | access confined to the App Group shared by the app and its extensions | `sharedDefaults` resolving `group.sardor.WaterBuddy` — the derived cache every target reads |
+| `CA92.1` | access confined to the app itself | the `.standard` fallback when the container is unreachable, and `migrateIfNeeded(from:into:)` below |
+
+`NSPrivacyTracking` is `false` with `NSPrivacyTrackingDomains` and `NSPrivacyCollectedDataTypes` both
+empty. That is true by construction rather than by assertion: no account, no server, no analytics,
+and no networking import anywhere in the tree (rule `70-privacy`, rule `95-dependencies`).
+
+**If a key is added, ask whether it brings a new required-reason category with it.** The likely ones
+are file timestamp, disk space, system boot time and active keyboard — none of which this product
+touches today. A new category means editing all four manifests together, exactly as a new key means
+touching both this file's count and `CLAUDE.md`'s.
+
+Separately and unrelated to privacy: `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` on the app
+target's two configurations only. Extensions and the watch app inherit the containing app's answer;
+duplicating it is wrong. Without it every upload stalls on a manual export-compliance questionnaire.
 
 ## The one-shot migration
 
