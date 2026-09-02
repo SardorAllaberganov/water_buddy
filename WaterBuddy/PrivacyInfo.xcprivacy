@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  WaterBuddy has no account, no server and no analytics (rule `70-privacy`), so the three
+	  declarations below are empty by construction rather than by omission: nothing is tracked,
+	  no tracking domain is contacted, and no data category is collected. A grep of the tree for
+	  URLSession, Network, CloudKit, HealthKit, CoreLocation and every third-party SDK returns
+	  nothing, and rule `95-dependencies` keeps it that way.
+
+	  The one required-reason API this product does use is UserDefaults, and it is unavoidable:
+	  the widget's read path cannot open SwiftData, so the App Group suite is the only surface
+	  both processes share (rule `40-widget`).
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!--
+				  1C8F.1 — access confined to the App Group the app and its extensions share.
+				  `DataManager.sharedDefaults` resolves `group.sardor.WaterBuddy`, which is the
+				  derived cache every target reads (rule `25-shared-storage`).
+				-->
+				<string>1C8F.1</string>
+				<!--
+				  CA92.1 — access confined to the app itself. The `.standard` fallback taken when
+				  the App Group container is unreachable, and the one-shot
+				  `migrateIfNeeded(from:into:)` that copies legacy `.standard` state into the suite.
+				-->
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
