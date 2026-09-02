@@ -14,6 +14,16 @@
 > | `WaterBuddyWatchWidget/` | **LIVE** — `.accessoryCircular` percentage-ring complication, reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
 > | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets) |
+> | `Tools/` | standalone scripts, in **no** build target — the icon generator, and the screenshot harness |
+> | `Screenshots/` | the App Store assets (`en-US/`) and the coverage run (`census/`), in no target |
+>
+> **Every shipping bundle also carries its own `PrivacyInfo.xcprivacy`** — four of them, byte-identical,
+> one beside each target's sources. `UserDefaults` is a required-reason API, and since 1 May 2024 an
+> upload that does not declare one is **rejected** by App Store Connect. All four bundles compile
+> `DataManager.swift`, so all four need it; declaring only the iOS pair still fails. Each target's
+> synchronized root group grants membership, so **adding one needs no `project.pbxproj` edit** — and a
+> new target added later needs its own, which nothing will remind you of (`docs/STATE.md`,
+> rule `15-project`'s *Submission* section).
 >
 > **`DataManager.swift`, `WaterLog.swift`, `WaterSurface.swift`, `LiquidGlassModifier.swift`,
 > `ReminderPlan.swift` and `NotificationManager.swift` are compiled into both the app and the
@@ -120,7 +130,10 @@ something to record.
   the exact, current commands; do not re-derive them by hand or copy stale ones from memory). One
   simulator at a time, never a cloned parallel run, `xcrun simctl shutdown all` first:
   1. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyTests` — phone unit tests
-  2. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyUITests` — phone UI tests
+  2. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyUITests
+     -skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` — phone UI tests. The skip is
+     **mandatory**: `AppStoreScreenshotUITests` is the App Store capture harness, deliberately
+     non-idempotent, and fails on any device where setup has already been completed
   3. `xcodebuild test -scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests` — watch unit tests
   4. `xcodebuild build -scheme WaterBuddyWidgetExtension` — the phone widget, its own scheme
   5. `xcodebuild build -scheme WaterBuddyWatchWidget` — the watch widget, its own scheme (no
@@ -128,8 +141,16 @@ something to record.
   — **no scheme compiles a sibling's sources**, so a widget-only or watch-only break passes a
   green `WaterBuddy`-scheme test run untouched. Both widget builds are as mandatory as the three
   test runs
-- Treat every new warning as a failure, on **every** invocation. This codebase compiles clean, and
-  a concurrency warning here is a Swift 6 error later
+- Treat every new warning as a failure, on **every** invocation, and a concurrency warning here is a
+  Swift 6 error later. **"This codebase compiles clean" is no longer true and was retired on
+  2026-09-02** — a full `-scheme WaterBuddy` build emits **38** warnings, every one of the
+  *"main actor-isolated … cannot be referenced from a nonisolated context; this is an error in the
+  Swift 6 language mode"* class, concentrated in `DataManager.swift` and `NotificationManager.swift`.
+  They are **pre-existing and unrelated** to any recent change (verified by building the same scheme
+  at two different deployment targets and diffing: identical sets). They are invisible to an
+  incremental build, which is how the claim survived so long. The rule is therefore *no **new**
+  warnings against that 38-warning baseline*, and closing the baseline is its own task
+  (`docs/AI_CONTEXT.md` known issue #29)
 - **A green suite is not proof the product works.** The suite injects its own `UserDefaults`,
   `Calendar` and clock, so it structurally cannot see an entitlement that was not added, a file
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the

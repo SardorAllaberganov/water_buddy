@@ -86,7 +86,8 @@ xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddy \
 
 xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddy \
   -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17' \
-  -only-testing:WaterBuddyUITests -parallel-testing-enabled NO
+  -only-testing:WaterBuddyUITests -parallel-testing-enabled NO \
+  -skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests
 
 xcodebuild test -project WaterBuddy.xcodeproj -scheme WaterBuddyWatch \
   -destination 'platform=watchOS Simulator,OS=26.5,name=Apple Watch Series 11 (46mm)' \
@@ -99,12 +100,26 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
   -destination 'platform=watchOS Simulator,OS=26.5,name=Apple Watch Series 11 (46mm)'
 ```
 
-- **`OS=26.5` is load-bearing on both platforms — do not simplify it away.**
-  `IPHONEOS_DEPLOYMENT_TARGET`/`WATCHOS_DEPLOYMENT_TARGET` are both 26.5, and an unpinned or
-  `OS=latest` destination is ambiguous the moment more than one runtime of that platform is
-  installed — which is routinely true on both iOS and watchOS on this machine. Pin the runtime by
-  number, and update it when the installed runtime changes — never by swapping in a device `id=`,
-  which resolves nothing on anybody else's machine
+- **`-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` on the UI-test invocation is
+  mandatory, not an optimisation.** `AppStoreScreenshotUITests` is a capture harness, not a test:
+  it is **deliberately non-idempotent** — it asserts *Get Started* exists, so it fails on any device
+  where setup has already been completed, which is every ordinary run. It is driven only by
+  `bash Tools/CaptureScreenshots.sh`, which erases the device first. Dropping the skip turns a green
+  gate red for a reason that has nothing to do with the product
+- **`OS=26.5` is load-bearing on both platforms — do not simplify it away.** The reason changed on
+  2026-09-02 and is now the *stronger* one. It used to be that the deployment targets were 26.5, so
+  the runtime and the floor matched; they no longer do — `IPHONEOS_DEPLOYMENT_TARGET` is **17.0** and
+  `WATCHOS_DEPLOYMENT_TARGET` is **26.0**, so the app would now happily install on the iOS 18.6
+  runtime that is also on this machine. That is exactly why the pin matters more, not less: an
+  unpinned or `OS=latest` destination is ambiguous the moment more than one runtime of that platform
+  is installed, and the gate must keep reporting on one known runtime rather than whichever one
+  resolved that day. Pin the runtime by number, and update it when the installed runtime changes —
+  never by swapping in a device `id=`, which resolves nothing on anybody else's machine
+- **The floors are compile-and-link-verified, never run-verified.** No iOS 17.x runtime and no
+  watchOS 26.0 runtime is installed here, so nothing in this gate has ever *executed* the product at
+  its own minimum. `vtool -show-build` on the built binaries is the whole of the evidence
+  (`minos 17.0` / `minos 26.0`). Treat "runs on iOS 17" as unproven until someone installs that
+  runtime or a real device
 - **The watch widget scheme is `WaterBuddyWatchWidget`, with no "Extension" suffix.** Do not
   copy-paste the phone widget's `WaterBuddyWidgetExtension` spelling and assume a parallel name —
   `xcodebuild -list` is the source of truth for every scheme name in this list

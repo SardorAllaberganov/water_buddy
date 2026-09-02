@@ -43,7 +43,18 @@
       "Write(WaterBuddyUITests/**)",
       "Write(docs/**)",
       "Write(tasks/**)",
-      "Write(HISTORY.md)"
+      "Write(HISTORY.md)",
+      "Write(WaterBuddy.xcodeproj/**)",
+      "Write(WaterBuddyWatch/**)",
+      "Write(WaterBuddyWatchWidget/**)",
+      "Write(WaterBuddyWatchTests/**)",
+      "Write(Tools/**)",
+      "Write(Screenshots/**)",
+      "Write(CLAUDE.md)",
+      "Write(.claude/rules/**)",
+      "Read(WaterBuddyWatch/**)",
+      "Read(WaterBuddyWatchWidget/**)",
+      "Read(WaterBuddyWatchTests/**)"
     ],
     "deny": [
       "Bash(defaults write:*)",
