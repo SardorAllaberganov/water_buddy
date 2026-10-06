@@ -81,8 +81,11 @@ one by eye breaks a contrast figure somebody measured.
   almost-empty or almost-full vessel does not show a wave clipping through the wall
 - Any readout drawn over `WaterSurface` sits above a `WaterReadabilityScrim(diameter:)` sized to the
   vessel. Do not remove it or tune it away in favour of a heavier text shadow
-- Leave `intensity` at its default 1 in the app; scale it with the level (`min(1, level * 1.6)`)
-  only in the widget's small vessel
+- Leave `intensity` at its default 1 in the app; scale it with the level only on a small canvas: the
+  widget's small vessel (`min(1, level * 1.6)`) and the watch's vessel
+  (`WristVessel.scrimIntensity(at:)`, full strength by 20%). Each ramp is calibrated to where its
+  **own** smallest readout sits and reaches full strength before water can reach it. Never copy one
+  canvas's ramp to another
 - Volumes stay `Int` everywhere, including a view's `@State`. A `Double` may exist only as a drawing
   fraction (`progress`, `progressUnclamped`, `WaterSurface.level`) or inside a `Slider` binding that
   rounds back to `Int` on the way out
