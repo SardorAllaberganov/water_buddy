@@ -145,13 +145,15 @@ something to record.
   test runs
 - Treat every new warning as a failure, on **every** invocation, and a concurrency warning here is a
   Swift 6 error later. **"This codebase compiles clean" is no longer true and was retired on
-  2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05; the 38 measured on Xcode 26.6 no longer
-  compares), a clean `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique
-  warning lines (80 occurrences): the *"main actor-isolated … cannot be referenced from a nonisolated
-  context"* family in `DataManager.swift` and `NotificationManager.swift`, plus two Xcode 27
-  *"'Combine' was not imported by this file"* warnings in `WristView.swift`. The
-  `WaterBuddyWatchWidget` scheme adds two `actool` trait-set warnings on the phone's catalogues
-  (known issue #36). All are **pre-existing** — proven by building the code from before a change and
+  2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05, and again unchanged on 2026-10-06; the 38
+  measured on Xcode 26.6 no longer compares), a clean `-scheme WaterBuddy` build into an empty
+  DerivedData folder emits **31** unique warning lines (80 occurrences): the *"main actor-isolated …
+  cannot be referenced from a nonisolated context"* family in `DataManager.swift` and
+  `NotificationManager.swift`, plus two Xcode 27 *"'Combine' was not imported by this file"* warnings
+  in `WristView.swift`. The `WaterBuddyWatchWidget` scheme adds two `actool` trait-set warnings on the
+  phone's catalogues (known issue #36) — its checked-in scheme builds `WaterBuddy.app` too, so it also
+  reprints the phone targets' Swift warnings whenever they had to rebuild. All are **pre-existing** —
+  proven by building the code from before a change and
   comparing, never assumed. They are invisible to an incremental build, which is how "compiles
   clean" survived so long. The rule is therefore *no **new** warnings against a baseline measured by
   a clean build on the current toolchain*, compared per file and message, and closing the baseline is
