@@ -1631,3 +1631,74 @@ app before anything is promised on it.
 **The rule:** on paired simulators the install order is part of the setup — the phone app, then the
 watch app, then launch the phone app so its activation publish lands while the counterpart is known
 to be installed.
+
+## 2026-10-06 — A scheme's name is not its build list, and an incremental build re-prints only what it recompiled
+
+The watch-localization plan predicted that building the `WaterBuddyWatchWidget` scheme would print
+"only the two known `actool` warnings". It printed the phone targets' whole main-actor warning
+family instead, and no `actool` line at all. The checked-in `WaterBuddyWatchWidget.xcscheme` lists
+`WaterBuddy.app` among its `buildForRunning` entries, so a "watch widget" build compiles the phone
+app and the phone widget as well — which also answers known issue #36's open question, why a
+watch-destination build compiles the phone's asset catalogues. Which warnings a run prints depends
+on which targets it had to recompile, not on what the scheme is called: the same scheme printed
+exactly the two `actool` lines one gate later, once the phone targets were up to date.
+
+**The rule:** before predicting a build's output, read the scheme's `BuildActionEntries`. And
+compare warnings only between two clean builds into empty DerivedData — never between whatever two
+incremental runs happened to be in the log.
+
+## 2026-10-06 — `xcodebuild` wrote no extracted string back into a new catalogue
+
+The 2026-08-29 entry above records the build extracting `Text` literals and appending them to the
+target's catalogue. Across a dozen `xcodebuild` builds and test runs in this session, neither new
+watch catalogue gained a single key — even while the watch code still held unmigrated literals such
+as `More servings` — so the cleanup step planned for stale extracted keys found nothing to clean.
+Where the phone widget's nine extracted keys came from is therefore not established; builds in the
+Xcode IDE are the likely source, but that is an inference, not an observation.
+
+**The rule:** never count on the command-line build to surface a literal nobody authored. Check the
+keys the code asks for against the catalogue directly — a two-line script did it here — because no
+test and no build will.
+
+## 2026-10-06 — XCUITest *is* in the watchOS SDK; "Apple never shipped it" was never checked
+
+The 2026-09-02 entry above lists "Apple ships no XCUITest for watchOS" among claims that were "all
+true", and known issue #32 built on it — and this session's watch-localization plan repeated it as
+the reason a task could have no RED step. A fresh reviewer read the installed SDK instead:
+`Platforms/WatchOS.platform/Developer/Library/Frameworks/XCUIAutomation.framework` is there, with
+`XCUIApplication` (`openURL:` marked `watchos(9.4)`, the accessibility audit `watchos(10.0)`) and
+`XCUIElement.tap` unavailable only on tvOS. Nobody in three passes had looked; the claim had been
+copied from document to document. What remains true is narrower: this repo has no watch UI-test
+target, and adding one is a project-file change of its own.
+
+**The rule:** a capability recorded as absent is a claim about an SDK version — re-read the SDK's
+headers before repeating it, the same way an API's presence is checked with `xcodebuild -showsdks`
+(2026-08-29). This supersedes the XCUITest clause of the 2026-09-02 entry; that entry's own rule
+still stands.
+
+## 2026-10-06 — A slash command's `$1` is an argument slot, and the harness fills it
+
+The twenty-ninth `/doc_sync` pass wrote into `HISTORY.md` that the command's own probe "still reads
+`s+=the`" — a typo worth reporting, it seemed. The file has read `awk '{s+=$1} …'` since the
+repository's first commit. That pass had invoked `/doc_sync` *with arguments*, and the harness
+substitutes positional arguments into a command's text before the model ever sees it: `$1` became
+the second word of the argument string ("After the watch-localization work…" → "the"). The owner's
+own re-run, invoked with no arguments, showed `$1` intact, which is how the false record was caught
+— the same day, and only because the re-run was treated as a check rather than a formality.
+
+**The rule:** before reporting a defect in a command's text, read the file on disk — the expanded
+prompt is not the file. And invoke a command whose body uses `$1` for its own purposes (shell, awk)
+without arguments, or it will be rewritten on the way in.
+
+## 2026-10-06 — `docs/superpowers/` is inside a doc sync's write scope and outside all of its checks
+
+The watch-localization spec's status line read "This written spec is awaiting the owner's review.
+No code has been written" through the implementation and through two `/doc_sync` runs, both of
+which reported the docs current. Neither was wrong about what it checked: the command's probes cover
+`docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md`, and a
+spec or plan under `docs/superpowers/` appears in none of them. A status line is a claim like any
+other, and it goes stale the moment the thing it describes moves.
+
+**The rule:** when a session approves or executes a spec or plan, update its status line in the same
+change — and a doc sync that touches the work should read the status lines of the specs and plans
+that work cites, not only the five docs its checklist names.

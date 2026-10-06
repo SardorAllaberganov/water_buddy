@@ -3826,3 +3826,300 @@ against the first gate log).
 Fourteen paths now, superseding the "thirteen" in the entry above: the same thirteen plus
 `PRIVACY.md`, all staged by explicit path, nothing left unstaged, `Screenshots/census/` still
 untracked. No `git commit` was run.
+
+## [2026-10-06] — The watch draws in the user's language: known issues #18 and #19
+
+### What
+
+Every string the watch drew was a hard-coded English literal — `WristView`'s screen, its "More"
+sheet and every VoiceOver string — and `WristMirror.languageCode`, sent on every publish and saved
+by the watch, had no reader. Known issue #18 counted eleven sites; re-derived for this work there
+were fifteen strings in three files (it missed two captions, `WristVessel`'s readout and the
+complication's description).
+
+- `WristModel.language` = `AppLanguage(code: mirror?.languageCode)`: the phone's in-app choice.
+  `nil` (*Follow device*) and no mirror at all resolve the watch's own `Bundle.main`. Nothing new is
+  stored — the code already rides in the persisted mirror.
+- `WristRoot`, a private view in `WaterBuddyWatchApp.swift`, injects `\.strings` and `\.locale`
+  together above `WristView` — a view rather than the `App` body, for the reason `RootView` gives.
+- Every watch string resolves through that bundle in the phone's own call style:
+  `attribution(mirror:now:strings:)` and `syncedCaption(composedAt:now:strings:)`,
+  `WristServing.name(in:)`, `WristVessel.readout(volume:goal:strings:locale:)`, and the VoiceOver
+  label, value and hint and the sheet rows inline.
+- Two new catalogues, written by a script that copies the shared keys straight out of the phone's:
+  `WaterBuddyWatch/Localizable.xcstrings` (16 keys — six copied value for value, nine watch-only,
+  `%`) and `WaterBuddyWatchWidget/Localizable.xcstrings` (`Today's hydration`, `WaterBuddy`).
+- English copy changed in exactly three places (spec §3): the VoiceOver value adopts the phone's
+  sentence (a full stop for a comma); the complication's description drops its full stop; the "More"
+  button's separate `More servings` VoiceOver label is gone (rule `65-accessibility`: one string).
+- The readout keeps its thousands grouping, now per language (`1 250 / 2 000 мл`), through a
+  watch-only `%1$@ / %2$@ ml` key — not the phone's `%1$d`, which never groups.
+- Rules `70-privacy`, `15-project`, `50-views` and `65-accessibility` amended per spec §7, under the
+  owner's approval of the spec.
+
+### The rulings this rests on
+
+- Spec `docs/superpowers/specs/2026-10-06-watch-localization-design.md`, §3 rulings 1–7, approved by
+  the owner section by section; plan `docs/superpowers/plans/2026-10-06-watch-localization.md`,
+  executed inline on `main`, staged only, at the owner's choice.
+- Made during execution:
+  - The `WaterBuddyWatchWidget` scheme printed the phone targets' baseline warnings rather than only
+    the two `actool` lines, because its checked-in scheme builds `WaterBuddy.app` too; the clean-build
+    comparison stayed the authority.
+  - No RED step was possible for `WristRoot` and the VoiceOver wiring: no unit test sees a view tree,
+    and the tool that could — a watch UI-test target — does not exist and would need a
+    `project.pbxproj` edit the plan rules out. The plan first gave the reason as "Apple ships no
+    XCUITest for watchOS"; that is false (*Found along the way*), and the plan is corrected.
+  - Two existing comments in `WaterBuddyWatchApp.swift` corrected: `WristRoot`'s `@State` is now a
+    second place `WristModel.shared` is touched.
+  - The whole-branch review ran before this checkpoint, so this records the final state.
+
+### Files touched
+
+Modified: `WaterBuddyWatch/WristModel.swift` · `WaterBuddyWatch/WristView.swift` ·
+`WaterBuddyWatch/WristVessel.swift` · `WaterBuddyWatch/WaterBuddyWatchApp.swift` ·
+`WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` · `WaterBuddyTests/LocalizationTests.swift` ·
+`WaterBuddyWatchTests/WristModelTests.swift` · `WaterBuddyWatchTests/WristViewLogicTests.swift` ·
+`.claude/rules/70-privacy.md` · `.claude/rules/15-project.md` · `.claude/rules/50-views.md` ·
+`.claude/rules/65-accessibility.md` · `tasks/lessons.md` (three entries). New:
+`WaterBuddyWatch/Localizable.xcstrings` · `WaterBuddyWatchWidget/Localizable.xcstrings` · the spec ·
+the plan. No project file, entitlement, `PrivacyInfo.xcprivacy`, exception set or wire field changed.
+
+### Verification
+
+- **RED, then GREEN, for every task** — filtered by suite, executed count read:
+  - Task 1: RED `value of type 'WristModel' has no member 'language'` → GREEN `✔ Test run with 17
+    tests in 1 suite passed`.
+  - Task 2: RED `✘ Test run with 20 tests` with exactly the five expected failures and
+    `theWatchBundlesAreWhereWeThinkTheyAre` passing — so the installed phone test host does embed
+    `Watch/WaterBuddyWatch.app` → GREEN `✔ Test run with 20 tests in 1 suite passed`.
+  - Task 3: RED `extra argument 'strings' in call` → GREEN 17 tests in 1 suite.
+  - Task 4: RED `no member 'name'` and `no member 'readout'` → GREEN 19 tests in 1 suite; Russian and
+    Uzbek group four-digit figures on the watchOS 26.5 runtime too.
+  - Task 5: the whole watch suite, `✔ Test run with 42 tests in 5 suites passed`.
+- **Key check:** the watch's code asks for 12 keys, none missing from its catalogue; no catalogue
+  holds a stale key or an unauthored key with a translation.
+- **The gate**, foreground, one simulator, Xcode 27.0: `✔ Test run with 316 tests in 33 suites
+  passed` · `Executed 25 tests, with 0 failures` · `✔ Test run with 42 tests in 5 suites passed` ·
+  `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`) · `** BUILD SUCCEEDED **`
+  (`WaterBuddyWatchWidget`, with exactly the two known `actool` lines).
+- **Warnings**, clean builds into empty DerivedData, a `git archive HEAD` export against the tree,
+  `-scheme WaterBuddy`, generic iOS Simulator: 31 against 31 unique lines with line numbers, 19
+  against 19 file-and-message pairs; none new, none gone.
+- `project.pbxproj` untouched.
+- **On screen**, the device-language path (`-AppleLanguages`/`-AppleLocale` launch arguments, which
+  persist nothing) — all four pass: SE 3 (40mm) and Series 11 (46mm), Russian and Uzbek. `0 / 2 000
+  мл`, "Нет синхронизации · цель по умолчанию", "Синхронизировано 878 мин назад", "878 daqiqa oldin
+  sinxronlandi". Uzbek takes three caption lines at 40mm, at the edge of the documented scroll.
+- **Whole-branch review** by a fresh, read-only reviewer: no Critical; one Important (the false
+  XCUITest premise, fixed in the records); six Minor, deferred to the owner.
+
+### Not verified
+
+- The live switch (phone set to Русский, watch follows) and the "More" sheet's rendering — skipped
+  at the owner's choice. `WristModelTests` pins the switch and `LocalizationTests` the strings, but
+  under `.system` a missed injection is invisible, so this is the check most worth one tap.
+- The complication's description in the face editor — skipped at the owner's choice.
+- VoiceOver speech; real hardware; a watch whose language differs from the phone's while the phone
+  follows its device.
+
+### Found along the way
+
+- **Known issue #36 answered.** `WaterBuddyWatchWidget.xcscheme` lists `WaterBuddy.app` among its
+  build entries, so a "watch widget" build compiles the phone app and widget — hence the phone's
+  asset catalogues, and the phone targets' Swift warnings whenever they rebuild.
+- **XCUITest is in the watchOS SDK.** `XCUIAutomation.framework` ships in `WatchOS.platform`, with
+  `XCUIApplication` and `tap`. Known issue #32's premise, and the 2026-09-02 lesson's, was never
+  checked against the headers; the lesson is superseded.
+- **`xcodebuild` wrote no extracted key** into either new catalogue across a dozen builds.
+- **Deferred minors from the review**, for the owner: review focus 1 and 4 are only half pinned (the
+  content checks iterate a literal `["ru", "uz"]`, and the Russian/Uzbek readout runs one figure);
+  the Russian 40mm caption leads its second line with `·`; `WristRoot` rebuilds `WristView` on every
+  mirror, restarting the caption timer; four DocC and comment nits; the key check lives only in the
+  session's scratch workspace.
+- **New known issues from spec §8:** the phone's `String(format:)` figures never group; the shared
+  Russian keys use one plural form; `syncedCaption`'s `nil` branch is unreachable from production.
+
+## [2026-10-06] — `/doc_sync`: the twenty-ninth pass, after the watch localization
+
+### What
+
+Ran `/doc_sync` per rule `99-docs-cascade`, diff-first, every probe over all seven target folders plus
+`Tools/` — the command's own probe still names four, and its `awk` still reads `s+=the`. This entry
+records only what the sync found and changed; the work itself is the checkpoint above.
+
+### Drift found and fixed
+
+- **8 of 56 line counts** in *Files on disk* — exactly the eight files the localization touched; the
+  other 48 were current.
+- **The phone widget catalogue's row** still called its nine extracted keys untranslated, five of them
+  known issue #1. 15 of its 19 keys are translated, all five Shortcuts strings among them.
+- **Known issues #1 and #12 were fixed on disk before the repository's first commit (`69c5a39`) and
+  never retired** — the Shortcuts translations with their two guard tests, and `GoalSetupUITests`'
+  portrait pin. Retired with that evidence.
+- **#25's premise was false:** the phone widget draws the uncapped percentage too. Retired.
+- **#32's premise was false:** XCUITest ships in the watchOS SDK. Corrected in place, and #42 opened
+  for the watch UI-test target this project lacks.
+- **#36's open question answered:** the checked-in scheme builds `WaterBuddy.app`. Recorded in #36 and
+  in `CLAUDE.md`'s warning-baseline paragraph.
+- **#35's line citation** moved, `WristVessel.swift:39` → `:42`.
+- **The Git section** named HEAD `55c73b2` and 42 commits; it is `638a883` and 45. The previous pass's
+  14 staged paths were committed by the owner in three commits — `git diff --name-only 55c73b2
+  638a883` lists exactly 14.
+- **The targets table and the gate table:** 309 → 316 phone tests, 30 → 42 watch.
+
+### Recorded
+
+- Known issues **#18 and #19 fixed**, the fix on disk.
+- **#39–#43 opened:** the phone's ungrouped `String(format:)` figures; the single Russian plural form;
+  `syncedCaption`'s unreachable `nil` branch; no watch UI-test target although XCUITest exists; and
+  the whole-branch review's deferred minors.
+- `docs/STATE.md`: no key added — still eleven, re-derived (13 `static let`s: the private `prefix`,
+  the eleven keys, `all`) — but `languageCode` inside `Key.wristMirror` now has a reader. The
+  `language` row, a new *…and why it crosses to the watch* section and a grouping caveat say so.
+- `CLAUDE.md`: the warning-baseline paragraph, re-measured unchanged this session, gains #36's cause.
+
+### Re-derived and current — no change made
+
+- 56 Swift files on disk and 56 documented (53 in targets, 3 in `Tools/`), no phantom row, none
+  undocumented.
+- `@Test`: 316 phone, 42 watch; 12 declared UI methods — the same figures wherever the docs state them.
+- The three exception sets, printed member by member: six files each, exactly as `CLAUDE.md` lists.
+- Eleven keys, agreeing between `CLAUDE.md` (nine phone + two watch) and `docs/STATE.md`.
+- Every `` rule `nn-name` `` citation resolves; the three docs that must not exist still do not.
+- `docs/WIDGET.md` and `docs/DESIGN.md` checked and deliberately not touched: neither mentions the
+  watch, and neither the phone widget's contract nor a design token changed, so their `Last updated`
+  lines stand.
+
+### Verification
+
+The gate figures are this session's, from the full run recorded in the checkpoint above. This sync
+changed no code: the source and test diffs against the index were empty when it finished.
+
+### Staged, not committed
+
+21 paths, every one by explicit path, nothing unstaged — re-printed with `git diff --cached
+--name-status` after this entry was written: the four watch sources, the complication's source, the
+two new catalogues, the three test files, the spec, the plan, the four amended rule files,
+`CLAUDE.md`, `HISTORY.md`, `tasks/lessons.md`, `docs/AI_CONTEXT.md` and `docs/STATE.md`.
+`Screenshots/census/` is still untracked. No `git commit` was run.
+
+## [2026-10-06] — `/doc_sync` re-run: three of the twenty-ninth pass's own statements corrected
+
+### What
+
+The owner ran `/doc_sync` again immediately after the twenty-ninth pass, with no code change in
+between. Treated as an independent verification, as the 2026-10-06 re-run of the twenty-eighth pass
+was: every probe re-derived from a fresh script, every claim in this session's own text re-read
+rather than trusted.
+
+### Found and fixed
+
+- **`docs/AI_CONTEXT.md` said "six non-Swift build inputs".** Its table lists five — the four string
+  catalogues and the app icon set — plus `Tools/GenerateAppIcon.swift`, deliberately not one. The
+  line said "four" with three listed before the twenty-ninth pass, so that pass inherited an
+  off-by-one and added one of its own. Corrected to five.
+- **`docs/AI_CONTEXT.md` said "every task went RED before GREEN".** Tasks 1–4 did; Task 5's wiring
+  had no RED step, by ruling — there is no watch UI-test target (known issue #42) — and Tasks 6–9 had
+  no test cycle of their own. Corrected in place.
+- **`docs/STATE.md` said an unrecognised language code is "announced under `#if DEBUG`".**
+  `AppLanguage(code:)` announces only a non-empty one (`if let code, !code.isEmpty`); an empty code
+  falls back silently. Corrected to "unless empty" — the same inaccuracy the whole-branch review
+  found in `WristModel.language`'s DocC, which is code and so stays in known issue #43.
+
+### Superseded here, not rewritten (rule `90-git`)
+
+- The twenty-ninth pass's `/doc_sync` entry above says the command's `awk` "still reads `s+=the`".
+  **False:** `.claude/commands/doc_sync.md` has read `s+=$1` since `69c5a39`. That pass invoked the
+  command with arguments, and the harness substituted the second word of them into `$1`
+  (`tasks/lessons.md`, this date). The probe does still name four folders.
+- The implementation checkpoint above heads its verification "RED, then GREEN, for every task".
+  Tasks 1–4 went RED then GREEN; Task 5 was verified by the whole watch suite and the key check
+  only, as its own ledgered ruling says.
+
+### Re-derived and current — no change made
+
+- 56 Swift files on disk and 56 documented, no phantom, none undocumented; all 56 line counts
+  current.
+- `@Test`: 316 phone, 42 watch; 12 declared UI methods.
+- The four catalogues: 58 / 19 / 16 / 2 keys, with 54 / 15 / 15 / 1 in en/ru/uz — as documented.
+- Eleven keys in `DataManager.Key` (plus the private `prefix` and the `all` roster), agreeing with
+  `CLAUDE.md` and `docs/STATE.md`.
+- The three exception sets, six files each, as `CLAUDE.md` lists them.
+- Known issues numbered 1–43, no gap, no duplicate; `<details>` blocks balanced.
+- Every `` rule `nn-name` `` citation resolves; the three docs that must not exist still do not.
+- `docs/WIDGET.md` and `docs/DESIGN.md` unchanged and correctly unstamped; `CLAUDE.md`'s edited
+  baseline paragraph re-read and accurate.
+
+### Verification
+
+No gate was run by this re-run — it changed no code. The gate figures stand from the full run
+earlier in this session, which every staged code and test file predates (modification times compared
+against the first gate log).
+
+### Staged, not committed
+
+Still 21 paths — this re-run touched only `docs/AI_CONTEXT.md`, `docs/STATE.md`, `tasks/lessons.md`
+and `HISTORY.md`, all already in the set — every one by explicit path, nothing unstaged, re-printed
+with `git diff --cached --name-status` after this entry was written. `Screenshots/census/` still
+untracked. No `git commit` was run.
+
+## [2026-10-06] — `/doc_sync` third run: the spec's status line, the plan's, and a build count
+
+### What
+
+The owner ran `/doc_sync` a third time, with no code or doc change since the second run. Treated as an
+independent verification again — every probe re-run, and this time every factual claim this
+session wrote checked against the tree rather than against its own probes.
+
+### Found and fixed
+
+- **The new spec still said "This written spec is awaiting the owner's review. No code has been
+  written."** It was approved and implemented. Its status line now says so, points at the plan and
+  at this file, and records that §6.4's live-switch, sheet and face-editor checks were skipped at the
+  owner's choice. Neither earlier sync could see it: the command's checks name five docs, and
+  `docs/superpowers/` is none of them (`tasks/lessons.md`, this date).
+- **The plan read as pending** — every checkbox unticked. It gains a status note saying it was
+  executed in full, that progress was tracked in the executor's ledger, and that Task 7 Steps 3 and 4
+  were skipped at the owner's choice. The boxes stay unticked rather than marking skipped steps done.
+
+### Superseded here, not rewritten (rule `90-git`)
+
+- The implementation checkpoint and the 2026-10-06 lesson on extraction both say `xcodebuild` wrote
+  nothing back "across a dozen builds". There were **22** — 20 kept test and gate logs in the
+  executor's workspace, plus the two clean builds of the warning comparison. The finding stands; the
+  count was an estimate written as a number.
+- The second run's entry lists three fixes; it made a fourth after that entry was written — the Git
+  section's "three `tasks/lessons.md` entries", stale because the second run had added a fourth.
+
+### Checked against the tree — accurate
+
+- Known issue #1's retirement: the five Shortcuts translations and both guard tests are already in
+  `69c5a39` (`git show`). #12's portrait pin likewise.
+- The citations this session wrote: `WristVessel.swift:42` (the scrim), `WaterBuddyWidget.swift:350`
+  (the uncapped percentage), `HistoryView`'s `Best %1$d ml` through `String(format:)` (#39).
+- No reference to a replaced surface — the old caption signatures, `More servings`, `Text(verbatim:)`,
+  the description's full stop — outside the retired #18 entry's own record, in `CLAUDE.md`, `docs/`
+  or `.claude/rules/`.
+- Every computed probe as in the second run: 56 Swift files, all documented and all counts current;
+  316 / 42 / 12 tests; the four catalogues' figures; eleven keys; the three six-file exception sets;
+  known issues 1–43 without gap or duplicate; balanced `<details>`; every rule citation resolving; the
+  three must-not-exist docs absent. `docs/WIDGET.md` and `docs/DESIGN.md` unchanged and correctly
+  unstamped; `docs/STATE.md` unchanged by this run.
+
+### Verification
+
+No gate was run — no code changed. The gate figures stand from the full run earlier in this session.
+
+### Staged, not committed
+
+Still 21 paths — this run touched the spec, the plan, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and
+`HISTORY.md`, all already in the set — every one by explicit path, nothing unstaged, re-printed after
+this entry was written. `Screenshots/census/` still untracked. No `git commit` was run.
+
+### Addendum to the third run, written after its staging block
+
+Appending this run's own lesson — the fifth dated 2026-10-06 — made the Git section's "four
+`tasks/lessons.md` entries" stale in turn: the very trap this entry records the second run falling
+into. The sentence now reads "this session's `tasks/lessons.md` entries", with no count for the next
+appended lesson to falsify. Still 21 paths staged, nothing unstaged, re-printed after this addendum.

@@ -4,6 +4,34 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-06 (twenty-ninth pass, **re-verified by two further `/doc_sync` runs the
+same day**. The second re-derived every probe and corrected three of this pass's own statements —
+the build-input count (six → five), a claim that every task went RED before GREEN (Task 5 had no RED
+step, by ruling), and `docs/STATE.md`'s DEBUG note (an empty code is not announced). The third found
+the new spec's status line still reading "awaiting the owner's review … No code has been written",
+gave the plan a status note, and corrected a build count recorded as "a dozen" — there were 22.
+The pass's own summary follows. `/doc_sync` after **the watch was localized**,
+closing known issues **#18** and **#19**. The watch drew hard-coded English everywhere — its screen,
+the "More" sheet, every VoiceOver string — and `WristMirror.languageCode`, sent and persisted, had no
+reader. Now `WristModel.language` resolves it through `AppLanguage(code:)` (`nil` and no mirror →
+the watch's own `Bundle.main`), a private `WristRoot` injects `\.strings` and `\.locale` above
+`WristView`, and two new catalogues ship en/ru/uz (`WaterBuddyWatch/` 16 keys,
+`WaterBuddyWatchWidget/` 2) — spec `docs/superpowers/specs/2026-10-06-watch-localization-design.md`,
+plan `docs/superpowers/plans/2026-10-06-watch-localization.md`, both owner-approved. **This sync's
+own drift:** 8 of 56 line counts (exactly the eight files the change touched); the phone widget
+catalogue's row still called its five Shortcuts strings untranslated; known issues **#1** and **#12**
+were fixed on disk before the repository's first commit and never retired; **#25**'s premise was
+false; **#32**'s premise — "Apple has never shipped XCUITest for watchOS" — was false too,
+`XCUIAutomation.framework` ships in the watchOS SDK; **#36**'s open question is answered; and the Git
+section named HEAD `55c73b2`, three commits stale. Known issues **#1, #12, #18, #19 and #25
+retired**; **#39–#43** opened. Gate re-run in full this session: **316**/33 phone unit, **25** phone
+UI, **42**/5 watch unit, both widget builds green; warnings 31 against 31 on clean builds, none new.
+`docs/WIDGET.md` and `docs/DESIGN.md` were checked and deliberately not touched — neither mentions the
+watch, and neither the phone widget's contract nor a design token changed.)
+
+<details>
+<summary>Twenty-eighth pass — 2026-10-05, re-verified 2026-10-06, retained</summary>
+
 **Last updated:** 2026-10-06 (twenty-eighth pass, 2026-10-05, **re-verified by a second `/doc_sync`
 run on 2026-10-06**: every probe and check re-derived and current, one figure in this paragraph
 corrected — the Git section had been stale for three passes, not two — and `PRIVACY.md`'s list of
@@ -29,6 +57,8 @@ paragraph naming two files of four, and the Git section three passes stale. Know
 **#36–#38** opened. Gate re-run in full this session: **309**/33 phone unit, **25** phone UI,
 **30**/5 watch unit, both widget builds green. `docs/WIDGET.md` and `docs/DESIGN.md` were checked and
 deliberately not touched — the phone widget's contract and the design tokens did not change.)
+
+</details>
 
 <details>
 <summary>Twenty-seventh pass — 2026-09-02, retained</summary>
@@ -193,11 +223,11 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 309 `@Test` functions in 33 suites |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 316 `@Test` functions in 33 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
-| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 30 `@Test` functions in 5 suites |
+| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 42 `@Test` functions in 5 suites |
 
 Every target's sources come from a `PBXFileSystemSynchronizedRootGroup`, so a new `.swift` file
 dropped in a folder joins that target with no project edit. `xcodebuild -list` reports **four**
@@ -305,7 +335,7 @@ WaterBuddyTests/HistoryRangeTests.swift          439   DaySummaryTests (pure, no
 WaterBuddyTests/HistoryViewTests.swift           132   HistoryServingTests — the editor's offered range, and the fixture's own tripwire
 WaterBuddyTests/HomeViewTests.swift              180   HomeServingTests — the quick-add row's offered vessels
 WaterBuddyTests/LiquidGlassTests.swift           135   LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response
-WaterBuddyTests/LocalizationTests.swift          345   both bundles' string tables, en/ru/uz
+WaterBuddyTests/LocalizationTests.swift          476   the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two
 WaterBuddyTests/NotificationManagerTests.swift   215   applying a plan, against a spy scheduler
 WaterBuddyTests/ReminderPlanTests.swift          180   the plan — pure, and no UserNotifications import
 WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab bar's offered destinations
@@ -320,27 +350,26 @@ WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            138   writes: runs DataManager in the extension
 WaterBuddyWidget/WaterBuddyWidget.swift          590   reads the cache only, never SwiftData
 WaterBuddyWidget/WaterBuddyWidgetBundle.swift     17
-WaterBuddyWatch/WaterBuddyWatchApp.swift          54   watch app only — activates WristLink.live, hosts WristView, .backgroundTask(.watchConnectivity)
+WaterBuddyWatch/WaterBuddyWatchApp.swift          78   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
-WaterBuddyWatch/WristModel.swift                 231   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite
-WaterBuddyWatch/WristVessel.swift                 88   watch app only — the one vessel, WaterSurface + WaterReadabilityScrim + readout; NOT self-describing to VoiceOver since it became a Button's label
-WaterBuddyWatch/WristView.swift                  432   watch app only — the one screen: the vessel IS the pour button, one "More" button over a sheet, "Synced Nm ago"
+WaterBuddyWatch/WristModel.swift                 252   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite; language, the phone's in-app choice read off the mirror
+WaterBuddyWatch/WristVessel.swift                110   watch app only — the one vessel, WaterSurface + WaterReadabilityScrim + readout; readout(volume:goal:strings:locale:) groups per language; NOT self-describing to VoiceOver since it became a Button's label
+WaterBuddyWatch/WristView.swift                  468   watch app only — the one screen: the vessel IS the pour button, one "More" button over a sheet, "Synced Nm ago"; every string through \.strings
 WaterBuddyWatchTests/WristLinkCompileTests.swift  21   compile-time canary — WristLink stays non-@MainActor and Sendable
-WaterBuddyWatchTests/WristModelTests.swift       209   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction, the phone's day end through the model
+WaterBuddyWatchTests/WristModelTests.swift       308   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction, the phone's day end through the model, the language the watch draws in
 WaterBuddyWatchTests/WristPlanCompileTests.swift  20   compile-time canary — WristPlan stays free of actor isolation
 WaterBuddyWatchTests/WristVesselLayoutTests.swift 49   diameter(fitting:within:) against five real watch width/height pairs
-WaterBuddyWatchTests/WristViewLogicTests.swift   150   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution
-WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 88   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight
+WaterBuddyWatchTests/WristViewLogicTests.swift   273   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution in en/ru/uz, serving names, the grouped readout
+WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 90   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight; its description is the phone's own "Today's hydration"
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-05 with
-`find` over all seven plus `Tools/` and a two-way `comm` against this file: no phantom row, and one
-undocumented file — `Tools/ComposeStoreScreenshot.swift`, now in the block below. The 55 line counts
-this section carried (the 53 above and the two Swift scripts below it at the time) were re-checked
-against `wc -l`, not spot-checked: 7 were stale — exactly the seven files the known-issue #26 fix
-touched — and 48 were current. The new script's row was written from `wc -l`, and all 56 were
-re-checked again after the edit. *(The previous pass found 1 stale of 52, on 2026-09-02.)*
+**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-06 with
+`find` over all seven plus `Tools/` and a two-way `comm` against this file: no phantom row and no
+undocumented file — the watch localization added no Swift file, only two catalogues (below). All 56
+line counts (the 53 above and the three Swift scripts below) were re-checked against `wc -l` by
+script: 8 were stale — exactly the eight files the localization touched — and 48 current. *(The
+previous pass found 7 stale of 55 on 2026-10-05, the seven files the known-issue #26 fix touched.)*
 
 ### Outside every target
 
@@ -402,12 +431,16 @@ and `Entitlements/WaterBuddyWatchWidgetExtension.entitlements`, each declaring
 (`NSExtensionPointIdentifier = com.apple.widgetkit-extension` only). *(This sentence named only the
 first two files until the twenty-eighth pass; the watch's two have existed since 2026-09-01.)*
 
-And four non-Swift build inputs, plus one file that is deliberately *not* one:
+And five non-Swift build inputs — the four string catalogues and the app icon set — plus one file
+that is deliberately *not* one. *(This line said "four" with three listed until the twenty-ninth
+pass, and that pass's own "six" was off by one too; corrected by the same day's re-run.)*
 
 | | |
 |---|---|
 | `WaterBuddy/Localizable.xcstrings` | **58** keys — 54 translated into en/ru/uz, 4 deliberately not (`%`, `+%lld`, `1,450 ml`, `WaterBuddy`). The explicit `en` values are what make the build emit an `en.lproj` to select |
-| `WaterBuddyWidget/Localizable.xcstrings` | **19** keys — 10 hand-written as a strict subset of the app's (a membership exception cannot carry a resource), plus **9 the build extracted**, all untranslated. Five of those nine are `AddWaterIntent`'s Shortcuts vocabulary — known issue #1 |
+| `WaterBuddyWidget/Localizable.xcstrings` | **19** keys — **15** in en/ru/uz: the 10 hand-written as a strict subset of the app's (a membership exception cannot carry a resource) plus `AddWaterIntent`'s five Shortcuts strings, translated since before the repository's first commit (known issue #1, retired this pass); and **4 the build extracted** (`%`, `+%lld`, `1,450 ml`, `Today`) with no values at all, which reach no compiled table. *(This row called all nine extracted keys untranslated until the twenty-ninth pass.)* |
+| `WaterBuddyWatch/Localizable.xcstrings` | **16** keys — 15 in en/ru/uz (six copied value for value from the app's catalogue, nine the watch's own) and `%`, en only. Written by a script that copies the shared keys, and held to the phone's own strings by `LocalizationTests` through the built phone app |
+| `WaterBuddyWatchWidget/Localizable.xcstrings` | **2** keys — `Today's hydration` (the complication's description, the phone's own string) in en/ru/uz, and `WaterBuddy`, en only and never translated |
 | `WaterBuddy/Assets.xcassets/AppIcon.appiconset/AppIcon-{light,dark,tinted}.png` | 1024², generated |
 | `Tools/GenerateAppIcon.swift` | **not in any target.** `Tools/` is not a synchronized root, which is the point — a `.swift` file in `WaterBuddy/` would join the app, and this one imports AppKit |
 
@@ -542,44 +575,52 @@ issue #15.
 
 ## Current state
 
-**Gate — all five re-run 2026-10-05, on Xcode 27.0**, after the known-issue #26 fix. Foreground,
-one simulator at a time, `xcrun simctl shutdown all` before each, `-parallel-testing-enabled NO`,
-the commands exactly as rule `85-testing` writes them.
+**Gate — all five re-run 2026-10-06, on Xcode 27.0**, after the watch localization. Foreground, one
+simulator at a time, `xcrun simctl shutdown all` before each, `-parallel-testing-enabled NO`, the
+commands exactly as rule `85-testing` writes them.
 
 | Command | Result |
 |---|---|
-| `-only-testing:WaterBuddyTests` | `✔ Test run with 309 tests in 33 suites passed` |
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 316 tests in 33 suites passed` |
 | `-only-testing:WaterBuddyUITests` (harness skipped) | `** TEST SUCCEEDED **` — `Executed 25 tests, with 0 failures` |
-| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 30 tests in 5 suites passed` |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 42 tests in 5 suites passed` |
 | `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
-| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` — with exactly the two known `actool` lines |
 
-**Nine new phone tests and one new watch test**, all in the wrist suites: `WristWireTests` +1,
-`WristPlanTests` +6, `WristPublishTests` +2 (33 suites still — no suite was added), and
-`WristModelTests` +1. One existing watch assertion was changed with the owner's approval — see
-known issue #26 and spec §17.
+**Seven new phone tests and twelve new watch tests**, no suite added. `LocalizationTests` +7: the
+watch's two bundles, read through `Watch/WaterBuddyWatch.app` inside the built phone app — present,
+every offered language shipped, every string shared with the phone identical to the phone's, the
+watch's own keys present, format arguments kept, nothing extracted left untranslated, the product
+name untranslated. `WristModelTests` +6: the language the watch draws in. `WristViewLogicTests` +6: a
+bundle guard, every caption in Russian and Uzbek, a phone clock running ahead, serving names, the
+grouped readout. The six existing caption tests now take the `en` bundle and keep their exact English
+expectations. Tasks 1–4 each went RED before GREEN, filtered by suite, with the executed count read;
+Task 5's wiring has no test that can observe it — there is no watch UI-test target (known issue #42)
+— and Tasks 6–9 were the gate, the screens, the rules and the records.
 
-**The toolchain changed between sessions, and the gate needed one repair to run at all.** Xcode is
-now 27.0, with iOS and watchOS 27.0 runtimes installed beside 26.5. A second simulator named
-"iPhone 17" existed on iOS 26.5, so `OS=26.5,name=iPhone 17` matched two devices and `xcodebuild`
-refused (exit 70); the owner had the newer one renamed "iPhone 17 (spare)" rather than the gate
-moved to `id=`, which rule `85-testing` forbids. The documented commands then resolved unchanged.
+**Warnings, compared rather than counted.** Clean builds of `-scheme WaterBuddy` into empty
+DerivedData folders, generic iOS Simulator destination — a `git archive HEAD` export against the
+working tree — compared per file and message: **31 against 31** unique lines, 19 against 19
+file-and-message pairs, none new and none gone. The `WaterBuddyWatchWidget` scheme's two `actool`
+warnings now have a cause (known issue #36): its checked-in scheme builds `WaterBuddy.app` as well,
+which is also why that scheme reprints the phone targets' Swift warnings whenever they had to
+rebuild. Incremental logs show only what they recompiled, which is why the comparison runs on clean
+builds (`tasks/lessons.md`, 2026-09-02 and 2026-10-06).
 
-**Warnings, compared rather than counted.** A clean build of `-scheme WaterBuddy` into an empty
-DerivedData folder, generic iOS Simulator destination, before and after the change, compared per
-file and message: **33 → 31** unique warning lines, **84 → 80** occurrences, and no new
-file-and-message pair. The two that disappeared were raw `Key.currentWater` reads in
-`composeWristMirror`. The `WaterBuddyWatchWidget` scheme additionally prints two `actool` warnings
-about the *phone's* catalogues, proven pre-existing on a `git archive HEAD` export — known issue
-#36. Incremental gate logs show only the files they recompiled, which is why this comparison runs
-on clean builds (`tasks/lessons.md`, 2026-09-02).
+**By hand, on simulators:** the watch app launched with `-AppleLanguages`/`-AppleLocale` —
+argument-domain overrides, nothing persisted — on an SE 3 (40mm) and a Series 11 (46mm), in Russian
+and in Uzbek. All four screens draw their language with nothing truncated: `0 / 2 000 мл`, "Нет
+синхронизации · цель по умолчанию", "Синхронизировано 878 мин назад", "878 daqiqa oldin
+sinxronlandi". **Not observed, at the owner's choice:** the live switch (the phone set to Русский,
+the watch following), the "More" sheet in another language, and the complication's description in
+the face editor. Under `.system` a missed injection would be invisible, so the live switch is the
+check most worth one tap.
 
-**By hand, on a paired iPhone 17 and Apple Watch Series 11 (46mm):** the phone's mirror, carrying
-the new `phoneDayEnd`, crossed `WatchConnectivity` and the watch drew 13% · 250 / 2 000 ml ·
-"Synced just now" — the first mirror delivery observed on simulators in this repo, once the watch app
-was installed *after* the phone app (`tasks/lessons.md`). **Not observed:** the complication on a
-watch face (Xcode 27 ships no `Simulator.app` to automate, and the owner chose to record it
-unverified) and a real midnight turnover; both rest on the `WristPlan` tests.
+**Standing from 2026-10-05:** Xcode 27.0, with iOS and watchOS 27.0 runtimes beside 26.5; the second
+iOS 26.5 "iPhone 17" renamed "iPhone 17 (spare)" so the gate's destination stays unique; the iPhone
+17 and Series 11 (46mm) left paired, where the first mirror delivery on simulators was observed once
+the watch app was installed *after* the phone app (`tasks/lessons.md`); and the complication on a
+watch face and a real midnight turnover still unobserved, resting on the `WristPlan` tests.
 
 *(The 2026-09-02 gate block below is retained as the record of the App Store preparation pass's run,
 on Xcode 26.6.)*
@@ -984,31 +1025,32 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-05), after the pass's staging and before
+**There is a git repository.** Verified this pass (2026-10-06), after the pass's staging and before
 this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-55c73b2
+638a883
 $ git log --oneline | wc -l
-      42
+      45
 $ git diff --cached --name-only | wc -l
-      14
+      21
 $ git status --short | grep '^??'
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 14 staged paths — the known-issue #26 fix and its tests,
-spec §17, three `tasks/lessons.md` entries, this sync's own docs, and the one-line `PRIVACY.md`
-correction the 2026-10-06 re-run made at the owner's word — were staged with explicit paths for the
-owner's `/commit` (rule `90-git`), with nothing left unstaged. Re-counted after the re-run's staging;
-the twenty-eighth pass itself staged 13. `Screenshots/census/`
-(28 coverage captures, 51 MB) was untracked before this session began and is still neither committed
-nor ignored; whether it belongs in the tree is the owner's call.
+**Nothing is committed by this pass.** The 21 staged paths — the watch localization (four watch
+sources, the complication's source, two new catalogues, three test files), its spec and plan, the
+four amended rule files, `CLAUDE.md`, this session's `tasks/lessons.md` entries, the `HISTORY.md` checkpoints
+and this sync's own docs — were staged with explicit paths for the owner's `/commit` (rule
+`90-git`), with nothing left unstaged. The previous pass's 14 staged paths were committed by the
+owner before this session began, as `85fe4c4`, `4792192` and `638a883` — `git diff --name-only
+55c73b2 638a883` lists exactly 14. `Screenshots/census/` (28 coverage captures, 51 MB) is still
+untracked, neither committed nor ignored; whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 42 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 45 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -1081,7 +1123,11 @@ the next read re-derived `false` and cross-faded the whole app back into setup m
 Persistence is now guarded on the key and observation on the in-memory flag. See `docs/STATE.md`
 and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
 
-1. **`AddWaterIntent`'s Shortcuts vocabulary is untranslated.** Found by the `/doc_sync` pass on
+1. ~~**`AddWaterIntent`'s Shortcuts vocabulary is untranslated.**~~ **Retired 2026-10-06 — fixed on
+   disk since before the repository's first commit (`69c5a39`), and never retired.** All five strings
+   carry `ru` and `uz` in `WaterBuddyWidget/Localizable.xcstrings`, and
+   `everyWidgetStringIsTranslatedUnlessDeliberatelyNot` and `theShortcutsVocabularyIsTranslated` guard
+   them (both already in that first commit). The original entry follows, for the record: Found by the `/doc_sync` pass on
    2026-08-29 and deliberately not fixed there, because that command may not touch source. Five
    strings — `Log Water`, its `IntentDescription`, `Amount`, `Millilitres of water to log.` and
    `Log ${amount} ml of water` — carry no `ru` or `uz`, so a Russian or Uzbek user who adds the
@@ -1203,7 +1249,10 @@ and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
    water. The test is green for a different reason than its comment gives (`loadFromStore()` picks
    the cached total back up). DocC outranks the rule files in this repo, so a comment describing a
    rejected design is actively misleading.
-12. **This document claimed `GoalSetupUITests` pins orientation in `setUp`. It does not.** There is
+12. ~~**This document claimed `GoalSetupUITests` pins orientation in `setUp`. It does not.**~~
+   **Retired 2026-10-06 — it does:** `GoalSetupUITests.swift:31` sets
+   `XCUIDevice.shared.orientation = .portrait`, present since the repository's first commit
+   (`69c5a39`). The original entry follows, for the record: There is
    no `XCUIDevice` reference anywhere under `WaterBuddyUITests/`, although `tasks/lessons.md`
    records adding one after a landscape-state flake. The claim is corrected above; the mitigation
    itself was never applied. Lower risk than it was, since the iPhone is portrait-only now, but the
@@ -1255,7 +1304,12 @@ and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
    model gates are now unreachable by *compilation* from watchOS, not merely by discipline, per
    `docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §3.2.
 
-18. **`WristView` draws hardcoded English throughout rather than routing through `\.strings` — and
+18. ~~**`WristView` draws hardcoded English throughout rather than routing through `\.strings`.**~~
+   **Fixed 2026-10-06** (spec `docs/superpowers/specs/2026-10-06-watch-localization-design.md`). Every
+   watch string — fifteen across `WristView`, `WristVessel` and the complication, not the eleven this
+   entry counted — resolves through `\.strings`, injected together with `\.locale` by `WristRoot` from
+   `WristModel.language`, and two new catalogues ship en/ru/uz. The original entry follows, for the
+   record: **`WristView` draws hardcoded English throughout rather than routing through `\.strings` — and
    the 2026-09-01 redesign *widened* this rather than narrowing it.** The entry used to name two
    literals at `:78` and `:53`; both line numbers and the surfaces behind them are gone with the
    pour rows. Re-derived against the tree as it now stands, there are **eleven** such sites in
@@ -1278,7 +1332,9 @@ and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
 **Deferred from the final whole-branch review's fix round (2026-09-01), Minor severity, tracked
 rather than fixed — the review's own explicit call, not an oversight:**
 
-19. **`WristMirror.languageCode` is a dead wire field.** `composeWristMirror` writes it
+19. ~~**`WristMirror.languageCode` is a dead wire field.**~~ **Fixed 2026-10-06** — `WristModel.language`
+   reads it, and it decides the watch's strings and number formatting; `nil` resolves the watch's own
+   language. The wire is unchanged. The original entry follows, for the record: `composeWristMirror` writes it
    (`resolveLanguage(in: defaults).code`), but nothing reads it anywhere under `WaterBuddyWatch/` or
    `WaterBuddyWatchWidget/` — the watch draws hard-coded English regardless (known issue #18, above).
    The field is not wrong, just unconsumed; wiring it up is the natural first step of actually fixing
@@ -1323,7 +1379,11 @@ rather than fixed — the review's own explicit call, not an oversight:**
 24. **`WaterBuddyWatchWidget`'s `CFBundleDisplayName` reads "WaterBuddy Widget"**, identical to the
    phone widget's, rather than a watch-specific name — cosmetic, surfaces only in system UI that
    lists installed complications by name.
-25. **`WaterBuddyWatchWidget`'s `Gauge` is fed a percentage clamped only at the low end.**
+25. ~~**`WaterBuddyWatchWidget`'s `Gauge` is fed a percentage clamped only at the low end.**~~
+   **Retired 2026-10-06 — the premise was false.** The contrast with the phone widget does not hold:
+   `WaterBuddyWidget.swift:350` draws `snapshot.percentage` unclamped too, and so does `HomeView` — an
+   overachieving day reads above 100 on every surface, by design (`progressUnclamped`). The watch's
+   `min(999, …)` only bounds the label's width. The original entry follows, for the record:
    `WristWidgetProvider.entry(at:mirror:outbox:calendar:)` (formerly `currentEntry()`) clamps to
    `min(999, max(0, percentage))` — the `Gauge(...,
    in: 0...100)` itself will visually cap the ring, but the printed `currentValueLabel` text can
@@ -1405,7 +1465,8 @@ rather than fixed — the review's own explicit call, not an oversight:**
     `Timer.publish`'s `Autoconnect` and `Publishers` (an `import Combine` there is the likely remedy;
     not attempted, rule `90-git`). `CLAUDE.md` now carries the Xcode 27 figure. Rule `85-testing`
     still says *"This codebase compiles clean"* — `.claude/` is the owner's to change, and a doc sync
-    may not touch it.
+    may not touch it. **Re-measured 2026-10-06** after the watch localization, the same way: 31
+    against 31, no file-and-message pair new or gone.
 
 30. **`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` is set on the app target only, not on all seven.**
     Rule `43-concurrency` asserts it is "set on every native target" and builds a long argument on
@@ -1435,7 +1496,11 @@ rather than fixed — the review's own explicit call, not an oversight:**
     use". The owner was shown this and chose the empty state on 2026-09-02. If review pushes back,
     the remedy is already built: drop `WATERBUDDY_SCREENSHOT_NOWAIT=1` and
     `bash Tools/CaptureWatchScreenshot.sh` pauses for a human to tap the pour button.
-    - **Why a human is unavoidable.** `simctl` has no tap, touch or click primitive for watchOS —
+    - ~~**Why a human is unavoidable.**~~ **Corrected 2026-10-06 — half of this was never true.**
+      `simctl` has no tap primitive for watchOS, but XCUITest *is* in the watchOS SDK
+      (`XCUIAutomation.framework`, with `XCUIApplication` and `XCUIElement.tap`); what is missing is
+      a watch UI-test target in this project — known issue #42. The original bullet, for the record:
+      `simctl` has no tap, touch or click primitive for watchOS —
       re-verified against `simctl help` this pass, which offers `io` (screenshot, recordVideo,
       enumerate, poll) and `ui` (appearance, contrast, content size) and nothing that touches the
       screen — and Apple has never shipped XCUITest for watchOS, so there is no UI-test target to
@@ -1476,7 +1541,7 @@ rather than fixed — the review's own explicit call, not an oversight:**
     form** — not the `watch-marketing` form it had, which compiles silently to no launcher icon at all.
 
 35. **The watch vessel does not scale its readability scrim, and it shipped that way.**
-    `WristVessel.swift:39` passes `WaterReadabilityScrim` at the default `intensity: 1` — the
+    `WristVessel.swift:42` passes `WaterReadabilityScrim` at the default `intensity: 1` — the
     full-strength *app* value. Rule `60-design-system` says a small canvas scales the scrim with the
     level (`min(1, level * 1.6)`), and `WaterSurface.swift`'s own DocC gives the reason: "at 0% there
     is nothing bright to hold back and a full scrim only turns the vessel into a black hole." The
@@ -1494,7 +1559,10 @@ rather than fixed — the review's own explicit call, not an oversight:**
     `git archive HEAD` export of the code before the #26 fix; absent from the phone-destination
     builds and from the `WaterBuddyWatch` scheme's runs. Why a watch-destination build compiles the
     phone's catalogues at all is not established. Recorded so "no new warnings" can be read against
-    it: these two are this scheme's baseline on this toolchain, not a regression.
+    it: these two are this scheme's baseline on this toolchain, not a regression. **Cause
+    established 2026-10-06:** the checked-in `WaterBuddyWatchWidget.xcscheme` lists `WaterBuddy.app`
+    among its `buildForRunning` entries, so this scheme builds the phone app and the phone widget too
+    — their asset catalogues, and their Swift warnings whenever they had to rebuild.
 
 37. **Three `@Test` names are each reused across two suites**, against rule `85-testing`'s "names are
     never reused across suites": `aCorruptZeroGoalFallsBackToTheDefault` and
@@ -1513,6 +1581,65 @@ rather than fixed — the review's own explicit call, not an oversight:**
     The existing "Synced Nm ago" caption already ages, but says nothing about a day boundary. Its
     DocC now says plainly that it decides nothing; it should either gain a reader or go, with its one
     test.
+
+**Opened by the 2026-10-06 watch localization (spec §8, and the whole-branch review):**
+
+39. **The phone's `String(format:)` figures never group thousands.** `HomeView`'s vessel draws
+    `1300 / 2000 ml` and the week card `Best 8050 ml`, in every language, because `%1$d` does no
+    grouping — while `AppLanguage.locale`'s DocC, `WaterBuddyApp.swift`'s injection comment and
+    `docs/STATE.md` all say `\.locale` groups numbers ("4 500"). Only `Text(_:format:)` sites, and
+    now the watch's readout (`WristVessel.readout`), honour it. Found because the watch's readout
+    already grouped (`1 250 / 2 000 ml`), and the owner chose to keep that rather than copy the
+    phone's figure (spec §3, ruling 3). The fix is a phone change of its own: format the figures
+    first and hand them to `%1$@` keys, in both phone catalogues.
+
+40. **The shared Russian keys use a single plural form.** `%1$d percent. %2$d of %3$d millilitres.`
+    reads `62 процентов` (correct: `процента`), and `Add %1$d millilitres` reads `Добавить 222
+    миллилитров` (correct: `миллилитра`) — wrong for counts ending in 1–4 except 11–14. The watch now
+    inherits both, plus its own `Logs %1$d millilitres`. Heard rather than seen: these are VoiceOver
+    strings. A fix means plural variations in every catalogue that holds the keys, at once, through a
+    formatting path that honours them.
+
+41. **`WristView.syncedCaption(composedAt:now:strings:)`'s `nil` branch is unreachable from
+    production.** `WristMirror.composedAt` is non-optional, and `attribution(mirror:now:strings:)`
+    answers a missing mirror before it gets there; only `noMirrorYetReadsAsNeverSynced` exercises it.
+    Kept, and translated, because the parameter is optional (spec §8.3). Either make the parameter
+    non-optional and drop the branch with its test, or leave it.
+
+42. **There is no watch UI-test target — and XCUITest is in the watchOS SDK.** Known issue #32 and
+    the 2026-09-02 lesson said Apple never shipped XCUITest for watchOS; the installed SDK says
+    otherwise (`Platforms/WatchOS.platform/…/XCUIAutomation.framework`: `XCUIApplication`,
+    `XCUIElement.tap`, APIs marked `watchos(9.4)` and `watchos(10.0)`). A watch UI-test target would
+    automate what is still done by hand or skipped: the live language switch, the "More" sheet, the
+    three `Text(_:bundle:)` strings resolving through an `.lproj`, and the App Store watch
+    screenshot's poured state. Adding one is a `project.pbxproj` change and a scheme entry — its own
+    task.
+
+43. **Deferred minors from the 2026-10-06 whole-branch review** — graded Minor by effect and left for
+    the owner:
+    - **Review focus 1 and 4 are only half pinned.** The watch's content checks in
+      `LocalizationTests` iterate the literal `translated = ["ru", "uz"]`, so a new language with a
+      *partial* watch catalogue would pass (a missing `.lproj` would not — those two tests iterate
+      `AppLanguage.selectable`); deriving `translated` from `selectable` is one line. And
+      `theVesselReadoutGroupsThousandsInTheChosenLanguage` checks the empty and five-digit figures in
+      English only, though its DocC reads as if every language were covered.
+    - **`WristRoot` rebuilds `WristView` on every mirror**, because it reads `model.language` and so
+      tracks `mirror`; each rebuild creates a fresh `Timer.publish(…).autoconnect()`, restarting the
+      caption's 30-second cadence. No visible effect.
+    - **The only check that a watch literal reaches the catalogue lived in the session's scratch
+      workspace** and is gone. A test cannot scan source — under TCC that hangs the gate
+      (`tasks/lessons.md`) — so it would have to be a script under `Tools/`. Until then, a new watch
+      `Text(…, bundle:)` or `forKey:` lookup missing from the catalogue draws English in every
+      language with every test green.
+    - **The Russian 40mm caption leads its second line with `·`** — the separator-in-a-format-string
+      hazard `tasks/lessons.md` records from 2026-08-30. A no-break space would likely make it worse;
+      the real fix is two strings, as the week card did.
+    - **Four DocC and comment nits:** `WristModel.language` says an unrecognised code "says so under
+      `#if DEBUG`" — not for `""`, and it prints twice per `WristRoot` body; `syncedCaption`'s DocC
+      says "rounded" where it truncates; `watchOwnKeys`' DocC in `LocalizationTests` gives a partly
+      wrong reason (two of the nine are `Text` literals; the real one is that an extracted key with
+      no `en` value reaches no table); two ragged lines left by a reflow in
+      `WaterBuddyWatchApp.swift`.
 
 ## Where the rest is written down
 

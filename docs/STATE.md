@@ -4,8 +4,17 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-05 (sixteenth pass — `/doc_sync` after known issue #26's fix. **No key
-added, removed or renamed**: still **eleven**, re-derived this pass from `DataManager.Key` itself.
+**Last updated:** 2026-10-06 (seventeenth pass — `/doc_sync` after the watch was localized, known
+issues #18 and #19. **No key added, removed or renamed**: still **eleven**, re-derived this pass from
+`DataManager.Key` itself. What changed is that a stored value gained a reader: `languageCode`, inside
+the `WristMirror` the watch keeps under `Key.wristMirror`, was composed and persisted but read by
+nothing; `WristModel.language` now reads it, and it decides the watch's strings and number
+formatting. Recorded in the `language` row and in *The seventh key*, below. The wire is unchanged —
+`schemaVersion` stays 1. *Re-verified by a second `/doc_sync` run the same day: the key count
+re-derived again, and one line corrected — an empty code falls back silently; only a non-empty
+unrecognised one is announced under `#if DEBUG`.* Previously: sixteenth pass, 2026-10-05 — `/doc_sync` after known issue #26's
+fix. **No key added, removed or renamed**: still **eleven**, re-derived this pass from
+`DataManager.Key` itself.
 What changed is the shape of one *value*: the JSON `WristMirror` stored under `Key.wristMirror` on
 the watch gained an optional `phoneDayEnd` — the instant the phone's day ends — and the watch now
 counts the mirror's `currentWater` only before it (spec §17). The change is additive: a value
@@ -117,7 +126,7 @@ total; the eight below plus three more, all documented in *The watch's own suite
 | `sardor.WaterBuddy.isGoalSet` | `Bool` | — | app only | Whether the user has *chosen* a goal, so setup is shown once. **Deliberately never materialised — its absence carries meaning.** |
 | `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs**, which is how the two front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
 | `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
-| `sardor.WaterBuddy.language` | `String` | — | app + widget | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
+| `sardor.WaterBuddy.language` | `String` | — | app + widget; the watch reads it secondhand, as `WristMirror.languageCode` | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
 | `sardor.WaterBuddy.wristApplied` | `Data` (JSON `[Int: [UUID]]`) | **unbounded per day, until the 90-day trim** — see note below | **app only, via `ingest(_:)`** | The phone's per-day applied ledger for wrist-authored pours — day ordinal → the `WaterLog.id`s already folded in. `nonisolated`, unlike its seven neighbours above, because `readAppliedLedger(from:)`/`writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` and a nested type's members otherwise infer the enclosing `@MainActor` class's isolation. Trimmed to the last `appliedLedgerRetentionDays` (90) real calendar days on every write — never by subtracting a raw integer from the `yyyyMMdd` ordinal, which borrows across the month/day radix incorrectly (a real bug this plan introduced and fixed in its own Task 4, before it shipped). A write also protects any day it just folded into, even one already older than the 90-day cutoff, so the same write that adds an entry can never be the write that trims it (final review, `ingest(_:)`'s cutoff is `min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)`). |
 
@@ -421,17 +430,43 @@ replays, so without the doorbell it would keep drawing the previous language ind
 `WaterSnapshot` carries the language for the same reason it carries the goal — the provider reads
 the cache and never the model (rule `40-widget`).
 
+### …and why it crosses to the watch
+
+**The setter also publishes to the wrist.** The code travels as `WristMirror.languageCode` —
+`resolveLanguage(in:).code`, so `nil` for *Follow device* — and the watch keeps it inside the mirror
+it persists under `Key.wristMirror`. No key was added for it, on either device.
+`WristModel.language` resolves it through the phone's own `AppLanguage(code:)`:
+
+```
+mirror with "en" / "ru" / "uz"   → that language's .lproj in the watch app
+mirror with nil (Follow device)  → .system — the WATCH's own Bundle.main
+no mirror yet                    → .system
+unrecognised code                → .system, announced under #if DEBUG unless empty
+```
+
+"Follow device", read on the wrist, means *this* device: the two usually agree, because watchOS
+mirrors the iPhone's language by default, but only the watch knows its own. The choice survives a
+relaunch because the mirror is persisted, and switches the moment a new mirror arrives — Observation
+tracks `language` through `mirror`, and `WristRoot` re-injects the bundle and the locale
+(`docs/superpowers/specs/2026-10-06-watch-localization-design.md` §4.1). The complication's
+`.description` cannot follow the in-app choice: WidgetKit resolves it before any entry exists, so it
+follows the watch's system language, exactly as the phone widget's description and the Shortcuts
+vocabulary follow the phone's.
+
 ### The language is why nothing asks `Bundle.main`
 
 iOS resolves `Bundle.main`'s localisation **once at launch and never again**, so an in-app picker
 that only wrote a preference would need a relaunch to take effect. Every user-facing string in this
 product instead resolves through `EnvironmentValues.strings`, a `Bundle` injected at each root from
-`DataManager.language`. Changing the model invalidates observers, both roots re-evaluate, a
-different bundle travels down, and the tree redraws in place.
+`DataManager.language` — on the watch, from `WristModel.language`. Changing the model invalidates
+observers, the roots re-evaluate, a different bundle travels down, and the tree redraws in place.
 
 `.locale` is injected alongside it. Switching the strings without the locale leaves `4 500` wearing
 the device's grouping separator inside a Russian sentence — half-translated reads as a bug in the
-app rather than as a language it does not have.
+app rather than as a language it does not have. *Only sites that format against the locale honour
+this:* `Text(_:format:)` on the phone and the watch's own readout (`WristVessel.readout`) group, but
+every phone figure built with `String(format:)` and `%1$d` — the vessel's `1300 / 2000 ml`, the week
+card's `Best 8050 ml` — groups in no language at all (`AI_CONTEXT.md` known issue #39).
 
 ## The day ordinal
 
