@@ -3590,3 +3590,239 @@ Still nothing staged. The index continues to hold the watchOS docs pass's own 39
 > `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` and
 > `HISTORY.md`**, and touched no source, test or project file. What was wrong was the evidence
 > offered for it, not the statement.
+
+## [2026-10-05] — Known issue #26: the watch counts the phone's total only until the phone's day ends
+
+### What
+
+Every morning, until something woke the phone, the watch's screen **and** its complication drew
+yesterday's total as today's. `WristModel.todaysTotal` and the complication's provider both added
+`mirror.currentWater` without asking which day it belonged to; the complication refreshed on a flat
+15 minutes with no entry at any day boundary; and `WristModel.isMirrorStale` — the one predicate
+that did ask — had no reader. Known issue #26 named only the complication. The screen had the same
+fault, which the orientation for this task first misdescribed (`tasks/lessons.md`).
+
+Fixed by sending the one fact the watch cannot derive for itself — **when the phone's day ends**:
+
+- `WristMirror` gains `phoneDayEnd: Date?`, composed with `DataManager.nextDayBoundary(after:calendar:)`
+  on the phone's own calendar.
+- `WristPlan.todaysTotal(mirror:outbox:now:calendar:)` counts the phone's total only while
+  `now < phoneDayEnd`; the watch's own outbox is still bucketed by the watch's day. `WristModel`
+  and the complication both read it, so they cannot disagree.
+- `WristPlan.dayBoundaries(after:mirror:calendar:)` returns the instants the total changes with
+  nothing new arriving — the phone's day end and the watch's own midnight, deduplicated and
+  ascending. The complication emits a timeline entry at each: the phone widget's midnight entry,
+  one platform over. The 15-minute refresh stays; it is how the face picks up pours made in the app.
+- `composeWristMirror` reads the total through `snapshot(...)`'s rollover, so a mirror never
+  carries yesterday's cached total under today's `phoneDayStart`. Every path traced to that was
+  transient, but the mirror's window is now load-bearing.
+
+### The rulings this rests on
+
+- **The owner's ruling, recorded as spec §17.** Shown three options — stop counting at the phone's
+  own day end, at the watch's midnight, or keep the number and label it stale — the owner chose the
+  phone's day end. It refines §5 rather than reversing it: still no stored day, still a filter on
+  instants, still no false zero while the phone's day runs.
+- **Why not the watch's own midnight.** That is `isMirrorStale`'s comparison, and under time-zone
+  skew it is wrong in the direction §5 forbids: with the watch five hours behind the phone, a mirror
+  composed a minute ago compares as a different day for nineteen hours of every twenty-four.
+- **One assertion was changed, with the owner's approval.**
+  `isMirrorStaleWhenThePhonesDayDisagreesWithTheWatchsOwnDay` read `todaysTotal == 1_800`, *"never a
+  confident zero — the number is still shown"* — the bug, pinned as policy. It now reads `== 0`. The
+  guarantee it protected is re-pinned on its own by
+  `aWatchAheadOfThePhoneKeepsThePhonesTotalUntilThePhonesDayEnds`, not deleted.
+- **`phoneDayEnd` is optional, and `schemaVersion` stays 1.** A mirror persisted before this change
+  must still decode; a missing value falls back to the watch's own midnight after `phoneDayStart`.
+  The change is additive — an older watch ignores the unknown key.
+- `isMirrorStale` keeps its meaning and still has no reader; its DocC no longer claims the number is
+  "still shown".
+
+### Files touched
+
+Modified: `WaterBuddy/DataManager.swift` (`WristMirror.phoneDayEnd`, `composeWristMirror`) ·
+`WaterBuddy/WristPlan.swift` (`todaysTotal(mirror:outbox:now:calendar:)`, `dayBoundaries`,
+`dayEnd(of:calendar:)`) · `WaterBuddyWatch/WristModel.swift` (`todaysTotal` delegates; two DocC
+corrections) · `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` (one store read per timeline,
+entries at each boundary) · `WaterBuddyTests/WristSyncTests.swift` (nine tests, three fixtures) ·
+`WaterBuddyWatchTests/WristModelTests.swift` (one test, four fixtures, the approved assertion) ·
+`WaterBuddyWatchTests/WristViewLogicTests.swift` (two fixtures) ·
+`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` (§17) · `tasks/lessons.md` (three
+entries). No project file, entitlement, asset catalogue or target membership changed.
+
+### Verification
+
+- **RED first, on both platforms, filtered runs with the executed count read:** phone 24 tests in 4
+  suites, 10 issues — every one the expected one; watch 24 tests in 2 suites, 2 issues.
+- **GREEN, same filters:** 24 in 4 suites and 24 in 2 suites passed.
+- **Two real mutation checks**, each restored byte-for-byte from a backup (sha1 compared). Making
+  `phoneDayEnd` non-optional fails `aMirrorFromBeforeThisChangeStillDecodes` with
+  `DecodingError.keyNotFound`. Changing the fallback to `phoneDayStart + 86_400` fails
+  `aMirrorWithNoDayEndFallsBackToTheWatchsOwnMidnight` — but only after that test was moved onto a
+  25-hour New York day; its first, UTC version could not tell the two apart.
+- **The full five-invocation gate**, foreground, one simulator, on Xcode 27.0: `✔ Test run with 309
+  tests in 33 suites passed` (phone unit) · `Executed 25 tests, with 0 failures` (phone UI, harness
+  skipped) · `✔ Test run with 30 tests in 5 suites passed` (watch unit) · `** BUILD SUCCEEDED **` for
+  `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`.
+- **Warnings**, clean builds into empty DerivedData before and after, generic iOS Simulator,
+  compared per file and message: 33 → 31 unique lines, 84 → 80 occurrences, no new pair — two kinds
+  each dropped by two, because `composeWristMirror` no longer reads the key raw. The two `actool`
+  warnings on the `WaterBuddyWatchWidget` scheme were proven pre-existing on a `git archive HEAD`
+  export.
+- **By hand**, on a paired iPhone 17 and Apple Watch Series 11 (46mm), 26.5 runtimes: the phone's
+  mirror, new field and all, crossed `WatchConnectivity` and drew 13% · 250 / 2 000 ml · "Synced
+  just now" on the watch.
+
+### Not verified
+
+- **The complication on a watch face.** Skipped at the owner's choice: Xcode 27 ships no
+  `Simulator.app` to automate, and `DeviceHub.app` is unexplored. Its arithmetic and timeline
+  instants are unit-tested through `WristPlan` and its scheme builds; its rendering is unobserved —
+  the gap rule `85-testing` already names for both widgets.
+- **A real midnight.** No simulator crossed one; the turnover rests on the timeline-instant tests.
+
+### Environment changes, not code
+
+- Simulator `F4685D91…` renamed "iPhone 17" → "iPhone 17 (spare)", at the owner's choice — a second
+  device of the same name on iOS 26.5 made the gate's destination ambiguous (`tasks/lessons.md`).
+- Apple Watch Series 11 (46mm) `93ADDD75…` paired with iPhone 17 `EE56B958…` as pair `75392FDC…`,
+  owner-approved, and left paired; `xcrun simctl unpair 75392FDC-66C9-4C69-9FB8-C9442AE02DFF` undoes
+  it. Both apps are installed there, holding the UI tests' own 250 ml.
+
+## [2026-10-05] — `/doc_sync`: the twenty-eighth pass, after the known-issue #26 fix
+
+### What
+
+Ran `/doc_sync` per rule `99-docs-cascade`, diff-first. As in the previous pass, every probe ran
+over all seven target folders plus `Tools/`, because the command's own probe still names four. This
+entry records only what the **sync** found and changed; the fix itself is the checkpoint above.
+
+### Drift found and fixed
+
+- **7 of 55 line counts** in *Files on disk* — exactly the seven files the fix touched; the other 48
+  were current. Re-derived mechanically against `wc -l`, then all 56 rows re-checked after the edit.
+- **One undocumented file**, `Tools/ComposeStoreScreenshot.swift` (161 lines), committed after the
+  last sync. Added to the `Tools/` block, with the iPad 13″ set it produced.
+- **The watch widget's exception set was described as five files** that "never bucket pours", and a
+  non-negotiable said "six, six, and five" — both stale since 2026-09-01, when spec §16 put
+  `WristPlan.swift` in it. Re-derived by printing all three sets' members from `project.pbxproj`:
+  six each, the two watch sets identical.
+- **#27 and #28 were still listed open** after the twenty-seventh pass's own header closed them by
+  observation. Struck through, with the evidence.
+- **The entitlements paragraph named two files of four.** All four checked: each declares
+  `group.sardor.WaterBuddy`, and the four are byte-identical (one distinct sha1).
+- **Known issues #20 and #25 cited `currentEntry()`**, which the fix renamed to
+  `entry(at:mirror:outbox:calendar:)`.
+- **`CLAUDE.md`'s 38-warning baseline was an Xcode 26.6 figure.** Replaced with the Xcode 27.0
+  measurement from this session — 31 unique lines on a clean build — and the method that produced it.
+- **The Git section was two passes stale** (`6cee506`, 27 commits). Rewritten last, after staging.
+
+### Five commits that landed after the last sync with no checkpoint
+
+From `git log`, all 2026-09-02: `3874c8e` chore(claude): update the gate, project invariants and
+permissions — the rule edits the twenty-seventh pass described as already made, committed after it ·
+`9aa12bb` chore(tools): compose store screenshots at a target slot size · `03d4fc8`
+chore(screenshots): add the iPad 13″ store set · `e93802d` docs: add README with App Store Connect
+metadata · `55c73b2` docs: add the privacy policy. This pass read the first two only as far as the
+docs needed — the line count, and `ComposeStoreScreenshot.swift`'s own header for why an
+iPhone-only app carries an iPad set — and did not review `README.md` or `PRIVACY.md`.
+
+### Added, because the code or the environment gained things the docs had no row for
+
+- `docs/AI_CONTEXT.md`: a 2026-10-05 gate block (Xcode 27.0, the destination repair, the warning
+  comparison, the hand check); #26 marked fixed; #29 re-measured; #32's remedy shown achievable
+  without a tap; **#36** (the watch-widget scheme's two `actool` warnings), **#37** (three `@Test`
+  names reused across suites), **#38** (`isMirrorStale` unread).
+- `docs/STATE.md`: `phoneDayEnd` in the `wristMirror` row, and what the watch now counts from it.
+- `CLAUDE.md`: the Xcode 27 baseline, and `WristPlan.swift`'s new §17 role in the watch's sets.
+
+### Checked and already accurate — no change made
+
+- **The key count**: eleven in `DataManager.Key`, `Key.all`, `CLAUDE.md` and `docs/STATE.md`. The
+  fix changed one stored *value's* shape, not the key set.
+- **The `@Test` counts**: 309 phone in 33 suites, 30 watch in 5, 12 declared UI methods — the
+  attribute grep, matching the gate's own printed figures, and the same in every current mention.
+- **Every `` rule `nn-name` `` citation resolves**, swept over `CLAUDE.md`, `docs/`, `tasks/` and the
+  source and test folders.
+- **`docs/WIDGET.md`** is the phone widget's contract and has no watch section; nothing in it
+  changed, so its `Last updated:` stamp was left alone (rule `99-docs-cascade`).
+- **`docs/DESIGN.md`**: no token moved; not touched.
+
+### Not done, and why
+
+- `.claude/rules/85-testing.md` still says *"This codebase compiles clean"*, and rule `15-project`
+  speaks of Xcode 26.6. `.claude/` is not derived; changing it is the owner's decision.
+- `Tools/CaptureWatchScreenshot.sh` installs only the watch app, so it cannot yet produce the synced
+  capture #32 now knows how to get.
+
+### Verification
+
+No gate was run *by this sync* — it changed no code. The figures above come from the full
+five-invocation gate run in this same session after the final source change (the checkpoint
+above): 309/33 phone unit, 25 phone UI, 30/5 watch unit, both widget builds green.
+
+### Scope
+
+The sync itself wrote only `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md` and this entry. The
+spec's §17 and the three `tasks/lessons.md` entries were written with the fix, before the sync
+began. No source, test or project file was touched by the sync.
+
+### Staged, not committed
+
+Thirteen paths, all modifications, staged by explicit path — never `git add -A` (rule `90-git`): the
+seven source and test files of the fix, the spec, `tasks/lessons.md`, `CLAUDE.md`,
+`docs/AI_CONTEXT.md`, `docs/STATE.md` and this file. `Screenshots/census/` stays untracked, as it was
+before this session. No `git commit` was run. Both of this session's checkpoints live in this one
+file, and `docs/AI_CONTEXT.md` carries both the fix's edits and the sync's, so a `/commit` that
+wants the sync's drift fixes as a separate `docs:` commit has to split those two files by hunk.
+
+## [2026-10-06] — `/doc_sync` re-run: one figure corrected, and the privacy policy's link list
+
+### What
+
+The owner ran `/doc_sync` again right after the twenty-eighth pass, with no code or doc change in
+between. Treated as an independent verification: every probe and check was re-derived from
+scratch rather than trusted from the pass before. Two things were wrong, and both trace back to
+this session's own work.
+
+### Found and fixed
+
+- **The twenty-eighth pass undercounted how stale the Git section had been.** Both
+  `docs/AI_CONTEXT.md` and the entry immediately above say "two passes stale". It was **three**:
+  the block was accurate when the twenty-fourth pass wrote it ("the final-review fix round's own
+  in-progress work", HEAD `6cee506`), and the twenty-fifth pass's own header already records HEAD
+  `7f55364`, so passes 25, 26 and 27 all carried it unchanged. Corrected in place in
+  `docs/AI_CONTEXT.md`; the entry above is superseded by this one rather than edited (rule
+  `90-git`). Git alone could not date the block — the docs were committed in batches — so the
+  count rests on the passes' own headers, quoted above.
+- **`PRIVACY.md` no longer listed everything that crosses the phone→watch link.** It promises "Here
+  is everything that travels on that link" and "That is the entire contents of the link", and named
+  the composition time and the phone's day *start* — but not the `phoneDayEnd` the #26 fix added to
+  `WristMirror`. `PRIVACY.md` is outside `/doc_sync`'s write scope and is a public document, so the
+  owner was asked; at the owner's word, line 88 now reads "when the message was composed, and when
+  your phone's day starts and ends". Nothing else in it changed. Its effective and last-updated
+  dates are still unfilled placeholders, so there was no date to move.
+
+### Re-derived and current — no change made
+
+- 56 Swift files on disk and 56 documented, no phantom row; all 56 line counts current.
+- `@Test`: 309 phone, 30 watch; 12 declared UI methods.
+- The three exception sets, printed member by member, match both lists in `CLAUDE.md`.
+- Eleven keys in `DataManager.Key`, agreeing with `CLAUDE.md` (nine phone + two watch) and
+  `docs/STATE.md`.
+- `docs/WIDGET.md` and `docs/DESIGN.md` unchanged and correctly unstamped; the three docs that must
+  not exist still do not; every `` rule `nn-name` `` citation resolves.
+- `CLAUDE.md`'s "two Xcode 27 'Combine' warnings" re-checked against the clean build: exactly two
+  unique `WristView.swift` lines.
+- `README.md` carries no field-level claim about the link, so nothing in it went stale.
+
+### Verification
+
+No gate was run by this re-run — it changed no code. The gate figures stand from the full run
+earlier in this session, which every staged source file predates (modification times compared
+against the first gate log).
+
+### Staged, not committed
+
+Fourteen paths now, superseding the "thirteen" in the entry above: the same thirteen plus
+`PRIVACY.md`, all staged by explicit path, nothing left unstaged, `Screenshots/census/` still
+untracked. No `git commit` was run.

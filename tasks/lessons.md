@@ -1564,3 +1564,70 @@ run is incremental.
 
 **The rule:** "no new warnings" is only meaningful against a baseline somebody measured. Measure it
 with a clean build into an empty `-derivedDataPath`, and write the number down.
+
+## 2026-10-05 — A property's name is not its behaviour, and a test can pin a bug as a ruling
+
+Offering the owner a task list, I described known issue #26 as "the complication shows yesterday's
+water, while `WristModel` already ignores a mirror from a previous day" — inferred from
+`isMirrorStale` existing at `WristModel.swift:111`. It did not ignore anything. `todaysTotal` added
+`mirror.currentWater` unconditionally, and `isMirrorStale` had **no reader at all** — which
+`HISTORY.md` had already recorded twice, on 2026-09-01. The owner chose the task on that wrong
+premise; it was caught one step later only because the debugging pass read the consumer before
+proposing a fix.
+
+Underneath it sat the sharper trap: a test asserting the bug as policy.
+`isMirrorStaleWhenThePhonesDayDisagreesWithTheWatchsOwnDay` ended in
+`#expect(model.todaysTotal == 1_800, "never a confident zero — the number is still shown")` — an
+owner-approved spec ruling (§5), faithfully pinned, and the exact behaviour #26 called a bug.
+
+**The rule:** before saying what code does, read the line that *consumes* it — a computed property
+proves only that someone could ask the question. And when a known issue and a test disagree, that is
+a ruling for the owner, not a test to edit: quote the assertion, say what changing it would undo,
+and ask. Here that produced a better fix than either side had — the phone's own day end on the wire
+(spec §17) — and the guarantee the old assertion protected was re-pinned by a test of its own
+rather than deleted.
+
+## 2026-10-05 — A new Xcode moved the gate without touching the repo
+
+Between sessions the machine moved to Xcode 27.0, with iOS and watchOS 27.0 runtimes beside 26.5.
+Three things changed under the gate with no change to the repository:
+
+- **The pinned destination stopped resolving.** Two simulators were both named "iPhone 17" on iOS
+  26.5 (created 11 and 12 September), so `OS=26.5,name=iPhone 17` matched both and `xcodebuild`
+  exited 70 with *"multiple devices matched"*. Fixed at the owner's choice by renaming the newer one
+  to "iPhone 17 (spare)" — not by switching to `id=`, which rule `85-testing` forbids.
+- **A failing test run now stalls after it fails.** On a failure, `xcodebuild` runs
+  `simctl diagnose … --timeout=600` to fill the result bundle. A deliberate mutation run whose tests
+  finished in 0.05 s therefore outlasted the 600 s foreground limit and was moved to the
+  background. The verdict was already in the log; only the log collection was slow. For a run that
+  is *meant* to fail — RED, or a mutation check — pass `-collect-test-diagnostics never` (confirmed
+  in Xcode 27's `xcodebuild -help`). Leave the gate's own commands as rule `85-testing` writes them.
+- **The warning baseline moved.** A clean `-scheme WaterBuddy` build is **33** unique warning lines
+  on Xcode 27, not the 38 measured on 26.6. The `WaterBuddyWatchWidget` scheme also emits two
+  `actool` warnings on the *phone's* catalogs — *"Could not get trait set for device Watch7,18 with
+  version 26.5"* — proven pre-existing by building a `git archive HEAD` export, which touches neither
+  `.git` nor the working tree.
+
+**The rule:** when the toolchain changes, re-measure before the first edit. A baseline is a property
+of the toolchain as much as of the code, and a number carried over from the old one compares
+nothing.
+
+## 2026-10-05 — On paired simulators, install the phone app first, then the watch app
+
+With the watch app installed by `simctl install` *before* the phone app, the phone's `WCSession`
+reported `paired: YES, appInstalled: NO`, and every publish failed with
+`WCErrorCodeWatchAppNotInstalled`. Reinstalling the phone app does not push its embedded watch app
+across — thirty seconds, nothing arrived. Installing the watch app **after** the phone app flipped
+the phone to `appInstalled: YES`, and the next `updateApplicationContext` landed: the watch drew the
+phone's 250 ml as "Synced just now". That is the first mirror delivery anyone has observed on
+simulators in this repo — spec §15's probe saw none, and the shipped watch screenshot is the empty
+state for exactly that reason (known issue #32).
+
+One more thing changed underneath: **Xcode 27 ships no `Simulator.app`** — `DeviceHub.app` sits in
+its place, and `tell process "Simulator"` finds nothing. The System Events route recorded above
+(*watchOS has no tap primitive, but macOS accessibility does*) has to be re-derived against the new
+app before anything is promised on it.
+
+**The rule:** on paired simulators the install order is part of the setup — the phone app, then the
+watch app, then launch the phone app so its activation publish lands while the counterpart is known
+to be installed.

@@ -4,6 +4,35 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-06 (twenty-eighth pass, 2026-10-05, **re-verified by a second `/doc_sync`
+run on 2026-10-06**: every probe and check re-derived and current, one figure in this paragraph
+corrected — the Git section had been stale for three passes, not two — and `PRIVACY.md`'s list of
+"the entire contents of the link" found one field short of the wire after the #26 fix, corrected at
+the owner's word. The twenty-eighth pass's own summary follows. `/doc_sync` after **known issue #26
+was fixed**.
+The watch counted the phone's mirrored total whatever day it came from, so every morning — until
+something woke the phone — the watch's screen *and* its complication drew yesterday's water.
+`WristMirror` gained `phoneDayEnd` (spec §17, owner-approved), `WristPlan` gained
+`todaysTotal(mirror:outbox:now:calendar:)` and `dayBoundaries(after:mirror:calendar:)`, both watch
+surfaces read them, and the complication now schedules timeline entries at the phone's day end and
+the watch's own midnight. **The toolchain moved under the repo between sessions:** Xcode 27.0 with
+iOS/watchOS 27.0 runtimes beside 26.5; a second simulator named "iPhone 17" on iOS 26.5 made the
+gate's destination ambiguous until the owner had it renamed; and the warning baseline was
+re-measured on the new toolchain — 33 unique warning lines before this change, **31** after, no new
+pair (known issue #29). HEAD is `55c73b2`: five commits landed after the twenty-seventh pass with no
+checkpoint — the rule/gate update, the iPad 13″ composite set and its tool, the README and the
+privacy policy — and `HISTORY.md` now records them. **This sync's own drift:** 7 of 55 line counts
+(exactly the seven files the fix touched), one undocumented file (`Tools/ComposeStoreScreenshot.swift`),
+the watch widget's exception set still described as five files when it has been six since
+2026-09-01, #27 and #28 still listed open after this file's own header closed them, the entitlements
+paragraph naming two files of four, and the Git section three passes stale. Known issue **#26 fixed**;
+**#36–#38** opened. Gate re-run in full this session: **309**/33 phone unit, **25** phone UI,
+**30**/5 watch unit, both widget builds green. `docs/WIDGET.md` and `docs/DESIGN.md` were checked and
+deliberately not touched — the phone widget's contract and the design tokens did not change.)
+
+<details>
+<summary>Twenty-seventh pass — 2026-09-02, retained</summary>
+
 **Last updated:** 2026-09-02 (twenty-seventh pass — `/doc_sync` after the App Store preparation
 work: iPad dropped to `TARGETED_DEVICE_FAMILY = 1`, `IPHONEOS_DEPLOYMENT_TARGET` 26.5/18.6 → **17.0**
 and `WATCHOS_DEPLOYMENT_TARGET` 26.5 → **26.0** (both compile- and link-verified, neither ever *run* —
@@ -17,6 +46,8 @@ UI-test declared count 10 → 12, and a build command in `docs/WIDGET.md` still 
 (`WristServingMenu` had never been rendered by anyone — it has now, and it is correct) and **#28** (the
 "More" button's below-the-fold position *and* its crown reachability, both previously argued rather
 than seen). Superseding note for the twenty-sixth pass below, which is retained as written.)
+
+</details>
 
 <details>
 <summary>Twenty-sixth pass — 2026-09-01, retained</summary>
@@ -162,11 +193,11 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 300 `@Test` functions in 33 suites |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 309 `@Test` functions in 33 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
-| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 29 `@Test` functions in 5 suites |
+| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 30 `@Test` functions in 5 suites |
 
 Every target's sources come from a `PBXFileSystemSynchronizedRootGroup`, so a new `.swift` file
 dropped in a folder joins that target with no project edit. `xcodebuild -list` reports **four**
@@ -206,7 +237,7 @@ Omits `NotificationManager.swift` — `role.mayFileReminders` is `false` on both
 shipping the notification surface to a process that can never file one is pointless. Adds
 `WristPlan.swift`, absent from the widget's set, because `WristModel` buckets pours through it.
 
-**`WaterBuddyWatchWidget`'s own set (five files, a minimal subset of the watch app's):**
+**`WaterBuddyWatchWidget`'s own set (six files — the watch app's roster, by the same reasoning):**
 
 ```
 DataManager.swift
@@ -214,10 +245,15 @@ LiquidGlassModifier.swift
 ReminderPlan.swift
 WaterLog.swift
 WaterSurface.swift
+WristPlan.swift
 ```
 
-Omits both `NotificationManager.swift` (same reason) and `WristPlan.swift` — the widget reads
-`DataManager.sharedDefaults`/`Key.wristMirror` directly and never buckets pours itself.
+Omits only `NotificationManager.swift` (same reason). `WristPlan.swift` joined on 2026-09-01, when
+spec §16 made the complication count pending outbox pours, and since spec §17 it is also what tells
+the complication when the phone's total stops counting and where to schedule its timeline entries —
+the same function the watch app reads, so the face and the screen cannot disagree. *(This block said
+five files, and that the widget "never buckets pours itself", until the twenty-eighth pass — stale
+for that whole month; `project.pbxproj` has carried six since 2026-09-01.)*
 `LiquidGlassModifier.swift` is required only **transitively**: nothing the widget draws calls
 `.liquidGlass(...)` directly, but `WaterSurface.swift`'s own `#Preview` does, and a `#Preview` still
 has to compile into whatever target the file joins.
@@ -245,7 +281,7 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2223   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs, WristLink (behind #if canImport(WatchConnectivity))
+WaterBuddy/DataManager.swift                    2243   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs, WristLink (behind #if canImport(WatchConnectivity))
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
 WaterBuddy/HistoryView.swift                     672   app only — the week card, today's log, swipe-to-delete, the serving editor
@@ -260,7 +296,7 @@ WaterBuddy/WaterBuddyApp.swift                   108   app only — RootView, th
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
 WaterBuddy/WaterSurface.swift                    194   shared — waves, scrim, Aurora palette, vesselSlots (moved in from HomeView, Task 14 — a second, non-view consumer: WristView)
 WaterBuddy/WristInbox.swift                       90   app only, NOT shared — reassembles chunked WristBatch payloads (wrist → phone), calls DataManager.ingest(_:)
-WaterBuddy/WristPlan.swift                        37   shared (in the watch's own exception set, not the widget's) — the watch's pure day-bucketing twin to ReminderPlan
+WaterBuddy/WristPlan.swift                        80   shared (in both watch exception sets, not the phone widget's) — ReminderPlan's pure twin: buckets the outbox by the watch's day, counts the phone's total until the phone's day ends, names the complication's turnover instants (spec §17)
 WaterBuddyTests/AppLanguageTests.swift           112   AppLanguageTests — the menu and each bundle
 WaterBuddyTests/AuroraBackgroundTests.swift       98   AuroraLightTests — the backdrop's lights
 WaterBuddyTests/CelebrationTests.swift           108   HapticLadderTests + ConfettiTests
@@ -276,7 +312,7 @@ WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab b
 WaterBuddyTests/ServingSeamTests.swift           279   ServingResolutionTests (pure, not @MainActor) + ServingSeamTests
 WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
-WaterBuddyTests/WristSyncTests.swift             661   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristLinkDecodingTests + WristLinkChunkingTests
+WaterBuddyTests/WristSyncTests.swift             829   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristLinkDecodingTests + WristLinkChunkingTests
 WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set and the 25-shot full census
 WaterBuddyUITests/GoalSetupUITests.swift         245   setup, the a11y tree, the tab swap, the Settings tab, the week card
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
@@ -286,22 +322,25 @@ WaterBuddyWidget/WaterBuddyWidget.swift          590   reads the cache only, nev
 WaterBuddyWidget/WaterBuddyWidgetBundle.swift     17
 WaterBuddyWatch/WaterBuddyWatchApp.swift          54   watch app only — activates WristLink.live, hosts WristView, .backgroundTask(.watchConnectivity)
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
-WaterBuddyWatch/WristModel.swift                 222   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite
+WaterBuddyWatch/WristModel.swift                 231   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite
 WaterBuddyWatch/WristVessel.swift                 88   watch app only — the one vessel, WaterSurface + WaterReadabilityScrim + readout; NOT self-describing to VoiceOver since it became a Button's label
 WaterBuddyWatch/WristView.swift                  432   watch app only — the one screen: the vessel IS the pour button, one "More" button over a sheet, "Synced Nm ago"
 WaterBuddyWatchTests/WristLinkCompileTests.swift  21   compile-time canary — WristLink stays non-@MainActor and Sendable
-WaterBuddyWatchTests/WristModelTests.swift       172   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction
+WaterBuddyWatchTests/WristModelTests.swift       209   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction, the phone's day end through the model
 WaterBuddyWatchTests/WristPlanCompileTests.swift  20   compile-time canary — WristPlan stays free of actor isolation
 WaterBuddyWatchTests/WristVesselLayoutTests.swift 49   diameter(fitting:within:) against five real watch width/height pairs
-WaterBuddyWatchTests/WristViewLogicTests.swift   149   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution
-WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 71   .accessoryCircular percentage ring — reads DataManager.sharedDefaults/Key.wristMirror directly, never WristModel.shared
+WaterBuddyWatchTests/WristViewLogicTests.swift   150   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution
+WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 88   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-09-02 with
-`find` over all seven and a two-way `comm` against the table: no undocumented file, no phantom row.
-Every line count above was re-checked against `wc -l`, not spot-checked — one was stale
-(`RootTabView.swift`, 252 → 260) and 51 were current.
+**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-05 with
+`find` over all seven plus `Tools/` and a two-way `comm` against this file: no phantom row, and one
+undocumented file — `Tools/ComposeStoreScreenshot.swift`, now in the block below. The 55 line counts
+this section carried (the 53 above and the two Swift scripts below it at the time) were re-checked
+against `wc -l`, not spot-checked: 7 were stale — exactly the seven files the known-issue #26 fix
+touched — and 48 were current. The new script's row was written from `wc -l`, and all 56 were
+re-checked again after the edit. *(The previous pass found 1 stale of 52, on 2026-09-02.)*
 
 ### Outside every target
 
@@ -312,6 +351,7 @@ into anything (rule `15-project`). It is **not** part of the 53 above, which is 
 ```
 Tools/GenerateAppIcon.swift                      267   generates the three iOS icon variants at 1024². Run: swift Tools/GenerateAppIcon.swift. Does NOT own the watch icon — see known issue #34
 Tools/FlattenPNG.swift                            99   re-encodes a PNG to colour type 2, RGB untouched. Required for every watch capture: simctl writes RGBA on watchOS even with --mask=ignored
+Tools/ComposeStoreScreenshot.swift               161   composites an unaltered iPhone screen onto the product's own aurora at a target slot size — how the iPad 13" set was made (see below)
 Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5
 Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position
 Tools/CaptureWatchScreenshot.sh                    —   the watch capture. WATERBUDDY_SCREENSHOT_NOWAIT=1 shoots the empty state unattended
@@ -331,6 +371,7 @@ WaterBuddyWatch/PrivacyInfo.xcprivacy             —    | bundle. Each target's
 WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with NO project.pbxproj edit
 Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868
 Screenshots/en-US/iPhone-6.5/*.png                4    the 6.5" store set, 1284x2778
+Screenshots/en-US/iPad-13/*.png                   4    2064x2752, COMPOSITED by Tools/ComposeStoreScreenshot.swift — not an iPad capture
 Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32)
 Screenshots/census/iPhone-6.9/*.png              19    coverage run, 1260x2736 — NOT store assets
 Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states
@@ -340,14 +381,26 @@ The four `PrivacyInfo.xcprivacy` files are a **submission blocker**, not paperwo
 a required-reason API and Apple does not accept an upload that fails to declare one. See rule
 `15-project`'s *Submission* section for the reason codes and why all four bundles need their own.
 
+**Why an iPhone-only app has an iPad set** (committed `03d4fc8`, after the twenty-seventh pass, with
+no checkpoint until this one). Apple's spec asks for the 13″ iPad set only "if app runs on iPad", and
+this app does not (`UIDeviceFamily [1]`); App Store Connect offers the tab anyway until a build has
+been processed. Filled with a raw iPad-simulator capture, the slot would show the app inside the
+iPad's floating compatibility window — the desktop rather than the product, and the kind of asset
+App Review 2.3.3 objects to. So the four images are the real, unaltered iPhone screens scaled onto
+the product's own aurora. The reasoning is `Tools/ComposeStoreScreenshot.swift`'s own header; this
+paragraph only points at it.
+
 `AuroraBackground` and `PressStyle` were `private` inside `HomeView.swift` until `GoalSetupView`
 became a second consumer. They are **app-only**: the widget re-expresses the same lights itself in
 `WidgetAurora`, because the app's absolute ±240pt offsets mean nothing on a 158pt canvas. Only the
 colours in `Aurora` are shared between the two processes.
 
-Plus `Entitlements/WaterBuddy.entitlements`, `Entitlements/WaterBuddyWidgetExtension.entitlements`
-(both declaring `group.sardor.WaterBuddy`) and `WaterBuddyWidget-Info.plist`
-(`NSExtensionPointIdentifier = com.apple.widgetkit-extension` only).
+Plus four entitlements files, one per signed target — `Entitlements/WaterBuddy.entitlements`,
+`Entitlements/WaterBuddyWidgetExtension.entitlements`, `Entitlements/WaterBuddyWatch.entitlements`
+and `Entitlements/WaterBuddyWatchWidgetExtension.entitlements`, each declaring
+`group.sardor.WaterBuddy` (rule `15-project`'s *Signing*) — and `WaterBuddyWidget-Info.plist`
+(`NSExtensionPointIdentifier = com.apple.widgetkit-extension` only). *(This sentence named only the
+first two files until the twenty-eighth pass; the watch's two have existed since 2026-09-01.)*
 
 And four non-Swift build inputs, plus one file that is deliberately *not* one:
 
@@ -441,9 +494,11 @@ in `.claude/rules/`.
     design flagged that leaving it in only one file would make the two rule files disagree.
 24. **Three `PBXFileSystemSynchronizedBuildFileExceptionSet`s, not one.** The `target` field on each
     is scalar; `WaterBuddyWidgetExtension`, `WaterBuddyWatch` and `WaterBuddyWatchWidget` each carry
-    their own, with different membership (six, six, and five files respectively — see *The six
-    shared files* above). A file reaching one target through its set is invisible to the other two
-    unless it is also listed in theirs.
+    their own (six files each: the two watch targets' sets are identical, and the phone widget's
+    swaps `WristPlan.swift` for `NotificationManager.swift` — see *The six shared files* above). A
+    file reaching one target through its set is invisible to the other two unless it is also listed
+    in theirs. *(Read "six, six, and five" until the twenty-eighth pass; the
+    watch widget's set reached six on 2026-09-01.)*
 
 ## The process role
 
@@ -486,6 +541,48 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five re-run 2026-10-05, on Xcode 27.0**, after the known-issue #26 fix. Foreground,
+one simulator at a time, `xcrun simctl shutdown all` before each, `-parallel-testing-enabled NO`,
+the commands exactly as rule `85-testing` writes them.
+
+| Command | Result |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 309 tests in 33 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `** TEST SUCCEEDED **` — `Executed 25 tests, with 0 failures` |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 30 tests in 5 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+
+**Nine new phone tests and one new watch test**, all in the wrist suites: `WristWireTests` +1,
+`WristPlanTests` +6, `WristPublishTests` +2 (33 suites still — no suite was added), and
+`WristModelTests` +1. One existing watch assertion was changed with the owner's approval — see
+known issue #26 and spec §17.
+
+**The toolchain changed between sessions, and the gate needed one repair to run at all.** Xcode is
+now 27.0, with iOS and watchOS 27.0 runtimes installed beside 26.5. A second simulator named
+"iPhone 17" existed on iOS 26.5, so `OS=26.5,name=iPhone 17` matched two devices and `xcodebuild`
+refused (exit 70); the owner had the newer one renamed "iPhone 17 (spare)" rather than the gate
+moved to `id=`, which rule `85-testing` forbids. The documented commands then resolved unchanged.
+
+**Warnings, compared rather than counted.** A clean build of `-scheme WaterBuddy` into an empty
+DerivedData folder, generic iOS Simulator destination, before and after the change, compared per
+file and message: **33 → 31** unique warning lines, **84 → 80** occurrences, and no new
+file-and-message pair. The two that disappeared were raw `Key.currentWater` reads in
+`composeWristMirror`. The `WaterBuddyWatchWidget` scheme additionally prints two `actool` warnings
+about the *phone's* catalogues, proven pre-existing on a `git archive HEAD` export — known issue
+#36. Incremental gate logs show only the files they recompiled, which is why this comparison runs
+on clean builds (`tasks/lessons.md`, 2026-09-02).
+
+**By hand, on a paired iPhone 17 and Apple Watch Series 11 (46mm):** the phone's mirror, carrying
+the new `phoneDayEnd`, crossed `WatchConnectivity` and the watch drew 13% · 250 / 2 000 ml ·
+"Synced just now" — the first mirror delivery observed on simulators in this repo, once the watch app
+was installed *after* the phone app (`tasks/lessons.md`). **Not observed:** the complication on a
+watch face (Xcode 27 ships no `Simulator.app` to automate, and the owner chose to record it
+unverified) and a real midnight turnover; both rest on the `WristPlan` tests.
+
+*(The 2026-09-02 gate block below is retained as the record of the App Store preparation pass's run,
+on Xcode 26.6.)*
 
 **Gate — all five re-run 2026-09-02**, after the App Store preparation pass (iPad dropped,
 `IPHONEOS_DEPLOYMENT_TARGET` 26.5/18.6 → **17.0**, `WATCHOS_DEPLOYMENT_TARGET` 26.5 → **26.0**, the
@@ -887,23 +984,37 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass:
+**There is a git repository.** Verified this pass (2026-10-05), after the pass's staging and before
+this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-6cee506
+55c73b2
 $ git log --oneline | wc -l
-      27
-$ git status --short
-(clean, aside from the final-review fix round's own in-progress work)
+      42
+$ git diff --cached --name-only | wc -l
+      14
+$ git status --short | grep '^??'
+?? Screenshots/census/
 ```
+
+**Nothing is committed by this pass.** The 14 staged paths — the known-issue #26 fix and its tests,
+spec §17, three `tasks/lessons.md` entries, this sync's own docs, and the one-line `PRIVACY.md`
+correction the 2026-10-06 re-run made at the owner's word — were staged with explicit paths for the
+owner's `/commit` (rule `90-git`), with nothing left unstaged. Re-counted after the re-run's staging;
+the twenty-eighth pass itself staged 13. `Screenshots/census/`
+(28 coverage captures, 51 MB) was untracked before this session began and is still neither committed
+nor ignored; whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 27 commits on `main`,
-root through the watchOS plan's own work; `.gitignore` exists and lists `build/`, `DerivedData/`,
-`**/xcuserdata/`, `.DS_Store` and `.claude/settings.local.json`, and does **not** ignore
-`xcshareddata/`, matching rule `90-git`'s own requirement.
+recorded — the authorization is in-conversation, scoped to this execution. 42 commits on `main`;
+`.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
+`.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
+matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
+twenty-eighth pass. It was accurate when the twenty-fourth pass wrote it — "the final-review fix
+round's own in-progress work" — and stale from the twenty-fifth, whose header already records `HEAD
+7f55364`: three passes carried it unchanged.)*
 
 This section previously read "There is no git repository," true at the time it was written and
 carried forward stale across several passes after it stopped being true — recorded here as an
@@ -1176,9 +1287,9 @@ rather than fixed — the review's own explicit call, not an oversight:**
    (`Int((… * 100).rounded())`): `HomeView.percentage`, `WaterSnapshot.percentage`,
    `WristView.vessel(boxedInto:)`'s inline vessel percentage (it was `WristView.body`'s until the
    2026-09-01 redesign moved it into that method; the copy itself is unchanged), and
-   `WaterBuddyWatchWidget.WristWidgetProvider
-   .currentEntry()`. All four currently agree by coincidence of being copied correctly, not by
-   sharing one definition — rule `50-views`'s "a third copy is a bug waiting to round differently"
+   `WaterBuddyWatchWidget.WristWidgetProvider.entry(at:mirror:outbox:calendar:)` (named
+   `currentEntry()` until the #26 fix split it; the formula moved with it unchanged). All four
+   currently agree by coincidence of being copied correctly, not by sharing one definition — rule `50-views`'s "a third copy is a bug waiting to round differently"
    already names this risk for the first two; the watch app and watch widget are a third and fourth
    copy the rule predates.
 21. ~~**`WristVessel.diameter(fitting:reserving:)`'s `reserving:` parameter is always passed `0`.**~~
@@ -1213,11 +1324,25 @@ rather than fixed — the review's own explicit call, not an oversight:**
    phone widget's, rather than a watch-specific name — cosmetic, surfaces only in system UI that
    lists installed complications by name.
 25. **`WaterBuddyWatchWidget`'s `Gauge` is fed a percentage clamped only at the low end.**
-   `WristWidgetProvider.currentEntry()` clamps to `min(999, max(0, percentage))` — the `Gauge(...,
+   `WristWidgetProvider.entry(at:mirror:outbox:calendar:)` (formerly `currentEntry()`) clamps to
+   `min(999, max(0, percentage))` — the `Gauge(...,
    in: 0...100)` itself will visually cap the ring, but the printed `currentValueLabel` text can
    still read above 100 for an overachieving day, which the phone widget's own equivalent readout
    does not do.
-26. **`WaterBuddyWatchWidget`'s `TimelineProvider` never applies the day-ordinal rollover, and
+26. ~~**`WaterBuddyWatchWidget`'s `TimelineProvider` never applies the day-ordinal rollover, and
+   emits no midnight-dated entry.**~~ **Fixed 2026-10-05** (spec §17, owner-approved). The fault was
+   wider than this title: `WristModel.todaysTotal` also added `mirror.currentWater` unconditionally,
+   so the watch's *screen* drew yesterday's water every morning beside its face — and an existing
+   test pinned that as policy (`todaysTotal == 1_800`, *"the number is still shown"*), changed with
+   the owner's approval. The mirror now carries `phoneDayEnd`;
+   `WristPlan.todaysTotal(mirror:outbox:now:calendar:)` counts the phone's total only before it, and
+   both watch surfaces read that one function; the complication emits a timeline entry at each
+   `WristPlan.dayBoundaries(after:mirror:calendar:)` instant — the phone's day end and the watch's
+   own midnight — beside its unchanged 15-minute refresh. Deliberately *not* the watch's own midnight
+   alone: under time-zone skew that comparison zeroes a mirror composed a minute ago, which §5 rules
+   out. Pinned by nine phone tests and one watch test; the face itself is unobserved, at the owner's
+   choice (see *Current state*). The superseded entry follows, for the record:
+   **`WaterBuddyWatchWidget`'s `TimelineProvider` never applies the day-ordinal rollover, and
    emits no midnight-dated entry.** Unlike the phone's `HydrationProvider`, which always emits a
    second, zeroed, midnight-dated timeline entry (rule `40-widget`) so the widget turns over even if
    nothing else wakes it, `WristWidgetProvider.getTimeline(in:completion:)` emits exactly one entry
@@ -1230,8 +1355,13 @@ rather than fixed — the review's own explicit call, not an oversight:**
 
 **Opened by the 2026-09-01 `WristView` redesign:**
 
-27. **`WristServingMenu` — the sheet holding the other two servings — has never been rendered by
-   anyone.** It compiles, its contents come from `WristView.secondary(from:)` which is unit-tested,
+27. ~~**`WristServingMenu` — the sheet holding the other two servings — has never been rendered by
+   anyone.**~~ **Closed by observation 2026-09-02** — recorded in that day's `/doc_sync` checkpoint
+   and in the twenty-seventh pass's header above, but left open in this list until the
+   twenty-eighth pass. Rendered by driving the watch simulator's accessibility tree with `AXPress`
+   from macOS, and correct: two glass capsules, Cup 150 ml and Bottle 500 ml, on its own aurora, with
+   a close button. (That route went through `Simulator.app`, which Xcode 27 no longer ships —
+   `tasks/lessons.md`, 2026-10-05.) The original entry follows, for the record: It compiles, its contents come from `WristView.secondary(from:)` which is unit-tested,
    and the whole screen was rendered on a 46mm and a 40mm — but the "More" button was never
    *pressed*, because `simctl` has no tap primitive for watchOS and this project has no watch UI-test
    target. So the sheet's own layout, its glass capsules, its aurora backdrop and its dismiss
@@ -1239,8 +1369,12 @@ rather than fixed — the review's own explicit call, not an oversight:**
    names for both widgets' rendering — "proved only by placing them and looking" — and the remedy is
    identical: one human tap on a simulator or a watch.
 
-28. **The "More" button now sits below the fold at rest on every watch size, and that it is reachable
-   by crown is argued rather than observed.** `vesselHeightFraction` is `0.78125` after two
+28. ~~**The "More" button now sits below the fold at rest on every watch size, and that it is reachable
+   by crown is argued rather than observed.**~~ **Closed by observation 2026-09-02**, the same way and
+   with the same late bookkeeping as #27: below the fold at rest on every size, entirely off-screen
+   at 40mm, and it does arrive when scrolled (`AXScrollToVisible`). The trade itself — reach for
+   presence — stands as the owner chose it. The original entry follows, for the record:
+   `vesselHeightFraction` is `0.78125` after two
    owner-directed 25% enlargements, so on a 46mm only the capsule's top curve shows and on a 40mm it
    is off-screen entirely. The screen does scroll — `ScrollView` with `.frame(minHeight:)` and
    `.scrollBounceBehavior(.basedOnSize)` — and that contract is what the claim rests on; no one has
@@ -1262,6 +1396,16 @@ rather than fixed — the review's own explicit call, not an oversight:**
     the claim survived. `CLAUDE.md` now states the rule as *no **new** warnings against a
     38-warning baseline*. Closing the baseline is real work — every one is a Swift 6 error later —
     and it is its own task, deliberately not folded in (rule `90-git`).
+    **Re-measured 2026-10-05, on Xcode 27.0** — the toolchain changed between sessions, so the 38
+    compares nothing any more. A clean build into an empty DerivedData folder, generic iOS Simulator
+    destination, counted as unique warning lines: **33** before the #26 fix and **31** after (84 → 80
+    occurrences), compared per file and message with no new pair. Two classes now, not one: the
+    main-actor isolation family in `DataManager.swift` and `NotificationManager.swift`, and a
+    diagnostic new in Xcode 27 in `WristView.swift` — *"'Combine' was not imported by this file"*, on
+    `Timer.publish`'s `Autoconnect` and `Publishers` (an `import Combine` there is the likely remedy;
+    not attempted, rule `90-git`). `CLAUDE.md` now carries the Xcode 27 figure. Rule `85-testing`
+    still says *"This codebase compiles clean"* — `.claude/` is the owner's to change, and a doc sync
+    may not touch it.
 
 30. **`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` is set on the app target only, not on all seven.**
     Rule `43-concurrency` asserts it is "set on every native target" and builds a long argument on
@@ -1299,6 +1443,12 @@ rather than fixed — the review's own explicit call, not an oversight:**
     - **Getting rid of the caption is a further step still.** Pouring locally raises the number but
       not the caption; only a real `WristMirror` arriving from a paired, booted iPhone simulator
       clears it, which is a manual setup no part of the gate performs.
+      **Shown achievable on 2026-10-05, with no tap on the watch at all:** on a paired pair with the
+      phone app installed **before** the watch app, the phone's activation publish lands and the
+      watch draws the phone's own total as "Synced just now" — 13% · 250 / 2 000 ml there, the UI
+      tests' own serving. In the opposite order the phone's `WCSession` reports `appInstalled: NO`
+      and every publish fails (`tasks/lessons.md`). `Tools/CaptureWatchScreenshot.sh` installs only
+      the watch app, so it cannot produce that state yet.
     - **A capture-side trap worth knowing:** `simctl io … screenshot` writes PNG colour type 6
       (RGBA) on watchOS **even with `--mask=ignored`**, because the display is non-rectangular and
       the framebuffer carries a mask regardless of corner fill. App Store Connect rejects any
@@ -1334,6 +1484,35 @@ rather than fixed — the review's own explicit call, not an oversight:**
     a shipped asset: compare `Screenshots/census/AppleWatch/01-series11-46mm.png` (0%, a near-black
     disc) against `06-wrist-water-63pct.png` (bright and legible). Found by looking at the captures,
     which is exactly the class of defect rule `85-testing` says no green suite can see.
+
+**Opened by the 2026-10-05 pass:**
+
+36. **On Xcode 27, the `WaterBuddyWatchWidget` scheme prints two `actool` warnings about the
+    *phone's* asset catalogues.** `WaterBuddy/Assets.xcassets` and `WaterBuddyWidget/Assets.xcassets`
+    each report *"Could not get trait set for device Watch7,18 with version 26.5"* — Watch7,18 being
+    the gate's Series 11 (46mm). Pre-existing, proven by building the same scheme from a
+    `git archive HEAD` export of the code before the #26 fix; absent from the phone-destination
+    builds and from the `WaterBuddyWatch` scheme's runs. Why a watch-destination build compiles the
+    phone's catalogues at all is not established. Recorded so "no new warnings" can be read against
+    it: these two are this scheme's baseline on this toolchain, not a regression.
+
+37. **Three `@Test` names are each reused across two suites**, against rule `85-testing`'s "names are
+    never reused across suites": `aCorruptZeroGoalFallsBackToTheDefault` and
+    `progressUnclampedExceedsOneOnOverachievement` in both `DataManagerTests`
+    (`DataManagerTests.swift:244`, `:232`) and `WaterSnapshotTests` (`WaterSnapshotTests.swift:91`,
+    `:280`), and `theOfferedRangeIsAWholeNumberOfSteps` in both `DailyGoalSetupTests`
+    (`DataManagerTests.swift:1213`) and `HistoryServingTests` (`HistoryViewTests.swift:80`). All
+    pre-existing — found by this pass's own name sweep, not introduced by it. Every one passes; the
+    cost is a name that no longer identifies one test in a report. Renaming them is test-only and
+    mechanical, but it is its own change.
+
+38. **`WristModel.isMirrorStale` is computed and tested, and has no reader.** `HISTORY.md` recorded
+    that twice on 2026-09-01, but it never reached this list. Spec §17 kept it deliberately: it is the
+    watch-calendar comparison, which is the wrong predicate for what to *count* — under skew it calls
+    a minute-old mirror stale — and whether the attribution line should use it is a product decision.
+    The existing "Synced Nm ago" caption already ages, but says nothing about a day boundary. Its
+    DocC now says plainly that it decides nothing; it should either gain a reader or go, with its one
+    test.
 
 ## Where the rest is written down
 
