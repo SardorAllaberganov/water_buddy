@@ -4123,3 +4123,317 @@ Appending this run's own lesson — the fifth dated 2026-10-06 — made the Git 
 `tasks/lessons.md` entries" stale in turn: the very trap this entry records the second run falling
 into. The sentence now reads "this session's `tasks/lessons.md` entries", with no count for the next
 appended lesson to falsify. Still 21 paths staged, nothing unstaged, re-printed after this addendum.
+
+## [2026-10-06] — Known issue #35: the empty watch vessel stops drawing as a black disc
+
+### What
+
+`WristVessel` laid `WaterReadabilityScrim` down at the phone app's constant full strength, so at 0% —
+every watch's first screen of the day, and the shipped App Store image — the vessel drew as a
+near-black disc. It now scales the scrim with the water, on a ramp of its own:
+
+- `WristVessel.scrimIntensity(at:)` = `min(1, max(0, level / scrimFullStrengthLevel))`, with
+  `scrimFullStrengthLevel = 0.2`: none at 0%, full strength by 20%, and exactly as before from 20%
+  up. `body` passes it to the scrim; nothing else in the vessel moved.
+- No shared file, no phone target and not the complication: the change is one watch-only file.
+- Rule `60-design-system`'s *Water* bullet amended, approved with the plan: a small canvas scales the
+  scrim, each ramp calibrated to where its own smallest readout sits, never copied from another.
+
+### The rulings this rests on
+
+- `WaterReadabilityScrim.intensity`'s own DocC: somewhere small, where an empty vessel is most of what
+  you see, a full scrim "only turns the vessel into a black hole".
+- Measured before any code, off the shipped captures — pixel-sampled sRGB, the scrim modelled as a
+  black overlay, which predicted the rendered text pixels to ±1:
+  - The widget's `min(1, level * 1.6)` is calibrated to its large, centred percentage (3:1). The
+    watch's lowest readout is a small millilitre line below centre (4.5:1), which water reaches at
+    `(0.2625·D − 6)/(D − 12)` — 0.203 at the 60pt floor, about 0.23–0.24 on real watches. Ported,
+    the widget's ramp would have taken that line to about 2.9:1. Hence a watch-only ramp, full by 20%.
+  - At 63% with today's full scrim, the millilitre line already measures ≈4.7:1 at its centre and
+    3.3–3.5:1 toward its ends: **known issue #44**, recorded and deliberately not fixed here.
+- Owner rulings this session: #35 chosen from four candidates; #35 alone, with the contrast failure
+  logged as #44; the plan, including the rule amendment, approved in plan mode.
+
+### Files touched
+
+Modified: `WaterBuddyWatch/WristVessel.swift` · `WaterBuddyWatchTests/WristViewLogicTests.swift` ·
+`.claude/rules/60-design-system.md` · `docs/DESIGN.md` · `tasks/lessons.md`. No project file,
+entitlement, shared file, exception set or wire field changed.
+
+### Verification
+
+- **RED on a wrong value, not a compile error.** The seam first returned today's constant 1:
+  `✘ Test run with 22 tests in 1 suite failed … with 4 issues` — exactly the empty-vessel and ramp
+  tests. The full-strength test passed, as it should against a full scrim.
+- **Mutation.** The widget's ramp in the seam failed the full-strength test for all four diameters
+  (`60.0`, `104.0`, `123.0`, `170.0`), so the guard against porting it is live. The run also showed
+  the widget's expression has no lower clamp.
+- **GREEN:** `✔ Test run with 22 tests in 1 suite passed`.
+- **The gate**, foreground, one simulator, Xcode 27.0: `✔ Test run with 316 tests in 33 suites
+  passed` · `Executed 25 tests, with 0 failures` · `✔ Test run with 45 tests in 5 suites passed` ·
+  `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`, reprinting the known 31-line baseline because
+  it rebuilt the phone app and the watch app it embeds) · `** BUILD SUCCEEDED **`
+  (`WaterBuddyWatchWidget`, no warning — it compiled nothing). After a final, comment-only DocC
+  edit, the watch unit run was repeated: `✔ Test run with 45 tests in 5 suites passed`.
+- **Warnings:** clean `-scheme WaterBuddyWatch` builds into empty DerivedData, a `git archive HEAD`
+  export against the tree, generic watchOS Simulator — 2 against 2 unique lines (the known `Combine`
+  pair in `WristView.swift`), identical down to line numbers, 16 against 16 occurrences; none new,
+  none gone.
+- **On screen, measured:** the watch app built from the tree, installed on the watchOS 26.5 Series
+  11 (46mm) and SE 3 (40mm), both at 0%. The vessel reads as glass — sRGB `(36, 43, 95)` behind the
+  text, where the old captures read `(23, 28, 62)` — and the millilitre line measures **8.58:1**
+  (46mm) and **8.60:1** (40mm) in its worst column. The renders stayed in the session's scratch
+  workspace; the shipped asset is untouched.
+
+### Not verified
+
+- Levels between 0% and 20% on screen. They are bounded by the 0% figure, since only glass is behind
+  the text there; 20% and above is unchanged by construction and pinned by the tests.
+- Reduce Transparency (≈8.3:1, worked out from `Base.archived.opaqueFill` — a token, not a render),
+  the scrolled state (≈7.5:1, estimated), and real hardware.
+- `Screenshots/en-US/AppleWatch/01-wrist.png` still shows the black disc; recapturing it was out of
+  scope (known issue #32).
+
+### Found along the way
+
+- **Known issue #44**, above.
+- `Tools/CaptureWatchScreenshot.sh` defaults to watch `A47014EF…`, which no longer exists on this
+  machine; the watchOS 26.5 Series 11 (46mm) is now `93ADDD75…`. `WATERBUDDY_SCREENSHOT_WATCH`
+  overrides it.
+- A clean `-scheme WaterBuddyWatch` build carries only the two `Combine` warnings; the main-actor
+  family appears only where the phone app is built.
+
+## [2026-10-06] — `/doc_sync`: the thirtieth pass, after the known-issue #35 fix
+
+### What
+
+Ran `/doc_sync` per rule `99-docs-cascade`, invoked without arguments, every probe over all seven
+target folders plus `Tools/` — the command's own probe still names four. This entry records only what
+the sync found and changed; the fix itself is the checkpoint above.
+
+### Drift found and fixed
+
+- **2 of 56 line counts** in *Files on disk* — `WristVessel.swift` 110 → 144 and
+  `WristViewLogicTests.swift` 273 → 323, exactly the two files the fix touched. Their rows now also
+  describe the new ramp and its tests.
+- **The targets table and the gate table** said 42 watch tests; the attribute grep and the run both
+  say 45.
+- **The Git section** named HEAD `638a883` and 45 commits; it is `e665cda` and 50. The twenty-ninth
+  pass's 21 staged paths were committed by the owner as five commits.
+
+### Recorded
+
+- Known issue **#35 retired** — the fix is on disk — with a note that the formula it named was the
+  wrong one for the watch.
+- **#44 opened:** the watch's millilitre line under 4.5:1 whenever water is behind it.
+- **#45 opened:** all three capture scripts default to simulators that no longer exist. That is wider
+  than the checkpoint above found, which named only the watch script's default.
+- **#32** gains two bullets: the shipped watch image now shows a defect the product no longer has,
+  and its script names a watch that is gone.
+- A *Current state* gate block for this pass: the five results, the warning comparison, and the
+  measured renders.
+- `tasks/lessons.md`: a second entry for the session, on hard-coded device ids in tools.
+
+### Re-derived and current — no change made
+
+- 56 Swift files on disk and 56 documented (53 in targets, 3 in `Tools/`), no phantom row, none
+  undocumented.
+- `@Test`: 316 phone, 45 watch; 12 declared UI methods.
+- The three exception sets, six files each, as `CLAUDE.md` lists them.
+- Eleven keys in `DataManager.Key`, plus the private `prefix` and the `all` roster, agreeing with
+  `CLAUDE.md` and `docs/STATE.md`.
+- Known issues numbered 1–45, no gap, no duplicate; `<details>` blocks balanced, four and four.
+- Every `` rule `nn-name` `` citation resolves; the three docs that must not exist still do not.
+- `docs/STATE.md`, `docs/WIDGET.md` and `CLAUDE.md` checked and deliberately not touched: no key, no
+  phone-widget contract and nothing they state changed. `docs/DESIGN.md` changed with the fix itself,
+  and its stamp moved with it.
+- No doc still says the widget is the only canvas that scales the scrim. Rule `40-widget`'s line is
+  about the widget alone, and rule `65-accessibility` already said "only a small canvas scales it".
+- No spec or plan under `docs/superpowers/` covers this work — it took the bounded path, its plan
+  approved in plan mode — so no status line there could go stale.
+
+### Verification
+
+The gate figures are this session's, from the full run recorded in the checkpoint above. This sync
+changed no code: it wrote only to `docs/`, `tasks/` and `HISTORY.md`.
+
+### Staged, not committed
+
+7 paths, every one by explicit path, nothing unstaged — re-printed with `git diff --cached
+--name-status` after this entry was written: `WaterBuddyWatch/WristVessel.swift`,
+`WaterBuddyWatchTests/WristViewLogicTests.swift`, `.claude/rules/60-design-system.md`,
+`docs/DESIGN.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and `HISTORY.md`. `Screenshots/census/`
+is still untracked. No `git commit` was run.
+
+## [2026-10-06] — `/doc_sync` re-run: four of the thirtieth pass's own figures corrected
+
+### What
+
+The owner ran `/doc_sync` again immediately after the thirtieth pass, with no code change in between —
+HEAD `e665cda`, the same 7 paths staged, nothing unstaged. Treated as an independent verification:
+every probe re-derived from a fresh script, and every figure this session published re-measured
+rather than trusted.
+
+### Found and fixed
+
+- **Known issue #44's figures came from a biased sampler.** The pass replaced its pixel sampler once
+  it read glyph ink as background on the 0% renders, but never re-ran the 63% figures the old sampler
+  had already produced. Re-measured with the clean-row sampler across all 167 columns of the line,
+  under the shipped full scrim: **3.34:1 worst, 4.13:1 median, 4.65:1 best — under 4.5:1 across 77%
+  of the line**, clearing it only in its middle 39 columns. Published as "≈4.7:1 at its centre and
+  3.3–3.5:1 toward its ends", which understated how much of the line fails. Corrected in
+  `docs/AI_CONTEXT.md` (#44 and the header) and `docs/DESIGN.md`.
+- **The widget's ramp, ported, gives ≈3.0:1, not "about 2.9:1"** — 2.97 at the 60pt floor's first
+  touch, 2.99 at the 46mm's. Corrected in the header, #35's retirement and `docs/DESIGN.md`.
+- **The warning comparison counted Swift's caret annotation lines.** "16 against 16 occurrences" is 8
+  against 8 compiler-emitted — each of the two `Combine` warnings four times on each side. The
+  verdict, none new and none gone, stands. Corrected in *Current state*.
+- **The old glass colour** was sampled one row off the frame-derived centre: ≈(24, 28, 62) —
+  (24, 28, 63) on the 46mm, (24, 29, 62) on the 40mm — not (23, 28, 62). The new renders read
+  (36, 43, 95) and (36, 43, 94) at the corrected points, as published.
+
+### Superseded here, not rewritten (rule `90-git`)
+
+- The #35 checkpoint above says "about 2.9:1", "≈4.7:1 at its centre and 3.3–3.5:1 toward its ends",
+  "16 against 16 occurrences" and "(23, 28, 62)". Read them as ≈3.0:1; 3.34 worst, 4.13 median and
+  4.65 best, under 4.5:1 across 77% of the line; 8 against 8; and ≈(24, 28, 62).
+- `tasks/lessons.md`'s *A calibrated constant carries the geometry it was calibrated on* says "about
+  2.9:1" and "3.3–3.5:1 toward its ends"; the same correction applies, and its rule stands. The new
+  lesson below that pair records how the figures got through.
+
+### Out of a doc sync's scope — for the owner
+
+`WristVessel.scrimIntensity(at:)`'s DocC (`WaterBuddyWatch/WristVessel.swift:114–115`) and the
+full-strength test's DocC (`WaterBuddyWatchTests/WristViewLogicTests.swift:307`) still quote "about
+4.7:1 … 3.3–3.5:1 toward its ends" and "about 2.9:1". Both are code, staged and not committed, and a
+doc sync may not touch them. The correction is comment-only — no behaviour and no test changes.
+Recorded in #44.
+
+### Re-derived and current — no change made
+
+- 56 Swift files on disk and 56 documented, no phantom, none undocumented; all 56 line counts current.
+- `@Test`: 316 phone, 45 watch; 12 declared UI methods. Every live statement of the watch count says
+  45; the remaining 42s are the twenty-ninth pass's retained record and known issue number 42.
+- The three exception sets, six files each; 13 `static let`s in `DataManager.Key` — the private
+  `prefix`, eleven keys and `all`.
+- Known issues 1–45, no gap, no duplicate; `<details>` balanced, four and four; every rule citation
+  resolves; the three must-not-exist docs absent.
+- Re-tested and accurate: the capture scripts were added in `acd5dfd` on 2026-09-02 with the same
+  default ids, as the lesson says; Reduce Transparency recomputes to 8.30:1 from
+  `Base.archived.opaqueFill`, labelled as derived; the 0% figures, 8.58 and 8.60, came from the
+  corrected sampler from the start; `SWIFT_DEFAULT_ACTOR_ISOLATION` sits on the app target's two
+  configurations only; `WaterBuddyWatch.xcscheme` builds only the watch app and its tests.
+- `docs/STATE.md`, `docs/WIDGET.md` and `CLAUDE.md` unchanged, and correctly unstamped by this run.
+
+### Verification
+
+No gate was run by this re-run — it changed no code. The gate figures stand from the run recorded in
+the #35 checkpoint; no code or test file has changed since.
+
+### Staged, not committed
+
+Still 7 paths — this re-run touched `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `tasks/lessons.md` and
+`HISTORY.md`, all already in the set — every one by explicit path, nothing unstaged, re-printed after
+this entry was written. HEAD is still `e665cda`. `Screenshots/census/` still untracked. No
+`git commit` was run.
+
+## [2026-10-06] — `/doc_sync` third run: the watch capture script's two false claims, and #45 widened
+
+### What
+
+The owner ran `/doc_sync` a third time, with no code or doc change since the second run — HEAD
+`e665cda`, the same 7 paths staged, nothing unstaged. The computed probes were re-run and are all
+current, so this run spent its effort on the claims no probe can test: every sentence this session
+wrote about something outside the docs, checked against the thing itself.
+
+### Found and fixed
+
+- **`Tools/CaptureWatchScreenshot.sh` repeats two claims since found false.** Its comments say twice
+  (`:20–22`, `:92–94`) that Apple never shipped XCUITest for watchOS — false since earlier today
+  (known issue #42) — and its interactive pause says "Open Simulator.app". Xcode 27.0 ships no
+  `Simulator.app`: there is no `Developer/Applications` folder, and `Xcode.app/Contents/Applications/`
+  holds `DeviceHub.app` instead, as the 2026-10-05 lesson says. No earlier entry recorded either copy.
+  Added to **#45**, now titled for the scripts going stale rather than only their dead defaults.
+  `Tools/` is outside a doc sync's write scope.
+- **#45 overclaimed one thing:** that passing the override "still works". No script was run, so it
+  now says the override gets past the dead default, read from the scripts.
+- **The *Outside every target* table** pointed at none of this; the three capture-script rows now
+  cite #45.
+- `tasks/lessons.md`: *A correction reaches only as far as its grep* — the XCUITest claim was
+  corrected through every document this morning and survived in the one script that states it.
+
+### Checked against the tree — accurate
+
+- The #35 checkpoint's explanation of why the `WaterBuddyWidgetExtension` build reprinted the whole
+  baseline — "it rebuilt the phone app and the watch app it embeds" — had been inferred from the
+  warnings. `WaterBuddyWidgetExtension.xcscheme` lists `WaterBuddy.app` with
+  `buildForRunning = "YES"` beside the appex, so it holds.
+- The specs and plans that mention the watch's scrim are design records, still true as written — the
+  watchOS spec's mock-up names a `WaterReadabilityScrim`, its plan's code sample predates #35, and
+  the localization spec lists #35 as out of its scope. None carries a status line this work moves.
+- #44's two causes, read off the source again: `HomeView`'s millilitre line is white @ 0.85 under a
+  `(0.3, radius 10, y 2)` shadow, and `WristVessel`'s is white @ 0.8 with no shadow.
+- The computed probes, re-run: 56 files, all documented, 0 stale counts; 316 / 45 / 12 tests; three
+  six-file exception sets; 13 `Key` statics; known issues 1–45; `<details>` four and four; every rule
+  citation resolves.
+
+### Superseded here, not rewritten (rule `90-git`)
+
+- `tasks/lessons.md`'s *A calibrated constant carries the geometry it was calibrated on* closes by
+  saying that modelling the scrim as a black overlay "is what showed which numbers were real". It
+  showed it for the 0% figures only; the 63% figures it was used alongside were wrong until the
+  second run — see *Fixing a biased measurement means re-running every figure it produced*.
+
+### Still for the owner
+
+Unchanged since the second run: `WristVessel.swift:114–115` and `WristViewLogicTests.swift:307`
+still quote #44's first figures in their DocC — code, staged and not committed, which a doc sync may
+not touch. And the two stale claims above, in `Tools/`.
+
+### Verification
+
+No gate was run — no code changed. The gate figures stand from the run recorded in the #35
+checkpoint; no code or test file has changed since, re-checked by modification time against that
+run's last log.
+
+### Staged, not committed
+
+Still 7 paths — this run touched `docs/AI_CONTEXT.md`, `tasks/lessons.md` and `HISTORY.md`, all
+already in the set — every one by explicit path, nothing unstaged, re-printed after this entry was
+written. HEAD is still `e665cda`. `Screenshots/census/` still untracked. No `git commit` was run.
+
+## [2026-10-06] — Two DocC comments corrected to #44's re-measured figures
+
+### What
+
+At the owner's word, the two DocC comments the second and third `/doc_sync` runs left for the owner
+now carry #44's re-measured figures. Comment-only: no code and no test logic changed.
+
+- `WristVessel.scrimIntensity(at:)`: "about 4.7:1 over water at its centre and 3.3–3.5:1 toward its
+  ends … about 2.9:1" now reads that the line clears 4.5:1 over water only in its middle — 4.65:1 at
+  best, 4.13:1 median, 3.34:1 at worst, under the floor across 77% of its width — and that the
+  widget's ramp would take it down to about 3.0:1.
+- `theWatchScrimIsAtFullStrengthBeforeWaterCanReachTheMillilitreLine`'s DocC: "about 4.7:1 … at its
+  centre and less toward its ends" now reads under 4.5:1 across 77% of its width, 4.65:1 at its best.
+
+This closes the *Still for the owner* item in both re-run entries above, except the `Tools/` script's
+two stale claims, which stay with known issue #45 as their own change.
+
+### Files touched
+
+`WaterBuddyWatch/WristVessel.swift` (144 → 145 lines) · `WaterBuddyWatchTests/WristViewLogicTests.swift`
+· `docs/AI_CONTEXT.md` (the line count, #44's note, the gate line) · `HISTORY.md`.
+
+### Verification
+
+- The diff of both files touches `///` lines only, checked by script; no stale figure is left in
+  either.
+- `xcodebuild test -scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests`, foreground, one
+  simulator: `✔ Test run with 45 tests in 5 suites passed`, the known `Combine` pair the only warnings.
+  The other four gate invocations were not re-run — a comment cannot change what they build.
+
+### Staged, not committed
+
+Still 7 paths — every one already in the set, each by explicit path, nothing unstaged, re-printed
+after this entry was written. HEAD is still `e665cda`. `Screenshots/census/` still untracked. No
+`git commit` was run.

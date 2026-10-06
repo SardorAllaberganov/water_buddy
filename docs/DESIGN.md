@@ -7,7 +7,7 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-08-31 (the Settings cards' three measured figures, and why borrowing the week card's number happened to hold)
+**Last updated:** 2026-10-06 (the watch vessel's own scrim ramp — known issue #35 — and two watch figures measured off renders, one of them a pre-existing failure now recorded as known issue #44)
 
 ---
 
@@ -223,12 +223,24 @@ RadialGradient(
 The app keeps `intensity` at **1**. The widget scales it with **`min(1, level * 1.6)`** — at 0%
 there is nothing bright to hold back and a full scrim only turns a small vessel into a black hole.
 
+The watch scales it too, on a ramp of its own: **`WristVessel.scrimIntensity(at:)`**, none at 0%
+and full strength by **20%**. It had the app's constant until 2026-10-06, and its empty vessel drew
+as a near-black disc (known issue #35). **The widget's ramp cannot be borrowed.** It is calibrated
+to the widget's readout — a large, centred percentage, held to 3:1 — while the watch's lowest
+readout is the small millilitre line *below* centre, held to 4.5:1, which water first reaches at
+`(0.2625·D − 6) / (D − 12)`: 0.203 at the 60pt floor, about 0.23–0.24 on real watches. That line
+has no contrast to spare over water even at full strength (the table below), so the ramp has to be
+full before water can reach it; the widget's would have left it at about 3.0:1. Each small canvas
+calibrates its ramp to where its own text sits.
+
 ## Contrast figures that were measured, not eyeballed
 
 | Figure | Measured | Consequence |
 |---|---|---|
 | White @ 0.8 over the bright wave fill | **3.4–3.9:1** | Safe at the app's 25pt `%` (large text, 3:1). **Not** safe at the widget's 12pt `%` (small text, 4.5:1) — so the widget draws that glyph at **full white** and subordinates it by size alone. |
 | White over the bright cyan surface, full | **~1.4:1** | Why the scrim exists at all. |
+| White @ 0.8 on the watch vessel's bare glass at 0%, no scrim | **8.58:1** worst column (46mm), **8.60:1** (40mm) | Why the watch's scrim can go to zero when the vessel is empty: the glass alone holds the millilitre line far above 4.5:1. Read off renders after the #35 fix; the glass reads sRGB `(36, 43, 95)` where the full scrim had it at ≈`(24, 28, 62)` — the black hole. |
+| White @ 0.8 over water, the watch's millilitre line, full scrim | **3.34:1** worst, **4.13:1** median, **4.65:1** best — under 4.5:1 across **77%** of the line | **A real failure, and pre-existing** — known issue #44, not fixed. The scrim is radial and thins toward the line's ends, and the watch's readout dropped the app's text shadow and its 0.85 opacity. Read off the 63% census capture, column by column, the ground sampled from the clean rows just above and below the line — a first pass that took the darkest pixels *within* the band read glyph ink as ground and published "≈4.7:1 at its centre, 3.3–3.5:1 toward its ends". It is also why the watch's ramp must be full before water reaches the line. |
 | `Aurora.cyan` on the tab bar's pane | **4.34:1** | Fine for the active **glyph** (non-text, 3:1) and **under the 4.5:1 floor for the label beside it**. So the tab bar tints the icon, never the caption — the first draft tinted both and was a real violation. Pane sampled at sRGB `(0.388, 0.282, 0.484)`. |
 | White on the tab bar's pane, full | **7.66:1** | The active label. |
 | White @ 0.72 on the tab bar's pane | **4.89:1** | The inactive label — clears 4.5:1, so the inactive state is a real dimming rather than a token one. |

@@ -4,6 +4,34 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-06 (thirtieth pass, **re-verified by two further `/doc_sync` runs the same
+day**. The second re-derived every probe — all current — and corrected four of this pass's own
+figures: #44 measured with a sampler that read glyph ink as background, so its failure is wider than
+first written (77% of the line, not "toward its ends"); the widget's ramp, ported, ≈3.0:1 rather than
+2.9; the warning comparison 8 against 8 compiler-emitted occurrences, not 16; and the old glass colour
+≈(24, 28, 62). The third widened #45 — the watch capture script also repeats two claims since found
+false — and confirmed off the scheme file a claim this pass had only inferred. The pass's own summary
+follows, corrected. `/doc_sync` after **known issue #35 was
+fixed**. The watch's vessel laid its readability scrim down at the phone app's constant full
+strength, so at 0% it drew as a near-black disc — every watch's first screen of the day, and the
+shipped App Store image. `WristVessel.scrimIntensity(at:)` now ramps it from none at 0% to full
+strength by 20%, a ramp of the watch's own: measuring the shipped captures showed the phone widget's
+`min(1, level * 1.6)`, ported, would have taken the watch's small millilitre line to about 3.0:1 over
+water. The same measurement found that line already under 4.5:1 across most of its width at full
+strength — **known issue #44**, opened and deliberately not fixed, at the owner's ruling. Rule `60-design-system`'s *Water* bullet amended,
+owner-approved. **This sync's own drift:** 2 of 56 line counts (exactly the two files the fix
+touched); the targets table and the gate table a pass behind on the watch count (42 → 45); the Git
+section five commits stale. **Found along the way:** all three capture scripts default to simulators
+that no longer exist — **known issue #45**. Known issue **#35 retired**; **#44 and #45 opened**. Gate
+re-run in full this session: **316**/33 phone unit, **25** phone UI, **45**/5 watch unit, both widget
+builds green; warnings compared on clean `-scheme WaterBuddyWatch` builds, 2 against 2, none new.
+`docs/DESIGN.md` carries the new ramp and two measured watch figures. `docs/STATE.md`,
+`docs/WIDGET.md` and `CLAUDE.md` were checked and deliberately not touched — no key, no phone-widget
+contract and nothing they state changed.)
+
+<details>
+<summary>Twenty-ninth pass — 2026-10-06, re-verified twice the same day, retained</summary>
+
 **Last updated:** 2026-10-06 (twenty-ninth pass, **re-verified by two further `/doc_sync` runs the
 same day**. The second re-derived every probe and corrected three of this pass's own statements —
 the build-input count (six → five), a claim that every task went RED before GREEN (Task 5 had no RED
@@ -28,6 +56,8 @@ retired**; **#39–#43** opened. Gate re-run in full this session: **316**/33 ph
 UI, **42**/5 watch unit, both widget builds green; warnings 31 against 31 on clean builds, none new.
 `docs/WIDGET.md` and `docs/DESIGN.md` were checked and deliberately not touched — neither mentions the
 watch, and neither the phone widget's contract nor a design token changed.)
+
+</details>
 
 <details>
 <summary>Twenty-eighth pass — 2026-10-05, re-verified 2026-10-06, retained</summary>
@@ -227,7 +257,7 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
-| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 42 `@Test` functions in 5 suites |
+| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 45 `@Test` functions in 5 suites |
 
 Every target's sources come from a `PBXFileSystemSynchronizedRootGroup`, so a new `.swift` file
 dropped in a folder joins that target with no project edit. `xcodebuild -list` reports **four**
@@ -353,23 +383,24 @@ WaterBuddyWidget/WaterBuddyWidgetBundle.swift     17
 WaterBuddyWatch/WaterBuddyWatchApp.swift          78   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
 WaterBuddyWatch/WristModel.swift                 252   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite; language, the phone's in-app choice read off the mirror
-WaterBuddyWatch/WristVessel.swift                110   watch app only — the one vessel, WaterSurface + WaterReadabilityScrim + readout; readout(volume:goal:strings:locale:) groups per language; NOT self-describing to VoiceOver since it became a Button's label
+WaterBuddyWatch/WristVessel.swift                145   watch app only — the one vessel, WaterSurface + WaterReadabilityScrim + readout; scrimIntensity(at:) is its own scrim ramp, none at 0% and full by 20% (known issue #35), never the widget's; readout(volume:goal:strings:locale:) groups per language; NOT self-describing to VoiceOver since it became a Button's label
 WaterBuddyWatch/WristView.swift                  468   watch app only — the one screen: the vessel IS the pour button, one "More" button over a sheet, "Synced Nm ago"; every string through \.strings
 WaterBuddyWatchTests/WristLinkCompileTests.swift  21   compile-time canary — WristLink stays non-@MainActor and Sendable
 WaterBuddyWatchTests/WristModelTests.swift       308   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction, the phone's day end through the model, the language the watch draws in
 WaterBuddyWatchTests/WristPlanCompileTests.swift  20   compile-time canary — WristPlan stays free of actor isolation
 WaterBuddyWatchTests/WristVesselLayoutTests.swift 49   diameter(fitting:within:) against five real watch width/height pairs
-WaterBuddyWatchTests/WristViewLogicTests.swift   273   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution in en/ru/uz, serving names, the grouped readout
+WaterBuddyWatchTests/WristViewLogicTests.swift   323   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution in en/ru/uz, serving names, the grouped readout, and the vessel's scrim ramp (full before water can reach the millilitre line, on every diameter)
 WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 90   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight; its description is the phone's own "Today's hydration"
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-06 with
-`find` over all seven plus `Tools/` and a two-way `comm` against this file: no phantom row and no
-undocumented file — the watch localization added no Swift file, only two catalogues (below). All 56
-line counts (the 53 above and the three Swift scripts below) were re-checked against `wc -l` by
-script: 8 were stale — exactly the eight files the localization touched — and 48 current. *(The
-previous pass found 7 stale of 55 on 2026-10-05, the seven files the known-issue #26 fix touched.)*
+**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-06 in the
+thirtieth pass with `find` over all seven plus `Tools/` and a two-way comparison against this file:
+no phantom row and no undocumented file — the #35 fix added no Swift file. All 56 line counts (the 53
+above and the three Swift scripts below) were re-checked against `wc -l` by script: 2 were stale —
+exactly the two files the fix touched — and 54 current. *(The twenty-ninth pass found 8 stale of 56
+earlier the same day, the eight files the watch localization touched; the twenty-eighth, 7 of 55 on
+2026-10-05.)*
 
 ### Outside every target
 
@@ -381,9 +412,9 @@ into anything (rule `15-project`). It is **not** part of the 53 above, which is 
 Tools/GenerateAppIcon.swift                      267   generates the three iOS icon variants at 1024². Run: swift Tools/GenerateAppIcon.swift. Does NOT own the watch icon — see known issue #34
 Tools/FlattenPNG.swift                            99   re-encodes a PNG to colour type 2, RGB untouched. Required for every watch capture: simctl writes RGBA on watchOS even with --mask=ignored
 Tools/ComposeStoreScreenshot.swift               161   composites an unaltered iPhone screen onto the product's own aurora at a target slot size — how the iPad 13" set was made (see below)
-Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5
-Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position
-Tools/CaptureWatchScreenshot.sh                    —   the watch capture. WATERBUDDY_SCREENSHOT_NOWAIT=1 shoots the empty state unattended
+Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5. Its default device is gone — known issue #45
+Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position. Its default device is gone — #45
+Tools/CaptureWatchScreenshot.sh                    —   the watch capture. WATERBUDDY_SCREENSHOT_NOWAIT=1 shoots the empty state unattended. Its default device is gone, and it repeats two claims since found false — #45
 Tools/VerifyScreenshots.sh                         —   proves each capture's size/alpha/format against the slot it will be uploaded to
 Tools/RenameScreenshots.py                         —   xcresult attachment UUIDs → slot names, via manifest.json
 ```
@@ -574,6 +605,45 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five re-run 2026-10-06, on Xcode 27.0, after the known-issue #35 fix** (the thirtieth
+pass). Foreground, one simulator at a time, `xcrun simctl shutdown all` before each,
+`-parallel-testing-enabled NO`, the commands exactly as rule `85-testing` writes them.
+
+| Command | Result |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 316 tests in 33 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `** TEST SUCCEEDED **` — `Executed 25 tests, with 0 failures` |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 45 tests in 5 suites passed` — and again after each of two later, comment-only DocC edits |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` — reprinting the known 31-line baseline, because it rebuilt the phone app and the watch app it embeds |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` — no warning at all: everything was up to date, so it compiled nothing |
+
+**Three new watch tests** in `WristViewLogicTests`, no suite added: the empty vessel lays down no
+scrim; below full strength the scrim rises with the water; and it is at full strength by the level at
+which water first reaches the millilitre line, worked out by hand for diameters 60, 104, 123 and 170.
+RED on a wrong value rather than a compile error — the seam first returned today's constant 1, and
+exactly the first two failed — and a mutation run with the widget's ramp failed the third on all four
+diameters.
+
+**Warnings, compared rather than counted.** The fix compiles into one target, so the comparison ran on
+clean `-scheme WaterBuddyWatch` builds into empty DerivedData — a `git archive HEAD` export against
+the working tree, generic watchOS Simulator: **2 against 2** unique lines (the known `Combine` pair in
+`WristView.swift`, identical down to line numbers), 8 against 8 compiler-emitted occurrences, none new
+and none gone. *(This said "16 against 16" until the same day's re-run: that count included Swift's
+caret annotation lines, one beneath each warning.)*
+That scheme builds only the watch app, and the main-actor family does not appear in it at all —
+consistent with known issue #30: `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` sits on the app target's
+two configurations and nowhere else. The `-scheme WaterBuddy` clean baseline (31) was not re-measured
+this pass; of what it compiles, only the embedded watch app's one file changed.
+
+**By hand, on simulators, measured off the renders:** the watch app built from the tree, on the
+watchOS 26.5 Series 11 (46mm) and SE 3 (40mm), both at 0%. The vessel reads as glass, sRGB
+`(36, 43, 95)` behind the text where the old captures read ≈`(24, 28, 62)`, and the millilitre line
+holds **8.58:1** and **8.60:1** in its worst column. **Not observed:** levels between 0% and 20%
+(bounded by the 0% figure, since only glass is behind the text there), Reduce Transparency (≈8.3:1,
+worked out from a token rather than measured), the scrolled state, and real hardware.
+
+*(The 2026-10-06 watch-localization gate block below is retained as that pass's record.)*
 
 **Gate — all five re-run 2026-10-06, on Xcode 27.0**, after the watch localization. Foreground, one
 simulator at a time, `xcrun simctl shutdown all` before each, `-parallel-testing-enabled NO`, the
@@ -1030,27 +1100,27 @@ this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-638a883
+e665cda
 $ git log --oneline | wc -l
-      45
+      50
 $ git diff --cached --name-only | wc -l
-      21
+       7
 $ git status --short | grep '^??'
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 21 staged paths — the watch localization (four watch
-sources, the complication's source, two new catalogues, three test files), its spec and plan, the
-four amended rule files, `CLAUDE.md`, this session's `tasks/lessons.md` entries, the `HISTORY.md` checkpoints
-and this sync's own docs — were staged with explicit paths for the owner's `/commit` (rule
-`90-git`), with nothing left unstaged. The previous pass's 14 staged paths were committed by the
-owner before this session began, as `85fe4c4`, `4792192` and `638a883` — `git diff --name-only
-55c73b2 638a883` lists exactly 14. `Screenshots/census/` (28 coverage captures, 51 MB) is still
-untracked, neither committed nor ignored; whether it belongs in the tree is the owner's call.
+**Nothing is committed by this pass.** The 7 staged paths — the fix (`WristVessel.swift`), its tests
+(`WristViewLogicTests.swift`), the amended rule `60-design-system`, `docs/DESIGN.md`, this session's
+`tasks/lessons.md` entries, the `HISTORY.md` checkpoints and this sync's own `docs/AI_CONTEXT.md` —
+were staged with explicit paths for the owner's `/commit` (rule `90-git`), with nothing left
+unstaged. The previous pass's 21 staged paths were committed by the owner before this session began,
+as `6499cf4`, `6aba955`, `a8515da`, `9502146` and `e665cda` — `git diff --name-only 638a883 e665cda`
+lists exactly 21. `Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither
+committed nor ignored; whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 45 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 50 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -1514,6 +1584,10 @@ rather than fixed — the review's own explicit call, not an oversight:**
       tests' own serving. In the opposite order the phone's `WCSession` reports `appInstalled: NO`
       and every publish fails (`tasks/lessons.md`). `Tools/CaptureWatchScreenshot.sh` installs only
       the watch app, so it cannot produce that state yet.
+    - **The shipped image now shows a defect the product no longer has.** `01-wrist.png` is the 0%
+      vessel under a full-strength scrim — the near-black disc known issue #35 fixed on 2026-10-06.
+      A recapture would draw glass instead; none was taken, as that fix's scope ruled.
+    - **As written, the script names a watch that no longer exists** (known issue #45).
     - **A capture-side trap worth knowing:** `simctl io … screenshot` writes PNG colour type 6
       (RGBA) on watchOS **even with `--mask=ignored`**, because the display is non-rectangular and
       the framebuffer carries a mask regardless of corner fill. App Store Connect rejects any
@@ -1540,7 +1614,14 @@ rather than fixed — the review's own explicit call, not an oversight:**
     teaching the script to emit the watch set **in the modern `universal` + `"platform" : "watchos"`
     form** — not the `watch-marketing` form it had, which compiles silently to no launcher icon at all.
 
-35. **The watch vessel does not scale its readability scrim, and it shipped that way.**
+35. ~~**The watch vessel does not scale its readability scrim, and it shipped that way.**~~ **Fixed
+    2026-10-06.** `WristVessel.scrimIntensity(at:)` ramps the scrim from none at 0% to full strength
+    by 20%. Measured on renders, the empty vessel now reads as glass and its millilitre line holds
+    8.58:1 (46mm) and 8.60:1 (40mm) with no scrim at all. **Not the formula this entry named.** It
+    quoted the widget's `min(1, level * 1.6)`, which is calibrated to the widget's large, centred
+    percentage; on the watch it would have taken the small millilitre line to about 3.0:1 over water.
+    The fix's own measurement opened #44. The shipped App Store image still shows the old disc (#32).
+    The original entry follows, for the record:
     `WristVessel.swift:42` passes `WaterReadabilityScrim` at the default `intensity: 1` — the
     full-strength *app* value. Rule `60-design-system` says a small canvas scales the scrim with the
     level (`min(1, level * 1.6)`), and `WaterSurface.swift`'s own DocC gives the reason: "at 0% there
@@ -1640,6 +1721,45 @@ rather than fixed — the review's own explicit call, not an oversight:**
       wrong reason (two of the nine are `Text` literals; the real one is that an extracted key with
       no `en` value reaches no table); two ragged lines left by a reflow in
       `WaterBuddyWatchApp.swift`.
+
+**Opened by the 2026-10-06 known-issue #35 fix:**
+
+44. **The watch's millilitre line falls under 4.5:1 whenever water is behind it.** Measured off the
+    63% census capture under today's full-strength scrim, column by column across all 167 columns
+    of the line, the ground sampled from the clean rows just above and below it: **3.34:1 at worst,
+    4.13:1 median, 4.65:1 at best — under 4.5:1 across 77% of the line**, clearing it only in its
+    middle 39 columns. It is small text — `WristVessel`'s readout at `diameter × 0.09`, white @ 0.8 —
+    so the floor is 4.5:1 (rule `65-accessibility`), and water reaches it from about 20–24% full,
+    which is most of a day. Two causes, both in the source: `WaterReadabilityScrim` is radial and thins
+    toward the line's ends, and `WristVessel` reproduced `HomeView`'s readout without the two things
+    that carry the app's own line — its 0.85 opacity and its text shadow `(0.3, radius 10, y 2)`.
+    Pre-existing, found by the #35 fix's measurement, and left at the owner's ruling; it is also why
+    the watch's scrim ramp must be full before water reaches the line. A fix is a design choice to
+    measure on renders — the app's opacity and shadow, the widget's tight second shadow
+    `(0.45, radius 2)`, or both. Rule `60-design-system` forbids trading the scrim away for a heavier
+    shadow, not adding one beside it. The phone app's own vessel was not measured.
+    *(First written as "≈4.7:1 at the line's centre and 3.3–3.5:1 toward its ends", from a sampler
+    that read glyph ink as background; the same day's re-run corrected it, and the failure is wider
+    than "toward its ends". The two DocC comments that quoted the first figures —
+    `WristVessel.scrimIntensity(at:)`'s and `WristViewLogicTests`' — were corrected the same day, at
+    the owner's word.)*
+
+45. **The capture scripts have gone stale against the toolchain.** All three default to simulators
+    that no longer exist: `Tools/CaptureScreenshots.sh` and `Tools/CaptureFullCensus.sh` to iPhone
+    `EDF19A71…`, `Tools/CaptureWatchScreenshot.sh` to watch `A47014EF…`, and `xcrun simctl list
+    devices` lists neither. The scripts date from 2026-09-02, and this machine's simulators have been
+    recreated since (the watchOS 26.5 Series 11 (46mm) is now `93ADDD75…`). Each takes an override —
+    `WATERBUDDY_SCREENSHOT_PHONE`, `WATERBUDDY_SCREENSHOT_WATCH` — that gets past the dead default;
+    run as documented, each would stop at its first step that names the device. Both halves are read
+    from the scripts, not observed: none was run, since each writes into `Screenshots/`. A fix should
+    look a device up by name and runtime rather than hard-code another id that will rot the same way.
+    **The watch script also carries two claims since found false.** Its comments say, twice
+    (`:20–22`, `:92–94`), that Apple never shipped XCUITest for watchOS — it did (known issue #42) —
+    and its interactive pause tells the human to "Open Simulator.app", which Xcode 27.0 does not
+    ship: `Xcode.app/Contents/Applications/` holds `DeviceHub.app` in its place (`tasks/lessons.md`,
+    2026-10-05). `Tools/` is outside a doc sync's write scope, so these are for the owner. *(This
+    entry first said the override meant "passing one still works" — never tried — and named only the
+    dead defaults; the same day's third `/doc_sync` run widened it.)*
 
 ## Where the rest is written down
 

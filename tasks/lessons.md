@@ -1702,3 +1702,69 @@ other, and it goes stale the moment the thing it describes moves.
 **The rule:** when a session approves or executes a spec or plan, update its status line in the same
 change — and a doc sync that touches the work should read the status lines of the specs and plans
 that work cites, not only the five docs its checklist names.
+
+## 2026-10-06 — A calibrated constant carries the geometry it was calibrated on
+
+Known issue #35 read as a one-line port: the phone widget already scales the readability scrim with
+`min(1, level * 1.6)`, so give the watch's vessel the same expression. Measuring the shipped watch
+captures before writing anything said no. The 1.6 is calibrated to the widget's own readout — a
+large, centred percentage, held to 3:1. The watch's lowest readout is a *small* millilitre line
+*below* centre, held to 4.5:1, which water reaches at about 20–24% while the widget's ramp is still
+near a third. Copied, the ramp would have taken that line to about 2.9:1 over water — an
+accessibility regression shipped as a visual fix, invisible to every test the widget's ramp has.
+
+The same measurement found the line already under the floor at full strength — 3.3–3.5:1 toward its
+ends (known issue #44). It looks perfectly legible, which is how it shipped.
+
+Two corrections were needed before any figure could be trusted. The widest bright outline on the
+screen was the "More" capsule, not the vessel. And a column through a tall glyph stroke has no clean
+background pixel inside the text band, so a "worst column" read about 3:1 on the old *and* new
+renders alike — an artefact, gone once the background was sampled from the clean rows just above and
+below the line. Modelling the scrim as a black overlay, and checking it predicts a real text pixel
+to ±1, is what showed which numbers were real.
+
+**The rule:** a tuned constant is a claim about the geometry it was tuned on. Before porting one to
+another canvas, find where *that* canvas's smallest text sits and measure a render; a value that is
+safe in one container can fail contrast in the next.
+
+## 2026-10-06 — A pin forbidden in the gate is still a pin in a tool
+
+Rule `85-testing` forbids `id=` destinations because a device id "resolves nothing on anybody else's
+machine" — and on this machine ids stop resolving on their own, because simulators get recreated.
+All three capture scripts, written 2026-09-02, default to device ids anyway (`EDF19A71…`,
+`A47014EF…`), and by 2026-10-06 neither existed (known issue #45). Nothing noticed for a month,
+because nothing runs the scripts routinely; it surfaced only because verifying #35 needed a watch to
+render on and went looking for one.
+
+**The rule:** a ban written for the gate covers every script that drives a simulator. Resolve the
+device by name and runtime when the script runs, the way the gate does, and treat a hard-coded id as
+already stale.
+
+## 2026-10-06 — Fixing a biased measurement means re-running every figure it produced
+
+The thirtieth pass caught its own pixel sampler reading glyph ink as background: taking the darkest
+third of each column *inside* the text band, it reported a ~3:1 "worst column" on renders that
+measure 8.6:1 — absurd enough to notice, so the sampler was replaced with one that reads the clean
+rows just above and below the line. The figures the old sampler had already produced for the 63%
+capture were not re-run, because they looked plausible — "≈4.7:1 at the line's centre and 3.3–3.5:1
+toward its ends", and "about 2.9:1" for the widget's ramp ported — and they went into `docs/`,
+`HISTORY.md`, this file and two DocC comments. The same day's re-run, with the corrected sampler:
+4.65:1 at best, 4.13:1 median, under 4.5:1 across 77% of the line — a failure three times wider than
+"toward its ends" — and ≈3.0:1 for the ported ramp.
+
+**The rule:** when a measurement method turns out biased, re-run every figure it has produced,
+starting with the plausible ones — nobody re-checks those. An implausible number is how a bias gets
+caught; a plausible one is how it gets published.
+
+## 2026-10-06 — A correction reaches only as far as its grep
+
+"Apple never shipped XCUITest for watchOS" was found false earlier today, and its own lesson above
+says the claim "had been copied from document to document". The correction then followed it through
+the documents — known issue #32, the 2026-09-02 lesson, the localization plan — and stopped there.
+`Tools/CaptureWatchScreenshot.sh` still states it twice in its comments, and the same script's
+interactive pause still says "Open Simulator.app", which the 2026-10-05 lesson records Xcode 27
+does not ship. Nobody had looked, because a correction pass sweeps the docs it is about; a script's
+comments are prose too, and a reader trusts them just as much.
+
+**The rule:** when a claim is retired, grep the whole repository for it — scripts, comments and
+plans as well as `docs/` — and fix every copy in scope or record each one that is out of reach.
