@@ -40,7 +40,9 @@
 > six, and not each other's) to reach into `WaterBuddy/` for the parts they need:
 > `DataManager.swift`, `LiquidGlassModifier.swift`, `ReminderPlan.swift`, `WaterLog.swift`,
 > `WaterSurface.swift`, plus `WristPlan.swift` — which the watch widget gained on 2026-09-01 when
-> spec §16 made its complication count pending outbox pours. They exchange data with the
+> spec §16 made its complication count pending outbox pours, and which since spec §17 (2026-10-05)
+> also decides how long the phone's mirrored total counts: until the phone's own day ends, carried
+> on the wire as `WristMirror.phoneDayEnd`. They exchange data with the
 > phone solely through `WristLink`'s `WatchConnectivity` session, never through the phone's own App
 > Group container (rule `70-privacy`, rule `25-shared-storage`).
 
@@ -143,14 +145,17 @@ something to record.
   test runs
 - Treat every new warning as a failure, on **every** invocation, and a concurrency warning here is a
   Swift 6 error later. **"This codebase compiles clean" is no longer true and was retired on
-  2026-09-02** — a full `-scheme WaterBuddy` build emits **38** warnings, every one of the
-  *"main actor-isolated … cannot be referenced from a nonisolated context; this is an error in the
-  Swift 6 language mode"* class, concentrated in `DataManager.swift` and `NotificationManager.swift`.
-  They are **pre-existing and unrelated** to any recent change (verified by building the same scheme
-  at two different deployment targets and diffing: identical sets). They are invisible to an
-  incremental build, which is how the claim survived so long. The rule is therefore *no **new**
-  warnings against that 38-warning baseline*, and closing the baseline is its own task
-  (`docs/AI_CONTEXT.md` known issue #29)
+  2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05; the 38 measured on Xcode 26.6 no longer
+  compares), a clean `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique
+  warning lines (80 occurrences): the *"main actor-isolated … cannot be referenced from a nonisolated
+  context"* family in `DataManager.swift` and `NotificationManager.swift`, plus two Xcode 27
+  *"'Combine' was not imported by this file"* warnings in `WristView.swift`. The
+  `WaterBuddyWatchWidget` scheme adds two `actool` trait-set warnings on the phone's catalogues
+  (known issue #36). All are **pre-existing** — proven by building the code from before a change and
+  comparing, never assumed. They are invisible to an incremental build, which is how "compiles
+  clean" survived so long. The rule is therefore *no **new** warnings against a baseline measured by
+  a clean build on the current toolchain*, compared per file and message, and closing the baseline is
+  its own task (`docs/AI_CONTEXT.md` known issue #29)
 - **A green suite is not proof the product works.** The suite injects its own `UserDefaults`,
   `Calendar` and clock, so it structurally cannot see an entitlement that was not added, a file
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
