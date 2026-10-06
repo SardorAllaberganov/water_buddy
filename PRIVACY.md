@@ -85,7 +85,7 @@ This uses Apple's WatchConnectivity, which links two devices that you own and th
 - your three quick-add serving sizes
 - your chosen language code (or nothing, if you follow your device's language)
 - whether you have set a goal yet
-- when the message was composed, and when your phone's day started
+- when the message was composed, and when your phone's day starts and ends
 - a list of serving identifiers your phone has already counted, so the Watch knows it can stop resending them
 
 The app also sends your Watch a one-word "wake up" signal that carries no data at all.

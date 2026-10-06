@@ -12,6 +12,9 @@ struct WristModelTests {
 
     private static let utc = { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c }()
 
+    /// 1970-01-02 00:00 UTC — where the phone's day ends for every fixture whose `now` is 1,000 s in.
+    private static let endOfFirstDay = Date(timeIntervalSince1970: 86_400)
+
     private func withTempDefaults<T>(_ body: (UserDefaults) throws -> T) rethrows -> T {
         let name = "test.waterbuddywatch.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: name)!
@@ -70,7 +73,8 @@ struct WristModelTests {
             model.apply(WristMirror(
                 schemaVersion: WristMirror.currentSchemaVersion, currentWater: 250, dailyGoal: 2_000,
                 servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
-                composedAt: now, phoneDayStart: Self.utc.startOfDay(for: now), acked: [pouredId]
+                composedAt: now, phoneDayStart: Self.utc.startOfDay(for: now), phoneDayEnd: Self.endOfFirstDay,
+                acked: [pouredId]
             ))
 
             #expect(model.pendingOutbox.isEmpty)
@@ -88,7 +92,8 @@ struct WristModelTests {
             model.apply(WristMirror(
                 schemaVersion: WristMirror.currentSchemaVersion, currentWater: 500, dailyGoal: 2_000,
                 servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
-                composedAt: now, phoneDayStart: Self.utc.startOfDay(for: now), acked: []
+                composedAt: now, phoneDayStart: Self.utc.startOfDay(for: now), phoneDayEnd: Self.endOfFirstDay,
+                acked: []
             ))
 
             #expect(model.pendingOutbox.count == 1)
@@ -105,10 +110,41 @@ struct WristModelTests {
             model.apply(WristMirror(
                 schemaVersion: WristMirror.currentSchemaVersion, currentWater: 1_800, dailyGoal: 2_000,
                 servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
-                composedAt: yesterday, phoneDayStart: Self.utc.startOfDay(for: yesterday), acked: []
+                composedAt: yesterday, phoneDayStart: Self.utc.startOfDay(for: yesterday),
+                phoneDayEnd: Date(timeIntervalSince1970: -86_400), // 1969-12-31 00:00 UTC, before `today` began
+                acked: []
             ))
             #expect(model.isMirrorStale == true)
-            #expect(model.todaysTotal == 1_800, "never a confident zero — the number is still shown")
+            // Reversed on 2026-10-05 at the owner's ruling (spec §17). This read `todaysTotal == 1_800`,
+            // "the number is still shown" — which is how a phone that slept through midnight left
+            // yesterday's water on the wrist all morning. The guarantee that sentence protected — no
+            // false zero while the phone's own day is still running — is now pinned by
+            // `WristPlanTests.aWatchAheadOfThePhoneKeepsThePhonesTotalUntilThePhonesDayEnds`.
+            #expect(model.todaysTotal == 0, "the phone's own day has ended, so its 1,800 is not today's water")
+        }
+    }
+
+    /// Known issue #26's fix end to end through the model: one persisted mirror, read one second
+    /// either side of the phone's day end, by two models over the same suite (the clock is fixed per
+    /// model). The phone keeps UTC−5, so its day ends five hours after the watch's own midnight —
+    /// the fallback a lost `phoneDayEnd` would use — and `evening` reading 1,800 is what proves the
+    /// persisted day end, not the fallback, decided it.
+    @Test
+    func theWatchCountsThePhonesTotalUntilThePhonesDayEnds() {
+        withTempDefaults { defaults in
+            let phonesDayEnd = Date(timeIntervalSince1970: 104_400) // 1970-01-02 00:00 at UTC−5, 05:00 UTC
+            let evening = makeModel(defaults, now: { phonesDayEnd.addingTimeInterval(-1) })
+            evening.apply(WristMirror(
+                schemaVersion: WristMirror.currentSchemaVersion, currentWater: 1_800, dailyGoal: 2_000,
+                servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
+                composedAt: Date(timeIntervalSince1970: 50_000),
+                phoneDayStart: Date(timeIntervalSince1970: 18_000), // 1970-01-01 00:00 at UTC−5
+                phoneDayEnd: phonesDayEnd, acked: []
+            ))
+            #expect(evening.todaysTotal == 1_800)
+
+            let morning = makeModel(defaults, now: { phonesDayEnd })
+            #expect(morning.todaysTotal == 0, "the phone's day is over, so its 1,800 is yesterday's water")
         }
     }
 
@@ -146,7 +182,8 @@ struct WristModelTests {
                 schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 3_500,
                 servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
                 composedAt: Date(timeIntervalSince1970: 1_000),
-                phoneDayStart: Self.utc.startOfDay(for: Date(timeIntervalSince1970: 1_000)), acked: []
+                phoneDayStart: Self.utc.startOfDay(for: Date(timeIntervalSince1970: 1_000)),
+                phoneDayEnd: Self.endOfFirstDay, acked: []
             ))
             #expect(model.displayGoal == 3_500)
         }

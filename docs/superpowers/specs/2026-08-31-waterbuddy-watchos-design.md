@@ -830,3 +830,71 @@ never a confident zero"* extended from the stale-day case to the never-synced ca
 same argument, one state further out.
 
 §12's remaining exclusions are unaffected and were re-confirmed, not relaxed.
+
+---
+
+## 17. Amendment (2026-10-05): the mirror carries the end of the phone's day
+
+**Owner-approved** on 2026-10-05, closing `docs/AI_CONTEXT.md`'s known issue #26. It **refines §5
+rather than reversing it**: the watch still rolls nothing over, still filters on instants rather
+than stored ordinals, and still never shows a false zero. What changes is the instant it compares
+against.
+
+### What was wrong
+
+§5 asked for the base to be "withheld and attributed — never rendered as a confident zero" when
+`phoneDayStart` and the watch's own day disagree. The implementation plan read that as *still show
+the number, and soften it*. The number half shipped — `WristModel.todaysTotal` counts
+`mirror.currentWater` unconditionally, pinned by `WristModelTests`'
+`isMirrorStaleWhenThePhonesDayDisagreesWithTheWatchsOwnDay` (*"never a confident zero — the number
+is still shown"*) — and the softening never did: `isMirrorStale` has no reader.
+`WaterBuddyWatchWidget` added the same base on a flat 15-minute refresh, with no entry at any day
+boundary.
+
+The consequence was daily, not exotic. The phone publishes on a mutation, a foreground or a
+`WCSession` activation, and at midnight it is usually suspended. So every morning — until the phone
+app was opened, the phone widget tapped, or a watch pour reached the phone — the watch's screen and
+its complication both drew **yesterday's** total as today's, at whatever percentage the evening
+ended on, beside a phone that read zero.
+
+The watch's own calendar cannot fix this alone, because it answers the wrong question. *"Is the
+phone's day the watch's day?"* is exactly what goes wrong under the time-zone skew §5 was written
+for: with the watch five hours behind the phone, a mirror composed a minute ago still compares as a
+different day for nineteen hours of every twenty-four. Zeroing on that comparison is the *"0 ml on
+the wrist while the phone reads 1,800"* §5 rejected.
+
+### What changes
+
+- `WristMirror` gains **`phoneDayEnd: Date?`** — the instant the phone's day ends, composed with
+  `DataManager.nextDayBoundary(after:calendar:)` on the phone's own calendar: an instant, not an
+  ordinal, for §5's reason.
+- The watch counts `mirror.currentWater` only while **`now < phoneDayEnd`**. The question becomes
+  *"has the phone's own day ended?"*, which has one answer on both devices whatever their zones. In
+  one time zone the base drops at midnight. Under skew it is never dropped while the phone's day is
+  still running, so the watch cannot read zero while the phone reads its real total. The watch's
+  own outbox pours are untouched — still bucketed by the watch's day, as §5 says.
+- The decision lives in `WristPlan` — `todaysTotal(mirror:outbox:now:calendar:)` and
+  `dayBoundaries(after:mirror:calendar:)` — pure, as §5 requires, and **both** watch surfaces read
+  it, so the screen and the complication cannot disagree.
+- The complication emits a timeline entry at every instant the total can change with no new input:
+  the phone's day end and the watch's own midnight, one entry when they coincide. That is the
+  watch's twin of the phone widget's midnight entry (rule `40-widget`). The 15-minute refresh stays —
+  it is how the complication picks up pours made in the watch app.
+- `composeWristMirror` reads the total through the same rollover `DataManager.snapshot(...)`
+  applies, so a mirror never carries yesterday's cached total under today's `phoneDayStart`. Every
+  path traced to it was transient — a correct publish always followed — but the mirror's window is
+  now load-bearing, so its total has to belong to that window by construction.
+- `phoneDayEnd` is **optional** so a mirror persisted before this change, or sent by a phone build
+  that predates it, still decodes. A missing value falls back to the watch's own boundary after
+  `phoneDayStart` — exact whenever both devices share a zone. The change is additive, so
+  `schemaVersion` stays 1: an older watch ignores the unknown key.
+
+### What this deliberately does not change
+
+- The watch still stores no day and rolls nothing over; it filters on every read (rule
+  `30-rollover`).
+- `isMirrorStale` keeps its meaning — the watch-calendar comparison — and still has no reader.
+  Wiring it into the attribution line remains its own decision.
+- Within the phone's day the number is still shown. §5's *"never a confident zero"* holds for exactly
+  the case it was written for, and is now pinned by a time-zone test of its own instead of by the
+  assertion this amendment changes.

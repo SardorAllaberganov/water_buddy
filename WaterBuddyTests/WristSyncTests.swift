@@ -46,6 +46,7 @@ struct WristWireTests {
             isGoalSet: true,
             composedAt: Date(timeIntervalSince1970: 3_000),
             phoneDayStart: Date(timeIntervalSince1970: 2_900),
+            phoneDayEnd: Date(timeIntervalSince1970: 89_300),
             acked: [UUID(), UUID()]
         )
         let data = try JSONEncoder().encode(mirror)
@@ -60,11 +61,29 @@ struct WristWireTests {
         let mirror = WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 2_000,
             servings: [150, 250, 500], languageCode: nil, isGoalSet: false,
-            composedAt: .now, phoneDayStart: .now, acked: []
+            composedAt: .now, phoneDayStart: .now, phoneDayEnd: .now, acked: []
         )
         let data = try JSONEncoder().encode(mirror)
         let decoded = try JSONDecoder().decode(WristMirror.self, from: data)
         #expect(decoded.languageCode == nil)
+    }
+
+    /// A mirror written before `phoneDayEnd` existed — persisted in the watch's own suite across an
+    /// update, or sent by a phone that updated after its watch — must still decode, with the field
+    /// absent rather than the whole value lost. That is the reason the field is optional: a decode
+    /// failure here puts an upgrading watch back on its never-synced screen until the phone next
+    /// publishes (spec §17).
+    @Test
+    func aMirrorFromBeforeThisChangeStillDecodes() throws {
+        // Hand-written in the shape the previous build encoded: every field except `phoneDayEnd`.
+        // `languageCode` is missing too, which is how a `nil` one is encoded.
+        let legacy = Data("""
+            {"schemaVersion":1,"currentWater":500,"dailyGoal":2000,"servings":[150,250,500],
+             "isGoalSet":true,"composedAt":3000,"phoneDayStart":2900,"acked":[]}
+            """.utf8)
+        let decoded = try JSONDecoder().decode(WristMirror.self, from: legacy)
+        #expect(decoded.phoneDayEnd == nil)
+        #expect(decoded.currentWater == 500)
     }
 }
 
@@ -416,6 +435,118 @@ struct WristPlanTests {
         let total = WristPlan.todaysTotal(from: [justBefore, justAfter], now: midnight, calendar: Self.utc)
         #expect(total == 200)
     }
+
+    // MARK: - The phone's total, and when it stops counting (spec §17)
+
+    /// A mirror holding `currentWater` for the phone's day `[phoneDayStart, phoneDayEnd)`. Only the
+    /// two ends and the total matter to the plan; everything else is filler.
+    private static func mirror(currentWater: Int = 1_800, phoneDayStart: Date, phoneDayEnd: Date?) -> WristMirror {
+        WristMirror(
+            schemaVersion: WristMirror.currentSchemaVersion, currentWater: currentWater, dailyGoal: 2_000,
+            servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
+            composedAt: phoneDayStart, phoneDayStart: phoneDayStart, phoneDayEnd: phoneDayEnd, acked: []
+        )
+    }
+
+    /// The phone's total belongs to the phone's day and to nothing after it. Counting it regardless
+    /// is what left yesterday's water on the wrist every morning until something woke the phone. The
+    /// end is exclusive — the same half-open day `fetchLogsForToday()` reads on the phone — and the
+    /// watch's own pours keep counting once the phone's figure has stopped.
+    @Test
+    func thePhonesTotalCountsUntilThePhonesDayEnds() {
+        let mirror = Self.mirror(
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_225_600), // 2026-01-01 00:00 UTC
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_312_000)    // 2026-01-02 00:00 UTC
+        )
+        let lastSecond = Date(timeIntervalSince1970: 1_767_311_999)
+        let end = Date(timeIntervalSince1970: 1_767_312_000)
+        let newDaysPour = WristPour(id: UUID(), amount: 250, at: Date(timeIntervalSince1970: 1_767_312_060)) // 00:01
+
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [], now: lastSecond, calendar: Self.utc) == 1_800)
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [], now: end, calendar: Self.utc) == 0,
+                "the instant the phone's day ends already belongs to the next one")
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [newDaysPour], now: Date(timeIntervalSince1970: 1_767_312_120), calendar: Self.utc) == 250,
+                "the watch's own pour still counts once the phone's total has stopped")
+    }
+
+    /// §5's guarantee, pinned on its own: a watch whose day turned first must never zero a phone
+    /// whose day is still running. The phone keeps New York time (UTC−5) and the watch UTC, so for
+    /// five hours the watch is on 2 January while the phone is still on the 1st. Comparing the
+    /// watch's own calendar day — what `isMirrorStale` does — would drop the phone's total for all
+    /// five of those hours.
+    @Test
+    func aWatchAheadOfThePhoneKeepsThePhonesTotalUntilThePhonesDayEnds() {
+        let mirror = Self.mirror(
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_243_600), // 2026-01-01 00:00 EST
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_330_000)    // 2026-01-02 00:00 EST
+        )
+        let watchsNewDay = Date(timeIntervalSince1970: 1_767_315_600) // 2026-01-02 01:00 UTC, 20:00 EST on the 1st
+
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [], now: watchsNewDay, calendar: Self.utc) == 1_800,
+                "never a confident zero while the phone's own day is still running")
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [], now: Date(timeIntervalSince1970: 1_767_330_000), calendar: Self.utc) == 0)
+    }
+
+    /// A mirror from a phone build that predates `phoneDayEnd` carries none. The watch then assumes
+    /// the phone shares its time zone and ends the phone's day at the watch's own next midnight after
+    /// `phoneDayStart` — the real one, which on this New York day is 25 hours on, not 24
+    /// (rule `30-rollover`: never add 86,400).
+    @Test
+    func aMirrorWithNoDayEndFallsBackToTheWatchsOwnMidnight() {
+        var newYork = Calendar(identifier: .gregorian)
+        newYork.timeZone = TimeZone(identifier: "America/New_York")!
+        let mirror = Self.mirror(phoneDayStart: Date(timeIntervalSince1970: 1_793_505_600), phoneDayEnd: nil) // 2026-11-01 00:00 EDT
+
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [], now: Date(timeIntervalSince1970: 1_793_595_599), calendar: newYork) == 1_800,
+                "23:59:59 EST, in the 25th hour of the day the clocks fell back")
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [], now: Date(timeIntervalSince1970: 1_793_595_600), calendar: newYork) == 0) // 2026-11-02 00:00 EST
+    }
+
+    // MARK: - When the complication has to turn over by itself
+
+    /// One shared midnight is one turnover, not two timeline entries at the same instant.
+    @Test
+    func theTimelineTurnsOnceWhenTheDevicesShareAZone() {
+        let mirror = Self.mirror(
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_225_600), // 2026-01-01 00:00 UTC
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_312_000)    // 2026-01-02 00:00 UTC
+        )
+        let boundaries = WristPlan.dayBoundaries(after: Date(timeIntervalSince1970: 1_767_279_600), mirror: mirror, calendar: Self.utc) // 15:00 UTC
+
+        #expect(boundaries == [Date(timeIntervalSince1970: 1_767_312_000)])
+    }
+
+    /// Under skew the two days end at different instants, and each changes what the face shows: the
+    /// phone's total stops at one, the watch's own pours re-bucket at the other. Here the phone keeps
+    /// Tokyo time, so its day ends **first** — the order a list built as "the watch's midnight, then
+    /// the phone's end" would get backwards.
+    @Test
+    func theTimelineTurnsAtBothBoundariesInOrderWhenTheZonesDisagree() {
+        let mirror = Self.mirror(
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_193_200), // 2026-01-01 00:00 JST
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_279_600)    // 2026-01-02 00:00 JST
+        )
+        let boundaries = WristPlan.dayBoundaries(after: Date(timeIntervalSince1970: 1_767_261_600), mirror: mirror, calendar: Self.utc) // 10:00 UTC
+
+        #expect(boundaries == [
+            Date(timeIntervalSince1970: 1_767_279_600), // the phone's day ends, 15:00 UTC
+            Date(timeIntervalSince1970: 1_767_312_000), // the watch's own midnight
+        ])
+    }
+
+    /// A phone day that has already ended changes nothing further, and with no mirror at all only the
+    /// watch's own pours can move — either way, the watch's own midnight is all that is left.
+    @Test
+    func withNoPhoneDayStillRunningOnlyTheWatchsMidnightIsScheduled() {
+        let now = Date(timeIntervalSince1970: 1_767_279_600) // 2026-01-01 15:00 UTC
+        let ended = Self.mirror(
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_139_200), // 2025-12-31 00:00 UTC
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_225_600)    // 2026-01-01 00:00 UTC
+        )
+
+        #expect(WristPlan.dayBoundaries(after: now, mirror: ended, calendar: Self.utc) == [Date(timeIntervalSince1970: 1_767_312_000)])
+        #expect(WristPlan.dayBoundaries(after: now, mirror: nil, calendar: Self.utc) == [Date(timeIntervalSince1970: 1_767_312_000)])
+    }
 }
 
 /// `WristInbox`'s only reference to `DataManager` is `.shared`, which cannot be swapped in a test —
@@ -492,6 +623,8 @@ struct WristInboxReassemblyTests {
 @MainActor
 struct WristPublishTests {
 
+    private static let utc = { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c }()
+
     private func withTempDefaults<T>(_ body: (UserDefaults) throws -> T) rethrows -> T {
         let name = "test.waterbuddy.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: name)!
@@ -548,6 +681,41 @@ struct WristPublishTests {
             #expect(mirror.languageCode == nil)
         }
     }
+
+    /// On a 25-hour day the phone's day ends at the next real midnight — not 24 hours after it began,
+    /// which here would close the day an hour early and take the phone's total off the wrist at
+    /// 23:00. New York, 1 November 2026: the clocks fall back at 02:00.
+    @Test
+    func aMirrorNamesTheMomentThePhonesDayEnds() {
+        withTempDefaults { defaults in
+            var newYork = Calendar(identifier: .gregorian)
+            newYork.timeZone = TimeZone(identifier: "America/New_York")!
+            let noon = Date(timeIntervalSince1970: 1_793_552_400) // 2026-11-01 12:00 EST
+
+            let mirror = DataManager.composeWristMirror(from: defaults, calendar: newYork, now: noon)
+            #expect(mirror.phoneDayEnd == Date(timeIntervalSince1970: 1_793_595_600)) // 2026-11-02 00:00 EST
+        }
+    }
+
+    /// A mirror's total has to belong to the day the mirror names. A cache still holding yesterday's
+    /// total — this process has not run the phone's own rollover yet — is sent as zero, exactly as
+    /// `DataManager.snapshot` draws it on the phone's widget. Sent as-is, it would sit on the wrist
+    /// all day under today's `phoneDayStart`, where no comparison of days could catch it.
+    @Test
+    func aMirrorNeverCarriesYesterdaysCachedTotalIntoToday() {
+        withTempDefaults { defaults in
+            let now = Date(timeIntervalSince1970: 1_791_190_800) // 2026-10-05 09:00 UTC
+            defaults.set(1_800, forKey: DataManager.Key.currentWater)
+
+            defaults.set(20_261_004, forKey: DataManager.Key.lastActiveDay)
+            let stale = DataManager.composeWristMirror(from: defaults, calendar: Self.utc, now: now)
+            #expect(stale.currentWater == 0, "stamped yesterday, so it is yesterday's water")
+
+            defaults.set(20_261_005, forKey: DataManager.Key.lastActiveDay)
+            let fresh = DataManager.composeWristMirror(from: defaults, calendar: Self.utc, now: now)
+            #expect(fresh.currentWater == 1_800, "stamped today, the same figure is today's and goes as it is")
+        }
+    }
 }
 
 /// The half of `WristLink` worth testing without a paired watch: decoding the two payload shapes
@@ -578,7 +746,7 @@ struct WristLinkDecodingTests {
         let mirror = WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion, currentWater: 500, dailyGoal: 2_000,
             servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
-            composedAt: .now, phoneDayStart: .now, acked: []
+            composedAt: .now, phoneDayStart: .now, phoneDayEnd: .now, acked: []
         )
         let data = try JSONEncoder().encode(mirror)
         let decoded = WristLink.decodeMirror(from: ["mirror": data])

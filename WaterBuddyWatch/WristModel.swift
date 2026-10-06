@@ -99,10 +99,15 @@ final class WristModel {
         mirror?.dailyGoal ?? DataManager.defaultDailyGoal
     }
 
-    /// `true` when the mirror's own day and the watch's own day disagree — the phone may not have
-    /// rolled over yet, or the two devices are in different time zones right now. The number is
-    /// still shown; this only tells the UI to soften how confidently it presents it (spec §5:
-    /// "withheld and attributed, never a confident zero").
+    /// `true` when the mirror's own day and the watch's own day disagree, compared on the watch's
+    /// calendar — the phone may not have rolled over yet, or the two devices are in different time
+    /// zones right now.
+    ///
+    /// **This flag does not decide what is counted**, and nothing reads it yet. `todaysTotal` asks
+    /// the sharper question — has the phone's own day *ended*? — because under time-zone skew this
+    /// comparison calls a minute-old mirror stale, and zeroing on it is exactly the false zero spec §5
+    /// rules out (spec §17). What it remains is a signal the UI could use to soften how a number is
+    /// presented; wiring it into the attribution line is a separate decision.
     ///
     /// Reads through `self.mirror`, not `storedMirror` directly — Observation tracks a computed
     /// property's dependencies transitively through the tracked properties its getter reads, so
@@ -113,14 +118,18 @@ final class WristModel {
         return !calendar.isDate(mirror.phoneDayStart, inSameDayAs: now())
     }
 
-    /// The mirror's own total, plus whatever's still in the outbox waiting to be acked. Reads
-    /// through `self.mirror` and `self.pendingOutbox` for the same reason `isMirrorStale` does —
-    /// no separate tracking of its own; it changes exactly when either of those does, which is
-    /// what keeps this from ever double-counting a pour the phone has folded but not yet acked
-    /// (see this task's own header note: `apply(_:)` moves both together, synchronously).
+    /// The phone's total until the phone's own day ends, plus whatever's still in the outbox waiting
+    /// to be acked — decided by `WristPlan.todaysTotal(mirror:outbox:now:calendar:)`, the same
+    /// function the complication reads, so the screen and the face cannot disagree (spec §17).
+    ///
+    /// Reads through `self.mirror` and `self.pendingOutbox` for the same reason `isMirrorStale` does —
+    /// no separate tracking of its own; it changes exactly when either of those does, which is what
+    /// keeps this from ever double-counting a pour the phone has folded but not yet acked (see this
+    /// task's own header note: `apply(_:)` moves both together, synchronously). The phone's day
+    /// ending is not a change Observation can see: `WristView` re-reads this on its 30-second clock,
+    /// and the complication schedules a timeline entry for it.
     var todaysTotal: Int {
-        let base = mirror?.currentWater ?? 0
-        return base + WristPlan.todaysTotal(from: pendingOutbox, now: now(), calendar: calendar)
+        WristPlan.todaysTotal(mirror: mirror, outbox: pendingOutbox, now: now(), calendar: calendar)
     }
 
     /// Records a pour the user just made, and hands the transport the **whole current outbox** —

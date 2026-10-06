@@ -21,35 +21,52 @@ struct WristWidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (WristWidgetEntry) -> Void) {
-        completion(context.isPreview ? placeholder(in: context) : currentEntry())
+        guard !context.isPreview else { return completion(placeholder(in: context)) }
+        let stored = readStore()
+        completion(entry(at: Date(), mirror: stored.mirror, outbox: stored.outbox, calendar: .waterBuddyDay))
     }
 
+    /// An entry's `date` is when WidgetKit *renders* it, so each future-dated entry is a scheduled
+    /// turnover that costs no wake-up: the phone's day ending, and the watch's own midnight. Without
+    /// them a face nobody touches would still show yesterday's water tomorrow morning — the phone
+    /// widget's midnight entry (rule `40-widget`), one platform over (spec §17).
+    ///
+    /// The 15-minute refresh is a different job and stays: it is how the face picks up pours made in
+    /// the watch app, which reloads no timelines of its own.
     func getTimeline(in context: Context, completion: @escaping (Timeline<WristWidgetEntry>) -> Void) {
-        completion(Timeline(entries: [currentEntry()], policy: .after(Date().addingTimeInterval(15 * 60))))
+        let now = Date()
+        let calendar = Calendar.waterBuddyDay
+        let stored = readStore()
+        let dates = [now] + WristPlan.dayBoundaries(after: now, mirror: stored.mirror, calendar: calendar)
+        let entries = dates.map { entry(at: $0, mirror: stored.mirror, outbox: stored.outbox, calendar: calendar) }
+        completion(Timeline(entries: entries, policy: .after(now.addingTimeInterval(15 * 60))))
     }
 
-    /// Reads the persisted mirror directly, never through `WristModel.shared` — a `TimelineProvider`
-    /// is `nonisolated`, and `WristModel` is `@MainActor` (rule `40-widget`'s "the provider reads
-    /// `WaterSnapshot`, never `DataManager.shared`", one platform over).
-    private func currentEntry() -> WristWidgetEntry {
+    /// Reads the persisted mirror and outbox directly, never through `WristModel.shared` — a
+    /// `TimelineProvider` is `nonisolated`, and `WristModel` is `@MainActor` (rule `40-widget`'s "the
+    /// provider reads `WaterSnapshot`, never `DataManager.shared`", one platform over). Read once per
+    /// timeline, so every entry in it is drawn from the same store.
+    private func readStore() -> (mirror: WristMirror?, outbox: [WristPour]) {
         let defaults = DataManager.sharedDefaults
         let mirror = defaults.data(forKey: DataManager.Key.wristMirror)
             .flatMap { try? JSONDecoder().decode(WristMirror.self, from: $0) }
-
-        // The face has to agree with the app beside it. `WristView` now draws a usable screen before
-        // the first sync — against `DataManager.defaultDailyGoal`, counting pours still sitting in
-        // the outbox — so a complication that read only the mirror would sit at 0% while the app it
-        // belongs to showed real water. Same two inputs, same fallback, same arithmetic.
-        let goal = mirror?.dailyGoal ?? DataManager.defaultDailyGoal
-        guard goal > 0 else { return WristWidgetEntry(date: .now, percentage: 0) }
-
         let outbox = defaults.data(forKey: DataManager.Key.wristOutbox)
             .flatMap { try? JSONDecoder().decode([WristPour].self, from: $0) } ?? []
-        let pending = WristPlan.todaysTotal(from: outbox, now: .now, calendar: .waterBuddyDay)
+        return (mirror, outbox)
+    }
 
-        let total = (mirror?.currentWater ?? 0) + pending
+    private func entry(at date: Date, mirror: WristMirror?, outbox: [WristPour], calendar: Calendar) -> WristWidgetEntry {
+        // The face has to agree with the app beside it. `WristView` draws a usable screen before the
+        // first sync — against `DataManager.defaultDailyGoal`, counting pours still sitting in the
+        // outbox — and counts the phone's total only until the phone's day ends. A complication that
+        // did either differently would show a different number from the app it belongs to: same two
+        // inputs, same fallback, and `WristPlan.todaysTotal` doing the arithmetic for both.
+        let goal = mirror?.dailyGoal ?? DataManager.defaultDailyGoal
+        guard goal > 0 else { return WristWidgetEntry(date: date, percentage: 0) }
+
+        let total = WristPlan.todaysTotal(mirror: mirror, outbox: outbox, now: date, calendar: calendar)
         let percentage = Int((Double(total) / Double(goal) * 100).rounded())
-        return WristWidgetEntry(date: .now, percentage: min(999, max(0, percentage)))
+        return WristWidgetEntry(date: date, percentage: min(999, max(0, percentage)))
     }
 }
 

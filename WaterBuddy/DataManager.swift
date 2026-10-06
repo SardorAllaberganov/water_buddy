@@ -1436,15 +1436,23 @@ final class DataManager {
         // happens in steady state — permanently stranding every pour still genuinely in flight.
         let acked = Array(ledger.sorted { $0.key > $1.key }.flatMap(\.value).prefix(WristMirror.maximumAckedIds))
 
+        // The total through the rollover, never the raw key. This also publishes from `WCSession`'s
+        // own activation callback, which can land before this process has run `resetIfNeeded()` —
+        // and read raw, a cache still holding yesterday's total would go out under today's
+        // `phoneDayStart`, inside a window the watch now trusts (spec §17). `snapshot` applies the
+        // same `lastActiveDay` rule the phone's own widget draws by.
+        let today = snapshot(defaults: defaults, calendar: calendar, now: now)
+
         return WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion,
-            currentWater: defaults.integer(forKey: Key.currentWater).clamped(to: 0...maximumDailyIntake),
+            currentWater: today.currentWater,
             dailyGoal: resolveDailyGoal(in: defaults),
             servings: resolveServings(in: defaults),
             languageCode: resolveLanguage(in: defaults).code,
             isGoalSet: resolveIsGoalSet(in: defaults, goal: resolveDailyGoal(in: defaults)),
             composedAt: now,
             phoneDayStart: calendar.startOfDay(for: now),
+            phoneDayEnd: nextDayBoundary(after: now, calendar: calendar),
             acked: acked
         )
     }
@@ -1875,6 +1883,18 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
     /// stored as an ordinal the watch would have to re-interpret under its own time zone
     /// (rule `30-rollover`, spec §5).
     let phoneDayStart: Date
+    /// When the phone's day ends, **as an instant** — ``DataManager/nextDayBoundary(after:calendar:)``
+    /// on the phone's own calendar. `currentWater` is the phone's total for `[phoneDayStart,
+    /// phoneDayEnd)` and for nothing after it, so the watch stops counting it here (spec §17).
+    ///
+    /// An instant, not a comparison of calendar days on the watch, because the two devices can
+    /// disagree about the time zone: compared on the watch's own calendar, a mirror composed a minute
+    /// ago can look like yesterday's, and zeroing it shows nothing on the wrist while the phone reads
+    /// its real total — the failure spec §5 was written to rule out.
+    ///
+    /// Optional only so a mirror persisted before this field existed, or sent by a phone build that
+    /// predates it, still decodes. A current phone always sends one.
+    let phoneDayEnd: Date?
     /// Pour ids the phone has already folded, capped at ``maximumAckedIds``. Once the ledger holds
     /// more ids than the cap, ``DataManager/composeWristMirror(from:calendar:now:)`` keeps the
     /// **newest**-folded ids, not the oldest — the watch's own outbox only ever holds recently

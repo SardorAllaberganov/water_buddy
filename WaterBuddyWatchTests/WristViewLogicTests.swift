@@ -25,7 +25,7 @@ struct WristViewLogicTests {
         let mirror = WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 2_000,
             servings: [100, 200, 300], languageCode: nil, isGoalSet: true,
-            composedAt: .now, phoneDayStart: .now, acked: []
+            composedAt: .now, phoneDayStart: .now, phoneDayEnd: .now, acked: []
         )
         #expect(WristView.resolveServings(from: mirror) == [100, 200, 300])
     }
@@ -62,7 +62,8 @@ struct WristViewLogicTests {
         WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: goal,
             servings: servings, languageCode: nil, isGoalSet: isGoalSet,
-            composedAt: composedAt, phoneDayStart: composedAt, acked: []
+            // The day's end plays no part in what the screen says about where its number came from.
+            composedAt: composedAt, phoneDayStart: composedAt, phoneDayEnd: nil, acked: []
         )
     }
 
