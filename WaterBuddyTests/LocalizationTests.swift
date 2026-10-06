@@ -29,6 +29,45 @@ private let widgetBundle = Bundle(
     url: appBundle.bundleURL.appending(path: "PlugIns/WaterBuddyWidgetExtension.appex")
 )
 
+/// The watch app, embedded inside the phone app the way it ships. The watch's own test target
+/// cannot make the comparisons below — it is hosted by the watch app and cannot see the phone's
+/// bundle — so this suite is the one place all four bundles are in reach.
+private let watchBundle = Bundle(
+    url: appBundle.bundleURL.appending(path: "Watch/WaterBuddyWatch.app")
+)
+
+/// The complication's extension, embedded inside the watch app.
+private let watchWidgetBundle = watchBundle.flatMap {
+    Bundle(url: $0.bundleURL.appending(path: "PlugIns/WaterBuddyWatchWidget.appex"))
+}
+
+/// Every phone string the watch draws, copied into the watch's own catalogue value for value
+/// (`docs/superpowers/specs/2026-10-06-watch-localization-design.md` §4.4).
+private let watchSharedKeys = [
+    "Today's hydration",
+    "%1$d percent. %2$d of %3$d millilitres.",
+    "%1$d ml",
+    "Cup",
+    "Glass",
+    "Bottle",
+]
+
+/// The watch's own strings, which have no phone equivalent. Listed by name because the build
+/// extracts only `Text` literals: a key resolved with `localizedString(forKey:)` never reaches the
+/// extracted table, so a coverage check cannot see one go missing — the gap
+/// `theShortcutsVocabularyIsTranslated` exists for.
+private let watchOwnKeys = [
+    "%1$@ / %2$@ ml",
+    "Logs %1$d millilitres",
+    "More",
+    "Shows the other serving sizes",
+    "Not yet synced · default goal",
+    "Set your goal in WaterBuddy on iPhone",
+    "Not yet synced",
+    "Synced just now",
+    "Synced %1$dm ago",
+]
+
 /// Every string the widget draws or files, and therefore every string that has to exist in **both**
 /// bundles.
 ///
@@ -341,5 +380,97 @@ private func specifiers(in text: String) -> Set<String> {
     func theProductNameIsNeverTranslated(language: String) {
         #expect(value(appBundle, language, "WaterBuddy") == nil,
                 "WaterBuddy has a \(language) entry — the product name is not a word")
+    }
+
+    // MARK: - The watch (spec 2026-10-06 §6.3)
+
+    @Test func theWatchBundlesAreWhereWeThinkTheyAre() {
+        #expect(watchBundle != nil,
+                "no Watch/WaterBuddyWatch.app inside the test host — every watch assertion below would pass vacuously")
+        #expect(watchWidgetBundle != nil,
+                "no WaterBuddyWatchWidget.appex inside the watch app — its assertions would pass vacuously")
+    }
+
+    /// **The regression test for a catalogue that lands in the wrong target**, and — review focus —
+    /// run over the languages the product *offers*, so a case added to `AppLanguage.selectable`
+    /// without a watch translation fails here instead of drawing English on the wrist.
+    @Test(arguments: AppLanguage.selectable.compactMap(\.code))
+    func theWatchShipsEveryLanguage(language: String) {
+        #expect(localization(watchBundle, language) != nil,
+                "the watch app does not ship \(language) — choosing it on the phone would draw the watch's own language")
+        #expect(localization(watchWidgetBundle, language) != nil,
+                "the watch widget does not ship \(language)")
+    }
+
+    /// **The watch's copies agree with the phone, value for value**, in English too — two catalogues
+    /// holding one key is fine right up until somebody improves a translation in one of them.
+    @Test(arguments: ["en"] + translated)
+    func theWatchAgreesWithThePhoneOnEverySharedString(language: String) {
+        for key in watchSharedKeys {
+            let phone = value(appBundle, language, key)
+            #expect(phone != nil, "\"\(key)\" is missing from the phone's \(language) table — nothing to agree with")
+            #expect(value(watchBundle, language, key) == phone,
+                    "\"\(key)\" differs between the phone and the watch in \(language)")
+        }
+        let description = "Today's hydration"
+        #expect(value(watchWidgetBundle, language, description) == value(appBundle, language, description),
+                "the complication's description differs from the phone's in \(language)")
+    }
+
+    @Test(arguments: ["en"] + translated)
+    func theWatchsOwnKeysResolveInEveryLanguage(language: String) {
+        for key in watchOwnKeys {
+            #expect(value(watchBundle, language, key) != nil,
+                    "\"\(key)\" has no \(language) entry in the watch app — it would draw the raw key")
+        }
+    }
+
+    @Test(arguments: translated)
+    func noWatchTranslationLosesAFormatArgument(language: String) {
+        for (name, bundle) in [("watch", watchBundle), ("watch widget", watchWidgetBundle)] as [(String, Bundle?)] {
+            guard let strings = table(bundle, language) else {
+                Issue.record("\(name): could not read the \(language) table")
+                continue
+            }
+            for (key, translation) in strings {
+                let expected = specifiers(in: key)
+                guard !expected.isEmpty else { continue }
+                #expect(specifiers(in: translation) == expected,
+                        "\(name): \"\(key)\" in \(language) does not carry the same format arguments")
+            }
+        }
+    }
+
+    /// **Every string the watch's build extracted is translated, unless it is deliberately not.**
+    /// `%` is a symbol and `WaterBuddy` the product's name; nothing else is argued for.
+    @Test func everyWatchStringIsTranslatedUnlessDeliberatelyNot() {
+        let deliberatelyEnglishOnly: Set<String> = ["%", "WaterBuddy"]
+
+        for (name, bundle) in [("watch", watchBundle), ("watch widget", watchWidgetBundle)] as [(String, Bundle?)] {
+            guard let english = table(bundle, "en") else {
+                Issue.record("\(name): no en table — choosing English would fall back to the watch's own language")
+                continue
+            }
+            for language in translated {
+                guard let other = table(bundle, language) else {
+                    Issue.record("\(name): could not read the \(language) table")
+                    continue
+                }
+                let untranslated = Set(english.keys)
+                    .subtracting(other.keys)
+                    .subtracting(deliberatelyEnglishOnly)
+                    .sorted()
+                #expect(untranslated.isEmpty,
+                        "\(name): these draw English for a \(language) user — \(untranslated)")
+            }
+        }
+    }
+
+    @Test(arguments: translated)
+    func theProductNameIsNeverTranslatedOnTheWatch(language: String) {
+        for (name, bundle) in [("watch", watchBundle), ("watch widget", watchWidgetBundle)] as [(String, Bundle?)] {
+            #expect(value(bundle, language, "WaterBuddy") == nil,
+                    "\(name): WaterBuddy has a \(language) entry — the product name is not a word")
+        }
     }
 }

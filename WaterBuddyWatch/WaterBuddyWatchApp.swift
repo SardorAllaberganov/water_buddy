@@ -14,10 +14,11 @@ struct WaterBuddyWatchApp: App {
         // Mirrors the phone's own `WaterBuddyApp.init()` (`_ = WristInbox.shared` before
         // `WristLink.live.activate()`): touching the singleton first is what registers its
         // `WristLink.didReceiveMirrorNotification` observer before any delegate callback could
-        // possibly land. `WristView`'s `@State private var model = WristModel.shared` normally does
-        // this instead, during window construction — but window content is never built for a
-        // `.backgroundTask(.watchConnectivity)` launch (see below), so that path alone leaves a
-        // window of time with an activated session and no observer listening. Doing it here too
+        // possibly land. `WristRoot`'s and `WristView`'s `@State private var model =
+        // WristModel.shared` normally do this instead, during window construction — but window
+        // content is never built for a `.backgroundTask(.watchConnectivity)` launch (see below),
+        // so that path alone leaves a window of time with an activated session and no observer
+        // listening. Doing it here too
         // closes it for the ordinary foreground launch as well, for the identical reason the phone
         // side does it unconditionally rather than only on its own background path.
         _ = WristModel.shared
@@ -26,7 +27,7 @@ struct WaterBuddyWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
-            WristView()
+            WristRoot()
         }
         // `@MainActor in`, explicit: `.backgroundTask`'s closure parameter is a plain
         // `@Sendable () async -> Void`, genuinely off the main actor by default — unlike
@@ -39,8 +40,9 @@ struct WaterBuddyWatchApp: App {
         // runs on the main queue.
         .backgroundTask(.watchConnectivity) { @MainActor in
             // The same touch, required again here specifically: a background-task launch never
-            // evaluates `WindowGroup`'s content, so `WristView`'s `@State` initializer — the only
-            // other place `WristModel.shared` gets constructed — never runs. Without this line, a
+            // evaluates `WindowGroup`'s content, so the `@State` initializers in `WristRoot` and
+            // `WristView` — the only other places `WristModel.shared` gets constructed — never run.
+            // Without this line, a
             // mirror that arrives while the app is woken only for this background task posts to
             // zero observers and is silently dropped, and the `reloadAllTimelines()` below then
             // re-renders the complication from a store `WristModel.apply(_:)` never actually wrote.
@@ -50,5 +52,27 @@ struct WaterBuddyWatchApp: App {
             WidgetCenter.shared.reloadAllTimelines()
             #endif
         }
+    }
+}
+
+// MARK: - Root
+
+/// Injects the language the watch draws in, once, above everything it draws
+/// (`docs/superpowers/specs/2026-10-06-watch-localization-design.md` §4.2).
+///
+/// A `View` rather than two modifiers on `WristView()` inside `body` above, for the reason the
+/// phone's own `RootView` gives: Observation tracks reads made while a *view* body evaluates, and an
+/// `App` body is not a reliable scope for it — so a mirror that changes the language would redraw
+/// nothing.
+///
+/// **Both values, together** (rule `70-privacy`). The bundle switches the words; the locale switches
+/// how the figures are grouped. One without the other draws `2,000` inside a Russian sentence.
+private struct WristRoot: View {
+    @State private var model = WristModel.shared
+
+    var body: some View {
+        WristView()
+            .environment(\.strings, model.language.bundle)
+            .environment(\.locale, model.language.locale)
     }
 }

@@ -82,7 +82,9 @@ struct WaterBuddyWatchWidget: Widget {
             .tint(Aurora.blue)
         }
         .configurationDisplayName("WaterBuddy")
-        .description("Today's hydration.")
+        // No full stop: this is the phone's own `Today's hydration`, so the complication's catalogue
+        // holds it value for value and `LocalizationTests` keeps the two from drifting.
+        .description("Today's hydration")
         .supportedFamilies([.accessoryCircular])
     }
 }

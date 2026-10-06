@@ -31,6 +31,9 @@ struct WristVessel: View {
     let goal: Int
     let diameter: CGFloat
 
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
     var body: some View {
         ZStack {
             WaterSurface(level: level, phase: 0, amplitude: diameter * 0.02)
@@ -39,12 +42,14 @@ struct WristVessel: View {
             WaterReadabilityScrim(diameter: diameter)
             VStack(spacing: 0) {
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
-                    Text("\(percentage)")
+                    // `HomeView`'s own spelling: formatted against the injected locale, and not a
+                    // `%lld` key the build would extract for nobody to translate.
+                    Text(percentage, format: .number)
                         .font(.system(size: diameter * 0.28, weight: .bold, design: .rounded))
                     Text("%")
                         .font(.system(size: diameter * 0.14, weight: .semibold, design: .rounded))
                 }
-                Text("\(volume) / \(goal) ml")
+                Text(Self.readout(volume: volume, goal: goal, strings: strings, locale: locale))
                     .font(.system(size: diameter * 0.09, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
             }
@@ -79,6 +84,23 @@ struct WristVessel: View {
     /// and its scrim stop being legible at all, so a vessel that small is worse than a clipped one.
     nonisolated static func diameter(fitting availableWidth: CGFloat, within availableHeight: CGFloat) -> CGFloat {
         max(60, min(availableWidth, availableHeight))
+    }
+
+    /// `1 250 / 2 000 мл` — both figures grouped the way the language being drawn groups them.
+    ///
+    /// **Deliberately not the phone's `%1$d / %2$d ml`.** `%d` never groups, which is why the phone
+    /// draws `1300 / 2000 ml` in every language (spec 2026-10-06 §8.1). The watch grouped this
+    /// readout before it was ever localized, and the owner chose to keep that (§3, ruling 3): the
+    /// figures are formatted first, against the locale `WristRoot` injects beside the bundle, and
+    /// handed to a `%1$@ / %2$@ ml` key only the watch holds.
+    ///
+    /// `nonisolated static` and free of view state, so `WristViewLogicTests` can pin it.
+    nonisolated static func readout(volume: Int, goal: Int, strings: Bundle, locale: Locale) -> String {
+        String(
+            format: strings.localizedString(forKey: "%1$@ / %2$@ ml", value: nil, table: nil),
+            volume.formatted(.number.locale(locale)),
+            goal.formatted(.number.locale(locale))
+        )
     }
 }
 

@@ -4,8 +4,15 @@
 //
 
 import Foundation
+import Observation
 import Testing
 @testable import WaterBuddyWatch
+
+/// `withObservationTracking`'s `onChange` is `@Sendable`, so the tally needs a reference box
+/// (rule `85-testing`).
+private final class Counter: @unchecked Sendable {
+    var count = 0
+}
 
 @MainActor
 struct WristModelTests {
@@ -204,6 +211,98 @@ struct WristModelTests {
             #expect(model.todaysTotal == 250)
             #expect(model.displayGoal == DataManager.defaultDailyGoal)
             #expect(makeModel(defaults, now: { now }).pendingOutbox.map(\.amount) == [250])
+        }
+    }
+
+    // MARK: - The language the watch draws in (spec 2026-10-06 §4.1)
+
+    /// A mirror that differs from the ones above only in the language the phone chose.
+    private static func mirror(language code: String?) -> WristMirror {
+        let now = Date(timeIntervalSince1970: 1_000)
+        return WristMirror(
+            schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 2_000,
+            servings: [150, 250, 500], languageCode: code, isGoalSet: true,
+            composedAt: now, phoneDayStart: utc.startOfDay(for: now), phoneDayEnd: endOfFirstDay,
+            acked: []
+        )
+    }
+
+    @Test
+    func theWatchFollowsTheLanguageChosenOnThePhone() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            model.apply(Self.mirror(language: "ru"))
+            #expect(model.language == .russian)
+        }
+    }
+
+    @Test
+    func withNoMirrorTheWatchFollowsItsOwnLanguage() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            #expect(model.mirror == nil, "precondition: never synced")
+            #expect(model.language == .system)
+        }
+    }
+
+    /// `nil` is the phone saying *Follow device*. On the wrist that means the watch's own language,
+    /// not the phone's — the two usually match, because watchOS mirrors the iPhone's language by
+    /// default, but only the watch knows its own.
+    @Test
+    func aPhoneFollowingItsDeviceLeavesTheWatchOnItsOwn() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            model.apply(Self.mirror(language: nil))
+            #expect(model.language == .system)
+        }
+    }
+
+    /// Review focus: whatever arrives on the wire, the watch never reaches for a bundle it doesn't
+    /// have. `"system"` is a case name the phone never stores (rule `70-privacy`), `""` is what a
+    /// corrupt encode would carry, and `"xx"` stands for a language a newer phone ships and this
+    /// build does not.
+    @Test(arguments: ["xx", "system", ""])
+    func anUnrecognisedLanguageCodeFallsBackToTheWatchsOwn(code: String) {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            model.apply(Self.mirror(language: code))
+            #expect(model.language == .system)
+        }
+    }
+
+    /// `WristRoot` re-injects the bundle only if Observation tells it the language moved. And —
+    /// review focus — the switch runs both ways: a phone put back on *Follow device* hands the watch
+    /// back its own language rather than leaving it on the last one it was told.
+    @Test
+    func aNewMirrorSwitchesTheLanguageForObservers() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Date(timeIntervalSince1970: 1_000) })
+            model.apply(Self.mirror(language: "ru"))
+
+            let changes = Counter()
+            withObservationTracking {
+                _ = model.language
+            } onChange: {
+                changes.count += 1
+            }
+            model.apply(Self.mirror(language: "uz"))
+
+            #expect(changes.count == 1)
+            #expect(model.language == .uzbek)
+
+            model.apply(Self.mirror(language: nil))
+            #expect(model.language == .system)
+        }
+    }
+
+    @Test
+    func theChosenLanguageSurvivesARelaunch() {
+        withTempDefaults { defaults in
+            let now = Date(timeIntervalSince1970: 1_000)
+            makeModel(defaults, now: { now }).apply(Self.mirror(language: "ru"))
+            let relaunched = makeModel(defaults, now: { now })
+            #expect(relaunched.language == .russian,
+                    "the language rides in the persisted mirror, so a relaunch keeps it")
         }
     }
 }

@@ -89,14 +89,35 @@ final class WristModel {
     /// materialises into its own suite for a fresh install (`DataManager.init`), so the two devices
     /// already agree on it before they have ever spoken — and the moment a real mirror lands, this
     /// switches to the phone's own number with no reconciliation needed, because nothing was ever
-    /// *stored* here. `WristView.attribution(mirror:now:)` names which of the two is on screen, so
-    /// the number is attributed rather than asserted (spec §5's "withheld and attributed, never a
-    /// confident zero", read across to the never-synced case).
+    /// *stored* here. `WristView.attribution(mirror:now:strings:)` names which of the two is on
+    /// screen, so the number is attributed rather than asserted (spec §5's "withheld and
+    /// attributed, never a confident zero", read across to the never-synced case).
     ///
     /// Reads through `self.mirror` for the same reason `isMirrorStale` and `todaysTotal` do — it
     /// needs no tracking of its own, because `mirror` is the only tracked state it touches.
     var displayGoal: Int {
         mirror?.dailyGoal ?? DataManager.defaultDailyGoal
+    }
+
+    /// The language the watch draws in: the phone's own in-app choice, carried on the mirror
+    /// (`docs/superpowers/specs/2026-10-06-watch-localization-design.md` §4.1).
+    ///
+    /// `nil` on the wire — the phone set to *Follow device* — and no mirror at all, before the first
+    /// sync, both resolve to ``AppLanguage/system``: this watch's own `Bundle.main`, its own system
+    /// language. "Follow device", read on the wrist, means *this* device.
+    ///
+    /// **Resolved through the phone's own `AppLanguage(code:)`**, so an unrecognised code — a
+    /// language a newer phone ships and this build does not, or anything corrupt — falls back to the
+    /// watch's own language and says so under `#if DEBUG` (rule `70-privacy`), rather than reaching
+    /// for a bundle that isn't there.
+    ///
+    /// **A read, never a write.** Nothing new is stored: `languageCode` already rides inside the
+    /// persisted mirror, which is why the choice survives a relaunch. This is not
+    /// `DataManager.language` and never touches `Key.language` — one writer per store (rule
+    /// `20-state`). Like `displayGoal`, it needs no tracking of its own: it changes exactly when
+    /// `mirror` does.
+    var language: AppLanguage {
+        AppLanguage(code: mirror?.languageCode)
     }
 
     /// `true` when the mirror's own day and the watch's own day disagree, compared on the watch's
