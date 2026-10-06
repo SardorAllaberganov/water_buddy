@@ -39,7 +39,7 @@ struct WristVessel: View {
             WaterSurface(level: level, phase: 0, amplitude: diameter * 0.02)
                 .clipShape(Circle())
                 .padding(6)
-            WaterReadabilityScrim(diameter: diameter)
+            WaterReadabilityScrim(diameter: diameter, intensity: Self.scrimIntensity(at: level))
             VStack(spacing: 0) {
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
                     // `HomeView`'s own spelling: formatted against the injected locale, and not a
@@ -84,6 +84,41 @@ struct WristVessel: View {
     /// and its scrim stop being legible at all, so a vessel that small is worse than a clipped one.
     nonisolated static func diameter(fitting availableWidth: CGFloat, within availableHeight: CGFloat) -> CGFloat {
         max(60, min(availableWidth, availableHeight))
+    }
+
+    /// The level by which the readability scrim is back at full strength: 20%.
+    ///
+    /// Derived, not chosen. The vessel's lowest readout is the millilitre line, small text below the
+    /// centre, and water first reaches its ink at `(0.2625·D − 6) / (D − 12)`: the water's well is
+    /// inset 6pt, its wave peaks `0.02·D` above the mean surface, and the line's ink ends `0.2175·D`
+    /// below the centre — measured off renders rather than taken from a font metric (0.215 on a 46mm,
+    /// 0.213 on a 40mm) and rounded up, so the line is assumed lower than it is. That is 0.203 at the
+    /// 60pt floor and about 0.23–0.24 on real watches, so a ramp that is full by 0.2 is full before
+    /// any water can be behind the line, on every size. `WristViewLogicTests` works the same formula
+    /// out by hand.
+    nonisolated static let scrimFullStrengthLevel = 0.2
+
+    /// How much of ``WaterReadabilityScrim`` to lay down: none for an empty vessel, rising with the
+    /// water to full strength at ``scrimFullStrengthLevel``, and full from there on.
+    ///
+    /// The scrim's own DocC is the ruling: somewhere small, where an empty vessel is most of what you
+    /// see, a full scrim at 0% "only turns the vessel into a black hole". This one did, at full
+    /// strength — every watch's first screen of the day, and the shipped App Store image (known
+    /// issue #35). Below the threshold only glass is ever behind the text, and there the millilitre
+    /// line clears 4.5:1 with no scrim at all: 8.58:1 in its worst column on a 46mm and 8.60:1 on a
+    /// 40mm, measured off renders of this vessel at 0%.
+    ///
+    /// **Not the phone widget's `min(1, level * 1.6)`.** That ramp is calibrated to the widget's own
+    /// readout — a large, centred percentage, held to 3:1 — and is full only at 62.5%. Here the
+    /// lowest readout is small text held to 4.5:1, and it has no contrast to give back: even at full
+    /// strength it clears 4.5:1 over water only in its middle — 4.65:1 at best, 4.13:1 median, 3.34:1
+    /// at worst, under the floor across 77% of its width (known issue #44). Copied here, the widget's
+    /// ramp would take it down to about 3.0:1 where the water first reaches it. Each small canvas
+    /// calibrates its ramp to where its own text sits.
+    ///
+    /// `nonisolated static` and free of view state, so `WristViewLogicTests` can pin it.
+    nonisolated static func scrimIntensity(at level: Double) -> Double {
+        min(1, max(0, level / scrimFullStrengthLevel))
     }
 
     /// `1 250 / 2 000 мл` — both figures grouped the way the language being drawn groups them.

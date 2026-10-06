@@ -270,4 +270,54 @@ struct WristViewLogicTests {
             #expect(!text.contains(","), "\(text) groups with the English separator")
         }
     }
+
+    // MARK: - How much readability scrim the vessel lays down (known issue #35)
+
+    /// The bug itself. At 0% there is no water behind the readout to hold back, so a scrim only
+    /// darkens the glass — at full strength the empty vessel drew as a near-black disc, every watch's
+    /// first screen of the day and the shipped App Store image. Without it the millilitre line still
+    /// clears 4.5:1 over the bare glass with room to spare (`WristVessel.scrimIntensity(at:)` carries
+    /// the measured figures).
+    @Test
+    func anEmptyWatchVesselLaysDownNoScrim() {
+        #expect(WristVessel.scrimIntensity(at: 0) == 0)
+        #expect(WristVessel.scrimIntensity(at: -0.1) == 0, "a level below empty is still no water")
+    }
+
+    /// Below full strength the scrim comes on with the water rather than all at once — "only as much
+    /// shade as there is water to hold back", the phone widget's own reasoning. One that switched on
+    /// at the threshold would visibly pop on a pour; one that thinned as the water rose would be the
+    /// ramp run backwards.
+    @Test
+    func theWatchScrimRampsUpWithTheWaterBelowFullStrength() {
+        let full = WristVessel.scrimFullStrengthLevel
+        let ramp = [0.25, 0.5, 0.75].map { WristVessel.scrimIntensity(at: full * $0) }
+        #expect(ramp.allSatisfy { $0 > 0 && $0 < 1 }, "\(ramp) is not a partial scrim below full strength")
+        #expect(zip(ramp, ramp.dropFirst()).allSatisfy { $0 < $1 }, "\(ramp) does not rise with the water")
+    }
+
+    /// The level at which water first reaches the millilitre line is worked out here from the
+    /// vessel's own geometry, not from the code under test: the water sits in a well inset 6pt from
+    /// the rim, its wave peaks `0.02 × diameter` above the mean surface, and the line's lowest ink
+    /// sits `0.2175 × diameter` below the centre — measured off the 46mm render (53.4 of 248 px,
+    /// rounded up), not taken from a font metric. That is 0.203 at the 60pt floor, rising with the
+    /// diameter.
+    ///
+    /// The scrim must be at full strength by then, because the line has no contrast to give back:
+    /// even at full strength it is under 4.5:1 over water across 77% of its width, and only 4.65:1 at
+    /// its best, in the middle (known issue #44). The widget's ramp, `min(1, level * 1.6)`, is
+    /// calibrated to a centred, large-text percentage and would stand at about a third here — this is
+    /// the test that fails if anyone copies it across.
+    @Test(arguments: [60.0, 104, 123, 170])
+    func theWatchScrimIsAtFullStrengthBeforeWaterCanReachTheMillilitreLine(diameter: Double) {
+        let inset = 6.0
+        let crest = 0.02 * diameter
+        let lineBottom = 0.2175 * diameter
+        let waterReachesTheLine = (diameter / 2 - inset - crest - lineBottom) / (diameter - 2 * inset)
+        #expect((0.2...0.25).contains(waterReachesTheLine), "the probe must land where the widget's ramp is still well short of full")
+
+        #expect(WristVessel.scrimIntensity(at: waterReachesTheLine) == 1)
+        #expect(WristVessel.scrimIntensity(at: 0.5) == 1)
+        #expect(WristVessel.scrimIntensity(at: 1) == 1)
+    }
 }
