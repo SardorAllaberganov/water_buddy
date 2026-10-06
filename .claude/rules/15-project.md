@@ -166,5 +166,6 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
 ## Localization
 - `developmentRegion = en`, `knownRegions = (en, ru, uz, Base)`, and
   `LOCALIZATION_PREFERS_STRING_CATALOGS = YES` at project level
-- Adding a language means the catalogue in **both** `WaterBuddy/` and `WaterBuddyWidget/`, plus
-  `knownRegions`, plus `AppLanguage.selectable` (rule `70-privacy`)
+- Adding a language means the catalogue in **all four** of `WaterBuddy/`, `WaterBuddyWidget/`,
+  `WaterBuddyWatch/` and `WaterBuddyWatchWidget/`, plus `knownRegions`, plus `AppLanguage.selectable`
+  (rule `70-privacy`)

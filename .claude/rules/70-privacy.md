@@ -84,12 +84,6 @@ policy rather than a draft, closing that document's own §9.3.
 
 ## Localization
 
-**Known gap, tracked, not fixed here:** this glob widened to `WaterBuddyWatch/**/*.swift`, and every
-string `WristView` draws is currently a hard-coded English literal — none of them route through
-`\.strings`, unlike every rule below. `docs/AI_CONTEXT.md`'s known issue #18 records it. Out of scope
-for this pass; this note exists so the rule does not silently claim compliance the watch does not
-have.
-
 - Route every user-facing string through `@Environment(\.strings)` and
   `bundle.localizedString(forKey:value:table:)`. No view, intent or notification composer may read
   `Bundle.main` for copy
@@ -98,13 +92,18 @@ have.
 - Inject `\.strings` and `\.locale` together at every root — never one without the other
 - The widget takes its language from `entry.snapshot.language`, never `Bundle.main` or the device
   locale
+- The watch takes its language from `WristMirror.languageCode`, through `WristModel.language`,
+  injected at `WristRoot`. `nil` — the phone set to *Follow device* — and the time before the first
+  mirror both resolve the watch's own `Bundle.main`. The complication's `.description` is resolved by
+  WidgetKit and follows the watch's system language
 - The product ships exactly `en`, `ru` and `uz`. Never add a case to `AppLanguage.selectable` without
-  shipping the matching translations in **both** `Localizable.xcstrings` files, and keep
+  shipping the matching translations in **all four** `Localizable.xcstrings` files, and keep
   `knownRegions` in step
-- Keep the two catalogues separate — one in `WaterBuddy/`, one in `WaterBuddyWidget/`. A string
-  catalogue is not shareable through a `membershipExceptions` entry
+- Keep the four catalogues separate — `WaterBuddy/`, `WaterBuddyWidget/`, `WaterBuddyWatch/` and
+  `WaterBuddyWatchWidget/`. A string catalogue is not shareable through a `membershipExceptions` entry
 - Every key in `sharedKeys` must resolve to the identical value in both bundles, in every language.
-  Add any new widget-drawn or widget-filed string to it
+  Add any new widget-drawn or widget-filed string to it. The watch's copies of phone strings are held
+  to the same standard: `LocalizationTests` compares them against the app bundle in every language
 - Give every key an explicit `en` value so a real `en.lproj` is emitted, and keep the
   deliberately-English-only list short and argued
 - Use positional format specifiers (`%1$d`, `%2$@`) in every key, never bare `%d`, and never drop or
@@ -115,6 +114,7 @@ have.
 - Name each language in its own script and untranslated (`English`, `Русский`, `O‘zbekcha`);
   translate only *Follow device*
 - Never read a `.xcstrings` file off disk with `#filePath` in a test — assert against the built
-  bundle via `Bundle.main` and `PlugIns/WaterBuddyWidgetExtension.appex`
+  bundle via `Bundle.main`, `PlugIns/WaterBuddyWidgetExtension.appex`, `Watch/WaterBuddyWatch.app`
+  and its `PlugIns/WaterBuddyWatchWidget.appex`
 - Keep `.configurationDisplayName` and `.description` bare static literals with no interpolation, and
   never name the serving amount there

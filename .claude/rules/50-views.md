@@ -100,8 +100,8 @@ persist anything.
 
 ## Text and strings
 - Resolve every user-visible string through `@Environment(\.strings) private var strings`, injected
-  once at the root from `manager.language` together with `\.locale`. Never `Bundle.main`, and never
-  resolve a string into a `static let`
+  once at the root from `manager.language` — on the watch, `WristModel.language` — together with
+  `\.locale`. Never `Bundle.main`, and never resolve a string into a `static let`
 - Where a SwiftUI convenience initializer cannot carry a bundle, use the closure form
   (`Label { Text("Delete", bundle: strings) } icon: { … }`)
 - Timestamps render through the phone's own 12/24-hour setting

@@ -114,7 +114,7 @@ rather than re-deriving it.
   resolves to exactly one element
 - Treat the labels the UI suite queries as a public surface — renaming one breaks the suite, and that
   is the point
-- Every VoiceOver string resolves through the `strings` environment bundle, and the shared ones go
-  into `sharedKeys` so both bundles are checked (rule `70-privacy`)
+- Every VoiceOver string resolves through the `strings` environment bundle, and the shared ones are
+  listed in `LocalizationTests` so every bundle that draws them is checked (rule `70-privacy`)
 - Never write a probe that queries an element the product deliberately hides, and when verifying at a
   large text size pass a **real** category name (`UICTContentSizeCategoryAccessibilityXXXL`)
