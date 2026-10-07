@@ -201,3 +201,70 @@ enum NotificationManager {
         return outcome
     }
 }
+
+// MARK: - One reconcile at a time
+
+/// Runs reconciles one at a time, in the order they were asked for.
+///
+/// ``NotificationManager/reconcile(_:calendar:strings:using:)`` makes the pending set equal *its*
+/// plan, so of two that overlap, the one that finishes last is the one that stands — whichever was
+/// asked for first. A mutation asks twice: the `refresh()` it starts with plans on the rows from
+/// before it, `recomputeToday()` on the rows after. Started as two `Task`s, which nothing orders,
+/// the older plan could read the pending set after the newer one had dropped a slot from it, and
+/// file that slot again — the one reminder a drink exists to skip. Queued here, the newer plan is
+/// always applied last. `anOlderPlanCannotRefileTheSlotANewerPlanDropped` pins it.
+///
+/// ## Why a stream, rather than a lock or an actor
+///
+/// The one caller, `DataManager.requestReminderReschedule`, is synchronous and `nonisolated`
+/// (rule `43-concurrency`): it can neither `await` its turn nor touch main-actor state.
+/// `AsyncStream.Continuation.yield` is synchronous, safe from any thread, and keeps the order it was
+/// called in, so asking costs the caller nothing and the ordering needs no lock of this file's own.
+/// - An **actor** can only be reached with `await`, so the hook would need a `Task` per call to
+///   reach it — and two `Task`s are unordered, which is the bug again.
+/// - `Mutex` needs iOS 18, and the deployment floor is 17.0.
+/// - `OSAllocatedUnfairLock` would work, but needs `import os` and a lock this file then owns; the
+///   stream needs neither.
+/// - An `NSLock` would make this class `@unchecked Sendable`, a promise the compiler cannot check.
+///
+/// ## The cost, and the lifetime
+///
+/// An operation that never returns now holds up every one asked for after it, until the process
+/// ends; as a `Task` of its own it would have stranded only itself. The one operation production
+/// queues awaits nothing but the notification centre.
+///
+/// One worker task per queue, for as long as the queue lives. Production keeps one for the life of
+/// the app process (`DataManager.reminderReconciles`). `deinit` finishes the stream: work already
+/// asked for still runs, and then the worker ends rather than waiting forever on a queue nobody can
+/// reach — which is what a test's queue would otherwise leave behind.
+///
+/// `nonisolated` stated outright: this file also compiles into the app, whose default isolation is
+/// the main actor, and a queue the `nonisolated` hook could not reach would be no queue at all.
+///
+/// In this file rather than one of its own because `DataManager.swift` names it, and the widget
+/// extension compiles `DataManager.swift`: a file of its own would have to join the widget's
+/// exception set, and rule `40-widget` forbids a seventh.
+nonisolated final class ReconcileQueue: Sendable {
+
+    private let operations: AsyncStream<@Sendable () async -> Void>.Continuation
+
+    init() {
+        let (stream, operations) = AsyncStream<@Sendable () async -> Void>.makeStream()
+        self.operations = operations
+        // The worker. It holds the stream, never `self`, so the queue can still be released.
+        Task {
+            for await operation in stream {
+                await operation()
+            }
+        }
+    }
+
+    deinit {
+        operations.finish()
+    }
+
+    /// Runs `operation` once everything asked for before it has finished.
+    func enqueue(_ operation: @escaping @Sendable () async -> Void) {
+        operations.yield(operation)
+    }
+}

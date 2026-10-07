@@ -1014,13 +1014,12 @@ final class DataManager {
     ///
     /// **The latest drink is the latest this process has read**, taken off ``todaysLogs`` — which
     /// ``recomputeToday()`` republishes from the same fetch just before it reschedules, and
-    /// ``refresh()`` before its own. Not "fresh" in any stronger sense, and three gaps follow:
-    /// - A mutation reschedules twice — once from the `refresh()` it starts with, on the rows from
-    ///   before it, then from `recomputeToday()` — and the production hook files each in its own
-    ///   detached `Task`, unordered. The two plans used to differ only when a serving crossed the
-    ///   goal; now they differ whenever the drink silences a slot, and if the older reconcile reads
-    ///   the pending set after the newer one removed that slot, it files it again: one extra
-    ///   reminder.
+    /// ``refresh()`` before its own. A mutation therefore plans twice — once from the `refresh()` it
+    /// starts with, on the rows from before it, then from `recomputeToday()` — and the two plans
+    /// differ whenever the drink silences a slot or the serving crosses the goal. The production
+    /// hook files them one at a time, in that order (``requestReminderReschedule(_:)``), so the
+    /// older plan can never land after the newer one. Not "fresh" in any stronger sense, and two
+    /// gaps follow:
     /// - A cross-process read can succeed and still miss the other process's newest row (see
     ///   ``republishTodaysLogs()``), so `refresh()`'s backstop can put back a slot a widget tap
     ///   silenced, until a read sees the row. And a failed fetch after ``deleteLog(_:)`` skips the
@@ -1050,27 +1049,45 @@ final class DataManager {
         rescheduleReminders(currentReminderSlots())
     }
 
-    /// The production default for ``init(defaults:modelContainer:calendar:now:reloadWidgets:rescheduleReminders:)``.
+    #if !os(watchOS)
+    /// Every reminder reconcile this process files, one at a time, in the order they were asked for
+    /// — see ``requestReminderReschedule(_:)``.
     ///
-    /// Returns immediately in an extension. A widget process is only guaranteed to live for the span
-    /// of *awaited* work inside `perform()`, so the detached `Task` below would be torn down before
-    /// it finished — `AddWaterIntent` awaits ``NotificationManager/reconcile(_:calendar:strings:using:)``
-    /// directly instead, which is the only place that work can be held open.
+    /// One per process: the hook is `static`, and what has to be ordered is every call it receives.
+    /// `nonisolated` so the `nonisolated` hook can reach it — safe, because a `ReconcileQueue` is
+    /// `Sendable` (rule `43-concurrency`).
+    nonisolated private static let reminderReconciles = ReconcileQueue()
+    #endif
+
+    /// The production default for ``init(defaults:modelContainer:calendar:now:reloadWidgets:rescheduleReminders:publishWrist:)``.
+    ///
+    /// Returns immediately in any process that may not file reminders — the widget extension, and
+    /// both watch roles. A widget process is only guaranteed to live for the span of *awaited* work
+    /// inside `perform()`, so a reconcile queued from here would be torn down before it finished —
+    /// `AddWaterIntent` awaits ``NotificationManager/reconcile(_:calendar:strings:using:)`` directly
+    /// instead, which is the only place that work can be held open.
+    ///
+    /// **Queued on ``reminderReconciles``, never a `Task` per call.** A mutation reschedules twice,
+    /// and a reconcile makes the pending set equal *its* plan, so of two that overlap, the last to
+    /// finish wins. Two `Task`s are unordered: the plan from before a drink could land after the plan
+    /// from after it and file the slot the drink dropped — the one reminder the drink exists to skip.
+    /// The queue runs them one at a time, in the order they were asked for (``ReconcileQueue``).
     ///
     /// `role.mayFileReminders` is already `false` on both watch roles, so the body below never runs
     /// there — but `NotificationManager.swift` is deliberately excluded from the watch target's
-    /// membership exceptions (rule `80-notifications`, Task 9), so `NotificationManager` and
-    /// `ReminderScheduler` are types this file's module does not have on watchOS. The runtime guard
-    /// alone does not stop the compiler from needing those types to exist, so the reference itself —
-    /// not just the call — is compiled out with `#if !os(watchOS)`, the same pattern ``role`` uses.
+    /// membership exceptions (rule `80-notifications`, Task 9), so `NotificationManager`,
+    /// `ReminderScheduler` and `ReconcileQueue` are types this file's module does not have on
+    /// watchOS. The runtime guard alone does not stop the compiler from needing those types to
+    /// exist, so the references themselves — not just the call — are compiled out with
+    /// `#if !os(watchOS)`, the same pattern ``role`` uses.
     nonisolated static func requestReminderReschedule(_ slots: [ReminderPlan.Slot]) {
         guard role.mayFileReminders else { return }
 
         #if !os(watchOS)
         let calendar = Calendar.waterBuddyDay
-        Task {
-            // Built inside the closure: `UNUserNotificationCenter` is not `Sendable` and the
-            // scheduler that wraps it must not cross into the task (rule `43-concurrency`).
+        reminderReconciles.enqueue {
+            // Built inside the operation: `UNUserNotificationCenter` is not `Sendable` and the
+            // scheduler that wraps it must not cross into the queue (rule `43-concurrency`).
             await NotificationManager.reconcile(
                 slots,
                 calendar: calendar,

@@ -111,9 +111,10 @@ struct AddWaterIntent: AppIntent {
         // sure" that rule `20-state` forbids. It is the only place the work can happen at all.
         //
         // A widget extension is guaranteed to live exactly as long as the awaited work inside
-        // `perform()`. The model's production hook spawns a detached `Task`, which in this process
-        // would be torn down before it reached the system, so that hook returns immediately when
-        // `isAppExtension` — leaving this as the one path that can hold the process open.
+        // `perform()`. The model's production hook queues its reconcile for a background task,
+        // which in this process would be torn down before it reached the system, so that hook
+        // returns immediately unless `role.mayFileReminders` — leaving this as the one path that
+        // can hold the process open.
         //
         // The centre reached from here is the **containing app's**: an `.appex` has no notification
         // identity of its own, so `UNUserNotificationCenter.current()` resolves through

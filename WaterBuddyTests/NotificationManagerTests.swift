@@ -75,6 +75,45 @@ private func plan(now: Date = utc(2026, 8, 28, 12), water: Int = 0, horizonDays:
     )
 }
 
+/// A centre two reconciles can reach at the same time.
+///
+/// ``SchedulerSpy`` stays a plain class on purpose: the suite that uses it calls `reconcile` one
+/// pass at a time. ``ReconcileQueueTests`` hands each pass to another task — and against the
+/// one-`Task`-per-call shape the queue replaced, two passes genuinely overlap — so this one keeps
+/// its state behind a lock. `@unchecked` because the lock, not the compiler, is what makes it safe.
+private final class SharedCentre: @unchecked Sendable {
+    private let lock = NSLock()
+    private var pending: [String] = []
+    private var added: [String] = []
+
+    var pendingNow: [String] { lock.withLock { pending } }
+    var addedSoFar: [String] { lock.withLock { added } }
+
+    /// - Parameter readDelay: how long *this* scheduler's read of the pending set takes. It answers
+    ///   with whatever is pending once the delay is over, so a slow read can come back after a later
+    ///   pass has already changed the set — the overtaking this exists to stage.
+    func scheduler(readDelay: Duration = .zero) -> ReminderScheduler {
+        ReminderScheduler(
+            pendingIdentifiers: { [self] in
+                if readDelay > .zero { try? await Task.sleep(for: readDelay) }
+                return lock.withLock { pending }
+            },
+            add: { [self] request in
+                lock.withLock {
+                    added.append(request.identifier)
+                    pending.append(request.identifier)
+                }
+            },
+            removePending: { [self] identifiers in
+                lock.withLock { pending.removeAll { identifiers.contains($0) } }
+            },
+            removeDelivered: { _ in },
+            authorizationStatus: { .authorized },
+            requestAuthorization: { true }
+        )
+    }
+}
+
 // MARK: - Tests
 
 /// Applying a plan to the notification centre.
@@ -212,5 +251,102 @@ struct NotificationManagerTests {
         let carriesAFigure = text.contains { $0.isNumber }
         #expect(!carriesAFigure, "reminder copy must not carry a figure: \(text)")
         #expect(content.interruptionLevel == .active, ".timeSensitive would need an entitlement")
+    }
+}
+
+// MARK: - One reconcile at a time
+
+/// ``ReconcileQueue``: reconciles run one at a time, in the order they were asked for.
+///
+/// Not `@MainActor`, like ``NotificationManagerTests``: the queue's one production caller,
+/// `DataManager.requestReminderReschedule`, is `nonisolated`, so a queue only the main actor could
+/// reach would not compile there — and this suite fails to compile first (rule `43-concurrency`).
+///
+/// **The first `Task.sleep`s in this target, so their job is stated.** Each only gives an operation
+/// asked for *later* the time to overtake one asked for earlier. A queue that keeps call order
+/// spends that time waiting, and nothing it does then can fail an assertion; only the
+/// one-`Task`-per-call shape the queue replaced is exposed by it. The time limit is for a queue that
+/// loses an operation: cancelling the test ends its wait, because an `AsyncStream` stops iterating
+/// when its task is cancelled, so the gate fails in minutes rather than hanging. Minutes, not one:
+/// on Xcode 27 `xcodebuild` reads a time limit as a test timeout and relaunches the host for the
+/// tests after it, so three tests that each time out cost three runs (measured: 647 seconds).
+@Suite(.timeLimit(.minutes(1)))
+struct ReconcileQueueTests {
+
+    @Test func aSlowOperationAskedForFirstStillFinishesFirst() async {
+        let queue = ReconcileQueue()
+        let (finished, finish) = AsyncStream<String>.makeStream()
+
+        queue.enqueue {
+            try? await Task.sleep(for: .milliseconds(100))
+            finish.yield("older")
+        }
+        queue.enqueue { finish.yield("newer") }
+
+        let order = await finished.prefix(2).reduce(into: [String]()) { $0.append($1) }
+        #expect(order == ["older", "newer"])
+    }
+
+    /// Known issue #46, through the real `reconcile`. A mutation plans twice — `refresh()` on the
+    /// rows from before a drink, `recomputeToday()` on the rows after — and a drink at 12:20 drops
+    /// the 13:00 slot. If the older pass reads the pending set after the newer one has removed that
+    /// slot, it files it again: the one reminder the drink was meant to skip.
+    @Test func anOlderPlanCannotRefileTheSlotANewerPlanDropped() async throws {
+        let drink = utcDay.date(from: DateComponents(year: 2026, month: 8, day: 28, hour: 12, minute: 20))!
+        let older = ReminderPlan.slots(
+            enabled: true, currentWater: 0, dailyGoal: 2_000, lastDrink: nil, now: drink, calendar: utcDay
+        )
+        let newer = ReminderPlan.slots(
+            enabled: true, currentWater: 250, dailyGoal: 2_000, lastDrink: drink, now: drink, calendar: utcDay
+        )
+        // Before the drink, the app had already filed the older plan.
+        let centre = SharedCentre()
+        await NotificationManager.reconcile(older, calendar: utcDay, strings: .main, using: centre.scheduler())
+        let filedBeforeTheDrink = centre.addedSoFar
+
+        // Without a slot the drink drops there is nothing to refile, and the expectations below
+        // would pass for any queue at all. Checked through what each plan files rather than off the
+        // slots themselves: a `Slot`'s members are main-actor-isolated in the app target, and this
+        // suite is not.
+        let thirteen = "\(ReminderPlan.identifierPrefix)20260828.13"
+        let newerAlone = SharedCentre()
+        await NotificationManager.reconcile(newer, calendar: utcDay, strings: .main, using: newerAlone.scheduler())
+        try #require(filedBeforeTheDrink.contains(thirteen))
+        try #require(!newerAlone.pendingNow.contains(thirteen))
+
+        let queue = ReconcileQueue()
+        let (finished, finish) = AsyncStream<Void>.makeStream()
+
+        queue.enqueue {
+            await NotificationManager.reconcile(
+                older, calendar: utcDay, strings: .main, using: centre.scheduler(readDelay: .milliseconds(100))
+            )
+            finish.yield()
+        }
+        queue.enqueue {
+            await NotificationManager.reconcile(newer, calendar: utcDay, strings: .main, using: centre.scheduler())
+            finish.yield()
+        }
+        for await _ in finished.prefix(2) {}
+
+        #expect(!centre.pendingNow.contains(thirteen), "the older plan filed the dropped slot again")
+        #expect(centre.addedSoFar.dropFirst(filedBeforeTheDrink.count).isEmpty)
+    }
+
+    /// The worker outlives an empty queue: a reconcile asked for after the last one has finished
+    /// still runs. It cannot fail against the one-`Task`-per-call shape, which had no worker to lose,
+    /// so it is proven by mutation instead.
+    @Test func anOperationAskedForAfterTheQueueWentIdleStillRuns() async {
+        let queue = ReconcileQueue()
+        let (finished, finish) = AsyncStream<String>.makeStream()
+        var arrivals = finished.makeAsyncIterator()
+
+        queue.enqueue { finish.yield("first") }
+        let first = await arrivals.next()
+        #expect(first == "first")
+
+        queue.enqueue { finish.yield("second") }
+        let second = await arrivals.next()
+        #expect(second == "second")
     }
 }
