@@ -5375,3 +5375,196 @@ Written last, from the commands' own output; this file staged once more after th
   export the warning comparison built.
 - **The same five paths left unstaged**, and `Screenshots/census/` still untracked.
 - HEAD is still `05a6998`, 59 commits. No `git commit` was run.
+
+## [2026-10-07] — A serving can be added or fixed at an earlier time or day
+
+### What
+
+Roadmap item 3 (pain #3 in the 2026-10-06 review scan, ~16 mentions: "History edits only today, and
+nothing logs at an earlier time"). The design is
+`docs/superpowers/specs/2026-10-07-earlier-servings-design.md`.
+
+- **The week card picks the day.** Each of its seven days is a button, the day row running the card's
+  full width so every slot clears 44 pt on the narrowest iPhone (`(375 − 2 × 28) / 7 = 45.6`). The shown
+  day carries a lit rim, a bold white letter and `.isSelected`. VoiceOver hears a summary and seven days.
+- **History shows the picked day.** Today reads as before — "Today", `currentWater`, `todaysLogs`; a past
+  day shows its weekday and date, its bar's total, and its servings, which edit and delete as today's do.
+- **A `+` in the header adds a serving.** One sheet, two modes — *Add a serving*, *Edit serving* — with
+  the amount slider and a day · hour · minute wheel bounded by the week and by now. An edit can move a
+  serving to another day; History follows it there.
+- **The model:** `historyLogs` (the window's rows, published from the fetch `history` is summed from,
+  unguarded); `updateLog(_:newAmount:timestamp:)` (`nil` keeps the time; a refused amount refuses the
+  whole edit; nothing changed, nothing happens); `historyWindowStart(endingOn:calendar:)`, the one
+  definition of where the week starts; `correctionRange()`, what the wheel offers;
+  `suggestedTime(onDay:)`, where it opens; `dayOrdinal(for:)` no longer `private`.
+- **Strings:** *Add a serving*, *When*, *Nothing logged that day*, *Tap + to add a serving you forgot.*
+  in en/ru/uz, app catalogue only; *Logged at %1$@* removed with the line that drew it.
+- **DocC** brought into line on `updateLog`, `republishHistory()` (closing known issue #16),
+  `DaySummary.date`, `HistoryView`, `HistoryCard` and the sheet.
+
+### The rulings this rests on
+
+- **The owner's roadmap**, approved 2026-10-06 to be worked in order.
+- **This design, approved in conversation on 2026-10-07**: the reach is the visible week; one route,
+  from History; one day · hour · minute wheel — then "all ok go implementation".
+- **The store keeps accepting any instant.** `fetchLogsForTodayExcludesOtherDays` logs a serving dated
+  tomorrow through `addLog`; rejecting future instants there would have hollowed it. The bound is what
+  the sheet *offers*, as amounts already were.
+- **Two departures from the approved text**, stated in the spec: the copy says *serving*, the word every
+  existing History string uses, not *drink*; and the wheel spans its card's full width.
+
+### Files touched
+
+Modified:
+- `WaterBuddy/DataManager.swift` (2406 → 2499)
+- `WaterBuddy/HistoryView.swift` (672 → 947)
+- `WaterBuddy/Localizable.xcstrings` (58 → 61 keys)
+- `WaterBuddyUITests/GoalSetupUITests.swift` (245 → 316)
+
+New:
+- `WaterBuddyTests/EarlierServingTests.swift` (429)
+- `docs/superpowers/specs/2026-10-07-earlier-servings-design.md`
+
+Unchanged: no key, wire field, stored byte, schema, project file, entitlement, exception set, widget
+view tree, notification string or rule.
+
+### Verification
+
+- **RED on seams that compiled:** 27 ran, 19 failed, each on its own expectation. **The other eight, by
+  mutation**, in three runs: `updateLog` defaulting a missing time to `now()`, applying the time before
+  the amount guard and losing its nothing-changed guard, `addLog` ringing the doorbell, and
+  `selection(forDay:in:)` never clearing — exactly the five predicted new tests failed, with the existing
+  `loggingRingsTheWidgetDoorbellExactlyOnce` and `mutationsRingTheWidgetDoorbellAndNoOpRefreshesDoNot`;
+  then `updateLog` re-inserting under a new id, and re-filing the applied ledger under the new day, each
+  failing its one watch test. Restored from saved copies, `cmp`-identical; no marker left (grep).
+- **The two UI tests were written after the view**, so their RED was taken against a `git archive HEAD`
+  export with only the test file swapped in: both failed.
+- **GREEN:** `✔ Test run with 27 tests in 6 suites passed`, then the whole phone suite.
+- **The gate**, all five, foreground, Xcode 27.0, commands as rule `85-testing` writes them —
+  `xcrun simctl shutdown all` skipped, because an iPhone 18 Pro this session had not booted was running:
+  - `✔ Test run with 358 tests in 41 suites passed`
+  - `Executed 26 tests, with 0 failures`, on a second run. The first was refused launch —
+    `Busy ("Application failed preflight checks")`, no test executed (#57's shape).
+  - `✔ Test run with 57 tests in 6 suites passed`
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`) — it compiled the changed `DataManager.swift`
+    for all four targets
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWatchWidget`)
+- **Warnings: none new.** `git archive HEAD` (`cd09663`) against the same export plus only the change's
+  five files, one empty DerivedData per side. Named destinations, all four schemes: identical per build,
+  per file and message, and per location count. Generic destination, the `WaterBuddy` build-for-testing:
+  31 unique lines and 80 occurrences shipping, 6 and 12 tests, both sides. The named run's 44 and 6 are
+  one architecture's worth: a generic destination builds `arm64` and `x86_64` — shown by building HEAD
+  both ways.
+- **On the simulator** — iPhone 17 and iPhone 17e, screenshots from a throwaway XCUITest probe, deleted
+  afterwards: English, Russian, Uzbek, `AccessibilityXXXL`. **Two layout bugs found and fixed** before the
+  gate — the wheel widening the sheet past the screen, and the day row compressing at
+  `AccessibilityXXXL`. Contrast read off the renders clears every floor but one; figures in
+  `docs/DESIGN.md`.
+- **Not run:** the Home Screen widget and the watch face — no storage, entitlement, membership or widget
+  view tree changed — and the 12-hour wheel an explicitly chosen English is inferred to draw.
+
+### Found along the way
+
+- **The wheel's neighbouring rows measure 2.43–2.80:1**, under the 4.5:1 text floor; the row being set
+  measures 5.47:1. UIKit's styling, which no public API changes — known issue **#59**, the owner's call.
+- **The sheet's *Cancel* and *Save* overflow at `AccessibilityXXXL`** — pre-existing, carried from
+  `EditServingSheet` unchanged; **#60**, deferred to its own change.
+- **HEAD's week card resolved two accessibility elements labelled *Last 7 days***, where the old test
+  queried `otherElements` and counted one; only the swap-in RED run showed it.
+- **`STATE.md`'s "the week card is its only consumer"** of `history` was already loose before this change:
+  `HistoryView`'s own `hasSomethingToShow` reads it.
+
+## [2026-10-07] — `/doc_sync`: the thirty-fourth pass, after earlier servings
+
+### What changed
+
+- **`docs/AI_CONTEXT.md`:**
+  - the thirty-fourth pass header, with the thirty-third retained;
+  - the targets table's phone counts (358/41 unit; 13 declared, 26 executed UI);
+  - three stale line counts and the new `EarlierServingTests.swift` row;
+  - this pass's gate block, with the complication pass's retained;
+  - #16 retired; #59 and #60 opened;
+  - the Git section, re-derived — including its account of `.claude/settings.json`, which said
+    `git push` moved to *allow* where the diff moves `git commit` and `git init`.
+- **`docs/STATE.md`:** the twenty-first pass header; a `historyLogs` section beside `history`; `history`'s
+  consumers, already loose before this change; *Tests that pin this*, re-counted per suite to 199 in
+  seventeen suites.
+- **`docs/DESIGN.md`:** seven figures measured off the renders, one of them under its floor (#59), and
+  how they were taken.
+- **`tasks/lessons.md`:** six entries — a control that will not shrink, a tap-target floor that let a
+  row compress, warning occurrences that depend on the destination, a UI test's late RED, a contrast
+  sample that read a stroke, and renders taken without a product hook.
+- **The spec's** status line, its two departures from the approved text, the simulator's result, one
+  §9 claim softened to what was inferred, and §3.2's VoiceOver line brought into line with the code.
+
+### Checked and already accurate
+
+- **`docs/WIDGET.md`:** the widget's contract — nothing in it moved.
+- **`CLAUDE.md`:** it names no History surface and no `updateLog`; the six shared files, the keys and
+  the storage table all still hold.
+
+### Checks run
+
+- `find` over the seven target folders: 55 `.swift` files, one undocumented — the new test file.
+- A script comparing all 57 documented line counts with the files: 3 stale, exactly the three existing
+  files the change touched.
+- `@Test` attribute counts: 358 phone, 57 watch; 13 UI `func test`. Per suite, by line range: the first
+  eleven of *Tests that pin this* still 172, the six new 27.
+- The three exception sets: unchanged. `Key.all`: eleven keys.
+- Every `` rule `nn-name` `` cited in `CLAUDE.md`, `docs/`, `tasks/`, the app, the widget and both phone
+  test targets resolves to a file in `.claude/rules/`.
+
+### Staging
+
+Written last, from the commands' own output; this file and `docs/AI_CONTEXT.md` staged once more after
+these lines:
+
+- **11 paths staged by explicit path:** the four code and string files, the new test file, the spec,
+  `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/DESIGN.md`, `tasks/lessons.md` and this file. Each of the
+  five code and string files is byte-identical (`cmp`) to the export the warning comparison built.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- **The rule wording in the spec's §5 is not written**: rules change only when the owner decides.
+- HEAD is `cd09663`, 62 commits. No `git commit` was run.
+
+## [2026-10-07] — The owner's three rulings on the earlier-servings follow-ups
+
+### What
+
+Asked after the change was staged, the owner ruled on all three follow-ups it raised:
+
+1. **The spec's §5 rule wording — written.** `20-state` names `updateLog(_:newAmount:timestamp:)` in the
+   mutation surface and `historyLogs` beside `todaysLogs` (get-only, no equality guard); `30-rollover`'s
+   parenthetical names the new `updateLog`, and *Day bounds* gains `historyWindowStart(endingOn:calendar:)`
+   as the single definition of where the window starts; `50-views` lets a view read `historyLogs` for a
+   past day; `65-accessibility` records the week card's shape — one summary, one button per day,
+   `.isSelected` on the shown one. Staged on its own paths, so `/commit` can make it its own change.
+2. **Known issue #59 — accepted** as the system control's styling: the wheel's neighbouring rows stay at
+   2.43–2.80:1. Recorded in the code comment beside the wheel, `docs/AI_CONTEXT.md`, `docs/DESIGN.md` and
+   the spec; #59 stays open as a record, not as work.
+3. **Known issue #60 — fixed, verified, and held out of the tree.** On both of the sheet's labels:
+   `.lineLimit(1)`, `.minimumScaleFactor(0.4)` and `.padding(.horizontal, 12)`. Rendered at
+   `AccessibilityXXXL` in English and Uzbek, all four labels sit inside their capsules, clear of the
+   curved ends. The first attempt — 0.5 with no clearance — fit edge to edge, and 0.5 with the clearance
+   would have truncated *Bekor qilish*. The fix shares `HistoryView.swift` with the staged feature and
+   `/commit` commits whole files, so it was saved as a patch, the file restored to its staged version, and
+   the patch checked to apply cleanly; it lands as its own change once the feature is committed.
+
+### Verification
+
+- `✔ Test run with 358 tests in 41 suites passed`, re-run on the final staged tree — after the #59
+  comment, the only change to compiled sources since the gate.
+- The #60 renders came from a throwaway probe test, deleted afterwards; `grep` finds none left.
+
+### Staging
+
+Supersedes the previous checkpoint's staging block — 11 paths there, 15 now — and its "byte-identical"
+claim, which no longer holds for `HistoryView.swift`. Written last, from the commands' own output; this
+file staged once more after these lines:
+
+- **15 paths staged by explicit path:** the previous checkpoint's 11 and the four rule files. Four of the
+  five code and string files are byte-identical (`cmp`) to the export the warning comparison built;
+  `HistoryView.swift` differs by the one #59 comment.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked. **Held out:** the #60 fix.
+- HEAD is `cd09663`, 62 commits. No `git commit` was run.

@@ -4,7 +4,14 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-07 (twentieth pass — `/doc_sync` after roadmap item 2, the complication kept
+**Last updated:** 2026-10-07 (twenty-first pass — `/doc_sync` after roadmap item 3, a serving added or
+fixed at an earlier time or day (`docs/superpowers/specs/2026-10-07-earlier-servings-design.md`). **No
+key added, removed or renamed**: still **eleven**, re-derived from `DataManager.Key`, and no schema
+change — `WaterLog.timestamp` was already a `var`. What changed is derived state: a sixth observed
+property, `historyLogs`, the window's rows from the fetch `history` is summed from; one definition of
+where the window starts; and `updateLog` taking a time, which can move a serving's water between two
+days — all under *`historyLogs`* below. *Tests that pin this* gains the change's six suites:
+seventeen, 199 `@Test`, counted per suite. Previously: twentieth pass — `/doc_sync` after roadmap item 2, the complication kept
 current (`docs/superpowers/specs/2026-10-07-complication-current-design.md`). **No key added, removed
 or renamed**: still **eleven**, re-derived from `DataManager.Key`. The JSON `WristMirror` stored under
 `Key.wristMirror` keeps its shape — `composedAt` became a `var` in Swift, which changes no byte on the
@@ -336,7 +343,10 @@ can be wrong without throwing.
 ### `history` — the same shape, one store read wider
 
 `history` is a fifth observed property: `[DaySummary]`, the last `DataManager.historyWindow` (7)
-local days, oldest first, today last. `HistoryView`'s week card is its only consumer. It **stores
+local days, oldest first, today last. `HistoryView` is its only consumer — the week card, whether
+the card is drawn at all, and since 2026-10-07 the header's total for a past day and which day is
+shown. *(Until then this read "the week card is its only consumer", which `HistoryView`'s own
+`hasSomethingToShow` already contradicted.)* It **stores
 nothing** — no eighth key, no schema change, no column on `WaterLog` — and is recomputed from the
 rows on every republish, so it belongs to this document only as *derived* state.
 
@@ -377,6 +387,39 @@ scalar overwritten in place, and `SettingsView.GoalCard` lets the user move it a
 `DaySummary` deliberately carries **no `goal` field**: today's figure stamped onto seven days would
 look like a record of something the store cannot know. The card compares against the current goal
 and discloses that it does.
+
+### `historyLogs` — the window's rows, from the same fetch
+
+`historyLogs` is a sixth observed property: `[Int: [WaterLog]]`, the window's servings keyed by day
+ordinal, newest first within each day, a day with none having no key. History lists a past day from
+it. It is published by `republishHistory()` **from the fetch `history` is summed from**, so a bar
+and the list under it are one reading of the store — the reason `recomputeToday()` publishes today's
+rows and total from one fetch.
+
+- **No equality guard**, for `todaysLogs`' reason: a `[WaterLog]` compares by `persistentModelID`.
+  It is published *before* the series' guard returns, because a serving re-timed inside a past day
+  moves no total — `history` compares equal and stays put — while that day's rows reorder. Pinned by
+  `retimingAServingWithinAPastDayRepublishesItsRows`.
+- **App-only**, under the same `role.drawsHistory` guard; the widget extension never builds it.
+- **Stores nothing.** Like `history`, it is derived on every republish.
+
+The window's start has one definition: `DataManager.historyWindowStart(endingOn:calendar:)`, beside
+`nextDayBoundary(after:calendar:)`, stepped in calendar days — never 86,400 seconds, which lands an
+hour off midnight across a DST change (`theWindowsOpeningWalksCalendarDaysAcrossTheEndOfDaylightTime`).
+The bars' fetch and History's sheet both call it. The sheet's wheel offers
+`correctionRange()` — that start up to `now()` — and that range is an **offer, not a floor**: `addLog`
+and `updateLog` accept any instant, as they accept any positive amount while the editor offers 50–1,000
+ml. `fetchLogsForTodayExcludesOtherDays` logs a serving dated tomorrow through `addLog`, and rejecting
+future instants there would have left it green while it tested nothing.
+
+`updateLog(_:newAmount:timestamp:)` corrects an amount, a time, or both, in one save; `timestamp: nil`
+keeps the time. Moving a serving across midnight moves its water between two days, and
+`saveAndRecompute()` follows it: today's total is re-derived through the `currentWater` setter, so the
+cache key, the widget doorbell and the wrist publish move **only if today's total did** — a serving
+added to or re-timed inside a past day wakes nothing (`aServingBackdatedIntoYesterdayRingsNoWidgetDoorbell`,
+`aMoveAcrossMidnightRingsTheWidgetDoorbellOnce`). A watch pour can be re-timed safely: the applied
+ledger is keyed by the pour's own `at`, which a resend repeats, and the existence check finds the row
+by `id` wherever its time moved (`aRetimedWatchPourStaysDeletedWhenTheWatchResendsIt`).
 
 ## The sixth key, and the seam that reads it
 
@@ -691,7 +734,7 @@ A `body` that computes a displayed figure for itself is how the two start disagr
 
 ## Tests that pin this
 
-Eleven suites, 172 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
+Seventeen suites, 199 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
 `ReminderSeamTests` (68 between them) cover the write path, the rollover, observation, the goal and
 the reminder seam; `WaterSnapshotTests` (28) covers the read path, the day boundary and the
 migration; `WaterLogStoreTests` (23) covers the log CRUD, the published rows and the seed migration;
@@ -699,8 +742,13 @@ migration; `WaterLogStoreTests` (23) covers the log CRUD, the published rows and
 `NotificationManagerTests` (10) pins what happens to the plan, and `ReconcileQueueTests` (3) the
 order plans are applied in; `HomeServingTests` (7) pins the quick-add row, `AppTabTests` (6) the tab
 menu, and `HistoryServingTests` (5) the serving editor's offered range and its own fixture's
-reminder seam. *(Counted per suite by line range on 2026-10-06. Until then this read 151 — its own
-figures summed to 152 — while the tree held 160. 2026-10-07: +3, the new `ReconcileQueueTests`.)*
+reminder seam. `HistoryLogsTests` (3), `RetimingTests` (10), `HistoryWindowStartTests` (2),
+`CorrectionRangeTests` (5) and `RetimedPourTests` (2) pin the window's published rows, re-timing a
+serving, where the window starts, what the History sheet offers and where it opens, and a re-timed
+watch pour; `HistorySelectionTests` (5) the screen's day selection. *(Counted per suite by line range
+on 2026-10-06. Until then this read 151 — its own figures summed to 152 — while the tree held 160.
+2026-10-07: +3, the new `ReconcileQueueTests`; then +27, the six suites of the earlier-servings
+change, re-counted per suite — the first eleven still sum to 172.)*
 
 Named cases worth knowing: `travellingWestwardDoesNotWipeTheDay`,
 `travellingEastwardAcrossTheDateStartsANewDay`, `theDayBoundaryHoldsAcrossADstTransition`,

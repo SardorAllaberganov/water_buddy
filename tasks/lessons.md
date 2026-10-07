@@ -2148,3 +2148,68 @@ would be. Both stay as written above, superseded here; `docs/AI_CONTEXT.md` is c
 
 **The rule:** when a record already states a fact exactly, carry its wording forward rather than a
 summary of it. Every paraphrase is a fresh claim, and needs checking again.
+
+## 2026-10-07 — A control that will not shrink widens everything above it
+
+The serving sheet's first build put a `.wheel` `DatePicker` inside a card with a 24-pt inset. Every
+test was green; the render showed the card, the title and both buttons pushed past the screen's right
+edge. The wheel's natural width is more than the inset leaves, it reports that width whatever it is
+offered, and the stack around it took the widest child's width.
+
+`.frame(maxWidth: .infinity)` does not cap it: with no `minWidth`, a flexible frame's lower bound is
+its child's own size. `.frame(minWidth: 0, maxWidth: .infinity)` reports the offered width instead.
+
+**The rule:** a UIKit-backed control in a padded stack gets `minWidth: 0` on its frame, and its first
+check is a render at the narrowest width shipped. No unit test can see a layout.
+
+## 2026-10-07 — A tap-target floor can make a rigid row compressible
+
+The week card's bars used to sit in a `.frame(height: barHeight)`. When each day became a button, the
+slot took `.frame(maxWidth: .infinity, minHeight: 44)` — the 44-pt floor rule `65-accessibility` asks
+for. At `AccessibilityXXXL` the card is squeezed above the `List`, and the slot gave way down to 44:
+its content, drawn at full size inside a smaller frame, sent the bars up through the title and the
+weekday letters down into the figures.
+
+**The rule:** a `minHeight` is a floor, not a height. Where a row was rigid before, keep it rigid —
+`.fixedSize(horizontal: false, vertical: true)` — and render the largest text size before the gate.
+
+## 2026-10-07 — Warning occurrences depend on the destination's architectures
+
+This pass counted 44 and 6 primary warning occurrences in the `WaterBuddy` build-for-testing where
+every recent pass recorded 80 and 12, for the same code. A clean HEAD build with a *generic* simulator
+destination gave 80 and 12 again: it compiles `arm64` and `x86_64` separately, and prints each warning
+once per architecture. A named destination builds one. The unique counts, 31 and 6, agree either way.
+
+**The rule:** compare occurrence counts only between builds made with the same destination, and say
+which in the record. Unique lines are the figure that survives a change of method.
+
+## 2026-10-07 — A UI test written after the view still owes its RED
+
+The two new History UI tests were written after the view, and first seen green — which proves
+nothing. Their RED came from a `git archive HEAD` export with only the new test file swapped in:
+both failed, one on a missing button and one on HEAD's two-element card summary, a shape nobody had
+predicted.
+
+**The rule:** when a UI test lands after its view, run it against the old code before trusting it.
+Swapping one test file into a HEAD export costs a minute.
+
+## 2026-10-07 — A contrast sample beside a rounded stroke reads the stroke
+
+The shown day's letter first measured 4.84:1 — passing, but low. The sample square had caught the
+rim's curve near the slot's foot, so the "pane" was partly a 0.55-white stroke. Four samples clear of
+both stroke and glyph read 7.36–7.54:1.
+
+**The rule:** sample a pane at several points away from every edge and glyph, and distrust a single
+figure that is surprisingly close to a floor in either direction.
+
+## 2026-10-07 — Renders without a product hook: a throwaway probe and `xcresulttool`
+
+Contrast and layout needed real renders of History's new states — a past day, the sheets, Russian,
+Uzbek, `AccessibilityXXXL` — and nothing in the product can open them by argument. A UI test that
+navigates, attaches `XCUIScreen` shots with `.keepAlways`, and runs with `-resultBundlePath` gives
+them; `xcrun xcresulttool export attachments` writes the PNGs out. `-AppleLanguages`, `-AppleLocale`
+and `-UIPreferredContentSizeCategoryName` change no stored setting. The probe file was deleted
+before anything was staged.
+
+**The rule:** prefer a deleted probe test to a debug hook in the product. Check `git status` after
+deleting it — a file in a synchronized folder joins its target the moment it exists.

@@ -7,7 +7,7 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-06 (the watch vessel's own scrim ramp — known issue #35 — and two watch figures measured off renders, one of them a pre-existing failure now recorded as known issue #44)
+**Last updated:** 2026-10-07 (History's day picker and serving sheet: seven figures measured off renders, one of them — the wheel's neighbouring rows — under the floor and recorded as known issue #59). Previously 2026-10-06 (the watch vessel's own scrim ramp — known issue #35 — and two watch figures measured off renders, one of them a pre-existing failure now recorded as known issue #44)
 
 ---
 
@@ -250,6 +250,13 @@ calibrates its ramp to where its own text sits.
 | White @ 0.45 on the week card's pane | **3.26:1** | The goal reference line — non-text, 3:1. |
 | `Aurora.cyan` on the week card's pane | **5.22:1** | The bar fill — non-text, 3:1. |
 | `Aurora.blue` on the week card's pane | **2.72:1** | **Under the 3:1 floor**, which is why the bars are a solid cyan and not the `Aurora.blue` → `Aurora.cyan` gradient they were first drawn with. Below `t ≈ 0.15` along that gradient the fill fails, and a nearly-empty day is drawn almost entirely in that end. |
+| White @ 0.72 on the week card's pane, the full-width day row | **5.43:1** | The weekday letters, re-measured 2026-10-07 once the days became full-width buttons; pane sRGB `(0.208, 0.296, 0.444)` at the letters. Still clear of 4.5:1, a shade under the first layout's 5.70:1. |
+| White inside the shown day's rim | **7.4:1** | The shown day's letter, full white and bold; pane inside the rim sRGB `(0.258, 0.343, 0.440)`. A first sample taken at the rim's curve read the stroke as ground and gave 4.84:1 — resampled at four points clear of both stroke and glyph, 7.36–7.54:1. |
+| White @ 0.55, the shown day's 1pt rim | **4.15:1** rendered, **4.16:1** derived | Non-text, 3:1. Pane beside it sRGB `(0.188, 0.277, 0.390)`. It carries the selection with the letter's weight and `.isSelected`, never colour alone. |
+| White on History's `+` | **11.69:1** | The glyph; the circle's glass sRGB `(0.192, 0.210, 0.354)`. |
+| White / white @ 0.70 on the empty past-day pane | **8.03:1** / **5.24:1** | *Nothing logged that day* and *Tap + to add a serving you forgot.* |
+| The serving sheet's wheel, the row being set | **5.47:1** | System-drawn (`UIDatePicker`, `.wheel`), so read off its brightest glyph pixel against its band, sRGB `(0.292, 0.259, 0.404)`. |
+| The serving sheet's wheel, the rows around it | **2.43–2.80:1** | **Under the 4.5:1 floor — known issue #59, accepted by the owner on 2026-10-07 as the system control's styling.** UIKit draws them in a dimmed grey that assumes a near-black backdrop, and no public API recolours them. Switching the card to `.opaque` adds scrim and tint together, and is estimated — not measured — to darken it too little to help. |
 | White @ 0.70 on the **Settings** cards' pane | **5.50:1** | `ServingsCard`'s *"The middle vessel is the one your widget logs."* The figure was first *borrowed* from the week card's measurement and only verified afterwards — see the note below, because borrowing it was not sound and it happened to hold. |
 | White @ 0.75 on the Settings cards' pane | **6.04:1** | The vessel names and their millilitre readouts. |
 | `Aurora.cyan` on the Settings cards' pane | **5.26:1** | The vessel glyphs and the slider tint — non-text, 3:1. Comfortably clear here, unlike the same colour on the tab bar's lighter pane at 4.34:1. |
@@ -292,6 +299,14 @@ because the aurora is lighter under the bottom of the card — and every ratio w
 the **lighter** of the two, which is the worst case for white ink. Sampling only the top would have
 reported the disclosure line at a passing figure. The card sits at `.frosted`/`.raised`, the same
 pair as `HistoryView`'s empty state.
+
+**The 2026-10-07 figures were read off XCUITest screenshots** of the iPhone 17 simulator (iOS 26.5),
+taken by a throwaway probe test that attached them and was deleted afterwards, and exported with
+`xcrun xcresulttool export attachments` — no product hook. White-ink figures are computed against
+the pane sampled beside the mark, as above; the wheel's, being system-drawn, against its own
+brightest glyph pixel. The day row's geometry behind them: seven equal slots across the card's full
+width — `(375 − 2 × 28) / 7 = 45.6` pt on the narrowest supported iPhone, 49.4 pt on the iPhone 17 —
+each bar `barInset` (8 pt) in from its slot, so 16 pt between bars and 8 pt from the card's edge.
 
 ## Type sizing
 

@@ -4,6 +4,35 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-07 (thirty-fourth pass — `/doc_sync` after **roadmap item 3: a serving added
+or fixed at an earlier time or day**, owner-approved:
+`docs/superpowers/specs/2026-10-07-earlier-servings-design.md`. History's week card now picks the day:
+seven full-width buttons, the shown day outlined and announced as selected. The header and the list
+follow it — today exactly as before, a past day from `historyLogs`, the window's rows published from
+the fetch `history` is summed from. A `+` in the header opens one sheet, *Add a serving* or *Edit
+serving*, whose day · hour · minute wheel is bounded by the week and by now. `updateLog` takes a time,
+so an edit can move a serving's water between two days, and the widget and the watch hear of it only
+when today's total moves. **This sync's own drift:** 3 of 57 line counts (exactly the three existing
+files the change touched); one undocumented file, the new `EarlierServingTests.swift`; both phone test
+counts in the targets table; `docs/STATE.md`'s "the week card is its only consumer" of `history`,
+loose before this change; and the Git section's account of `.claude/settings.json`, which said
+`git push` moved to *allow* where the diff moves `git commit` and `git init` and leaves `git push`
+under *ask*. Known issue **#16 retired** — the change rewrote the DocC it named — and **#59 and #60
+opened**: the wheel's neighbouring rows under the text floor, and the sheet's buttons overflowing at
+`AccessibilityXXXL`, pre-existing. The owner then ruled on all three follow-ups the same day: #59
+**accepted** as the system control's styling; the spec's §5 rule wording **written** (`20-state`,
+`30-rollover`, `50-views`, `65-accessibility`); and #60 **fixed**, verified, and held for its own
+commit. Gate re-run in full this session, without `xcrun simctl shutdown
+all` (a simulator this session had not booted was running): **358**/41 phone unit, **26** phone UI (on
+a second run — the first was refused launch, #57's shape), **57**/6 watch unit, both widget builds
+green. No new warning, by named and by generic destinations; the generic one gives the documented 31/80
+and 6/12, the named one 44/6, because a generic destination builds two architectures. `docs/DESIGN.md`
+gains seven measured figures. `docs/WIDGET.md` and `CLAUDE.md` were checked and deliberately not
+touched: the widget and nothing `CLAUDE.md` states have changed.)
+
+<details>
+<summary>Thirty-third pass — 2026-10-07, re-verified three times the same day, retained</summary>
+
 **Last updated:** 2026-10-07 (thirty-third pass, **re-verified by three further `/doc_sync` runs the
 same day**. The fourth re-derived every probe — all current — and tightened three of the third's
 phrases in place: a check pinned only by the run after it is not "bracketed"; the probe shows that
@@ -57,6 +86,8 @@ across all four schemes — and in the `WaterBuddy` build-for-testing, the basel
 unique lines and 80 occurrences on the shipping targets, 6 and 12 on the test targets.
 `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md` were checked and deliberately not touched: the
 phone widget, the tokens and nothing `CLAUDE.md` states has changed.)
+
+</details>
 
 <details>
 <summary>Thirty-second pass — 2026-10-07, re-verified the same day, retained</summary>
@@ -380,8 +411,8 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 331 `@Test` functions in 35 suites |
-| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 358 `@Test` functions in 41 suites |
+| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (8 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **13 declared, 26 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
 | `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 57 `@Test` functions in 6 suites |
@@ -468,10 +499,10 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2406   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face on iOS, its wait for delivery on watchOS
+WaterBuddy/DataManager.swift                    2499   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face on iOS, its wait for delivery on watchOS
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
-WaterBuddy/HistoryView.swift                     672   app only — the week card, today's log, swipe-to-delete, the serving editor
+WaterBuddy/HistoryView.swift                     947   app only — the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
 WaterBuddy/HomeView.swift                        379   app only — the vessel, the editable quick-add row, the goal burst (vesselSlots moved out, Task 14)
 WaterBuddy/LiquidGlassModifier.swift             501   shared — design tokens + the glass modifier
 WaterBuddy/NotificationManager.swift             270   shared — ReminderScheduler + reconcile, the only UN caller; ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46)
@@ -488,6 +519,7 @@ WaterBuddyTests/AppLanguageTests.swift           112   AppLanguageTests — the 
 WaterBuddyTests/AuroraBackgroundTests.swift       98   AuroraLightTests — the backdrop's lights
 WaterBuddyTests/CelebrationTests.swift           108   HapticLadderTests + ConfettiTests
 WaterBuddyTests/DataManagerTests.swift          1265   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + LanguageSeamTests
+WaterBuddyTests/EarlierServingTests.swift        429   HistoryLogsTests + RetimingTests + HistoryWindowStartTests (not @MainActor) + CorrectionRangeTests + RetimedPourTests + HistorySelectionTests (not @MainActor) — the window's published rows, re-timing a serving, where the week starts, what the sheet offers and where it opens, a watch pour re-timed, the screen's day selection
 WaterBuddyTests/HistoryRangeTests.swift          439   DaySummaryTests (pure, not @MainActor) + HistoryWindowTests
 WaterBuddyTests/HistoryViewTests.swift           132   HistoryServingTests — the editor's offered range, and the fixture's own tripwire
 WaterBuddyTests/HomeViewTests.swift              180   HomeServingTests — the quick-add row's offered vessels
@@ -501,7 +533,7 @@ WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — on
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WristSyncTests.swift             889   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests
 WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set and the 25-shot full census
-WaterBuddyUITests/GoalSetupUITests.swift         245   setup, the a11y tree, the tab swap, the Settings tab, the week card
+WaterBuddyUITests/GoalSetupUITests.swift         316   setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving added to yesterday
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            139   writes: runs DataManager in the extension
@@ -522,13 +554,14 @@ WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 95   .accessoryCircular percen
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**54 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
-the thirty-third pass with `find` over all seven and a two-way comparison against this file: no
-phantom row, and one undocumented file — the change's new `WristLinkDeliveryTests.swift`, now listed.
-The 56 line counts already here (53 files and the three Swift scripts below) were re-checked against
-`wc -l`: 6 were stale — exactly the six files the change touched — and 50 current; the new file's
-count was taken the same way, making 57. *(The thirty-second pass found 4 stale of 56, the
-thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the twenty-eighth 7 of 55 on 2026-10-05.)*
+**55 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
+the thirty-fourth pass with `find` over all seven and a two-way comparison against this file: no
+phantom row, and one undocumented file — the change's new `EarlierServingTests.swift`, now listed.
+The 57 line counts already here (54 files and the three Swift scripts below) were re-checked against
+`wc -l` by a script: 3 were stale — exactly the three existing files the change touched — and 54
+current; the new file's count was taken the same way, making 58. *(The thirty-third pass found 6
+stale of 56, the thirty-second 4, the thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the
+twenty-eighth 7 of 55 on 2026-10-05.)*
 
 ### Outside every target
 
@@ -737,6 +770,61 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five re-run 2026-10-07, on Xcode 27.0, after roadmap item 3: a serving added or fixed at
+an earlier time or day** (the thirty-fourth pass). Foreground, `-parallel-testing-enabled NO`, the
+commands exactly as rule `85-testing` writes them — **except `xcrun simctl shutdown all`, skipped**: no
+other `xcodebuild` was running, but an iPhone 18 Pro (iOS 27.0) this session had not booted was, and
+shutting it down could have ended someone else's work. The phone UI-test run was **refused launch** the
+first time, as #57's was, and run again.
+
+| Command | Result |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 358 tests in 41 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `** TEST SUCCEEDED **` — `Executed 26 tests, with 0 failures`, on the second run. The first: `Busy ("Application failed preflight checks")`, no test executed |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` — it compiled the changed `DataManager.swift` for all four targets |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+
+**Twenty-seven new unit tests in six new suites, and two UI tests.** `HistoryLogsTests` (3),
+`RetimingTests` (10), `HistoryWindowStartTests` (2, not `@MainActor`), `CorrectionRangeTests` (5),
+`RetimedPourTests` (2) and `HistorySelectionTests` (5, not `@MainActor`), in the new
+`EarlierServingTests.swift`. **RED on seams that compiled:** all 27 ran and 19 failed, each on its own
+expectation. **The other eight, by mutation.** One run mutated `updateLog` (a missing time defaulting to
+`now()`, the time applied before the amount guard, the nothing-changed guard removed), made `addLog`
+ring the doorbell, and stopped `selection(forDay:in:)` clearing: exactly the five predicted new tests
+failed, with the existing `loggingRingsTheWidgetDoorbellExactlyOnce` and
+`mutationsRingTheWidgetDoorbellAndNoOpRefreshesDoNot`. Two more runs had `updateLog` re-insert the
+serving under a new id, and re-file the applied ledger under the new day: each failed its one watch
+test. The fixture guard passes by design. The files were restored from saved copies, `cmp`-identical,
+no marker left. **UI:** `testTheWeekCardIsOneSummaryAndOneButtonPerDay` replaces
+`testLoggingAServingRevealsTheWeekCardAsOneElement` — the card is one summary plus exactly one button
+per day now — and `testAServingAddedToYesterdayShowsUnderYesterday` is new. Both were written after the
+view, so their RED was taken against a `git archive HEAD` export with only the test file swapped in:
+the first failed on the summary (HEAD resolves *two* elements labelled *Last 7 days*), the second on
+yesterday's missing button.
+
+**Warnings: none new, by two methods.** Clean builds of a `git archive HEAD` export (`cd09663`) and of
+the same export plus only the change's five files, one empty DerivedData per side. With *named*
+destinations, across all four schemes (`build-for-testing` of `WaterBuddy` and `WaterBuddyWatch`,
+`build` of both widgets): identical per build, per file and message, and per location count. With a
+*generic* destination, in the `WaterBuddy` build-for-testing — the baseline's own method: shipping **31
+unique lines and 80 occurrences**, tests **6 and 12**, on both sides. **The named run counts 44 and 6**
+for the same code: a generic simulator destination compiles `arm64` and `x86_64` separately and prints
+each warning once per architecture — confirmed this session by building HEAD both ways. Compare
+occurrences only between builds made the same way.
+
+**On the simulator**, on the iPhone 17 and the iPhone 17e — at 390 pt the narrowest phone installed;
+there is no 375-pt one. Screenshots came from a throwaway XCUITest probe, deleted afterwards: the day
+picker, a past day, an empty past day, both sheets, Russian and Uzbek through launch arguments, and
+`AccessibilityXXXL`. **Two layout bugs were found there and fixed** before the gate: the wheel's
+natural width pushed the sheet past the screen's right edge, and the day row's `minHeight` floor let it
+compress at `AccessibilityXXXL` until the bars rose through the title. **Contrast**, read off those
+renders, clears its floor for every new mark — figures in `docs/DESIGN.md` — except the wheel's
+neighbouring rows, 2.43–2.80:1 (#59). Not checked: the Home Screen widget and the watch face — nothing in
+storage, entitlements, membership or the widget's view tree changed.
+
+*(The 2026-10-07 complication gate block below is retained as that pass's record.)*
 
 **Gate — all five re-run 2026-10-07, on Xcode 27.0, after the complication change** (the
 thirty-third pass). Foreground, `-parallel-testing-enabled NO`, the commands exactly as rule
@@ -1366,17 +1454,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-07, the thirty-third) and again by each of
-its three re-runs the same day — every time after the staging and before this section was written,
-from the commands themselves; every re-run's figures matched these exactly:
+**There is a git repository.** Verified this pass (2026-10-07, the thirty-fourth) after the staging
+and before this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-05a6998
+cd09663
 $ git log --oneline | wc -l
-      59
+      62
 $ git diff --cached --name-only | wc -l
-      13
+      15
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
@@ -1386,24 +1473,29 @@ $ git status --short | grep -v -E '^[MA]  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 13 staged paths — the change (`DataManager.swift`,
-`WristModel.swift`, `WaterBuddyWatchApp.swift`, `WaterBuddyWatchWidget.swift`), its tests
-(`WristSyncTests.swift`, `WristModelTests.swift` and the new `WristLinkDeliveryTests.swift`), the new
-spec and the watch spec's §18, `docs/STATE.md`, this session's `tasks/lessons.md` entries, the
-`HISTORY.md` checkpoints and this sync's own `docs/AI_CONTEXT.md` — were staged with explicit paths
-for the owner's `/commit` (rule `90-git`). **Five paths are deliberately left unstaged:** the two
-watch schemes and the two watch catalogues the Xcode app wrote before this session began (known issue
-#50), and `.claude/settings.json`, last written at 10:11 that morning, before this session's first
-edit (`git push` and `git init` moved from *ask* to *allow*). None is this change's to stage or
-revert. The previous pass's 12 staged
-paths were committed by the owner before this session began, as `807bca8`, `74d6a47` and `05a6998` —
-`git diff --name-only 641e88c 05a6998` lists exactly 12. `Screenshots/census/` (28 coverage captures,
-51 MB) is still untracked, neither committed nor ignored; whether it belongs in the tree is the
-owner's call.
+**Nothing is committed by this pass.** The 15 staged paths — the change (`DataManager.swift`,
+`HistoryView.swift`, the app's `Localizable.xcstrings`), its tests (the new `EarlierServingTests.swift`
+and `GoalSetupUITests.swift`), the new spec, `docs/STATE.md`, `docs/DESIGN.md`, this session's
+`tasks/lessons.md` entries, the `HISTORY.md` checkpoints, this sync's own `docs/AI_CONTEXT.md`, and the
+four rule files the owner approved the same day (`20-state`, `30-rollover`, `50-views`,
+`65-accessibility`), which `/commit` groups as workflow config — were staged with explicit paths for the
+owner's `/commit` (rule `90-git`). Four of the five code and string files are byte-identical (`cmp`) to
+the export the warning comparison built; `HistoryView.swift` differs by one comment — the owner's #59
+ruling, written after it — and the phone unit suite was re-run on the final staged tree:
+`✔ Test run with 358 tests in 41 suites passed`. **Held out of the tree:** the #60 fix, which shares
+`HistoryView.swift` with the feature while `/commit` commits whole files (see #60). **Five paths are
+deliberately left unstaged:** the two watch schemes and the two watch catalogues the Xcode app wrote
+before the thirty-third pass's session began (known issue #50), and `.claude/settings.json`, which
+moves `git commit` and `git init` from *ask* to *allow* and leaves `git push` under *ask*. None is this
+change's to stage or revert. *(The thirty-third pass said `git push` and `git init` moved; the diff moves
+`git commit` and `git init`.)* The previous pass's 13 staged paths were committed by the owner before
+this session began, as `3010338`, `90bb40b` and `cd09663` — `git diff --name-only 05a6998 cd09663`
+lists exactly 13. `Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither
+committed nor ignored; whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 59 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 62 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -1637,7 +1729,11 @@ and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
    `HISTORY.md` checkpoint) — outstanding, out-of-scope hits remain only in `.claude/commands/`,
    which this task's declared file list does not include.
 
-16. **Two DocC comments in `DataManager.swift` were left stale by the role model** — three until
+16. ~~**Two DocC comments in `DataManager.swift` were left stale by the role model**~~ **Fixed
+   2026-10-07**, by roadmap item 3. Both sat in `republishHistory()`'s DocC, which the change had to
+   rewrite to describe the rows it now publishes; it now reads *"Guarded on `role.drawsHistory`"* and
+   *"derivable from none of the cache keys"* — no count left to rot. The original entry follows, for
+   the record: **Two DocC comments in `DataManager.swift` were left stale by the role model** — three until
    2026-10-07. Identified 2026-09-01; **still not fixed** — this is a documentation-only task and
    may not touch source (`.claude/rules/00-workspace.md`'s "no source, test, or project file
    changes"). Line numbers re-verified 2026-10-07; the code they describe is unchanged, only its
@@ -2188,6 +2284,35 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     included, unable to land while the task was still open. The behaviour is unaffected — waiting is
     right either way — but the comments are code, outside a doc sync's write scope. Found by the
     2026-10-07 re-run.
+
+59. **The serving sheet's wheel draws the rows around the one being set under the text floor.**
+    History's sheet picks a time with `DatePicker(…, displayedComponents: [.date, .hourAndMinute])`
+    in `.wheel` style, the control the owner chose (spec 2026-10-07-earlier-servings §1). Read off a
+    render on 2026-10-07, the row being set measures **5.47:1** against its band; the rows around it
+    measure **2.43–2.80:1** against the card's `.frosted` pane — under the 4.5:1 rule
+    `65-accessibility` sets for text. UIKit draws them in a dimmed grey that assumes a near-black
+    backdrop, and no public API recolours a `UIDatePicker`'s wheel. The value being set is always the
+    centred row, and VoiceOver reads the wheel's columns as adjustable elements, so the fault is the
+    legibility of the neighbouring choices, not of the choice. **Accepted by the owner on
+    2026-10-07** as the system control's own styling, over replacing the wheel with a hand-built
+    picker whose rows the app colours — a larger change, and a different control from the one
+    approved. Kept open as a record, not as work. A darker pane was considered: `.opaque` adds scrim
+    and tint together, and is estimated — not measured — to darken it too little. Figures in
+    `docs/DESIGN.md`.
+
+60. **The serving sheet's *Cancel* and *Save* overflow their capsules at `AccessibilityXXXL`.** Seen
+    on the 2026-10-07 render: *Cancel* runs past its capsule's left edge. **Pre-existing** — the two
+    buttons are `EditServingSheet`'s, carried into `ServingSheet` unchanged — and newly more visible,
+    because the sheet is now also how a serving is added. The labels carry no `.lineLimit(1)` or
+    `.minimumScaleFactor`, unlike the screen's other capped type. A one-line fix, deferred to its own
+    change (rule `90-git`: one logical change per commit). **Fix written and verified 2026-10-07, at
+    the owner's word, and held out of the tree:** on both labels, `.lineLimit(1)`,
+    `.minimumScaleFactor(0.4)` and `.padding(.horizontal, 12)` before `.frame(maxWidth: .infinity)`,
+    with a comment naming this issue. Rendered at `AccessibilityXXXL` in English and Uzbek, all four
+    labels sit inside their capsules, clear of the curved ends — at 0.5 with no clearance they fit
+    edge to edge, and 0.5 with the clearance would have truncated *Bekor qilish*. It shares
+    `HistoryView.swift` with the staged feature, and `/commit` commits whole files, so it lands as its
+    own change once the feature is committed.
 
 ## Where the rest is written down
 
