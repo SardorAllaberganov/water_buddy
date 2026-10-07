@@ -5568,3 +5568,107 @@ file staged once more after these lines:
 - **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
   `Screenshots/census/` still untracked. **Held out:** the #60 fix.
 - HEAD is `cd09663`, 62 commits. No `git commit` was run.
+
+## [2026-10-07] — The serving sheet's *Cancel* and *Save* stay inside their capsules
+
+### What
+
+Known issue #60. On both of `ServingSheet`'s action labels: `.lineLimit(1)`, `.minimumScaleFactor(0.4)`
+and `.padding(.horizontal, 12)` before `.frame(maxWidth: .infinity)`, with a comment naming the issue.
+At `AccessibilityXXXL` *Cancel* ran past its capsule's left edge, and Uzbek's *Bekor qilish* is twice
+as long; each label now shrinks to fit, clear of the capsule's curved ends.
+
+It lands on its own, after the feature it was held back from: at the owner's instruction `/commit` ran
+first, and committed and pushed the earlier-servings change as `9e8e6df`, `ffe82e6`, `b33d08f` and
+`4217f7c` (`cd09663..4217f7c`).
+
+### The rulings this rests on
+
+- **The owner's ruling on #60**, in the previous checkpoint: fix it, and land it as its own change once
+  the feature is committed (rule `90-git`: one logical change per commit).
+- **The owner's order for this session:** #60 first, then roadmap item 4.
+
+### Files touched
+
+Modified:
+- `WaterBuddy/HistoryView.swift` (948 → 959): eleven lines, all in `ServingSheet.actions`
+
+Unchanged: every other source, string, test, key, project file, entitlement, exception set and rule.
+
+### Verification
+
+- **These are the bytes that were rendered.** The previous session saved the fix as a patch against
+  blob `2e8b266`, which is `HEAD:WaterBuddy/HistoryView.swift`. Made here with `Edit`, the file hashes
+  to `e083cfc`, the patch's own result, and its hunks match the patch line for line. That session's
+  renders at `AccessibilityXXXL`, in English and Uzbek, were of exactly this file; they were not
+  re-taken. No test pins the layout — the renders are the proof, as they were then.
+- **The gate**, all five, foreground, Xcode 27.0, commands as rule `85-testing` writes them:
+  - `✔ Test run with 358 tests in 41 suites passed`
+  - `Executed 26 tests, with 0 failures`, on a second run. The first was refused launch at 19:03:59,
+    22 seconds after it started — `Busy ("Application failed preflight checks")`, no test executed —
+    and ended at 19:14:03 with exit 65 (#57's shape). No other `xcodebuild` was running when it
+    started (`pgrep` at 19:03:37). Before the second, `xcrun simctl bootstatus … -b` booted the
+    iPhone 17 and waited for it.
+  - `✔ Test run with 57 tests in 6 suites passed`
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`)
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWatchWidget`)
+- **Warnings: none in `HistoryView.swift`**, which the unit run recompiled. The builds were incremental;
+  every warning they printed is in `DataManager.swift`, `NotificationManager.swift` or `WristView.swift`,
+  in the baseline's families.
+- **Not run:** the Home Screen widget and the watch face — nothing they draw changed.
+
+### Found along the way
+
+- **`/commit`'s own gate block is still the one from the initial commit** — iOS 18.6 on an iPhone 16,
+  no watch invocation, and a UI run without the `AppStoreScreenshotUITests` skip rule `85-testing`
+  makes mandatory. The commit above ran rule `85-testing`'s five instead, as agreed with the owner
+  beforehand. Command text is the owner's to change.
+- **`sed -i` was reached for again** — on a scratchpad draft of a commit message — and refused by the
+  deny list, which `tasks/lessons.md` already records. Reported to the owner; the draft was left as it
+  was, and the approved message was passed to `git commit -F -` directly.
+- **`docs/AI_CONTEXT.md`'s 947 for `HistoryView.swift` was one short at HEAD**, which has 948: the
+  owner's #59 comment landed after the count.
+
+## [2026-10-07] — `/doc_sync`: the thirty-fifth pass, after #60
+
+### What changed
+
+- **`docs/AI_CONTEXT.md`:**
+  - the thirty-fifth pass header, with the thirty-fourth retained;
+  - `HistoryView.swift`'s line count, 947 → 959, and the files-on-disk note re-derived;
+  - this pass's gate block — both runs, before the commit and after the fix — with the thirty-fourth's
+    retained;
+  - #60 retired; #57 given its second refusal; #61 opened, for `/commit`'s own gate block;
+  - the Git section, re-derived from the commands after the staging.
+- **`tasks/lessons.md`:** one entry — a deny rule names a command, not a folder.
+
+### Checked and already accurate
+
+- **`docs/STATE.md`:** no key, resolution rule or seam moved.
+- **`docs/WIDGET.md`:** nothing the widget draws or does changed.
+- **`docs/DESIGN.md`:** it describes the sheet's buttons only as interactive glass, which they still
+  are; its type-bounds table covers readouts, not button labels.
+- **`CLAUDE.md`:** no target, shared file, key or storage rule moved.
+
+### Checks run
+
+- `find` over the seven target folders: 55 `.swift` files, none undocumented.
+- A script comparing all 58 documented line counts — 55 files and three `Tools/` scripts — with the
+  files: 1 stale, `HistoryView.swift`.
+- `@Test` attribute counts: 358 phone, 57 watch; 13 UI `func test`. All unchanged.
+- The three exception sets: unchanged, six files each. `Key.all`: eleven keys.
+- Every `` rule `nn-name` `` cited in `CLAUDE.md`, `docs/`, `tasks/`, `HISTORY.md` and all seven target
+  folders resolves to a file in `.claude/rules/`.
+- `docs/AI_CONTEXT.md`'s `<details>` blocks balance: nine opened, nine closed.
+
+### Staging
+
+Written last, from the commands' own output; this file and `docs/AI_CONTEXT.md` staged once more after
+these lines:
+
+- **4 paths staged by explicit path:** `WaterBuddy/HistoryView.swift` (blob `e083cfc`),
+  `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- HEAD is `4217f7c`, 66 commits, level with `origin/main`. This pass ran no `git commit`; the four
+  commits that made HEAD were `/commit`'s, earlier the same session.

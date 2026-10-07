@@ -4,6 +4,25 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-07 (thirty-fifth pass — `/doc_sync` after **known issue #60's fix**: the
+serving sheet's *Cancel* and *Save* labels now shrink to fit their capsules at `AccessibilityXXXL` —
+`.lineLimit(1)`, `.minimumScaleFactor(0.4)` and `.padding(.horizontal, 12)` on both, eleven lines in
+`HistoryView.swift`, byte-identical to the fix the previous session rendered (`e083cfc`). It lands on
+its own, as the owner ruled: first, `/commit` — run at the owner's instruction — committed and pushed
+roadmap item 3 as `9e8e6df`, `ffe82e6`, `b33d08f` and `4217f7c`. **#60 retired.** **This sync's own
+drift:** one line count of 58 — `HistoryView.swift`'s, documented 947, already 948 at HEAD (the owner's
+#59 comment landed after the count), now 959. **#57** gains a second refusal, from a run that started
+with no other `xcodebuild` running; **#61 opened**: `/commit`'s own gate block predates the watch. Gate
+run in full twice this session — before the commit and after the fix — green both times: **358**/41
+phone unit, **26** phone UI (the second time on a second run — the first was refused launch, #57),
+**57**/6 watch unit, both widget builds. No warning in `HistoryView.swift`; the builds were
+incremental, so there is no figure to set against the clean baseline. `docs/STATE.md`,
+`docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md` were checked and deliberately not touched: nothing
+they state has changed.)
+
+<details>
+<summary>Thirty-fourth pass — 2026-10-07, retained</summary>
+
 **Last updated:** 2026-10-07 (thirty-fourth pass — `/doc_sync` after **roadmap item 3: a serving added
 or fixed at an earlier time or day**, owner-approved:
 `docs/superpowers/specs/2026-10-07-earlier-servings-design.md`. History's week card now picks the day:
@@ -29,6 +48,8 @@ green. No new warning, by named and by generic destinations; the generic one giv
 and 6/12, the named one 44/6, because a generic destination builds two architectures. `docs/DESIGN.md`
 gains seven measured figures. `docs/WIDGET.md` and `CLAUDE.md` were checked and deliberately not
 touched: the widget and nothing `CLAUDE.md` states have changed.)
+
+</details>
 
 <details>
 <summary>Thirty-third pass — 2026-10-07, re-verified three times the same day, retained</summary>
@@ -502,7 +523,7 @@ WaterBuddy/Celebration.swift                     213   app only — ConfettiPiec
 WaterBuddy/DataManager.swift                    2499   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face on iOS, its wait for delivery on watchOS
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
-WaterBuddy/HistoryView.swift                     947   app only — the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
+WaterBuddy/HistoryView.swift                     959   app only — the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
 WaterBuddy/HomeView.swift                        379   app only — the vessel, the editable quick-add row, the goal burst (vesselSlots moved out, Task 14)
 WaterBuddy/LiquidGlassModifier.swift             501   shared — design tokens + the glass modifier
 WaterBuddy/NotificationManager.swift             270   shared — ReminderScheduler + reconcile, the only UN caller; ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46)
@@ -555,13 +576,13 @@ WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
 **55 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
-the thirty-fourth pass with `find` over all seven and a two-way comparison against this file: no
-phantom row, and one undocumented file — the change's new `EarlierServingTests.swift`, now listed.
-The 57 line counts already here (54 files and the three Swift scripts below) were re-checked against
-`wc -l` by a script: 3 were stale — exactly the three existing files the change touched — and 54
-current; the new file's count was taken the same way, making 58. *(The thirty-third pass found 6
-stale of 56, the thirty-second 4, the thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the
-twenty-eighth 7 of 55 on 2026-10-05.)*
+the thirty-fifth pass with `find` over all seven and a two-way comparison against this file: no
+phantom row and none undocumented. The 58 line counts here (55 files and the three Swift scripts
+below) were re-checked against `wc -l` by a script: 1 was stale — `HistoryView.swift`, the one file
+the change touched, already one short at HEAD (948) because the #59 comment landed after the
+thirty-fourth pass counted it — and 57 current. *(The thirty-fourth pass found 3 stale of 57, the
+thirty-third 6 of 56, the thirty-second 4, the thirty-first 5, the thirtieth 2, the twenty-ninth 8 of
+56, the twenty-eighth 7 of 55 on 2026-10-05.)*
 
 ### Outside every target
 
@@ -770,6 +791,33 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five run twice on 2026-10-07, on Xcode 27.0: before `/commit` committed roadmap item 3,
+and after known issue #60's fix** (the thirty-fifth pass). Foreground, `-parallel-testing-enabled NO`,
+the commands exactly as rule `85-testing` writes them. `xcrun simctl shutdown all` preceded every test
+invocation but one — the commit's unit run, while another project's (`Glazzy`) `xcodebuild` was
+running; `simctl` had listed nothing booted at 18:39. The commit's UI and watch runs waited until no
+`xcodebuild` had run for ten seconds. The #60 phone UI-test run was **refused launch** the first time
+(#57), and run again after `xcrun simctl bootstatus … -b` had booted the iPhone 17.
+
+| Command | Before the commit | After #60 |
+|---|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 358 tests in 41 suites passed` | `✔ Test run with 358 tests in 41 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `Executed 26 tests, with 0 failures` | `Executed 26 tests, with 0 failures`, on the second run. The first: `Busy ("Application failed preflight checks")`, no test executed, exit 65 |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` | `** BUILD SUCCEEDED **` |
+
+**Warnings:** every build was incremental, so neither run gives a figure to set against the clean
+baseline. Every warning printed is in `DataManager.swift`, `NotificationManager.swift` or
+`WristView.swift`, in the baseline's two families; `HistoryView.swift`, which the #60 unit run
+recompiled (`SwiftCompile … HistoryView.swift`), printed none. The committed code had been compared
+against a clean build of HEAD by the thirty-fourth pass. **On the simulator:** #60's renders were not
+re-taken — the fixed file hashes to `e083cfc`, the result of the patch those renders were of, on the
+same base, `2e8b266`. Not checked: the Home Screen widget and the watch face — nothing they draw
+changed.
+
+*(The 2026-10-07 earlier-servings gate block below is retained as that pass's record.)*
 
 **Gate — all five re-run 2026-10-07, on Xcode 27.0, after roadmap item 3: a serving added or fixed at
 an earlier time or day** (the thirty-fourth pass). Foreground, `-parallel-testing-enabled NO`, the
@@ -1454,16 +1502,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-07, the thirty-fourth) after the staging
+**There is a git repository.** Verified this pass (2026-10-07, the thirty-fifth) after the staging
 and before this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-cd09663
+4217f7c
 $ git log --oneline | wc -l
-      62
+      66
 $ git diff --cached --name-only | wc -l
-      15
+       4
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
@@ -1473,29 +1521,22 @@ $ git status --short | grep -v -E '^[MA]  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 15 staged paths — the change (`DataManager.swift`,
-`HistoryView.swift`, the app's `Localizable.xcstrings`), its tests (the new `EarlierServingTests.swift`
-and `GoalSetupUITests.swift`), the new spec, `docs/STATE.md`, `docs/DESIGN.md`, this session's
-`tasks/lessons.md` entries, the `HISTORY.md` checkpoints, this sync's own `docs/AI_CONTEXT.md`, and the
-four rule files the owner approved the same day (`20-state`, `30-rollover`, `50-views`,
-`65-accessibility`), which `/commit` groups as workflow config — were staged with explicit paths for the
-owner's `/commit` (rule `90-git`). Four of the five code and string files are byte-identical (`cmp`) to
-the export the warning comparison built; `HistoryView.swift` differs by one comment — the owner's #59
-ruling, written after it — and the phone unit suite was re-run on the final staged tree:
-`✔ Test run with 358 tests in 41 suites passed`. **Held out of the tree:** the #60 fix, which shares
-`HistoryView.swift` with the feature while `/commit` commits whole files (see #60). **Five paths are
-deliberately left unstaged:** the two watch schemes and the two watch catalogues the Xcode app wrote
-before the thirty-third pass's session began (known issue #50), and `.claude/settings.json`, which
-moves `git commit` and `git init` from *ask* to *allow* and leaves `git push` under *ask*. None is this
-change's to stage or revert. *(The thirty-third pass said `git push` and `git init` moved; the diff moves
-`git commit` and `git init`.)* The previous pass's 13 staged paths were committed by the owner before
-this session began, as `3010338`, `90bb40b` and `cd09663` — `git diff --name-only 05a6998 cd09663`
-lists exactly 13. `Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither
-committed nor ignored; whether it belongs in the tree is the owner's call.
+**Nothing is committed by this pass.** The 4 staged paths — the #60 fix (`WaterBuddy/HistoryView.swift`,
+staged as blob `e083cfc`), this pass's `tasks/lessons.md` entry, the `HISTORY.md` checkpoints and this
+sync's own `docs/AI_CONTEXT.md` — were staged with explicit paths for the owner's `/commit` (rule
+`90-git`). **The thirty-fourth pass's 15 staged paths were committed and pushed this session**, by
+`/commit` run at the owner's instruction, the owner approving its plan first: `9e8e6df`, `ffe82e6`,
+`b33d08f` and `4217f7c` — `git diff --name-only cd09663 4217f7c` lists exactly 15 — pushed as
+`cd09663..4217f7c`, leaving `main` level with `origin/main`. **Five paths are deliberately left
+unstaged**, as they were at that commit: the two watch schemes and the two watch catalogues the Xcode
+app wrote (known issue #50), and `.claude/settings.json`, which moves `git commit` and `git init` from
+*ask* to *allow* and leaves `git push` under *ask*. None is this change's to stage or revert.
+`Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither committed nor ignored;
+whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 62 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 66 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -2271,6 +2312,14 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `-collect-test-diagnostics never`. The re-run passed in 3 minutes 10 seconds. The gate's commands
     are the owner's to change (rule `85-testing`). *(Until the 2026-10-07 re-run, this was titled
     "refused launch while another project's UI tests ran", which said more than the two samples.)*
+    **Seen again on 2026-10-07 at 19:03:59**, by the #60 gate (the thirty-fifth pass): the same
+    refusal 22 seconds into the run, no test executed, and exit 65 at 19:14:03 after the same 600
+    seconds. No other `xcodebuild` was running when that run started (`pgrep` at 19:03:37, after which
+    `xcrun simctl shutdown all` ran and the run cold-booted its iPhone 17); whether one started in the
+    next 22 seconds, no sample shows. The re-run, after `xcrun simctl bootstatus … -b` had booted the
+    device and waited for it, passed in 3 minutes 11 seconds. One pass with the wait is not proof the
+    wait is the cure: the commit's UI run the same evening, also from a cold boot and with no wait,
+    launched normally.
 58. **Two comments the complication change wrote overstate what the old background wake missed.**
     `WaterBuddyWatchApp.swift`'s comment above `await WristLink.waitForPendingDelivery()` says
     "nothing has been delivered yet" at that point, and that returning there let the system suspend
@@ -2300,8 +2349,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     and tint together, and is estimated — not measured — to darken it too little. Figures in
     `docs/DESIGN.md`.
 
-60. **The serving sheet's *Cancel* and *Save* overflow their capsules at `AccessibilityXXXL`.** Seen
-    on the 2026-10-07 render: *Cancel* runs past its capsule's left edge. **Pre-existing** — the two
+60. ~~**The serving sheet's *Cancel* and *Save* overflow their capsules at `AccessibilityXXXL`.**~~
+    **Fixed 2026-10-07** (the thirty-fifth pass), as its own change once the feature it shared
+    `HistoryView.swift` with was committed (`9e8e6df`): the fix described below, byte-identical
+    (`e083cfc`) to the version that was rendered. Seen on the 2026-10-07 render: *Cancel* runs past its capsule's left edge. **Pre-existing** — the two
     buttons are `EditServingSheet`'s, carried into `ServingSheet` unchanged — and newly more visible,
     because the sheet is now also how a serving is added. The labels carry no `.lineLimit(1)` or
     `.minimumScaleFactor`, unlike the screen's other capped type. A one-line fix, deferred to its own
@@ -2313,6 +2364,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     edge to edge, and 0.5 with the clearance would have truncated *Bekor qilish*. It shares
     `HistoryView.swift` with the staged feature, and `/commit` commits whole files, so it lands as its
     own change once the feature is committed.
+
+**Opened by the 2026-10-07 `/doc_sync` after #60 (the thirty-fifth pass):**
+
+61. **`/commit`'s own gate block predates the watch.** `.claude/commands/commit.md` is unchanged since
+    the root commit `69c5a39`. Its Step 1 pins every invocation to `OS=18.6,name=iPhone 16`, runs
+    `-only-testing:WaterBuddyUITests` without `-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests`
+    — the skip rule `85-testing` makes mandatory, because that harness fails on any device where setup
+    is done — and has no watch invocation at all; its Step 0 still says the project "is not a git
+    repository yet". A `/commit` that followed it literally could stop on the screenshot harness, and
+    would never run the watch unit tests. This pass's commit ran rule `85-testing`'s five instead,
+    agreed with the owner beforehand. Command text is the owner's to change (rule `99-docs-cascade`).
 
 ## Where the rest is written down
 

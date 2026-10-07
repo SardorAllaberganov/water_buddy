@@ -2213,3 +2213,15 @@ before anything was staged.
 
 **The rule:** prefer a deleted probe test to a debug hook in the product. Check `git status` after
 deleting it — a file in a synchronized folder joins its target the moment it exists.
+
+## 2026-10-07 — A deny rule names a command, not a folder
+
+`sed -i` was reached for again — this time on a commit-message draft in the session's own scratchpad,
+outside the repository, where writing needs no approval — and the deny list's `Bash(sed -i:*)` refused
+it, exactly as the 2026-09-02 entry above records for `project.pbxproj`. That entry was skimmed by its
+heading at session start and not reread. The rule names the command, so no folder is an exemption, and
+a general habit of making small edits with shell tools does not outrank a project's deny list.
+
+**The rule:** read `.claude/settings.json`'s deny list before choosing a shell mechanism for any edit,
+in any folder, and make edits with `Edit` or `Write`. When one is refused anyway, report it and leave
+the file as it was.
