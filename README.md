@@ -26,8 +26,8 @@ No account. No server. No analytics. No third-party dependencies of any kind.
 - **Apple Watch app** — tap the vessel to log; a *More* button reaches the other two amounts. Works
   offline and syncs when the phone is in range.
 - **Watch complication** — an `.accessoryCircular` percentage ring.
-- **Optional reminders** — every two hours from 9 AM to 9 PM. Logging pushes the next one back, and
-  reaching the goal silences the rest of the day.
+- **Optional reminders** — every two hours from 9 AM to 9 PM, skipped if you drank in the hour
+  before one, and silenced for the rest of the day once the goal is reached.
 - **English, Russian and Uzbek**, switchable in-app, applied immediately.
 
 ## Requirements

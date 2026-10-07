@@ -172,9 +172,9 @@ struct SettingsView: View {
         if manager.remindersEnabled && deliveryIsBatched {
             // Not a failure, and not hidden: `.timeSensitive` would break through a summary, and it
             // needs an entitlement this app deliberately does not carry (rule `70-privacy`).
-            return strings.localizedString(forKey: "A nudge every two hours from 9 AM to 9 PM, unless you've already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour.", value: nil, table: nil)
+            return strings.localizedString(forKey: "A nudge every two hours from 9 AM to 9 PM, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour.", value: nil, table: nil)
         }
-        return strings.localizedString(forKey: "A nudge every two hours from 9 AM to 9 PM. Logging water pushes the next one back, and reaching your goal silences the rest of the day.", value: nil, table: nil)
+        return strings.localizedString(forKey: "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day.", value: nil, table: nil)
     }
 
     private var openSettingsRow: some View {

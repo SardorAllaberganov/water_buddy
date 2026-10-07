@@ -20,7 +20,7 @@ import Foundation
 /// only for *push*; nothing in the system asks the app "should this one fire?" as the moment
 /// arrives. So "don't nag me, I've already hit my goal" cannot be a filter — it can only be an
 /// absence. Everything smart about these reminders is therefore decided here, ahead of time, and
-/// re-decided on every change to today's total.
+/// re-decided on every change to today's logs.
 ///
 /// ## Why a fixed grid rather than a rolling timer
 ///
@@ -28,10 +28,30 @@ import Foundation
 /// wrong: a serving logged at 20:50 fires at 22:50, outside the window the user asked for. On a
 /// fixed grid that is not a bug to guard against, it is arithmetically unreachable —
 /// `noSlotEverFallsOutsideTheWindow` is the test that keeps it that way.
+///
+/// ## Why a drink drops a slot rather than moving it
+///
+/// "Don't remind me right after I drank" is the same reading coming back in a second form, and
+/// moving the next reminder to an hour after the drink would be the rolling timer again, with the
+/// same 22:50 failure. So a drink less than ``quietAfterDrink`` before a slot answers that slot in
+/// advance — it is dropped, and the one after it fires on the grid as planned. A plan with a drink
+/// is always the plan without one, minus at most one slot; `oneDrinkSilencesAtMostOneSlot` sweeps
+/// a whole day to keep it that way.
 enum ReminderPlan {
 
     /// Every two hours from 09:00 to 21:00, inclusive at both ends — seven a day.
     nonisolated static let hours = [9, 11, 13, 15, 17, 19, 21]
+
+    /// How long a drink keeps the next slot quiet: a slot due less than this after the latest
+    /// serving is dropped from the plan.
+    ///
+    /// An hour, and it is half the grid's interval that makes an hour safe. Long enough that no
+    /// reminder lands moments after a drink — the complaint this exists for. Short enough that one
+    /// drink can drop at most one slot, so a single serving quietens the day for under three hours:
+    /// one missed interval, never two. `theQuietHourEndsExactlyAnHourAfterTheDrink` pins the hour;
+    /// `oneDrinkSilencesAtMostOneSlot` pins the one-slot bound, which holds only while this stays
+    /// within the grid's interval.
+    nonisolated static let quietAfterDrink: TimeInterval = 60 * 60
 
     /// Namespaced like every other identifier this product owns, and for the same reason: the
     /// notification centre an extension resolves is the **containing app's**, so these ids share a
@@ -79,6 +99,10 @@ enum ReminderPlan {
     ///     so switching reminders off *clears* the schedule instead of stranding it.
     ///   - currentWater: Today's total. Reaching ``dailyGoal`` silences the rest of today.
     ///   - dailyGoal: Today's target.
+    ///   - lastDrink: The latest serving's instant, or `nil` before the first. A slot due less than
+    ///     ``quietAfterDrink`` after it is dropped. Clamped to `now`: a watch pour carries the
+    ///     watch's own clock, and one stamped ahead of this one would otherwise silence every slot
+    ///     up to an hour past it.
     ///   - now: Injected, like every clock in this product.
     ///   - calendar: ``Calendar/waterBuddyDay``. The same calendar the rollover uses, so the log and
     ///     the reminders can never disagree about where a day ends (rule `30-rollover`).
@@ -86,6 +110,7 @@ enum ReminderPlan {
         enabled: Bool,
         currentWater: Int,
         dailyGoal: Int,
+        lastDrink: Date?,
         now: Date,
         calendar: Calendar,
         horizonDays: Int = ReminderPlan.horizonDays
@@ -111,6 +136,9 @@ enum ReminderPlan {
 
                 // Strictly ahead: a slot at exactly `now` has already had its moment.
                 if offset == 0, fire <= now { continue }
+
+                // A drink in the hour before a slot answers it in advance — dropped, never moved.
+                if let lastDrink, fire.timeIntervalSince(min(lastDrink, now)) < quietAfterDrink { continue }
 
                 planned.append(Slot(dayOrdinal: ordinal, hour: hour, fireDate: fire))
             }

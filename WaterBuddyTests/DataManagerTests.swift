@@ -659,6 +659,39 @@ struct ReminderSeamTests {
         }
     }
 
+    /// The plan reads the latest drink off today's rows, so a serving has to reach it. Checked
+    /// through `currentReminderSlots()` as well, because that is what `AddWaterIntent` files from
+    /// the widget — the two front doors must silence the same slot.
+    @Test func loggingADrinkSilencesTheReminderDueWithinTheHour() {
+        withTempDefaults { defaults in
+            var latest: [ReminderPlan.Slot] = []
+            let manager = makeManager(defaults, onReschedule: { latest = $0 }) { utc(2026, 8, 28, 10, 15) }
+            manager.remindersEnabled = true
+
+            manager.addWater(amount: 250)
+
+            #expect(latest.filter { $0.dayOrdinal == 20_260_828 }.map(\.hour) == [13, 15, 17, 19, 21],
+                    "11:00 is 45 minutes after the drink")
+            #expect(manager.currentReminderSlots().filter { $0.dayOrdinal == 20_260_828 }.map(\.hour)
+                    == [13, 15, 17, 19, 21])
+        }
+    }
+
+    @Test func deletingTheDrinkBringsTheSilencedReminderBack() throws {
+        try withTempDefaults { defaults in
+            var latest: [ReminderPlan.Slot] = []
+            let manager = makeManager(defaults, onReschedule: { latest = $0 }) { utc(2026, 8, 28, 10, 15) }
+            manager.remindersEnabled = true
+            manager.addWater(amount: 250)
+            #expect(!latest.contains { $0.dayOrdinal == 20_260_828 && $0.hour == 11 },
+                    "the drink has to silence 11:00 first, or bringing it back proves nothing")
+
+            manager.deleteLog(try #require(manager.todaysLogs.first))
+
+            #expect(latest.filter { $0.dayOrdinal == 20_260_828 }.map(\.hour) == [11, 13, 15, 17, 19, 21])
+        }
+    }
+
     /// `applyDailyReset` bypasses the `currentWater` setter and rings the widget doorbell by hand,
     /// so a hook hung only on the setter would miss midnight — the one schedule change that
     /// happens with nobody tapping.

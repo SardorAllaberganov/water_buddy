@@ -68,6 +68,7 @@ private func plan(now: Date = utc(2026, 8, 28, 12), water: Int = 0, horizonDays:
         enabled: true,
         currentWater: water,
         dailyGoal: 2_000,
+        lastDrink: nil,
         now: now,
         calendar: utcDay,
         horizonDays: horizonDays

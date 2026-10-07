@@ -1011,11 +1011,31 @@ final class DataManager {
     /// Exposed so `AddWaterIntent` can hand it straight to ``NotificationManager`` and *await* the
     /// result — the extension cannot use the injected closure for that, because a detached `Task`
     /// does not outlive `perform()` returning.
+    ///
+    /// **The latest drink is the latest this process has read**, taken off ``todaysLogs`` — which
+    /// ``recomputeToday()`` republishes from the same fetch just before it reschedules, and
+    /// ``refresh()`` before its own. Not "fresh" in any stronger sense, and three gaps follow:
+    /// - A mutation reschedules twice — once from the `refresh()` it starts with, on the rows from
+    ///   before it, then from `recomputeToday()` — and the production hook files each in its own
+    ///   detached `Task`, unordered. The two plans used to differ only when a serving crossed the
+    ///   goal; now they differ whenever the drink silences a slot, and if the older reconcile reads
+    ///   the pending set after the newer one removed that slot, it files it again: one extra
+    ///   reminder.
+    /// - A cross-process read can succeed and still miss the other process's newest row (see
+    ///   ``republishTodaysLogs()``), so `refresh()`'s backstop can put back a slot a widget tap
+    ///   silenced, until a read sees the row. And a failed fetch after ``deleteLog(_:)`` skips the
+    ///   reschedule, leaving the deleted drink's slot silent until the next good read.
+    /// - A trigger resolves in whatever zone the device is in when it fires, and a zone change only
+    ///   re-plans when it also turns the day — so flying east soon after a drink can bring a kept
+    ///   slot inside the hour, until the app next re-plans.
     func currentReminderSlots() -> [ReminderPlan.Slot] {
         ReminderPlan.slots(
             enabled: storedRemindersEnabled,
             currentWater: storedCurrentWater,
             dailyGoal: storedDailyGoal,
+            // `max()`, not `.first`, though the rows are fetched newest first: the plan should not
+            // lean on a sort order chosen for a list.
+            lastDrink: storedTodaysLogs.lazy.map(\.timestamp).max(),
             now: now(),
             calendar: calendar
         )

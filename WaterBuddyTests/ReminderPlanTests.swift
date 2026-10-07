@@ -28,6 +28,7 @@ private func slots(
     enabled: Bool = true,
     water: Int = 0,
     goal: Int = 2_000,
+    lastDrink: Date? = nil,
     now: Date = utc(2026, 8, 28, 12),
     calendar: Calendar = utcDay,
     horizonDays: Int = ReminderPlan.horizonDays
@@ -36,6 +37,7 @@ private func slots(
         enabled: enabled,
         currentWater: water,
         dailyGoal: goal,
+        lastDrink: lastDrink,
         now: now,
         calendar: calendar,
         horizonDays: horizonDays
@@ -114,6 +116,75 @@ struct ReminderPlanTests {
 
     @Test func disabledPlansNothingAtAll() {
         #expect(slots(enabled: false).isEmpty)
+    }
+
+    // MARK: A drink in the hour before a slot
+
+    /// The complaint this answers, from a review of a competing app: "not prompt me to drink more
+    /// when you know that I had a drink moments ago". 11:00 is 45 minutes after a 10:15 drink.
+    @Test func aDrinkSilencesASlotDueWithinTheHour() {
+        let today = slots(lastDrink: utc(2026, 8, 28, 10, 15), now: utc(2026, 8, 28, 10, 15))
+            .filter { $0.dayOrdinal == 20_260_828 }
+        #expect(today.map(\.hour) == [13, 15, 17, 19, 21])
+    }
+
+    /// Ninety minutes is not "moments ago" — the rhythm the user asked for still holds.
+    @Test func aDrinkMoreThanAnHourBeforeASlotLeavesItPlanned() {
+        let today = slots(lastDrink: utc(2026, 8, 28, 9, 30), now: utc(2026, 8, 28, 9, 30))
+            .filter { $0.dayOrdinal == 20_260_828 }
+        #expect(today.map(\.hour) == [11, 13, 15, 17, 19, 21])
+    }
+
+    /// Strictly under an hour: a drink at exactly 10:00 leaves 11:00 in place, and one a minute
+    /// later does not. Any quiet longer than the hour fails the first half.
+    @Test func theQuietHourEndsExactlyAnHourAfterTheDrink() {
+        let atTen = slots(lastDrink: utc(2026, 8, 28, 10), now: utc(2026, 8, 28, 10))
+        let aMinuteLater = slots(lastDrink: utc(2026, 8, 28, 10, 1), now: utc(2026, 8, 28, 10, 1))
+
+        #expect(atTen.contains { $0.dayOrdinal == 20_260_828 && $0.hour == 11 })
+        #expect(!aMinuteLater.contains { $0.dayOrdinal == 20_260_828 && $0.hour == 11 })
+    }
+
+    /// 09:00 has no slot before it, so only the drink's own distance from it can silence it.
+    @Test func aDrinkBeforeNineSilencesTheFirstSlot() {
+        let today = slots(lastDrink: utc(2026, 8, 28, 8, 30), now: utc(2026, 8, 28, 8, 30))
+            .filter { $0.dayOrdinal == 20_260_828 }
+        #expect(today.map(\.hour) == [11, 13, 15, 17, 19, 21])
+    }
+
+    /// A watch pour carries the watch's own clock, and `ingest(_:)` folds it in as stamped, so a
+    /// drink can sit *ahead* of `now`. Unclamped, a pour stamped 20:00 and read at 10:15 would
+    /// silence every slot until 21:00; clamped, it counts as a drink at 10:15.
+    @Test func aDrinkStampedAheadOfTheClockSilencesOnlyTheNextHour() {
+        let today = slots(lastDrink: utc(2026, 8, 28, 20), now: utc(2026, 8, 28, 10, 15))
+            .filter { $0.dayOrdinal == 20_260_828 }
+        #expect(today.map(\.hour) == [13, 15, 17, 19, 21])
+    }
+
+    /// The latest drink is one of today's rows, and tomorrow's first slot is hours past any of them.
+    @Test func aLateDrinkLeavesTomorrowUntouched() {
+        let planned = slots(lastDrink: utc(2026, 8, 28, 21, 30), now: utc(2026, 8, 28, 21, 30))
+        #expect(planned.contains { $0.dayOrdinal == 20_260_829 && $0.hour == 9 })
+    }
+
+    /// The plan with a drink is the plan without one, minus at most one slot — dropped, never moved,
+    /// so nothing can fire outside the window. Swept every five minutes across a day, with each drink
+    /// logged at `now` and again stamped three hours ahead of it (a watch clock running fast).
+    @Test func oneDrinkSilencesAtMostOneSlot() {
+        var silencedAnything = false
+        for step in 0..<(24 * 12) {
+            let now = utc(2026, 8, 28, 0).addingTimeInterval(TimeInterval(step * 5 * 60))
+            let unsilenced = Set(slots(now: now))
+            for drink in [now, now.addingTimeInterval(3 * 60 * 60)] {
+                let silenced = Set(slots(lastDrink: drink, now: now))
+                let dropped = unsilenced.subtracting(silenced)
+
+                #expect(silenced.isSubset(of: unsilenced), "a drink at \(drink) moved a slot")
+                #expect(dropped.count <= 1, "a drink at \(drink) silenced \(dropped.count) slots")
+                silencedAnything = silencedAnything || !dropped.isEmpty
+            }
+        }
+        #expect(silencedAnything, "a sweep that never silences anything proves nothing")
     }
 
     // MARK: The horizon, and the cap that silently truncates

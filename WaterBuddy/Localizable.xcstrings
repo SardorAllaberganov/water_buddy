@@ -238,48 +238,48 @@
         }
       }
     },
-    "A nudge every two hours from 9 AM to 9 PM, unless you've already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour.": {
+    "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A nudge every two hours from 9 AM to 9 PM, unless you've already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour."
+            "value": "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Напоминание каждые два часа с 9:00 до 21:00, если цель ещё не достигнута. У вас включена сводка уведомлений, поэтому напоминания могут приходить пачкой, а не точно по часам."
+            "value": "Напоминание каждые два часа с 9:00 до 21:00. Оно пропускается, если за час до него вы пили воду. Достижение цели отключает остальные напоминания до конца дня."
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "9:00 dan 21:00 gacha har ikki soatda eslatma, agar maqsadga hali erishmagan bo‘lsangiz. Bildirishnomalar jamlanmasi yoqilgan, shuning uchun eslatmalar soat sayin emas, to‘plam bo‘lib kelishi mumkin."
+            "value": "9:00 dan 21:00 gacha har ikki soatda eslatma. Undan oldingi bir soat ichida suv ichgan bo‘lsangiz, u o‘tkazib yuboriladi. Maqsadga erishilsa, kun oxirigacha eslatmalar to‘xtaydi."
           }
         }
       }
     },
-    "A nudge every two hours from 9 AM to 9 PM. Logging water pushes the next one back, and reaching your goal silences the rest of the day.": {
+    "A nudge every two hours from 9 AM to 9 PM, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A nudge every two hours from 9 AM to 9 PM. Logging water pushes the next one back, and reaching your goal silences the rest of the day."
+            "value": "A nudge every two hours from 9 AM to 9 PM, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Напоминание каждые два часа с 9:00 до 21:00. Запись воды отодвигает следующее, а достижение цели отключает остальные до конца дня."
+            "value": "Напоминание каждые два часа с 9:00 до 21:00, если цель ещё не достигнута и вы не пили воду за час до него. У вас включена сводка уведомлений, поэтому напоминания могут приходить пачкой, а не точно по часам."
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "9:00 dan 21:00 gacha har ikki soatda eslatma. Suv qayd etilsa keyingisi keyinroqqa suriladi, maqsadga erishilsa kun oxirigacha eslatmalar to‘xtaydi."
+            "value": "9:00 dan 21:00 gacha har ikki soatda eslatma, agar maqsadga hali erishmagan va undan oldingi bir soat ichida suv ichmagan bo‘lsangiz. Bildirishnomalar jamlanmasi yoqilgan, shuning uchun eslatmalar soat sayin emas, to‘plam bo‘lib kelishi mumkin."
           }
         }
       }
