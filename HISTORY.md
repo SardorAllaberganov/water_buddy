@@ -5076,3 +5076,302 @@ not evidence yet*.
 - The four Xcode-written paths are still unstaged, on purpose (#50).
 - HEAD is still `641e88c`.
 - No `git commit` was run.
+
+## [2026-10-07] — The complication stays current: the watch reloads its face, the phone pushes news
+
+### What
+
+Roadmap item 2 (pain #2 in the 2026-10-06 review scan, ~24 mentions). The design is
+`docs/superpowers/specs/2026-10-07-complication-current-design.md`; §18 of the watch spec records what
+it supersedes there.
+
+- **The watch reloads its own face.** `WristModel` gains an injected `reloadComplication` (default
+  `requestComplicationReload`, `nonisolated static`, calling `WidgetCenter.shared.reloadAllTimelines()`).
+  It fires after every pour, and after `apply(_:)` only when the mirror is news or a pour was retired.
+- **`apply(_:)` never takes an older mirror.** A mirror composed before the one held is set aside; a
+  tie is taken; and a held mirror stamped more than a minute ahead of the watch's own clock never
+  blocks, since that means a clock was set back.
+- **The background wake waits.** `.backgroundTask(.watchConnectivity)` now awaits
+  `WristLink.waitForPendingDelivery()` — `poll(until:every:atMost:)` every 0.1 s, at most 100 checks,
+  ending when cancelled — instead of reloading the face and returning at once. Its
+  `reloadAllTimelines()` and `WaterBuddyWatchApp.swift`'s `WidgetKit` import are gone.
+- **The face asks once a day.** `getTimeline`'s policy is `.atEnd`, not `.after(15 minutes)`.
+- **The phone pushes news.** `requestWristPublish(from:)` reads `session.applicationContext` as the
+  mirror last sent, updates the context as before, then calls `WristLink.pushToFace(_:encoded:after:in:)`:
+  `transferCurrentComplicationUserInfo` when the mirror is news, the complication is enabled and
+  pushes remain — cancelling any queued mirror push first, and saying so in `DEBUG` at zero.
+- **One door on the watch.** `didReceiveUserInfo` gains a watchOS branch that posts a pushed mirror on
+  the context's own `didReceiveMirrorNotification`.
+- **What counts as news.** `WristMirror.isNews(since:)`: any field but `composedAt`. It copies the
+  earlier mirror whole and re-stamps the copy, so `composedAt` became the type's one `var`.
+- **DocC** brought into line on `WristMirror`, `didReceiveMirrorNotification`, `activate()`'s re-read,
+  `didReceiveUserInfo`, `requestWristPublish`, `WristModel.pour`/`apply`, and the face's `getTimeline`.
+
+### The rulings this rests on
+
+- **The owner's roadmap**, approved 2026-10-06 to be worked in order. Item 2 names the phone's unused
+  complication push.
+- **This design, approved in conversation on 2026-10-07**, in two sections — the watch, then the phone
+  and the ordering rule — then "all looks right and go implement". The owner chose to verify the
+  background path on their own iPhone and Apple Watch.
+- **It reverses the watch spec's §12**, which listed `transferCurrentComplicationUserInfo` as "Not in
+  v1", amends §4 with a second carrier, and retires §17's "the 15-minute refresh stays".
+- **Apple's own statements** (spec §3): a SwiftUI background task is complete when its closure returns;
+  the WatchKit form waits for `hasContentPending`; 50 pushes a day while the complication is active;
+  about 75 reloads a day for a complication on the face; a superseded push stays queued. Whether the
+  push reaches a WidgetKit complication, Apple has answered both ways — no on the forums in 2024, yes
+  at WWDC26.
+- **The context stays the record.** The push only carries the same mirror sooner, so where it fails
+  nothing regresses.
+
+### Known limitations, recorded rather than fixed
+
+`docs/AI_CONTEXT.md` #52 (unverified on hardware), #53 (Home Screen widget drinks reach the watch
+only when the phone app next comes forward), #54 (a mid-day complication; a phone clock set behind
+real time), #55 (rule `70-privacy`'s transfer-queue text), #56 (a test's DocC against Apple's ordering
+statement) and #57 (a UI-test launch refused under load).
+
+### Files touched
+
+Modified:
+- `WaterBuddy/DataManager.swift` (2280 → 2406)
+- `WaterBuddyWatch/WristModel.swift` (252 → 305)
+- `WaterBuddyWatch/WaterBuddyWatchApp.swift` (78 → 77)
+- `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` (90 → 95)
+- `WaterBuddyTests/WristSyncTests.swift` (829 → 889; `WristMirrorNewsTests`)
+- `WaterBuddyWatchTests/WristModelTests.swift` (308 → 443; `makeModel` gains `reloaded:`)
+- `docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` (§18)
+
+New:
+- `WaterBuddyWatchTests/WristLinkDeliveryTests.swift` (56)
+- `docs/superpowers/specs/2026-10-07-complication-current-design.md`
+
+Unchanged: no key, wire field, stored byte (`composedAt` becoming a `var` encodes identically),
+project file, entitlement, exception set, widget view tree, user-visible string or rule.
+
+### Verification
+
+- **RED on seams that compiled**, the tests written first.
+  - Phone: `isNews` returning `true` failed the composed-at test; returning `false` failed the other
+    two, all nine fields by name.
+  - Watch: the reload closure stored but never called, no ordering rule, `poll` returning `false`
+    unchecked — nine of the twelve new tests failed, each on its own expectation.
+- **GREEN:** phone `✔ Test run with 13 tests in 3 suites passed` (the news, wire and publish suites);
+  watch `✔ Test run with 29 tests in 2 suites passed`.
+- **Mutation**, for the three tests a seam could not fail: the pour's reload above its guard, ties
+  rejected, the clock escape removed and `apply`'s reload made unconditional, in one run. Exactly the
+  five predicted tests failed — those three, `aMirrorNewOnlyInWhenItWasComposedReloadsNothing`, and
+  the existing `aNewMirrorSwitchesTheLanguageForObservers`, whose mirrors share a stamp. Restored by
+  hand; no marker left (grep), and the restored code read back in the full diff.
+- **The gate**, all five, foreground, Xcode 27.0, commands as rule `85-testing` writes them —
+  `xcrun simctl shutdown all` skipped, because a `Glazzy` test run was live:
+  - `✔ Test run with 331 tests in 35 suites passed`
+  - `Executed 25 tests, with 0 failures`, on a second run. The first was refused launch —
+    `Busy ("Application failed preflight checks")`, no test executed — then hung 600 s collecting
+    diagnostics (#57).
+  - `✔ Test run with 57 tests in 6 suites passed`
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`)
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWatchWidget`)
+- **Warnings**, across all four schemes: clean `build-for-testing` of `WaterBuddy` and
+  `WaterBuddyWatch`, and `build` of both widget schemes, into one empty DerivedData per side — a
+  `git archive HEAD` export against the same export plus only the seven Swift files above.
+  - Identical per file, message and count.
+  - Shipping targets: 31 unique lines and 80 occurrences, on primary `File.swift:L:C: warning:` lines.
+  - Test targets: 6 and 12.
+- **Not run:** any simulator check of the wire, and the owner's device check (spec §8.3) — pending.
+
+### Found along the way
+
+- **The background wake had never been able to work.** Returning at once ended the task before any
+  delivery; it read as finished since the watchOS plan's Task 17.
+- **The first `isNews` DocC overclaimed.** "Never a missed one" was false for a `var` with a default;
+  the copy-and-re-stamp shape replaced it before any build.
+- **A line-count check broke on zsh's `path`**, and its first form tripped `Bash(chmod:*)`: refused,
+  the sync stopped, and the owner said to go on with plain `wc -l`.
+- **The warning count depends on what is counted:** every line containing ` warning: ` gives 101/245;
+  primary lines give the documented 31/80.
+
+## [2026-10-07] — `/doc_sync`: the thirty-third pass, after the complication change
+
+### What changed
+
+- **`docs/AI_CONTEXT.md`:**
+  - the thirty-third pass header, with the thirty-second retained;
+  - the targets table's two test counts (331/35, 57/6);
+  - six stale line counts and the new `WristLinkDeliveryTests.swift` row;
+  - `WristSyncTests.swift`'s row, which had never listed `WristLinkReachabilityTests`;
+  - this pass's gate block, with the #46 block retained;
+  - the real-device bullet of *Still not verified*;
+  - #43 narrowed, and #52–#57 opened.
+- **`docs/STATE.md`:** the twentieth pass header; the `wristMirror` row's writer cell, which named only
+  the application context.
+- **`tasks/lessons.md`:** seven entries, from the background task that ended at once to a design that
+  is safe whichever answer Apple's hardware gives.
+
+### Checked and already accurate
+
+- **`docs/WIDGET.md`:** the phone widget's contract; nothing in it moved.
+- **`docs/DESIGN.md`:** no token or measurement moved.
+- **`CLAUDE.md`:** its watch sentences still hold — the watch exchanges data with the phone solely
+  through `WristLink`'s session, and the complication reads the watch's own suite — as do the six
+  shared files and the eleven keys.
+
+### Checks run
+
+- `find` over the seven target folders: 54 `.swift` files, one undocumented — the new test file.
+- `wc -l` against every documented count: 6 of 56 stale, exactly the six files the change touched.
+- `@Test` attribute counts: 331 phone, 57 watch; 12 UI `func test`.
+- The three exception sets: unchanged, six files each.
+- `DataManager.Key`: eleven keys, matching `Key.all`.
+- Every cited rule resolves to a file in `.claude/rules/`.
+- No doc cites a `DataManager.swift` line past the region this change shifted.
+
+### Staging
+
+Written last, from the commands' own output, after the session's staging. This file and
+`docs/AI_CONTEXT.md` were staged again once their git blocks were written, and the count re-printed:
+
+- **13 paths staged by explicit path:** the seven Swift files, the two specs, `docs/AI_CONTEXT.md`,
+  `docs/STATE.md`, `tasks/lessons.md` and this file. None has an unstaged edit on top.
+- **Five paths deliberately left unstaged:** the two watch schemes and two watch catalogues the Xcode
+  app wrote before the session began (#50), and `.claude/settings.json`, last written at 10:11, before
+  this session's first edit. `Screenshots/census/` is still untracked.
+- HEAD is `05a6998`, 59 commits. No `git commit` was run.
+
+## [2026-10-07] — `/doc_sync` re-run: seven of the thirty-third pass's own statements corrected
+
+### Re-derived, and current
+
+54 `.swift` files, none undocumented; all 57 documented line counts; 331 phone and 57 watch `@Test`,
+12 UI `func test`; three exception sets of six files; eleven keys, matching `Key.all`; every cited
+rule resolves. `WristSyncTests.swift`'s row was checked against every committed version of
+`docs/AI_CONTEXT.md`: all seven that carry it omit `WristLinkReachabilityTests`, so "had never listed"
+stands. #43's two ragged lines were checked against HEAD's `WaterBuddyWatchApp.swift`: lines 21 and 45,
+and the change rewrote the comment holding 45, so "narrowed" stands.
+
+### Corrected
+
+1. **"No simulator here has ever run a WatchConnectivity background task"** said more than spec
+   §15 found — that none was ever seen to. Corrected in place in `docs/AI_CONTEXT.md`, three times;
+   superseded in `tasks/lessons.md`.
+2. **The warning figures' scope.** 31/80 and 6/12 are the `WaterBuddy` build-for-testing's, the
+   baseline's own method. Across all four builds they are 31/160 — the phone widget's scheme rebuilds
+   the phone app and reprints its 80 — and 6/12, identical on both sides either way. Recomputed from
+   the saved logs. This file's earlier checkpoint gives 31/80 under "Warnings, across all four
+   schemes"; it stays as written, superseded here, and `docs/AI_CONTEXT.md` is corrected in place.
+3. **The old background wake.** The earlier checkpoint's *Found along the way* says it "had never been
+   able to work". It could, for a context: at HEAD `05a6998`, on watchOS, `activate()` re-read
+   `receivedApplicationContext` synchronously before the old closure's reload, so a context already
+   held reached the store. What returning at once ruled out was every delegate delivery, any push
+   included. The spec's §2 is corrected in place; `tasks/lessons.md` is superseded; and two comments
+   the change wrote into code still overstate it — `docs/AI_CONTEXT.md` **#58 opened**, since a doc
+   sync does not edit code.
+4. **The spec's §2 also said the 15-minute refresh "cannot help a phone drink".** At HEAD a foreground
+   launch applied a mirror without reloading the face, and the timer is what then drew it. Corrected
+   in place.
+5. **"The first `isNews` DocC overclaimed"**, in the earlier checkpoint. No such code ever existed: the
+   overclaim was the spec's first §4.6, and the DocC drafted from it was never written.
+   Superseded here and in `tasks/lessons.md`.
+6. **The `chmod` script was never written.** `tasks/lessons.md` says the check "wrote a script … and
+   ran `chmod +x`"; the whole command was refused before any of it ran. Superseded there.
+7. **#57 claimed more than its samples.** Another project's UI-test run was seen at 11:39:42 and was
+   gone by 11:51; the refusal came at 11:41:07, between the two. Whether that run was still going, and
+   whether it caused the refusal, nothing shows. Corrected in place in `docs/AI_CONTEXT.md`;
+   superseded in `tasks/lessons.md`.
+
+### Files touched
+
+`docs/AI_CONTEXT.md`, `docs/superpowers/specs/2026-10-07-complication-current-design.md`,
+`tasks/lessons.md` and this file. No code, and no gate re-run: nothing the gate compiles changed. Each
+of the seven staged Swift files was compared with `cmp` against the export the warning comparison
+built: all identical.
+
+### Staging
+
+Written last, from the commands' own output; this file staged once more after these lines:
+
+- **Still 13 paths**, every one already in the set and staged by explicit path, none with an unstaged
+  edit on top.
+- **The same five paths left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- HEAD is still `05a6998`, 59 commits. No `git commit` was run.
+
+## [2026-10-07] — `/doc_sync` third run: the re-run's central correction confirmed, three of its phrases corrected
+
+### Re-derived, and current
+
+54 `.swift` files, none undocumented; all 57 line counts; 331 phone and 57 watch `@Test`, 12 UI
+`func test`; three exception sets of six; eleven keys; every rule citation resolves; 13 paths staged,
+none half-staged, HEAD `05a6998`.
+
+### Confirmed by experiment
+
+The re-run's central correction — at HEAD the old wake's re-read context could reach the face —
+rested on `WristModel`'s `queue: .main` observer running before `post` returns when posted to from the
+main thread. A throwaway probe, a `swift` script in the session's scratchpad (in no target, touching no
+defaults and no file), printed `before post -> observer -> after post` on this Mac's Foundation, Swift
+6.4. The correction stands. Not shown on watchOS itself.
+
+### Corrected
+
+1. **The phone widget's rebuild.** The re-run's item 2 says its scheme "rebuilds the phone app and
+   reprints its 80". Eight of the 80 are the watch's `WristView.swift`: the scheme builds the watch app
+   it embeds as well, and its 80 lines are the `WaterBuddy` build's shipping 80 exactly, line for line.
+   Corrected in place in `docs/AI_CONTEXT.md`; superseded here.
+2. **"Ruled out."** The re-run's item 3 says returning at once "ruled out" every delegate delivery. A
+   delivery applied after the closure returned could still land before suspension; what returning at
+   once did was leave none able to land while the task was still open. Corrected in place in
+   `docs/AI_CONTEXT.md` (the header and #58); superseded here and in `tasks/lessons.md`.
+3. **The times.** The re-run's item 7 gives another project's run "seen at 11:39:42" and "gone by
+   11:51". Neither process check printed a time. The first ran just before the gate's own
+   `start 11:39:42`; the second ran after the failed run's `end 11:51:11` and before the re-run's
+   `start 11:52:05`. Corrected in place in #57; superseded here and in `tasks/lessons.md`.
+
+### Files touched
+
+`docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file. No code, and no gate re-run: nothing the gate
+compiles changed. The probe lives only in the scratchpad.
+
+### Staging
+
+Written last, from the commands' own output; this file staged once more after these lines:
+
+- **Still 13 paths**, none half-staged, and each of the seven staged Swift files still byte-identical
+  (`cmp`) to the export the warning comparison built.
+- **The same five paths left unstaged**, and `Screenshots/census/` still untracked.
+- HEAD is still `05a6998`, 59 commits. No `git commit` was run.
+
+## [2026-10-07] — `/doc_sync` fourth run: three of the third run's phrases tightened
+
+### Re-derived, and current
+
+54 `.swift` files, none undocumented; all 57 line counts; 331 phone and 57 watch `@Test`, 12 UI
+`func test`; three exception sets of six; eleven keys; every rule citation resolves; 13 paths staged,
+none half-staged, HEAD `05a6998`.
+
+### Tightened
+
+1. **"Bracketed by the runs that did."** The first process check is pinned only by the gate's
+   `start 11:39:42` after it; nothing before it printed a time. Corrected in place in
+   `docs/AI_CONTEXT.md` (the header and #57); superseded in `tasks/lessons.md`. This file's third-run
+   item 3 already said it exactly.
+2. **"The re-read context the old wake applied was in the store."** That presupposes there was one.
+   The probe shows that any context the old wake re-read was in the store before its reload.
+   Corrected in place in the header; superseded in `tasks/lessons.md`.
+3. **"Another project's test runs were live."** One run was identified — `Glazzy`'s UI tests, just
+   before 11:39:42 — and one `xcodebuild` from an unidentified session was counted just before the
+   watch run's `start 11:55:26`. Corrected in place in `docs/AI_CONTEXT.md`, twice. This file's own
+   "a `Glazzy` test run was live" was already exact.
+
+### Files touched
+
+`docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file. No code, and no gate re-run.
+
+### Staging
+
+Written last, from the commands' own output; this file staged once more after these lines:
+
+- **Still 13 paths**, none half-staged; 7 of 7 staged Swift files byte-identical (`cmp`) to the
+  export the warning comparison built.
+- **The same five paths left unstaged**, and `Screenshots/census/` still untracked.
+- HEAD is still `05a6998`, 59 commits. No `git commit` was run.

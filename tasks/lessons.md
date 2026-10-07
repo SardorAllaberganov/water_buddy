@@ -1996,3 +1996,155 @@ checkpoint stay as written, superseded here.
 
 **The rule:** describe a background measurement only once it has finished, and scope each claim to
 the samples actually read.
+
+## 2026-10-07 — A SwiftUI background task ends when its closure returns
+
+The watch's `.backgroundTask(.watchConnectivity)` closure activated the session, reloaded the
+complication and returned. Apple's `backgroundTask(_:action:)` page says the task is complete when the
+closure returns, and a WatchConnectivity delivery reaches the delegate only after activation, which is
+asynchronous. So the closure reloaded the face from the store as it stood, then gave the system leave
+to suspend the app before the mirror it was woken for had landed. It had read as "handles the
+background wake" since the watchOS plan's Task 17, and nothing in the gate could tell: no simulator
+here has ever run that task.
+
+**The rule:** an async background-task closure `await`s the work it was woken for before it returns —
+bounded, and ending when cancelled, because cancelling is how the system says time is up. For
+WatchConnectivity that work is "activated, and `hasContentPending` false": Apple's own instruction for
+the WatchKit form of the same task.
+
+## 2026-10-07 — A claim about how a design fails safe has to survive every way the type can grow
+
+The first `WristMirror.isNews(since:)` re-stamped the earlier mirror through the memberwise
+initialiser, and its DocC said a field added later "would err towards an extra push, never a missed
+one". That held for a `let`, which breaks the call and forces a decision. It was false for a `var`
+with a default: the call still compiles, the copy takes the default, and a change *to* the default
+reads as no change at all. Re-reading *A memberwise initialiser is a field list* (2026-08-30) caught it
+before any build did. The method now copies the whole earlier mirror and re-stamps that, so a field
+added later is compared for free — which took making `composedAt` the type's one `var`.
+
+**The rule:** before writing "never" into a claim about future changes, list the ways the type can
+change — a `let`, a `var` with a default, an optional — and check the claim against each. Prefer the
+shape that needs no claim: copy the whole value and change the one field.
+
+## 2026-10-07 — In zsh, never name a loop variable `path`
+
+A line-count check ran `while read -r path doc`, and reported all 56 rows stale, each with `command not
+found: wc`. zsh ties the array `path` to `PATH`, so assigning it emptied the command search path for
+the rest of the loop. Fifty current rows read as stale, and nothing failed loudly enough to stop it.
+
+**The rule:** loop variables in this shell are `f`, `p` or any word that is not `path`, `fpath`,
+`cdpath` or `manpath`. A check in which every row fails is a broken check before it is a finding.
+
+## 2026-10-07 — A read-only check needs no script file
+
+The first form of that line-count check wrote a script into the scratchpad and ran `chmod +x` on it.
+`Bash(chmod:*)` is on the project's deny list, so the call was refused and the sync stopped, as the
+2026-09-02 entry requires, until the owner said to go on with plain `wc -l`. The same check as one
+pipeline needed neither the file nor the permission.
+
+**The rule:** compose a read-only check as a pipeline. When a script really is needed, read the deny
+list in `.claude/settings.json` before writing a command that makes it executable.
+
+## 2026-10-07 — A UI-test runner refused as "Busy" is the simulator, not the code
+
+The phone UI-test gate run ended `Simulator device failed to launch sardor.WaterBuddyUITests.xctrunner`,
+SpringBoard answering `Busy ("Application failed preflight checks")`, with no test executed — while
+another project's UI tests ran on a second simulator. `xcodebuild` then spent its full 600 seconds
+collecting diagnostics (*A failing run can cost ten minutes*), which carried the command past the
+tool's foreground limit. Re-run unchanged once the other run had ended, it passed in 3 minutes 10.
+
+**The rule:** read a failed run's `Testing failed:` lines before its code. "Failed to launch … Busy"
+with no test executed is the environment: let the other session's run finish, then re-run the gate
+command exactly as written.
+
+## 2026-10-07 — Count the compiler's primary warning lines, not every line that says "warning"
+
+The warning comparison first read 101 unique lines and 245 occurrences on the shipping targets,
+against a documented 31 and 80. Both sides agreed, so the change was clean either way, but the figure
+looked like a moved baseline. It was the method: Swift 6 echoes each diagnostic under a caret
+(`` `- warning: … ``), and macro expansions print their own lines. Counting only
+`File.swift:L:C: warning:` lines reproduces 31/80 exactly.
+
+**The rule:** compare against the baseline on `\.swift:[0-9]+:[0-9]+: warning: ` lines, and say which
+count a published figure is.
+
+## 2026-10-07 — When Apple contradicts itself, design so that either answer is safe
+
+Whether `transferCurrentComplicationUserInfo` reaches a WidgetKit complication had three Apple answers:
+the sample code does it, an Apple engineer on the forums said in 2024 that it does not work, and
+WWDC26 said it "works now". No simulator here can settle it. The design made the push an early copy of
+what the application context already carries, so the "no" answer degrades to the behaviour before the
+change rather than breaking anything; and the owner, asked, chose to settle it on their own devices.
+
+**The rule:** an unverifiable platform claim gets a design whose failure is "as before", tests for
+everything pure around it, and a named hardware check with an owner — never a confident sentence in
+the docs.
+
+## 2026-10-07 — Before saying what replaced code could not do, read what still runs around it
+
+The `/doc_sync` re-run found this session's own records saying the old `.backgroundTask(.watchConnectivity)`
+wake "had never been able to work" and that its reload "draws the old store". Both were written from
+the line being replaced — the return straight after the reload — and not from `activate()`, called
+on the line before it, which on watchOS re-reads `receivedApplicationContext` synchronously. A context
+already held could reach the face that way; what returning at once ruled out was every delegate
+delivery, a pushed mirror included. The same reading produced "the 15-minute refresh cannot help a
+phone drink", when a mirror a foreground launch applied without reloading the face was exactly what
+that timer drew. Two comments in the staged code still carry the overstatement
+(`docs/AI_CONTEXT.md` #58), outside a doc sync's reach.
+
+Four of this session's entries above overreach the same way, in smaller things, and stay as written,
+superseded here:
+- *A SwiftUI background task ends when its closure returns* says the closure "gave the system leave to
+  suspend the app before the mirror it was woken for had landed" — true of a push, not of a context
+  the re-read had already applied — and that "no simulator here has ever run that task", where spec
+  §15 found only that none was ever seen to.
+- *A claim about how a design fails safe* says "the first `WristMirror.isNews(since:)` re-stamped the
+  earlier mirror through the memberwise initialiser, and its DocC said…". No such code ever existed:
+  it was the spec's first §4.6, and the DocC drafted from it was never written.
+- *A read-only check needs no script file* says the check "wrote a script into the scratchpad and ran
+  `chmod +x` on it". The whole command was refused before any of it ran.
+- *A UI-test runner refused as "Busy"* says the refusal came "while another project's UI tests ran on
+  a second simulator". The samples show that run at 11:39:42 and gone by 11:51, the refusal at
+  11:41:07 between them — not that it was still running then.
+
+**The rule:** a sentence about what old code could not do is a claim about every path through it.
+Read the whole entry point — the calls just before the line being replaced, as much as the line —
+before writing "never", "cannot" or "draws the old". And scope an observation to the samples that
+show it, as *A measurement still running is not evidence yet* already asks.
+
+## 2026-10-07 — A correction is a claim too, and a time nobody printed is a bracket
+
+The third `/doc_sync` run checked the second run's corrections the way the second had checked the
+first's, and three of its replacement phrases overreached in their turn:
+- It placed another project's run "at 11:39:42" and gone "by 11:51". Neither process check printed a
+  time: each sat between two runs that did. The honest figures are "just before 11:39:42" and "by
+  11:52:05".
+- It said the phone widget's scheme "reprints its 80" warnings — the phone app's. Eight of the 80 are
+  the watch's `WristView.swift`, because that scheme builds the watch app too: the correction the
+  thirty-second pass's re-run had already made once.
+- It said returning at once "ruled out" every delegate delivery. A delivery applied after the closure
+  returned could still land before the system suspended the app; what returning at once did was leave
+  none able to land while the task was still open, as the spec's §2 already put it.
+
+The second run's central claim held, and is now evidenced rather than reasoned: a throwaway probe
+showed a `queue: .main` block observer, posted to from the main thread, running before `post`
+returns, so HEAD's re-read context was in the store before its reload. The second run's entry above,
+*Before saying what replaced code could not do*, and its `HISTORY.md` checkpoint stay as written,
+superseded here.
+
+**The rule:** read a correction's replacement text with the same suspicion as the text it replaces. A
+time from a check that printed none is a bracket between its neighbours' timestamps — write it as one.
+And when a claim turns on runtime behaviour a one-minute probe can show, run the probe.
+
+## 2026-10-07 — Paraphrasing a precise record undoes its precision
+
+The fourth `/doc_sync` run found the third's own summary less exact than the record it summarised.
+`HISTORY.md`'s third-run item 3 says the first process check "ran just before the gate's own `start
+11:39:42`". `docs/AI_CONTEXT.md`, and the entry above, turned that into "bracketed by the runs that
+did" and "each sat between two runs that did" — but nothing before that check had printed a time, so
+it was pinned on one side only. The entry above also says "HEAD's re-read context was in the store
+before its reload", which presupposes there was one; the probe shows only that any context re-read
+would be. Both stay as written above, superseded here; `docs/AI_CONTEXT.md` is corrected in place.
+
+**The rule:** when a record already states a fact exactly, carry its wording forward rather than a
+summary of it. Every paraphrase is a fresh claim, and needs checking again.

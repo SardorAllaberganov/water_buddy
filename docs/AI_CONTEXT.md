@@ -4,6 +4,63 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-07 (thirty-third pass, **re-verified by three further `/doc_sync` runs the
+same day**. The fourth re-derived every probe — all current — and tightened three of the third's
+phrases in place: a check pinned only by the run after it is not "bracketed"; the probe shows that
+*any* context the old wake re-read was in the store before its reload, not that one was; and one
+identified `Glazzy` run plus one unidentified `xcodebuild` are not "another project's test runs". The
+third re-derived every probe again — all current — and confirmed the second's central correction by
+experiment: a `queue: .main` block observer, posted to from the main thread, ran before `post`
+returned, on this Mac's Foundation, so any context the old wake re-read was in the store before its
+reload. It corrected three of the second run's own phrases, fixed in place below. The phone widget's
+rebuild reprints the watch app's warnings as well as the phone app's. The other project's run was seen
+just before 11:39:42 — by a check that printed no time, pinned by the gate's own `start` after it —
+and gone by 11:52:05, by a second check between the failed run's `end 11:51:11` and the re-run's
+`start`: not "at 11:39:42" and "by 11:51". And returning at once did not rule delegate deliveries
+out; it left them unable to land while the task was still open. The second run
+re-derived every probe — all current — and corrected seven of this pass's own statements.
+"No simulator here has ever run" a WatchConnectivity background task said more than spec §15 found,
+which is that none was ever *seen* to. The 31/80 warning figures belong to the `WaterBuddy`
+build-for-testing alone, not to all four schemes, which give 31/160 — the phone widget's scheme
+rebuilds the phone app and the watch app it embeds, and reprints the same 80 — and still 6/12. The old
+background wake was not "never able to work": `activate()` re-read `receivedApplicationContext` before
+the reload, so a context already held could reach the face, while returning at once left every
+delegate delivery, any push included, unable to land while the task was still open; the spec's §2 is
+corrected in place, and two comments the change wrote into code still say otherwise (#58 opened).
+That §2 also said the 15-minute refresh "cannot help a phone drink": it could, once the watch app had
+run, because a foreground launch applied a mirror without reloading the face, and the timer drew it —
+corrected in place too. The memberwise `isNews` whose claim was too strong never existed as code — it
+was the spec's first §4.6. The script that tripped `Bash(chmod:*)` was never written: the whole
+command was refused. And #57 now says what was observed rather than what was likely. The pass's own
+summary follows, corrected. `/doc_sync` after **roadmap item 2: the complication stays current**,
+owner-approved: `docs/superpowers/specs/2026-10-07-complication-current-design.md`, with §18 added to
+the watch spec. The watch app now reloads its own face whenever it writes the store
+— every pour, and every mirror that is *news* (`WristMirror.isNews(since:)`: any field but
+`composedAt`). The `.backgroundTask(.watchConnectivity)` closure waits, bounded and cancellable, until
+the session has delivered, instead of returning at once. The face asks for a timeline `.atEnd`, not
+every 15 minutes. The phone pushes a news mirror with `transferCurrentComplicationUserInfo` beside the
+application context, while the complication is on the face and the day's budget lasts, cancelling any
+superseded push first. And `WristModel.apply(_:)` never takes a mirror composed before the one it
+holds, unless the one held is more than a minute ahead of the watch's clock. **The background path is
+unverified on hardware** — no simulator here has ever been seen running a WatchConnectivity
+background task — and the owner chose to check it on their own iPhone and Apple Watch (spec §8.3,
+#52). **This sync's own
+drift:** 6 of 56 line counts (exactly the six files the change touched); one undocumented file, the
+new `WristLinkDeliveryTests.swift`; `WristSyncTests.swift`'s row, which had never listed
+`WristLinkReachabilityTests`; both test counts in the targets table; `docs/STATE.md`'s `wristMirror`
+row, which named only the context as its source. Known issue **#43 narrowed** — the change reflowed
+one of its two ragged comment lines — and **#52–#57 opened**, with #58 by the re-run. Gate re-run in full this session, again
+without `xcrun simctl shutdown all` (another project's run was live): **331**/35 phone unit, **25**
+phone UI (on a second run — the first was refused launch, #57), **57**/6 watch unit, both widget
+builds green; warnings identical per file, message and count against a `git archive HEAD` export
+across all four schemes — and in the `WaterBuddy` build-for-testing, the baseline's own method, 31
+unique lines and 80 occurrences on the shipping targets, 6 and 12 on the test targets.
+`docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md` were checked and deliberately not touched: the
+phone widget, the tokens and nothing `CLAUDE.md` states has changed.)
+
+<details>
+<summary>Thirty-second pass — 2026-10-07, re-verified the same day, retained</summary>
+
 **Last updated:** 2026-10-07 (thirty-second pass, **re-verified by a second `/doc_sync` run the same
 day**. It re-derived every probe — all current — and corrected four of this pass's own statements.
 The simulators found shut down between runs were shut down by `xcodebuild` itself as each run ended,
@@ -32,6 +89,8 @@ green; warnings identical per file and message against a `git archive HEAD` expo
 and 80 occurrences on the shipping targets, and 6 and 12 on the test targets, their first clean-build
 count. `docs/DESIGN.md` and `CLAUDE.md` were checked and deliberately not touched — no token moved,
 and nothing `CLAUDE.md` states changed.)
+
+</details>
 
 <details>
 <summary>Thirty-first pass — 2026-10-06, re-verified 2026-10-06 and 2026-10-07, retained</summary>
@@ -321,11 +380,11 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 328 `@Test` functions in 34 suites |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 331 `@Test` functions in 35 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
-| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 45 `@Test` functions in 5 suites |
+| `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 57 `@Test` functions in 6 suites |
 
 Every target's sources come from a `PBXFileSystemSynchronizedRootGroup`, so a new `.swift` file
 dropped in a folder joins that target with no project edit. `xcodebuild -list` reports **four**
@@ -409,7 +468,7 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2280   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs, WristLink (behind #if canImport(WatchConnectivity))
+WaterBuddy/DataManager.swift                    2406   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face on iOS, its wait for delivery on watchOS
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
 WaterBuddy/HistoryView.swift                     672   app only — the week card, today's log, swipe-to-delete, the serving editor
@@ -440,7 +499,7 @@ WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab b
 WaterBuddyTests/ServingSeamTests.swift           279   ServingResolutionTests (pure, not @MainActor) + ServingSeamTests
 WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
-WaterBuddyTests/WristSyncTests.swift             829   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristLinkDecodingTests + WristLinkChunkingTests
+WaterBuddyTests/WristSyncTests.swift             889   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests
 WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set and the 25-shot full census
 WaterBuddyUITests/GoalSetupUITests.swift         245   setup, the a11y tree, the tab swap, the Settings tab, the week card
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
@@ -448,27 +507,28 @@ WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            139   writes: runs DataManager in the extension
 WaterBuddyWidget/WaterBuddyWidget.swift          590   reads the cache only, never SwiftData
 WaterBuddyWidget/WaterBuddyWidgetBundle.swift     17
-WaterBuddyWatch/WaterBuddyWatchApp.swift          78   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
+WaterBuddyWatch/WaterBuddyWatchApp.swift          77   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity) (which now awaits WristLink.waitForPendingDelivery() rather than returning at once), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
-WaterBuddyWatch/WristModel.swift                 252   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite; language, the phone's in-app choice read off the mirror
+WaterBuddyWatch/WristModel.swift                 305   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite; language, the phone's in-app choice read off the mirror; reloads the complication on every pour and every mirror that is news, and never takes a mirror older than the one held
 WaterBuddyWatch/WristVessel.swift                145   watch app only — the one vessel, WaterSurface + WaterReadabilityScrim + readout; scrimIntensity(at:) is its own scrim ramp, none at 0% and full by 20% (known issue #35), never the widget's; readout(volume:goal:strings:locale:) groups per language; NOT self-describing to VoiceOver since it became a Button's label
 WaterBuddyWatch/WristView.swift                  468   watch app only — the one screen: the vessel IS the pour button, one "More" button over a sheet, "Synced Nm ago"; every string through \.strings
 WaterBuddyWatchTests/WristLinkCompileTests.swift  21   compile-time canary — WristLink stays non-@MainActor and Sendable
-WaterBuddyWatchTests/WristModelTests.swift       308   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction, the phone's day end through the model, the language the watch draws in
+WaterBuddyWatchTests/WristLinkDeliveryTests.swift 56   WristLinkDeliveryTests (not @MainActor) — how long a background wake is held open: WristLink.poll stops when delivery is done, gives up after its last check, ends when cancelled
+WaterBuddyWatchTests/WristModelTests.swift       443   WristModelTests — pour, apply, isMirrorStale, todaysTotal, reconstruction, the phone's day end through the model, the language the watch draws in, when the face reloads, and which mirror wins
 WaterBuddyWatchTests/WristPlanCompileTests.swift  20   compile-time canary — WristPlan stays free of actor isolation
 WaterBuddyWatchTests/WristVesselLayoutTests.swift 49   diameter(fitting:within:) against five real watch width/height pairs
 WaterBuddyWatchTests/WristViewLogicTests.swift   323   the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution in en/ru/uz, serving names, the grouped readout, and the vessel's scrim ramp (full before water can reach the millilitre line, on every diameter)
-WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 90   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight; its description is the phone's own "Today's hydration"
+WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 95   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight, policy .atEnd (no longer a 15-minute timer); its description is the phone's own "Today's hydration"
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**53 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
-the thirty-second pass with `find` over all seven plus `Tools/` and a two-way comparison against this
-file: no phantom row and no undocumented file — the #46 fix added no Swift file. All 56 line counts
-(the 53 above and the three Swift scripts below) were re-checked against `wc -l` by script: 4 were
-stale — exactly the four files the fix touched — and 52 current. *(This note still named the
-thirtieth pass until now; the thirty-first had found 5 stale of 56, the five files smart reminders
-grew. The thirtieth found 2, the twenty-ninth 8 of 56, the twenty-eighth 7 of 55 on 2026-10-05.)*
+**54 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
+the thirty-third pass with `find` over all seven and a two-way comparison against this file: no
+phantom row, and one undocumented file — the change's new `WristLinkDeliveryTests.swift`, now listed.
+The 56 line counts already here (53 files and the three Swift scripts below) were re-checked against
+`wc -l`: 6 were stale — exactly the six files the change touched — and 50 current; the new file's
+count was taken the same way, making 57. *(The thirty-second pass found 4 stale of 56, the
+thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the twenty-eighth 7 of 55 on 2026-10-05.)*
 
 ### Outside every target
 
@@ -677,6 +737,57 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five re-run 2026-10-07, on Xcode 27.0, after the complication change** (the
+thirty-third pass). Foreground, `-parallel-testing-enabled NO`, the commands exactly as rule
+`85-testing` writes them — **except `xcrun simctl shutdown all`, skipped again**: another project's
+(`Glazzy`) UI-test run was live just before the gate began, and some other session's `xcodebuild` was
+counted again just before the watch run. The phone UI-test run was **refused launch**
+the first time, and run again (#57).
+
+| Command | Result |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 331 tests in 35 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `** TEST SUCCEEDED **` — `Executed 25 tests, with 0 failures`, on the second run. The first ended `Testing failed: Simulator device failed to launch sardor.WaterBuddyUITests.xctrunner` — SpringBoard answered `Busy ("Application failed preflight checks")` — with no test executed |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+
+**Fifteen new tests, in two new suites and one grown.** Phone, `WristMirrorNewsTests` (+3, not
+`@MainActor`): the first mirror is news; one differing only in `composedAt` is not; a change to any
+other field is, field by field. Watch, `WristModelTests` (+9): a pour reloads the face and a refused
+one does not; a mirror that changes the total reloads, the same mirror twice reloads once, and one new
+only in `composedAt` is taken but reloads nothing; an older mirror changes nothing; a tie is taken; a
+held mirror 30 s ahead of the watch's clock still blocks an older one, and one an hour ahead does not.
+And `WristLinkDeliveryTests` (+3, not `@MainActor`): the wait ends as soon as delivery is done, gives up
+after its last check, and ends when its task is cancelled. **RED on seams that compiled:** `isNews`
+returning `true` (the composed-at test failed) and then `false` (the other two, all nine fields by
+name); then the reload closure stored but never called, no ordering rule, and `poll` returning `false`
+unchecked — nine of the watch's twelve failed, each on its own expectation. **The other three, by
+mutation:** the pour's reload moved above its guard, ties rejected, the clock escape removed and
+`apply`'s reload made unconditional, in one run — exactly the five predicted tests failed, among them
+the existing `aNewMirrorSwitchesTheLanguageForObservers`, whose mirrors share a stamp.
+
+**Warnings, compared rather than counted, across all four schemes.** Clean `build-for-testing` of
+`WaterBuddy` and `WaterBuddyWatch` and `build` of both widget schemes, generic simulator destinations,
+one empty DerivedData folder per side: a `git archive HEAD` export (`05a6998`) against the same export
+plus only the change's seven Swift files — the four files the Xcode app wrote (#50) kept out of both.
+**Identical per file, message and count.** On the compiler's primary `File.swift:L:C: warning:` lines,
+in the `WaterBuddy` build-for-testing — the baseline's own method — shipping targets 31 unique lines and
+80 occurrences, test targets 6 and 12. Across all four builds, 31 and 160 — the phone widget's scheme
+rebuilds the phone app and the watch app it embeds, and reprints the same 80, eight of them from the
+watch's `WristView.swift` — and still 6 and 12. Counting every line that contains
+` warning: ` in the `WaterBuddy` build-for-testing also counts Swift 6's caret echoes and macro
+expansions, and reads 101/245 on the shipping targets — equally identical, and not the figure the
+baseline means. *(Until the 2026-10-07 re-run, 31/80 stood here without its scope, under a heading
+that names all four schemes.)*
+
+**Not observed:** anything on the wire. The push, the waiting wake and the face's `.atEnd` policy have
+no automated coverage and were not run on a simulator — none here has ever been seen running a
+WatchConnectivity background task (spec 2026-08-31 §15), and the complication has never been placed on
+a face. The owner's device check (spec 2026-10-07 §8.3) is what proves them (#52).
+
+*(The 2026-10-07 known-issue #46 gate block below is retained as that pass's record.)*
 
 **Gate — all five re-run 2026-10-07, on Xcode 27.0, after the known-issue #46 fix** (the
 thirty-second pass). Foreground, `-parallel-testing-enabled NO`, the commands exactly as rule
@@ -1223,7 +1334,10 @@ both roots rendering at accessibility text sizes.
   `WatchConnectivity` delivery" from "the transport genuinely failed" — `sendMessage` never
   succeeded once across 48 attempts there, `isReachable` got stuck asymmetric, and
   `.backgroundTask(.watchConnectivity)` was never observed firing. No part of the automated gate
-  exercises a real pairing.
+  exercises a real pairing. **The 2026-10-07 complication change sits entirely on this unverified
+  ground:** the phone's push, the background wake that now waits for it, and the face reloading from
+  the background. Its pure decisions are tested; the owner's own iPhone and Apple Watch are the check
+  (spec 2026-10-07 §8.3, known issue #52), and it has not yet been run.
 - **The watch widget's on-face rendering.** No automated coverage exists for widget rendering on
   either platform (rule `85-testing`'s standing note) — the phone widget's Home Screen appearance
   was never re-verified against the watchOS plan's changes (none touched it), and the watch's
@@ -1252,17 +1366,19 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-07), after the pass's staging and before
-this section was written, from the commands themselves:
+**There is a git repository.** Verified this pass (2026-10-07, the thirty-third) and again by each of
+its three re-runs the same day — every time after the staging and before this section was written,
+from the commands themselves; every re-run's figures matched these exactly:
 
 ```
 $ git rev-parse --short HEAD
-641e88c
+05a6998
 $ git log --oneline | wc -l
-      56
+      59
 $ git diff --cached --name-only | wc -l
-      12
-$ git status --short | grep -v '^M  '
+      13
+$ git status --short | grep -v -E '^[MA]  '
+ M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatchWidget.xcscheme
  M WaterBuddyWatch/Localizable.xcstrings
@@ -1270,22 +1386,24 @@ $ git status --short | grep -v '^M  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 12 staged paths — the change (`NotificationManager.swift`,
-`DataManager.swift`, `AddWaterIntent.swift`), its tests (`NotificationManagerTests.swift`), the
-three amended rules (`80-notifications`, `43-concurrency`, `85-testing`), `docs/STATE.md`,
-`docs/WIDGET.md`, this session's `tasks/lessons.md` entries, the `HISTORY.md` checkpoints and this
-sync's own `docs/AI_CONTEXT.md` — were staged with explicit paths for the owner's `/commit` (rule
-`90-git`). **Four paths are deliberately left unstaged:** the two watch schemes and the two watch
-catalogues the Xcode app wrote during the session (known issue #50). They are not this change's,
-and not the session's to stage or revert. The previous pass's 13 staged paths were committed by the
-owner before this session began, as `e6aa8ad`, `c48715a` and `641e88c` —
-`git diff --name-only 5ac02f1 641e88c` lists exactly 13. `Screenshots/census/` (28 coverage
-captures, 51 MB) is still untracked, neither committed nor ignored; whether it belongs in the tree
-is the owner's call.
+**Nothing is committed by this pass.** The 13 staged paths — the change (`DataManager.swift`,
+`WristModel.swift`, `WaterBuddyWatchApp.swift`, `WaterBuddyWatchWidget.swift`), its tests
+(`WristSyncTests.swift`, `WristModelTests.swift` and the new `WristLinkDeliveryTests.swift`), the new
+spec and the watch spec's §18, `docs/STATE.md`, this session's `tasks/lessons.md` entries, the
+`HISTORY.md` checkpoints and this sync's own `docs/AI_CONTEXT.md` — were staged with explicit paths
+for the owner's `/commit` (rule `90-git`). **Five paths are deliberately left unstaged:** the two
+watch schemes and the two watch catalogues the Xcode app wrote before this session began (known issue
+#50), and `.claude/settings.json`, last written at 10:11 that morning, before this session's first
+edit (`git push` and `git init` moved from *ask* to *allow*). None is this change's to stage or
+revert. The previous pass's 12 staged
+paths were committed by the owner before this session began, as `807bca8`, `74d6a47` and `05a6998` —
+`git diff --name-only 641e88c 05a6998` lists exactly 12. `Screenshots/census/` (28 coverage captures,
+51 MB) is still untracked, neither committed nor ignored; whether it belongs in the tree is the
+owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 56 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 59 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -1893,8 +2011,9 @@ rather than fixed — the review's own explicit call, not an oversight:**
       `#if DEBUG`" — not for `""`, and it prints twice per `WristRoot` body; `syncedCaption`'s DocC
       says "rounded" where it truncates; `watchOwnKeys`' DocC in `LocalizationTests` gives a partly
       wrong reason (two of the nine are `Text` literals; the real one is that an extracted key with
-      no `en` value reaches no table); two ragged lines left by a reflow in
-      `WaterBuddyWatchApp.swift`.
+      no `en` value reaches no table); one ragged line left by a reflow in
+      `WaterBuddyWatchApp.swift`'s `init()` comment ("Doing it here too"). *(Two until 2026-10-07,
+      when the complication change rewrote the background-task comment that held the other.)*
 
 **Opened by the 2026-10-06 known-issue #35 fix:**
 
@@ -2007,6 +2126,68 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     whenever the pair exists, and when it was created is not recorded. Rule text is the owner's to
     change. Unpairing the two is not the fix either: `WristLink`'s live session is exercised by hand
     on paired simulators (rule `85-testing`).
+
+**Opened by the 2026-10-07 complication change (roadmap item 2):**
+
+52. **The complication push is unverified on hardware.** The phone's
+    `transferCurrentComplicationUserInfo`, the background wake that now waits for delivery, and the
+    face reloading from the background are proved only by their pure halves' tests, the build and
+    inspection: no simulator here has ever been seen running a WatchConnectivity background task
+    (spec 2026-08-31 §15). Apple has said both things about whether the push reaches a WidgetKit complication — an
+    Apple engineer on the Developer Forums said in July 2024 that it did not; Apple's own sample code
+    does exactly this; WWDC26's watchOS group lab said updating widgets over Watch Connectivity "works
+    now". So it should work on watchOS 27, and is uncertain on 26.x, inside the app's 26.0 floor.
+    Where it fails nothing regresses: the application context still carries every mirror. The
+    owner's device check (spec 2026-10-07 §8.3) is pending.
+53. **A drink logged from the phone's Home Screen widget reaches the watch only when the phone app
+    next comes forward.** An Apple engineer said in 2016 that `WCSession` is not available in iOS app
+    extensions, so `AddWaterIntent.activateWristLinkIfNeeded()` is most likely inert, and the
+    extension's publish throws into `requestWristPublish`'s `DEBUG`-only catch — skipping the push
+    with it. Pre-existing; recorded now because the complication change makes it the largest gap left.
+    Check 5 of the device check settles whether that activation does anything at all.
+54. **Two deliberate limits of the push design** (spec 2026-10-07 §9). A complication added to a face
+    mid-day shows what the watch last heard until the next change, because adding it is not news to
+    the phone. And a phone whose clock is set *behind* real time, while the watch keeps real time,
+    stalls the watch until the phone's clock catches up: `apply(_:)` refuses a mirror older than the
+    one held, and its escape — a held mirror more than a minute ahead of the watch's own clock —
+    fires only when the watch's clock moved with the phone's.
+55. **Rule `70-privacy` describes the transfer queue for pours only.** Its *WatchConnectivity is a
+    ruling* section says a payload handed to `transferUserInfo` lives in a system daemon until the
+    counterpart runs. A pushed mirror now waits there too, holding the same fields the application
+    context does — at most one at a time, since a new push cancels the one it replaces. Proposed in
+    spec 2026-10-07 §5; rule text is the owner's to change.
+56. **A test's DocC and Apple's documentation disagree about user-info ordering.** The comment on
+    `WristInboxReassemblyTests.chunksArriveOutOfOrderButReassembleInOrder` says `transferUserInfo`
+    "promises no ordering"; Apple's `transferUserInfo(_:)` page says such dictionaries "are queued on
+    the other device and delivered in the order in which they were sent". Sorting by `chunkIndex` is
+    right either way, so nothing breaks — the comment overstates its reason. A complication push,
+    which jumps that queue while budget lasts, is the documented exception.
+57. **A UI-test gate run was refused launch as "Busy".** On 2026-10-07 the first
+    `-only-testing:WaterBuddyUITests` run ended `Simulator device failed to launch
+    sardor.WaterBuddyUITests.xctrunner`, SpringBoard answering `Busy ("Application failed preflight
+    checks")` at 11:41:07, with no test executed. Another project's `xcodebuild test` of its UI tests
+    had been seen running just before 11:39:42 and was gone by 11:52:05 — two process checks that
+    printed no time of their own: the first pinned only by the gate's `start 11:39:42` after it, the
+    second between the failed run's `end 11:51:11` and the re-run's `start 11:52:05`. Whether it was
+    still running at 11:41, and whether it caused the refusal, no sample shows. *(The third run of
+    2026-10-07 corrected those two times, which read "at 11:39:42" and "by 11:51".)* `xcodebuild` then spent its full 600 seconds
+    collecting simulator diagnostics, because the gate's UI command carries no
+    `-collect-test-diagnostics never`. The re-run passed in 3 minutes 10 seconds. The gate's commands
+    are the owner's to change (rule `85-testing`). *(Until the 2026-10-07 re-run, this was titled
+    "refused launch while another project's UI tests ran", which said more than the two samples.)*
+58. **Two comments the complication change wrote overstate what the old background wake missed.**
+    `WaterBuddyWatchApp.swift`'s comment above `await WristLink.waitForPendingDelivery()` says
+    "nothing has been delivered yet" at that point, and that returning there let the system suspend
+    the app "before the mirror it was woken for ever landed"; `waitForPendingDelivery()`'s DocC in
+    `DataManager.swift` says the same — "before anything had been delivered to it". But on watchOS
+    `activate()`, called on the line before, re-reads `receivedApplicationContext` synchronously
+    (`applyPersistedContext(from:)`), as it did at HEAD `05a6998` before the old closure's reload. A
+    context already held could therefore reach the face — `WristModel`'s `queue: .main` observer,
+    posted to from the main thread, runs before `post` returns, as the third run's probe showed on
+    this Mac's Foundation — while returning at once left every delegate delivery, a pushed mirror
+    included, unable to land while the task was still open. The behaviour is unaffected — waiting is
+    right either way — but the comments are code, outside a doc sync's write scope. Found by the
+    2026-10-07 re-run.
 
 ## Where the rest is written down
 
