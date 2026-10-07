@@ -16,9 +16,15 @@ system.
   `NotificationManager`
 - `ReminderPlanTests.swift` deliberately imports neither `UserNotifications` nor `@MainActor` — it
   is a compile-time canary, not an oversight. Do not "fix" it
-- The schedule is a **fixed grid** of hours, not a rolling timer. "Remind me two hours after my last
-  serving" would need a plan that changes every time the user drinks, which is a different product
-  and a different failure mode
+- The schedule is a **fixed grid** of hours, not a rolling timer. A slot is only ever **dropped**,
+  never moved: by the goal (today only, below) or by a drink less than `ReminderPlan.quietAfterDrink`
+  before it, the drink clamped to `now`. A rolling "two hours after your last serving" timer moves
+  slots, and a moved slot fires outside the window
+- `quietAfterDrink` is one hour — `theQuietHourEndsExactlyAnHourAfterTheDrink` pins it. One drink
+  drops at most one slot — `oneDrinkSilencesAtMostOneSlot` pins that, and it holds only while
+  `quietAfterDrink` stays within the grid's interval and the clamp stays: a watch pour carries the
+  watch's own clock, and one stamped ahead of the phone's would otherwise silence every slot up to
+  an hour past it
 - Derive a slot's fire date with `calendar.date(bySettingHour:minute:second:of:)` on a day produced
   by `calendar.date(byAdding: .day, …)`. Never add 86,400 seconds
 - `slots(...)` degrades rather than traps: the loop bound is `0...max(0, horizonDays)`, and both
