@@ -127,16 +127,18 @@ final class GoalSetupUITests: XCTestCase {
     /// accessibility tree.
     ///
     /// `HistoryWindowTests` already proves the model half — that `DataManager.history` is
-    /// published, windowed and correct. What an injected store cannot show is whether the card
-    /// arrives as **one** VoiceOver stop or as one per bar plus one per weekday. This codebase has
-    /// shipped a duplicated stop before, and it was visible only in a real accessibility tree
-    /// (`tasks/lessons.md`).
+    /// published, windowed and correct. What an injected store cannot show is how the card arrives
+    /// in VoiceOver. It was **one** element until the card became the day picker
+    /// (`docs/superpowers/specs/2026-10-07-earlier-servings-design.md`), and this test asserted
+    /// exactly that. The contract now is one summary stop plus **exactly one button per day** —
+    /// never one per bar *and* one per weekday, the duplicated stop this codebase has shipped
+    /// before and could see only in a real accessibility tree (`tasks/lessons.md`).
     ///
     /// Reachable through ordinary UI because today counts: one serving makes the published window
     /// non-empty, which is what draws the card. No seeded fixture and no launch argument — a test
     /// whose setup can silently no-op is worse than no test, because it is counted.
     @MainActor
-    func testLoggingAServingRevealsTheWeekCardAsOneElement() throws {
+    func testTheWeekCardIsOneSummaryAndOneButtonPerDay() throws {
         let app = XCUIApplication()
         app.launch()
 
@@ -153,12 +155,81 @@ final class GoalSetupUITests: XCTestCase {
 
         app.buttons["History"].tap()
 
-        let card = app.otherElements["Last 7 days"]
-        XCTAssertTrue(card.waitForExistence(timeout: 5), "the week card did not draw after a serving")
-        XCTAssertEqual(
-            app.otherElements.matching(identifier: "Last 7 days").count, 1,
-            "the card must resolve to exactly one element, not one per bar"
+        XCTAssertTrue(
+            app.staticTexts["Last 7 days"].waitForExistence(timeout: 5),
+            "the week card did not draw after a serving"
         )
+        XCTAssertEqual(
+            app.descendants(matching: .any).matching(identifier: "Last 7 days").count, 1,
+            "the card's summary must resolve to exactly one element"
+        )
+        for name in Self.dayNames() {
+            XCTAssertEqual(
+                app.buttons.matching(identifier: name).count, 1,
+                "\(name) must be exactly one button on the week card"
+            )
+        }
+        XCTAssertTrue(app.buttons["Today"].isSelected, "the card opens on today")
+    }
+
+    /// The whole new path, from outside the process: pick yesterday on the week card, add a serving
+    /// with the `+`, and find it under yesterday.
+    ///
+    /// `EarlierServingTests` pins the model's half. What it cannot see is the card's button, the
+    /// sheet opening on the day it was asked for, and the screen following the serving there.
+    /// Idempotent like the rest of this suite: it counts yesterday's rows before and after rather
+    /// than assuming an empty day, because the simulator keeps every serving an earlier run added.
+    @MainActor
+    func testAServingAddedToYesterdayShowsUnderYesterday() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let getStarted = app.buttons["Get Started"]
+        if getStarted.waitForExistence(timeout: 5) {
+            getStarted.tap()
+        }
+
+        // A serving today is what draws the week card, and with it yesterday's button.
+        let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass")).firstMatch
+        XCTAssertTrue(glass.waitForExistence(timeout: 5), "the Home tab's quick-add row did not draw")
+        glass.tap()
+
+        app.buttons["History"].tap()
+
+        let yesterday = app.buttons[Self.dayNames()[1]]
+        XCTAssertTrue(yesterday.waitForExistence(timeout: 5), "the week card has no button for yesterday")
+        yesterday.tap()
+        XCTAssertTrue(yesterday.isSelected, "tapping a day did not select it")
+
+        // A serving row is labelled with its amount — "250 millilitres" — and a day with its name, so
+        // this matches the list and nothing on the card.
+        let rows = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres"))
+        let before = rows.count
+
+        XCTAssertEqual(
+            app.buttons.matching(identifier: "Add a serving").count, 1,
+            "the + must resolve to exactly one element"
+        )
+        app.buttons["Add a serving"].tap()
+
+        XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5), "the sheet did not open on its wheel")
+        app.buttons["Save"].tap()
+
+        let added = XCTNSPredicateExpectation(predicate: NSPredicate(format: "count == %d", before + 1), object: rows)
+        XCTAssertEqual(XCTWaiter().wait(for: [added], timeout: 5), .completed, "the new serving is not under yesterday")
+        XCTAssertTrue(yesterday.isSelected, "the screen did not stay on the day the serving landed on")
+    }
+
+    /// The names VoiceOver gives the week card's seven days, today first: "Today", then the six days
+    /// before it as full weekdays — formatted the way the app formats them while it follows the
+    /// device's language, which is how this suite runs.
+    private static func dayNames() -> [String] {
+        let formatter = DateFormatter()
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("EEEE")
+        let calendar = Calendar.autoupdatingCurrent
+        let past = (1...6).compactMap { calendar.date(byAdding: .day, value: -$0, to: Date()) }
+        return ["Today"] + past.map(formatter.string(from:))
     }
 
     /// `HomeView`'s *Today's log* button and its sheet were removed when the log became a tab.

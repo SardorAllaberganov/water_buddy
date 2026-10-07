@@ -307,6 +307,29 @@
         }
       }
     },
+    "Add a serving": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a serving"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить порцию"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porsiya qo‘shish"
+          }
+        }
+      }
+    },
     "Average %1$d millilitres. Best %2$d millilitres.": {
       "extractionState": "manual",
       "localizations": {
@@ -766,29 +789,6 @@
         }
       }
     },
-    "Logged at %1$@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Logged at %1$@"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Записано в %1$@"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ da qayd etilgan"
-          }
-        }
-      }
-    },
     "Measured against your current goal": {
       "extractionState": "manual",
       "localizations": {
@@ -808,6 +808,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Joriy maqsadingizga nisbatan"
+          }
+        }
+      }
+    },
+    "Nothing logged that day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing logged that day"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В этот день ничего не записано"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu kuni hech narsa qayd etilmagan"
           }
         }
       }
@@ -1042,6 +1065,29 @@
         }
       }
     },
+    "Tap + to add a serving you forgot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + to add a serving you forgot."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коснитесь «+», чтобы добавить забытую порцию."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unutilgan porsiyani qo‘shish uchun «+» tugmasini bosing."
+          }
+        }
+      }
+    },
     "The app switches straight away. The widget follows on its next refresh.": {
       "extractionState": "manual",
       "localizations": {
@@ -1209,6 +1255,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Xush kelibsiz"
+          }
+        }
+      }
+    },
+    "When": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Когда"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qachon"
           }
         }
       }

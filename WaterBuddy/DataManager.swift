@@ -183,6 +183,7 @@ final class DataManager {
     @ObservationIgnored private var storedIsGoalSet: Bool
     @ObservationIgnored private var storedTodaysLogs: [WaterLog] = []
     @ObservationIgnored private var storedHistory: [DaySummary] = []
+    @ObservationIgnored private var storedHistoryLogs: [Int: [WaterLog]] = [:]
     @ObservationIgnored private var storedRemindersEnabled: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
     @ObservationIgnored private var storedServings: [Int]
@@ -338,6 +339,25 @@ final class DataManager {
     var history: [DaySummary] {
         access(keyPath: \.history)
         return storedHistory
+    }
+
+    /// The window's servings by day ordinal, newest first within each day — what History lists for a
+    /// day that is not today. A day with no servings has no key.
+    ///
+    /// **Published from the fetch ``history`` is summed from** (``republishHistory()``), so the list
+    /// under a bar and the bar itself are one reading of the store — the reason ``recomputeToday()``
+    /// publishes today's rows and total from one fetch.
+    ///
+    /// **No equality guard**, for ``todaysLogs``' reason: a `[WaterLog]` compares by
+    /// `persistentModelID`, so the rows after an edit equal the rows before it.
+    /// `retimingAServingWithinAPastDayRepublishesItsRows` fails if one is added. ``history`` keeps
+    /// its guard, so the week card still does not redraw on every foreground.
+    ///
+    /// Empty wherever ``role`` does not draw history: the widget extension never builds it.
+    /// Read-only, like ``todaysLogs`` — a consequence of the rows, never an input.
+    var historyLogs: [Int: [WaterLog]] {
+        access(keyPath: \.historyLogs)
+        return storedHistoryLogs
     }
 
     /// Whether the user wants a nudge every two hours between 09:00 and 21:00.
@@ -707,14 +727,61 @@ final class DataManager {
         saveAndRecompute()
     }
 
-    /// Corrects a serving's amount.
+    /// Corrects a serving's amount, its time, or both, in one save.
     ///
     /// Non-positive amounts are ignored rather than deleting the row: "set this to zero" and
     /// "remove this" are different intentions, and ``deleteLog(_:)`` is the one that means remove.
-    func updateLog(_ log: WaterLog, newAmount: Int) {
-        guard newAmount > 0, newAmount != log.amount else { return }
+    /// A refused amount refuses the **whole** edit — a new time applied while its amount was turned
+    /// away would be half an edit nobody confirmed.
+    ///
+    /// `timestamp` is `nil` to keep the serving's time. Any instant is accepted, as
+    /// ``addLog(amount:at:)`` accepts one: the store's floor is against corruption, not a menu. What
+    /// the History sheet *offers* is ``correctionRange()``.
+    ///
+    /// One call for both halves, so the sheet's *Save* stays one call into the model (rule
+    /// `50-views`). Moving a serving across midnight moves its water between two days, and
+    /// ``saveAndRecompute()`` follows it: today's total is re-derived — ringing the widget doorbell
+    /// and publishing to the wrist only if it moved — and the bars and both days' rows republish.
+    /// Like ``deleteLog(_:)``, this addresses the row by identity rather than computing from a total,
+    /// so it does not ``refresh()`` first (rule `30-rollover`).
+    func updateLog(_ log: WaterLog, newAmount: Int, timestamp: Date? = nil) {
+        let newTimestamp = timestamp ?? log.timestamp
+        guard newAmount > 0, newAmount != log.amount || newTimestamp != log.timestamp else { return }
         log.amount = newAmount
+        log.timestamp = newTimestamp
         saveAndRecompute()
+    }
+
+    /// The instants the History sheet offers a serving's time from: the start of the first day
+    /// ``history`` shows, up to now.
+    ///
+    /// On the model rather than on the screen — where `HistoryView.servingRange` lives as a
+    /// `static let` — because it moves with the clock and is bounded by the window the model owns,
+    /// the same reason ``historyWindow`` is declared here. It is an offer, not a floor: the store
+    /// accepts any instant. A serving dated before the window would vanish from view the moment it
+    /// was saved, and one dated after now would be counted before it happened.
+    func correctionRange() -> ClosedRange<Date> {
+        let instant = now()
+        let opening = Self.historyWindowStart(endingOn: instant, calendar: calendar) ?? calendar.startOfDay(for: instant)
+        return opening...instant
+    }
+
+    /// Where the History sheet's wheel opens when a serving is added to the day `ordinal`: that day
+    /// at the current time of day — or now, for today (`nil`, as `HistoryView` spells it) and for a
+    /// day outside the window.
+    ///
+    /// Stepped back a calendar day at a time with `date(byAdding: .day,…)`, which keeps the wall-clock
+    /// time, never 86,400 seconds at a time (rule `30-rollover`). A time a daylight-saving change
+    /// skipped resolves the calendar's way and still lands on the chosen day —
+    /// `theSuggestionLandsOnTheChosenDayAcrossTheStartOfDaylightTime`.
+    func suggestedTime(onDay ordinal: Int?) -> Date {
+        let instant = now()
+        guard let ordinal else { return instant }
+        for offset in 0..<Self.historyWindow {
+            guard let candidate = calendar.date(byAdding: .day, value: -offset, to: instant) else { continue }
+            if dayOrdinal(for: candidate) == ordinal { return candidate }
+        }
+        return instant
     }
 
     // MARK: - The cache
@@ -768,16 +835,22 @@ final class DataManager {
         return logs
     }
 
-    /// Recomputes ``history`` from the store and publishes it if it moved.
+    /// Republishes the window's rows to ``historyLogs``, then recomputes ``history`` from the same
+    /// rows and publishes it if it moved.
     ///
-    /// **Guarded on `isAppExtension`, and the guard is about cost rather than correctness.** The
-    /// four existing guards in this file stop an extension writing group state; this one stops it
+    /// **Guarded on `role.drawsHistory`, and the guard is about cost rather than correctness.** The
+    /// other role guards in this file stop a non-owner writing group state; this one stops a process
     /// doing work it can never draw. `recomputeToday()` is deliberately *not* guarded, so
     /// `AddWaterIntent` reaches ``saveAndRecompute()`` on every widget tap — and without this
     /// early return that tap would run a seven-day fetch and a full Swift-side roll-up inside a
     /// process whose entire job is to draw one number. The widget has no history surface: a
-    /// per-day series is derivable from none of the seven cache keys, and `WaterSnapshot` may only
+    /// per-day series is derivable from none of the cache keys, and `WaterSnapshot` may only
     /// carry what the cache alone can answer (rule `40-widget`).
+    ///
+    /// **One fetch feeds both**, so a bar and the list under it are one reading of the store. The
+    /// rows are published first and unguarded (see ``historyLogs``): a time-only edit inside a past
+    /// day moves no total, so the series below compares equal and returns early while that day's
+    /// rows have still reordered.
     ///
     /// Returns early on a failed read rather than publishing an empty window. An empty chart is
     /// indistinguishable from a user who never drank, which is the same mistake as writing a
@@ -786,12 +859,14 @@ final class DataManager {
         guard Self.role.drawsHistory else { return }
 
         let instant = now()
-        let today = calendar.startOfDay(for: instant)
-        // Walked by calendar days, never by subtracting 86,400 seconds — a DST day is 23 or 25
-        // hours long (rule `30-rollover`).
-        guard let start = calendar.date(byAdding: .day, value: -(Self.historyWindow - 1), to: today),
+        guard let start = Self.historyWindowStart(endingOn: instant, calendar: calendar),
               let logs = readLogs(from: start, to: Self.nextDayBoundary(after: instant, calendar: calendar))
         else { return }
+
+        // `Dictionary(grouping:by:)` keeps each day's rows in the fetch's newest-first order.
+        withMutation(keyPath: \.historyLogs) {
+            storedHistoryLogs = Dictionary(grouping: logs) { dayOrdinal(for: $0.timestamp) }
+        }
 
         let series = DaySummary.series(
             from: logs,
@@ -1215,7 +1290,10 @@ final class DataManager {
     /// an hour behind would have yesterday's stored midnight re-read as the day before,
     /// wiping a day of water on a date that never changed. Comparing day ordinals also still
     /// rolls over correctly flying the other way, where the local date genuinely does advance.
-    private func dayOrdinal(for date: Date) -> Int {
+    ///
+    /// Not `private`: `HistoryView` asks it which day a saved serving landed on, on this model's
+    /// calendar, rather than holding a calendar of its own.
+    func dayOrdinal(for date: Date) -> Int {
         Self.dayOrdinal(for: date, in: calendar)
     }
 
@@ -1704,7 +1782,8 @@ struct DaySummary: Sendable, Equatable {
     /// Millilitres logged on that day, saturated at ``DataManager/maximumDailyIntake``.
     let total: Int
 
-    /// The start of that local day, **for formatting a weekday label and nothing else**.
+    /// The start of that local day, **for formatting the day's label and nothing else** — the week
+    /// card's weekday letters, and History's heading and spoken names for a past day.
     ///
     /// It is safe here for one reason: a `DaySummary` is derived on every read and never stored.
     /// Rule `30-rollover`'s ban is on *persisting* a day as an instant — a stored `Date` has to be
@@ -1714,7 +1793,7 @@ struct DaySummary: Sendable, Equatable {
     /// they cannot disagree.
     ///
     /// **Do not persist this, and do not compare on it.** A screen needs it because `Date` is what
-    /// `.dateTime.weekday()` formats, and that formatting has to resolve through the environment's
+    /// `.dateTime` formats, and that formatting has to resolve through the environment's
     /// locale so the label follows the in-app language picker rather than the device
     /// (rule `70-privacy`).
     let date: Date
@@ -2378,6 +2457,20 @@ extension DataManager {
             matching: DateComponents(hour: 0, minute: 0, second: 0),
             matchingPolicy: .nextTime
         ) ?? date.addingTimeInterval(24 * 60 * 60)
+    }
+
+    /// The start of the first day ``DataManager/history`` shows: midnight, ``historyWindow`` − 1
+    /// calendar days before the day containing `now`.
+    ///
+    /// The one definition of where the week starts, as ``nextDayBoundary(after:calendar:)`` is of
+    /// where a day ends. The bars' fetch and the History sheet's wheel both call it, so the oldest
+    /// bar and the earliest instant the sheet offers cannot disagree. Stepped with
+    /// `date(byAdding: .day,…)`: a DST day is 23 or 25 hours long, so six days of 86,400 seconds can
+    /// land an hour off midnight (rule `30-rollover`).
+    ///
+    /// `nil` only if the calendar cannot step back a day.
+    nonisolated static func historyWindowStart(endingOn now: Date, calendar: Calendar) -> Date? {
+        calendar.date(byAdding: .day, value: -(historyWindow - 1), to: calendar.startOfDay(for: now))
     }
 }
 
