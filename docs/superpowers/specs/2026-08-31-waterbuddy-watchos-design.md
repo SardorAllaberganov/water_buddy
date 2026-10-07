@@ -898,3 +898,20 @@ the wrist while the phone reads 1,800"* §5 rejected.
 - Within the phone's day the number is still shown. §5's *"never a confident zero"* holds for exactly
   the case it was written for, and is now pinned by a time-zone test of its own instead of by the
   assertion this amendment changes.
+
+---
+
+## 18. Amendment (2026-10-07): the phone pushes the face
+
+**Owner-approved** on 2026-10-07, roadmap item 2. The design is its own document,
+`docs/superpowers/specs/2026-10-07-complication-current-design.md`; this section only records what it
+supersedes here, which is left as written above.
+
+- **§4's transport table** gains a second phone → wrist carrier. The application context stays the
+  record. Beside it, the phone sends the same mirror with `transferCurrentComplicationUserInfo` — only
+  when it is news, only while the complication is on the active face, and only while the day's budget
+  lasts. The watch takes a mirror from either lane unless it is older than the one it holds.
+- **§12** no longer lists `transferCurrentComplicationUserInfo` as "Not in v1".
+- **§17's "the 15-minute refresh stays"** is retired. The watch app now reloads the face whenever it
+  writes the store, so the complication asks for a new timeline only after its last day boundary
+  (`.atEnd`).
