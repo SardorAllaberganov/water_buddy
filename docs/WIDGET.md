@@ -3,7 +3,7 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-09-02 (tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
+**Last updated:** 2026-10-07 (eleventh pass — `/doc_sync` after known issue #46: one sentence below still said `DataManager`'s reminder hook "spawns a detached `Task`"; it now queues each reconcile on one `ReconcileQueue`, in call order. No widget contract changed. Previously: tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
 `role.mayFileReminders`, not `isAppExtension`. No widget contract changed. Previously: eighth pass — every `WaterSnapshot` field documented, and the timeline's code sample corrected: it still showed the memberwise midnight entry that was fixed. Previously: the button now logs `entry.snapshot.serving`, and `rolledOver()` fixes the midnight entry that dropped the chosen language)
 
 ---
@@ -207,7 +207,8 @@ side effect again to make sure" rule `20-state` forbids — it is the only place
 at all:
 
 - A widget extension is guaranteed to live exactly as long as the *awaited* work inside
-  `perform()`. `DataManager`'s injected reminder hook spawns a detached `Task`, which in this
+  `perform()`. `DataManager`'s injected reminder hook queues its reconcile for a background
+  worker (one `ReconcileQueue` per process, so reconciles run in call order), which in this
   process would be torn down before it reached the system — so that hook returns immediately
   unless `role.mayFileReminders`, which only `.phoneApp` answers `true`. (It read
   `!isAppExtension` until 2026-08-31; the predicate now also excludes a watch, for a second and

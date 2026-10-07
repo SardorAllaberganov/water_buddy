@@ -4,7 +4,11 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-06 (eighteenth pass — `/doc_sync` after smart reminders learned to skip
+**Last updated:** 2026-10-07 (nineteenth pass — `/doc_sync` after known issue #46 was fixed. **No key
+added, removed or renamed**: still **eleven**, re-derived from `DataManager.Key`. The reminder seam
+lost the first of its three limits — the production hook now queues every reconcile, in the order it
+was asked for — and *Tests that pin this* gains `ReconcileQueueTests`: eleven suites, 172 `@Test`.
+Previously: eighteenth pass — `/doc_sync` after smart reminders learned to skip
 the one due within an hour of a drink. **No key added, removed or renamed**: still **eleven**,
 re-derived from `DataManager.Key`. What changed is the reminder seam: the plan gained an input, the
 latest drink, read off today's rows — recorded under *The plan depends on the goal* below. And
@@ -412,14 +416,16 @@ That input needs no trigger of its own. Only a log mutation can move it, and eve
 `recomputeToday()`, which republishes the rows from the same fetch before it reschedules.
 `currentReminderSlots()` reads it off `todaysLogs` for the app's hook and for `AddWaterIntent` alike,
 so the two front doors silence the same slot (`loggingADrinkSilencesTheReminderDueWithinTheHour`).
-Its limits — two unordered reconciles per mutation, a zone change before the next re-plan, a
-cross-process read that misses a row — are in that method's DocC and in `AI_CONTEXT.md`'s known
-issues #46–#48.
+Its limits — a zone change before the next re-plan, and a cross-process read that misses a row — are
+in that method's DocC and in `AI_CONTEXT.md`'s known issues #47–#48. A third, two unordered
+reconciles per mutation, was closed on 2026-10-07 (#46, retired): the production hook hands every
+reconcile to one `ReconcileQueue`, which runs them one at a time in the order they were asked for, so
+the plan from before a drink can no longer finish after the plan from after it.
 
 The production default returns immediately unless `role.mayFileReminders` — that is, in any process
 but the phone app. Two independent reasons now sit behind one predicate. For an extension: a
-detached `Task` does not outlive `perform()` returning, so `AddWaterIntent` awaits the reconcile
-itself instead. For a watch: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a
+reconcile queued from the hook would not outlive `perform()` returning, so `AddWaterIntent` awaits
+the reconcile itself instead. For a watch: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a
 second notification centre would file byte-identical identifiers it cannot dedupe against the
 phone's. Full reasoning in rule `80-notifications`, corrected in this same pass to name
 `role.mayFileReminders` rather than the `!isAppExtension` it described until 2026-09-01
@@ -678,15 +684,16 @@ A `body` that computes a displayed figure for itself is how the two start disagr
 
 ## Tests that pin this
 
-Ten suites, 169 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
+Eleven suites, 172 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
 `ReminderSeamTests` (68 between them) cover the write path, the rollover, observation, the goal and
 the reminder seam; `WaterSnapshotTests` (28) covers the read path, the day boundary and the
 migration; `WaterLogStoreTests` (23) covers the log CRUD, the published rows and the seed migration;
 `ReminderPlanTests` (22) pins *when* to remind, the quiet hour after a drink included, and
-`NotificationManagerTests` (10) pins what happens to the plan; `HomeServingTests` (7) pins the
-quick-add row, `AppTabTests` (6) the tab menu, and `HistoryServingTests` (5) the serving editor's
-offered range and its own fixture's reminder seam. *(Counted per suite by line range on
-2026-10-06. Until then this read 151 — its own figures summed to 152 — while the tree held 160.)*
+`NotificationManagerTests` (10) pins what happens to the plan, and `ReconcileQueueTests` (3) the
+order plans are applied in; `HomeServingTests` (7) pins the quick-add row, `AppTabTests` (6) the tab
+menu, and `HistoryServingTests` (5) the serving editor's offered range and its own fixture's
+reminder seam. *(Counted per suite by line range on 2026-10-06. Until then this read 151 — its own
+figures summed to 152 — while the tree held 160. 2026-10-07: +3, the new `ReconcileQueueTests`.)*
 
 Named cases worth knowing: `travellingWestwardDoesNotWipeTheDay`,
 `travellingEastwardAcrossTheDateStartsANewDay`, `theDayBoundaryHoldsAcrossADstTransition`,

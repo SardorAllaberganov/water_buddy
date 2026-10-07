@@ -4753,3 +4753,326 @@ No gate was run, because no code changed.
 - HEAD is still `5ac02f1`.
 - `Screenshots/census/` is still untracked.
 - No `git commit` was run.
+
+## [2026-10-07] — Known issue #46: the two reconciles per mutation run in call order
+
+### What
+
+The change the owner deferred on 2026-10-06 "to its own change, ahead of the next roadmap item".
+
+- **`ReconcileQueue`**, new in `WaterBuddy/NotificationManager.swift`: one worker task draining an
+  `AsyncStream` of operations, so each runs only once everything asked for before it has finished.
+- **`DataManager.requestReminderReschedule`** hands its reconcile to one process-wide queue,
+  `reminderReconciles`, instead of starting a `Task` per call. The guard, the scheduler built inside
+  the closure and the strings bundle are unchanged.
+- **Why it mattered.** `addLog`, `removeWater` and `ingest(_:)` each reschedule twice: `refresh()` on
+  the rows from before the change, then `recomputeToday()` after it. A reconcile makes the pending
+  set equal *its* plan. With a `Task` each, the plan from before a drink could finish last and file
+  the slot the drink had dropped: one extra reminder, the one smart reminders exist to skip.
+- **DocC.**
+  - `requestReminderReschedule`'s is rewritten. That includes its first sentence, "Returns
+    immediately in an extension" (known issue #16's second bullet: it also returns on both watch
+    roles), and its `init` link, which had lacked `publishWrist:` since that parameter landed.
+  - `currentReminderSlots()` drops the first of its three gaps.
+  - `AddWaterIntent`'s comment on the hook no longer says it "spawns a detached `Task`" or names
+    `isAppExtension`.
+
+### The rulings this rests on
+
+- **The owner's 2026-10-06 ruling** named the fix: serialize reconciles in the production hook, in
+  call order.
+- **The owner approved this plan with "go"** on 2026-10-07, including three rule amendments:
+  - rule `80-notifications`, *Who reschedules*: every plan goes through one `ReconcileQueue`, never a
+    `Task` per reconcile
+  - rules `43-concurrency` and `85-testing`: `ReconcileQueueTests` joins the suites that are
+    deliberately not `@MainActor`
+- **A stream, not a lock or an actor.** The reasons are in the type's DocC:
+  - the hook is synchronous and `nonisolated`
+  - an actor needs a `Task` to reach, and two `Task`s are unordered
+  - `Mutex` needs iOS 18
+  - `OSAllocatedUnfairLock` needs `import os`, checked by a typecheck
+  - `NSLock` needs `@unchecked Sendable`
+- **In `NotificationManager.swift`, not a file of its own.** The widget compiles `DataManager.swift`,
+  which names the type, and rule `40-widget` forbids a seventh shared file.
+
+### Known limitations, recorded rather than fixed
+
+1. **The wiring has no test.** Rule `85-testing` forbids reaching a real centre, so reverting the
+   hook to a `Task` would leave the suite green. Checked by reading.
+2. **A reconcile that never returns now holds up every later one** until the process ends. As its
+   own `Task` it stranded only itself. The one operation queued awaits only the notification centre.
+3. **Out of scope, unverified.** `AddWaterIntent.perform()` awaits its own reconcile in the widget
+   extension, outside the queue. If WidgetKit can run two `perform()`s at once, they could race the
+   same way. Cross-process races remain #48.
+
+### Files touched
+
+Modified:
+- `WaterBuddy/NotificationManager.swift` (203 → 270)
+- `WaterBuddy/DataManager.swift` (2263 → 2280; the queue, the hook, DocC)
+- `WaterBuddyWidget/AddWaterIntent.swift` (138 → 139; a comment)
+- `WaterBuddyTests/NotificationManagerTests.swift` (216 → 352; `SharedCentre`, `ReconcileQueueTests`)
+- `.claude/rules/80-notifications.md`, `43-concurrency.md`, `85-testing.md` (owner-approved)
+
+Unchanged: no key, stored shape, wire field, project file, entitlement, exception set, widget view
+tree or user-visible string.
+
+### Verification
+
+- **RED on values, against today's behaviour.**
+  - The tests were written first.
+  - `ReconcileQueue` then landed with a one-`Task`-per-call body, the hook's old shape exactly, so
+    the tests compiled and failed on values: `order → ["newer", "older"]`, and the older plan
+    re-filed `sardor.WaterBuddy.reminder.20260828.13`.
+  - The idle-queue test passed, as planned: it cannot fail against that shape.
+- **The refile test was reshaped after RED** to read no `Slot` member (see *Found along the way*).
+  It was re-verified RED by putting the old shape back as a mutation: it failed on the same values.
+- **GREEN:** `✔ Test run with 3 tests in 1 suite passed`.
+- **Mutation.** The source was restored and confirmed byte-identical by `cmp` after each.
+
+  | Mutation | Caught by |
+  |---|---|
+  | `enqueue` starts a `Task` per call (the old shape) | the order test, the refile test |
+  | the worker starts a `Task` per operation | the order test, the refile test |
+  | the worker stops after one operation | all three, each by the 1-minute time limit |
+
+- **The gate**, all five invocations, foreground, Xcode 27.0:
+  - `✔ Test run with 328 tests in 34 suites passed`
+  - `Executed 25 tests, with 0 failures`
+  - `✔ Test run with 45 tests in 5 suites passed`
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`)
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWatchWidget`)
+- **Warnings.** Clean `build-for-testing -scheme WaterBuddy` into empty DerivedData, generic iOS
+  Simulator. A `git archive HEAD` export was compared against the same export plus only the four
+  Swift files above.
+  - Identical per file and message.
+  - Shipping targets: 31 unique lines and 80 occurrences, the documented baseline.
+  - Test targets: 6 unique lines and 12 occurrences, measured here for the first time.
+  - The two in `NotificationManagerTests.swift` moved 180/196 → 219/235 with the inserted fixture.
+
+### Found along the way
+
+- **Swift Testing printed a failed negated expectation's operand with the wrong value**, twice, on
+  Xcode 27.0. `!centre.pendingNow.contains(thirteen)` failed while its expansion read
+  `contains(thirteen) → false`, beside an array that ended in that very identifier.
+- **Reading a `Slot` member from this non-`@MainActor` suite added a warning, twice:** a
+  `\.identifier` key path, then `dayOrdinal` inside a stored closure. The test now reads what each
+  plan files instead. All eight baseline warnings in `reconcile` come from the same default
+  isolation (`Slot.identifier` five times, `ReconcileOutcome.init` and two `ReminderScheduler`
+  closures); they are #29's to close.
+- **A time limit is expensive in a failing run.** `xcodebuild` read each exceeded limit as a test
+  timeout and relaunched the host for the rest, so the third mutation took 647 seconds for three
+  tests.
+- **A failing run stalled for ten minutes** collecting simulator diagnostics. The targeted runs that
+  followed passed `-collect-test-diagnostics never`; the gate's five commands are unchanged.
+- **Other sessions share this Mac's simulators.** `AvtoLog` and `Glazzy` test runs ran alongside
+  this one, and every simulator, this session's included, was found shut down between two of its
+  runs. `xcrun simctl shutdown all` was therefore skipped, so as not to kill theirs. Every run here
+  still used one device and `-parallel-testing-enabled NO`.
+- **Xcode wrote four files this change does not touch**, at 08:17:58 and 08:21:20, while this
+  session had written nothing to the repository:
+  - Both watch schemes lost `BlueprintName` from their `BuildableProductRunnable` references.
+  - Both watch catalogues were reformatted and gained seven empty entries, extracted from
+    `LiquidGlassModifier.swift`'s `#Preview` (`Today`, `1,450 ml`, `+%lld`, `%lld`).
+  - All four are left unstaged and unreverted, for the owner.
+
+### Not verified
+
+- **The real notification centre.** No test may reach it, and its pending set cannot be read from
+  the host (`tasks/lessons.md`, 2026-08-28). The race was reproduced only against a stand-in.
+
+## [2026-10-07] — `/doc_sync`: the thirty-second pass, after the known-issue #46 fix
+
+### What
+
+`/doc_sync` after the #46 change in the checkpoint above. Docs only: nothing under `WaterBuddy/`,
+`WaterBuddyWidget/` or a test target was written by this pass.
+
+### Drift found and fixed
+
+**`docs/AI_CONTEXT.md`**
+- **Four line counts were stale**, exactly the four Swift files the change touched:
+  - `DataManager.swift` 2263 → 2280
+  - `NotificationManager.swift` 203 → 270
+  - `AddWaterIntent.swift` 138 → 139
+  - `NotificationManagerTests.swift` 216 → 352
+
+  The other 52 documented counts matched `wc -l`.
+- **The files-on-disk note still named the thirtieth pass.** The thirty-first had not moved it.
+- **The targets table's phone test count** moved from 325 in 33 suites to 328 in 34.
+- **All eight `DataManager.swift` line references in *The process role* were stale**, before this
+  change as well. The hook's guard, for one, was documented at `:847` and stood at `:1067` in
+  `641e88c`. Each was re-derived by grep.
+- **Known issue #16's line numbers** were stale too, and its middle bullet is now fixed, because the
+  change rewrote that DocC.
+- **A new gate block** heads *Current state*. The smart-reminders block is kept as that pass's record.
+- **The header** is now the thirty-second pass. The thirty-first moved into a `<details>` block;
+  there are now six, balanced.
+- **Known issues.**
+  - **#46 retired.**
+  - **#49 opened:** the widget's own reconciles stay outside the queue, a race unverified.
+  - **#50 opened:** the Xcode app's writes to four tracked files.
+  - **#29** gains this session's measurement, with the test targets counted for the first time.
+- **The Git section** was one pass stale: it said HEAD `5ac02f1` and 53 commits. It now says HEAD
+  `641e88c` and 56.
+
+**`docs/STATE.md`**
+- The reminder seam named "two unordered reconciles per mutation" among its limits, and a "detached
+  `Task`" as the reason the extension awaits its own reconcile. Both now describe the queue.
+- *Tests that pin this* gains `ReconcileQueueTests`: eleven suites, 172 `@Test`.
+- The header is now the nineteenth pass.
+
+**`docs/WIDGET.md`**
+- One sentence still said the hook "spawns a detached `Task`". The header is now the eleventh pass.
+
+**`tasks/lessons.md`** gained seven entries:
+- two `Task`s from one caller are unordered
+- a failed `!` expectation's expansion can print the wrong value
+- what a failing run costs on this toolchain: diagnostics and time limits
+- the simulators on this Mac are shared
+- the Xcode app writes tracked files while you work
+- a sequence agreed in chat is gone the next session
+- a canary suite can warn on a model's member
+
+### Checked and already accurate
+
+- **Swift files:** 53 across the seven folders, all documented, checked in both directions.
+- **`@Test` counts**, by the attribute grep: 328 phone, 45 watch. There are 12 UI test functions.
+- **Exception sets:** three, six files each, unchanged. **Keys:** eleven on `DataManager.Key`.
+- **Known issues** are numbered 1–50 with no gap or duplicate.
+- **Rule citations:** every one in `CLAUDE.md`, `docs/`, `tasks/` and the two source folders
+  resolves.
+- **`docs/DESIGN.md`:** no token changed. Not touched.
+- **`CLAUDE.md`:** its reminders bullet, its target table, its six shared files and its key counts
+  all still hold. The warning baseline it states, 31 unique lines and 80 occurrences, was
+  re-measured unchanged. Not touched.
+- **No spec or plan under `docs/superpowers/` covers this change,** so no status line moved.
+- **The suite table in *Current state*** still lists `NotificationManagerTests` at 10 and
+  `ReminderPlanTests` at 15. It belongs to an older pass's retained narrative, so it stays as written.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/WIDGET.md` · `tasks/lessons.md` · `HISTORY.md`
+
+### Verification
+
+No gate was run by this pass. The gate figures it publishes are this session's own five runs,
+recorded in the checkpoint above. No code changed after them: every edit since was to a doc, to this
+file or to `tasks/lessons.md`.
+
+### Staged, not committed
+
+- 12 paths, every one staged by explicit path. The count was re-printed after this entry was
+  written.
+- Four paths are left unstaged on purpose, all written by the Xcode app (#50): the two watch schemes
+  and the two watch catalogues.
+- HEAD is still `641e88c`.
+- `Screenshots/census/` is still untracked.
+- No `git commit` was run.
+
+## [2026-10-07] — `/doc_sync` re-run: four of the thirty-second pass's own statements corrected
+
+### What
+
+The owner ran `/doc_sync` again with no change since the thirty-second pass. HEAD was `641e88c`, the
+same 12 paths were staged and identical to the working files, and the four Xcode-written files had
+not changed since 08:17 and 08:21. Every computed probe was re-run and is current, so this run spent
+its effort on the claims no probe tests, and ran a measurement to test one of them.
+
+### Found and fixed
+
+**The shut-down simulators.** The #46 checkpoint and the pass's gate block said every simulator,
+this session's included, "was found shut down between two of its runs", next to other projects' live
+test runs. In conversation the session went further and stated as fact that another session was
+running `xcrun simctl shutdown all`.
+- A poller recorded `simctl list devices booted` every two seconds across two targeted runs: the
+  three-test `ReconcileQueueTests` suite, and the watch unit suite.
+- Each device went down in the last seconds of the `xcodebuild` run that booted it, with that run
+  still alive. No `simctl shutdown` from any session appeared.
+- Skipping `shutdown all` still stands: `Glazzy`'s `xcodebuild test` was live through the whole poll.
+
+**One device per run.** The gate block said each run "used one device". The watch run brought up the
+watch and, eight seconds later, the iPhone 17 it is paired with. Known issue **#51** opened: rule
+`85-testing`'s "one simulator at a time" cannot hold for that invocation.
+
+**The phone-widget build's warnings** were described as coming "from the shared files it
+recompiled". `WristView.swift`, which is in no shared set, warned too, because that scheme also built
+the phone app, the watch app and the watch widget.
+
+**"Measured for the first time."** The pass said this of the test targets' 6/12 warnings, in
+`docs/AI_CONTEXT.md`'s header and #29 and in both checkpoints above. An older pass had recorded one
+test-module warning, `DataManagerTests.swift:1102`, which neither clean build shows now. It was the
+first clean-build count, not the first measurement.
+
+**Three figures written from memory** in this session's `tasks/lessons.md` entries and the #46
+checkpoint, which the logs contradict:
+- The inverted `!` expansion happened in all six failures of that expectation across five runs, not
+  "twice".
+- Of the two test drafts that warned, only the first passed its tests. The second only ever ran
+  against a mutation.
+- Of the alternatives to the stream, `OSAllocatedUnfairLock` did not fail. It would have worked.
+
+`docs/AI_CONTEXT.md` was corrected in place, each change marked with what it said until this run.
+The two checkpoints above and the lessons stay as written, superseded here and by two new lessons.
+
+### Checked against the tree — accurate
+
+- 53 Swift files, all documented in both directions; all 56 line counts current.
+- 328 phone and 45 watch `@Test`, 13 of them in `NotificationManagerTests.swift`; 12 UI test
+  functions.
+- Three six-file exception sets; eleven keys in `Key.all`.
+- Known issues numbered 1–51 with no gap, counted inside their own section.
+- Six `<details>` blocks, balanced; every rule citation resolves.
+- `docs/STATE.md`'s 172 `@Test` across eleven suites. The 13 in `NotificationManagerTests.swift`
+  are its 10 plus `ReconcileQueueTests`' 3, and no other counted suite's file has changed.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` · `tasks/lessons.md` · `HISTORY.md`
+
+### Verification
+
+Not a gate. Two targeted runs were made, to test a claim:
+- `-only-testing:WaterBuddyTests/ReconcileQueueTests`: `Test run with 3 tests in 1 suite passed`
+- `-scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests`: `Test run with 45 tests in 5 suites
+  passed`
+
+The gate figures this file publishes are still the thirty-second pass's own five runs. No code has
+changed since.
+
+### Staged, not committed
+
+- Still 12 paths, every one already in the set and staged by explicit path. The count was re-printed
+  after this entry was written.
+- The four Xcode-written paths are still unstaged, on purpose (#50).
+- HEAD is still `641e88c`.
+- `Screenshots/census/` is still untracked.
+- No `git commit` was run.
+
+## [2026-10-07] — The re-run's poll, read in full: one phrase superseded
+
+### What
+
+The re-run checkpoint above, and its lesson *`xcodebuild` shuts down what it boots…*, say `Glazzy`'s
+`xcodebuild test` "was live through the whole poll". Both were written while the poller was still
+running, from its first minute. The finished log (09:48:25 to 09:55:37, 200 samples) says otherwise:
+- `Glazzy`'s run is in 106 samples, from 09:48:25 to 09:52:14. That covers both targeted runs, which
+  is the window the conclusion needs, but not the whole poll.
+- `AvtoLog`'s `xcodebuild test` is in 99 samples.
+- No `simctl boot`, `shutdown` or `erase` from any session appears in any sample. That extends the
+  re-run's finding from the two runs to the full seven minutes.
+
+Both entries stay as written, superseded here and by a new lesson, *A measurement still running is
+not evidence yet*.
+
+### Files touched
+
+`tasks/lessons.md` · `HISTORY.md`
+
+### Staged, not committed
+
+- Still 12 paths, every one already in the set and staged by explicit path. The count was re-printed
+  after this entry was written.
+- The four Xcode-written paths are still unstaged, on purpose (#50).
+- HEAD is still `641e88c`.
+- No `git commit` was run.

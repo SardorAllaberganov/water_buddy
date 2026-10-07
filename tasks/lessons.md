@@ -1851,3 +1851,148 @@ assertion.
 
 **The rule:** before citing a test as evidence, read its `#expect` and state what that line proves,
 in its terms rather than the test's name.
+
+## 2026-10-07 — Two `Task`s started by one caller are unordered
+
+Known issue #46. `DataManager.requestReminderReschedule` started a `Task` for every reschedule, and a
+mutation reschedules twice: the plan from before a drink, then the plan from after it. A reconcile
+makes the pending set equal *its* plan, so whichever finishes last wins, and nothing made the newer
+one finish last. Reproduced against a stand-in centre: with the older reconcile's read slowed, the
+older plan re-filed the slot the drink had dropped, every time.
+
+The caller is synchronous and `nonisolated`, so it cannot `await` its turn. An actor does not help
+either: reaching one needs a `Task` per call, and those are unordered too. What does work is
+`AsyncStream.Continuation.yield`. It is synchronous, safe from any thread, and keeps call order, so
+one worker draining the stream runs the work in the order it was asked for. The alternatives each
+failed on something concrete: `Mutex` needs iOS 18 against a 17.0 floor, and `OSAllocatedUnfairLock`
+needs `import os`.
+
+**The rule:** when async work ends in "the last to finish wins", fix its order where it is asked for.
+Spawning a `Task` per request and hoping they finish in order is the bug.
+
+## 2026-10-07 — A failed `!` expectation can print its operand with the wrong value
+
+Twice, on Xcode 27.0, `#expect(!centre.pendingNow.contains(thirteen))` failed while its expansion
+printed `centre.pendingNow.contains(thirteen) → false`. The same expansion printed the array, and
+the array ended in that very identifier. The check was right and the expansion was wrong.
+
+**The rule:** when a failure's expansion contradicts the failure, trust the captured values (the
+collection, the strings) over the boolean labelled beside them. Never "fix" a test because its
+expansion looks impossible.
+
+## 2026-10-07 — A failing run can cost ten minutes, and a time limit one relaunch per test
+
+Two behaviours of `xcodebuild` on Xcode 27.0, both seen while running tests that were meant to fail:
+- **Diagnostics.** After a failed run it collects simulator diagnostics. Once, `simctl diagnose` hung
+  for its full 600 seconds: *"Failure collecting diagnostics from simulator: Timed out after 600.0
+  seconds"*. `-collect-test-diagnostics never` skips the collection.
+- **Time limits.** A Swift Testing `.timeLimit` that fires is read as a test timeout, and the host is
+  relaunched for the tests after it. A mutation that timed out three tests ran them as 3, then 2,
+  then 1, at a minute each: 647 seconds in all.
+
+**The rule:** pass `-collect-test-diagnostics never` on runs meant to fail (RED, mutations), and keep
+the gate's own commands exactly as written. Budget n(n+1)/2 minutes for a mutation that times out n
+tests.
+
+## 2026-10-07 — The simulators on this Mac are shared
+
+During the #46 session, two other projects' `xcodebuild test` runs (`AvtoLog`, `Glazzy`) ran
+alongside this one, and every simulator, this session's included, was found shut down between two
+of its runs. The gate's first line, `xcrun simctl shutdown all`, would have done the same to theirs.
+
+**The rule:** before `xcrun simctl shutdown all`, check `ps` for another `xcodebuild`. If one is
+live, skip it, shut down only your own device by its UDID, and say so in the gate's record. A run of
+yours that dies for no reason in the code may have been shut down from outside: re-run it before
+diagnosing it.
+
+## 2026-10-07 — The Xcode app writes tracked files while you work
+
+At 08:17 and 08:21, while the session had written nothing to the repository, four tracked files
+changed: both watch schemes were normalised, and both watch catalogues were reformatted and gained
+seven empty extracted entries (known issue #50). The only reason they were noticed is that
+`git diff --stat` was printed before staging.
+
+**The rule:** before staging, print the changed paths and account for every one. A file you did not
+touch is the owner's, neither yours to stage nor yours to revert. Stage by explicit path only
+(rule `90-git`).
+
+## 2026-10-07 — A sequence agreed in chat is gone the next session
+
+The owner approved a seven-item App Store roadmap on 2026-10-06 with "go by order". `HISTORY.md`
+named only its first item, and nothing else in the tree recorded the rest. The next session found it
+only by searching that session's transcript under `~/.claude/projects/` for "roadmap", and then saved
+it to project memory.
+
+**The rule:** when the owner approves an order of work, write the order down in the same session,
+somewhere the next session reads at its start.
+
+## 2026-10-07 — A canary suite can warn on a model's member, stored or computed
+
+`ReconcileQueueTests` is deliberately not `@MainActor`. Its first draft read
+`older.map(\.identifier)` and gained a warning: *"cannot form key path to main actor-isolated
+property"*. The second read `slot.dayOrdinal` inside a stored closure and gained another, although
+`ReminderPlanTests` reads the same stored `dayOrdinal` inside `filter { }` without one. Both drafts
+passed their tests, and the warnings showed only because the file had just been recompiled.
+
+The test now asserts on what the code under test produces: the identifier strings `reconcile` files
+into a stand-in centre. It reads no `Slot` member at all. Marking `Slot` `nonisolated` would be the
+real fix, and it is #29's, not a test's.
+
+**The rule:** after adding a test to a canary suite, read that file's warnings from the build that
+compiled it. When a model's member warns, assert through values the code produces rather than by
+annotating the suite.
+
+## 2026-10-07 — `xcodebuild` shuts down what it boots, and a watch run boots its paired phone
+
+The #46 session found every simulator shut down between two of its runs. It read that as another
+session's `xcrun simctl shutdown all`, and said so as fact in conversation. Its entry *The
+simulators on this Mac are shared* leaned the same way: "A run of yours that dies for no reason in
+the code may have been shut down from outside."
+
+The second `/doc_sync` run tested it. A poller recorded `simctl list devices booted` every two
+seconds across two targeted runs:
+- The iPhone 17 came up for the phone run and was gone in that run's last two seconds, while its
+  `xcodebuild` was still alive.
+- The watch run brought up the watch and, eight seconds later, the iPhone 17 it is paired with. Both
+  went down the same way.
+- No `simctl shutdown` from any session appeared.
+
+The other projects' runs were real: `Glazzy`'s `xcodebuild test` was live through the whole poll. So
+skipping `shutdown all` still stands. The explanation for the shut-down devices does not.
+
+**The rule:** a device found shut down after your own run was shut down by that run. Poll before
+blaming another session. And count the pair: a paired watch destination brings its phone up with it.
+
+## 2026-10-07 — Count from the logs, not from memory of reading them
+
+Three statements in this session's own entries were written from memory of the session, and the
+logs say otherwise:
+- *A failed `!` expectation can print its operand with the wrong value* says "Twice". It happened
+  every time: six failures of that expectation across five runs, each printing the negation as
+  `→ true` and its operand as `→ false`, the reverse of what the check found. Two was only the number
+  of logs read when the entry was written.
+- *A canary suite can warn on a model's member* says "Both drafts passed their tests". The first
+  did. The second was only ever run against a mutation, which it failed as designed.
+- *Two `Task`s started by one caller are unordered* says "The alternatives each failed on something
+  concrete". `Mutex` did fail, on the iOS 17.0 floor. `OSAllocatedUnfairLock` did not. It would have
+  worked, and was passed over because it needs `import os` and a lock the file would then own, which
+  is how the type's DocC puts it.
+
+Those entries stay as written, superseded here. This is *A claim's age is a claim too* again: a
+number written from recall is a claim, and the log that holds the real one was in the scratchpad all
+along.
+
+**The rule:** before writing "twice", "both" or "each" into a record, re-count from the logs or the
+code. A summary written at the end of a long session is a draft until it has been checked.
+
+## 2026-10-07 — A measurement still running is not evidence yet
+
+The re-run's lesson *`xcodebuild` shuts down what it boots…*, and its `HISTORY.md` checkpoint, both
+say `Glazzy`'s `xcodebuild test` "was live through the whole poll". Both were written while the
+poller was still running, from its first minute. The finished log has that run in 106 of 200
+samples, gone by 09:52:14, three minutes before the poll ended. It did cover both targeted runs,
+which is all the conclusion needed, but it did not cover "the whole poll". The entry and the
+checkpoint stay as written, superseded here.
+
+**The rule:** describe a background measurement only once it has finished, and scope each claim to
+the samples actually read.
