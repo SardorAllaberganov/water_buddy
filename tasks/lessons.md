@@ -1768,3 +1768,86 @@ comments are prose too, and a reader trusts them just as much.
 
 **The rule:** when a claim is retired, grep the whole repository for it — scripts, comments and
 plans as well as `docs/` — and fix every copy in scope or record each one that is out of reach.
+
+## 2026-10-06 — A caption is a claim about the code, and a translated one is three
+
+From 2026-08-28 the Settings caption said "Logging water pushes the next one back", in English,
+Russian and Uzbek, and the README said it too. `ReminderPlan.slots(...)` never took a drink as an
+input. Its own DocC argued *against* the rolling timer that sentence describes, a few lines from the
+code. The claim shipped for five weeks and was translated twice. It surfaced only because a feature
+survey read `slots`' parameter list while mapping what the app already did. No test could have seen
+it, because the string is resolved and displayed and nothing compares it with the behaviour it names.
+
+**The rule:** when a string describes behaviour, find the code that produces that behaviour before
+the string ships or goes out for translation. A parameter list is often enough to falsify it. The
+same goes for a README feature list: it is user-facing copy.
+
+## 2026-10-06 — An instant from another device's clock is an input, not a fact
+
+The first design for the drink-skip claimed "one drink drops at most one slot". It deliberately left
+out a `lastDrink <= fire` clause, so that a watch pour stamped slightly ahead would still silence the
+slot beside it.
+
+An adversarial review of the plan found the consequence:
+- Watch pours carry the watch's own clock (`WristModel.swift:174`), and `ingest(_:)` folds them in
+  unchecked.
+- So a pour stamped 20:00 and read at 10:15 would have silenced every reminder until 21:00.
+- A phone clock set back by hand does the same.
+
+Clamping to `now` keeps the benefit and restores the bound. The test that pins it,
+`aDrinkStampedAheadOfTheClockSilencesOnlyTheNextHour`, was RED on the seam and fails again without
+the clamp.
+
+**The rule:** an instant authored by another device, or by a clock the user can set, gets clamped to
+`now` before it feeds arithmetic that assumes "past ≤ now". Any sweep test over such inputs includes
+stamps ahead of `now`.
+
+## 2026-10-06 — A mutation check in a plan has to be computed, not assumed
+
+The same plan promised that a 2-hour quiet window would fail `oneDrinkSilencesAtMostOneSlot`. The
+review computed it: with drinks at or before `now`, any window up to the grid's two-hour interval
+drops at most one slot, so that mutation leaves the sweep green.
+
+The test that actually pins the one-hour value is the boundary test,
+`theQuietHourEndsExactlyAnHourAfterTheDrink`, which fails for any window over an hour. The plan, and
+the rule amendment drafted from it, named the wrong tripwire. Both were corrected before any code was
+written. The six mutations that were then run were each predicted test by test, and each was caught
+by the test predicted for it.
+
+**The rule:** before a plan says "mutation X fails test Y", work through Y's arithmetic under X. A
+mutation that cannot fail its named test points at a gap in the tests, not at a passing check.
+
+## 2026-10-06 — A claim's age is a claim too
+
+The caption lesson above opens "From 2026-08-28 the Settings caption said…" and says the claim
+"shipped for five weeks". `docs/AI_CONTEXT.md` and `HISTORY.md` said the same. All three took the
+date of the reminders feature's checkpoint and assumed the caption was born with it. Nobody ran the
+check.
+
+The owner's second `/doc_sync` run did. `git log -S` finds the string first in the repository's root
+commit, `69c5a39` (2026-09-01), and git holds nothing earlier. The README's wording, "Logging pushes
+the next one back", first appears in `e93802d` (2026-09-02). The `AI_CONTEXT` header was corrected
+in place. The entry above and the `HISTORY.md` checkpoint stay as written, superseded here and in
+that run's checkpoint.
+
+**The rule:** date a string with `git log -S`, not with the feature it belongs to. When the history
+begins after the thing it dates, write "at least since" and name the commit.
+
+## 2026-10-07 — A test's name is not its assertion
+
+The smart-reminders change cited `everyDrawnStringIsTranslatedUnlessDeliberatelyNot` as having
+"resolved both new keys in ru and uz from the built bundle", in the `HISTORY.md` checkpoint and in
+`docs/AI_CONTEXT.md`. The plan before them had already said it "covers" the new keys' ru/uz values.
+Both read as if the Russian and Uzbek captions had been checked.
+
+The test was never opened. Read on the third `/doc_sync` run, it subtracts each language's keys
+from the English table's. That proves a translation *exists* for every English key, and says nothing
+about what it says. These two were the model's drafts, and the docs said so in the next sentence, so
+the overstatement stood beside its own correction.
+
+This is the 2026-10-05 lesson again, *A property's name is not its behaviour*, on a test instead of
+a property. A name records what its author meant to check. What it actually checks is in the
+assertion.
+
+**The rule:** before citing a test as evidence, read its `#expect` and state what that line proves,
+in its terms rather than the test's name.

@@ -4,7 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-06 (seventeenth pass — `/doc_sync` after the watch was localized, known
+**Last updated:** 2026-10-06 (eighteenth pass — `/doc_sync` after smart reminders learned to skip
+the one due within an hour of a drink. **No key added, removed or renamed**: still **eleven**,
+re-derived from `DataManager.Key`. What changed is the reminder seam: the plan gained an input, the
+latest drink, read off today's rows — recorded under *The plan depends on the goal* below. And
+*Tests that pin this* had drifted before the change: its own figures summed to 152 against the 151 it
+printed, while the tree held 160; corrected to the 169 that stand now. Previously: seventeenth pass —
+`/doc_sync` after the watch was localized, known
 issues #18 and #19. **No key added, removed or renamed**: still **eleven**, re-derived this pass from
 `DataManager.Key` itself. What changed is that a stored value gained a reader: `languageCode`, inside
 the `WristMirror` the watch keeps under `Key.wristMirror`, was composed and persisted but read by
@@ -399,6 +405,17 @@ write still costs nothing. `raisingTheGoalPastAMetTotalRePlansToday` and
 `loweringTheGoalBelowTheTotalSilencesToday` pin both directions; both failed before the call
 existed.
 
+**And on the latest drink** (2026-10-06). The plan drops any slot due less than
+`ReminderPlan.quietAfterDrink` — one hour — after the latest of today's rows: dropped, never moved,
+so the grid holds, and the drink clamped to `now`, because a watch pour carries the watch's own clock.
+That input needs no trigger of its own. Only a log mutation can move it, and every one ends in
+`recomputeToday()`, which republishes the rows from the same fetch before it reschedules.
+`currentReminderSlots()` reads it off `todaysLogs` for the app's hook and for `AddWaterIntent` alike,
+so the two front doors silence the same slot (`loggingADrinkSilencesTheReminderDueWithinTheHour`).
+Its limits — two unordered reconciles per mutation, a zone change before the next re-plan, a
+cross-process read that misses a row — are in that method's DocC and in `AI_CONTEXT.md`'s known
+issues #46–#48.
+
 The production default returns immediately unless `role.mayFileReminders` — that is, in any process
 but the phone app. Two independent reasons now sit behind one predicate. For an extension: a
 detached `Task` does not outlive `perform()` returning, so `AddWaterIntent` awaits the reconcile
@@ -661,13 +678,15 @@ A `body` that computes a displayed figure for itself is how the two start disagr
 
 ## Tests that pin this
 
-Ten suites, 151 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
-`ReminderSeamTests` (65 between them) cover the write path, the rollover, observation, the goal and
-the reminder seam; `WaterSnapshotTests` (24) covers the read path, the day boundary and the
-migration; `WaterLogStoreTests` (22) covers the log CRUD, the published rows and the seed migration;
-`ReminderPlanTests` (15) pins *when* to remind and `NotificationManagerTests` (10) pins what happens
-to the plan; `HomeServingTests` (6) pins the quick-add row, `AppTabTests` (5) the tab menu, and
-`HistoryServingTests` (5) the serving editor's offered range and its own fixture's reminder seam.
+Ten suites, 169 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
+`ReminderSeamTests` (68 between them) cover the write path, the rollover, observation, the goal and
+the reminder seam; `WaterSnapshotTests` (28) covers the read path, the day boundary and the
+migration; `WaterLogStoreTests` (23) covers the log CRUD, the published rows and the seed migration;
+`ReminderPlanTests` (22) pins *when* to remind, the quiet hour after a drink included, and
+`NotificationManagerTests` (10) pins what happens to the plan; `HomeServingTests` (7) pins the
+quick-add row, `AppTabTests` (6) the tab menu, and `HistoryServingTests` (5) the serving editor's
+offered range and its own fixture's reminder seam. *(Counted per suite by line range on
+2026-10-06. Until then this read 151 — its own figures summed to 152 — while the tree held 160.)*
 
 Named cases worth knowing: `travellingWestwardDoesNotWipeTheDay`,
 `travellingEastwardAcrossTheDateStartsANewDay`, `theDayBoundaryHoldsAcrossADstTransition`,

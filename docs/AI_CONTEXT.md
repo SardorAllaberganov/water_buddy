@@ -4,6 +4,38 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-07 (thirty-first pass, **re-verified by two further `/doc_sync` runs**, the
+same day and the next. Both re-derived every probe — all current. The second corrected one claim
+this pass had inferred rather than checked: the false caption's age, first written as "since
+2026-08-28", the date of the reminders feature's checkpoint. Git can prove only that the string was
+in the repository's first commit; the summary below now says so, and quotes the README in its own
+words. The third, on 2026-10-07, found two claims in *Current state* stated beyond their evidence —
+the TDD order ("the parameter landed first"; the tests came first) and what
+`everyDrawnStringIsTranslatedUnlessDeliberatelyNot` proves (that a translation exists, not what it
+says) — and corrected both there. The pass's own summary follows, corrected. `/doc_sync` after **smart reminders learned to skip
+the one due within an hour of a drink**, the first item of the owner's App Store roadmap, ordered by a
+read-only market scan of about 430 recent reviews of six competing apps. `ReminderPlan.slots(...)`
+takes `lastDrink: Date?` and drops — never moves — any slot due less than `quietAfterDrink` (one
+hour) after it, the drink clamped to `now`; `DataManager.currentReminderSlots()` passes the latest of
+`todaysLogs`' timestamps, so the app's hook and `AddWaterIntent` file the same plan. It also retires
+a false claim that was in the tree from the repository's first commit (`69c5a39`, 2026-09-01) — git
+holds nothing earlier: the Settings caption said "Logging water pushes the next one back", the README
+"Logging pushes the next one back" (from `e93802d`, 2026-09-02), and nothing did. Both reminder
+captions are rewritten in en/ru/uz
+under new keys. Rule `80-notifications` amended, owner-approved. **This sync's own drift:** the five
+line counts of exactly the five Swift files the change grew; the phone test count in the targets
+table; the Git section one pass stale; and `docs/STATE.md`'s *Tests that pin this*, stale before the
+change — it printed 151, its own figures summed to 152, the tree held 160. Known issues **#46–#48**
+opened: the three limits the change records rather than fixes. Gate re-run in full this session:
+**325**/33 phone unit, **25** phone UI, **45**/5 watch unit, both widget builds green; warnings
+compared on clean `-scheme WaterBuddy` builds, 31 against 31 unique lines and 80 against 80
+occurrences, none new. `docs/STATE.md` carries the plan's new input. `docs/WIDGET.md`,
+`docs/DESIGN.md` and `CLAUDE.md` were checked and deliberately not touched — the widget's contract,
+the tokens and every statement they make about reminders still hold.)
+
+<details>
+<summary>Thirtieth pass — 2026-10-06, re-verified twice the same day, retained</summary>
+
 **Last updated:** 2026-10-06 (thirtieth pass, **re-verified by two further `/doc_sync` runs the same
 day**. The second re-derived every probe — all current — and corrected four of this pass's own
 figures: #44 measured with a sampler that read glyph ink as background, so its failure is wider than
@@ -28,6 +60,8 @@ builds green; warnings compared on clean `-scheme WaterBuddyWatch` builds, 2 aga
 `docs/DESIGN.md` carries the new ramp and two measured watch figures. `docs/STATE.md`,
 `docs/WIDGET.md` and `CLAUDE.md` were checked and deliberately not touched — no key, no phone-widget
 contract and nothing they state changed.)
+
+</details>
 
 <details>
 <summary>Twenty-ninth pass — 2026-10-06, re-verified twice the same day, retained</summary>
@@ -253,7 +287,7 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 316 `@Test` functions in 33 suites |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 325 `@Test` functions in 33 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (7 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **12 declared, 25 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
@@ -341,7 +375,7 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2243   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs, WristLink (behind #if canImport(WatchConnectivity))
+WaterBuddy/DataManager.swift                    2263   shared — the model, the log CRUD, the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs, WristLink (behind #if canImport(WatchConnectivity))
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
 WaterBuddy/HistoryView.swift                     672   app only — the week card, today's log, swipe-to-delete, the serving editor
@@ -349,7 +383,7 @@ WaterBuddy/HomeView.swift                        379   app only — the vessel, 
 WaterBuddy/LiquidGlassModifier.swift             501   shared — design tokens + the glass modifier
 WaterBuddy/NotificationManager.swift             203   shared — ReminderScheduler + reconcile; the only UN caller
 WaterBuddy/PressStyle.swift                       31   app only — the shared press recoil
-WaterBuddy/ReminderPlan.swift                    121   shared — WHEN to remind, as a pure value
+WaterBuddy/ReminderPlan.swift                    149   shared — WHEN to remind, as a pure value
 WaterBuddy/RootTabView.swift                     260   app only — AppTab (3 cases), the container, the glass tab bar (the 420pt cap's comment rewritten 2026-09-02: it justified itself in iPad measurements, and iPad is gone — the cap is kept, because 420 is below the widest iPhone's content width)
 WaterBuddy/SettingsView.swift                    658   app only — the goal editor, the vessel editor, reminders, the language picker
 WaterBuddy/WaterBuddyApp.swift                   108   app only — RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch
@@ -360,14 +394,14 @@ WaterBuddy/WristPlan.swift                        80   shared (in both watch exc
 WaterBuddyTests/AppLanguageTests.swift           112   AppLanguageTests — the menu and each bundle
 WaterBuddyTests/AuroraBackgroundTests.swift       98   AuroraLightTests — the backdrop's lights
 WaterBuddyTests/CelebrationTests.swift           108   HapticLadderTests + ConfettiTests
-WaterBuddyTests/DataManagerTests.swift          1232   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + LanguageSeamTests
+WaterBuddyTests/DataManagerTests.swift          1265   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + LanguageSeamTests
 WaterBuddyTests/HistoryRangeTests.swift          439   DaySummaryTests (pure, not @MainActor) + HistoryWindowTests
 WaterBuddyTests/HistoryViewTests.swift           132   HistoryServingTests — the editor's offered range, and the fixture's own tripwire
 WaterBuddyTests/HomeViewTests.swift              180   HomeServingTests — the quick-add row's offered vessels
 WaterBuddyTests/LiquidGlassTests.swift           135   LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response
 WaterBuddyTests/LocalizationTests.swift          476   the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two
-WaterBuddyTests/NotificationManagerTests.swift   215   applying a plan, against a spy scheduler
-WaterBuddyTests/ReminderPlanTests.swift          180   the plan — pure, and no UserNotifications import
+WaterBuddyTests/NotificationManagerTests.swift   216   applying a plan, against a spy scheduler
+WaterBuddyTests/ReminderPlanTests.swift          251   the plan — pure, and no UserNotifications import
 WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab bar's offered destinations
 WaterBuddyTests/ServingSeamTests.swift           279   ServingResolutionTests (pure, not @MainActor) + ServingSeamTests
 WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
@@ -605,6 +639,49 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five re-run 2026-10-06, on Xcode 27.0, after the smart-reminders change** (the
+thirty-first pass). Foreground, one simulator at a time, `xcrun simctl shutdown all` before each,
+`-parallel-testing-enabled NO`, the commands exactly as rule `85-testing` writes them.
+
+| Command | Result |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 325 tests in 33 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `** TEST SUCCEEDED **` — `Executed 25 tests, with 0 failures` |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 45 tests in 5 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` — no warning printed |
+
+**Nine new phone tests**, no suite added. `ReminderPlanTests` +7: a drink silences the slot due
+within the hour; one ninety minutes ahead of a slot leaves it; the quiet ends exactly an hour after
+the drink; a drink before nine silences the first slot; a drink stamped ahead of the clock silences
+only the next hour; a late drink leaves tomorrow alone; and a day swept every five minutes, which
+proves one drink drops at most one slot and never moves one. `ReminderSeamTests` +2: logging a drink
+silences the slot through both the app's hook and `currentReminderSlots()`, and deleting it brings
+the slot back. **RED on wrong values rather than a compile error** — the tests were written first,
+then the parameter, accepted and ignored, so the RED run compiled and exactly the seven expected
+tests failed (37 run, 8 issues); the other two are regression guards, proven by mutation instead.
+*(Until the 2026-10-07 re-run this said "the parameter landed first", which had the order wrong.)* **Six mutations, each caught by its test:** `<`
+→ `<=` and a 61-minute quiet by `theQuietHourEndsExactlyAnHourAfterTheDrink`, a 2-hour quiet by
+`aDrinkMoreThanAnHourBeforeASlotLeavesItPlanned`, a 3-hour quiet by `oneDrinkSilencesAtMostOneSlot`,
+a 12-hour quiet by `aLateDrinkLeavesTomorrowUntouched`, and a dropped clamp by
+`aDrinkStampedAheadOfTheClockSilencesOnlyTheNextHour` and the sweep.
+
+**Warnings, compared rather than counted.** The change reaches every binary through two shared
+files, so the comparison ran on the scheme that carries the recorded baseline: clean
+`-scheme WaterBuddy` builds into empty DerivedData, a `git archive HEAD` export (`5ac02f1`) against
+the working tree, generic iOS Simulator — **31 against 31** unique lines and 80 against 80
+occurrences, identical per file and message. None new, none gone.
+
+**Not observed:** pending notifications on a simulator (not readable as a file), and either reminder
+caption on screen in any language — Xcode 27 offers no tap route to Settings while the capture
+scripts are stale (#45). `everyDrawnStringIsTranslatedUnlessDeliberatelyNot` found both new keys in
+the built bundle's ru and uz tables — it proves a translation exists for every English key, not what
+the translation says, and these two are the model's drafts, unreviewed by a native speaker. The
+caption grows vertically, so a longer string cannot truncate. *(Until the 2026-10-07 re-run this said
+the test "resolved" both keys, which claimed more than it checks.)*
+
+*(The 2026-10-06 known-issue #35 gate block below is retained as that pass's record.)*
 
 **Gate — all five re-run 2026-10-06, on Xcode 27.0, after the known-issue #35 fix** (the thirtieth
 pass). Foreground, one simulator at a time, `xcrun simctl shutdown all` before each,
@@ -1100,27 +1177,29 @@ this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-e665cda
+5ac02f1
 $ git log --oneline | wc -l
-      50
+      53
 $ git diff --cached --name-only | wc -l
-       7
+      13
 $ git status --short | grep '^??'
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 7 staged paths — the fix (`WristVessel.swift`), its tests
-(`WristViewLogicTests.swift`), the amended rule `60-design-system`, `docs/DESIGN.md`, this session's
-`tasks/lessons.md` entries, the `HISTORY.md` checkpoints and this sync's own `docs/AI_CONTEXT.md` —
-were staged with explicit paths for the owner's `/commit` (rule `90-git`), with nothing left
-unstaged. The previous pass's 21 staged paths were committed by the owner before this session began,
-as `6499cf4`, `6aba955`, `a8515da`, `9502146` and `e665cda` — `git diff --name-only 638a883 e665cda`
-lists exactly 21. `Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither
-committed nor ignored; whether it belongs in the tree is the owner's call.
+**Nothing is committed by this pass.** The 13 staged paths — the change (`ReminderPlan.swift`,
+`DataManager.swift`, `SettingsView.swift`, `Localizable.xcstrings`), its tests
+(`ReminderPlanTests.swift`, `DataManagerTests.swift`, `NotificationManagerTests.swift`),
+`README.md`, the amended rule `80-notifications`, `docs/STATE.md`, this session's `tasks/lessons.md`
+entries, the `HISTORY.md` checkpoints and this sync's own `docs/AI_CONTEXT.md` — were staged with
+explicit paths for the owner's `/commit` (rule `90-git`), with nothing left unstaged. The previous
+pass's 7 staged paths were committed by the owner before this session began, as `7b8f14a`,
+`ffc6dfa` and `5ac02f1` — `git diff --name-only e665cda 5ac02f1` lists exactly 7.
+`Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither committed nor
+ignored; whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 50 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 53 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -1760,6 +1839,34 @@ rather than fixed — the review's own explicit call, not an oversight:**
     2026-10-05). `Tools/` is outside a doc sync's write scope, so these are for the owner. *(This
     entry first said the override meant "passing one still works" — never tried — and named only the
     dead defaults; the same day's third `/doc_sync` run widened it.)*
+
+**Opened by the 2026-10-06 smart-reminders change** — each a limit the change records rather than
+fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
+
+46. **A mutation re-plans twice, and the two reconciles are unordered.** `addLog`, `removeWater` and
+    `ingest(_:)` start with `refresh()`, which reschedules on the rows from *before* the change, and
+    end in `recomputeToday()`, which reschedules again. `requestReminderReschedule` files each in its
+    own `Task`, and nothing orders them. The two plans used to differ only when a serving crossed the
+    goal — so this race predates the change — but they now differ whenever a drink silences a slot:
+    if the older reconcile reads the pending set *after* the newer one removed that slot, it files it
+    again, and the user gets the one reminder the change exists to skip. Narrow — the older task
+    must be overtaken by a whole read-and-remove round trip — and benign, but real. The fix is to
+    serialize reconciles in the production hook, in call order; deferred at the owner's ruling to its
+    own change, ahead of the next roadmap item.
+
+47. **A zone change can bring a kept slot inside the hour.** A trigger resolves in whatever zone the
+    device is in when it fires (`NotificationManager.swift`, the trigger's comment), while the quiet
+    hour was measured in the zone the plan was made in, and the `NSSystemTimeZoneDidChange` observer
+    re-plans only when the day also turns. Flying east soon after a drink can therefore deliver a
+    slot less than an hour after it, until the app next re-plans — on its next foreground at the
+    latest. Fixing it means re-planning from that observer, which rule `30-rollover` owns.
+
+48. **The latest drink is the latest this process has read.** A cross-process read can succeed and
+    still miss the other process's newest row (`republishTodaysLogs()`'s own DocC), so `refresh()`'s
+    backstop can put back a slot a widget tap silenced, until a read sees the row; and a failed fetch
+    after `deleteLog(_:)` skips the reschedule, leaving the deleted drink's slot silent until the next
+    good read. Both degrade to one reminder too many or too few, never to a reminder outside the
+    window.
 
 ## Where the rest is written down
 

@@ -4437,3 +4437,319 @@ two stale claims, which stay with known issue #45 as their own change.
 Still 7 paths — every one already in the set, each by explicit path, nothing unstaged, re-printed
 after this entry was written. HEAD is still `e665cda`. `Screenshots/census/` still untracked. No
 `git commit` was run.
+
+## [2026-10-06] — Smart reminders skip the one due within an hour of a drink
+
+### What
+
+The first item of a roadmap for the App Store push. The owner set the goal as "stand out on the App
+Store and get users", and plans a Plus/Premium subscription later. They chose to work through the
+roadmap in order.
+
+A read-only market scan informed the order: about 430 recent US reviews of 6 hydration apps, plus
+their listings and prices. It put "reminders ignore what I just drank" at #4 of the complaints.
+Paywalled basics were #1 and stale watch complications #2.
+
+- **`ReminderPlan.slots(...)`** takes `lastDrink: Date?`, with no default, and drops any slot due
+  less than `ReminderPlan.quietAfterDrink` (one hour) after it.
+  - The drink is clamped to `now`.
+  - A slot is dropped, never moved, so the fixed grid and `noSlotEverFallsOutsideTheWindow` hold.
+  - One drink drops at most one slot.
+- **`DataManager.currentReminderSlots()`** passes the latest of `todaysLogs`' timestamps.
+  - This is the one function both the app's hook and `AddWaterIntent.perform()` file from, so the
+    widget extension needed no change.
+- **A false claim that had shipped is fixed.**
+  - Since 2026-08-28, Settings said "Logging water pushes the next one back" in en/ru/uz, and so did
+    the README. The plan never took a drink as input.
+  - Both reminder captions are rewritten under new keys, in all three languages. The batched one
+    named the goal as the only exception and now names the drink as well.
+  - Both keep the `"A nudge every two hours"` prefix that `AppStoreScreenshotUITests` matches.
+
+### The rulings this rests on
+
+- **The owner chose "Within an hour"** over "always skip the next one" (2–4 h of silence after a
+  drink) and "within 30 minutes".
+- **The owner approved the plan with "go"**, including:
+  - the rule `80-notifications` amendment
+  - shipping with limitation 1 below recorded, rather than fixed first
+- **`ReminderPlan`'s own DocC ruling against a rolling timer** is why a drink *drops* a slot rather
+  than moving it. A new DocC section says so.
+- **The clamp came from an adversarial review of the plan,** every finding verified in the code
+  before acceptance.
+  - Watch pours carry the watch's clock (`WristModel.swift:174`), and `ingest(_:)` folds them in
+    unchecked.
+  - Unclamped, a pour stamped 20:00 and read at 10:15 would silence every slot until 21:00.
+- **The same review corrected the plan in two more places:**
+  - The planned 2-hour mutation could not fail the at-most-one sweep. The hour is pinned by
+    `theQuietHourEndsExactlyAnHourAfterTheDrink`, and the rule now names that test.
+  - Two of the nine tests could not be RED on the seam, so they are proven by mutation instead.
+
+### Known limitations, recorded rather than fixed
+
+Each is stated in `currentReminderSlots()`'s DocC, and goes to the known issues with the doc sync.
+
+1. **Each mutation reschedules twice.** Once from the `refresh()` it starts with, on the rows from
+   before it, and again from `recomputeToday()`.
+   - The production hook files each in its own `Task`, and the two are not ordered.
+   - The two plans used to differ only when the goal was crossed; now they differ whenever a drink
+     silences a slot.
+   - If the older reconcile reads the pending set after the newer one removed the slot, it files the
+     slot again: one extra reminder.
+   - The fix is to serialize reconciles in `requestReminderReschedule`, as its own change.
+2. **Zone changes.** Triggers resolve in the device's current zone, and the zone observer re-plans
+   only when the day turns. Flying east soon after a drink can bring a kept slot inside the hour.
+3. **Cross-process reads.**
+   - A read can miss the other process's newest row, so `refresh()`'s backstop can restore a slot a
+     widget tap silenced.
+   - A failed fetch after `deleteLog(_:)` keeps the deleted drink's slot silent until the next good
+     read.
+
+### Files touched
+
+Modified:
+- `WaterBuddy/ReminderPlan.swift` (121 → 149)
+- `WaterBuddy/DataManager.swift` (2243 → 2263; one argument plus DocC)
+- `WaterBuddy/SettingsView.swift` (658, two keys)
+- `WaterBuddy/Localizable.xcstrings` (1287, two entries replaced)
+- `WaterBuddyTests/ReminderPlanTests.swift` (180 → 251)
+- `WaterBuddyTests/DataManagerTests.swift` (1232 → 1265)
+- `WaterBuddyTests/NotificationManagerTests.swift` (215 → 216, the helper only)
+- `README.md`
+- `.claude/rules/80-notifications.md` (owner-approved)
+
+Unchanged: no key, stored shape, wire field, project file, entitlement, exception set, widget view
+tree or reminder notification copy.
+
+### Verification
+
+- **RED on wrong values, not on a compile error.**
+  - Seam first: the parameter was accepted and ignored, while `DataManager` already passed the real
+    `max()`.
+  - Then `✘ Test run with 37 tests in 2 suites failed … with 8 issues`: exactly the seven expected
+    tests.
+  - The two regression guards, `aDrinkMoreThanAnHourBeforeASlotLeavesItPlanned` and
+    `aLateDrinkLeavesTomorrowUntouched`, passed as planned.
+- **GREEN:** `✔ Test run with 37 tests in 2 suites passed`.
+- **Mutation:** six mutations, each caught by the intended test. The source was restored and
+  confirmed byte-identical by `cmp` after each batch.
+
+  | Mutation | Caught by |
+  |---|---|
+  | `<` → `<=` | `theQuietHourEndsExactlyAnHourAfterTheDrink` |
+  | 61-minute quiet | `theQuietHourEndsExactlyAnHourAfterTheDrink` |
+  | 2-hour quiet | `aDrinkMoreThanAnHourBeforeASlotLeavesItPlanned` |
+  | 3-hour quiet | `oneDrinkSilencesAtMostOneSlot` (132 issues) |
+  | 12-hour quiet | `aLateDrinkLeavesTomorrowUntouched` |
+  | no clamp | `aDrinkStampedAheadOfTheClockSilencesOnlyTheNextHour` and the sweep |
+
+- **The gate**, all five invocations, foreground, one simulator, Xcode 27.0:
+  - `✔ Test run with 325 tests in 33 suites passed`
+  - `Executed 25 tests, with 0 failures`
+  - `✔ Test run with 45 tests in 5 suites passed`
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWidgetExtension`)
+  - `** BUILD SUCCEEDED **` (`WaterBuddyWatchWidget`)
+- **Warnings:** clean `-scheme WaterBuddy` builds into empty DerivedData, generic iOS Simulator, a
+  `git archive HEAD` export (`5ac02f1`) against the tree.
+  - 31 unique lines and 80 occurrences each, identical per file and message.
+  - None new, none gone.
+
+### Not verified
+
+- **Pending notifications on a simulator:** they are not readable as a file (`tasks/lessons.md`,
+  2026-08-28).
+- **Either caption on screen, in any language.** Xcode 27 offers no tap route to Settings while the
+  capture scripts are stale (#45).
+  - The caption is `Text(explanation)` with a vertical `fixedSize`, so it grows rather than
+    truncates.
+  - `everyDrawnStringIsTranslatedUnlessDeliberatelyNot` resolved both keys in ru and uz from the
+    built bundle.
+- **The Russian and Uzbek copy** were written by the model and shown to the owner before approval.
+  They have not been reviewed by a native speaker.
+
+## [2026-10-06] — `/doc_sync`: the thirty-first pass, after smart reminders
+
+### What
+
+`/doc_sync` after the smart-reminders change in the checkpoint above. Docs only: nothing under
+`WaterBuddy/`, `WaterBuddyWidget/` or a test target was written by this pass.
+
+### Drift found and fixed
+
+**`docs/AI_CONTEXT.md`**
+- **Five line counts were stale**, exactly the five Swift files the change grew:
+  - `DataManager.swift` 2243 → 2263
+  - `ReminderPlan.swift` 121 → 149
+  - `DataManagerTests.swift` 1232 → 1265
+  - `NotificationManagerTests.swift` 215 → 216
+  - `ReminderPlanTests.swift` 180 → 251
+
+  Every other documented count matched `wc -l`.
+- **The targets table's phone test count** moved from 316 to 325.
+- **A new gate block** heads *Current state*. The #35 block is kept as that pass's record.
+- **The header** is now the thirty-first pass. The thirtieth pass moved into a `<details>` block,
+  which now number five, balanced.
+- **Known issues #46–#48 opened**: the three limits the change records rather than fixes.
+- **The Git section was one pass stale.** It said HEAD `e665cda` and 50 commits; it now says HEAD
+  `5ac02f1` and 53 commits. The previous pass's 7 staged paths were committed as `7b8f14a`, `ffc6dfa`
+  and `5ac02f1`.
+
+**`docs/STATE.md`**
+- The reminder seam records the plan's new input.
+- ***Tests that pin this* was stale before the change.** It printed 151 `@Test` across its ten
+  suites; its own per-suite figures summed to 152; the tree held 160. It now reads 169, counted per
+  suite by line range.
+- The header is now the eighteenth pass.
+
+**`tasks/lessons.md`** gained three entries:
+- the caption as a claim
+- an instant from another device's clock
+- a planned mutation check that was never computed
+
+### Checked and already accurate
+
+- **Swift files:** all 53 across the seven folders are documented.
+- **`@Test` counts**, by the attribute grep: 325 phone, 45 watch. There are 12 UI test functions.
+- **Exception sets:** three, six files each, unchanged. No key added: still eleven.
+- **Known issues** are numbered 1–48 with no gap or duplicate.
+- **Rule citations:** every one in `CLAUDE.md`, `docs/`, `tasks/` and the two source folders
+  resolves.
+- **The retired caption claim** survives only where it is quoted as retired: this file and the
+  `docs/AI_CONTEXT.md` header. Grepped across the whole tree, the old Russian and Uzbek wordings
+  included.
+- **`docs/WIDGET.md`:** its reminder section describes *how* the intent reconciles, not what the plan
+  contains, so it still holds. Not touched.
+- **`docs/DESIGN.md`:** no token changed. Not touched.
+- **`CLAUDE.md`:** its reminders bullet still holds, and no count it states moved. Not touched.
+- **No spec or plan under `docs/superpowers/` covers this change,** so no status line moved.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` · `docs/STATE.md` · `tasks/lessons.md` · `HISTORY.md`
+
+### Verification
+
+No gate was run by this pass. The gate figures it publishes are this session's own five runs,
+recorded in the checkpoint above. No code changed after them: the edits since then were all to docs,
+to this file, and to `tasks/lessons.md`.
+
+### Staged, not committed
+
+- 13 paths, every one by explicit path, nothing unstaged, re-printed after this entry was written.
+- HEAD is still `5ac02f1`.
+- `Screenshots/census/` is still untracked.
+- No `git commit` was run.
+
+## [2026-10-06] — `/doc_sync` re-run: the false caption's age corrected
+
+### What
+
+The owner ran `/doc_sync` again with no code change since the thirty-first pass: HEAD `5ac02f1`, the
+same 13 paths staged, nothing unstaged. Every computed probe was re-run and is current, so this run
+spent its effort on the claims no probe tests.
+
+### Found and fixed
+
+- **The false caption's age was inferred, not checked.**
+  - Three places dated the string from the reminders feature's 2026-08-28 checkpoint:
+    - the thirty-first pass's `docs/AI_CONTEXT.md` header
+    - the smart-reminders checkpoint above ("Since 2026-08-28, Settings said…")
+    - the caption lesson ("From 2026-08-28…", "five weeks")
+  - `git log -S` finds the string first in the root commit, `69c5a39` (2026-09-01). Git holds
+    nothing earlier.
+  - The header now says so. The checkpoint above and the lesson are superseded here, and by a new
+    lesson, *A claim's age is a claim too*, rather than rewritten.
+- **The README was quoted in the caption's words.** It read "Logging pushes the next one back"
+  (from `e93802d`, 2026-09-02), not "Logging water pushes…". Corrected in the header.
+
+### Checked against the tree — accurate
+
+- 53 Swift files, all documented, and every documented line count matches `wc -l`.
+- 325 phone and 45 watch `@Test`, and 12 UI test functions.
+- Three exception sets, six files each. Eleven keys on `DataManager.Key`.
+- `WaterBuddy/Localizable.xcstrings`: 58 keys, 54 in en/ru/uz, and the 4 deliberately not, exactly as
+  documented. Re-derived by a script file.
+- Known issue #46's callers: `addLog`, `removeWater` and `ingest(_:)` each call `refresh()` before
+  `saveAndRecompute()`.
+- Every rule citation resolves.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the header) · `tasks/lessons.md` · `HISTORY.md`
+
+### Verification
+
+No gate was run, because no code changed. The gate figures stand from this session's run, recorded in
+the smart-reminders checkpoint above.
+
+### Staged, not committed
+
+- Still 13 paths. Every one was already in the set, each staged by explicit path, with nothing
+  unstaged; the count was re-printed after this entry was written.
+- HEAD is still `5ac02f1`.
+- `Screenshots/census/` is still untracked.
+- No `git commit` was run.
+
+## [2026-10-07] — `/doc_sync` third run: two claims stated beyond their evidence
+
+### What
+
+The owner ran `/doc_sync` a third time, with no code or doc change since the second run: HEAD
+`5ac02f1`, the same 13 paths staged, nothing unstaged. Every computed probe was re-run and is current,
+so this run read the evidence behind the claims the earlier two had carried over.
+
+### Found and fixed
+
+- **What `everyDrawnStringIsTranslatedUnlessDeliberatelyNot` proves.**
+  - Two places said it "resolved" both new keys in ru and uz from the built bundle:
+    - the smart-reminders checkpoint above, in its *Not verified* list
+    - `docs/AI_CONTEXT.md`'s *Current state*
+  - Read, the test subtracts each language's keys from the English table's. It proves a translation
+    exists for every English key, not what the translation says.
+  - Corrected in `docs/AI_CONTEXT.md`, and superseded here for the checkpoint.
+  - The captions' ru and uz text are still the model's drafts, unreviewed by a native speaker.
+- **The TDD order.**
+  - `docs/AI_CONTEXT.md` said "the parameter landed first", and the checkpoint above said "Seam
+    first".
+  - The session's own sequence was different. The nine tests were written first. Then came the
+    parameter, accepted and ignored, and the one-line `max()` in `DataManager`. Only then came the
+    RED run, which is what let it compile and fail on values.
+  - Corrected in `docs/AI_CONTEXT.md`, and superseded here for the checkpoint.
+- **`tasks/lessons.md`:** *A test's name is not its assertion*, the 2026-10-05 lesson's pattern
+  recurring on a test instead of a property.
+
+### Checked against the tree — accurate
+
+- **Known issue #47's "on its next foreground at the latest":** `WaterBuddyApp` calls
+  `manager.refresh()` on every `.active` scene phase, and `refresh()` reschedules.
+- **`docs/STATE.md`'s "every one ends in `recomputeToday()`":** all of these end in
+  `saveAndRecompute()`:
+  - `addLog`
+  - `removeWater`
+  - `deleteLog`
+  - `updateLog`
+  - `resetDailyProgress`
+  - `ingest(_:)`
+
+  Another process's mutation reaches this one through `refresh()`, which republishes before it
+  reschedules.
+- **The computed probes:**
+  - 53 Swift files, all documented, every line count current
+  - 325 phone and 45 watch `@Test`, and 12 UI test functions
+  - three six-file exception sets
+  - every rule citation resolves
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the header and *Current state*) · `tasks/lessons.md` · `HISTORY.md`
+
+### Verification
+
+No gate was run, because no code changed.
+
+### Staged, not committed
+
+- Still 13 paths. Every one was already in the set, each staged by explicit path, with nothing
+  unstaged; the count was re-printed after this entry was written.
+- HEAD is still `5ac02f1`.
+- `Screenshots/census/` is still untracked.
+- No `git commit` was run.
