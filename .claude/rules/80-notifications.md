@@ -114,6 +114,11 @@ system.
   phone's. The extension reaches `reconcile` by awaiting it directly inside
   `AddWaterIntent.perform()` — never through the injected hook, and never from a detached `Task`
   that would not outlive `perform()`
+- The production hook files every plan through one `ReconcileQueue`
+  (`DataManager.reminderReconciles`), in the order the plans were asked for — never a `Task` per
+  reconcile. A mutation reschedules twice, two `Task`s are unordered, and a reconcile makes the
+  pending set equal *its* plan, so the plan from before a drink could land last and file the slot
+  the drink dropped. `anOlderPlanCannotRefileTheSlotANewerPlanDropped` pins it
 - `refresh()`'s unconditional reconcile on every foreground is the backstop for a widget tap the
   extension sandbox may not have permitted. Do not remove it as redundant
 

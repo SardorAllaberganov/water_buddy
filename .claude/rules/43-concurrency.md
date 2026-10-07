@@ -125,5 +125,5 @@ warning here is a Swift 6 error later.
   reference box, never a captured local `var`
 - Never add `@MainActor` to `WaterSnapshotTests`, `WidgetLanguageTests`, `AppLanguageTests`,
   `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
-  `LiquidGlassInteractionTests` or `NotificationManagerTests` to make them compile. They are
-  compile-time canaries: fix the declaration they read instead
+  `LiquidGlassInteractionTests`, `NotificationManagerTests` or `ReconcileQueueTests` to make them
+  compile. They are compile-time canaries: fix the declaration they read instead

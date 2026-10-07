@@ -57,8 +57,9 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   nested `func` does not inherit the enclosing closure's isolation
 - Some suites are deliberately **not** `@MainActor` — `WaterSnapshotTests`, `WidgetLanguageTests`,
   `AppLanguageTests`, `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
-  `LiquidGlassInteractionTests`, `NotificationManagerTests`. They are compile-time canaries for
-  rule `43-concurrency`: fix the declaration they read rather than annotating the suite
+  `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`. They are
+  compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
+  annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
   the plan stayed pure (rule `80-notifications`)
 - Tally `withObservationTracking`'s `onChange` through a `final class … : @unchecked Sendable` box,
