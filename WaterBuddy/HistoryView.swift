@@ -849,7 +849,15 @@ private struct ServingSheet: View {
             Button { dismiss() } label: {
                 Text("Cancel", bundle: strings)
                     .font(.headline.weight(.semibold))
+                    // Two buttons share the row, so each label has half of it. At
+                    // `AccessibilityXXXL` *Cancel* ran past its capsule's edge (known issue #60), and
+                    // Uzbek's *Bekor qilish* is twice as long; the label shrinks to fit instead, and
+                    // keeps clear of the capsule's curved ends. 0.4, because 0.5 with the clearance
+                    // would have truncated the Uzbek rather than shrunk it.
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
                     .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 56)
                     .liquidGlass(in: Capsule(), density: .sheer, elevation: .resting, interactive: true)
@@ -872,7 +880,10 @@ private struct ServingSheet: View {
             } label: {
                 Text("Save", bundle: strings)
                     .font(.headline.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
                     .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 56)
                     .liquidGlass(in: Capsule(), density: .frosted, elevation: .raised, interactive: true)
