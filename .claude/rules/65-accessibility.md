@@ -76,6 +76,8 @@ rather than re-deriving it.
 ## VoiceOver
 - The vessel is exactly **one** element in both processes: `.accessibilityElement(children: .ignore)`
   + a label + an `.accessibilityValue` carrying percent and millilitres
+- The week card's summary is one element; each day is exactly one button, with `.isSelected` on the
+  shown day
 - Put `.accessibilityLabel` / `.accessibilityValue` / `.accessibilityHint` / `.accessibilityAddTraits`
   **on the control itself** — never on an `.accessibilityElement(children: .ignore)` wrapper around a
   `Button`, `Toggle` or `Slider`

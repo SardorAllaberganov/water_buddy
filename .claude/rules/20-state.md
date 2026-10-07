@@ -27,7 +27,7 @@ after the body above had already conceded it.
 - A `#Preview` may build its own throwaway suite, but must tear it down with
   `removePersistentDomain(forName:)` in the same scope
 - The public mutation surface is `addLog(amount:at:)`, `addWater(amount:)`, `removeWater(amount:)`,
-  `deleteLog(_:)`, `updateLog(_:newAmount:)`, `saveDailyGoal(ml:)`, `resetIfNeeded()`,
+  `deleteLog(_:)`, `updateLog(_:newAmount:timestamp:)`, `saveDailyGoal(ml:)`, `resetIfNeeded()`,
   `resetDailyProgress()` and `refresh()`. Anything new joins that list rather than reaching around it
 
 ## Today's total is derived, never authored
@@ -71,10 +71,10 @@ after the body above had already conceded it.
   (`defaults.object(forKey:) as? Bool != true`) and the **observation** separately on
   `storedIsGoalSet`. They are not the same: `resolveIsGoalSet(in:goal:)` infers `true` from a
   non-default goal when the key is absent
-- `isGoalSet` and `todaysLogs` stay get-only. Both are consequences, not inputs
-- Do **not** add an equality guard to the `todaysLogs` republish. `WaterLog` is a `@Model` class
-  hashed by `persistentModelID`, so the array after an amount edit compares equal to the array
-  before it — a guard would swallow exactly the change it is meant to publish
+- `isGoalSet`, `todaysLogs` and `historyLogs` stay get-only. All three are consequences, not inputs
+- Do **not** add an equality guard to the `todaysLogs` or `historyLogs` republish. `WaterLog` is a
+  `@Model` class hashed by `persistentModelID`, so the array after an amount edit compares equal to
+  the array before it — a guard would swallow exactly the change it is meant to publish
 - `loadFromStore()` compares each re-read value against its `stored…` field before wrapping the
   assignment in `withMutation`. `refresh()` runs on every foreground; an unconditional mutation
   redraws the whole tree for nothing

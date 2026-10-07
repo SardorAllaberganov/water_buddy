@@ -16,7 +16,8 @@ persist anything.
   being edited, a haptic counter, the value under a finger
 - A `WaterLog` may sit in `@State` only as a **sheet's selection** (`@State private var editing:
   WaterLog?`), never as the source of a list
-- No `@Query` and no `ModelContext` in a view — read `manager.todaysLogs`
+- No `@Query` and no `ModelContext` in a view — read `manager.todaysLogs`, or `manager.historyLogs`
+  for a past day
 - A view never writes `UserDefaults`. Every mutation goes through a `DataManager` method, or a
   `Binding` whose setter calls one
 

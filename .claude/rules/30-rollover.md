@@ -59,6 +59,8 @@ changed.
 - `DataManager.nextDayBoundary(after:calendar:)` is the single definition of when the day turns. The
   widget's timeline entry, its refresh policy and `fetchLogsForToday`'s upper bound all call it with
   the same calendar the ordinal uses
+- `DataManager.historyWindowStart(endingOn:calendar:)` is the single definition of where the history
+  window starts — the bars' fetch and History's sheet both call it
 - It computes through `Calendar.nextDate(after:matching:matchingPolicy:)`. Never add `86_400` — a
   DST day is 23 or 25 hours long
 
@@ -78,7 +80,8 @@ changed.
 - Keep `refresh()`'s calls in order: `loadFromStore()` → `resetIfNeeded()` → `republishTodaysLogs()`
 - `addLog(amount:at:)` and `removeWater(amount:)` call `refresh()` first, so a mutation always lands
   on the right day. Any new mutator that computes from current state must too. (`deleteLog(_:)` and
-  `updateLog(_:newAmount:)` currently do not — they address a row by identity rather than by total)
+  `updateLog(_:newAmount:timestamp:)` currently do not — they address a row by identity rather
+  than by total)
 - `seedFromCachedTotalIfNeeded()` may only seed a cached total whose `lastActiveDay` equals today's;
   keep all three of its guards
 
