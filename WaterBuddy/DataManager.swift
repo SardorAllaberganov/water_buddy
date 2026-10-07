@@ -1507,17 +1507,30 @@ final class DataManager {
     /// to override `publishWrist:` still cannot leak a read of the real App Group suite merely by
     /// composing a mirror — only the un-guardable `WCSession.default` call below still touches a
     /// real system object, which is why fixtures must still pass a no-op explicitly.
+    ///
+    /// **Then pushes the same mirror to the watch face when it is news**, through
+    /// ``WristLink/pushToFace(_:encoded:after:in:)`` — the context stays the record, and the push only
+    /// gets it there sooner (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.4).
+    /// What it is news *against* is `session.applicationContext`, read before it is overwritten: the
+    /// mirror this phone last sent. Should the system ever hand that back empty, the next mirror simply
+    /// counts as news, at the cost of one push.
     nonisolated static func requestWristPublish(from defaults: UserDefaults) {
         guard WCSession.isSupported() else { return }
+        let session = WCSession.default
         let mirror = composeWristMirror(from: defaults, calendar: .waterBuddyDay, now: Date())
         guard let data = try? JSONEncoder().encode(mirror) else { return }
+        let lastSent = WristLink.decodeMirror(from: session.applicationContext)
         do {
-            try WCSession.default.updateApplicationContext(["mirror": data])
+            try session.updateApplicationContext(["mirror": data])
         } catch {
             #if DEBUG
             print("[WaterBuddy] Could not publish the wrist mirror: \(error.localizedDescription)")
             #endif
+            return
         }
+        #if os(iOS)
+        WristLink.pushToFace(mirror, encoded: data, after: lastSent, in: session)
+        #endif
     }
     #endif
 }
@@ -1900,9 +1913,13 @@ nonisolated struct WristBatch: Codable, Sendable, Equatable {
 }
 
 /// What the phone last told the watch, phone → wrist. Delivered as a **property**
-/// (`updateApplicationContext`/`receivedApplicationContext`), never an event stream — the watch
-/// reads whatever the phone most recently composed, with no ordering dependency and no callback
-/// needed on wake.
+/// (`updateApplicationContext`/`receivedApplicationContext`) — the watch reads whatever the phone most
+/// recently composed, with no callback needed on wake.
+///
+/// **And, when it is news, pushed to the face as well** (`WristLink.pushToFace(_:encoded:after:in:)`,
+/// `docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.4). That second lane is a
+/// queue, not a property, so two mirrors can arrive in the wrong order: `WristModel.apply(_:)` keeps
+/// the order by never taking a mirror composed before the one it holds.
 nonisolated struct WristMirror: Codable, Sendable, Equatable {
     let schemaVersion: Int
     let currentWater: Int
@@ -1915,7 +1932,9 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
     let languageCode: String?
     let isGoalSet: Bool
     /// An instant: when the phone composed this mirror, for the watch's "Synced Nm ago" line.
-    let composedAt: Date
+    ///
+    /// The one `var`, so ``isNews(since:)`` can re-stamp a whole copy rather than list the fields.
+    var composedAt: Date
     /// The phone's `startOfDay`, **as an instant** — compared against the watch's own day, never
     /// stored as an ordinal the watch would have to re-interpret under its own time zone
     /// (rule `30-rollover`, spec §5).
@@ -1941,6 +1960,23 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
 
     static let currentSchemaVersion = 1
     static let maximumAckedIds = 256
+
+    /// Whether this mirror tells the watch anything `previous` did not: any field but ``composedAt``,
+    /// which differs on every composition by construction. `true` when there is no `previous`.
+    ///
+    /// **The one test both ends use** (`docs/superpowers/specs/2026-10-07-complication-current-design.md`
+    /// §4.6). The phone spends a complication push only on news, and the watch reloads its face only on
+    /// news: `refresh()` republishes on every foreground, and a push or a background reload spent on
+    /// "synced at" alone is one the day's budget no longer has.
+    ///
+    /// **Re-stamps a whole copy, then compares the whole value** — never a list of fields, which is
+    /// correct only on the day it is written (`tasks/lessons.md`, 2026-08-30). A field added to the wire
+    /// later is compared here without anyone touching this method.
+    func isNews(since previous: WristMirror?) -> Bool {
+        guard var restamped = previous else { return true }
+        restamped.composedAt = composedAt
+        return restamped != self
+    }
 }
 
 #endif
@@ -2022,7 +2058,9 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
         //
         // Reading it here closes that hole from the receiving side, and is safe to do unconditionally:
         // it is last-write-wins state, `WristModel.apply(_:)` is idempotent, and an empty dictionary
-        // before the first sync simply decodes to nil.
+        // before the first sync simply decodes to nil. A push can now deliver a mirror ahead of its
+        // context, so the context re-read here may be older than the mirror held — and `apply(_:)`
+        // sets an older one aside rather than taking it (spec 2026-10-07 §4.5).
         applyPersistedContext(from: session)
         #endif
     }
@@ -2034,6 +2072,53 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
         guard let mirror = Self.decodeMirror(from: session.receivedApplicationContext),
               mirror.schemaVersion == WristMirror.currentSchemaVersion else { return }
         NotificationCenter.default.post(name: Self.didReceiveMirrorNotification, object: nil, userInfo: ["mirror": mirror])
+    }
+
+    // MARK: - Holding a background wake open (watch)
+
+    /// Returns once the session has handed over everything it was woken to deliver — activated, with
+    /// no content pending — or after about ten seconds, or the moment the system cancels the task.
+    ///
+    /// **What `.backgroundTask(.watchConnectivity)` awaits after `activate()`.** That task is complete
+    /// when its closure returns, so a closure that returned straight after activating let the system
+    /// suspend the app before anything had been delivered to it. Apple's instruction for the WatchKit
+    /// form of the same task is to defer completion "until after you've activated your session and
+    /// received all the pending data", using `hasContentPending`
+    /// (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §3, §4.2).
+    ///
+    /// **Polls rather than observes:** `activationState` is documented as key-value observable,
+    /// `hasContentPending` is not. **Bounded,** so a flag that never clears cannot hold a wake open,
+    /// and **cancellable,** because cancelling is how the system ends a task that has run out of time —
+    /// and a closure still running past that risks the app being terminated.
+    nonisolated static func waitForPendingDelivery() async {
+        let delivered = await poll(
+            until: {
+                let session = WCSession.default
+                return session.activationState == .activated && !session.hasContentPending
+            },
+            every: .milliseconds(100), atMost: 100
+        )
+        #if DEBUG
+        if !delivered {
+            print("[WaterBuddy] A background wake ended with WatchConnectivity content still pending.")
+        }
+        #endif
+    }
+
+    /// Checks `isDone` up to `attempts` times, `interval` apart, and says whether it ever held — `false`
+    /// at once if the task is cancelled. The pure half of ``waitForPendingDelivery()``, testable with no
+    /// session (`WristLinkDeliveryTests`).
+    nonisolated static func poll(until isDone: () -> Bool, every interval: Duration, atMost attempts: Int) async -> Bool {
+        for attempt in 0..<max(attempts, 0) {
+            if isDone() { return true }
+            guard attempt < attempts - 1 else { break }
+            do {
+                try await Task.sleep(for: interval)
+            } catch {
+                return false
+            }
+        }
+        return false
     }
     #endif
 
@@ -2075,6 +2160,40 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
         }
     }
 
+    #if os(iOS)
+    // MARK: - Pushing to the face (phone → wrist)
+
+    /// Sends the watch's complication the mirror just written to the application context, with the one
+    /// priority the system reserves for a complication on the active face: transferred at once, waking
+    /// the watch app in the background to take it (`WCSession.h`, `transferCurrentComplicationUserInfo:`).
+    /// The context stays the record; this only gets the same mirror there sooner
+    /// (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.4).
+    ///
+    /// **Only news, and only while the face can use it.** A mirror that is not news against `lastSent`
+    /// spends nothing — `refresh()` republishes on every foreground, against a budget of 50 pushes a
+    /// day. Nor does a complication that is not on the active face. At zero remaining, the SDK would
+    /// send an ordinary user-info transfer instead, which the context already covers, so that is
+    /// skipped too, and said so in `DEBUG`.
+    ///
+    /// **A replacement cancels what it replaces.** A push superseded while still queued is untagged but
+    /// kept, and delivered after the one that replaced it (`WCSession.h`) — only to wake the watch and
+    /// be set aside by `WristModel.apply(_:)`. Only a push about to be sent cancels: a publish that is
+    /// not news leaves a waiting push alone, since it may be the only fast copy of a real change.
+    nonisolated static func pushToFace(_ mirror: WristMirror, encoded data: Data, after lastSent: WristMirror?, in session: WCSession) {
+        guard mirror.isNews(since: lastSent), session.isComplicationEnabled else { return }
+        guard session.remainingComplicationUserInfoTransfers > 0 else {
+            #if DEBUG
+            print("[WaterBuddy] No complication pushes left today; the watch catches up through the application context.")
+            #endif
+            return
+        }
+        for transfer in session.outstandingUserInfoTransfers where transfer.userInfo["mirror"] != nil {
+            transfer.cancel()
+        }
+        session.transferCurrentComplicationUserInfo(["mirror": data])
+    }
+    #endif
+
     // MARK: - Decoding (the pure half — testable with no paired watch)
 
     nonisolated static func decodeBatch(from userInfo: [String: Any]) -> WristBatch? {
@@ -2110,7 +2229,8 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
     static let didReceiveBatchNotification = Notification.Name("sardor.WaterBuddy.wristLink.didReceiveBatch")
 
     /// Posted with the decoded `WristMirror`, phone → wrist, in lieu of `WristLink` naming
-    /// `WristModel` directly.
+    /// `WristModel` directly — for both lanes: a delivered application context, and a mirror pushed to
+    /// the complication (spec 2026-10-07 §4.5).
     ///
     /// **Why the indirection, the same shape as `didReceiveBatchNotification` above, mirrored:**
     /// `WristLink` lives in `DataManager.swift`, which — since Task 16 — is also compiled into
@@ -2180,11 +2300,17 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
     }
     #endif
 
-    /// Wrist → phone. Only meaningful on `iOS` — the watch never receives a batch, it authors one.
-    /// Posts `Self.didReceiveBatchNotification` rather than calling `WristInbox` directly — see that
-    /// constant's DocC for why.
+    /// Both directions, one per platform. Wrist → phone, a batch of pours; phone → wrist, a mirror
+    /// pushed to the complication (``pushToFace(_:encoded:after:in:)``). Each posts a notification
+    /// rather than calling `WristInbox` or `WristModel` directly — see the two constants' DocC for why.
+    /// A pushed mirror is the only user info a watch receives: batches travel wrist → phone alone.
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
-        #if !os(watchOS)
+        #if os(watchOS)
+        // The context's own notification, so `WristModel` keeps one door — and its "never older" rule
+        // is what sets aside a push that lands after the one that replaced it (spec 2026-10-07 §4.5).
+        guard let mirror = Self.decodeMirror(from: userInfo), mirror.schemaVersion == WristMirror.currentSchemaVersion else { return }
+        NotificationCenter.default.post(name: Self.didReceiveMirrorNotification, object: nil, userInfo: ["mirror": mirror])
+        #else
         guard let batch = Self.decodeBatch(from: userInfo), batch.schemaVersion == WristBatch.currentSchemaVersion else { return }
         NotificationCenter.default.post(name: Self.didReceiveBatchNotification, object: nil, userInfo: ["batch": batch])
         #endif

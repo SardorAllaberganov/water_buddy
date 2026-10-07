@@ -15,6 +15,9 @@
 
 import Foundation
 import Observation
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 @MainActor
 @Observable
@@ -28,6 +31,10 @@ final class WristModel {
     /// Hands new pours to the transport. Injected so tests never touch `WCSession`
     /// (`WristLinkTests` would need a paired watch to reach the real one at all).
     @ObservationIgnored private let send: ([WristPour]) -> Void
+    /// Reloads the complication's timeline whenever the store it reads changes — the watch's twin of
+    /// `DataManager`'s `reloadWidgets`, injected so tests never reach `WidgetCenter`
+    /// (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.1).
+    @ObservationIgnored private let reloadComplication: () -> Void
 
     private var storedMirror: WristMirror?
     private var storedOutbox: [WristPour]
@@ -43,12 +50,14 @@ final class WristModel {
         defaults: UserDefaults = DataManager.sharedDefaults,
         calendar: Calendar = .waterBuddyDay,
         now: @escaping () -> Date = Date.init,
-        send: @escaping ([WristPour]) -> Void = WristModel.requestSend
+        send: @escaping ([WristPour]) -> Void = WristModel.requestSend,
+        reloadComplication: @escaping () -> Void = WristModel.requestComplicationReload
     ) {
         self.defaults = defaults
         self.calendar = calendar
         self.now = now
         self.send = send
+        self.reloadComplication = reloadComplication
         self.storedOutbox = Self.readOutbox(from: defaults)
         self.storedMirror = Self.readMirror(from: defaults)
         mirrorObserver = NotificationCenter.default.addObserver(
@@ -169,6 +178,9 @@ final class WristModel {
     /// reachability observer. `WristLink.send(_:)` re-chunks and the phone's applied-ledger
     /// conjunction guard (`DataManager.ingest(_:)`) makes re-sending an already-applied pour a
     /// no-op, so resending is always safe.
+    ///
+    /// The face is reloaded once the outbox is persisted, because it reads the same outbox — so the
+    /// ring moves with the tap, not on a timer.
     func pour(amount: Int) {
         guard amount > 0 else { return }
         let pour = WristPour(id: UUID(), amount: amount, at: now())
@@ -176,13 +188,28 @@ final class WristModel {
             storedOutbox.append(pour)
         }
         persistOutbox()
+        reloadComplication()
         send(storedOutbox)
     }
 
-    /// The one entry point for a fresh `WristMirror`: replaces it and retires every outbox pour the
-    /// phone has now acked, together, in one synchronous method with no suspension point between
-    /// the two — so nothing reads a torn mix of the two.
+    /// The one entry point for a fresh `WristMirror`, from either lane — the application context or a
+    /// complication push (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.5).
+    /// Replaces the mirror held and retires every outbox pour the phone has now acked, together, in
+    /// one synchronous method with no suspension point between the two — so nothing reads a torn mix
+    /// of the two.
+    ///
+    /// **Never older.** A mirror composed before the one held is set aside (``isSuperseded(_:)``): a
+    /// superseded push can land after the push that replaced it, and the context re-read at activation
+    /// can lag a push, and taking either would put the face back a drink. A tie is taken — the same
+    /// composition arrives by both lanes.
+    ///
+    /// **The face is reloaded only on news,** or when a pour is retired. A republish of unchanged state
+    /// still moves "synced at" on the screen, so it is taken; but a reload from the background counts
+    /// against the face's daily budget, and this one would change nothing it draws.
     func apply(_ mirror: WristMirror) {
+        guard !isSuperseded(mirror) else { return }
+        let isNews = mirror.isNews(since: storedMirror)
+        let pendingBefore = storedOutbox.count
         withMutation(keyPath: \.mirror) {
             storedMirror = mirror
         }
@@ -191,7 +218,24 @@ final class WristModel {
         }
         persistOutbox()
         persistMirror()
+        if isNews || storedOutbox.count != pendingBefore {
+            reloadComplication()
+        }
     }
+
+    /// Whether the mirror held was composed after `mirror` — unless the one held is stamped more than
+    /// ``clockSkewAllowance`` ahead of this watch's own clock. That means a clock was set back after it
+    /// was composed: the phone's stamps no longer say which came last, and refusing everything older
+    /// would freeze the face for as long as the clock was moved.
+    private func isSuperseded(_ mirror: WristMirror) -> Bool {
+        guard let held = storedMirror, mirror.composedAt < held.composedAt else { return false }
+        return held.composedAt <= now().addingTimeInterval(Self.clockSkewAllowance)
+    }
+
+    /// How far a mirror's stamp may run ahead of this watch's clock and still order it. Paired devices'
+    /// clocks differ by far less, and a clock set back by less than this stalls the watch no longer
+    /// than this.
+    private static let clockSkewAllowance: TimeInterval = 60
 
     // MARK: - Persistence
 
@@ -248,5 +292,14 @@ final class WristModel {
     /// error tomorrow.
     nonisolated static func requestSend(_ pours: [WristPour]) {
         WristLink.send(pours)
+    }
+
+    /// The production default for `reloadComplication:` — `nonisolated` for ``requestSend(_:)``'s
+    /// reason: a `@MainActor` function value defaulting a plain closure parameter drops its isolation
+    /// silently.
+    nonisolated static func requestComplicationReload() {
+        #if canImport(WidgetKit)
+        WidgetCenter.shared.reloadAllTimelines()
+        #endif
     }
 }

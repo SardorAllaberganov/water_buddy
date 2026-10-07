@@ -31,15 +31,20 @@ struct WristWidgetProvider: TimelineProvider {
     /// them a face nobody touches would still show yesterday's water tomorrow morning — the phone
     /// widget's midnight entry (rule `40-widget`), one platform over (spec §17).
     ///
-    /// The 15-minute refresh is a different job and stays: it is how the face picks up pours made in
-    /// the watch app, which reloads no timelines of its own.
+    /// **`.atEnd`, not a periodic refresh.** The watch app reloads this face whenever it writes the
+    /// store — on every pour, and on every mirror that is news (`WristModel.apply(_:)`) — and every
+    /// instant the total changes with nothing arriving is already an entry here, so a timer would have
+    /// nothing left to catch. The 15-minute refresh this replaced asked for 96 reloads a day of the
+    /// ~75 a complication on the face is given, the same budget the phone's pushes need. `.atEnd` asks
+    /// once, after the last boundary — when the next day's boundaries are due
+    /// (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.3).
     func getTimeline(in context: Context, completion: @escaping (Timeline<WristWidgetEntry>) -> Void) {
         let now = Date()
         let calendar = Calendar.waterBuddyDay
         let stored = readStore()
         let dates = [now] + WristPlan.dayBoundaries(after: now, mirror: stored.mirror, calendar: calendar)
         let entries = dates.map { entry(at: $0, mirror: stored.mirror, outbox: stored.outbox, calendar: calendar) }
-        completion(Timeline(entries: entries, policy: .after(now.addingTimeInterval(15 * 60))))
+        completion(Timeline(entries: entries, policy: .atEnd))
     }
 
     /// Reads the persisted mirror and outbox directly, never through `WristModel.shared` — a

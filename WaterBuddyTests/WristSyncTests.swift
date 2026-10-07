@@ -718,6 +718,66 @@ struct WristPublishTests {
     }
 }
 
+/// When a mirror tells the watch something the last one did not — the one test the phone uses to
+/// decide a complication push and the watch uses to decide a reload
+/// (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.6). Not `@MainActor`, for
+/// `WristWireTests`' reason: a mirror is a plain value with no isolation.
+struct WristMirrorNewsTests {
+
+    private static let ackedId = UUID(uuidString: "6A0B6C8E-2F55-4E27-9C3B-6F1E0B7D1A20")!
+
+    /// Every field a literal, so a test that changes one can name exactly which.
+    private static func mirror(
+        schemaVersion: Int = WristMirror.currentSchemaVersion,
+        currentWater: Int = 500,
+        dailyGoal: Int = 2_000,
+        servings: [Int] = [150, 250, 500],
+        languageCode: String? = nil,
+        isGoalSet: Bool = true,
+        composedAt: Date = Date(timeIntervalSince1970: 1_000),
+        phoneDayStart: Date = Date(timeIntervalSince1970: 0),
+        phoneDayEnd: Date? = Date(timeIntervalSince1970: 86_400),
+        acked: [UUID] = [WristMirrorNewsTests.ackedId]
+    ) -> WristMirror {
+        WristMirror(
+            schemaVersion: schemaVersion, currentWater: currentWater, dailyGoal: dailyGoal,
+            servings: servings, languageCode: languageCode, isGoalSet: isGoalSet, composedAt: composedAt,
+            phoneDayStart: phoneDayStart, phoneDayEnd: phoneDayEnd, acked: acked
+        )
+    }
+
+    /// When a republish of the same state is composed: a minute after the base mirror.
+    private static let aMinuteLater = Date(timeIntervalSince1970: 1_060)
+
+    @Test
+    func theFirstMirrorEverSentIsNews() {
+        #expect(Self.mirror().isNews(since: nil))
+    }
+
+    /// `refresh()` republishes on every foreground and every tab appearance. Counted as news, each of
+    /// those would spend a complication push, and a reload on the wrist, on "synced at" alone.
+    @Test
+    func aMirrorDifferingOnlyInWhenItWasComposedIsNotNews() {
+        #expect(!Self.mirror(composedAt: Self.aMinuteLater).isNews(since: Self.mirror()))
+    }
+
+    /// Field by field, so a re-stamp that took any one value from the wrong mirror fails here by name.
+    @Test
+    func aChangeToAnyOtherFieldIsNews() {
+        let base = Self.mirror()
+        let later = Self.aMinuteLater
+        #expect(Self.mirror(schemaVersion: 2, composedAt: later).isNews(since: base), "schemaVersion")
+        #expect(Self.mirror(currentWater: 750, composedAt: later).isNews(since: base), "currentWater")
+        #expect(Self.mirror(dailyGoal: 2_500, composedAt: later).isNews(since: base), "dailyGoal")
+        #expect(Self.mirror(servings: [150, 300, 500], composedAt: later).isNews(since: base), "servings")
+        #expect(Self.mirror(languageCode: "ru", composedAt: later).isNews(since: base), "languageCode")
+        #expect(Self.mirror(isGoalSet: false, composedAt: later).isNews(since: base), "isGoalSet")
+        #expect(Self.mirror(composedAt: later, phoneDayStart: Date(timeIntervalSince1970: 3_600)).isNews(since: base), "phoneDayStart")
+        #expect(Self.mirror(composedAt: later, phoneDayEnd: Date(timeIntervalSince1970: 90_000)).isNews(since: base), "phoneDayEnd")
+        #expect(Self.mirror(composedAt: later, acked: []).isNews(since: base), "acked")
+    }
+}
+
 /// The half of `WristLink` worth testing without a paired watch: decoding the two payload shapes
 /// WatchConnectivity hands a delegate — a `[String: Any]` dictionary, which `WCSession` itself is
 /// never reachable to produce in a unit test.

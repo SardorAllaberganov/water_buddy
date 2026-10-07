@@ -4,9 +4,6 @@
 //
 
 import SwiftUI
-#if canImport(WidgetKit)
-import WidgetKit
-#endif
 
 @main
 struct WaterBuddyWatchApp: App {
@@ -42,15 +39,17 @@ struct WaterBuddyWatchApp: App {
             // The same touch, required again here specifically: a background-task launch never
             // evaluates `WindowGroup`'s content, so the `@State` initializers in `WristRoot` and
             // `WristView` — the only other places `WristModel.shared` gets constructed — never run.
-            // Without this line, a
-            // mirror that arrives while the app is woken only for this background task posts to
-            // zero observers and is silently dropped, and the `reloadAllTimelines()` below then
-            // re-renders the complication from a store `WristModel.apply(_:)` never actually wrote.
+            // Without this line, a mirror that arrives while the app is woken only for this
+            // background task posts to zero observers and is silently dropped.
             _ = WristModel.shared
             WristLink.live.activate()
-            #if canImport(WidgetKit)
-            WidgetCenter.shared.reloadAllTimelines()
-            #endif
+            // The task ends when this closure returns, and nothing has been delivered yet: activation
+            // is asynchronous, and delivery follows it. This used to return here, after reloading the
+            // face from the store as it stood, which let the system suspend the app before the mirror
+            // it was woken for ever landed. Waiting is what lets `WristModel.apply(_:)` take that
+            // mirror — and it reloads the face itself, where the store is written
+            // (`docs/superpowers/specs/2026-10-07-complication-current-design.md` §4.2).
+            await WristLink.waitForPendingDelivery()
         }
     }
 }

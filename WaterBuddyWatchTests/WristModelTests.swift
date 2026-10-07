@@ -29,8 +29,11 @@ struct WristModelTests {
         return try body(defaults)
     }
 
-    private func makeModel(_ defaults: UserDefaults, now: @escaping () -> Date, sent: @escaping ([WristPour]) -> Void = { _ in }) -> WristModel {
-        WristModel(defaults: defaults, calendar: Self.utc, now: now, send: sent)
+    private func makeModel(
+        _ defaults: UserDefaults, now: @escaping () -> Date,
+        sent: @escaping ([WristPour]) -> Void = { _ in }, reloaded: @escaping () -> Void = {}
+    ) -> WristModel {
+        WristModel(defaults: defaults, calendar: Self.utc, now: now, send: sent, reloadComplication: reloaded)
     }
 
     @Test
@@ -303,6 +306,138 @@ struct WristModelTests {
             let relaunched = makeModel(defaults, now: { now })
             #expect(relaunched.language == .russian,
                     "the language rides in the persisted mirror, so a relaunch keeps it")
+        }
+    }
+
+    // MARK: - Keeping the face current (spec 2026-10-07)
+
+    /// A mirror like the ones above, carrying `currentWater` and stamped `composedAt` — both inside the
+    /// phone's first day, which ends at `endOfFirstDay`.
+    private static func mirror(currentWater: Int, composedAt: Date) -> WristMirror {
+        WristMirror(
+            schemaVersion: WristMirror.currentSchemaVersion, currentWater: currentWater, dailyGoal: 2_000,
+            servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
+            composedAt: composedAt, phoneDayStart: Date(timeIntervalSince1970: 0), phoneDayEnd: endOfFirstDay,
+            acked: []
+        )
+    }
+
+    /// Where the watch's clock stands in the reload tests: after every mirror they apply, as a
+    /// received mirror ordinarily is.
+    private static let afterward = Date(timeIntervalSince1970: 2_000)
+
+    @Test
+    func aPourReloadsTheComplication() {
+        withTempDefaults { defaults in
+            var reloads = 0
+            let model = makeModel(defaults, now: { Self.afterward }, reloaded: { reloads += 1 })
+            model.pour(amount: 250)
+            #expect(reloads == 1)
+        }
+    }
+
+    /// The face reads the outbox, and a refused pour never reaches it.
+    @Test
+    func aRefusedPourReloadsNothing() {
+        withTempDefaults { defaults in
+            var reloads = 0
+            let model = makeModel(defaults, now: { Self.afterward }, reloaded: { reloads += 1 })
+            model.pour(amount: 0)
+            #expect(reloads == 0)
+        }
+    }
+
+    @Test
+    func aMirrorThatChangesTheTotalReloadsTheComplication() {
+        withTempDefaults { defaults in
+            var reloads = 0
+            let model = makeModel(defaults, now: { Self.afterward }, reloaded: { reloads += 1 })
+            model.apply(Self.mirror(currentWater: 500, composedAt: Date(timeIntervalSince1970: 1_000)))
+            model.apply(Self.mirror(currentWater: 750, composedAt: Date(timeIntervalSince1970: 1_060)))
+            #expect(reloads == 2)
+        }
+    }
+
+    /// Every activation re-reads the context the watch already holds, and hands it to `apply(_:)`.
+    @Test
+    func theSameMirrorAppliedTwiceReloadsOnce() {
+        withTempDefaults { defaults in
+            var reloads = 0
+            let model = makeModel(defaults, now: { Self.afterward }, reloaded: { reloads += 1 })
+            let mirror = Self.mirror(currentWater: 500, composedAt: Date(timeIntervalSince1970: 1_000))
+            model.apply(mirror)
+            model.apply(mirror)
+            #expect(reloads == 1)
+        }
+    }
+
+    /// A republish of unchanged state still moves "synced at" on the screen, so it is taken. It spends
+    /// none of the face's reloads, which from the background count against a daily budget.
+    @Test
+    func aMirrorNewOnlyInWhenItWasComposedReloadsNothing() {
+        withTempDefaults { defaults in
+            var reloads = 0
+            let model = makeModel(defaults, now: { Self.afterward }, reloaded: { reloads += 1 })
+            model.apply(Self.mirror(currentWater: 500, composedAt: Date(timeIntervalSince1970: 1_000)))
+            let republished = Self.mirror(currentWater: 500, composedAt: Date(timeIntervalSince1970: 1_060))
+            model.apply(republished)
+            #expect(model.mirror == republished, "taken, so the caption moves")
+            #expect(reloads == 1, "the first mirror's reload, and no second")
+        }
+    }
+
+    /// A superseded push can land after the one that replaced it, and the context re-read at activation
+    /// can lag a push. Taking either would put the face back a drink.
+    @Test
+    func aMirrorOlderThanTheOneHeldChangesNothing() {
+        withTempDefaults { defaults in
+            var reloads = 0
+            let model = makeModel(defaults, now: { Self.afterward }, reloaded: { reloads += 1 })
+            let newer = Self.mirror(currentWater: 750, composedAt: Date(timeIntervalSince1970: 1_060))
+            model.apply(newer)
+            model.apply(Self.mirror(currentWater: 500, composedAt: Date(timeIntervalSince1970: 1_000)))
+            #expect(model.mirror == newer)
+            #expect(reloads == 1, "the newer mirror's reload, and no second")
+        }
+    }
+
+    /// The same composition can arrive by both lanes, a push and a context — and the language tests
+    /// above apply three mirrors stamped alike.
+    @Test
+    func aMirrorComposedAtTheSameInstantIsTaken() {
+        withTempDefaults { defaults in
+            let model = makeModel(defaults, now: { Self.afterward })
+            let instant = Date(timeIntervalSince1970: 1_000)
+            model.apply(Self.mirror(currentWater: 500, composedAt: instant))
+            model.apply(Self.mirror(currentWater: 750, composedAt: instant))
+            #expect(model.mirror?.currentWater == 750)
+        }
+    }
+
+    /// Paired devices' clocks differ a little, so a mirror can be stamped slightly ahead of the watch
+    /// that receives it. That is no reason to let an older one replace it.
+    @Test
+    func aHeldMirrorSlightlyAheadOfTheWatchsClockStillBlocksAnOlderOne() {
+        withTempDefaults { defaults in
+            let watchNow = Date(timeIntervalSince1970: 1_000)
+            let model = makeModel(defaults, now: { watchNow })
+            model.apply(Self.mirror(currentWater: 750, composedAt: watchNow.addingTimeInterval(30)))
+            model.apply(Self.mirror(currentWater: 500, composedAt: watchNow.addingTimeInterval(-60)))
+            #expect(model.mirror?.currentWater == 750)
+        }
+    }
+
+    /// A held mirror stamped an hour ahead of the watch's own clock means a clock was set back after it
+    /// was composed. The phone's stamps no longer say which came last, and refusing everything older
+    /// would freeze the face for as long as the clock was moved.
+    @Test
+    func aHeldMirrorFarAheadOfTheWatchsClockDoesNotBlockAnOlderOne() {
+        withTempDefaults { defaults in
+            let watchNow = Date(timeIntervalSince1970: 1_000)
+            let model = makeModel(defaults, now: { watchNow })
+            model.apply(Self.mirror(currentWater: 750, composedAt: watchNow.addingTimeInterval(3_600)))
+            model.apply(Self.mirror(currentWater: 500, composedAt: watchNow))
+            #expect(model.mirror?.currentWater == 500)
         }
     }
 }
