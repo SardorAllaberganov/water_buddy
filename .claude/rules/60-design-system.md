@@ -113,3 +113,5 @@ one by eye breaks a contrast figure somebody measured.
   system's accessory vocabulary instead — `.accessoryCircularCapacity` and `.accessoryLinearCapacity`
   gauges, `.primary`/`.secondary` foreground styles, `AccessoryWidgetBackground` behind the button —
   with no branch on `widgetRenderingMode` and no `colorScheme` override
+- The Control Center control draws nothing of its own — iOS draws its glyph and title in Control
+  Center's own style — so it takes no glass, no `Aurora` colour and no tint

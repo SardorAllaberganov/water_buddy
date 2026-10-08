@@ -7,7 +7,7 @@
 > | Target | Status |
 > |---|---|
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 26.5, `@Observable` `DataManager` over SwiftData |
-> | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: two `StaticConfiguration`s over one provider — the Home Screen widget and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent` |
+> | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: two `StaticConfiguration`s over one provider — the Home Screen widget and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
 > | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage) plus the Xcode template's launch tests |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
@@ -145,13 +145,16 @@ something to record.
   test runs
 - Treat every new warning as a failure, on **every** invocation, and a concurrency warning here is a
   Swift 6 error later. **"This codebase compiles clean" is no longer true and was retired on
-  2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05, and again unchanged on 2026-10-06; the 38
-  measured on Xcode 26.6 no longer compares), a clean `-scheme WaterBuddy` build into an empty
-  DerivedData folder emits **31** unique warning lines (80 occurrences): the *"main actor-isolated …
+  2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05, unchanged on 2026-10-06 and again on
+  2026-10-08; the 38 measured on Xcode 26.6 no longer compares), a clean `-scheme WaterBuddy` build into
+  an empty DerivedData folder emits **31** unique warning lines (80 occurrences as counted then; 44
+  primary lines on 2026-10-08 — occurrences move with the architectures a build compiles, the unique
+  lines do not): the *"main actor-isolated …
   cannot be referenced from a nonisolated context"* family in `DataManager.swift` and
   `NotificationManager.swift`, plus two Xcode 27 *"'Combine' was not imported by this file"* warnings
   in `WristView.swift`. The `WaterBuddyWatchWidget` scheme adds two `actool` trait-set warnings on the
-  phone's catalogues (known issue #36) — its checked-in scheme builds `WaterBuddy.app` too, so it also
+  phone's catalogues (known issue #36), in only one of the two architecture sets its clean builds
+  alternate between (2026-10-08) — its checked-in scheme builds `WaterBuddy.app` too, so it also
   reprints the phone targets' Swift warnings whenever they had to rebuild. All are **pre-existing** —
   proven by building the code from before a change and
   comparing, never assumed. They are invisible to an incremental build, which is how "compiles
@@ -162,8 +165,8 @@ something to record.
   `Calendar` and clock, so it structurally cannot see an entitlement that was not added, a file
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
   widget on the Home Screen after any change to storage, entitlements, target membership or the
-  widget's view tree — the Lock Screen widget on the Lock Screen too, and the same for the watch
-  face's complication, which no part of the automated gate renders
+  widget's view tree — the Lock Screen widget on the Lock Screen too, the control in Control
+  Center, and the same for the watch face's complication, which no part of the automated gate renders
 - Ask yourself: "Would a staff engineer approve this?"
 
 ## Demand Elegance (Balanced)
@@ -199,7 +202,11 @@ something to record.
   phrase is a third way in to the same serving:** "Log water in WaterBuddy" runs `LogServingIntent`,
   app-only, in the app's own process, and logs `DataManager.usualServing(in:)` — the one definition
   of the middle vessel, which the widget's snapshot reads too
-  (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`)
+  (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`). **The Control Center control is a
+  fourth:** `LogWaterControl` runs `AddWaterIntent(amount: snapshot.serving)` from the same snapshot,
+  draws the glyph at `DataManager.usualSlot` — the one name for that vessel's index — and is kept
+  current by `requestWidgetReload()`'s `reloadAllControls()`
+  (`docs/superpowers/specs/2026-10-08-control-center-design.md`)
 - **`addLog` is how water enters.** `addWater(amount:)` is a synonym kept for the two callers that
   log the usual serving — the widget's `AddWaterIntent` and the Siri shortcut's `LogServingIntent`;
   `HomeView`'s row offers three vessels and calls `addLog` directly

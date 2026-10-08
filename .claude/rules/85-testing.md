@@ -144,11 +144,12 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
 The suite injects its own `UserDefaults`, `Calendar` and clock, so it structurally **cannot** see an
 entitlement that was not added, a file missing from a target, or a widget that renders blank.
 **No widget's rendering has any automated coverage, on either platform** — the phone's Home Screen
-and Lock Screen widgets and the watch's `.accessoryCircular` face are all proved only by placing them
-and looking.
+and Lock Screen widgets, its Control Center control, and the watch's `.accessoryCircular` face are all
+proved only by placing them and looking.
 
 After any change to storage, entitlements, target membership or the widget's view tree: run the app
-on the simulator and put the widget on the Home Screen — in light, in dark, and tinted. The same
+on the simulator and put the widget on the Home Screen — in light, in dark, and tinted — and put the
+control in Control Center. The same
 applies to the watch face: install `WaterBuddyWatch` and add the widget to a watch face by hand: no
 part of the automated gate renders it.
 

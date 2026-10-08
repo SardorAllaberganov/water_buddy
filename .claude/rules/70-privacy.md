@@ -92,6 +92,13 @@ policy rather than a draft, closing that document's own §9.3.
   would hide every widget in the extension while locked and give it no runtime — the Home Screen
   widget would go blank in StandBy — and *Nothing leaves the device* already forbids a second
   entitlement without a written justification here
+- **The control draws no figure.** `LogWaterControl` — in Control Center, in the Lock Screen's
+  control slots and on the Action Button, all of them reachable on a locked iPhone — shows its title
+  and the Glass's glyph only, so it needs no `.privacySensitive()` and no quiet form. Its press is
+  allowed without unlocking — `AddWaterIntent` declares `.alwaysAllowed`, as the Siri phrase does:
+  logging water is harmless, and nothing is said back. What iOS does with that press on a locked
+  iPhone, and before the first unlock after a restart, is proved only on a device. A figure added to
+  the control later needs its own ruling here first
 
 ## Diagnostics carry no user data
 - A `#if DEBUG` diagnostic may name the failing condition and the App Group identifier only — never

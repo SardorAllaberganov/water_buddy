@@ -145,8 +145,9 @@ target the file joins.
 - Keep `.invalidatableContent()` on the figures an intent changes
 
 ## The control
-- The only control is `Button(intent:)` with `.buttonStyle(.plain)` and a label frame of at least
-  `PourButton.minimumTarget` (44pt). Never rely on the system to pad the hit region
+- The only control in a widget's view tree is `Button(intent:)` with `.buttonStyle(.plain)` and a
+  label frame of at least `PourButton.minimumTarget` (44pt). Never rely on the system to pad the hit
+  region
 - Hide the medium family's `Text`s with `.accessibilityHidden(true)` **individually** — never on the
   enclosing `VStack`, which also holds the button (rule `65-accessibility`)
 
@@ -170,9 +171,36 @@ target the file joins.
   line is a single tap target that only opens the app
 - It injects `entry.snapshot.language.bundle` and `.locale` at its root, as `HydrationView` does
 
+## The Control Center control
+- `LogWaterControl` is a third widget in the same extension, in its own file: a `ControlWidget` with
+  its own kind (`"WaterBuddyLogWater"`), `@available(iOS 18.0, *)`, listed in `WaterBuddyWidgetBundle`
+  inside `if #available(iOS 18.0, *)`. The kind is permanent — iOS identifies every placed control
+  by it, so a renamed kind no longer matches the controls people have already placed
+- Its `ControlValueProvider` reads only through `DataManager.snapshot(...)` — never
+  `DataManager.shared`, and never by constructing a `DataManager`, for the reason the timeline
+  provider may not. `currentValue()` is `async` because the protocol is; it awaits nothing
+- The button is `ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving))` — the Glass
+  from the snapshot, as both widgets' buttons take it. Never `AddWaterIntent()`, whose `init()` seeds
+  `defaultServing`, and never an amount resolved when the control is pressed
+- It draws no figure — its title and the Glass's glyph, `vesselSlots[DataManager.usualSlot].symbol`,
+  and nothing else (rule `70-privacy`). `usualSlot` is the one name for the slot the one-tap doors
+  log; `usualServing(in:)` reads it too, so never spell the index here
+- Its title is resolved in the extension's process from `snapshot.language.bundle` and handed to
+  `Text` as a finished `String`, so it is in the app's language whichever process draws it
+- Its gallery strings are `AddWaterIntent`'s own title and description, as static literals
+- `DataManager.requestWidgetReload()` also calls `ControlCenter.shared.reloadAllControls()` on iOS 18:
+  iOS builds a control from a value it reads when it chooses — the Glass its button logs, the
+  language of its title — and a reload is Apple's documented way to have it read again. Without it, a
+  press made after an edit logs the previous Glass (measured on the simulator). Never remove it as
+  redundant beside the timeline reload
+
 ## Proving it
 - The app scheme does not compile the widget's sources. Build the extension separately after any
   change here, and after any change to one of the six shared files (rule `15-project`)
 - The widget's rendering has no automated coverage: put it on the Home Screen, in both light and
   dark, and in a tinted (templated) configuration — and the Lock Screen widget on the Lock Screen, in
   all three shapes, with *Lock Screen Widgets* under *Allow Access When Locked* both on and off
+- The Control Center control has no automated coverage either: place it in Control Center, in a Lock
+  Screen slot and on the Action Button. Its press does run on a simulator — `chronod` performs it,
+  where `linkd` refuses the widgets' buttons — so prove there that it logs the stored Glass; a locked
+  phone, the Lock Screen slot, the Action Button and VoiceOver need a device

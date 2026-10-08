@@ -63,6 +63,11 @@ from before this design was read, kept deliberately rather than renamed for its 
     26.0 runtime is installed on this machine, so nothing has ever *run* at either floor.
     `vtool -show-build` on the built binaries (`minos 17.0`, `minos 26.0`) is the whole of the
     evidence (rule `85-testing`)
+  - **The first version check is the control's.** `LogWaterControl` needs iOS 18, so
+    `WaterBuddyWidgetBundle` lists it inside `if #available(iOS 18.0, *)` and
+    `DataManager.requestWidgetReload()` reloads controls inside one. The floor stays 17.0, and an
+    iPhone on 17 never offers the control. Like the floor itself, the 17.0 side of the check is
+    compile-verified only
   - **Two iPad artifacts survive the device-family change and cannot be removed from the project
     file.** Xcode 26.6's `actool` emits `AppIcon76x76@2x~ipad.png` and a `CFBundleIcons~ipad`
     Info.plist key from a modern single-size universal icon **unconditionally**, even when passed
