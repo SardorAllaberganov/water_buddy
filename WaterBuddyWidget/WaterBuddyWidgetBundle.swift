@@ -13,5 +13,6 @@ struct WaterBuddyWidgetBundle: WidgetBundle {
 
     var body: some Widget {
         WaterBuddyWidget()
+        LockScreenWidget()
     }
 }

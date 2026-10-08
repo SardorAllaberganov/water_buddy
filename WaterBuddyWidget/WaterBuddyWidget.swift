@@ -376,7 +376,10 @@ private struct MiniVessel: View {
 
 /// The interactive half. `Button(intent:)` is the only kind of button a widget can have: the
 /// archive carries the intent, and the system runs it when the user taps.
-private struct PourButton: View {
+///
+/// Not `private`, for one reason: the Lock Screen widget's button reads ``minimumTarget``, so the 44pt
+/// floor both widgets' buttons honour has one definition rather than two.
+struct PourButton: View {
 
     @Environment(\.strings) private var strings
 
