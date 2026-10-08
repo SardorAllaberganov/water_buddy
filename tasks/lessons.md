@@ -2259,3 +2259,73 @@ because the scan matched `#if` at column 0 only. The phone could not see the new
 
 **The rule:** before inserting beside an existing declaration, list every `#if`/`#else`/`#endif`
 around it, indented ones included — `awk '/^[[:space:]]*#(if|else|endif)/'` over the range.
+
+## 2026-10-08 — A view's own `@Environment` comes from above it
+
+`HydrationView` injects `.environment(\.strings, entry.snapshot.language.bundle)` in its own `body`,
+and its `medium` property resolves `%1$d ml` and `of %1$d ml` through `HydrationView`'s own `strings` —
+which that injection never reaches, because a modifier in a body affects only the views beneath it.
+The medium widget's two lines therefore read `Bundle.main`, the device's language (known issue #68,
+found by reading while planning the Lock Screen widget; not yet rendered). `MiniVessel` and `PourButton`
+are child views and read the injected bundle correctly.
+
+**The rule:** inject at a root and read below it. A view that injects an environment value may not read
+that value itself — give each part that reads it a view of its own, as `LockScreenView`'s shapes are.
+
+## 2026-10-08 — A percentage at exactly .5 is the `Double`'s to decide
+
+The gallery's sample, 1,150 of 2,000 ml, was called 58% in conversation and written into the design
+before anyone computed it. `1150/2000 × 100` is `57.49999999999999` as a `Double`, and `.rounded()`
+gives 57 — which is what the gallery then drew.
+
+**The rule:** compute every figure before stating it, and treat a half as a floating-point question.
+
+## 2026-10-08 — A widget's redraw does not follow its doorbell at once
+
+After the app switched to Russian, Lock Screen screenshots taken three seconds later still showed
+English, while SpringBoard's own tree, read a moment later, already carried `750 мл` and *Добавить 250
+миллилитров*. The capture raced WidgetKit's redraw; the product was right.
+
+**The rule:** in a probe, wait on the thing that changes — poll the widget's own accessibility value —
+never on a fixed sleep, before calling a capture evidence.
+
+## 2026-10-08 — Render every language: a locale's percent can be wider than English's
+
+The Lock Screen ring drew `38%` whole in English and `38…` in Russian, whose `.percent` format is `38 %`
+with a no-break space; the spec's `.minimumScaleFactor(0.6)` could not save it. At 0.4 — `MiniVessel`'s
+floor for the other percentage drawn inside a circle — `38 %` and `113 %` both drew whole.
+
+**The rule:** a figure in a tight container is checked in every shipped language, at three digits.
+
+## 2026-10-08 — SpringBoard's tree is not VoiceOver's
+
+On the Lock Screen, XCUITest lists the drawn texts beneath each widget's combined element — `3250 ml`,
+`of 2000 ml`, the gauge as `163%` with value `100%` — and still lists them after each was given
+`.accessibilityHidden(true)`, on a render forced fresh by a data change. Each widget also sits inside a
+SpringBoard button of its own. The dump shows SpringBoard's grouping, not the stops VoiceOver makes.
+
+**The rule:** a widget's VoiceOver reading is proved with VoiceOver on a device. An XCUITest dump of
+SpringBoard can show that a widget exists and what it draws, never what is spoken.
+
+## 2026-10-08 — Probe mechanics that cost time
+
+- A failed UI test makes `xcodebuild` collect diagnostics; with another project's simulators busy,
+  `simctl diagnose` ran ten minutes past the end of the tests. A throwaway probe passes
+  `-collect-test-diagnostics never`; in the gate, read the log's own results rather than waiting blind.
+- `xcrun simctl spawn <device> defaults read group.…` cannot resolve an App Group domain — it reported
+  `currentWater` missing too — and the group's plist on disk still read `ru` after the app had chosen
+  *Follow device*, because `cfprefsd` writes it lazily. Read app state through the app's own interface:
+  a selected trait, a screenshot.
+- After a lock, the tab bar is not hittable during the unlock that follows; make in-app choices before
+  locking.
+
+**The rule:** before blaming the product for a probe's failure, rule out the probe.
+
+## 2026-10-08 — The app scheme compiles the widget extension
+
+`xcodebuild build-for-testing -scheme WaterBuddy` compiled `LockScreenWidget.swift` "in target
+'WaterBuddyWidgetExtension'": the app embeds the `.appex`, so building it builds the extension. Rules
+`15-project` and `40-widget` say the app scheme does not compile the widget's sources. Their advice —
+build the extension's own scheme as well — stays harmless; the sentence is not what the build does.
+
+**The rule:** read a scheme's build list from its log, not from a rule's sentence about it.

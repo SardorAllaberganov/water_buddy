@@ -3,7 +3,10 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-07 (twelfth pass — `/doc_sync` after roadmap item 4, the Siri phrase: the snapshot's `serving` now reads `DataManager.usualServing(in:)` — the same value, given one name the Siri shortcut also calls; the "Shortcuts vocabulary" section corrected from "not translated", stale since known issue #1 was fixed on 2026-10-06; and a note that Shortcuts now lists the app's own *Log a Glass* beside *Log Water*. No widget contract changed. Previously: eleventh pass — `/doc_sync` after known issue #46: one sentence below still said `DataManager`'s reminder hook "spawns a detached `Task`"; it now queues each reconcile on one `ReconcileQueue`, in call order. No widget contract changed. Previously: tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
+**Last updated:** 2026-10-08 (thirteenth pass — `/doc_sync` after roadmap item 5: the extension now
+holds **two widgets**, and the second, `LockScreenWidget`, has its own section below. The Home Screen
+widget's contract is unchanged except that `PourButton` is no longer `private` — its `minimumTarget` is
+the Lock Screen button's floor too. Previously: twelfth pass — `/doc_sync` after roadmap item 4, the Siri phrase: the snapshot's `serving` now reads `DataManager.usualServing(in:)` — the same value, given one name the Siri shortcut also calls; the "Shortcuts vocabulary" section corrected from "not translated", stale since known issue #1 was fixed on 2026-10-06; and a note that Shortcuts now lists the app's own *Log a Glass* beside *Log Water*. No widget contract changed. Previously: eleventh pass — `/doc_sync` after known issue #46: one sentence below still said `DataManager`'s reminder hook "spawns a detached `Task`"; it now queues each reconcile on one `ReconcileQueue`, in call order. No widget contract changed. Previously: tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
 `role.mayFileReminders`, not `isAppExtension`. No widget contract changed. Previously: eighth pass — every `WaterSnapshot` field documented, and the timeline's code sample corrected: it still showed the memberwise midnight entry that was fixed. Previously: the button now logs `entry.snapshot.serving`, and `rolledOver()` fixes the midnight entry that dropped the chosen language)
 
 ---
@@ -20,7 +23,7 @@ The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 | `configurationDisplayName` | `"Hydration"` — **static literal** |
 | `description` | `"Track today's hydration and log a glass without opening the app."` — **static literal** |
 | Content margins | `.contentMarginsDisabled()` |
-| Bundle | `WaterBuddyWidgetBundle` (`@main`), one widget |
+| Bundle | `WaterBuddyWidgetBundle` (`@main`), two widgets — this one and `LockScreenWidget` (*The Lock Screen widget*, below) |
 | Gallery name | `INFOPLIST_KEY_CFBundleDisplayName = Hydration` |
 | Info.plist | `WaterBuddyWidget-Info.plist` → `NSExtensionPointIdentifier = com.apple.widgetkit-extension` |
 
@@ -324,6 +327,54 @@ checks the extension's own catalogue, the half `everyDrawnStringIsTranslatedUnle
 `LogServingIntent` behind the Siri phrase. Its strings live in the **app's** catalogue, not this
 one — it is not part of the extension (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`).
 
+## The Lock Screen widget
+
+Added 2026-10-08 (roadmap item 5; spec `docs/superpowers/specs/2026-10-08-lock-screen-widget-design.md`,
+the authority for everything below; rules `40-widget`, `60-design-system`, `65-accessibility`,
+`70-privacy`).
+
+| | |
+|---|---|
+| Type | `StaticConfiguration` — `LockScreenWidget`, in `WaterBuddyWidget/LockScreenWidget.swift` |
+| `kind` | `"WaterBuddyLockScreen"` (`LockScreenWidget.kind`) |
+| Families | `.accessoryCircular`, `.accessoryRectangular`, `.accessoryInline` — iOS 16.0, under the 17.0 floor |
+| Provider | **the same `HydrationProvider`** — the same snapshot read, gallery sample, midnight `rolledOver()` entry and `.after(midnight)` policy |
+| Gallery strings | the Home Screen widget's two literals, `"Hydration"` and its description |
+| Content margins | iOS's own — **no** `.contentMarginsDisabled()` (configuration-wide; the Home Screen's) |
+| Container background | an empty `containerBackground(for: .widget)`: the Lock Screen draws none, but iOS overlays a warning on a widget without one |
+
+**What each shape draws.** The circle: an `.accessoryCircularCapacity` ring filled to `progress`, with
+`Text(snapshot.percentage, format: .percent.locale(locale))` inside at a `0.4` scale floor — `MiniVessel`'s
+floor; at 0.6 Russian's `38 %` truncated to `38…`. The rectangle: `%1$d ml` and `of %1$d ml` (the medium
+family's keys), an `.accessoryLinearCapacity` bar, and the **+** —
+`Button(intent: AddWaterIntent(amount: entry.snapshot.serving))`, `.buttonStyle(.plain)`, a `plus` over
+`AccessoryWidgetBackground`, framed to `PourButton.minimumTarget`. The line: a `drop.fill` and the
+percentage. The gallery draws `WaterSnapshot.sample`: **57%** (1,150 of 2,000 — `57.49999999999999`
+rounds down).
+
+**Rendering.** The iPhone Lock Screen is always the vibrant mode, so there is no branch on
+`widgetRenderingMode`, no glass, no `Aurora` colour and no `colorScheme` override — capacity gauges,
+`.primary`/`.secondary` and `AccessoryWidgetBackground` only.
+
+**Privacy.** Every figure-bearing view, fills included, is `.privacySensitive()`; each shape reads
+`redactionReasons` and, under `.privacy`, draws its quiet form — the drop, an empty ring or bar,
+*Hydration* — and speaks its label alone, the button *Log Water*. Both answer the one trigger iOS applies
+when the user turns off *Allow Access When Locked → Lock Screen Widgets*.
+
+**Language.** `LockScreenView` injects `\.strings` and `\.locale` from `entry.snapshot.language` and reads
+neither itself — each shape is a child view, because a view's own `@Environment` comes from above it
+(known issue #68 is the Home Screen medium family's version of that trap).
+
+**Accessibility.** One combined element per shape (label `Today's hydration`, the vessel's
+percent-and-millilitres value), the button its own; the drawn figures, gauges and glyphs also carry
+`.accessibilityHidden(true)`. The card's figures carry `.invalidatableContent()`, so a tap shows at once.
+
+**Proved and not.** On the simulator: registered in the gallery, placed, rendered and captured in all
+three languages and at three digits. **Not proved:** the **+** (`linkd` refuses the ad-hoc-signed
+extension, #63), the quiet form, and what VoiceOver says — SpringBoard's XCUITest tree lists the drawn
+texts beneath each combined element whatever the flags (#70). The owner's device check (spec §7.5) is
+the proof.
+
 ## Building it
 
 **The app scheme does not compile the extension's own sources.** A widget-only break passes a green
@@ -349,4 +400,10 @@ defect in a shipped configuration, invisible to every build and test. Both are n
 cost no source changes at all, proven by building at both floors and diffing the warning sets.
 
 Neither this nor the unit suite can see a widget that renders blank. After any change to the
-widget's view tree, entitlements or target membership, place it on a Home Screen.
+widget's view tree, entitlements or target membership, place it on a Home Screen — and the Lock Screen
+widget on a Lock Screen.
+
+*(2026-10-08: "The app scheme does not compile the extension's own sources", above, is not what the
+build does — `build-for-testing -scheme WaterBuddy` compiled `LockScreenWidget.swift` in target
+`WaterBuddyWidgetExtension`, because the app embeds the `.appex`. Known issue #69; the sentence mirrors
+rule `40-widget`, whose text is the owner's, so it is flagged here rather than rewritten.)*

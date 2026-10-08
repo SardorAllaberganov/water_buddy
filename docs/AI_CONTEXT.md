@@ -4,6 +4,29 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-08 (thirty-seventh pass — `/doc_sync` after **roadmap item 5, the Lock Screen
+widget**, owner-approved: `docs/superpowers/specs/2026-10-08-lock-screen-widget-design.md`, executed from
+`docs/superpowers/plans/2026-10-08-lock-screen-widget.md`. A second widget in the existing extension,
+`LockScreenWidget` (kind `"WaterBuddyLockScreen"`), over the same `HydrationProvider`: a ring that fills
+with the percentage inside, a card with today's millilitres, the goal, a bar and a 44pt **+** that logs
+the Glass through `AddWaterIntent(amount: entry.snapshot.serving)`, and a drop and the percentage beside
+the date. Every figure is `.privacySensitive()` with a quiet form for `.privacy`, so iOS's own *Lock
+Screen Widgets* setting hides them — the owner's ruling, written into rule `70-privacy` with four more
+rule files (`40-widget`, `60-design-system`, `65-accessibility`, `85-testing`) before any code. Gate run
+three times, the last on the staged code — **371**/46 phone unit, **25 of 26** phone UI (#62,
+pre-existing — HEAD's export fails it identically), **57**/6 watch unit, both widget builds — with no
+new warning by clean builds. On the simulator all three shapes were placed and captured in all three
+languages; the **+** reached `linkd`, which refused it (#63). A fresh final review led to
+`.accessibilityHidden(true)` on every drawn figure and `.invalidatableContent()` on the card's — what
+VoiceOver actually says stays the owner's device check's. **This sync's own drift:** two line counts
+(`WaterBuddyWidget.swift`, `WaterBuddyWidgetBundle.swift`), one undocumented file
+(`LockScreenWidget.swift`), the targets table. Known issues **#68–#71 opened**. `CLAUDE.md` and
+`docs/WIDGET.md` updated; `docs/STATE.md` and `docs/DESIGN.md` checked and not touched — no key, no
+stored shape and no token moved.)
+
+<details>
+<summary>Thirty-sixth pass — 2026-10-07, re-verified 2026-10-08, retained</summary>
+
 **Last updated:** 2026-10-08 (thirty-sixth pass of 2026-10-07, **re-verified by a second `/doc_sync`
 run on 2026-10-08**, after the owner had spec §5's wording written into six rule files — `15-project`,
 `20-state`, `40-widget`, `43-concurrency`, `70-privacy`, `80-notifications`. The re-run re-derived every
@@ -29,6 +52,8 @@ app catalogue's key count, which read 58 from before the earlier-servings change
 2026-10-06. Known issues **#62–#67 opened**; #57 gains the unit-test host's refusal. `CLAUDE.md`,
 `docs/STATE.md` and `docs/WIDGET.md` updated; `docs/DESIGN.md` checked and not touched — no token or
 measured figure moved, and the tile's `.blue` is a system `ShortcutTileColor`, not an app colour.)
+
+</details>
 
 <details>
 <summary>Thirty-fifth pass — 2026-10-07, retained</summary>
@@ -462,7 +487,7 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 | Target | Bundle id | Sources | Status |
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
-| `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
+| `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent` |
 | `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 371 `@Test` functions in 46 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (8 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **13 declared, 26 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
@@ -592,8 +617,9 @@ WaterBuddyUITests/GoalSetupUITests.swift         316   setup, the a11y tree, the
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            139   writes: runs DataManager in the extension
-WaterBuddyWidget/WaterBuddyWidget.swift          590   reads the cache only, never SwiftData
-WaterBuddyWidget/WaterBuddyWidgetBundle.swift     17
+WaterBuddyWidget/LockScreenWidget.swift          344   the Lock Screen widget (kind "WaterBuddyLockScreen"): circle, rectangle with the + (AddWaterIntent(amount: entry.snapshot.serving)), line — over the same HydrationProvider; every figure privacySensitive, a quiet form under .privacy; strings read only in child views
+WaterBuddyWidget/WaterBuddyWidget.swift          593   reads the cache only, never SwiftData — the Home Screen widget; PourButton internal (its minimumTarget is the Lock Screen button's too)
+WaterBuddyWidget/WaterBuddyWidgetBundle.swift     18   two widgets: WaterBuddyWidget, LockScreenWidget
 WaterBuddyWatch/WaterBuddyWatchApp.swift          77   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity) (which now awaits WristLink.waitForPendingDelivery() rather than returning at once), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
 WaterBuddyWatch/WristModel.swift                 305   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite; language, the phone's in-app choice read off the mirror; reloads the complication on every pour and every mirror that is news, and never takes a mirror older than the one held
@@ -825,6 +851,39 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five run three times on 2026-10-08, on Xcode 27.0, for roadmap item 5, the Lock Screen
+widget** (the thirty-seventh pass): after the plan's gate task, again after the ring's floor moved from
+0.6 to 0.4, and a third time after the final review's fix pass — the last run is on the staged code.
+Foreground, `-parallel-testing-enabled NO`; `xcrun simctl shutdown all` was skipped whenever another
+project's (`AvtoLog`) `xcodebuild` was running.
+
+| Command | The staged code (after the fix pass) |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 371 tests in 46 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `Executed 26 tests, with 1 failure` — `testAServingAddedToYesterdayShowsUnderYesterday` (#62); in the second of the three runs, a first attempt was refused launch as `Busy` (#57) and re-run |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+
+**The UI failure is not this change's:** HEAD `562157e`'s `git archive` export fails the same test at the
+same line (`GoalSetupUITests.swift:219`) on the same simulator. After that failure, `xcodebuild` spent up
+to ten minutes in `simctl diagnose`; the results were read from the log.
+
+**Warnings: none new.** Clean builds of HEAD's export and of the final code into empty DerivedData, all
+four schemes, compared as unique `file: message` lines with line numbers stripped (the plan's Task 3,
+Step 3): app 38/38, widget 19/19, watch 2/2, watch widget 2/2 — identical, and none in
+`LockScreenWidget.swift`. (One app-log line once read differently: the same `#expect` warning, cut off
+mid-line by the log; 16 full copies on both sides in the final comparison.)
+
+**No new tests** — spec §6, approved: no test target compiles the extension, and WidgetKit lists no
+families. **On the simulator**, a throwaway probe (deleted) placed all three shapes and captured them:
+57% in the gallery; 38% and 113% in English, Russian (`750 мл`, `из 2000 мл`, `113 %`) and Uzbek
+(`2000 ml dan`). The **+** reached `linkd`, which refused it (#63) — see #70 for what only a device can
+show. A fresh final review returned "with fixes": the hidden flags and `.invalidatableContent()` it led
+to are in the staged code.
+
+The Siri phrase's gate block, retained:
 
 **Gate — all five run twice on 2026-10-07, on Xcode 27.0, for roadmap item 4, the Siri phrase** (the
 thirty-sixth pass): after the plan's last code task, and again after the final review's fix pass.
@@ -1576,16 +1635,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-07, the thirty-sixth) after the staging
+**There is a git repository.** Verified this pass (2026-10-08, the thirty-seventh) after the staging
 and before this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-4a7f4dd
+562157e
 $ git log --oneline | wc -l
-      68
+      72
 $ git diff --cached --name-only | wc -l
-      21
+      15
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
@@ -1595,21 +1654,18 @@ $ git status --short | grep -v -E '^[MA]  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** 21 paths are staged: the six rule files the owner approved on
-2026-10-08 (`15-project`, `20-state`, `40-widget`, `43-concurrency`, `70-privacy`,
-`80-notifications` — spec §5's wording), which `/commit` groups as workflow config, and these 15 — the
-change (`DataManager.swift`,
-`NotificationManager.swift`, the app's `Localizable.xcstrings`, and the new `LogServingIntent.swift`,
-`WaterBuddyShortcuts.swift` and `AppShortcuts.xcstrings`), its tests (the new `SiriPhraseTests.swift`),
-the spec and the plan, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
-`tasks/lessons.md` and the `HISTORY.md` checkpoints — were staged with explicit paths for the owner's
-`/commit` (rule `90-git`). The code files staged are the ones the final gate and the second clean-build
-warning comparison ran on. **The #60 change was committed and pushed this session**, before this work
-began, by `/commit` at the owner's instruction: `099d20d` and `4a7f4dd`, pushed as `4217f7c..4a7f4dd`,
+**Nothing is committed by this pass.** 15 paths are staged with explicit paths for the owner's
+`/commit` (rule `90-git`): the five rule files the owner approved on 2026-10-08 with the Lock Screen
+spec (`40-widget`, `60-design-system`, `65-accessibility`, `70-privacy`, `85-testing` — its §5 wording),
+which `/commit` groups as workflow config; the change (the new `LockScreenWidget.swift`,
+`WaterBuddyWidget.swift`, `WaterBuddyWidgetBundle.swift`); the spec and the plan; and `CLAUDE.md`,
+`docs/AI_CONTEXT.md`, `docs/WIDGET.md`, `tasks/lessons.md` and the `HISTORY.md` checkpoints. The code
+files staged are the ones the final gate and the last clean-build warning comparison ran on. The Siri
+phrase was committed and pushed before this work began (`1bedde7`, `2831f1c`, `610b81e`, `562157e`),
 leaving `main` level with `origin/main`. **Five paths are deliberately left unstaged**, as at every
-commit tonight: the two watch schemes and the two watch catalogues the Xcode app wrote (known issue
-#50), and `.claude/settings.json`, which moves `git commit` and `git init` from *ask* to *allow* and
-leaves `git push` under *ask*. None is this change's to stage or revert. `Screenshots/census/` (28
+commit since 2026-10-07: the two watch schemes and the two watch catalogues the Xcode app wrote (known
+issue #50), and `.claude/settings.json`, which moves `git commit` and `git init` from *ask* to *allow*
+and leaves `git push` under *ask*. None is this change's to stage or revert. `Screenshots/census/` (28
 coverage captures, 51 MB) is still untracked, neither committed nor ignored; whether it belongs in the
 tree is the owner's call.
 
@@ -2500,6 +2556,36 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `testSettingsIsReachableFromHomeAsATab`'s tap on Settings and the Yesterday test's tap on Glass took
     no effect while every later tap did; another project's UI tests ran beside it. It passed in isolation
     and in both later full runs. One sample, recorded, not explained.
+68. **The medium Home Screen widget draws its two figure lines in the device's language.**
+    `HydrationView` injects `.environment(\.strings, entry.snapshot.language.bundle)` in its own `body`,
+    and its `medium` property resolves `%1$d ml` and `of %1$d ml` through `HydrationView`'s own `strings`
+    — which that injection never reaches, because a modifier in a body affects only the views beneath
+    it. With the app in Russian on an English phone, the medium widget would draw `1150 ml` / `of 2000
+    ml` beside a Russian button. Found by reading on 2026-10-08, while planning the Lock Screen widget
+    (whose shapes read strings only in child views for this reason); **not rendered, not fixed** — its
+    own change, after a render confirms it (`tasks/lessons.md`, 2026-10-08).
+69. **The `WaterBuddy` scheme compiles the widget extension; three rules and a spec say it does not.**
+    `xcodebuild build-for-testing -scheme WaterBuddy` compiled `LockScreenWidget.swift` "in target
+    'WaterBuddyWidgetExtension'" on 2026-10-08 — the app embeds the `.appex`, so building it builds the
+    extension. Rules `15-project` ("No scheme compiles a sibling's sources") and `40-widget` ("The app
+    scheme does not compile the widget's sources"), `85-testing`, and the Lock Screen spec's §7.2 say
+    otherwise. Their advice — build the extension's own scheme too — stays harmless. Rule text is the
+    owner's to change.
+70. **The Lock Screen widget is unverified on hardware** (spec `2026-10-08-lock-screen-widget-design.md`
+    §7.5, nine steps). On the simulator the three shapes were placed, rendered and captured in all
+    three languages, but: the **+** has never logged — `linkd` refuses the ad-hoc-signed extension
+    ("Unable to get teamId from sardor.WaterBuddy.WaterBuddyWidget", #63); the quiet form needs a
+    passcode and the *Lock Screen Widgets* setting, which the simulator has not exercised; and **what
+    VoiceOver says is unknown** — SpringBoard's XCUITest tree lists the drawn texts beneath each
+    combined element with or without `.accessibilityHidden(true)`, and wraps each widget in a
+    SpringBoard button, so it shows SpringBoard's grouping rather than VoiceOver's stops (the ring's
+    gauge also appears with value `100%` beside its label). Whether Dynamic Type reaches a Lock Screen
+    widget is unconfirmed: at `accessibility-extra-large` the shapes drew at the same size as at
+    `large`. The simulator's Lock Screen keeps the three widgets, and its store the 2,000 ml the probe
+    logged (#5).
+71. **Deferred minor from the Lock Screen widget's final review:** the ring's percentage `Text` has no
+    `.lineLimit(1)`, though spec §3.5 says every text carries it. No behaviour changes — the gauge's
+    label is already single-line, as the `38…` seen at the old 0.6 floor proved.
 
 ## Where the rest is written down
 

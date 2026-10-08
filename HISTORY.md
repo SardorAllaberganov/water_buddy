@@ -5902,3 +5902,131 @@ Written last, from the commands' own output; this file staged once more after th
 - **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
   `Screenshots/census/` still untracked.
 - HEAD is `4a7f4dd`, 68 commits, level with `origin/main`. No `git commit` was run.
+
+## [2026-10-08] — WaterBuddy on the Lock Screen
+
+### What changed
+
+Roadmap item 5. A second widget in the existing extension, `LockScreenWidget` (kind
+`"WaterBuddyLockScreen"`), over the same `HydrationProvider` and `HydrationEntry` as the Home Screen
+widget, offering the three accessory families:
+
+- **the circle** — an `.accessoryCircularCapacity` ring that fills to today's progress, the
+  percentage inside;
+- **the rectangle** — today's millilitres, the goal, an `.accessoryLinearCapacity` bar, and a 44pt **+**
+  that runs `AddWaterIntent(amount: entry.snapshot.serving)` — the Glass, as the Home Screen logs it;
+- **the line** — a drop and the percentage beside the date.
+
+The percentage is `WaterSnapshot.percentage` formatted with `.percent` under the snapshot's locale
+(`62%`, Russian `62 %`). Every figure is `.privacySensitive()`, and each shape draws a quiet form — the
+drop, an empty ring or bar, *Hydration*, label-only VoiceOver, the button spoken as *Log Water* — when
+`redactionReasons` contains `.privacy`. The snapshot's language is injected at the root and read only
+in child views. No glass, no `Aurora` colour, iOS's own margins. `WaterBuddyWidgetBundle` lists both
+widgets; `PourButton` lost `private`, so both buttons read one `minimumTarget`. The approved wording
+went into five rule files.
+
+### The rulings it rests on
+
+- **The owner's, 2026-10-08:** the Lock Screen may show the user's figures, each privacy-sensitive with
+  a quiet form, so iOS's own *Allow Access When Locked → Lock Screen Widgets* setting hides them; all
+  three shapes; only the rectangle logs; a second widget in the same extension; then the written spec
+  and its §5 rule wording, approved ("go") before any code.
+- **The executor's** (ledgered as they were made): the ring's floor 0.4, not the spec's 0.6 — Russian's
+  `38 %` truncated to `38…` on the simulator; the Home Screen **+** control skipped once `linkd`'s log
+  named the extension at the tap's own timestamp; the final review's #2 re-graded Important; the review
+  run before these records; the work staged on `main`, nothing committed.
+
+### Files touched
+
+| File | Lines | Change |
+|---|---|---|
+| `WaterBuddyWidget/LockScreenWidget.swift` | 344 | new |
+| `WaterBuddyWidget/WaterBuddyWidget.swift` | 593 | +4/−1 — `PourButton`'s visibility and its reason |
+| `WaterBuddyWidget/WaterBuddyWidgetBundle.swift` | 18 | +1 |
+| `.claude/rules/40-widget.md` · `60-design-system.md` · `65-accessibility.md` · `70-privacy.md` · `85-testing.md` | — | +22/−1 · +5 · +3 · +20/−3 · +3/−2, spec §5 verbatim |
+| `docs/superpowers/specs/2026-10-08-lock-screen-widget-design.md` | 480 | new |
+| `docs/superpowers/plans/2026-10-08-lock-screen-widget.md` | 986 | new |
+| `tasks/lessons.md` | — | seven entries appended |
+
+No shared file, `DataManager.Key`, catalogue, entitlement, Info.plist key, privacy manifest or
+`project.pbxproj` line changed.
+
+### Verification actually run
+
+- **RED → GREEN:** the widget build failed on the missing type, then on `PourButton`'s `private`, then
+  succeeded. No unit test was added — spec §6, approved: no test target compiles the extension and
+  WidgetKit lists no families.
+- **The gate, on the final code:** phone unit `✔ 371 tests in 46 suites`; phone UI 26 executed, one
+  failure — #62's `testAServingAddedToYesterdayShowsUnderYesterday`, which HEAD's own export fails
+  identically (an earlier UI run was refused as `Busy`, #57); watch `✔ 57 tests in 6 suites`;
+  `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` built. Another project's `xcodebuild test`
+  shared the machine, so `shutdown all` was skipped whenever it ran.
+- **Warnings:** clean builds of HEAD's export and the final code, all four schemes — 38/38, 19/19, 2/2,
+  2/2 unique lines, identical; none in `LockScreenWidget.swift`.
+- **On the simulator** (iPhone 17, iOS 26.5; a throwaway probe, deleted): the gallery offers *Hydration*
+  as circle and rectangle at 57%; all three shapes placed; captured at 38% and 113% in English, Russian
+  (`750 мл`, `из 2000 мл`, `113 %`) and Uzbek (`2000 ml dan`); unchanged in size at
+  `accessibility-extra-large`. The **+** tap reached the extension, which `linkd` refused ("Unable to get
+  teamId from sardor.WaterBuddy.WaterBuddyWidget", #63). The app's language and text size were put
+  back; 2,000 ml the probe logged through the app's own Bottle stays in the simulator's store as test
+  data (#5), and the three widgets stay on its Lock Screen.
+- **A fresh final review — "with fixes":** #1, the card's figures standing as separate elements in
+  SpringBoard's tree — every drawn figure, gauge and glyph now carries `.accessibilityHidden(true)` as
+  rule `65-accessibility` requires, but the tree lists them either way, and wraps each widget in a
+  SpringBoard button: what VoiceOver says moved to the device check. #2 — `.invalidatableContent()` on
+  the card's figures. Minors: the ring's text has no `.lineLimit(1)` (deferred); spec §3.2's reasoning
+  and the plan's stale 0.6 (both corrected).
+- **Not run:** the owner's device check, spec §7.5 — nine steps, among them the **+**, the quiet form and
+  VoiceOver.
+
+### Found along the way
+
+- `HydrationView.medium` resolves its two lines through `HydrationView`'s own `strings`, which its own
+  body's injection never reaches — so a medium widget draws them in the device's language. Found by
+  reading; not rendered; not fixed here.
+- The `WaterBuddy` scheme compiles `WaterBuddyWidgetExtension` (the app embeds it), against rules
+  `15-project` and `40-widget`'s sentence that it does not. The rule text is the owner's.
+
+## [2026-10-08] — `/doc_sync`: the thirty-seventh pass, after the Lock Screen widget
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:** one undocumented file (`LockScreenWidget.swift`, 344) and two stale line
+  counts (`WaterBuddyWidget.swift` 590 → 593, `WaterBuddyWidgetBundle.swift` 17 → 18); the targets
+  table's extension row (one configuration → two); the gate block (the Lock Screen widget's, with the
+  Siri phrase's retained below it); the *Git* section; the header, the thirty-sixth's kept in a
+  `<details>` block. Known issues **#68–#71 opened**: the medium widget's device-language lines, the app
+  scheme compiling the extension, the Lock Screen widget's hardware-only surface, and the review's
+  deferred minor.
+- **`docs/WIDGET.md`:** a *Lock Screen widget* section; the bundle row (two widgets); the closing "place
+  it" line; and a dated note that its "the app scheme does not compile the extension's own sources" is
+  not what the build does (#69) — flagged rather than rewritten, because it mirrors rule `40-widget`.
+- **`CLAUDE.md`:** the target table's extension row; *Verification Before Done* gains the Lock Screen.
+- **`tasks/lessons.md`:** seven entries, appended earlier in this session.
+
+### Checked and already accurate
+
+- **`docs/STATE.md`, `docs/DESIGN.md`:** nothing they state moved — no key, no stored shape, no token,
+  no measured figure. Their `Last updated` lines (2026-10-07) stand.
+- **Counts:** `@Test` 371 phone, 57 watch (the attribute grep); 13 UI `func test`; `DataManager.Key` 11
+  keys, the phone's nine in `CLAUDE.md` and `docs/STATE.md`; three exception sets, `project.pbxproj`
+  unchanged.
+- **Every documented line count** — 62, by a script comparing each with the file: none stale after the
+  fixes above.
+- **Rule citations** across `CLAUDE.md`, `docs/`, `tasks/`, `HISTORY.md` and the four source folders all
+  resolve; `docs/AI_CONTEXT.md`'s `<details>` blocks balance, eleven and eleven.
+- **No gate re-run:** no code changed after the post-fix gate run in this session (the first checkpoint
+  above).
+
+### Staging
+
+Written last, from the commands' own output; this file and `docs/AI_CONTEXT.md` staged once more after
+these lines:
+
+- **15 paths staged by explicit path:** five rule files (`40-widget`, `60-design-system`,
+  `65-accessibility`, `70-privacy`, `85-testing`), which `/commit` groups as workflow config; the three
+  widget files; the spec and the plan; `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/WIDGET.md`,
+  `tasks/lessons.md` and this file.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- HEAD is `562157e`, 72 commits, level with `origin/main`. No `git commit` was run.
