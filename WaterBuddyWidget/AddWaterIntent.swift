@@ -10,8 +10,8 @@ import WidgetKit
 
 /// Logs a serving of water without opening the app.
 ///
-/// This is what the widget's button runs, and it is also a Shortcuts action in its own right, so
-/// "log 250 ml" works from an automation, a Back Tap, or Siri.
+/// This is what both widgets' buttons and the Control Center control run, and it is also a Shortcuts
+/// action in its own right, so "log 250 ml" works from an automation, a Back Tap, or Siri.
 ///
 /// It is compiled into the widget extension only. The app has no need of it — its own button
 /// already holds the `DataManager` — and a second copy in the app binary would register the same
@@ -30,6 +30,15 @@ struct AddWaterIntent: AppIntent {
     /// The widget stays put and the total updates in place — opening the app would throw away
     /// the whole point of an interactive widget.
     static let openAppWhenRun = false
+
+    /// The default, written out so the choice is visible where it is made, as `LogServingIntent` writes
+    /// out its own: the Control Center control runs this intent, and Control Center, a Lock Screen
+    /// control slot and the Action Button are all reachable on a locked iPhone. Logging water there is
+    /// harmless, and the control says nothing back (rule `70-privacy`). A stricter policy here would
+    /// make every press of the control ask for the passcode. Whether iOS runs it before the first unlock
+    /// after a restart, when the App Group store cannot be read, is unverified
+    /// (`docs/superpowers/specs/2026-10-08-control-center-design.md` §3.2).
+    static let authenticationPolicy: IntentAuthenticationPolicy = .alwaysAllowed
 
     /// Millilitres to log.
     ///

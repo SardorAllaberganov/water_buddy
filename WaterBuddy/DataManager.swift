@@ -1286,8 +1286,15 @@ final class DataManager {
     /// `nonisolated static` for the reason ``resolveServings(in:)`` is: the widget's timeline provider
     /// carries no isolation and reaches it through `snapshot`.
     nonisolated static func usualServing(in defaults: UserDefaults) -> Int {
-        resolveServings(in: defaults)[1]
+        resolveServings(in: defaults)[usualSlot]
     }
+
+    /// Which of the three vessels the one-tap doors log: the middle one, the Glass.
+    ///
+    /// **Named once, because two things read it.** ``usualServing(in:)`` takes its amount, and the
+    /// Control Center control (`LogWaterControl`) draws its glyph — a tile with no figure, which could
+    /// never show that the two had come from different slots.
+    nonisolated static let usualSlot = 1
 
     nonisolated private static func resolveDailyGoal(in defaults: UserDefaults) -> Int {
         guard let stored = defaults.object(forKey: Key.dailyGoal) as? Int, stored >= 1 else {
@@ -1556,9 +1563,23 @@ final class DataManager {
 
     /// Nudges WidgetKit after a mutation. A no-op when no widget is installed, and
     /// `nonisolated` so it can be used as a plain `() -> Void` default argument.
+    ///
+    /// **It reloads the control too.** iOS builds the Control Center control from a value it reads when
+    /// it chooses — the Glass its button logs, the language of its title — and a reload is Apple's
+    /// documented way to have it read again; this is the doorbell every change to either already rings.
+    /// Without it, a press made after an edit logs the previous Glass — measured on the iOS 26.5
+    /// simulator, where nothing else reloaded the control between the edit and the press.
+    /// All controls rather than one kind, because a shared file may not name a type that lives only in
+    /// the widget extension (`LogWaterControl`); iOS only, because the watch targets compile this file
+    /// and have no control.
     nonisolated static func requestWidgetReload() {
         #if canImport(WidgetKit)
         WidgetCenter.shared.reloadAllTimelines()
+        #if os(iOS)
+        if #available(iOS 18.0, *) {
+            ControlCenter.shared.reloadAllControls()
+        }
+        #endif
         #endif
     }
 

@@ -167,6 +167,24 @@ struct ServingResolutionTests {
         let evening = WaterSnapshot(currentWater: 900, dailyGoal: 2_000, language: .russian, serving: 330)
         #expect(evening.rolledOver().serving == 330)
     }
+
+    // MARK: The slot the one-tap doors log
+
+    /// **The slot every one-tap door logs is named once.** ``DataManager/usualServing(in:)`` reads it,
+    /// and the Control Center control draws its glyph — a tile with no figure, which could never show
+    /// that its glyph and its amount had come from two different slots.
+    @Test func theUsualServingIsReadFromTheUsualSlot() {
+        withTempDefaults { defaults in
+            defaults.set([200, 330, 750], forKey: DataManager.Key.servings)
+            #expect(DataManager.usualServing(in: defaults) == [200, 330, 750][DataManager.usualSlot])
+        }
+    }
+
+    /// The Glass by name, so moving the one-tap doors to another vessel is a decision this test makes
+    /// visible rather than an index somebody edited.
+    @Test func theUsualSlotIsTheGlass() {
+        #expect(vesselSlots[DataManager.usualSlot].nameKey == "Glass")
+    }
 }
 
 // MARK: - The published vessels

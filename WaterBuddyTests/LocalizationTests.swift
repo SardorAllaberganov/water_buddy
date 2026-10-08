@@ -349,6 +349,11 @@ private func specifiers(in text: String) -> Set<String> {
     /// These are the strings Shortcuts renders when the user adds the WaterBuddy action. They are
     /// macro arguments and therefore compile-time constants: they follow the **device** language,
     /// never the in-app picker (`docs/WIDGET.md`, `docs/AI_CONTEXT.md` known issue #1).
+    ///
+    /// **Two of them are also the Control Center control's.** *Log Water* is its gallery name and its
+    /// title — the title resolved through the snapshot's bundle, so it *does* follow the in-app picker —
+    /// and the description is its gallery description. This test is what pins them in every language,
+    /// so trimming the list must keep both.
     @Test(arguments: translated)
     func theShortcutsVocabularyIsTranslated(language: String) {
         let shortcutsKeys = [
