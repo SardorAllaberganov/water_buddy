@@ -542,8 +542,9 @@ final class DataManager {
     ///
     /// This is the only way water enters the product. ``addWater(amount:)`` is a synonym kept so
     /// the callers that log the standard serving did not have to change when the store did.
-    /// `AddWaterIntent` is now the only one left: `HomeView`'s row offers three vessels and calls
-    /// this method directly, because "add the standard serving" stopped being what its buttons do.
+    /// `AddWaterIntent` and `LogServingIntent` are the two left: `HomeView`'s row offers three vessels
+    /// and calls this method directly, because "add the standard serving" stopped being what its
+    /// buttons do.
     ///
     /// Re-reads the store and rolls the day over first, for the reason on ``addWater(amount:)``:
     /// two processes hold their own instance, and an idle one would otherwise recompute a total
@@ -1175,6 +1176,22 @@ final class DataManager {
         #endif
     }
 
+    #if !os(watchOS)
+    /// Returns once every reminder plan asked for before the call has reached the notification centre.
+    ///
+    /// **What `LogServingIntent` awaits before Siri's reply.** Siri launches the app in the background
+    /// to run the intent, and the system may suspend it as soon as `perform()` returns — before the
+    /// re-plan the intent's own mutation queued has run. Waiting on the queue rather than calling
+    /// ``NotificationManager/reconcile(_:calendar:strings:using:)`` directly keeps every plan in call
+    /// order: a reconcile run beside the queue is how known issue #46 raced (rule `80-notifications`).
+    ///
+    /// Compiled out on watchOS with ``reminderReconciles`` itself: `ReconcileQueue` is not in the watch
+    /// targets.
+    nonisolated static func remindersSettled() async {
+        await reminderReconciles.settled()
+    }
+    #endif
+
     // MARK: - Store
 
     private func loadFromStore() {
@@ -1257,6 +1274,19 @@ final class DataManager {
               stored.allSatisfy({ (1...maximumDailyIntake).contains($0) })
         else { return defaultServings }
         return stored
+    }
+
+    /// The serving every one-tap door logs: the middle quick-add vessel, the Glass.
+    ///
+    /// **One definition, so the widget's button and the Siri shortcut cannot read different slots.**
+    /// Each used to need "index 1" spelled where it read the triple; a `[1]` drifting in one place
+    /// would make two front doors log different amounts, with nothing to show it but arithmetic.
+    /// ``snapshot(defaults:calendar:now:)`` and `LogServingIntent` both call this.
+    ///
+    /// `nonisolated static` for the reason ``resolveServings(in:)`` is: the widget's timeline provider
+    /// carries no isolation and reaches it through `snapshot`.
+    nonisolated static func usualServing(in defaults: UserDefaults) -> Int {
+        resolveServings(in: defaults)[1]
     }
 
     nonisolated private static func resolveDailyGoal(in defaults: UserDefaults) -> Int {
@@ -2183,9 +2213,29 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
         }
         #endif
     }
+    #endif
+
+    #if os(iOS)
+    /// Returns once `WCSession` has activated, after about a second, at once where `WCSession` is
+    /// unsupported, or the moment the task is cancelled.
+    ///
+    /// **What `LogServingIntent` awaits before it logs.** Siri launches the app in the background just
+    /// to run the intent, and `WaterBuddyApp.init()` starts activation on that same launch — so the
+    /// intent's mutation could publish before the session is up, and
+    /// ``DataManager/requestWristPublish(from:)`` drops a publish that throws `sessionNotActivated`.
+    /// Bounded, because a watch that never answers must not hold Siri's reply; the publish on
+    /// activation (`activationDidCompleteWith`) still fires later if the process is alive. The pure
+    /// half is ``poll(until:every:atMost:)``.
+    nonisolated static func waitUntilActivated() async {
+        guard WCSession.isSupported() else { return }
+        _ = await poll(until: { WCSession.default.activationState == .activated },
+                       every: .milliseconds(100), atMost: 10)
+    }
+    #endif
 
     /// Checks `isDone` up to `attempts` times, `interval` apart, and says whether it ever held — `false`
-    /// at once if the task is cancelled. The pure half of ``waitForPendingDelivery()``, testable with no
+    /// at once if the task is cancelled. The pure half of `waitForPendingDelivery()` on the watch and of
+    /// `waitUntilActivated()` on the phone — which is why it is compiled for both — testable with no
     /// session (`WristLinkDeliveryTests`).
     nonisolated static func poll(until isDone: () -> Bool, every interval: Duration, atMost attempts: Int) async -> Bool {
         for attempt in 0..<max(attempts, 0) {
@@ -2199,7 +2249,6 @@ nonisolated final class WristLink: NSObject, WCSessionDelegate, Sendable {
         }
         return false
     }
-    #endif
 
     // MARK: - Sending (wrist → phone)
 
@@ -2438,8 +2487,9 @@ extension DataManager {
             currentWater: water,
             dailyGoal: resolveDailyGoal(in: defaults),
             language: resolveLanguage(in: defaults),
-            // Index 1 is the middle vessel — the one the widget's single button logs and draws.
-            serving: resolveServings(in: defaults)[1]
+            // The middle vessel — the one the widget's single button logs and draws, and the one the
+            // Siri shortcut logs.
+            serving: usualServing(in: defaults)
         )
     }
 

@@ -330,6 +330,29 @@
         }
       }
     },
+    "Adds your Glass to today's total in WaterBuddy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adds your Glass to today's total in WaterBuddy."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавляет ваш стакан к сегодняшнему итогу в WaterBuddy."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WaterBuddy’dagi bugungi umumiy hisobga stakaningizni qo‘shadi."
+          }
+        }
+      }
+    },
     "Average %1$d millilitres. Best %2$d millilitres.": {
       "extractionState": "manual",
       "localizations": {
@@ -789,6 +812,29 @@
         }
       }
     },
+    "Log a Glass": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log a Glass"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Записать стакан"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stakanni qayd etish"
+          }
+        }
+      }
+    },
     "Measured against your current goal": {
       "extractionState": "manual",
       "localizations": {
@@ -1222,6 +1268,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ilovani ochmasdan suv iste’molini kuzating va stakan qayd eting."
+          }
+        }
+      }
+    },
+    "Water logged.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Water logged."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вода записана."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suv qayd etildi."
           }
         }
       }

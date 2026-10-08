@@ -216,8 +216,9 @@ enum NotificationManager {
 ///
 /// ## Why a stream, rather than a lock or an actor
 ///
-/// The one caller, `DataManager.requestReminderReschedule`, is synchronous and `nonisolated`
-/// (rule `43-concurrency`): it can neither `await` its turn nor touch main-actor state.
+/// The caller the design serves, `DataManager.requestReminderReschedule`, is synchronous and
+/// `nonisolated` (rule `43-concurrency`): it can neither `await` its turn nor touch main-actor state.
+/// ``settled()`` asks the same way, from `async` code that could have waited anyway.
 /// `AsyncStream.Continuation.yield` is synchronous, safe from any thread, and keeps the order it was
 /// called in, so asking costs the caller nothing and the ordering needs no lock of this file's own.
 /// - An **actor** can only be reached with `await`, so the hook would need a `Task` per call to
@@ -230,8 +231,9 @@ enum NotificationManager {
 /// ## The cost, and the lifetime
 ///
 /// An operation that never returns now holds up every one asked for after it, until the process
-/// ends; as a `Task` of its own it would have stranded only itself. The one operation production
-/// queues awaits nothing but the notification centre.
+/// ends; as a `Task` of its own it would have stranded only itself. It would also hold every
+/// ``settled()`` behind it — `LogServingIntent`'s reply to Siri among them — which is one more reason
+/// the one operation production queues awaits nothing but the notification centre.
 ///
 /// One worker task per queue, for as long as the queue lives. Production keeps one for the life of
 /// the app process (`DataManager.reminderReconciles`). `deinit` finishes the stream: work already
@@ -266,5 +268,16 @@ nonisolated final class ReconcileQueue: Sendable {
     /// Runs `operation` once everything asked for before it has finished.
     func enqueue(_ operation: @escaping @Sendable () async -> Void) {
         operations.yield(operation)
+    }
+
+    /// Returns once every operation enqueued before this call has run.
+    ///
+    /// It enqueues an operation of its own that does nothing but resume the caller, so it rides the
+    /// same worker: it cannot overtake work asked for earlier, and work asked for after it does not
+    /// hold it. ``DataManager/remindersSettled()`` is its one production caller.
+    func settled() async {
+        await withCheckedContinuation { (resumed: CheckedContinuation<Void, Never>) in
+            enqueue { resumed.resume() }
+        }
     }
 }
