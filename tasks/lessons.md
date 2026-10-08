@@ -2225,3 +2225,37 @@ a general habit of making small edits with shell tools does not outrank a projec
 **The rule:** read `.claude/settings.json`'s deny list before choosing a shell mechanism for any edit,
 in any folder, and make edits with `Edit` or `Write`. When one is refused anyway, report it and leave
 the file as it was.
+
+## 2026-10-07 — A simulator build cannot run its own App Shortcut
+
+The *Log a Glass* tile appeared in the simulator's Shortcuts app — glyph, colour and Russian title all
+right — and tapping it said *Unable to run App Shortcut*. The simulator's log named the cause: `linkd`
+"Failed to generate bundleIdentity: -Not a platform binary, checking teamId... -Unable to get teamId",
+then "Rejecting invalid client due to requiresValidBundle". A simulator build is signed to run
+locally — `codesign` reads `Signature=adhoc`, `TeamIdentifier=not set` — even with `DEVELOPMENT_TEAM`
+set, and the App Intents daemon refuses a client with no Team ID. The intent's own code never ran.
+
+**The rule:** on a simulator, check that an App Shortcut registers; prove that it runs only on a
+team-signed device build. When a shortcut will not run, read `linkd` in `xcrun simctl spawn <device>
+log show` before suspecting the intent.
+
+## 2026-10-07 — A lazy list's visible rows are not a count of its rows
+
+`testAServingAddedToYesterdayShowsUnderYesterday` counts yesterday's rows before and after adding one —
+idempotent against earlier runs' servings, as its comment intends — but only rows on screen are in the
+accessibility tree. Once the gate's own repeated runs had put eight servings under yesterday, a new row
+at the top pushed one off the bottom and the count stood still. The serving was saved — a frame of the
+failure's recording shows it — and HEAD failed the same way on the same simulator.
+
+**The rule:** in a suite whose simulator keeps every earlier run's data, assert on something that cannot
+saturate — the day's total, or the new row itself — never on how many rows are visible.
+
+## 2026-10-07 — Read the conditional block before inserting beside a declaration
+
+`WristLink.waitUntilActivated()` went "directly after `waitForPendingDelivery()`", as the plan said —
+inside an indented `#if os(watchOS)` that neither the plan nor the scan that mapped the file had seen,
+because the scan matched `#if` at column 0 only. The phone could not see the new function, nor the
+`poll` it needed.
+
+**The rule:** before inserting beside an existing declaration, list every `#if`/`#else`/`#endif`
+around it, indented ones included — `awk '/^[[:space:]]*#(if|else|endif)/'` over the range.

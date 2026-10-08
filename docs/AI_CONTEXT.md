@@ -4,6 +4,35 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-08 (thirty-sixth pass of 2026-10-07, **re-verified by a second `/doc_sync`
+run on 2026-10-08**, after the owner had spec §5's wording written into six rule files — `15-project`,
+`20-state`, `40-widget`, `43-concurrency`, `70-privacy`, `80-notifications`. The re-run re-derived every
+probe — all current, the staged code byte-identical to what the final gate built — and corrected one
+sentence of the spec, which still said rule `43-concurrency` names a single `static var`. The pass
+itself: `/doc_sync` after **roadmap item 4, the Siri phrase**, owner-approved: `docs/superpowers/specs/2026-10-07-siri-phrase-design.md`, executed from
+`docs/superpowers/plans/2026-10-07-siri-phrase.md`. "Log water in WaterBuddy" — or *Add water in*, *Log
+a glass in*, and their Russian — runs the new app-only `LogServingIntent` (*Log a Glass*), which logs
+the user's middle vessel, read through the new `DataManager.usualServing(in:)` that the widget's
+snapshot now reads too, and replies only *Water logged.*, locked or not. Siri launches the app in the
+background; the intent waits up to a second for the watch link and then for the reminder queue to drain
+(`ReconcileQueue.settled()`). The phrases are en + ru in a fifth catalogue, `AppShortcuts.xcstrings` —
+Siri has no Uzbek. **Registration is verified on the simulator; execution is not:** `linkd` refuses an
+ad-hoc-signed build (#63), so the owner's device check is `perform()`'s first run, and
+`LogTheGlassTests` pins the body between its two waits. Gate run in full twice — **371**/46 phone unit,
+**25 of 26** phone UI (the one failure pre-existing: HEAD fails it identically on the same simulator,
+#62), **57**/6 watch unit, both widget builds — with no new warning by clean builds. A fresh final
+review found no defect; its fix pass added that seam and its three tests, corrected three DocC passages
+the change had made false, and widened a timing test. **This sync's own drift:** two line counts
+(`DataManager.swift`, `NotificationManager.swift`); three undocumented files; the targets table; the
+app catalogue's key count, which read 58 from before the earlier-servings change (now 64); and
+`docs/WIDGET.md`'s "vocabulary not translated" section, stale since known issue #1 was fixed on
+2026-10-06. Known issues **#62–#67 opened**; #57 gains the unit-test host's refusal. `CLAUDE.md`,
+`docs/STATE.md` and `docs/WIDGET.md` updated; `docs/DESIGN.md` checked and not touched — no token or
+measured figure moved, and the tile's `.blue` is a system `ShortcutTileColor`, not an app colour.)
+
+<details>
+<summary>Thirty-fifth pass — 2026-10-07, retained</summary>
+
 **Last updated:** 2026-10-07 (thirty-fifth pass — `/doc_sync` after **known issue #60's fix**: the
 serving sheet's *Cancel* and *Save* labels now shrink to fit their capsules at `AccessibilityXXXL` —
 `.lineLimit(1)`, `.minimumScaleFactor(0.4)` and `.padding(.horizontal, 12)` on both, eleven lines in
@@ -19,6 +48,8 @@ phone unit, **26** phone UI (the second time on a second run — the first was r
 incremental, so there is no figure to set against the clean baseline. `docs/STATE.md`,
 `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md` were checked and deliberately not touched: nothing
 they state has changed.)
+
+</details>
 
 <details>
 <summary>Thirty-fourth pass — 2026-10-07, retained</summary>
@@ -432,7 +463,7 @@ identical menu (rule `50-views`). The three *amounts* still live on `DataManager
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — `StaticConfiguration`, interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 358 `@Test` functions in 41 suites |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 371 `@Test` functions in 46 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (8 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **13 declared, 26 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
@@ -520,18 +551,20 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2499   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face on iOS, its wait for delivery on watchOS
+WaterBuddy/DataManager.swift                    2549   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's and Siri's one definition), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
 WaterBuddy/HistoryView.swift                     959   app only — the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
 WaterBuddy/HomeView.swift                        379   app only — the vessel, the editable quick-add row, the goal burst (vesselSlots moved out, Task 14)
 WaterBuddy/LiquidGlassModifier.swift             501   shared — design tokens + the glass modifier
-WaterBuddy/NotificationManager.swift             270   shared — ReminderScheduler + reconcile, the only UN caller; ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46)
+WaterBuddy/LogServingIntent.swift                 78   app only — the Siri phrase's intent ("Log a Glass"): wait for the watch link, logTheGlass, wait for the reminder queue, reply "Water logged."
+WaterBuddy/NotificationManager.swift             283   shared — ReminderScheduler + reconcile, the only UN caller; ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46), and settled(), which waits for it to drain
 WaterBuddy/PressStyle.swift                       31   app only — the shared press recoil
 WaterBuddy/ReminderPlan.swift                    149   shared — WHEN to remind, as a pure value
 WaterBuddy/RootTabView.swift                     260   app only — AppTab (3 cases), the container, the glass tab bar (the 420pt cap's comment rewritten 2026-09-02: it justified itself in iPad measurements, and iPad is gone — the cap is kept, because 420 is below the widest iPhone's content width)
 WaterBuddy/SettingsView.swift                    658   app only — the goal editor, the vessel editor, reminders, the language picker
 WaterBuddy/WaterBuddyApp.swift                   108   app only — RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch
+WaterBuddy/WaterBuddyShortcuts.swift              38   app only — the one AppShortcutsProvider: three phrases (en + ru, AppShortcuts.xcstrings), the "Log a Glass" tile
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
 WaterBuddy/WaterSurface.swift                    194   shared — waves, scrim, Aurora palette, vesselSlots (moved in from HomeView, Task 14 — a second, non-view consumer: WristView)
 WaterBuddy/WristInbox.swift                       90   app only, NOT shared — reassembles chunked WristBatch payloads (wrist → phone), calls DataManager.ingest(_:)
@@ -550,6 +583,7 @@ WaterBuddyTests/NotificationManagerTests.swift   352   NotificationManagerTests 
 WaterBuddyTests/ReminderPlanTests.swift          251   the plan — pure, and no UserNotifications import
 WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab bar's offered destinations
 WaterBuddyTests/ServingSeamTests.swift           279   ServingResolutionTests (pure, not @MainActor) + ServingSeamTests
+WaterBuddyTests/SiriPhraseTests.swift            277   UsualServingTests + ReconcileQueueSettledTests (both not @MainActor) + LogServingIntentTests + LogTheGlassTests + AppShortcutPhraseTests
 WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WristSyncTests.swift             889   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests
@@ -575,14 +609,13 @@ WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 95   .accessoryCircular percen
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**55 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
-the thirty-fifth pass with `find` over all seven and a two-way comparison against this file: no
-phantom row and none undocumented. The 58 line counts here (55 files and the three Swift scripts
-below) were re-checked against `wc -l` by a script: 1 was stale — `HistoryView.swift`, the one file
-the change touched, already one short at HEAD (948) because the #59 comment landed after the
-thirty-fourth pass counted it — and 57 current. *(The thirty-fourth pass found 3 stale of 57, the
-thirty-third 6 of 56, the thirty-second 4, the thirty-first 5, the thirtieth 2, the twenty-ninth 8 of
-56, the twenty-eighth 7 of 55 on 2026-10-05.)*
+**58 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
+the thirty-sixth pass with `find` over all seven and a two-way comparison against this file: no
+phantom row, and the change's three new files — `LogServingIntent.swift`, `WaterBuddyShortcuts.swift`,
+`SiriPhraseTests.swift` — now listed. The 61 line counts here (58 files and the three Swift scripts
+below) were re-checked against `wc -l` by a script after the edit: none stale. *(The thirty-fifth pass
+found 1 stale of 58, the thirty-fourth 3 of 57, the thirty-third 6 of 56, the thirty-second 4, the
+thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the twenty-eighth 7 of 55 on 2026-10-05.)*
 
 ### Outside every target
 
@@ -650,7 +683,8 @@ pass, and that pass's own "six" was off by one too; corrected by the same day's 
 
 | | |
 |---|---|
-| `WaterBuddy/Localizable.xcstrings` | **58** keys — 54 translated into en/ru/uz, 4 deliberately not (`%`, `+%lld`, `1,450 ml`, `WaterBuddy`). The explicit `en` values are what make the build emit an `en.lproj` to select |
+| `WaterBuddy/Localizable.xcstrings` | **64** keys — 60 translated into en/ru/uz, 4 deliberately not (`%`, `+%lld`, `1,450 ml`, `WaterBuddy`). The explicit `en` values are what make the build emit an `en.lproj` to select. *(Read 58 until the thirty-sixth pass — three passes after the earlier-servings change had made it 61.)* |
+| `WaterBuddy/AppShortcuts.xcstrings` | **3** phrases, **en and ru only** — Siri has no Uzbek, so this is the one catalogue that does not ship all three. Keys are the English phrases with `${applicationName}`; the build compiles `en.lproj`/`ru.lproj` `AppShortcuts.strings` (`AppShortcutPhraseTests`) |
 | `WaterBuddyWidget/Localizable.xcstrings` | **19** keys — **15** in en/ru/uz: the 10 hand-written as a strict subset of the app's (a membership exception cannot carry a resource) plus `AddWaterIntent`'s five Shortcuts strings, translated since before the repository's first commit (known issue #1, retired this pass); and **4 the build extracted** (`%`, `+%lld`, `1,450 ml`, `Today`) with no values at all, which reach no compiled table. *(This row called all nine extracted keys untranslated until the twenty-ninth pass.)* |
 | `WaterBuddyWatch/Localizable.xcstrings` | **16** keys — 15 in en/ru/uz (six copied value for value from the app's catalogue, nine the watch's own) and `%`, en only. Written by a script that copies the shared keys, and held to the phone's own strings by `LocalizationTests` through the built phone app |
 | `WaterBuddyWatchWidget/Localizable.xcstrings` | **2** keys — `Today's hydration` (the complication's description, the phone's own string) in en/ru/uz, and `WaterBuddy`, en only and never translated |
@@ -791,6 +825,46 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five run twice on 2026-10-07, on Xcode 27.0, for roadmap item 4, the Siri phrase** (the
+thirty-sixth pass): after the plan's last code task, and again after the final review's fix pass.
+Foreground, `-parallel-testing-enabled NO`, the commands as rule `85-testing` writes them;
+`xcrun simctl shutdown all` was skipped whenever another project's (`AvtoLog`) `xcodebuild` was
+running, and the iPhone 17 was booted with `simctl bootstatus … -b` before a test run.
+
+| Command | Before the fix pass | After it — the staged code |
+|---|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 368 tests in 45 suites passed` | `✔ Test run with 371 tests in 46 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `Executed 26 tests, with 2 failures`; a full re-run, `with 1 failure` | `Executed 26 tests, with 1 failure` — `testAServingAddedToYesterdayShowsUnderYesterday`, pre-existing (#62) |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` | `** BUILD SUCCEEDED **` |
+
+**The UI failure is not this change's.** HEAD `4a7f4dd`, built from `git archive` into its own
+DerivedData, fails the same test at the same line on the same simulator (#62). The first run's second
+failure, `testSettingsIsReachableFromHomeAsATab`, was a first tap dropped while another project's UI
+tests ran beside it (#67); it passed in isolation and in both later full runs.
+
+**Warnings: none new.** Clean builds of HEAD and of the change into empty DerivedData, the same sequence
+on both sides, all four schemes: identical per file and message (app 68/68 lines, widget 44/44, watch
+8/8, watch widget 8/8) — and identical again after the fix pass. The app's build-for-testing reads 37
+unique lines and 50 occurrences on both sides, 31 shipping and 6 in tests: the thirty-fourth pass's
+named-destination figures. The change compiles 171 steps to HEAD's 168.
+
+**Thirteen new tests in five suites** (`SiriPhraseTests.swift`), each RED on a seam that compiled —
+the Cup instead of the Glass (`UsualServingTests` 4 tests, 8 issues; `LogTheGlassTests` 3 tests, 5
+issues), a settle that returned at once, an intent with the wrong policy and a reply in no table, no
+phrase table — then GREEN. The idle settle, the widened settle test and the reply's figure check are
+proven by mutation (a two-second settle; a settle that returns at once; *Water logged: 250 ml.*), each
+restored and checked by `cmp`.
+
+**On the simulator** (a throwaway XCUITest probe, deleted): the shortcut registers — *WaterBuddy → Log
+a Glass*, mug glyph, blue tile, *Записать стакан* with Shortcuts in Russian — but cannot run: `linkd`
+refuses the ad-hoc-signed build for want of a Team ID (#63). Siri never came up on the simulator, and
+Spotlight's search field did not appear to the probe. Not checked: the Home Screen widget — its view
+tree and storage are unchanged, and its serving is the same value under a new name.
+
+*(The 2026-10-07 #60 gate block below is retained as that pass's record.)*
 
 **Gate — all five run twice on 2026-10-07, on Xcode 27.0: before `/commit` committed roadmap item 3,
 and after known issue #60's fix** (the thirty-fifth pass). Foreground, `-parallel-testing-enabled NO`,
@@ -1502,16 +1576,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-07, the thirty-fifth) after the staging
+**There is a git repository.** Verified this pass (2026-10-07, the thirty-sixth) after the staging
 and before this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-4217f7c
+4a7f4dd
 $ git log --oneline | wc -l
-      66
+      68
 $ git diff --cached --name-only | wc -l
-       4
+      21
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
@@ -1521,22 +1595,27 @@ $ git status --short | grep -v -E '^[MA]  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** The 4 staged paths — the #60 fix (`WaterBuddy/HistoryView.swift`,
-staged as blob `e083cfc`), this pass's `tasks/lessons.md` entry, the `HISTORY.md` checkpoints and this
-sync's own `docs/AI_CONTEXT.md` — were staged with explicit paths for the owner's `/commit` (rule
-`90-git`). **The thirty-fourth pass's 15 staged paths were committed and pushed this session**, by
-`/commit` run at the owner's instruction, the owner approving its plan first: `9e8e6df`, `ffe82e6`,
-`b33d08f` and `4217f7c` — `git diff --name-only cd09663 4217f7c` lists exactly 15 — pushed as
-`cd09663..4217f7c`, leaving `main` level with `origin/main`. **Five paths are deliberately left
-unstaged**, as they were at that commit: the two watch schemes and the two watch catalogues the Xcode
-app wrote (known issue #50), and `.claude/settings.json`, which moves `git commit` and `git init` from
-*ask* to *allow* and leaves `git push` under *ask*. None is this change's to stage or revert.
-`Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither committed nor ignored;
-whether it belongs in the tree is the owner's call.
+**Nothing is committed by this pass.** 21 paths are staged: the six rule files the owner approved on
+2026-10-08 (`15-project`, `20-state`, `40-widget`, `43-concurrency`, `70-privacy`,
+`80-notifications` — spec §5's wording), which `/commit` groups as workflow config, and these 15 — the
+change (`DataManager.swift`,
+`NotificationManager.swift`, the app's `Localizable.xcstrings`, and the new `LogServingIntent.swift`,
+`WaterBuddyShortcuts.swift` and `AppShortcuts.xcstrings`), its tests (the new `SiriPhraseTests.swift`),
+the spec and the plan, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
+`tasks/lessons.md` and the `HISTORY.md` checkpoints — were staged with explicit paths for the owner's
+`/commit` (rule `90-git`). The code files staged are the ones the final gate and the second clean-build
+warning comparison ran on. **The #60 change was committed and pushed this session**, before this work
+began, by `/commit` at the owner's instruction: `099d20d` and `4a7f4dd`, pushed as `4217f7c..4a7f4dd`,
+leaving `main` level with `origin/main`. **Five paths are deliberately left unstaged**, as at every
+commit tonight: the two watch schemes and the two watch catalogues the Xcode app wrote (known issue
+#50), and `.claude/settings.json`, which moves `git commit` and `git init` from *ask* to *allow* and
+leaves `git push` under *ask*. None is this change's to stage or revert. `Screenshots/census/` (28
+coverage captures, 51 MB) is still untracked, neither committed nor ignored; whether it belongs in the
+tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 66 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 68 commits on `main`;
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -2319,7 +2398,11 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     next 22 seconds, no sample shows. The re-run, after `xcrun simctl bootstatus … -b` had booted the
     device and waited for it, passed in 3 minutes 11 seconds. One pass with the wait is not proof the
     wait is the cure: the commit's UI run the same evening, also from a cold boot and with no wait,
-    launched normally.
+    launched normally. **At 22:28:06 the refusal hit the unit-test host itself** (`sardor.WaterBuddy`,
+    a `-only-testing:WaterBuddyTests/LocalizationTests` run in the Siri-phrase work): no test executed,
+    exit 65 after 40 seconds — a unit run spends no 600 seconds on diagnostics. It passed once
+    `simctl bootstatus … -b` had booted the device. Later runs launched both with and without that wait,
+    so it is still not shown to be the cure.
 58. **Two comments the complication change wrote overstate what the old background wake missed.**
     `WaterBuddyWatchApp.swift`'s comment above `await WristLink.waitForPendingDelivery()` says
     "nothing has been delivered yet" at that point, and that returning there let the system suspend
@@ -2375,6 +2458,48 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     repository yet". A `/commit` that followed it literally could stop on the screenshot harness, and
     would never run the watch unit tests. This pass's commit ran rule `85-testing`'s five instead,
     agreed with the owner beforehand. Command text is the owner's to change (rule `99-docs-cascade`).
+
+**Opened by the 2026-10-07 Siri-phrase change (roadmap item 4; the thirty-sixth pass):**
+
+62. **`testAServingAddedToYesterdayShowsUnderYesterday` fails on a simulator that has kept enough
+    servings.** It counts yesterday's rows before and after adding one, but a lazy list exposes only the
+    rows on screen: once yesterday held eight servings — each gate run adds one — a row landing at the
+    top pushed one off the bottom and the count stood still. The serving was saved; a frame of the
+    failure's recording shows the new 22:44 row. HEAD `4a7f4dd` fails identically on the same simulator,
+    so the earlier-servings gate (green at 18:53 and 19:14) passed only while the list was still short.
+    It now fails on every run against this simulator's data, and the UI gate reads 25 of 26 until it
+    is fixed. The fix is the test's — assert on the picked day's header total, which moves by the
+    serving, or on the new row itself, never a count of visible rows — and it is its own change, the
+    owner's call. Resetting the simulator is not ours either: `xcrun simctl erase` is on the deny list.
+63. **The App Shortcut cannot run on this simulator, so `LogServingIntent.perform()` has never
+    executed.** Registration is verified — Shortcuts lists *WaterBuddy → Log a Glass*, mug glyph, blue
+    tile, *Записать стакан* in Russian — but a tap says *Unable to run App Shortcut*: `linkd` "Failed to
+    generate bundleIdentity: -Not a platform binary, checking teamId... -Unable to get teamId", then
+    "Rejecting invalid client due to requiresValidBundle". A simulator build is signed to run locally
+    (`Signature=adhoc`, `TeamIdentifier=not set`) despite `DEVELOPMENT_TEAM = 4DT6XGJF29`.
+    `LogTheGlassTests` covers the body between the two waits; the waits, the reply, Siri and Spotlight
+    are proved only on a team-signed device — the owner's device check (spec §8.3). Signing simulator
+    builds with the owner's identity would also reach it, and is theirs to decide.
+64. **Two deferred minors from the Siri phrase's final review.** (a) `LogServingIntent` and
+    `WaterBuddyShortcuts` are nonisolated only because their protocols refine `Sendable` — the reviewer
+    typechecked it under the app target's flags; stating `nonisolated` outright would document it, as
+    `WristLink` does. (b) `ReconcileQueue.settled()` would never resume on a finished stream, because
+    `enqueue` discards `yield`'s `.terminated` — unreachable while the production queue is a static that
+    is never released.
+65. **Rule `43-concurrency` (and `WristLink`'s DocC) say every native target sets
+    `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`; `project.pbxproj` has two such lines** — the app target's
+    two configurations, by the final reviewer's reading. The widget and watch modules compile with no
+    default isolation, which is why `AddWaterIntent` is nonisolated by module default and
+    `LogServingIntent` by its protocol. Rule text is the owner's to change.
+66. **`AddWaterIntent`'s DocC says a second copy in the app binary "would register the same action twice
+    in Shortcuts" — unverified.** The 2026-10-07 research found no Apple source for it, and Apple's
+    widget documentation tells developers to add an interactive widget's intent to both the extension and
+    the app. Nothing depends on it — the Siri phrase got its own, differently named intent — but it
+    should not be leaned on.
+67. **A first tap after launch was dropped once, under load.** In the Siri-phrase gate's first UI run,
+    `testSettingsIsReachableFromHomeAsATab`'s tap on Settings and the Yesterday test's tap on Glass took
+    no effect while every later tap did; another project's UI tests ran beside it. It passed in isolation
+    and in both later full runs. One sample, recorded, not explained.
 
 ## Where the rest is written down
 

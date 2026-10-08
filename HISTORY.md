@@ -5672,3 +5672,233 @@ these lines:
   `Screenshots/census/` still untracked.
 - HEAD is `4217f7c`, 66 commits, level with `origin/main`. This pass ran no `git commit`; the four
   commits that made HEAD were `/commit`'s, earlier the same session.
+
+## [2026-10-07] — "Log water in WaterBuddy" logs the Glass by voice
+
+### What
+
+Roadmap item 4, the first of the *Next* group. The design is
+`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`, executed from
+`docs/superpowers/plans/2026-10-07-siri-phrase.md`. (The #60 fix this session started with was
+committed and pushed by `/commit` at the owner's word — `099d20d`, `4a7f4dd` — before this work began.)
+
+- **The phrases:** *Log water in WaterBuddy*, *Add water in WaterBuddy*, *Log a glass in WaterBuddy*,
+  and in Russian *Запиши воду в*, *Добавь воду в*, *Запиши стакан в* WaterBuddy — an App Shortcut, so
+  they work from install with no setup, and the same action shows as a *Log a Glass* tile (mug glyph,
+  blue) in Spotlight and the Shortcuts app.
+- **What it logs:** the Glass — the middle quick-add vessel at the user's own amount, the serving the
+  widget's button adds — read when Siri runs.
+- **What Siri says:** *Water logged.* — fixed and digit-free, in en/ru/uz. It runs on a locked iPhone
+  (`authenticationPolicy = .alwaysAllowed`, written out).
+- **The code:** `LogServingIntent` and `WaterBuddyShortcuts`, app-only; `AppShortcuts.xcstrings`
+  (en + ru); `DataManager.usualServing(in:)`, the one definition of the Glass, which the widget's
+  snapshot now reads too; `ReconcileQueue.settled()` and `DataManager.remindersSettled()`, so the
+  background launch outlives its re-plan; `WristLink.waitUntilActivated()`, at most about a second, so
+  the watch hears; three strings in the app catalogue. `perform()` waits for the link, runs
+  `logTheGlass(into:from:)`, waits for the queue, and replies.
+
+### The rulings this rests on
+
+- **The owner's**, asked one at a time on 2026-10-07: the widget's serving — not a named vessel, not an
+  amount Siri asks for; works locked, with no numbers; the app target — not the widget extension, not a
+  new App Intents extension; then the three design sections, the written spec and the plan.
+- **Platform facts**, from the SDK on this machine and Apple's documentation (the spec's Provenance): a
+  provider lives in the target of its intents; a phrase can carry no `Int`; Siri has no Uzbek; the
+  `AppShortcut` overload with a required title and image is iOS 17.0.
+- **The executor's rulings**, in the plan's ledger: work on `main` and stage, never commit;
+  `import AppIntents` in the test file (`MemberImportVisibility`); `WristLink.poll` moved out of a
+  watch-only block so the phone can wait on it; the final review run before the docs; and the review's
+  re-grades and declines.
+
+### Files touched
+
+Modified:
+- `WaterBuddy/DataManager.swift` (2499 → 2549)
+- `WaterBuddy/NotificationManager.swift` (270 → 283)
+- `WaterBuddy/Localizable.xcstrings` (61 → 64 keys)
+
+New:
+- `WaterBuddy/LogServingIntent.swift` (78)
+- `WaterBuddy/WaterBuddyShortcuts.swift` (38)
+- `WaterBuddy/AppShortcuts.xcstrings` (3 phrases, en + ru)
+- `WaterBuddyTests/SiriPhraseTests.swift` (277)
+- `docs/superpowers/specs/2026-10-07-siri-phrase-design.md`, `docs/superpowers/plans/2026-10-07-siri-phrase.md`
+
+Unchanged: no key, stored byte, schema, project file, entitlement, privacy manifest, exception set,
+widget view tree, notification string or rule. `AddWaterIntent` is untouched.
+
+### Verification
+
+- **RED on seams that compiled, then GREEN**, task by task: `UsualServingTests` 4 tests and 8 issues (the
+  seam returned the Cup); `ReconcileQueueSettledTests` ordered `[settled, earlier work, later work]`
+  against a settle that returned at once; `LogServingIntentTests` 3 tests and 5 issues (the wrong
+  policy, `openAppWhenRun`, a reply in no table); `AppShortcutPhraseTests` "no en phrase table"; and,
+  after the review, `LogTheGlassTests` 3 tests and 5 issues (the Cup again).
+- **By mutation**, each restored and `cmp`-checked: a two-second `settled()` failed both settle tests,
+  before and after their margins were widened; a `settled()` returning at once failed the order test;
+  *Water logged: 250 ml.* in the English reply failed the figure check.
+- **The gate**, all five, twice — before the fix pass and after it:
+  - `✔ Test run with 368 tests in 45 suites passed`, then `✔ Test run with 371 tests in 46 suites passed`
+  - `Executed 26 tests, with 2 failures`; a full re-run, `with 1 failure`; after the fix pass,
+    `with 1 failure`: `testAServingAddedToYesterdayShowsUnderYesterday`, pre-existing — HEAD `4a7f4dd`
+    fails it identically on the same simulator
+  - `✔ Test run with 57 tests in 6 suites passed`, both times
+  - `** BUILD SUCCEEDED **` for `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`, both times
+- **Warnings: none new.** Clean builds of `git archive HEAD` and of the change into empty DerivedData,
+  the same sequence, all four schemes: identical per file and message, before and after the fix pass.
+- **On the simulator** (a throwaway probe, deleted): registration verified — the tile, its glyph and
+  colour, its Russian title. Execution not: *Unable to run App Shortcut*, `linkd` refusing the
+  ad-hoc-signed build for want of a Team ID. Siri did not come up; Spotlight's field did not appear to
+  the probe.
+- **The final review** — a fresh reviewer, read-only, typechecking isolation probes with the app
+  target's flags: no Critical, no defect, "With fixes". Fixed: the untested body of `perform()` (the
+  `logTheGlass(into:from:)` seam and `LogTheGlassTests`), three DocC passages this change had made
+  false, and the settle test's margins. Deferred minors: `nonisolated` stated on the two types;
+  `settled()` on a finished stream (#64).
+- **Not run: the owner's device check** (spec §8.3) — `perform()`'s first execution. To check there:
+  killed, suspended and foreground launches; a locked phone; a Glass edited away from 250; a reminder
+  due within the hour leaving the pending set; the watch face moving; Russian Siri; Siri running *Log a
+  Glass* and not *Log Water*; and "WaterBuddy" recognised inside Russian sentences.
+
+### Found along the way
+
+- **`testAServingAddedToYesterdayShowsUnderYesterday` saturates** once yesterday holds more rows than fit
+  on screen (#62).
+- **An App Shortcut cannot run from a simulator build here** — `linkd` wants a Team ID (#63).
+- **A first tap after launch was dropped once**, while another project's UI tests ran (#67).
+- **#57 refused the unit-test host too**, at 22:28:06.
+- **`docs/WIDGET.md` still said `AddWaterIntent`'s Shortcuts vocabulary was untranslated**, a day after
+  #1's fix.
+- **Rule `43-concurrency` says every target sets default MainActor isolation**; only the app target does
+  (#65).
+- **`AddWaterIntent`'s "registers twice" DocC claim** has no Apple source behind it (#66).
+
+## [2026-10-07] — `/doc_sync`: the thirty-sixth pass, after the Siri phrase
+
+### What changed
+
+- **`docs/AI_CONTEXT.md`:**
+  - the thirty-sixth pass header, with the thirty-fifth retained;
+  - the targets table (371 tests in 46 suites), five file rows — two re-counted, three new — and the
+    files-on-disk note re-derived;
+  - the app catalogue's row, 58 → 64 keys (stale since before the earlier-servings change), and a new
+    row for `AppShortcuts.xcstrings`;
+  - this pass's gate block — both runs — with the #60 block retained;
+  - #57 given the unit-test host's refusal; #62–#67 opened;
+  - the Git section, re-derived from the commands after the staging.
+- **`docs/WIDGET.md`:** the snapshot's `serving` now names `usualServing(in:)`; the "Shortcuts
+  vocabulary is not translated" section corrected, stale since #1 was fixed on 2026-10-06; Shortcuts'
+  second WaterBuddy action noted.
+- **`docs/STATE.md`:** the servings row names `usualServing(in:)`; no key moved.
+- **`CLAUDE.md`:** the Siri phrase as a third way in to the same serving; `addWater`'s two remaining
+  callers, `HomeView`'s row calling `addLog` directly.
+- **`tasks/lessons.md`:** three entries — a simulator build cannot run its own App Shortcut; a lazy
+  list's visible rows are not a count of its rows; read the conditional block before inserting beside a
+  declaration.
+- **The spec's** status line: implemented and staged, execution unproven until the device check.
+
+### Checked and already accurate
+
+- **`docs/DESIGN.md`:** no token or measured figure moved; the tile's `.blue` is a system
+  `ShortcutTileColor`, not an app colour.
+
+### Checks run
+
+- `find` over the seven target folders: 58 `.swift` files, none undocumented.
+- A script comparing all 61 documented line counts — 58 files and three `Tools/` scripts — with the
+  files: none stale after the edit (two were before it, `DataManager.swift` and
+  `NotificationManager.swift`).
+- `@Test` attribute counts: 371 phone, 57 watch; 13 UI `func test`.
+- The three exception sets: unchanged, six files each. `Key.all`: eleven keys.
+- Every `` rule `nn-name` `` cited in `CLAUDE.md`, `docs/`, `tasks/`, `HISTORY.md` and all seven target
+  folders resolves to a file in `.claude/rules/`.
+- `docs/AI_CONTEXT.md`'s `<details>` blocks balance: ten opened, ten closed.
+
+### Staging
+
+Written last, from the commands' own output; this file and `docs/AI_CONTEXT.md` staged once more after
+these lines:
+
+- **15 paths staged by explicit path:** the change's seven code, string and test files, the spec, the
+  plan, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` and
+  this file.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- **Not written:** spec §5's rule wording — put to the owner, and written only at their word.
+- HEAD is `4a7f4dd`, 68 commits, level with `origin/main`. This pass ran no `git commit`.
+
+## [2026-10-08] — The owner's ruling on the Siri phrase's rule wording
+
+### What
+
+Asked after the change was staged, the owner chose "Write §5 as proposed" — not the option that would
+also have corrected rule `43-concurrency`'s "every native target" claim (#65, left open). Written as the
+spec words it:
+
+- **`70-privacy`:** Siri's reply to *Log a Glass* is a public surface held to the reminders' standard,
+  pinned by `theSiriReplyCarriesNoUserValues`, and `LogServingIntent.authenticationPolicy` is
+  `.alwaysAllowed` on purpose; `AppShortcuts.xcstrings` is the one catalogue exempt from shipping all
+  three languages.
+- **`80-notifications`:** `LogServingIntent.perform()` holds the process open with
+  `await DataManager.remindersSettled()`, never by calling `reconcile` itself.
+- **`15-project`:** `LogServingIntent` and `WaterBuddyShortcuts` are app-only and out of every
+  exception set; `AppShortcuts.xcstrings` is a fifth catalogue, en and ru.
+- **`40-widget`:** `WaterSnapshot.serving` comes from `DataManager.usualServing(in:)`.
+- **`43-concurrency`:** two `static var`s, not one — `WaterBuddyShortcuts.appShortcuts` joins
+  `AddWaterIntent.parameterSummary`; the `nonisolated static` list gains `usualServing(in:)`.
+- **`20-state`:** the same list gains `usualServing(in:)`.
+
+The spec's status line and §5 heading now say the wording is written.
+
+### Staging
+
+Supersedes the previous checkpoint's staging block — 15 paths there, 21 now. Written last, from the
+commands' own output; this file and `docs/AI_CONTEXT.md` staged once more after these lines:
+
+- **21 paths staged by explicit path:** the previous checkpoint's 15 and the six rule files
+  (`15-project`, `20-state`, `40-widget`, `43-concurrency`, `70-privacy`, `80-notifications`; 23 lines
+  added, 5 removed), which `/commit` groups as workflow config — its own change.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- HEAD is `4a7f4dd`, 68 commits, level with `origin/main`. No `git commit` was run.
+
+## [2026-10-08] — `/doc_sync` re-run: the thirty-sixth pass, re-verified after the rule wording
+
+### What changed
+
+- **The spec** (`2026-10-07-siri-phrase-design.md` §3.5): one sentence still said rule
+  `43-concurrency` names `AddWaterIntent.parameterSummary` as the only `static var`; since the owner's
+  ruling it names both, and the sentence says so.
+- **`docs/AI_CONTEXT.md`:** the thirty-sixth pass's header records this re-verification.
+
+### Checked and already accurate
+
+- **No code changed since the final gate:** the seven staged code, string and test files are
+  byte-identical (`cmp`) to the export the second clean-build warning comparison built.
+- **`CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`:** nothing they state moved with
+  the rule edits; `CLAUDE.md` counts no string catalogues, and no doc quotes the old "one `static var`"
+  rule text.
+- **The other §5 references** are history — the retained thirty-fourth header, the spec's sequence and
+  its §5 record — or belong to the complication spec's own §5 (known issue #55, still open).
+
+### Checks run
+
+- `find` over the seven target folders: 58 `.swift` files, none undocumented.
+- A script comparing all 61 documented line counts with the files: none stale.
+- `@Test` attribute counts: 371 phone, 57 watch; 13 UI `func test`.
+- The three exception sets: unchanged, six files each. `Key.all`: eleven keys.
+- Every `` rule `nn-name` `` cited in `CLAUDE.md`, `docs/`, `tasks/`, `HISTORY.md`, `.claude/rules/` and
+  all seven target folders resolves to a file in `.claude/rules/`.
+- `docs/AI_CONTEXT.md`'s `<details>` blocks balance: ten opened, ten closed.
+- No gate re-run: no code changed after the final one, run in this session (see the thirty-sixth pass's
+  gate block).
+
+### Staging
+
+Written last, from the commands' own output; this file staged once more after these lines:
+
+- **21 paths staged by explicit path** — the same 21 as the previous checkpoint; the spec and
+  `docs/AI_CONTEXT.md` re-staged with this run's edits.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
+  `Screenshots/census/` still untracked.
+- HEAD is `4a7f4dd`, 68 commits, level with `origin/main`. No `git commit` was run.

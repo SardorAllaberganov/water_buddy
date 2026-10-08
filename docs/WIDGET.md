@@ -3,7 +3,7 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-07 (eleventh pass — `/doc_sync` after known issue #46: one sentence below still said `DataManager`'s reminder hook "spawns a detached `Task`"; it now queues each reconcile on one `ReconcileQueue`, in call order. No widget contract changed. Previously: tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
+**Last updated:** 2026-10-07 (twelfth pass — `/doc_sync` after roadmap item 4, the Siri phrase: the snapshot's `serving` now reads `DataManager.usualServing(in:)` — the same value, given one name the Siri shortcut also calls; the "Shortcuts vocabulary" section corrected from "not translated", stale since known issue #1 was fixed on 2026-10-06; and a note that Shortcuts now lists the app's own *Log a Glass* beside *Log Water*. No widget contract changed. Previously: eleventh pass — `/doc_sync` after known issue #46: one sentence below still said `DataManager`'s reminder hook "spawns a detached `Task`"; it now queues each reconcile on one `ReconcileQueue`, in call order. No widget contract changed. Previously: tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
 `role.mayFileReminders`, not `isAppExtension`. No widget contract changed. Previously: eighth pass — every `WaterSnapshot` field documented, and the timeline's code sample corrected: it still showed the memberwise midnight entry that was fixed. Previously: the button now logs `entry.snapshot.serving`, and `rolledOver()` fixes the midnight entry that dropped the chosen language)
 
 ---
@@ -55,7 +55,7 @@ open SwiftData (rule `40-widget`).
 | `currentWater` | `Key.currentWater`, with the day-ordinal rollover applied to the *returned value only* | the figure the vessel fills to |
 | `dailyGoal` | `resolveDailyGoal(in:)` | the denominator; a missing key read as `0` would draw the first sip as 100% |
 | `language` | `resolveLanguage(in:)` | the widget has its own strings table and its own process; without this it draws the *device* language while the app draws the chosen one |
-| `serving` | `resolveServings(in:)[1]` — the **middle** quick-add vessel | the vessels are user-editable, so the button's face and the amount it logs are no longer a constant both processes compile. They agree by reading one key instead |
+| `serving` | `DataManager.usualServing(in:)` — `resolveServings(in:)[1]` with a name: the **middle** quick-add vessel, and the one definition the Siri shortcut (`LogServingIntent`, app-only) logs too | the vessels are user-editable, so the button's face and the amount it logs are no longer a constant both processes compile. They agree by reading one key instead |
 
 `serving` is the newest and the one to reason about carefully: it is why `PourButton` takes an
 `Int` and builds `AddWaterIntent(amount:)` rather than `init()`. Taking it from the snapshot rather
@@ -298,14 +298,13 @@ Formats are positional (`%1$d`) rather than bare `%d` so a translator may reorde
 that its table agrees with the app's value for value, and that every translation carries the same
 format arguments as its key.
 
-### `AddWaterIntent`'s Shortcuts vocabulary is **not** translated
+### `AddWaterIntent`'s Shortcuts vocabulary is translated
 
-Found by this `/doc_sync` pass, and **not fixed here** — `/doc_sync` never touches source.
+*(This section said "**not** translated" until 2026-10-07. Known issue #1 was fixed on 2026-10-06 and
+the section was not updated with it; the code won.)*
 
-The build extracted nine further keys into the widget catalogue, all with no localisations at all.
-Three are dead (`+%lld`, `1,450 ml`, `Today` — extracted before the interpolated `Text` sites became
-`String(format:)`, and no longer produced by any source). One is deliberate (`%`). **The other five
-are `AddWaterIntent`'s entire Shortcuts-facing vocabulary:**
+Five strings in the widget's catalogue are `AddWaterIntent`'s entire Shortcuts-facing vocabulary, and
+all five ship in English, Russian and Uzbek:
 
 | String | Where the user sees it |
 |---|---|
@@ -315,17 +314,15 @@ are `AddWaterIntent`'s entire Shortcuts-facing vocabulary:**
 | `Millilitres of water to log.` | the `@Parameter` description |
 | `Log ${amount} ml of water` | `parameterSummary` |
 
-So a Russian or Uzbek user who adds the WaterBuddy action in Shortcuts gets an English one, while
-the widget beside it draws their language.
+They are `LocalizedStringResource` and `@Parameter` macro arguments — **compile-time constants** — so
+they cannot take a runtime bundle the way `Text(_:bundle:)` does: they follow the **device** language,
+resolved by the system, not the in-app language picker. `everyWidgetStringIsTranslatedUnlessDeliberatelyNot`
+checks the extension's own catalogue, the half `everyDrawnStringIsTranslatedUnlessDeliberatelyNot`
+(app bundle only) could never see.
 
-These are `LocalizedStringResource` and `@Parameter` macro arguments, which have to be **compile-time
-constants** — the file already records that constraint for a different reason. They cannot take a
-runtime bundle the way `Text(_:bundle:)` does, so honouring the in-app language picker here may not
-be possible at all; following the *device* language almost certainly is, by translating the keys and
-letting the system resolve them.
-
-`everyDrawnStringIsTranslatedUnlessDeliberatelyNot` did not catch this because it checks the **app**
-bundle only. The same check pointed at the extension would have.
+**Shortcuts lists a second WaterBuddy action** since 2026-10-07: *Log a Glass*, the app-only
+`LogServingIntent` behind the Siri phrase. Its strings live in the **app's** catalogue, not this
+one — it is not part of the extension (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`).
 
 ## Building it
 
