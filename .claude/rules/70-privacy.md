@@ -71,6 +71,10 @@ policy rather than a draft, closing that document's own §9.3.
 - Never store `remindersEnabled = true` on a refused authorization; set it from the grant result and
   clear it when the system state reads `.denied`
 - Touch only identifiers carrying `ReminderPlan.identifierPrefix` (rule `80-notifications`)
+- Siri's reply to *Log a Glass* is a public surface held to the same standard: one fixed, digit-free
+  `IntentDialog`, no user value, in every shipped language — `theSiriReplyCarriesNoUserValues` asserts
+  it as `theReminderCopyCarriesNoUserValues` does. `LogServingIntent.authenticationPolicy` is
+  `.alwaysAllowed` on purpose: logging water on a locked phone is harmless, and the reply says nothing
 
 ## Diagnostics carry no user data
 - A `#if DEBUG` diagnostic may name the failing condition and the App Group identifier only — never
@@ -101,6 +105,9 @@ policy rather than a draft, closing that document's own §9.3.
   `knownRegions` in step
 - Keep the four catalogues separate — `WaterBuddy/`, `WaterBuddyWidget/`, `WaterBuddyWatch/` and
   `WaterBuddyWatchWidget/`. A string catalogue is not shareable through a `membershipExceptions` entry
+- `WaterBuddy/AppShortcuts.xcstrings` holds Siri's phrases in English and Russian only — Siri has no
+  Uzbek. It is the one catalogue exempt from shipping all three; the intent's own strings live in the
+  app's `Localizable.xcstrings` in all three
 - Every key in `sharedKeys` must resolve to the identical value in both bundles, in every language.
   Add any new widget-drawn or widget-filed string to it. The watch's copies of phone strings are held
   to the same standard: `LocalizationTests` compares them against the app bundle in every language

@@ -83,7 +83,7 @@ after the body above had already conceded it.
 - `DataManager` stays `@MainActor`. Anything an extension's `nonisolated` code must reach —
   `defaultServing`, `defaultServings`, `maximumDailyIntake`, `appGroupIdentifier`, `isAppExtension`,
   `snapshot(defaults:calendar:now:)`, `dayOrdinal(for:in:)`, `resolveLanguage(in:)`,
-  `resolveServings(in:)` — is declared `nonisolated static` (rule `43-concurrency`)
+  `resolveServings(in:)`, `usualServing(in:)` — is declared `nonisolated static` (rule `43-concurrency`)
 - The clock and calendar are injected (`now: @escaping () -> Date = Date.init`,
   `calendar: Calendar = .waterBuddyDay`). Call `now()`, never a bare `Date()`, in any rollover,
   fetch-bounds or reminder-planning logic (rule `30-rollover`)

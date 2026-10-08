@@ -17,8 +17,8 @@ warning here is a Swift 6 error later.
 - A member the widget or a non-`@MainActor` test must reach is declared `nonisolated static` and
   takes its inputs (`UserDefaults`, `Calendar`, `Date`) as parameters rather than reading instance
   state: `snapshot(defaults:calendar:now:)`, `nextDayBoundary(after:calendar:)`,
-  `dayOrdinal(for:in:)`, `resolveLanguage(in:)`, `isAppExtension`, `appGroupContainerExists`, and
-  the shared constants
+  `dayOrdinal(for:in:)`, `resolveLanguage(in:)`, `usualServing(in:)`, `isAppExtension`,
+  `appGroupContainerExists`, and the shared constants
 - `isAppExtension` and `appGroupContainerExists` stay `nonisolated static let` lazy globals — both
   are read during `sharedDefaults`' own lazy initialiser
 - Give the production default of every injected `DataManager` side-effect closure as a
@@ -81,8 +81,9 @@ warning here is a Swift 6 error later.
   itself, where a `WCSessionDelegate` callback is explicitly **not** guaranteed to be on the main
   queue and `assumeIsolated` would trap rather than merely warn — which is exactly why `WristLink`
   posts instead of hopping, and leaves the hop to callers who can actually make that guarantee
-- Spell static properties on a `Sendable` type as `static let`. The one `static var` is
-  `AddWaterIntent.parameterSummary`, which the protocol requires
+- Spell static properties on a `Sendable` type as `static let`. The two `static var`s are
+  `AddWaterIntent.parameterSummary` and `WaterBuddyShortcuts.appShortcuts`, both computed and both
+  required by their protocols
 - `nonisolated(unsafe)` is permitted only for a value whose thread-safety is stated in a comment on
   the declaration; `sharedDefaults` is the sole instance
 

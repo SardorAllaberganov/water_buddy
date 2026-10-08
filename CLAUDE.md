@@ -195,9 +195,14 @@ something to record.
   draws. Both doors resolve it from `Key.servings` in the App Group suite, carried to the extension
   by `WaterSnapshot.serving`. `defaultServing` (formerly `standardServing`) is only the fallback
   and the middle of `defaultServings`; a widget that logged a different amount is still a bug the
-  user could only find by arithmetic, and the key is what prevents it (rule `20-state`)
-- **`addLog` is how water enters.** `addWater(amount:)` is a synonym kept so `HomeView`'s button
-  and the widget's `AddWaterIntent` did not change when the store did
+  user could only find by arithmetic, and the key is what prevents it (rule `20-state`). **The Siri
+  phrase is a third way in to the same serving:** "Log water in WaterBuddy" runs `LogServingIntent`,
+  app-only, in the app's own process, and logs `DataManager.usualServing(in:)` — the one definition
+  of the middle vessel, which the widget's snapshot reads too
+  (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`)
+- **`addLog` is how water enters.** `addWater(amount:)` is a synonym kept for the two callers that
+  log the usual serving — the widget's `AddWaterIntent` and the Siri shortcut's `LogServingIntent`;
+  `HomeView`'s row offers three vessels and calls `addLog` directly
 - **Today's total is derived, never authored** — `recomputeToday()` sums today's logs and writes
   the figure through the `currentWater` setter, so the clamp, the equality guard and the widget
   doorbell all still fire exactly once per real change (rule `20-state`)

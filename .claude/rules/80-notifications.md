@@ -121,6 +121,9 @@ system.
   the drink dropped. `anOlderPlanCannotRefileTheSlotANewerPlanDropped` pins it
 - `refresh()`'s unconditional reconcile on every foreground is the backstop for a widget tap the
   extension sandbox may not have permitted. Do not remove it as redundant
+- `LogServingIntent.perform()` holds the app process open until the reminder queue has run what its
+  mutation asked for — `await DataManager.remindersSettled()` — never by calling `reconcile` itself,
+  which would run outside the queue
 
 ## Tests
 - Every test fixture and every `#Preview` that constructs a `DataManager` passes

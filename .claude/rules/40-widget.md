@@ -57,6 +57,8 @@ target the file joins.
   the marker, never `guard let … else { water = 0 }`
 - `WaterSnapshot.percentage` stays `Int((progressUnclamped * 100).rounded())` — never "tidied" to
   `water * 100 / goal`, which rounds differently from the app
+- `WaterSnapshot.serving` comes from `DataManager.usualServing(in:)` — the one definition the Siri
+  shortcut also logs
 - Do not add a seventh file to the shared set. Anything both processes need goes into one of the
   existing six; `WaterSnapshot` and `AppLanguage` live in `DataManager.swift` for exactly this reason
 - Any change here keeps `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys`
