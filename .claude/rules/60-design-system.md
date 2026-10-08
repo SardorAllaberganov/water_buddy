@@ -108,3 +108,8 @@ one by eye breaks a contrast figure somebody measured.
 - Every glyph or annotation inside a capped container is sized as a **ratio** of that container,
   never with its own text style — a capped container and an uncapped text style cross over at the
   accessibility sizes (rule `65-accessibility`)
+- The Lock Screen widget draws no glass and no `Aurora` colour. iOS renders the iPhone Lock Screen in
+  the vibrant mode, which desaturates the widget into its own material, so it is built from the
+  system's accessory vocabulary instead — `.accessoryCircularCapacity` and `.accessoryLinearCapacity`
+  gauges, `.primary`/`.secondary` foreground styles, `AccessoryWidgetBackground` behind the button —
+  with no branch on `widgetRenderingMode` and no `colorScheme` override

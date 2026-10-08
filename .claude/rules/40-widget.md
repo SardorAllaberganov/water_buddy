@@ -150,8 +150,29 @@ target the file joins.
 - Hide the medium family's `Text`s with `.accessibilityHidden(true)` **individually** — never on the
   enclosing `VStack`, which also holds the button (rule `65-accessibility`)
 
+## The Lock Screen widget
+- `LockScreenWidget` is a second widget in the same extension, in its own file: its own `kind`
+  (`"WaterBuddyLockScreen"`), its own `StaticConfiguration`, and the three accessory families only.
+  Never add an accessory family to `WaterBuddyWidget` — its configuration is glass over an aurora
+  with the margins disabled, and every one of those applies to every family it lists
+- It reads through the same `HydrationProvider` and `HydrationEntry` — never a second provider — so
+  both widgets draw one snapshot, turn over at one midnight and reload together
+- It keeps iOS's own margins: `.contentMarginsDisabled()` belongs to the Home Screen configuration.
+  It still declares an empty `containerBackground(for: .widget)`, which the Lock Screen never draws
+  — without one, iOS overlays a warning on the widget during development
+- Its gallery strings are the Home Screen widget's two static literals
+- Its percentage is `WaterSnapshot.percentage` formatted with `.percent` under the snapshot's
+  locale — never a second rounding, and never a `%` key
+- Every figure carries `.privacySensitive()`, and every shape has its quiet form (rule `70-privacy`)
+- The rectangle's button is `Button(intent: AddWaterIntent(amount: entry.snapshot.serving))`,
+  `.buttonStyle(.plain)`, framed to `PourButton.minimumTarget` — the one definition both widgets
+  read. The circle and the line carry no button: two 44pt targets do not fit in the circle, and the
+  line is a single tap target that only opens the app
+- It injects `entry.snapshot.language.bundle` and `.locale` at its root, as `HydrationView` does
+
 ## Proving it
 - The app scheme does not compile the widget's sources. Build the extension separately after any
   change here, and after any change to one of the six shared files (rule `15-project`)
 - The widget's rendering has no automated coverage: put it on the Home Screen, in both light and
-  dark, and in a tinted (templated) configuration
+  dark, and in a tinted (templated) configuration — and the Lock Screen widget on the Lock Screen, in
+  all three shapes, with *Lock Screen Widgets* under *Allow Access When Locked* both on and off

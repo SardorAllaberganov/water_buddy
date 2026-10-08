@@ -7,7 +7,7 @@
 > | Target | Status |
 > |---|---|
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 26.5, `@Observable` `DataManager` over SwiftData |
-> | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: `StaticConfiguration` + interactive `AddWaterIntent` |
+> | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: two `StaticConfiguration`s over one provider — the Home Screen widget and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
 > | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage) plus the Xcode template's launch tests |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
@@ -162,8 +162,8 @@ something to record.
   `Calendar` and clock, so it structurally cannot see an entitlement that was not added, a file
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
   widget on the Home Screen after any change to storage, entitlements, target membership or the
-  widget's view tree — and the same for the watch face's complication, which no part of the
-  automated gate renders
+  widget's view tree — the Lock Screen widget on the Lock Screen too, and the same for the watch
+  face's complication, which no part of the automated gate renders
 - Ask yourself: "Would a staff engineer approve this?"
 
 ## Demand Elegance (Balanced)

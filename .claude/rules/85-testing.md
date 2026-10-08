@@ -143,8 +143,9 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
 ## A green suite is not proof the product works
 The suite injects its own `UserDefaults`, `Calendar` and clock, so it structurally **cannot** see an
 entitlement that was not added, a file missing from a target, or a widget that renders blank.
-**Neither widget's rendering has any automated coverage, on either platform** — the phone widget and
-the watch's `.accessoryCircular` face are both proved only by placing them and looking.
+**No widget's rendering has any automated coverage, on either platform** — the phone's Home Screen
+and Lock Screen widgets and the watch's `.accessoryCircular` face are all proved only by placing them
+and looking.
 
 After any change to storage, entitlements, target membership or the widget's view tree: run the app
 on the simulator and put the widget on the Home Screen — in light, in dark, and tinted. The same

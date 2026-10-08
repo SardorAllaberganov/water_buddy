@@ -36,8 +36,9 @@ Three limits are conditions of the permission:
   ledger is what makes a re-sent copy of a deleted serving a no-op rather than a resurrection —
   a privacy mechanism as much as a correctness one.
 - **No wire field may reach a notification, a Live Activity, or any surface outside the two
-  apps' own screens — with one named carve-out: the watch's own complication, on the watch's own
-  face.** `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` renders a percentage derived from the
+  apps' own screens — with two named carve-outs: the watch's own complication, on the watch's own
+  face, and the phone's own Lock Screen widget, on the phone's own Lock Screen.**
+  `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` renders a percentage derived from the
   stored `WristMirror` as an `.accessoryCircular` complication, which is a wire-derived value
   reaching a surface other than `WristView`'s own screen — but it is the exact precedent the phone
   side already permits for its own Home Screen widget (`WaterBuddyWidget`, drawing from
@@ -46,7 +47,11 @@ Three limits are conditions of the permission:
   Activity remain forbidden on both devices, in both directions, with no carve-out of any kind — this
   amendment only recognises that each device's own face-level complication was always meant to sit
   beside its device's own Home Screen widget as the one sanctioned "outside the app's own screen,
-  inside the device's own ambient surfaces" reading, and the original wording simply never said so
+  inside the device's own ambient surfaces" reading, and the original wording simply never said so.
+  The phone's Lock Screen widget joined it in
+  `docs/superpowers/specs/2026-10-08-lock-screen-widget-design.md`: `currentWater` counts pours the
+  watch authored, so the total it draws is wire-derived too, and it is held to the marking *The lock
+  screen is a public surface* sets out
 - **No third framework rides in behind it.** `HealthKit`, `CoreLocation` and `CloudKit` remain
   banned by name, and a watch app is exactly where someone will propose all three.
 
@@ -75,6 +80,18 @@ policy rather than a draft, closing that document's own §9.3.
   `IntentDialog`, no user value, in every shipped language — `theSiriReplyCarriesNoUserValues` asserts
   it as `theReminderCopyCarriesNoUserValues` does. `LogServingIntent.authenticationPolicy` is
   `.alwaysAllowed` on purpose: logging water on a locked phone is harmless, and the reply says nothing
+- **The phone's Lock Screen widget may show the user's own figures** — the percentage, today's
+  total, the goal — because the user put it there, as the watch's complication may on the watch
+  face; a notification may not, because it arrives unasked. In return, every view that draws a
+  figure carries `.privacySensitive()`, and every shape draws a quiet form — the drop, an empty ring
+  or bar, *Hydration* — whenever `redactionReasons` contains `.privacy`, so a user who turns off
+  *Allow Access When Locked → Lock Screen Widgets* sees no figure until the phone unlocks, as iOS
+  hides a notification's preview. The quiet form speaks no figure either: its elements carry their
+  label alone, and its button says *Log Water*
+- Never add an entitlement to hide the Lock Screen widget harder. The Data Protection entitlement
+  would hide every widget in the extension while locked and give it no runtime — the Home Screen
+  widget would go blank in StandBy — and *Nothing leaves the device* already forbids a second
+  entitlement without a written justification here
 
 ## Diagnostics carry no user data
 - A `#if DEBUG` diagnostic may name the failing condition and the App Group identifier only — never

@@ -97,6 +97,9 @@ rather than re-deriving it.
 - Expose selection with `.accessibilityAddTraits(isSelected ? [.isSelected] : [])`
 - Keep every tab's title and symbol non-empty and mutually distinct; an SF Symbol must be proved to
   resolve by a test, because an unknown symbol draws nothing at all
+- The Lock Screen widget's figures are one element per shape — label *Today's hydration*, value the
+  vessel's own percent-and-millilitres string — and its quiet form speaks no figure: the label alone,
+  and *Log Water* on the button. A figure hidden from sight is hidden from speech
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1
