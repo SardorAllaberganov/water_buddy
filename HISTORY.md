@@ -6030,3 +6030,226 @@ these lines:
 - **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), and
   `Screenshots/census/` still untracked.
 - HEAD is `562157e`, 72 commits, level with `origin/main`. No `git commit` was run.
+
+## [2026-10-08] — Log Water from Control Center
+
+Roadmap item 6. `LogWaterControl`, an iOS 18 `ControlWidget` in the widget extension, logs the Glass
+without opening the app — from Control Center, a Lock Screen control slot or the Action Button. It is a
+tile with the Glass's glyph and *Log Water* in the app's chosen language, and no figure. Its button is
+`AddWaterIntent(amount: snapshot.serving)` over a `ControlValueProvider` that reads
+`DataManager.snapshot(now:)`, the widgets' own read, and `DataManager.requestWidgetReload()` now also
+calls `ControlCenter.shared.reloadAllControls()`, so an edited Glass or a switched language reaches the
+control. The bundle lists it inside `if #available(iOS 18.0, *)` — the codebase's first version check;
+the floor stays 17.0. `DataManager.usualSlot` now names the slot every one-tap door logs, read by
+`usualServing(in:)` and by the control's glyph, and `AddWaterIntent` writes out its default
+`.alwaysAllowed`. Five rule files took the wording.
+
+### The rulings it rests on
+
+- **The owner's, 2026-10-08:** no task was named, so the roadmap's next unshipped item; the tile shows
+  its name and glyph only; approach A — a value provider over the existing intent — over a new
+  live-reading intent or a bare `AddWaterIntent()`; the design's two sections ("all ok"); then "go to
+  implementation". The spec was therefore written as the record, and its §5 rule wording — section 2's
+  substance, corrected since by the simulator and the review — is in the staged diff for the owner to
+  read, not approved verbatim before code.
+- **The executor's:** the provider at file scope, so no isolation is inferred from the control; the
+  title resolved in-process to a `String`; all controls reloaded rather than one kind, because a shared
+  file may not name the extension's type; `#if os(iOS)` on the reload; the rule section titled *The
+  Control Center control*, because rule `40-widget` already had *The control*; the comments' "iOS keeps
+  the value until asked" rewritten to what Apple documents.
+- **The final review's, adopted:** `usualSlot`, test-first, in place of a second `[1]`; the policy
+  written out; four rule sentences corrected; the spec's provider name, #53, the reload's real cost and
+  the Action Button hint's language; three device-check steps. **Recorded, not fixed:** a press before
+  the first unlock after a restart (whether iOS runs a control's intent then is unknown, and either fix
+  is its own change or crosses the owner's ruling), and `loadFromStore()` never re-reading
+  `remindersEnabled` (pre-existing).
+
+### Files touched
+
+| File | Lines | Change |
+|---|---|---|
+| `WaterBuddyWidget/LogWaterControl.swift` | 83 | new |
+| `WaterBuddyWidget/WaterBuddyWidgetBundle.swift` | 23 | +5 |
+| `WaterBuddyWidget/AddWaterIntent.swift` | 148 | +11/−2 — the policy written out, the control named |
+| `WaterBuddy/DataManager.swift` | 2570 | +22/−1 — the control reload; `usualSlot` |
+| `WaterBuddyTests/ServingSeamTests.swift` | 297 | +18 — two tests |
+| `WaterBuddyTests/LocalizationTests.swift` | 481 | +5 — DocC only |
+| `.claude/rules/40-widget.md` · `70-privacy.md` · `15-project.md` · `60-design-system.md` · `85-testing.md` | — | +30/−2 · +7 · +5 · +2 · +4/−3 |
+| `docs/superpowers/specs/2026-10-08-control-center-design.md` | 366 | new |
+| `tasks/lessons.md` | — | five entries appended |
+
+No catalogue, `DataManager.Key`, entitlement, Info.plist key, privacy manifest or `project.pbxproj` line
+changed.
+
+### Verification actually run
+
+- **RED → GREEN:** the extension build failed on "cannot find 'LogWaterControl' in scope", then built
+  with the file. `usualSlot`: RED on "type 'DataManager' has no member 'usualSlot'", then GREEN, 11 of 11
+  in `ServingResolutionTests`.
+- **Warnings — clean builds of all four schemes, before (a copy of the tree taken before the first edit)
+  and after the final code:** identical per file, message and count — 31/31 `WaterBuddy`, 31/31
+  `WaterBuddyWidgetExtension`, 2/2 `WaterBuddyWatch`, 31/31 `WaterBuddyWatchWidget`. The last was
+  compared only with the baseline run that compiled the same architecture set: from one clean run to
+  the next, that scheme alternates between two (`tasks/lessons.md`).
+- **The gate, on the final code:** phone unit `✔ 373 tests in 46 suites`; phone UI 26 executed, one
+  failure — #62's `testAServingAddedToYesterdayShowsUnderYesterday` (the first attempt was refused
+  `Busy` with no test run, and was re-run unchanged after the device finished booting); watch `✔ 57
+  tests in 6 suites`; both widget schemes built. An earlier gate pass, before the review's fixes, read
+  371 / the same failure / 57 / built / built; its `shutdown all` was skipped while another project's
+  `xcodebuild test` ran.
+- **On the simulator** (iPhone 17, iOS 26.5; a throwaway probe, deleted): the gallery offers *WaterBuddy
+  → Log Water* with the mug; placed, a small glyph-only tile; its title *Записать воду*, *Suvni qayd
+  etish*, *Log Water* following the app's picker with the phone in English. A press ran
+  `AddWaterIntent.perform()` through `chronod` — the first execution of that intent in any verification
+  here, where `linkd` refuses the widgets' buttons and the App Shortcut (#63). Glass 250 → 400 ml, a
+  press logged 400; back to 250, a press logged 250 — repeated on the final code. **Mutation:** with
+  the reload removed, each press logged the Glass from before the edit; the call was restored and
+  verified identical.
+- **Not run:** the owner's device check, spec §7.4 — nine steps, among them a locked phone, a press
+  before the first unlock, a Lock Screen slot, the Action Button and VoiceOver.
+
+### Found along the way
+
+- A control's press runs on the simulator, unlike the widgets' buttons and the App Shortcut.
+- XCUITest's `adjust(toNormalizedSliderPosition:)` moves a slider without committing it; for a while
+  that looked like a product bug.
+- The `WaterBuddy` scheme builds both watch targets as well as the widget extension (#69 widens).
+- Before the first unlock after a restart, a press might write through a fallback store and clear the
+  pending reminders — an open risk (spec §3.2).
+- `loadFromStore()` never re-reads `remindersEnabled`, so a live extension reconciles against the flag it
+  read at launch — pre-existing; the control raises its exposure.
+- With the app open, a press may leave Home's total stale until the next activation — unverified
+  (spec §8).
+
+## [2026-10-08] — `/doc_sync`: the thirty-eighth pass, after the Control Center control
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:** one undocumented file (`LogWaterControl.swift`, 83) and five stale line
+  counts — the change's own five edited files (`DataManager.swift` 2549 → 2570, `AddWaterIntent.swift`
+  139 → 148, `WaterBuddyWidgetBundle.swift` 18 → 23, `ServingSeamTests.swift` 279 → 297,
+  `LocalizationTests.swift` 476 → 481); the targets table's extension and test rows (371 → 373); the
+  front-doors paragraph and non-negotiable 19 (the control, `usualSlot`); a new gate block, the Lock
+  Screen widget's retained below it; the header, the thirty-seventh's kept in a `<details>` block. Two
+  older drifts caught by the count script: the file total read **58** — one short since
+  `LockScreenWidget.swift` joined (HEAD tracks 59; now 60) — and *Outside every target* still said
+  "the 53 above". Known issues **#72–#75 opened** (a press before the first unlock; `remindersEnabled`
+  never re-read; Home stale while the app is open; the control unverified on hardware), and **#53,
+  #63, #69, #70 annotated** with what the simulator showed.
+- **`docs/WIDGET.md`:** a *Control Center control* section; the bundle row; `authenticationPolicy` in
+  the intent's table and `init(amount:)` naming every button; the "only kind of button" paragraph
+  pointing at the control; the closing "place it" line; #69's note widened to the watch targets.
+- **`docs/STATE.md`:** `usualSlot` in the constants table; the servings row names the control as a third
+  reader. No key added, removed or renamed — still eleven.
+- **`CLAUDE.md`:** the target table's extension row; the *Two front doors* bullet (the control, a fourth
+  way in); *Verification Before Done* gains the control in Control Center.
+- **`tasks/lessons.md`:** five entries, appended earlier in this session.
+
+### Checked and already accurate
+
+- **`docs/DESIGN.md`:** the control draws no token and no measured figure; its `Last updated`
+  (2026-10-07) stands.
+- **Counts:** `@Test` 373 phone, 57 watch (the attribute grep); 13 UI `func test`; three exception sets,
+  `project.pbxproj` unchanged; `DataManager.Key` unchanged, the phone's nine in `CLAUDE.md` and
+  `docs/STATE.md`.
+- **Every documented line count** — 63, by a script comparing each with the file after the edit: none
+  stale, no file undocumented.
+- **Rule citations** across `CLAUDE.md`, `docs/`, `tasks/` and the two source folders all resolve;
+  `docs/AI_CONTEXT.md`'s `<details>` blocks balance, twelve and twelve.
+- **No gate re-run:** no code changed after the final gate in this session (the first checkpoint above).
+
+### Staging
+
+Written last, from the commands' own output; this file and `docs/AI_CONTEXT.md` staged once more after
+these lines:
+
+- **18 paths staged by explicit path:** five rule files (`15-project`, `40-widget`, `60-design-system`,
+  `70-privacy`, `85-testing`), which `/commit` groups as workflow config; `LogWaterControl.swift` (new),
+  `WaterBuddyWidgetBundle.swift`, `AddWaterIntent.swift`, `DataManager.swift`, `ServingSeamTests.swift`,
+  `LocalizationTests.swift`; the spec (new); `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`,
+  `docs/WIDGET.md`, `tasks/lessons.md` and this file.
+- **Five paths deliberately left unstaged** (#50's four, and `.claude/settings.json`), unchanged since the
+  session began, and `Screenshots/census/` still untracked.
+- HEAD is `be31994`, 76 commits, level with `origin/main`. No `git commit` was run.
+
+## [2026-10-08] — `/doc_sync` re-run: the thirty-eighth pass, re-verified
+
+The owner ran `/doc_sync` again straight after the thirty-eighth pass. No code had changed; this pass
+read the sections a count script cannot judge.
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`, *The process role*:** all ten `DataManager.swift` citations stale — the eight
+  guard sites and the two in its code sample. HEAD `be31994` already disagreed with every one (`role`
+  documented at `:1272`, standing at `:1380`); this change's `usualSlot` moved three further. Each
+  re-derived against its symbol (`role` `:1387`, `Role` `:1396`, sites `:479`, `:1016`, `:938`, `:1531`,
+  `:860`, `:1160`) and the section's note rewritten. The header records this re-verification.
+- **`docs/STATE.md`:** the same six guard sites, last checked 2026-09-01, and `role` in its code sample
+  (`:1149`) — all re-derived; its `Last updated` records it.
+- **`docs/WIDGET.md`:** the intent's parameter paragraph said only the widget's button goes through
+  `init(amount:)`; now every button — both widgets' and the control's.
+- **`CLAUDE.md`:** the warning baseline's "31 unique lines (80 occurrences)" re-measured 2026-10-08 —
+  31 unique again, 44 primary lines: occurrences move with the architectures a build compiles, the
+  unique lines do not, and #36's two `actool` lines appear in only one of the watch widget scheme's two
+  architecture sets. Dated rather than overwritten.
+- **`tasks/lessons.md`:** one entry — a doc sync that checks file lengths has not checked the lines it
+  cites.
+
+### Checked and already accurate
+
+- No forward-looking mention of the control as unbuilt; every "two widgets" left is history or names the
+  control too; no doc claims the code has no `#available`.
+- Non-negotiable 17 ("every widget tap" reaches `saveAndRecompute()`) holds for the control's press,
+  which is an extension tap like any other.
+- **Counts:** `@Test` 373 phone (stated in the header, the targets table and the gate block), 57 watch;
+  13 UI `func test`; 60 Swift files in the seven target folders and 63 documented line counts, none
+  stale, none undocumented; `DataManager.Key` unchanged; three exception sets unchanged.
+- Rule citations resolve; `<details>` balance, twelve and twelve; `docs/DESIGN.md` untouched — no token.
+- **No gate re-run:** no code changed since the final gate in this session.
+
+### Staging
+
+Written last, from the commands' own output; this file staged once more after these lines. The same
+18 paths as the thirty-eighth pass — `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
+`tasks/lessons.md` and this file re-staged with this pass's edits, no staged path holding a newer
+unstaged edit. The five unrelated paths stay unstaged and `Screenshots/census/` untracked; HEAD is
+`be31994`, 76 commits. `docs/AI_CONTEXT.md`'s *Git* block, written after the first pass's staging, still
+reads true. No `git commit` was run.
+
+## [2026-10-08] — `/doc_sync`, third run: the open known issues' own citations
+
+The owner ran `/doc_sync` a third time. No code had changed; this run went where the first two had not —
+`DataManager.Key` enumerated from the code, and every `file:NNN` inside the known issues resolved
+against its file.
+
+### Drift found and fixed
+
+- **Known issue #11 retired.** "The DocC on `refreshRepublishesLogsWrittenByAnotherInstance` describes
+  code that is not there" — but the DocC (`WaterLogTests.swift:431`) has read "Pins the
+  `republishTodaysLogs()`" since the repository's first commit (`69c5a39`), naming the re-derive as
+  rejected and citing #11 as the record. Retired in #12's form: struck through, the evidence first, the
+  original entry kept.
+- **Known issue #37:** `theOfferedRangeIsAWholeNumberOfSteps` in `DailyGoalSetupTests` stands at
+  `DataManagerTests.swift:1246`, not `:1213`; its other five citations hold.
+- **`tasks/lessons.md`:** one entry — an open known issue is a current-state claim — narrowing the second
+  run's lesson, which had exempted all known-issue records from the citation check.
+- **`docs/AI_CONTEXT.md`'s header** records this run.
+
+### Checked and already accurate
+
+- **`DataManager.Key`**, enumerated: eleven keys — the phone's nine and the watch's `wristOutbox` and
+  `wristMirror` — matching "nine" in `CLAUDE.md` and "eleven" in `docs/STATE.md`; plus the private
+  `prefix` and the `all` roster.
+- **The open issues' remaining citations:** #34's `GenerateAppIcon.swift:5-6` still holds its claim;
+  #29's `DataManagerTests.swift:1102` records an older pass's warning, as does the 300-test gate block
+  that names it. Every citation in a retired entry or retained block was left as written.
+- File list, line counts (63, none stale), `<details>` (twelve and twelve) and rule citations re-run
+  after the edits: all hold.
+- **No gate re-run:** no code changed since the final gate in this session.
+
+### Staging
+
+Written last; this file staged once more after these lines. `docs/AI_CONTEXT.md`, `tasks/lessons.md`
+and this file re-staged with this run's edits; the staged set is still the same 18 paths, none holding
+a newer unstaged edit. The five unrelated paths stay unstaged, `Screenshots/census/` untracked; HEAD
+`be31994`, 76 commits. No `git commit` was run.

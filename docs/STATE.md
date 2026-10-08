@@ -4,7 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-07 (twenty-second pass — `/doc_sync` after roadmap item 4, the Siri phrase (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`). **No key added, removed or renamed** — still eleven — and no stored byte changed: the servings row now names `DataManager.usualServing(in:)`, the one definition of the middle vessel that the widget's snapshot and the Siri shortcut both read. Previously: twenty-first pass — `/doc_sync` after roadmap item 3, a serving added or
+**Last updated:** 2026-10-08 (twenty-third pass — `/doc_sync` after roadmap item 6, the Control Center
+control (`docs/superpowers/specs/2026-10-08-control-center-design.md`). **No key added, removed or
+renamed** — still eleven — and no stored byte changed: one constant, `usualSlot`, now names the index
+`usualServing(in:)` reads, and the servings row names the control as a third reader. Re-verified the
+same day by a second `/doc_sync`, which found the seven `DataManager.swift` line numbers here stale —
+the six guard sites (last checked 2026-09-01) and `role` in the code sample — and re-derived them.
+Previously: 2026-10-07, twenty-second pass — `/doc_sync` after roadmap item 4, the Siri phrase (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`). **No key added, removed or renamed** — still eleven — and no stored byte changed: the servings row now names `DataManager.usualServing(in:)`, the one definition of the middle vessel that the widget's snapshot and the Siri shortcut both read. Previously: twenty-first pass — `/doc_sync` after roadmap item 3, a serving added or
 fixed at an earlier time or day (`docs/superpowers/specs/2026-10-07-earlier-servings-design.md`). **No
 key added, removed or renamed**: still **eleven**, re-derived from `DataManager.Key`, and no schema
 change — `WaterLog.timestamp` was already a `var`. What changed is derived state: a sixth observed
@@ -133,6 +139,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there and the Control Center control draws that slot's glyph, so the index is spelled once; `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08 |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth shared with the watch's side of the wire
@@ -148,7 +155,7 @@ total; the eight below plus three more, all documented in *The watch's own suite
 | `sardor.WaterBuddy.dailyGoal` | `Int` | `1...100_000` | **app only** | The target. Clamped to ≥ 1 so `progress` cannot divide by zero. Materialised at app launch so a widget never reads a missing key as `0` and shows the first sip as 100%. |
 | `sardor.WaterBuddy.lastActiveDay` | `Int` | `yyyyMMdd` ordinal | **app only** | The day `currentWater` belongs to. An ordinal, not a `Date`, so travel cannot re-interpret it (see below). |
 | `sardor.WaterBuddy.isGoalSet` | `Bool` | — | app only | Whether the user has *chosen* a goal, so setup is shown once. **Deliberately never materialised — its absence carries meaning.** |
-| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut logs** — read through `DataManager.usualServing(in:)`, the one definition both call — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
+| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut and the Control Center control log** — read through `DataManager.usualServing(in:)`, the one definition they all call, at the index named once as `DataManager.usualSlot` — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
 | `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
 | `sardor.WaterBuddy.language` | `String` | — | app + widget; the watch reads it secondhand, as `WristMirror.languageCode` | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
@@ -613,7 +620,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1149
+nonisolated static let role: Role = {          // DataManager.swift:1387
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -630,18 +637,19 @@ burn-once migration flag, and filing a duplicate reminder plan. Resolved from `i
 the compile-time platform rather than from a second runtime probe, because rule `25-shared-storage`
 forbids a competing detection scheme: two probes can disagree and leave one guard open.
 
-**Four writes are guarded, by three different questions** (line numbers re-verified 2026-09-01,
-after the watchOS plan's ~500-line addition shifted every one of them):
+**Four writes are guarded, by three different questions** (line numbers re-verified 2026-10-08 against
+each guard's own line — all six had moved since the 2026-09-01 check that followed the watchOS plan's
+~500-line addition):
 
-1. **Materialising `dailyGoal` in `init`** (`:448`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:479`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:867`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:798`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1293`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1016`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:938`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1531`, `mayHaveLegacyStandardDefaults`).
 
 Two further sites are guarded by the same enum but are not group bookkeeping: `republishHistory`
-(`:734`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:961`,
+(`:860`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:1160`,
 `mayFileReminders`, the one whose wrong answer is immediately user-visible).
 
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`

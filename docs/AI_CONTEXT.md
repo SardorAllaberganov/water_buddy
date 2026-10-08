@@ -4,6 +4,35 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-08 (thirty-eighth pass — `/doc_sync` after **roadmap item 6, the Control Center
+control**: `docs/superpowers/specs/2026-10-08-control-center-design.md`. A `ControlWidget`,
+`LogWaterControl` (kind `"WaterBuddyLogWater"`), in the existing extension, listed inside `if
+#available(iOS 18.0, *)` — the codebase's first version check, the floor still 17.0. It draws the Glass's
+glyph and *Log Water* in the app's language and no figure (the owner's ruling); its button is
+`AddWaterIntent(amount: snapshot.serving)` over a `ControlValueProvider` that reads
+`DataManager.snapshot(now:)`. `requestWidgetReload()` now also reloads controls, and
+`DataManager.usualSlot` names the Glass's index for `usualServing(in:)` and the glyph alike. The owner
+approved the design in conversation and asked to go straight to implementation, so the spec is the
+record and the wording in five rule files is in the staged diff for their reading. Gate on the final code
+— **373**/46 phone unit, **25 of 26** phone UI (#62, pre-existing), **57**/6 watch unit, both widget
+builds — with no new warning by clean builds. On the simulator the control was placed, its title followed
+the picker in all three languages, and a press **ran** — through `chronod`, not `linkd` (#63) — logging
+the stored Glass, an edited one included; a mutation run showed the reload is what delivers the edit. A
+fresh final review found no critical issue; its fixes are in. **This sync's own drift:** one
+undocumented file (`LogWaterControl.swift`), five line counts, the targets table and the test count.
+Known issues **#72–#75 opened**; #53, #63, #69 and #70 annotated. `CLAUDE.md`, `docs/WIDGET.md` and
+`docs/STATE.md` updated; `docs/DESIGN.md` checked and not touched — no token moved. **Re-verified the
+same day by a second `/doc_sync`**, which read the sections a count script cannot judge and found
+*The process role*'s ten `DataManager.swift` citations stale — wrong at HEAD already, three moved further
+by `usualSlot` — and seven more in `docs/STATE.md`, all re-derived against their symbols; plus one
+`docs/WIDGET.md` sentence naming only the widget's button and a `CLAUDE.md` warning-baseline note now
+dated. **A third `/doc_sync`** resolved the open known issues' own citations: **#11 retired** — its fix,
+the test's corrected DocC, on disk since the repository's first commit — and one of #37's lines moved
+33 down.)
+
+<details>
+<summary>Thirty-seventh pass — 2026-10-08, retained</summary>
+
 **Last updated:** 2026-10-08 (thirty-seventh pass — `/doc_sync` after **roadmap item 5, the Lock Screen
 widget**, owner-approved: `docs/superpowers/specs/2026-10-08-lock-screen-widget-design.md`, executed from
 `docs/superpowers/plans/2026-10-08-lock-screen-widget.md`. A second widget in the existing extension,
@@ -23,6 +52,8 @@ VoiceOver actually says stays the owner's device check's. **This sync's own drif
 (`LockScreenWidget.swift`), the targets table. Known issues **#68–#71 opened**. `CLAUDE.md` and
 `docs/WIDGET.md` updated; `docs/STATE.md` and `docs/DESIGN.md` checked and not touched — no key, no
 stored shape and no token moved.)
+
+</details>
 
 <details>
 <summary>Thirty-sixth pass — 2026-10-07, re-verified 2026-10-08, retained</summary>
@@ -481,14 +512,16 @@ than as a literal, because the widget's face says `+250 ml` and the two must not
 vessels' names, glyphs and order (`vesselSlots`) no longer live on `HomeView` — Task 14 moved them to
 file scope in `WaterSurface.swift`, because `WristView` became a second, non-view consumer of the
 identical menu (rule `50-views`). The three *amounts* still live on `DataManager.servings`, unchanged.
+Since 2026-10-08 the same intent also sits behind the Control Center control (iOS 18), which reads the
+same snapshot; the Glass's index is named once, `DataManager.usualSlot`, for its amount and its glyph.
 
 ## Targets
 
 | Target | Bundle id | Sources | Status |
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
-| `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 371 `@Test` functions in 46 suites |
+| `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent`; and, from iOS 18 behind the codebase's first `if #available`, the Control Center control `LogWaterControl` |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 373 `@Test` functions in 46 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (8 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **13 declared, 26 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
@@ -576,7 +609,7 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2549   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's and Siri's one definition), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
+WaterBuddy/DataManager.swift                    2570   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's and the control's one definition) at usualSlot (its index, named once), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
 WaterBuddy/HistoryView.swift                     959   app only — the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
@@ -603,11 +636,11 @@ WaterBuddyTests/HistoryRangeTests.swift          439   DaySummaryTests (pure, no
 WaterBuddyTests/HistoryViewTests.swift           132   HistoryServingTests — the editor's offered range, and the fixture's own tripwire
 WaterBuddyTests/HomeViewTests.swift              180   HomeServingTests — the quick-add row's offered vessels
 WaterBuddyTests/LiquidGlassTests.swift           135   LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response
-WaterBuddyTests/LocalizationTests.swift          476   the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two
+WaterBuddyTests/LocalizationTests.swift          481   the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
 WaterBuddyTests/NotificationManagerTests.swift   352   NotificationManagerTests — applying a plan, against a spy scheduler — + ReconcileQueueTests (not @MainActor), against SharedCentre, a lock-guarded stand-in two reconciles can reach at once
 WaterBuddyTests/ReminderPlanTests.swift          251   the plan — pure, and no UserNotifications import
 WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab bar's offered destinations
-WaterBuddyTests/ServingSeamTests.swift           279   ServingResolutionTests (pure, not @MainActor) + ServingSeamTests
+WaterBuddyTests/ServingSeamTests.swift           297   ServingResolutionTests (pure, not @MainActor; usualSlot is the Glass, and usualServing reads it) + ServingSeamTests
 WaterBuddyTests/SiriPhraseTests.swift            277   UsualServingTests + ReconcileQueueSettledTests (both not @MainActor) + LogServingIntentTests + LogTheGlassTests + AppShortcutPhraseTests
 WaterBuddyTests/WaterLogTests.swift              504   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
@@ -616,10 +649,11 @@ WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App 
 WaterBuddyUITests/GoalSetupUITests.swift         316   setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving added to yesterday
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
-WaterBuddyWidget/AddWaterIntent.swift            139   writes: runs DataManager in the extension
+WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
 WaterBuddyWidget/LockScreenWidget.swift          344   the Lock Screen widget (kind "WaterBuddyLockScreen"): circle, rectangle with the + (AddWaterIntent(amount: entry.snapshot.serving)), line — over the same HydrationProvider; every figure privacySensitive, a quiet form under .privacy; strings read only in child views
+WaterBuddyWidget/LogWaterControl.swift            83   the Control Center control (kind "WaterBuddyLogWater", iOS 18): ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving)), titled Log Water in the snapshot's language, the glyph at DataManager.usualSlot, no figure; LogWaterControlProvider reads DataManager.snapshot(now:)
 WaterBuddyWidget/WaterBuddyWidget.swift          593   reads the cache only, never SwiftData — the Home Screen widget; PourButton internal (its minimumTarget is the Lock Screen button's too)
-WaterBuddyWidget/WaterBuddyWidgetBundle.swift     18   two widgets: WaterBuddyWidget, LockScreenWidget
+WaterBuddyWidget/WaterBuddyWidgetBundle.swift     23   two widgets, WaterBuddyWidget and LockScreenWidget, and inside if #available(iOS 18.0, *) the control, LogWaterControl
 WaterBuddyWatch/WaterBuddyWatchApp.swift          77   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity) (which now awaits WristLink.waitForPendingDelivery() rather than returning at once), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
 WaterBuddyWatch/WristModel.swift                 305   watch app only, NOT shared — @Observable @MainActor, the watch's only writer to its own local suite; language, the phone's in-app choice read off the mirror; reloads the complication on every pour and every mirror that is news, and never takes a mirror older than the one held
@@ -635,19 +669,22 @@ WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 95   .accessoryCircular percen
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**58 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-07 in
-the thirty-sixth pass with `find` over all seven and a two-way comparison against this file: no
-phantom row, and the change's three new files — `LogServingIntent.swift`, `WaterBuddyShortcuts.swift`,
-`SiriPhraseTests.swift` — now listed. The 61 line counts here (58 files and the three Swift scripts
-below) were re-checked against `wc -l` by a script after the edit: none stale. *(The thirty-fifth pass
-found 1 stale of 58, the thirty-fourth 3 of 57, the thirty-third 6 of 56, the thirty-second 4, the
+**60 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-08 in
+the thirty-eighth pass with `find` over all seven and a two-way comparison against this file: no
+phantom row, and the change's one new file — `LogWaterControl.swift` — now listed. The 63 line counts
+here (60 files and the three Swift scripts below) were re-checked against `wc -l` by a script after the
+edit: none stale. *(This paragraph read 58 files until the thirty-eighth pass — one short since
+`LockScreenWidget.swift` joined: HEAD `be31994` tracks 59. The thirty-eighth pass found 5 stale counts
+— the change's own five edited files — and one file undocumented; the thirty-seventh, 2 stale and one
+undocumented; the thirty-fifth pass found 1 stale of 58, the thirty-fourth 3 of 57, the thirty-third 6 of 56, the thirty-second 4, the
 thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the twenty-eighth 7 of 55 on 2026-10-05.)*
 
 ### Outside every target
 
 `Tools/` sits outside all seven `PBXFileSystemSynchronizedRootGroup`s, so nothing in it is compiled
-into anything (rule `15-project`). It is **not** part of the 53 above, which is why earlier passes'
-"every file is documented" claim was true while omitting it:
+into anything (rule `15-project`). It is **not** part of the 60 above (read "53" until the
+thirty-eighth pass), which is why earlier passes' "every file is documented" claim was true while
+omitting it:
 
 ```
 Tools/GenerateAppIcon.swift                      267   generates the three iOS icon variants at 1024². Run: swift Tools/GenerateAppIcon.swift. Does NOT own the watch icon — see known issue #34
@@ -780,7 +817,9 @@ in `.claude/rules/`.
     `Key.servings` from the App Group suite; `WaterSnapshot.serving` is how it crosses. A constant
     re-introduced on either side is the drift `defaultServing` used to prevent by being the only
     spelling, and `theWidgetsServingIsTheAppsMiddleVessel` asserts the read at an *edited* value so
-    a constant would fail it.
+    a constant would fail it. The Control Center control reads the same snapshot, and its glyph the
+    same slot — `DataManager.usualSlot`, which `usualServing(in:)` reads too and
+    `theUsualSlotIsTheGlass` pins to the Glass — so its tile and the amount it logs cannot drift.
 20. **`WaterSnapshot.rolledOver()` is how the midnight entry is built, never a memberwise call.**
     Copying `self` and zeroing one field is what makes a forgotten field impossible. Built by
     enumeration, that entry silently reset `language` to `.system` — the widget reverted to the
@@ -808,12 +847,12 @@ in `.claude/rules/`.
 
 ## The process role
 
-`DataManager.role` (`DataManager.swift:1272`) resolves once, `nonisolated static let`, from
+`DataManager.role` (`DataManager.swift:1387`) resolves once, `nonisolated static let`, from
 `isAppExtension` plus `#if os(watchOS)` — never a second runtime probe, which rule
 `25-shared-storage` forbids because two probes can disagree and leave one guard open.
 
 ```
-enum Role: Sendable, CaseIterable {   // DataManager.swift:1281
+enum Role: Sendable, CaseIterable {   // DataManager.swift:1396
     case phoneApp, phoneExtension, watchApp, watchExtension
 }
 ```
@@ -826,14 +865,16 @@ answers all four for it:
 
 | Question | Gates | Sites |
 |---|---|---|
-| `ownsSharedStorage` | *is this container my own first-class home?* | `:459` goal materialisation, `:940` fresh-install day stamp |
-| `mayHaveLegacyStandardDefaults` | *has my `.standard` ever held WaterBuddy state?* | `:862` `seedFromCachedTotalIfNeeded`, `:1416` `migrateIfNeeded` |
-| `drawsHistory` | *do I have a history surface to draw?* | `:786` `republishHistory` |
-| `mayFileReminders` | *may I file notifications for this user?* | `:1084` `requestReminderReschedule` |
+| `ownsSharedStorage` | *is this container my own first-class home?* | `:479` goal materialisation, `:1016` fresh-install day stamp |
+| `mayHaveLegacyStandardDefaults` | *has my `.standard` ever held WaterBuddy state?* | `:938` `seedFromCachedTotalIfNeeded`, `:1531` `migrateIfNeeded` |
+| `drawsHistory` | *do I have a history surface to draw?* | `:860` `republishHistory` |
+| `mayFileReminders` | *may I file notifications for this user?* | `:1160` `requestReminderReschedule` |
 
-*(Every `DataManager.swift` line in this section was re-derived on 2026-10-07. All eight had gone
-stale as the file grew — `requestReminderReschedule`'s guard, for one, was documented at `:847` and
-stood at `:1067`.)*
+*(Every `DataManager.swift` line in this section was re-derived on 2026-10-08, in the thirty-eighth
+pass's re-run. All ten citations — the eight sites and the two in the code above — had gone stale
+again: HEAD `be31994` already disagreed with every one (`role` documented at `:1272`, standing at
+`:1380`), and this change's `usualSlot` moved three of them further. Previously re-derived on 2026-10-07,
+when `requestReminderReschedule`'s guard was documented at `:847` and stood at `:1067`.)*
 
 Only `.phoneApp` answers `true` to any of them today. The fourth is the one whose wrong answer is
 immediately user-visible: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a
@@ -851,6 +892,41 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five run twice on 2026-10-08, on Xcode 27.0, for roadmap item 6, the Control Center
+control** (the thirty-eighth pass): after the change, and again on the final code after the final
+review's fixes. Foreground, `-parallel-testing-enabled NO`, the commands as rule `85-testing` writes
+them; `xcrun simctl shutdown all` was skipped once, while another project's (`Glazzy`) `xcodebuild test`
+ran, and used before every other test run.
+
+| Command | Before the review's fixes | The final code |
+|---|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 371 tests in 46 suites passed` | `✔ Test run with 373 tests in 46 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `Executed 26 tests, with 1 failure` — #62 | `Executed 26 tests, with 1 failure` — #62; a first attempt was refused launch as `Busy` with no test run (#57), and re-run unchanged once the device had booted |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` | `** BUILD SUCCEEDED **` |
+
+**The UI failure is #62's**, at `GoalSetupUITests.swift:219`, the waiter timing out on the visible-row
+count as it does at HEAD; nothing this change touches is on its path.
+
+**Warnings: none new.** Clean builds into empty DerivedData of a copy of the tree taken before the first
+edit and of the final code, all four schemes, compared per file, message and count with positions
+stripped: identical — unique `path:line:col: warning:` lines 31/31 app, 31/31 widget, 2/2 watch, 31/31
+watch widget. The watch widget's scheme compiles a different architecture set from one clean run to the
+next (phone arm64 alone with the watch on two, or the reverse), and only the second shape prints #36's two
+`actool` lines, so its runs were compared only against the baseline run of the same shape
+(`tasks/lessons.md`).
+
+**Two new tests** — `theUsualServingIsReadFromTheUsualSlot` and `theUsualSlotIsTheGlass` — RED on the
+missing `usualSlot`, then GREEN; the control itself has no unit test (spec §6: no test target compiles
+the extension). **On the simulator** (a throwaway probe, deleted): the control was offered, placed (a
+small glyph-only tile) and titled in all three languages by the app's picker; a press ran
+`AddWaterIntent.perform()` through `chronod` and logged the stored Glass — 400 after an edit from 250,
+250 after the edit back, on the final code too — and a mutation run without the reload logged the Glass
+from before each edit. What only a device can show is #75.
+
+The Lock Screen widget's gate block, retained:
 
 **Gate — all five run three times on 2026-10-08, on Xcode 27.0, for roadmap item 5, the Lock Screen
 widget** (the thirty-seventh pass): after the plan's gate task, again after the ring's floor moved from
@@ -1635,16 +1711,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-08, the thirty-seventh) after the staging
+**There is a git repository.** Verified this pass (2026-10-08, the thirty-eighth) after the staging
 and before this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-562157e
+be31994
 $ git log --oneline | wc -l
-      72
+      76
 $ git diff --cached --name-only | wc -l
-      15
+      18
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
@@ -1654,14 +1730,15 @@ $ git status --short | grep -v -E '^[MA]  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** 15 paths are staged with explicit paths for the owner's
-`/commit` (rule `90-git`): the five rule files the owner approved on 2026-10-08 with the Lock Screen
-spec (`40-widget`, `60-design-system`, `65-accessibility`, `70-privacy`, `85-testing` — its §5 wording),
-which `/commit` groups as workflow config; the change (the new `LockScreenWidget.swift`,
-`WaterBuddyWidget.swift`, `WaterBuddyWidgetBundle.swift`); the spec and the plan; and `CLAUDE.md`,
-`docs/AI_CONTEXT.md`, `docs/WIDGET.md`, `tasks/lessons.md` and the `HISTORY.md` checkpoints. The code
-files staged are the ones the final gate and the last clean-build warning comparison ran on. The Siri
-phrase was committed and pushed before this work began (`1bedde7`, `2831f1c`, `610b81e`, `562157e`),
+**Nothing is committed by this pass.** 18 paths are staged with explicit paths for the owner's
+`/commit` (rule `90-git`): the five rule files with the Control Center control's wording (`15-project`,
+`40-widget`, `60-design-system`, `70-privacy`, `85-testing` — spec §5, which the owner approved in
+substance and has not yet read verbatim), which `/commit` groups as workflow config; the change (the new
+`LogWaterControl.swift`, `WaterBuddyWidgetBundle.swift`, `AddWaterIntent.swift`, `DataManager.swift`,
+`ServingSeamTests.swift`, `LocalizationTests.swift`); the spec; and `CLAUDE.md`, `docs/AI_CONTEXT.md`,
+`docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` and the `HISTORY.md` checkpoints. The code files
+staged are the ones the final gate and the last clean-build warning comparison ran on. The Lock Screen
+widget was committed and pushed before this work began (`0f4f1be`, `8a9016a`, `59f3848`, `be31994`),
 leaving `main` level with `origin/main`. **Five paths are deliberately left unstaged**, as at every
 commit since 2026-10-07: the two watch schemes and the two watch catalogues the Xcode app wrote (known
 issue #50), and `.claude/settings.json`, which moves `git commit` and `git init` from *ask* to *allow*
@@ -1671,7 +1748,8 @@ tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 68 commits on `main`;
+recorded — the authorization is in-conversation, scoped to this execution. 76 commits on `main` (the
+figure read 68 until the thirty-eighth pass);
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -1861,8 +1939,13 @@ and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
    hand-written list it replaced. The guarantee this entry claimed lives in
    `DataManagerTests.everyKeyTheProductWritesIsOnTheRoster` (`:125`), which drives the real writers,
    reads the suite back, and carries an anti-vacuity floor.
-11. **The DocC on `refreshRepublishesLogsWrittenByAnotherInstance` describes code that is not
-   there.** `WaterLogTests.swift:404` says it "Pins the `recomputeToday()` in
+11. ~~**The DocC on `refreshRepublishesLogsWrittenByAnotherInstance` describes code that is not
+   there.**~~ **Retired 2026-10-08 — the fix is on disk:** the test's DocC (`WaterLogTests.swift:431`,
+   above the test at `:450`) now reads "Pins the `republishTodaysLogs()` in `DataManager/refresh()`",
+   says the rows come from the republish and the total from `loadFromStore()`, names the re-derive as
+   tried and rejected, and records that an earlier edition claimed otherwise — citing this issue. It
+   has stood so since the repository's first commit (`69c5a39`); the entry stayed open because no pass
+   resolved its citation. The original entry follows, for the record: `WaterLogTests.swift:404` says it "Pins the `recomputeToday()` in
    ``DataManager/refresh()``" and reasons about "the re-derive". `refresh()` calls
    `loadFromStore()` → `resetIfNeeded()` → `republishTodaysLogs()` → `republishHistory()` →
    `rescheduleRemindersNow()`, and **not** `recomputeToday()` — while `republishTodaysLogs()`' own
@@ -2214,7 +2297,8 @@ rather than fixed — the review's own explicit call, not an oversight:**
     `progressUnclampedExceedsOneOnOverachievement` in both `DataManagerTests`
     (`DataManagerTests.swift:244`, `:232`) and `WaterSnapshotTests` (`WaterSnapshotTests.swift:91`,
     `:280`), and `theOfferedRangeIsAWholeNumberOfSteps` in both `DailyGoalSetupTests`
-    (`DataManagerTests.swift:1213`) and `HistoryServingTests` (`HistoryViewTests.swift:80`). All
+    (`DataManagerTests.swift:1246` — read `:1213` until 2026-10-08) and `HistoryServingTests`
+    (`HistoryViewTests.swift:80`). All
     pre-existing — found by this pass's own name sweep, not introduced by it. Every one passes; the
     cost is a name that no longer identifies one test in a report. Renaming them is test-only and
     mechanical, but it is its own change.
@@ -2416,7 +2500,9 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     extensions, so `AddWaterIntent.activateWristLinkIfNeeded()` is most likely inert, and the
     extension's publish throws into `requestWristPublish`'s `DEBUG`-only catch — skipping the push
     with it. Pre-existing; recorded now because the complication change makes it the largest gap left.
-    Check 5 of the device check settles whether that activation does anything at all.
+    Check 5 of the device check settles whether that activation does anything at all. *(2026-10-08:
+    the Control Center control's press is the same extension-side `AddWaterIntent`, so this covers it
+    too; the control spec's §7.4 step 1 settles it for that surface.)*
 54. **Two deliberate limits of the push design** (spec 2026-10-07 §9). A complication added to a face
     mid-day shows what the watch last heard until the next change, because adding it is not news to
     the phone. And a phone whose clock is set *behind* real time, while the watch keeps real time,
@@ -2535,7 +2621,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     (`Signature=adhoc`, `TeamIdentifier=not set`) despite `DEVELOPMENT_TEAM = 4DT6XGJF29`.
     `LogTheGlassTests` covers the body between the two waits; the waits, the reply, Siri and Spotlight
     are proved only on a team-signed device — the owner's device check (spec §8.3). Signing simulator
-    builds with the owner's identity would also reach it, and is theirs to decide.
+    builds with the owner's identity would also reach it, and is theirs to decide. *(2026-10-08: not
+    every intent surface goes through `linkd`. A Control Center control's press goes SpringBoard →
+    `chronod`, which ran `AddWaterIntent.perform()` on this simulator — the first time that intent has
+    executed in any verification here. The App Shortcut and the widgets' buttons are still refused.)*
 64. **Two deferred minors from the Siri phrase's final review.** (a) `LogServingIntent` and
     `WaterBuddyShortcuts` are nonisolated only because their protocols refine `Sendable` — the reviewer
     typechecked it under the app target's flags; stating `nonisolated` outright would document it, as
@@ -2570,7 +2659,8 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     extension. Rules `15-project` ("No scheme compiles a sibling's sources") and `40-widget` ("The app
     scheme does not compile the widget's sources"), `85-testing`, and the Lock Screen spec's §7.2 say
     otherwise. Their advice — build the extension's own scheme too — stays harmless. Rule text is the
-    owner's to change.
+    owner's to change. *(2026-10-08: `build -scheme WaterBuddy` also compiled `WaterBuddyWatch` and
+    `WaterBuddyWatchWidget` — the app embeds the watch app as well.)*
 70. **The Lock Screen widget is unverified on hardware** (spec `2026-10-08-lock-screen-widget-design.md`
     §7.5, nine steps). On the simulator the three shapes were placed, rendered and captured in all
     three languages, but: the **+** has never logged — `linkd` refuses the ad-hoc-signed extension
@@ -2582,10 +2672,49 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     gauge also appears with value `100%` beside its label). Whether Dynamic Type reaches a Lock Screen
     widget is unconfirmed: at `accessibility-extra-large` the shapes drew at the same size as at
     `large`. The simulator's Lock Screen keeps the three widgets, and its store the 2,000 ml the probe
-    logged (#5).
+    logged (#5). *(2026-10-08: `AddWaterIntent.perform()` itself has now run on the simulator, from the
+    Control Center control (#63's note), logging the stored Glass; the **+**'s own path to it, through
+    `linkd`, is still unproved.)*
 71. **Deferred minor from the Lock Screen widget's final review:** the ring's percentage `Text` has no
     `.lineLimit(1)`, though spec §3.5 says every text carries it. No behaviour changes — the gauge's
     label is already single-line, as the `38…` seen at the old 0.6 floor proved.
+
+**Opened by the 2026-10-08 Control Center control (roadmap item 6; the thirty-eighth pass):**
+
+72. **A press before the first unlock after a restart is an open risk** (spec
+    `2026-10-08-control-center-design.md` §3.2). The App Group store and suite stay encrypted until that
+    unlock, and `AddWaterIntent` is `.alwaysAllowed`. If iOS runs the control's intent then,
+    `sharedModelContainer` falls to a local or in-memory rung and keeps it for the extension process's
+    life; the pour lands where the app never reads; `recomputeToday()`, reading a store that
+    *succeeded*, could write that one pour as today's total; and `remindersEnabled` reads `false`, so
+    the awaited reconcile clears every pending reminder until the app next comes forward. The widgets'
+    buttons never reach this — iOS holds them until an unlock. Whether iOS runs a control's intent before
+    the first unlock at all is unknown, and the simulator cannot say: the device check's step 4. If it
+    does, `perform()` declining unless the store resolved to the App Group rung is its own change;
+    requiring the passcode would cross the owner's "log without unlocking" ruling. Found by the final
+    review.
+73. **`loadFromStore()` never re-reads `remindersEnabled`.** It is read once, in `init`, while
+    `servings` and `language` are re-read on every `refresh()`. A widget extension that stays alive
+    keeps the flag it read at launch: turn reminders on in the app, then press the control (or a
+    widget's **+**) before iOS ends the extension, and its reconcile files an empty plan — clearing the
+    pending set until the app next comes forward; turning them off in the same window refiles them.
+    Pre-existing; the control makes a press while the extension lives more likely. The fix — re-read
+    the flag behind the same equality guard, with a `refreshPicksUpAnExternalWrite`-style test — is its
+    own change. Found by the final review's reading; not reproduced.
+74. **With WaterBuddy open, a control press may leave Home's total stale** until the next activation or
+    tab switch. The app re-reads on `scenePhase == .active` and on a tab's `onAppear`; an Action Button
+    press may cause neither, and Control Center's dismissal can race the extension's write. No serving
+    is lost — `addLog` re-reads first. Back Tap automations could do this before; the Action Button
+    makes it routine. Unverified: the device check's step 6. A fix — a Darwin notification posted at
+    the end of `perform()`, answered in the app with `refresh()`, say — would be its own change.
+75. **The Control Center control is unverified on hardware** (spec `2026-10-08-control-center-design.md`
+    §7.4, nine steps). On the simulator it was placed, titled in all three languages by the app's
+    picker, and pressed — logging the stored Glass, an edited one included. Not shown there: a press on
+    a locked iPhone (and whether iOS asks for the passcode despite `.alwaysAllowed`), a press before the
+    first unlock (#72), a Lock Screen slot, the Action Button, VoiceOver, a wide tile's title on screen,
+    the watch's reception (#53) and Home while the app is open (#74). The Action Button's hint follows
+    the phone's language — iOS derives it from the display name — while the tile follows the app's.
+    The simulator keeps the control placed, and nine presses' servings, 2,700 ml, in today's log (#5).
 
 ## Where the rest is written down
 

@@ -3,7 +3,11 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-08 (thirteenth pass — `/doc_sync` after roadmap item 5: the extension now
+**Last updated:** 2026-10-08 (fourteenth pass — `/doc_sync` after roadmap item 6: the extension also
+holds **a control**, `LogWaterControl`, listed from iOS 18 inside `if #available(iOS 18.0, *)` — its own
+section below. `AddWaterIntent` writes out its default `authenticationPolicy`, and
+`DataManager.requestWidgetReload()` now reloads controls as well as timelines. Neither widget's contract
+changed. Previously: thirteenth pass — `/doc_sync` after roadmap item 5: the extension now
 holds **two widgets**, and the second, `LockScreenWidget`, has its own section below. The Home Screen
 widget's contract is unchanged except that `PourButton` is no longer `private` — its `minimumTarget` is
 the Lock Screen button's floor too. Previously: twelfth pass — `/doc_sync` after roadmap item 4, the Siri phrase: the snapshot's `serving` now reads `DataManager.usualServing(in:)` — the same value, given one name the Siri shortcut also calls; the "Shortcuts vocabulary" section corrected from "not translated", stale since known issue #1 was fixed on 2026-10-06; and a note that Shortcuts now lists the app's own *Log a Glass* beside *Log Water*. No widget contract changed. Previously: eleventh pass — `/doc_sync` after known issue #46: one sentence below still said `DataManager`'s reminder hook "spawns a detached `Task`"; it now queues each reconcile on one `ReconcileQueue`, in call order. No widget contract changed. Previously: tenth pass — /doc_sync after the App Store preparation work: the build command here was still pinned to `OS=18.6,name=iPhone 16` and is now `OS=26.5,name=iPhone 17`, and the extension's deployment target moved 26.5 → 17.0 to close a live defect where the widget did not exist on any device below 26.5 while its host app deployed to 18.6. The widget contract itself — families, timeline, rendering modes, intent parameters — is unchanged. Previously: ninth pass — one sentence: the reminder hook's early return is
@@ -23,7 +27,7 @@ the Lock Screen button's floor too. Previously: twelfth pass — `/doc_sync` aft
 | `configurationDisplayName` | `"Hydration"` — **static literal** |
 | `description` | `"Track today's hydration and log a glass without opening the app."` — **static literal** |
 | Content margins | `.contentMarginsDisabled()` |
-| Bundle | `WaterBuddyWidgetBundle` (`@main`), two widgets — this one and `LockScreenWidget` (*The Lock Screen widget*, below) |
+| Bundle | `WaterBuddyWidgetBundle` (`@main`), two widgets and a control — this one, `LockScreenWidget` (*The Lock Screen widget*, below) and, inside `if #available(iOS 18.0, *)`, `LogWaterControl` (*The Control Center control*, below) |
 | Gallery name | `INFOPLIST_KEY_CFBundleDisplayName = Hydration` |
 | Info.plist | `WaterBuddyWidget-Info.plist` → `NSExtensionPointIdentifier = com.apple.widgetkit-extension` |
 
@@ -168,7 +172,8 @@ exactly the label's frame.
 
 `Button(intent:)` is the **only** kind of button a widget can have: the archive carries the intent
 and the system runs it on tap. `.buttonStyle(.plain)`, or the system draws
-`WidgetBorderedButtonStyle`'s capsule over the glass.
+`WidgetBorderedButtonStyle`'s capsule over the glass. (A control is not a widget: its button is a
+`ControlWidgetButton` — *The Control Center control*, below.)
 
 ### `AddWaterIntent`, as Shortcuts sees it
 
@@ -177,18 +182,19 @@ and the system runs it on tap. `.buttonStyle(.plain)`, or the system draws
 | `title` | `"Log Water"` (a `let` — a `static var` on a `Sendable` type is an error in the Swift 6 mode) |
 | `description` | `"Adds a serving of water to today's total in WaterBuddy."`, `categoryName: "Hydration"` |
 | `openAppWhenRun` | `false` |
+| `authenticationPolicy` | `.alwaysAllowed` — the protocol's default, written out on 2026-10-08 because the control's locked-phone ruling rests on it (rule `70-privacy`) |
 | `@Parameter amount` | title `"Amount"`, description `"Millilitres of water to log."`, `default: 250`, `inclusiveRange: (1, 100_000)` |
 | `parameterSummary` | `"Log \(\.$amount) ml of water"` |
 | `init()` | sets `amount = DataManager.defaultServing` — the `AppIntent` requirement and the Shortcuts default, **not** the path the widget button takes |
-| `init(amount:)` | explicit amount — **this is what the button uses**, with `entry.snapshot.serving` |
+| `init(amount:)` | explicit amount — **this is what every button uses**: both widgets' with `entry.snapshot.serving`, the control's with its provider's `snapshot.serving` |
 | `perform()` | `@MainActor` → `DataManager.shared.addWater(amount:)`, then `WidgetCenter.shared.reloadAllTimelines()`, then **`await NotificationManager.reconcile(…)`** |
 
 `@Parameter` is a macro and its arguments must be compile-time constants, so they **cannot** spell
 `DataManager.defaultServing` or `maximumDailyIntake` — and especially cannot spell a value the user
 edits at runtime. Those literals are only what Shortcuts pre-fills and validates against when a
-person builds an automation by hand; the widget's button goes through `init(amount:)` with
-`entry.snapshot.serving`, and `addWater` does the real clamping
-regardless of what any caller asks for.
+person builds an automation by hand; every button goes through `init(amount:)` — both widgets' with
+`entry.snapshot.serving`, the control's with its provider's `snapshot.serving` — and `addWater` does
+the real clamping regardless of what any caller asks for.
 
 `@MainActor` on the implementation of a `nonisolated` protocol requirement is legal and
 warning-free in **both** language modes — verified by compiling under `-swift-version 5` and
@@ -375,6 +381,43 @@ extension, #63), the quiet form, and what VoiceOver says — SpringBoard's XCUIT
 texts beneath each combined element whatever the flags (#70). The owner's device check (spec §7.5) is
 the proof.
 
+## The Control Center control
+
+Added 2026-10-08 (roadmap item 6; spec `docs/superpowers/specs/2026-10-08-control-center-design.md`,
+the authority for everything below; rules `40-widget`, `70-privacy`, `15-project`,
+`60-design-system`, `85-testing`).
+
+| | |
+|---|---|
+| Type | `ControlWidget` — `LogWaterControl`, in `WaterBuddyWidget/LogWaterControl.swift`, `@available(iOS 18.0, *)`; the bundle lists it inside `if #available(iOS 18.0, *)`, the codebase's first version check |
+| `kind` | `"WaterBuddyLogWater"` (`LogWaterControl.kind`) — permanent: iOS identifies every placed control by it |
+| Configuration | `StaticControlConfiguration(kind:provider:)` |
+| Provider | `LogWaterControlProvider` (`ControlValueProvider`, private, file scope): `currentValue()` returns `DataManager.snapshot(now: Date())`; `previewValue` is the default Glass in `.system` |
+| Button | `ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving))` — the Glass, from the snapshot |
+| Title | *Log Water*, resolved from `snapshot.language.bundle` and handed over as a `String` — the app's chosen language |
+| Glyph | `vesselSlots[DataManager.usualSlot].symbol` — `mug.fill`, the slot `usualServing(in:)` reads |
+| Gallery strings | `.displayName("Log Water")`, `.description("Adds a serving of water to today's total in WaterBuddy.")` — `AddWaterIntent`'s own, static; iOS draws them, and the Action Button's hint, in the phone's language |
+| Figures | **none** — no total, goal, percentage or serving size (rule `70-privacy`) |
+
+**Where it appears.** Control Center (a small tile draws the glyph alone), the Lock Screen's two control
+slots, and the Action Button on iPhone 15 Pro and later — one control for all three.
+
+**What keeps it current.** iOS builds the control from a value it reads when it chooses; a reload is
+Apple's documented way to have it read again. `DataManager.requestWidgetReload()` — rung by every setter
+that can change the Glass or the language — calls `ControlCenter.shared.reloadAllControls()` beside
+`reloadAllTimelines()`, inside `#if os(iOS)` and `if #available(iOS 18.0, *)`. Measured on the
+simulator: without it, a press made after an edit logged the previous Glass.
+
+**A press** runs `AddWaterIntent.perform()` in the extension, as the widgets' **+** does — through
+`chronod`, which on the simulator runs it where `linkd` refuses the widgets' buttons (#63). With
+`.alwaysAllowed` it is meant to log without unlocking; whether iOS honours that on a locked iPhone, and
+what happens before the first unlock after a restart (#72), is the device check's.
+
+**Proved and not.** On the simulator: offered in the controls gallery, placed, its title following the
+app's picker in all three languages, a press logging the stored Glass — an edited one included — and
+a mutation run showing the reload is what delivers the edit. **Not proved:** a locked phone, a press
+before the first unlock, a Lock Screen slot, the Action Button and VoiceOver (spec §7.4, #75).
+
 ## Building it
 
 **The app scheme does not compile the extension's own sources.** A widget-only break passes a green
@@ -400,10 +443,11 @@ defect in a shipped configuration, invisible to every build and test. Both are n
 cost no source changes at all, proven by building at both floors and diffing the warning sets.
 
 Neither this nor the unit suite can see a widget that renders blank. After any change to the
-widget's view tree, entitlements or target membership, place it on a Home Screen — and the Lock Screen
-widget on a Lock Screen.
+widget's view tree, entitlements or target membership, place it on a Home Screen — the Lock Screen
+widget on a Lock Screen, and the control in Control Center.
 
 *(2026-10-08: "The app scheme does not compile the extension's own sources", above, is not what the
 build does — `build-for-testing -scheme WaterBuddy` compiled `LockScreenWidget.swift` in target
 `WaterBuddyWidgetExtension`, because the app embeds the `.appex`. Known issue #69; the sentence mirrors
-rule `40-widget`, whose text is the owner's, so it is flagged here rather than rewritten.)*
+rule `40-widget`, whose text is the owner's, so it is flagged here rather than rewritten. Seen again on
+2026-10-08: `build -scheme WaterBuddy` also compiled both watch targets, which the app embeds too.)*

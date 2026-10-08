@@ -2329,3 +2329,78 @@ SpringBoard can show that a widget exists and what it draws, never what is spoke
 build the extension's own scheme as well — stays harmless; the sentence is not what the build does.
 
 **The rule:** read a scheme's build list from its log, not from a rule's sentence about it.
+
+## 2026-10-08 — Two clean builds of one scheme can compile different architectures
+
+Two clean builds of `WaterBuddyWatchWidget`, from one command into two empty folders, compiled
+different sets: the first built the phone targets for arm64 alone and the watch targets for arm64 and
+x86_64, the second the reverse — and only the second printed #36's two `actool` trait-set warnings.
+Every phone-file warning count doubled between them, and a per-message diff read as a regression that
+was not there. A second pair, both on the same set, matched exactly, counts included.
+
+**The rule:** before comparing a scheme's warnings, print each run's `SwiftCompile normal <arch> … in
+target` set beside the counts, and compare only runs whose sets agree.
+
+## 2026-10-08 — An API's doc comment is not a statement about caching
+
+The Control Center control's comments said iOS "keeps the value … until asked to read again". The SDK
+says only that `reloadAllControls()` "Reloads the templates for all configured controls belonging to
+the containing app" — nothing about what iOS does without one. The sentence had reached a DocC comment,
+a rule and the spec before the doc text was read.
+
+**The rule:** when a comment explains why a system call is there, quote what Apple documents and mark
+anything beyond it as inferred — before the sentence is copied anywhere else.
+
+## 2026-10-08 — XCUITest's `adjust` moves a slider without committing it
+
+`app.sliders["Glass"].adjust(toNormalizedSliderPosition:)` moved the Settings slider to 300 ml — its own
+value read `300 millilitres` — while Home's button still read *Glass, add 250 millilitres*, and the
+slider re-seeded to 250 on return: `manager.servings` was never set, so nothing reloaded. A real touch —
+`press(forDuration:thenDragTo:withVelocity:thenHoldForDuration:)` starting on the thumb's centre, read
+off a capture — committed 250 → 400 at once. For a while the miss looked like a product bug.
+
+**The rule:** prove a slider edit by reading the model back through another screen, never by the
+slider's own value; and drive a slider that commits on release with a real drag on its thumb.
+
+## 2026-10-08 — A control's press runs on a simulator
+
+The widgets' **+** and the App Shortcut never ran here — `linkd` refuses an ad-hoc-signed client (#63).
+A Control Center control's press goes another way: SpringBoard ("Control action: asked to perform") to
+`chronod`, which ran `AddWaterIntent.perform()` in the extension and logged the Glass. One `log show`
+over `chronod`, SpringBoard and the extension's process showed the press, the perform, and every
+`Reload live control` with its reason.
+
+**The rule:** before writing "device only" against an intent, find out which daemon runs it from that
+surface; a control can be proved end to end on the simulator.
+
+## 2026-10-08 — A probe can read the gallery's copy of what it meant to place
+
+A control left in the gallery's search results from an earlier run sat over Control Center, and the
+probe's `springboard.buttons["WaterBuddyLogWater"]` found the gallery's cell: it "read" the placed tile's
+title in English, then found nothing at all after a language change. The capture showed the gallery.
+
+**The rule:** before reading a placed element, prove no sheet sits over it (the gallery's *Sheet
+Grabber*) and read inside the surface's own container (`cc-root-folder-view`); capture every step.
+
+## 2026-10-08 — A doc sync that checks file lengths has not checked the lines it cites
+
+The thirty-seventh and thirty-eighth passes each re-checked every documented line count by script and
+reported nothing stale, while *The process role* in `docs/AI_CONTEXT.md` cited ten `DataManager.swift`
+lines and `docs/STATE.md` seven — all of them stale, `role` cited at `:1272` and `:1149` for a `static
+let` standing at `:1387`. STATE's had last been checked on 2026-09-01. A second `/doc_sync` the same day
+found them by reading the sections rather than counting files.
+
+**The rule:** in every sync, resolve each `file:NNN` in a current-state section against the symbol it
+names — `sed -n 'NNNp'` piped to a grep for that symbol — not against its "re-verified" date. Leave the
+citations inside retained blocks and known-issue records alone: those describe their own day.
+
+## 2026-10-08 — An open known issue is a current-state claim
+
+The entry above exempted "known-issue records" from that check, and was too broad. A third sync resolved
+the citations in the *open* issues anyway: #11 — "the DocC describes code that is not there" — had been
+fixed since the repository's first commit, its own DocC citing #11 as the record, yet stood open through
+every pass since; and #37 named a test 33 lines from where it stands. A retired entry and a retained
+block describe their own day; an open entry describes today.
+
+**The rule:** in every sync, resolve the citations of each *open* known issue and retire any whose fix is
+on disk. The exemption above covers retired entries and retained blocks only.
