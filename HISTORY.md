@@ -6253,3 +6253,115 @@ Written last; this file staged once more after these lines. `docs/AI_CONTEXT.md`
 and this file re-staged with this run's edits; the staged set is still the same 18 paths, none holding
 a newer unstaged edit. The five unrelated paths stay unstaged, `Screenshots/census/` untracked; HEAD
 `be31994`, 76 commits. No `git commit` was run.
+
+## [2026-10-08] — The medium widget's figures follow the app's language
+
+Known issue #68. With the app in one language and the phone in another, the medium Home Screen widget
+drew its two figure lines in the phone's language, beside a button in the app's. The two lines are
+today's millilitres and the goal under them. `HydrationView` injected the snapshot's bundle as
+`\.strings` in its own `body`, but resolved both lines through its own `strings`, which comes from above
+the view.
+
+The medium family's column is now `MediumColumn`: both lines, the spacer and the pour button, with every
+modifier and comment unchanged. It is a `private` view beneath the injection and reads `strings` itself,
+the pattern `LockScreenView`'s shapes already follow. `HydrationView` declares no `strings` at all, and
+its DocC says why, in `LockScreenView`'s words. `totalSize` moved with the two lines that read it.
+
+### The rulings it rests on
+
+- **The owner's, 2026-10-08:** no task was named, and the roadmap's *Now* and *Next* lists had all
+  shipped. The owner chose #68 ahead of the roadmap's two owner's-call items (Apple Health, StoreKit), then
+  approved the plan in plan mode: the column as a view of its own, and a throwaway probe for RED and GREEN.
+- **The executor's:**
+  - The whole column moved, rather than each line being wrapped in a view taking a key. A custom view is
+    transparent to layout, and this way needs no stringly-typed helper.
+  - The `.dynamicTypeSize` cap stays inside the new body, so `totalSize` reads exactly what it read
+    before (#76).
+  - Two alternatives were rejected. Reading the snapshot's bundle directly at the two sites leaves a
+    second way to resolve a string. Moving the injection up into the configuration closure splits the two
+    widgets' patterns and makes rule `40-widget`'s "as `HydrationView` does" untrue.
+
+### Files touched
+
+| File | Lines | Change |
+|---|---|---|
+| `WaterBuddyWidget/WaterBuddyWidget.swift` | 615 | +65/−43 — `MediumColumn`; `HydrationView`'s DocC; its `strings` and `totalSize` removed |
+
+No shared file, catalogue, `DataManager.Key`, entitlement, Info.plist key, privacy manifest, rule or
+`project.pbxproj` line changed.
+
+### Verification actually run
+
+- **RED → GREEN, by a throwaway probe.** The probe was `WaterBuddyUITests/HomeWidgetLanguageProbe.swift`,
+  deleted before staging; `git status` showed nothing left of it.
+  - **Method:** it placed a medium widget on the simulator's Home Screen (iPhone 17, iOS 26.5). With the
+    phone in English, it set the app to Russian and then Uzbek, waited each time until the widget's own
+    button spoke that language, and asserted on SpringBoard's tree.
+  - **Old code:** `+250 мл` beside `7450 ml` and `of 2000 ml`, and Uzbek's goal line `of 2000 ml`. It
+    failed on "no Russian goal line beside the Russian button".
+  - **Fixed code:** `7450 мл` / `из 2000 мл` / `+250 мл` and `7450 ml` / `2000 ml dan` / `+250 ml`. It
+    passed.
+  - Five earlier runs failed on probe mechanics alone (`tasks/lessons.md`).
+- **The layout did not move:** the English card's region, 1059 × 498 px, is byte-identical before and
+  after.
+- **Light and dark were captured;** the simulator had been in dark. **Tinted was not captured:** the
+  attempt timed out in SpringBoard under a load average of about 860 from other projects' tests, and was
+  not retried.
+- **Warnings:** clean `WaterBuddyWidgetExtension` builds before the first edit and on the final code,
+  compiling the same architecture set. 31/31 unique positioned warning lines, identical; none in
+  `WaterBuddyWidget/`.
+- **The gate, on the final code:**
+  - phone unit: `✔ 373 tests in 46 suites`;
+  - phone UI: 26 executed, one failure, #62's;
+  - watch: `✔ 57 tests in 6 suites`;
+  - both widget schemes built.
+
+  `xcrun simctl shutdown all` was skipped before every run, because other projects' `xcodebuild` was
+  running.
+- **Put back:** the app's language (English), the Home Screen look (Default) and the appearance (dark).
+  The medium widget stays placed on page 1.
+- **Not run:**
+  - a device check: VoiceOver, and a tinted Home Screen;
+  - a render at an accessibility size (#76).
+
+### Found along the way
+
+- `MediumColumn.totalSize` is a `@ScaledMetric` sitting above the column's Dynamic Type cap, so the hero
+  may keep growing past AX1. By reading, not rendered (#76).
+
+## [2026-10-08] — `/doc_sync`: the thirty-ninth pass, after #68
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:**
+  - `WaterBuddyWidget.swift`'s line count (593 → 615) and description;
+  - #68 retired in the struck-through form, evidence first, the original kept;
+  - #76 opened;
+  - a new gate block;
+  - the header records this pass, with the thirty-eighth folded into a retained block.
+- **`docs/WIDGET.md`:**
+  - the language paragraph names the views that resolve strings;
+  - the Lock Screen section's #68 sentence now reads as fixed;
+  - the *Accessibility* cap bullet points to #76;
+  - the header.
+- **`docs/DESIGN.md`:** the medium hero's row points to #76; the header. No token or measured figure
+  moved.
+- **`tasks/lessons.md`:** four entries.
+
+### Checked and already accurate
+
+- **`CLAUDE.md`:** the target table, the six shared files against `project.pbxproj`'s three exception
+  sets, and the nine phone keys.
+- **`docs/STATE.md`:** eleven keys against `DataManager.Key`. Nothing this change touches.
+- **The Swift file list against the disk:** every file documented.
+- **`@Test` counts:** 373 phone and 57 watch by the attribute grep, matching the gate.
+- **Rule citations:** all resolve.
+- **`<details>`:** thirteen opening and thirteen closing tags.
+
+### Staging
+
+Written last; this file and `docs/AI_CONTEXT.md` were re-staged after these lines. Six paths are staged
+with explicit paths: `WaterBuddyWidget/WaterBuddyWidget.swift`, `docs/AI_CONTEXT.md`, `docs/WIDGET.md`,
+`docs/DESIGN.md`, `tasks/lessons.md` and this file. The five unrelated paths stay unstaged, and
+`Screenshots/census/` stays untracked. HEAD is `78ff05a`, 80 commits, level with `origin/main`. No
+`git commit` was run.

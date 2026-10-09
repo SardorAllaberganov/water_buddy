@@ -7,7 +7,9 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-07 (History's day picker and serving sheet: seven figures measured off renders, one of them — the wheel's neighbouring rows — under the floor and recorded as known issue #59). Previously 2026-10-06 (the watch vessel's own scrim ramp — known issue #35 — and two watch figures measured off renders, one of them a pre-existing failure now recorded as known issue #44)
+**Last updated:** 2026-10-08 (the medium widget hero's row points to known issue #76 — by reading, its
+`.accessibility1` cap does not reach the `@ScaledMetric` that sizes it; no token and no measured figure
+changed). Previously 2026-10-07 (History's day picker and serving sheet: seven figures measured off renders, one of them — the wheel's neighbouring rows — under the floor and recorded as known issue #59). Previously 2026-10-06 (the watch vessel's own scrim ramp — known issue #35 — and two watch figures measured off renders, one of them a pre-existing failure now recorded as known issue #44)
 
 ---
 
@@ -320,7 +322,7 @@ Large and XXL.
 | app vessel diameter | `280` | `.largeTitle` | `min(…, 340)` |
 | app `%` | `58` | `.largeTitle` | `frame(maxWidth: diameter × 0.78)`, `minimumScaleFactor(0.4)` |
 | widget `%` | `27` | `.largeTitle` | `min(readoutSize, diameter × 0.33)` |
-| widget medium hero | `28` | `.title2` | `minimumScaleFactor(0.6)`, capped at `.accessibility1` |
+| widget medium hero | `28` | `.title2` | `minimumScaleFactor(0.6)`, capped at `.accessibility1` — by reading, the cap does not reach this metric, which sits above it (known issue #76, not rendered) |
 
 The `%` glyph is `size × 0.44` in both. The medium family's `of N ml` line is **`totalSize × 0.46`
 — a ratio of the figure it annotates, not its own text style**: `.footnote` and a fixed 28pt hero

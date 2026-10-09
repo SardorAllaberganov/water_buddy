@@ -2404,3 +2404,58 @@ block describe their own day; an open entry describes today.
 
 **The rule:** in every sync, resolve the citations of each *open* known issue and retire any whose fix is
 on disk. The exemption above covers retired entries and retained blocks only.
+
+## 2026-10-08 — A Home Screen widget can be placed, and read, by a probe
+
+Known issue #68 had waited a day for "a render" because nothing in the gate draws a widget. A throwaway
+XCUITest probe placed one and read it after five failed runs, every one a probe mechanic and none the
+product's:
+
+- **The gallery can open empty**, and a bare `springboard…["WaterBuddy"]` tap then lands on the Home
+  Screen icon behind the sheet. Type the app's name into *Search Widgets* and tap only a result inside
+  `add-sheet-collection-view`; on the sizes page the button's label is `' Add Widget'`, a glyph before
+  the words — match it with `ENDSWITH`.
+- **Leaving the app lands on the page that holds its icon**, not the page the widget was placed on.
+  Page by SpringBoard's own control: `springboard.pageIndicators["Page control"].value` reads
+  `Page 1 of 2`.
+- **SpringBoard's tree lists a Home Screen widget's drawn texts**, hidden figures included, as it does
+  on the Lock Screen — so a probe can assert what a widget *draws*. Read them from one
+  `springboard.snapshot()`: `allElementsBoundByIndex` resolves each element again, and a redraw between
+  two reads failed the query ("No matches found for Element at index 8").
+- **Launch the app once and `activate()` it after.** A relaunch per language added one more first tap,
+  and one was dropped under load (#67).
+
+**The rule:** a widget probe searches the gallery, pages by the page control, reads one snapshot, and
+launches its app once. Each step is written from the previous step's dump.
+
+## 2026-10-08 — Every dynamic property reads from above its view
+
+`@Environment` is not the only one. A `@ScaledMetric` declared on a view reads Dynamic Type from above
+that view, so a `.dynamicTypeSize` cap inside the view's own `body` does not reach it — by reading, the
+medium widget's hero has been sized past its cap since it was written (#76, not rendered). Moving the
+medium column out of `HydrationView` for #68 had to keep that exactly: the metric moved *with* the code
+that reads it, and the cap stayed below it, inside the new body. The English card then came out
+byte-identical, which a pixel diff of the widget's region proved.
+
+**The rule:** when moving a view's contents into a child view, move each dynamic property with the code
+that reads it, and leave every modifier on the same side of it. Then prove the move by diffing the
+render, not by looking at it.
+
+## 2026-10-08 — Read the simulator's appearance before naming a capture's
+
+`xcrun simctl ui <device> appearance` read `dark`. Every capture the session had taken was therefore the
+dark case, though nothing had asked for it. The light capture needed `appearance light`, and the device
+was put back to `dark` afterwards.
+
+**The rule:** read the appearance, and the content size, before calling a capture light, dark or
+default. Write the values down, and restore them.
+
+## 2026-10-08 — Other projects' tests can stall SpringBoard
+
+With two other projects' `xcodebuild test` running, the load average reached about 860, and a probe step
+spent 470 seconds before failing: "Timed out while evaluating UI query", on the way out of the Home
+Screen's *Customize* sheet. The tinted capture it was meant to take was recorded as not run. The change
+touched no rendering-mode branch, and the full-colour render had already proved identical.
+
+**The rule:** check `uptime` before a SpringBoard-heavy probe step. Under that load, record the step as
+not run, with the reason, rather than spending its second attempt.

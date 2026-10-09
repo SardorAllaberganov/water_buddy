@@ -4,6 +4,24 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-08 (thirty-ninth pass — `/doc_sync` after **known issue #68, fixed**. The
+roadmap's *Now* and *Next* lists had all shipped, and the owner chose this bug ahead of its two
+owner's-call items (Apple Health, StoreKit). The medium Home Screen widget drew its two figure lines in
+the phone's language beside a button in the app's: `HydrationView` read `strings` from above its own
+injection. The medium family's column is now `MediumColumn`, a view of its own beneath the injection —
+`LockScreenView`'s pattern — and `HydrationView` declares no `strings` at all. One file,
+`WaterBuddyWidget.swift`; no rule, key, catalogue, entitlement or project-file line. **Rendered for the
+first time**, by a throwaway probe that placed a medium widget on the simulator's Home Screen: RED on the
+old code — `+250 мл` beside `7450 ml` and `of 2000 ml` — then GREEN in Russian and Uzbek, with the
+English card byte-identical before and after. Gate on the final code — **373**/46 phone unit, **25 of 26**
+phone UI (#62, pre-existing), **57**/6 watch unit, both widget builds — with no new warning by clean
+builds. **This sync's own drift:** one line count. Known issue **#68 retired**, **#76 opened** (found by
+reading while moving the column). `docs/WIDGET.md` and `docs/DESIGN.md` updated; `CLAUDE.md` and
+`docs/STATE.md` checked and not touched — nothing they describe moved.)
+
+<details>
+<summary>Thirty-eighth pass — 2026-10-08, re-verified twice the same day, retained</summary>
+
 **Last updated:** 2026-10-08 (thirty-eighth pass — `/doc_sync` after **roadmap item 6, the Control Center
 control**: `docs/superpowers/specs/2026-10-08-control-center-design.md`. A `ControlWidget`,
 `LogWaterControl` (kind `"WaterBuddyLogWater"`), in the existing extension, listed inside `if
@@ -29,6 +47,8 @@ by `usualSlot` — and seven more in `docs/STATE.md`, all re-derived against the
 dated. **A third `/doc_sync`** resolved the open known issues' own citations: **#11 retired** — its fix,
 the test's corrected DocC, on disk since the repository's first commit — and one of #37's lines moved
 33 down.)
+
+</details>
 
 <details>
 <summary>Thirty-seventh pass — 2026-10-08, retained</summary>
@@ -652,7 +672,7 @@ WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
 WaterBuddyWidget/LockScreenWidget.swift          344   the Lock Screen widget (kind "WaterBuddyLockScreen"): circle, rectangle with the + (AddWaterIntent(amount: entry.snapshot.serving)), line — over the same HydrationProvider; every figure privacySensitive, a quiet form under .privacy; strings read only in child views
 WaterBuddyWidget/LogWaterControl.swift            83   the Control Center control (kind "WaterBuddyLogWater", iOS 18): ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving)), titled Log Water in the snapshot's language, the glyph at DataManager.usualSlot, no figure; LogWaterControlProvider reads DataManager.snapshot(now:)
-WaterBuddyWidget/WaterBuddyWidget.swift          593   reads the cache only, never SwiftData — the Home Screen widget; PourButton internal (its minimumTarget is the Lock Screen button's too)
+WaterBuddyWidget/WaterBuddyWidget.swift          615   reads the cache only, never SwiftData — the Home Screen widget; HydrationView reads no string itself, MediumColumn does; PourButton internal (its minimumTarget is the Lock Screen button's too)
 WaterBuddyWidget/WaterBuddyWidgetBundle.swift     23   two widgets, WaterBuddyWidget and LockScreenWidget, and inside if #available(iOS 18.0, *) the control, LogWaterControl
 WaterBuddyWatch/WaterBuddyWatchApp.swift          77   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity) (which now awaits WristLink.waitForPendingDelivery() rather than returning at once), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
@@ -892,6 +912,42 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**Gate — all five run once on 2026-10-08, on Xcode 27.0, for known issue #68** (the thirty-ninth pass),
+on the final code. Foreground, `-parallel-testing-enabled NO`, the commands as rule `85-testing` writes
+them; `xcrun simctl shutdown all` was skipped before every run, while other projects' (`AvtoLog`, then
+`Glazzy`) `xcodebuild test` ran.
+
+| Command | The final code |
+|---|---|
+| `-only-testing:WaterBuddyTests` | `✔ Test run with 373 tests in 46 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | `Executed 26 tests, with 1 failure` — #62 |
+| `-only-testing:WaterBuddyWatchTests` | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+
+**The UI failure is #62's**, at `GoalSetupUITests.swift:219` — "the new serving is not under yesterday",
+as at HEAD; the change is inside the widget extension, which no UI test reaches.
+
+**Warnings: none new.** Clean builds of `WaterBuddyWidgetExtension` — the scheme whose target compiles
+the changed file — into empty DerivedData, before the first edit and on the final code. Both compiled the
+same set (the phone targets arm64, the watch targets arm64 and x86_64): unique `path:line:col: warning:`
+lines 31/31, identical with positions included, 44 occurrences each, none in `WaterBuddyWidget/`.
+
+**RED → GREEN by a throwaway probe** (deleted before staging): no automated test can render the
+extension — `WaterBuddyTests` only `@testable import`s the app. It placed a medium WaterBuddy widget on
+the simulator's Home Screen (page 1), then, with the phone in English, chose Russian and then Uzbek in
+the app's picker, waited each time until the widget's own button spoke that language, and read
+SpringBoard's tree. Old code: `+250 мл` beside `7450 ml` and `of 2000 ml`; Uzbek's goal line `of 2000 ml`
+— the assertion failed on the Russian goal line. Fixed code: `7450 мл` / `из 2000 мл` / `+250 мл`, and
+`7450 ml` / `2000 ml dan` / `+250 ml`. The English card, 1059 × 498 px, is byte-identical before and after.
+Captured in the simulator's own dark appearance and in light; **tinted not captured** — SpringBoard's
+accessibility query timed out on the way out of its *Customize* sheet, under a load average of ~860 from
+the other projects' tests, and was not retried: the change touches no rendering-mode branch, and the
+full-colour card did not move a pixel. The app's language was put back to English, the Home Screen look
+to Default and the appearance to dark; the medium widget stays placed on page 1.
+
+The Control Center control's gate block, retained:
 
 **Gate — all five run twice on 2026-10-08, on Xcode 27.0, for roadmap item 6, the Control Center
 control** (the thirty-eighth pass): after the change, and again on the final code after the final
@@ -1711,16 +1767,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-08, the thirty-eighth) after the staging
+**There is a git repository.** Verified this pass (2026-10-08, the thirty-ninth) after the staging
 and before this section was written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
-be31994
+78ff05a
 $ git log --oneline | wc -l
-      76
+      80
 $ git diff --cached --name-only | wc -l
-      18
+       6
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
@@ -1730,26 +1786,27 @@ $ git status --short | grep -v -E '^[MA]  '
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** 18 paths are staged with explicit paths for the owner's
-`/commit` (rule `90-git`): the five rule files with the Control Center control's wording (`15-project`,
-`40-widget`, `60-design-system`, `70-privacy`, `85-testing` — spec §5, which the owner approved in
-substance and has not yet read verbatim), which `/commit` groups as workflow config; the change (the new
-`LogWaterControl.swift`, `WaterBuddyWidgetBundle.swift`, `AddWaterIntent.swift`, `DataManager.swift`,
-`ServingSeamTests.swift`, `LocalizationTests.swift`); the spec; and `CLAUDE.md`, `docs/AI_CONTEXT.md`,
-`docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` and the `HISTORY.md` checkpoints. The code files
-staged are the ones the final gate and the last clean-build warning comparison ran on. The Lock Screen
-widget was committed and pushed before this work began (`0f4f1be`, `8a9016a`, `59f3848`, `be31994`),
-leaving `main` level with `origin/main`. **Five paths are deliberately left unstaged**, as at every
-commit since 2026-10-07: the two watch schemes and the two watch catalogues the Xcode app wrote (known
-issue #50), and `.claude/settings.json`, which moves `git commit` and `git init` from *ask* to *allow*
-and leaves `git push` under *ask*. None is this change's to stage or revert. `Screenshots/census/` (28
-coverage captures, 51 MB) is still untracked, neither committed nor ignored; whether it belongs in the
-tree is the owner's call.
+**Nothing is committed by this pass.** 6 paths are staged with explicit paths for the owner's
+`/commit` (rule `90-git`):
+- the fix, `WaterBuddyWidget/WaterBuddyWidget.swift`, the file the final gate and the clean-build warning
+  comparison ran on;
+- `docs/AI_CONTEXT.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, `tasks/lessons.md` and the `HISTORY.md`
+  checkpoints.
+
+No rule file, `CLAUDE.md` or spec changed. The Control Center control was committed and pushed before
+this work began (`809e848`, `3d9c834`, `419d797`, `78ff05a`), leaving `main` level with `origin/main`.
+
+**Five paths are deliberately left unstaged**, as at every commit since 2026-10-07: the two watch schemes
+and the two watch catalogues the Xcode app wrote (known issue #50), and `.claude/settings.json`, which
+moves `git commit` and `git init` from *ask* to *allow* and leaves `git push` under *ask*. None is this
+change's to stage or revert, and this pass's builds left their diffs the size they were.
+`Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither committed nor ignored;
+whether it belongs in the tree is the owner's call.
 
 Initialised under scoped, explicit owner authorization to enable the watchOS plan's SDD execution
 process (root commit `69c5a39`), overriding the "owner declined twice" stance the design spec had
-recorded — the authorization is in-conversation, scoped to this execution. 76 commits on `main` (the
-figure read 68 until the thirty-eighth pass);
+recorded — the authorization is in-conversation, scoped to this execution. 80 commits on `main` (the
+figure read 76 until the thirty-ninth pass, and 68 until the thirty-eighth);
 `.gitignore` lists `build/`, `DerivedData/`, `__pycache__/`, `**/xcuserdata/`, `.DS_Store`,
 `.claude/settings.local.json` and `.superpowers/sdd/`, and does **not** ignore `xcshareddata/`,
 matching rule `90-git`'s own requirement. *(This block read `6cee506` and 27 commits until the
@@ -2645,7 +2702,14 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `testSettingsIsReachableFromHomeAsATab`'s tap on Settings and the Yesterday test's tap on Glass took
     no effect while every later tap did; another project's UI tests ran beside it. It passed in isolation
     and in both later full runs. One sample, recorded, not explained.
-68. **The medium Home Screen widget draws its two figure lines in the device's language.**
+68. ~~**The medium Home Screen widget draws its two figure lines in the device's language.**~~
+    **Retired 2026-10-08 (the thirty-ninth pass) — the fix is on disk, rendered before and after:** the
+    medium family's column is `MediumColumn` (`WaterBuddyWidget.swift:209`), a view of its own beneath
+    `HydrationView`'s injection that reads `strings` itself, as `LockScreenView`'s shapes do;
+    `HydrationView` (`:112`) declares no `strings`, and its DocC says why. With the phone in English and
+    the app set to Russian, SpringBoard's tree read `+250 мл` beside `7450 ml` and `of 2000 ml` on the old
+    code — the first render of this issue — and `7450 мл` / `из 2000 мл` on the fix; Uzbek's goal line
+    went from `of 2000 ml` to `2000 ml dan`. The original entry follows, for the record:
     `HydrationView` injects `.environment(\.strings, entry.snapshot.language.bundle)` in its own `body`,
     and its `medium` property resolves `%1$d ml` and `of %1$d ml` through `HydrationView`'s own `strings`
     — which that injection never reaches, because a modifier in a body affects only the views beneath
@@ -2715,6 +2779,18 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     the watch's reception (#53) and Home while the app is open (#74). The Action Button's hint follows
     the phone's language — iOS derives it from the display name — while the tile follows the app's.
     The simulator keeps the control placed, and nine presses' servings, 2,700 ml, in today's log (#5).
+
+**Opened by the 2026-10-08 fix for #68 (the thirty-ninth pass):**
+
+76. **The medium widget's hero is sized above its own Dynamic Type cap.** `MediumColumn.totalSize`
+    (`WaterBuddyWidget.swift:217`) is a `@ScaledMetric`, and a view's own dynamic property reads the
+    environment from *above* the view — the rule #68 broke — while the column's
+    `.dynamicTypeSize(...DynamicTypeSize.accessibility1)` (`:255`) is applied inside its body, below it.
+    So past AX1 the total and the goal line under it (`totalSize * 0.46`) would keep growing, held back
+    only by `.minimumScaleFactor(0.6)` — where the cap's comment, `docs/WIDGET.md` and `docs/DESIGN.md`
+    say the type "holds still". Pre-existing: `totalSize` sat on `HydrationView` with the same reach, and
+    the #68 fix kept it exactly. Found by reading; **not rendered** at an accessibility size. Whether the
+    cap moves above the metric or the comment changes is a design call, and its own change.
 
 ## Where the rest is written down
 

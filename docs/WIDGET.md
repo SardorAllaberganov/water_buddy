@@ -3,7 +3,11 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-08 (fourteenth pass — `/doc_sync` after roadmap item 6: the extension also
+**Last updated:** 2026-10-08 (fifteenth pass — `/doc_sync` after known issue #68: the medium family's
+two figure lines now follow the app's language like the rest of the widget. Its column is `MediumColumn`,
+a view beneath `HydrationView`'s injection, and `HydrationView` reads no string itself. No contract
+changed; known issue #76, found while moving the column, is pointed to from *Accessibility*.
+Previously: fourteenth pass — `/doc_sync` after roadmap item 6: the extension also
 holds **a control**, `LogWaterControl`, listed from iOS 18 inside `if #available(iOS 18.0, *)` — its own
 section below. `AddWaterIntent` writes out its default `authenticationPolicy`, and
 `DataManager.requestWidgetReload()` now reloads controls as well as timelines. Neither widget's contract
@@ -249,7 +253,8 @@ list for exactly this reason — six shared files now, not four.
   bare `+` does not say what it adds.
 - The medium column caps at `.dynamicTypeSize(...DynamicTypeSize.accessibility1)` — a widget
   cannot scroll or reflow, so past the first accessibility size the type holds still rather than
-  eating the 44pt control.
+  eating the 44pt control. *(By reading, the cap does not reach the hero's own `@ScaledMetric`, which
+  sits above it — known issue #76, not rendered.)*
 
 ## The extension carries its own localisation
 
@@ -266,7 +271,9 @@ delete the entry. A synchronized-folder membership exception carries source, not
 **Which language it draws in comes from the snapshot.** `WaterSnapshot.language` is read by
 `DataManager.snapshot(defaults:calendar:now:)` out of the App Group cache — the provider is
 `nonisolated` and never touches the model — and `HydrationView` injects it as
-`EnvironmentValues.strings` and `\.locale`. Without it the widget would render in the *device*
+`EnvironmentValues.strings` and `\.locale`, reading neither itself: a view's own `@Environment` comes
+from above it, so every string is resolved in a view below — `MiniVessel`, `PourButton`, and the medium
+family's `MediumColumn`. Without it the widget would render in the *device*
 language while the app rendered in the chosen one: two front doors disagreeing. `serving` travels
 in the same snapshot for the same reason, and `rolledOver()` is what carries **both** across the
 midnight entry — which it did not before, so the widget silently reverted to the device language at
@@ -369,7 +376,8 @@ when the user turns off *Allow Access When Locked → Lock Screen Widgets*.
 
 **Language.** `LockScreenView` injects `\.strings` and `\.locale` from `entry.snapshot.language` and reads
 neither itself — each shape is a child view, because a view's own `@Environment` comes from above it
-(known issue #68 is the Home Screen medium family's version of that trap).
+(known issue #68 was the Home Screen medium family's version of that trap, fixed on 2026-10-08 the same
+way: its column, `MediumColumn`, is a view of its own).
 
 **Accessibility.** One combined element per shape (label `Today's hydration`, the vessel's
 percent-and-millilitres value), the button its own; the drawn figures, gauges and glyphs also carry
