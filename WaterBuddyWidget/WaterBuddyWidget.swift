@@ -103,9 +103,13 @@ private extension WaterSnapshot {
 
 // MARK: - Entry view
 
+/// Injects the snapshot's language and lays out the family.
+///
+/// **It reads no string itself, and that is why the medium family's column is a view of its own.** A
+/// view's own `@Environment` comes from *above* it, so the bundle this body injects reaches only the
+/// views below. A string resolved here would come from `Bundle.main` — the device's language — while
+/// the app drew the chosen one, which is what the medium family's two figure lines once did.
 struct HydrationView: View {
-
-    @Environment(\.strings) private var strings
 
     /// How far the card floats inside the widget. Small enough that the card is still the widget,
     /// wide enough that the aurora reads as a surface the card is resting *on* rather than a
@@ -118,10 +122,6 @@ struct HydrationView: View {
     let entry: HydrationEntry
 
     @Environment(\.widgetFamily) private var family
-
-    /// The medium family's hero figure. Scaled, because a widget honours Dynamic Type; bounded
-    /// below by the column's own `minimumScaleFactor`.
-    @ScaledMetric(relativeTo: .title2) private var totalSize: CGFloat = 28
 
     var body: some View {
         card
@@ -194,44 +194,66 @@ struct HydrationView: View {
             MiniVessel(snapshot: entry.snapshot)
                 .aspectRatio(1, contentMode: .fit)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), entry.snapshot.currentWater))
-                    .font(.system(size: totalSize, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-                    .invalidatableContent()
-                    // Both figures are already in the vessel's accessibility value, read as one
-                    // sentence. Left visible to VoiceOver they become two more stops saying the
-                    // same numbers, the second of which — "of 2,000 ml" — is a fragment with
-                    // nothing to attach it to. Hidden individually, never on the enclosing stack:
-                    // that also holds the button, and hiding it would leave the widget's only
-                    // control unreachable.
-                    .accessibilityHidden(true)
-
-                // Sized off the total rather than given its own text style. `.footnote` and a
-                // fixed 28pt hero are the same size at default and cross over at the accessibility
-                // sizes — the annotation ends up bigger than the number it annotates. A ratio
-                // cannot invert.
-                Text(String(format: strings.localizedString(forKey: "of %1$d ml", value: nil, table: nil), entry.snapshot.dailyGoal))
-                    .font(.system(size: totalSize * 0.46, weight: .medium, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white.opacity(0.85))
-                    .accessibilityHidden(true)
-
-                Spacer(minLength: 8)
-
-                PourButton(shape: .capsule, serving: entry.snapshot.serving)
-            }
-            // The column is the full height of the card and the button's 44pt is not negotiable,
-            // so when the numbers cannot fit — a five-digit total, a long locale, a large Dynamic
-            // Type size — they shrink rather than push the button off the bottom. The cap is where
-            // shrinking stops being able to save it: a widget cannot scroll or reflow, so past the
-            // first accessibility size the type holds still rather than eating the control.
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            MediumColumn(snapshot: entry.snapshot)
         }
+    }
+}
+
+// MARK: - Medium column
+
+/// The medium family's numbers beside the vessel: the hero volume, the goal under it, and the
+/// full-width quick-add.
+///
+/// A view of its own because it reads a string: `HydrationView` injects the snapshot's language, and
+/// only a view below that injection can read it.
+private struct MediumColumn: View {
+
+    let snapshot: WaterSnapshot
+
+    @Environment(\.strings) private var strings
+
+    /// The medium family's hero figure. Scaled, because a widget honours Dynamic Type; bounded
+    /// below by the column's own `minimumScaleFactor`.
+    @ScaledMetric(relativeTo: .title2) private var totalSize: CGFloat = 28
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), snapshot.currentWater))
+                .font(.system(size: totalSize, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                .invalidatableContent()
+                // Both figures are already in the vessel's accessibility value, read as one
+                // sentence. Left visible to VoiceOver they become two more stops saying the
+                // same numbers, the second of which — "of 2,000 ml" — is a fragment with
+                // nothing to attach it to. Hidden individually, never on the enclosing stack:
+                // that also holds the button, and hiding it would leave the widget's only
+                // control unreachable.
+                .accessibilityHidden(true)
+
+            // Sized off the total rather than given its own text style. `.footnote` and a
+            // fixed 28pt hero are the same size at default and cross over at the accessibility
+            // sizes — the annotation ends up bigger than the number it annotates. A ratio
+            // cannot invert.
+            Text(String(format: strings.localizedString(forKey: "of %1$d ml", value: nil, table: nil), snapshot.dailyGoal))
+                .font(.system(size: totalSize * 0.46, weight: .medium, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white.opacity(0.85))
+                .accessibilityHidden(true)
+
+            Spacer(minLength: 8)
+
+            PourButton(shape: .capsule, serving: snapshot.serving)
+        }
+        // The column is the full height of the card and the button's 44pt is not negotiable,
+        // so when the numbers cannot fit — a five-digit total, a long locale, a large Dynamic
+        // Type size — they shrink rather than push the button off the bottom. The cap is where
+        // shrinking stops being able to save it: a widget cannot scroll or reflow, so past the
+        // first accessibility size the type holds still rather than eating the control.
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
