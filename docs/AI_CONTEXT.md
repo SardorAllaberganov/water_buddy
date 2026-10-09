@@ -4,6 +4,66 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-09 (forty-second pass — `/doc_sync` at 09:01, minutes after the forty-first, on
+the owner's word: **the Siri phrase works, and 1.1 has been submitted to App Review.** No source file
+changed, and none was changed for Siri. **#78 is closed by observation, not fixed**: why *Log a Glass*
+opened the app and logged nothing on an earlier build is still not known. **Four archives stand in
+Xcode's Archives folder**, read this pass for the first time: 1.0 (1), refused; then 1.1 (1), 1.1 (2) and
+1.1 (3), each uploaded. The failure was reported before build 3 existed, so it was seen on (1) or (2).
+Build (2) carried the app at 2 and its widget and watch app at 1; (3) carries 3 throughout. That is the
+one difference found between them, and it is a correlation, not a cause. **The build in review has no
+commit** (#79, opened): every one of those archives was made from the working tree, which holds the
+fixes for #68 and #73 and the version change, all uncommitted. **This sync's own drift:** the
+forty-first pass wrote that nothing had been archived as 1.1 (3), three minutes after one was. Known
+issue **#78 closed**, **#79 opened**; #63 gains a note. **No gate run this pass.** `docs/STATE.md`,
+`docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md` checked and not touched.)
+
+<details>
+<summary>Forty-first pass — 2026-10-09, 08:55, retained</summary>
+
+**Last updated:** 2026-10-09 (forty-first pass — `/doc_sync` the morning after the fortieth. **No source
+file changed.** Two other things did. **The Siri phrase fails on the owner's iPhone** (#78, opened): on a
+TestFlight build of 1.1, *Log a Glass* opens WaterBuddy and logs nothing, whether spoken to Siri in
+English or tapped in Shortcuts. It is the first time the App Shortcut has been tried on a build the
+system will run (#63), so roadmap item 4's device check has failed. **The cause is not found.** The built
+app's metadata, phrase tables and binary are right in Debug and in Release. Three throwaway probes on the
+simulator found the intent by name from off the main actor, ran `perform()` — it returned its dialog and
+logged one Glass — and read its mode as background-only. What is missing is the device's own log.
+**The build number is 3** at all fourteen sites, beside `MARKETING_VERSION` 1.1; the owner had set 2 on
+the app target alone. **This sync's own drift:** one stale sentence, the build number; #63 and #50 gain
+notes. Known issue **#78 opened**. **No gate run this pass** — no source changed; the three probe runs
+are recorded as probes, under *Current state*. `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and
+`CLAUDE.md` checked and not touched.)
+
+</details>
+
+<details>
+<summary>Fortieth pass — 2026-10-09, just after midnight, retained</summary>
+
+**Last updated:** 2026-10-09 (fortieth pass — `/doc_sync`, run just after midnight, after **known issue
+#73, fixed** on the evening of 2026-10-08: the owner's pick with no task named. `loadFromStore()` re-read the goal, the vessels and the language on every
+`refresh()` and left `remindersEnabled` as `init` had read it. A widget extension that outlived the
+toggle therefore planned from the old flag: a press after reminders were switched on filed an empty plan
+and cleared them, and a press after they were switched off filed them again. The flag is now re-read
+behind the same equality guard as its neighbours. One file, `DataManager.swift`, +13 lines; no rule, key,
+catalogue, entitlement or membership. Four tests in `ReminderSeamTests`, each seen RED: both directions
+through a second manager standing in for the extension, the publish, and the guard — the last made to
+fail against an unguarded re-read before the guard was written. **The gate ran on a different
+simulator.** The Mac's simulators lost their data that evening (#77), so the phone runs used iOS 27.0's
+iPhone 17, not the pinned 26.5: **377**/46 phone unit, **26 of 26** phone UI, both widget builds, no new
+warning by clean builds. **The watch tests did not run** — no watchOS 26 runtime is installed — though
+the watch app and its tests compile. **Also that evening, the owner's own change:** App Store Connect
+refused an upload of 1.0, which is approved, and `MARKETING_VERSION` is now **1.1** at all fourteen
+sites. **This sync's own drift:** two line counts, the test count, the eight `DataManager.swift`
+citations in *The process role*, seven more in `docs/STATE.md`, and one in #37. Known issue **#73
+retired**, **#77 opened**; #5, #62 and #75 annotated. `docs/STATE.md` and `docs/WIDGET.md` updated;
+`docs/DESIGN.md` and `CLAUDE.md` checked and not touched — nothing they describe moved.)
+
+</details>
+
+<details>
+<summary>Thirty-ninth pass — 2026-10-08, retained</summary>
+
 **Last updated:** 2026-10-08 (thirty-ninth pass — `/doc_sync` after **known issue #68, fixed**. The
 roadmap's *Now* and *Next* lists had all shipped, and the owner chose this bug ahead of its two
 owner's-call items (Apple Health, StoreKit). The medium Home Screen widget drew its two figure lines in
@@ -18,6 +78,8 @@ phone UI (#62, pre-existing), **57**/6 watch unit, both widget builds — with n
 builds. **This sync's own drift:** one line count. Known issue **#68 retired**, **#76 opened** (found by
 reading while moving the column). `docs/WIDGET.md` and `docs/DESIGN.md` updated; `CLAUDE.md` and
 `docs/STATE.md` checked and not touched — nothing they describe moved.)
+
+</details>
 
 <details>
 <summary>Thirty-eighth pass — 2026-10-08, re-verified twice the same day, retained</summary>
@@ -541,7 +603,7 @@ same snapshot; the Glass's index is named once, `DataManager.usualSlot`, for its
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent`; and, from iOS 18 behind the codebase's first `if #available`, the Control Center control `LogWaterControl` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 373 `@Test` functions in 46 suites |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 377 `@Test` functions in 46 suites |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (8 real tests), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **13 declared, 26 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
@@ -629,7 +691,7 @@ six edits two processes; adding a seventh means editing that list.
 ```
 WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2570   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's and the control's one definition) at usualSlot (its index, named once), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
+WaterBuddy/DataManager.swift                    2583   shared — the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's and the control's one definition) at usualSlot (its index, named once), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
 WaterBuddy/GoalSetupView.swift                   283   app only — first-run goal setup
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
 WaterBuddy/HistoryView.swift                     959   app only — the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
@@ -650,7 +712,7 @@ WaterBuddy/WristPlan.swift                        80   shared (in both watch exc
 WaterBuddyTests/AppLanguageTests.swift           112   AppLanguageTests — the menu and each bundle
 WaterBuddyTests/AuroraBackgroundTests.swift       98   AuroraLightTests — the backdrop's lights
 WaterBuddyTests/CelebrationTests.swift           108   HapticLadderTests + ConfettiTests
-WaterBuddyTests/DataManagerTests.swift          1265   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + LanguageSeamTests
+WaterBuddyTests/DataManagerTests.swift          1331   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + WristPublishSeamTests + LanguageSeamTests
 WaterBuddyTests/EarlierServingTests.swift        429   HistoryLogsTests + RetimingTests + HistoryWindowStartTests (not @MainActor) + CorrectionRangeTests + RetimedPourTests + HistorySelectionTests (not @MainActor) — the window's published rows, re-timing a serving, where the week starts, what the sheet offers and where it opens, a watch pour re-timed, the screen's day selection
 WaterBuddyTests/HistoryRangeTests.swift          439   DaySummaryTests (pure, not @MainActor) + HistoryWindowTests
 WaterBuddyTests/HistoryViewTests.swift           132   HistoryServingTests — the editor's offered range, and the fixture's own tripwire
@@ -867,12 +929,12 @@ in `.claude/rules/`.
 
 ## The process role
 
-`DataManager.role` (`DataManager.swift:1387`) resolves once, `nonisolated static let`, from
+`DataManager.role` (`DataManager.swift:1400`) resolves once, `nonisolated static let`, from
 `isAppExtension` plus `#if os(watchOS)` — never a second runtime probe, which rule
 `25-shared-storage` forbids because two probes can disagree and leave one guard open.
 
 ```
-enum Role: Sendable, CaseIterable {   // DataManager.swift:1396
+enum Role: Sendable, CaseIterable {   // DataManager.swift:1409
     case phoneApp, phoneExtension, watchApp, watchExtension
 }
 ```
@@ -885,16 +947,19 @@ answers all four for it:
 
 | Question | Gates | Sites |
 |---|---|---|
-| `ownsSharedStorage` | *is this container my own first-class home?* | `:479` goal materialisation, `:1016` fresh-install day stamp |
-| `mayHaveLegacyStandardDefaults` | *has my `.standard` ever held WaterBuddy state?* | `:938` `seedFromCachedTotalIfNeeded`, `:1531` `migrateIfNeeded` |
-| `drawsHistory` | *do I have a history surface to draw?* | `:860` `republishHistory` |
-| `mayFileReminders` | *may I file notifications for this user?* | `:1160` `requestReminderReschedule` |
+| `ownsSharedStorage` | *is this container my own first-class home?* | `:483` goal materialisation, `:1020` fresh-install day stamp |
+| `mayHaveLegacyStandardDefaults` | *has my `.standard` ever held WaterBuddy state?* | `:942` `seedFromCachedTotalIfNeeded`, `:1544` `migrateIfNeeded` |
+| `drawsHistory` | *do I have a history surface to draw?* | `:864` `republishHistory` |
+| `mayFileReminders` | *may I file notifications for this user?* | `:1164` `requestReminderReschedule` |
 
-*(Every `DataManager.swift` line in this section was re-derived on 2026-10-08, in the thirty-eighth
-pass's re-run. All ten citations — the eight sites and the two in the code above — had gone stale
-again: HEAD `be31994` already disagreed with every one (`role` documented at `:1272`, standing at
-`:1380`), and this change's `usualSlot` moved three of them further. Previously re-derived on 2026-10-07,
-when `requestReminderReschedule`'s guard was documented at `:847` and stood at `:1067`.)*
+*(Every `DataManager.swift` line in this section was re-derived on 2026-10-09, in the fortieth pass: the
+fix for #73 added four lines of DocC above the first site and nine in `loadFromStore()` above the last
+three, so the six sites and the two in the code above all moved, by four or by thirteen. Before that, the
+thirty-eighth pass's re-run the same day: all ten citations — the eight sites and the two in the code
+above — had gone stale again: HEAD `be31994` already disagreed with every one (`role` documented at
+`:1272`, standing at `:1380`), and that change's `usualSlot` moved three of them further. Previously
+re-derived on 2026-10-07, when `requestReminderReschedule`'s guard was documented at `:847` and stood at
+`:1067`.)*
 
 Only `.phoneApp` answers `true` to any of them today. The fourth is the one whose wrong answer is
 immediately user-visible: `ReminderPlan.Slot.identifier` is a pure function of day and hour, so a
@@ -912,6 +977,127 @@ in this pass, as part of the watchOS plan's final documentation task (owner edit
 issue #15.
 
 ## Current state
+
+**1.1 is with App Review, and the Siri phrase works — both on the owner's word** (2026-10-09, the
+forty-second pass). The owner reports that Siri "is ok and working" and that the submission is in App
+Store Connect's review. Nothing here can see App Store Connect; what this Mac does hold is Xcode's
+Archives folder, and each archive's own `Info.plist`:
+
+| Archived | Version (build) | Widget and watch app | Upload |
+|---|---|---|---|
+| 2026-10-08 23:10 | 1.0 (1) | build 1 | refused: 1.0 is the approved version |
+| 2026-10-08 23:31 | 1.1 (1) | build 1 | recorded as uploaded |
+| 2026-10-09 08:20 | 1.1 (2) | build **1** — the app alone was at 2 | recorded as uploaded |
+| 2026-10-09 08:52 | 1.1 (3) | build 3 | recorded as uploaded |
+
+- **Which build is in review is not known from here.** The latest upload is 1.1 (3).
+- **The Siri failure (#78) was seen on 1.1 (1) or 1.1 (2):** it was reported before build 3 existed. On
+  which of the two, the owner has not said; nor on which build it now works.
+- **No source differs between those three archives.** The app's sources last changed at 23:19 on the
+  8th, when the guard for #73 went in. Between (2) and (3) only the build numbers moved, and (3) is the
+  first in which the app and its extensions agree. That is a correlation. Nothing shows it to be the
+  cause, and an install that simply needed time to register its shortcut would look the same.
+- **Every archive was made from the working tree,** not from a commit (#79).
+- **What 1.1 carries that was not proved first:** the watch tests did not run for #73 (#77), and the
+  Lock Screen widget and the Control Center control still have no recorded device check (#70, #75).
+- **Not known:** the *What's New* text that was submitted, and whether it names the Siri phrase.
+
+The forty-first pass's account of the failure, written a few minutes earlier, retained:
+
+**The Siri phrase on a device: tried once, failed, cause not found** (2026-10-09, the forty-first pass;
+known issue #78). The owner's account, from their iPhone: a TestFlight build of 1.1; Siri in English,
+"Log water in WaterBuddy"; and the *Log a Glass* tile in Shortcuts. Each opens WaterBuddy, and no serving
+is logged. So the phrase is matched, and it is the action that does not run.
+
+Everything that can be read from here is as designed:
+
+| Checked | Found |
+|---|---|
+| `LogServingIntent` | `openAppWhenRun = false`. `perform()`'s first wait, `waitUntilActivated()`, is bounded at about a second. Its second, `remindersSettled()`, has **no time limit** — `ReconcileQueue.settled()` returns when the reconciles queued before it have run — but it comes after the Glass is logged, so a stall there would still leave a serving, which the owner did not see |
+| `Metadata.appintents`, Debug (simulator) and Release (device, built unsigned into scratch) | identical. One action, `LogServingIntent`: `openAppWhenRun: false`, `supportedModes: 1`, mangled name `10WaterBuddy16LogServingIntentV`. One shortcut over it, three phrase templates |
+| `en.lproj` and `ru.lproj` `AppShortcuts.strings` | all three phrases in each, the two keys Xcode marked stale included (#50) |
+| The Release binary | type and conformance records for `LogServingIntent: AppIntent` and `WaterBuddyShortcuts: AppShortcutsProvider` are present |
+| Probe 1 — found by mangled name, cast and built from a detached task | `cast=ok`, `init=ok`; the provider lists 1 shortcut |
+| Probe 2 — `perform()` run the same way, in the test host | returned `IntentResultContainer<Never, Never, Never, IntentDialog>`; water 0 → 250, rows 0 → 1; 3.87 seconds, on a loaded Mac |
+| Probe 3 — `supportedModes` read at run time | raw 1, equal to `.background`; `.foreground` is 2 |
+| Apple's forums and documentation | no report of this symptom. `openAppWhenRun` is deprecated from iOS 26 in favour of `supportedModes` |
+
+The three probes ran on iOS 27.0's iPhone 17 simulator, as `WaterBuddyTests/ZZSiriProbe.swift`, deleted
+after each; `git status` shows nothing left of it. Probe 2 added one Glass to that simulator's own data.
+None of them is the system's path: the simulator still refuses an App Shortcut from a locally signed
+build (#63).
+
+**Not known:** the phone's iOS version; which build number the TestFlight build carried; whether *Water
+logged.* shows before the app opens; anything from the device's log. **Asked of the owner, not yet
+answered:** the phone's log through Console, or leave to sign simulator builds with their development
+identity so the shortcut can be run here (#63 calls that theirs to decide).
+
+**No code was changed for it.** Moving the intent to `supportedModes` would be a guess: the app already
+reports the same mode through the older property.
+
+**Gate — run on the evening of 2026-10-08, on Xcode 27.0, for known issue #73** (the fortieth pass), on
+the final code: **four of the five, and none on its pinned destination.** That evening every simulator
+on this Mac lost its data, and only some runtimes came back (#77). iOS 26.5's iPhone 17 would not boot —
+"Unable to boot device because it cannot be located on disk" — and no watchOS 26 runtime was installed.
+The phone runs therefore used iOS **27.0**'s iPhone 17, erased by the owner, and the watch widget was
+built for the generic watchOS Simulator destination. Foreground, `-parallel-testing-enabled NO`;
+`xcrun simctl shutdown all` was skipped, while other projects' (`AvtoLog`, `Glazzy`) simulators were in
+use.
+
+| Command | Destination | The final code |
+|---|---|---|
+| `-only-testing:WaterBuddyTests` | iOS 27.0, iPhone 17 | `✔ Test run with 377 tests in 46 suites passed` |
+| `-only-testing:WaterBuddyUITests` (harness skipped) | iOS 27.0, iPhone 17 | `Executed 26 tests, with 0 failures` |
+| `-only-testing:WaterBuddyWatchTests` | — | **not run** — no watchOS 26 runtime. `build-for-testing -scheme WaterBuddyWatch`, generic watchOS Simulator: `** TEST BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWidgetExtension` | iOS 27.0, iPhone 17 | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | `generic/platform=watchOS Simulator` | `** BUILD SUCCEEDED **` |
+
+**The UI run is 26 of 26**, the first since 2026-10-07. #62's test passed on the freshly erased
+simulator: that is its cause seen from the other side, not a fix.
+
+**All four shipping targets compiled the changed file.** These logs show a `SwiftCompile` of
+`DataManager.swift` in `WaterBuddy`, `WaterBuddyWidgetExtension`, `WaterBuddyWatch` and
+`WaterBuddyWatchWidget`.
+
+**Warnings: none new.** Clean builds of the `WaterBuddy` scheme into empty DerivedData: a copy of the
+tree with the two changed files put back to HEAD, and the final code. Unique `path:line:col: warning:`
+lines 31/31, 44 occurrences each, and identical per file and message with positions stripped — the
+positions themselves moved with the thirteen new lines.
+
+**RED → GREEN, in three runs of `ReminderSeamTests`:**
+
+1. The tests alone: three failed — on `!widget.currentReminderSlots().isEmpty`, on
+   `widget.currentReminderSlots().isEmpty`, and on `manager.remindersEnabled` with `counter.count == 1`
+   — and the guard's test passed.
+2. An unguarded re-read: those three passed, and `aRefreshThatFindsTheFlagUnchangedDoesNotChurnObservers`
+   failed on `counter.count == 0`.
+3. The guard added: `✔ Test run with 19 tests in 1 suite passed`.
+
+The first run's call passed its 600-second foreground limit while the erased simulator booted for the
+first time, and finished in the background with its result already printed. Every later run finished in
+the foreground.
+
+**Not run:** the bug itself on a simulator or a device — it needs a widget extension kept alive across
+the toggle, and nothing lists the pending set — and no widget was placed: this change is in no view tree.
+
+**The version is 1.1 — the owner's own change, the same evening.** App Store Connect refused an upload
+of 1.0: *"The train version '1.0' is closed for new build submissions"*, 1.0 being the approved version.
+The owner moved `MARKETING_VERSION` from 1.0 to 1.1 at all fourteen sites in `project.pbxproj` — seven
+targets, Debug and Release. Every run above after the first RED built with it. It is unstaged, and its
+own commit.
+
+**The build number is 3**, at all fourteen sites (2026-10-09). The owner had moved the app target alone
+to 2, which left the widget, the watch app and the watch widget at 1 — and App Store Connect warns when
+an extension's build number differs from its app's. They then named 3 for the next build, and all
+fourteen were set to it. *(This paragraph read "`CURRENT_PROJECT_VERSION` is still 1" until the
+forty-first pass: true when the fortieth wrote it, and stale within hours.)* The gate above built with
+build number 1. Nothing has been archived or uploaded as 1.1 (3) by this work. *(Forty-second pass:
+true of the session and wrong about the Mac. The owner had archived and uploaded 1.1 (3) at 08:52,
+three minutes before that sentence was written; the forty-first pass did not look in the Archives
+folder. The table at the top of this section has all four.)* An archive carries whatever the working tree
+holds: that evening, HEAD plus the uncommitted fixes for #68 and #73.
+
+The #68 fix's gate block, retained:
 
 **Gate — all five run once on 2026-10-08, on Xcode 27.0, for known issue #68** (the thirty-ninth pass),
 on the final code. Foreground, `-parallel-testing-enabled NO`, the commands as rule `85-testing` writes
@@ -1767,8 +1953,8 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Verified this pass (2026-10-08, the thirty-ninth) after the staging
-and before this section was written, from the commands themselves:
+**There is a git repository.** Verified this pass (2026-10-09, the forty-second; the fortieth and forty-first printed the same list) before this section was
+written, from the commands themselves:
 
 ```
 $ git rev-parse --short HEAD
@@ -1779,27 +1965,45 @@ $ git diff --cached --name-only | wc -l
        6
 $ git status --short | grep -v -E '^[MA]  '
  M .claude/settings.json
+MM HISTORY.md
+ M WaterBuddy.xcodeproj/project.pbxproj
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
  M WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatchWidget.xcscheme
+ M WaterBuddy/AppShortcuts.xcstrings
+ M WaterBuddy/DataManager.swift
+ M WaterBuddyTests/DataManagerTests.swift
  M WaterBuddyWatch/Localizable.xcstrings
  M WaterBuddyWatchWidget/Localizable.xcstrings
+MM docs/AI_CONTEXT.md
+ M docs/STATE.md
+MM docs/WIDGET.md
+MM tasks/lessons.md
 ?? Screenshots/census/
 ```
 
-**Nothing is committed by this pass.** 6 paths are staged with explicit paths for the owner's
-`/commit` (rule `90-git`):
-- the fix, `WaterBuddyWidget/WaterBuddyWidget.swift`, the file the final gate and the clean-build warning
-  comparison ran on;
-- `docs/AI_CONTEXT.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, `tasks/lessons.md` and the `HISTORY.md`
-  checkpoints.
+**Nothing is committed by this pass, and nothing is staged by it.** Three changes sit in the tree, and
+only the first is in the index:
 
-No rule file, `CLAUDE.md` or spec changed. The Control Center control was committed and pushed before
-this work began (`809e848`, `3d9c834`, `419d797`, `78ff05a`), leaving `main` level with `origin/main`.
+1. **The fix for #68 — staged by the thirty-ninth pass, 6 paths, still waiting for the owner's
+   `/commit`:** `WaterBuddyWidget/WaterBuddyWidget.swift`, `docs/AI_CONTEXT.md`, `docs/WIDGET.md`,
+   `docs/DESIGN.md`, `tasks/lessons.md` and `HISTORY.md`.
+2. **The fix for #73 — unstaged, 7 paths:** `WaterBuddy/DataManager.swift`,
+   `WaterBuddyTests/DataManagerTests.swift`, `docs/STATE.md`, and this pass's further edits to
+   `docs/AI_CONTEXT.md`, `docs/WIDGET.md`, `tasks/lessons.md` and `HISTORY.md` — the four `MM` lines
+   above. They were left unstaged on purpose: staging them would fold #73 into #68's commit, and rule
+   `90-git` asks for one logical change per commit. Committing the index as it stands commits #68
+   alone.
+3. **The version, 1.1, and the build number, 3 — unstaged:** `WaterBuddy.xcodeproj/project.pbxproj`,
+   28 lines each way. The version is the owner's own edit; the build number was set at their word.
 
-**Five paths are deliberately left unstaged**, as at every commit since 2026-10-07: the two watch schemes
-and the two watch catalogues the Xcode app wrote (known issue #50), and `.claude/settings.json`, which
-moves `git commit` and `git init` from *ask* to *allow* and leaves `git push` under *ask*. None is this
-change's to stage or revert, and this pass's builds left their diffs the size they were.
+No rule file, `CLAUDE.md` or spec changed. `main` is level with `origin/main` at `78ff05a`.
+
+**Six paths are deliberately left unstaged**, five of them as at every commit since 2026-10-07: the two
+watch schemes and the two watch catalogues the Xcode app wrote (known issue #50), and
+`.claude/settings.json`, which moves `git commit` and `git init` from *ask* to *allow* and leaves
+`git push` under *ask*. The sixth is `WaterBuddy/AppShortcuts.xcstrings`, also the Xcode app's (#50's
+note of 2026-10-09); the thirty-ninth pass counted five while it was already modified. None is this
+change's to stage or revert.
 `Screenshots/census/` (28 coverage captures, 51 MB) is still untracked, neither committed nor ignored;
 whether it belongs in the tree is the owner's call.
 
@@ -1919,7 +2123,9 @@ and `editingAnInferredGoalDownToTheDefaultPersistsTheFlag`.*
    screen appearance. Either give it a caller that genuinely wants everything, or delete it.
 5. **The simulator's App Group holds test data** from this session's verification runs. The device was `simctl erase`d partway through to get a clean goal crossing, so the current contents are whatever the confetti probe logged — eight bottles against a 4,000 ml goal —
    the earlier six including a synthetic 1,000 ml serving, plus the 150/250/500 this run tapped in. Harmless, and only on the simulator; `simctl erase`
-   clears it if a clean first-run state is wanted.
+   clears it if a clean first-run state is wanted. *(2026-10-08, evening: no longer true of any device
+   here. Every simulator's data was lost (#77), this one's with it; the iOS 27.0 iPhone 17 the gate now
+   runs on was erased by the owner and holds only what one UI run wrote.)*
 6. ~~**Six of the eight `DataManager(` sites in the test target omit `rescheduleReminders:`, so they
    drive the real notification centre.**~~ **Fixed 2026-08-31.** The six named were the right six —
    `WaterLogTests.swift:51, :265, :291, :293, :416` and `HistoryViewTests.swift:44` — but the
@@ -2354,7 +2560,8 @@ rather than fixed — the review's own explicit call, not an oversight:**
     `progressUnclampedExceedsOneOnOverachievement` in both `DataManagerTests`
     (`DataManagerTests.swift:244`, `:232`) and `WaterSnapshotTests` (`WaterSnapshotTests.swift:91`,
     `:280`), and `theOfferedRangeIsAWholeNumberOfSteps` in both `DailyGoalSetupTests`
-    (`DataManagerTests.swift:1246` — read `:1213` until 2026-10-08) and `HistoryServingTests`
+    (`DataManagerTests.swift:1312` — read `:1246` until the fortieth pass, and `:1213` until
+    2026-10-08) and `HistoryServingTests`
     (`HistoryViewTests.swift:80`). All
     pre-existing — found by this pass's own name sweep, not introduced by it. Every one passes; the
     cost is a name that no longer identifies one test in a report. Renaming them is test-only and
@@ -2525,7 +2732,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     2026-10-06), and the Xcode app was open throughout. Expect the entries back whenever Xcode builds
     a watch target. The four files were left unstaged and unreverted for the owner. Keeping the
     entries out would mean `Text(verbatim:)` for the preview's literals and the complication's
-    figure; not attempted.
+    figure; not attempted. *(2026-10-09: a fifth, `WaterBuddy/AppShortcuts.xcstrings`, already modified
+    when the #73 session began on the evening of the 8th and missed by the thirty-ninth pass's count of
+    five unrelated paths. It is re-spaced into the same `"key" : value` style, and two keys gained
+    `"extractionState" : "stale"`; ignoring whitespace those two lines are the whole diff. Every value
+    is unchanged. Left unstaged and unreverted, like the four. Whether Xcode's "stale" on the Siri
+    phrases means anything for the next archive has not been looked at.)* *(Later on 2026-10-09: looked
+    at, for #78. A build from this tree still compiles all three phrases into `en.lproj` and
+    `ru.lproj`'s `AppShortcuts.strings`, the two stale keys included, in Debug and in Release. The
+    metadata lists the three as one shortcut's phrase templates; Xcode's catalogue most likely keys a
+    shortcut by its first phrase, which would be why it calls the other two stale. That last part is an
+    inference, not something read from Xcode.)*
 
 **Opened by the 2026-10-07 `/doc_sync` re-run:**
 
@@ -2670,6 +2887,9 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     is fixed. The fix is the test's — assert on the picked day's header total, which moves by the
     serving, or on the new row itself, never a count of visible rows — and it is its own change, the
     owner's call. Resetting the simulator is not ours either: `xcrun simctl erase` is on the deny list.
+    *(2026-10-08, evening: it passed — 26 of 26 — on a freshly erased iOS 27.0 simulator (#77), which is
+    the cause seen from the other side. The test is unchanged, and will fail again once yesterday holds
+    eight servings there.)*
 63. **The App Shortcut cannot run on this simulator, so `LogServingIntent.perform()` has never
     executed.** Registration is verified — Shortcuts lists *WaterBuddy → Log a Glass*, mug glyph, blue
     tile, *Записать стакан* in Russian — but a tap says *Unable to run App Shortcut*: `linkd` "Failed to
@@ -2681,7 +2901,13 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     builds with the owner's identity would also reach it, and is theirs to decide. *(2026-10-08: not
     every intent surface goes through `linkd`. A Control Center control's press goes SpringBoard →
     `chronod`, which ran `AddWaterIntent.perform()` on this simulator — the first time that intent has
-    executed in any verification here. The App Shortcut and the widgets' buttons are still refused.)*
+    executed in any verification here. The App Shortcut and the widgets' buttons are still refused.)* *(2026-10-09: it has now been tried on a
+    build the system will run — the owner's TestFlight 1.1, on their iPhone — and it does not work
+    there: #78. `perform()` has also executed once, in-process, in a throwaway probe on this simulator:
+    it returned its dialog and logged the Glass. That is the body's first run anywhere, and it is not
+    the system's path.)* *(Later the same morning: the owner reports the phrase works on their iPhone,
+    which makes that the first run through the system's path — on their word; nothing of it was seen
+    from here, and spec §8.3's steps were not reported one by one. #78 is closed on it.)*
 64. **Two deferred minors from the Siri phrase's final review.** (a) `LogServingIntent` and
     `WaterBuddyShortcuts` are nonisolated only because their protocols refine `Sendable` — the reviewer
     typechecked it under the app target's flags; stating `nonisolated` outright would document it, as
@@ -2757,7 +2983,15 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     does, `perform()` declining unless the store resolved to the App Group rung is its own change;
     requiring the passcode would cross the owner's "log without unlocking" ruling. Found by the final
     review.
-73. **`loadFromStore()` never re-reads `remindersEnabled`.** It is read once, in `init`, while
+73. ~~**`loadFromStore()` never re-reads `remindersEnabled`.**~~ **Retired 2026-10-09 (the fortieth
+    pass) — the fix is on disk, and its tests were seen RED first:** `loadFromStore()` re-reads the flag
+    (`DataManager.swift:1233`) behind the equality guard its neighbours use, and reschedules nothing
+    itself, because `refresh()` always ends in a reschedule. Four tests in `ReminderSeamTests` pin it
+    (`DataManagerTests.swift:747`–`:793`): a second manager stands in for the long-lived extension, and
+    the plan it hands back — what `AddWaterIntent` files — follows the app's toggle in both directions;
+    the change is published once, and a refresh that finds nothing changed publishes nothing. **Still
+    not reproduced** on a simulator or a device, before or after. The original entry follows, for the
+    record: It is read once, in `init`, while
     `servings` and `language` are re-read on every `refresh()`. A widget extension that stays alive
     keeps the flag it read at launch: turn reminders on in the app, then press the control (or a
     widget's **+**) before iOS ends the extension, and its reconcile files an empty plan — clearing the
@@ -2779,6 +3013,8 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     the watch's reception (#53) and Home while the app is open (#74). The Action Button's hint follows
     the phone's language — iOS derives it from the display name — while the tile follows the app's.
     The simulator keeps the control placed, and nine presses' servings, 2,700 ml, in today's log (#5).
+    *(2026-10-08, evening: that simulator's data is gone (#77), the placed control and the nine presses
+    with it.)*
 
 **Opened by the 2026-10-08 fix for #68 (the thirty-ninth pass):**
 
@@ -2791,6 +3027,73 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     say the type "holds still". Pre-existing: `totalSize` sat on `HydrationView` with the same reach, and
     the #68 fix kept it exactly. Found by reading; **not rendered** at an accessibility size. Whether the
     cap moves above the metric or the comment changes is a design call, and its own change.
+
+**Opened by the 2026-10-08 fix for #73 (the fortieth pass):**
+
+77. **The gate's pinned destinations do not resolve on this Mac.** On the evening of 2026-10-08 the
+    simulator devices here lost their data while staying listed — the device folder held two, both
+    created within the hour — and the installed runtimes fell to iOS 27.0 alone. The cause is not known.
+    iOS 26.5, iOS 18.6 and watchOS 11.5 were back later that evening (another project's session
+    downloaded 26.5); **watchOS 26.5 was not**, and the watch's floor is 26.0. What follows:
+    - `WaterBuddyWatchTests` cannot run until a watchOS 26 runtime is installed. The #73 gate has no
+      watch test run; the watch app and its tests were compiled instead.
+    - iOS 26.5's iPhone 17 is listed and will not boot — "Unable to boot device because it cannot be
+      located on disk" — until it is erased. `xcrun simctl erase` is on the deny list, so that is the
+      owner's to run; they ran it for iOS 27.0's iPhone 17, which the #73 gate used.
+    - Rule `85-testing` pins `OS=26.5` on both platforms, and says to update the pin when the installed
+      runtime changes. Whether the gate returns to 26.5 or moves to 27.0 is the owner's call, and the
+      rule's text is theirs to edit.
+    - The old simulator's contents went with its data: the placed widgets and control, and the servings
+      behind #5, #62 and #75's last line.
+
+**Opened by the owner's device report of 2026-10-09 (the forty-first pass):**
+
+78. ~~**On the owner's iPhone the Siri phrase opens WaterBuddy and logs nothing.**~~ **Closed 2026-10-09
+    (the forty-second pass) by the owner's observation — not fixed.** The owner reports that Siri "is ok
+    and working". No code was changed for it, so there is no fix on disk to point to, and **why it
+    failed is not known**. What is known: the failure was seen on 1.1 (1) or 1.1 (2), before build 3
+    existed; all three 1.1 archives were built from the same sources; and (3) is the first whose app,
+    widget and watch app carry one build number, where (2) had the app at 2 and the rest at 1. That is
+    a correlation only. If the phrase fails again, start from the table under *Current state* and from
+    the device's log, which was never obtained. The entry as opened follows, for the record: A
+    TestFlight build of
+    1.1; Siri in English, "Log water in WaterBuddy"; and the same from the *Log a Glass* tile in
+    Shortcuts, by the owner's account. The phrase is matched, so this is not Siri mishearing: the action
+    does not run, the app comes forward, and no serving appears. It is the App Shortcut's first try on a
+    build the system will run (#63), and roadmap item 4 is therefore **not done**.
+    - **The cause is not found.** Everything readable from here is as designed — the intent's
+      declaration, the metadata in Debug and Release, the phrase tables, the records in the Release
+      binary — and three probes on the simulator found the intent, ran `perform()` to a logged Glass,
+      and read its mode as background-only. *Current state* has the table.
+    - **What would settle it** is the device's own account of the tap: its log through Console, or a
+      simulator build signed with the owner's identity, if the simulator will then run the shortcut.
+      Both were asked for and neither is answered yet.
+    - **One thing the reading did turn up:** `perform()`'s last wait, `DataManager.remindersSettled()`,
+      has no time limit. It cannot explain a missing serving — the Glass is logged before it — but a
+      reconcile that never returned in a background launch would hold Siri's reply open. Unverified.
+    - **No code was changed.** `openAppWhenRun` is deprecated from iOS 26 for `supportedModes`; moving
+      to it is worth doing with the fix, and is not the fix by itself — the intent already reports
+      background-only through the older property.
+    - **Until it is fixed,** the build that goes out as 1.1 carries the shortcut as it is: a tile in
+      Shortcuts and Spotlight that opens the app. Fixing first, shipping as is, or holding the release
+      is the owner's call. The *What's New* text drafted for 1.1 names the phrase; that line stays out
+      until this works.
+
+**Opened by the 2026-10-09 submission (the forty-second pass):**
+
+79. **The build in review has no commit.** Every archive uploaded as 1.1 was made from the working
+    tree: HEAD `78ff05a`, plus the fix for #68 (staged), the fix for #73 (unstaged), the version and
+    build number in `project.pbxproj` (unstaged), and the catalogues the Xcode app rewrote (#50). No
+    commit reproduces the submitted binary until those are committed, and a checkout of `main` today
+    builds 1.0 without either fix.
+    - **The way to close it** is the owner's `/commit`, in the order the fortieth pass set out: #68
+      from the index as it stands; then #73 with its docs; then the version and build number. A tag on
+      the last would mark what went to review.
+    - **What the submitted build was not gated on:** the watch tests (#77), and iOS 26.5 — #73's gate
+      ran on iOS 27.0. Build 3 itself was never built by a gate run; its sources are the ones the gate
+      ran on, with two build settings changed.
+    - **Not known from here:** which of the three uploads is attached to the submission, and the
+      *What's New* text that went with it.
 
 ## Where the rest is written down
 

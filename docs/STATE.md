@@ -4,7 +4,12 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-08 (twenty-third pass — `/doc_sync` after roadmap item 6, the Control Center
+**Last updated:** 2026-10-09 (twenty-fourth pass — `/doc_sync` after known issue #73. **No key added,
+removed or renamed** — still eleven — and no stored byte changed: `refresh()` now re-reads
+`remindersEnabled`, which until then was read once, in `init`. Recorded under *The sixth key, and the
+seam that reads it*. *Tests that pin this* gains four: seventeen suites, 203 `@Test`. The seven
+`DataManager.swift` line numbers moved with the thirteen new lines and were re-derived.
+Previously: 2026-10-08, twenty-third pass — `/doc_sync` after roadmap item 6, the Control Center
 control (`docs/superpowers/specs/2026-10-08-control-center-design.md`). **No key added, removed or
 renamed** — still eleven — and no stored byte changed: one constant, `usualSlot`, now names the index
 `usualServing(in:)` reads, and the servings row names the control as a third reader. Re-verified the
@@ -439,6 +444,17 @@ write-through and equality guard as `currentWater` and `dailyGoal`, so a no-op w
 invalidates observers nor re-plans the day. Setting it re-plans **in both directions**: switching
 reminders off has to *clear* what is already filed with the system, not merely stop adding to it.
 
+**It is re-read on every `refresh()`** (2026-10-08, known issue #73). Only the app writes it, but a
+widget extension's `DataManager.shared` can outlive the write, and `AddWaterIntent` files that
+instance's plan. Until then `loadFromStore()` re-read the goal, the vessels and the language and left
+this flag as `init` had read it. A press made after the toggle moved therefore filed an empty plan over
+reminders just switched on, or a full one over reminders just switched off. The re-read sits behind the
+same equality guard as its neighbours and reschedules nothing itself: `refresh()` always ends in a
+reschedule. `aLongLivedExtensionPlansRemindersTurnedOnInTheApp` and
+`aLongLivedExtensionStopsPlanningRemindersTurnedOffInTheApp` pin the two directions;
+`refreshPublishesARemindersFlagChangedByAnotherProcess` and
+`aRefreshThatFindsTheFlagUnchangedDoesNotChurnObservers` pin the publish and the guard.
+
 `DataManager` takes a sixth injected dependency and hands out a plan; it never touches
 `UserNotifications` itself:
 
@@ -620,7 +636,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1387
+nonisolated static let role: Role = {          // DataManager.swift:1400
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -637,19 +653,20 @@ burn-once migration flag, and filing a duplicate reminder plan. Resolved from `i
 the compile-time platform rather than from a second runtime probe, because rule `25-shared-storage`
 forbids a competing detection scheme: two probes can disagree and leave one guard open.
 
-**Four writes are guarded, by three different questions** (line numbers re-verified 2026-10-08 against
-each guard's own line — all six had moved since the 2026-09-01 check that followed the watchOS plan's
-~500-line addition):
+**Four writes are guarded, by three different questions** (line numbers re-verified 2026-10-09 against
+each guard's own line — the fix for #73 moved all six, by four lines or by thirteen. Before that,
+2026-10-08: all six had moved since the 2026-09-01 check that followed the watchOS plan's ~500-line
+addition):
 
-1. **Materialising `dailyGoal` in `init`** (`:479`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:483`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1016`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:938`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1531`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1020`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:942`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1544`, `mayHaveLegacyStandardDefaults`).
 
 Two further sites are guarded by the same enum but are not group bookkeeping: `republishHistory`
-(`:860`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:1160`,
+(`:864`, `drawsHistory`, cost rather than correctness) and `requestReminderReschedule` (`:1164`,
 `mayFileReminders`, the one whose wrong answer is immediately user-visible).
 
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`
@@ -742,8 +759,8 @@ A `body` that computes a displayed figure for itself is how the two start disagr
 
 ## Tests that pin this
 
-Seventeen suites, 199 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
-`ReminderSeamTests` (68 between them) cover the write path, the rollover, observation, the goal and
+Seventeen suites, 203 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
+`ReminderSeamTests` (72 between them) cover the write path, the rollover, observation, the goal and
 the reminder seam; `WaterSnapshotTests` (28) covers the read path, the day boundary and the
 migration; `WaterLogStoreTests` (23) covers the log CRUD, the published rows and the seed migration;
 `ReminderPlanTests` (22) pins *when* to remind, the quiet hour after a drink included, and
@@ -756,7 +773,9 @@ serving, where the window starts, what the History sheet offers and where it ope
 watch pour; `HistorySelectionTests` (5) the screen's day selection. *(Counted per suite by line range
 on 2026-10-06. Until then this read 151 — its own figures summed to 152 — while the tree held 160.
 2026-10-07: +3, the new `ReconcileQueueTests`; then +27, the six suites of the earlier-servings
-change, re-counted per suite — the first eleven still sum to 172.)*
+change, re-counted per suite — the first eleven still sum to 172. 2026-10-08: +4, `ReminderSeamTests`'
+four for the re-read of the reminders flag; re-counted per suite on 2026-10-09 — 32 + 21 + 19, and the
+first eleven now sum to 176.)*
 
 Named cases worth knowing: `travellingWestwardDoesNotWipeTheDay`,
 `travellingEastwardAcrossTheDateStartsANewDay`, `theDayBoundaryHoldsAcrossADstTransition`,

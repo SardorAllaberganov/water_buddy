@@ -3,7 +3,11 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-08 (fifteenth pass — `/doc_sync` after known issue #68: the medium family's
+**Last updated:** 2026-10-09 (sixteenth pass — `/doc_sync` after known issue #73: the reminder plan
+`AddWaterIntent` files now follows the app's reminders toggle as it stands at the press, because
+`refresh()` re-reads the flag. One bullet under *The intent also reschedules reminders*; no file under
+`WaterBuddyWidget/` changed, and no other contract.
+Previously: 2026-10-08, fifteenth pass — `/doc_sync` after known issue #68: the medium family's
 two figure lines now follow the app's language like the rest of the widget. Its column is `MediumColumn`,
 a view beneath `HydrationView`'s injection, and `HydrationView` reads no string itself. No contract
 changed; known issue #76, found while moving the column, is pointed to from *Accessibility*.
@@ -232,6 +236,13 @@ at all:
   `LSPlugInKitProxy.containingBundle`, so these requests join the same pending set the app manages.
   Which is why `reconcile` only ever removes identifiers under `ReminderPlan.identifierPrefix` —
   `removeAllPendingNotificationRequests()` from here would clear the app's entire set.
+- The plan it files is `DataManager.shared.currentReminderSlots()`, and since 2026-10-08 that plan
+  follows the app's reminders toggle as it stands at the press. `addWater(amount:)` starts with
+  `refresh()`, which now re-reads `remindersEnabled` with the goal, the vessels and the language. Until
+  then an extension that had outlived the toggle planned from the flag it launched with: a press after
+  reminders were switched on filed an empty plan, which cleared them, and a press after they were
+  switched off filed them again (known issue #73, retired — pinned by tests, never reproduced on a
+  device).
 
 **Unverified:** whether WidgetKit's sandbox *permits* the call at runtime. The addressing is proven;
 the permission is not, and sandbox profiles are kernel-compiled. `DataManager.refresh()` reconciles

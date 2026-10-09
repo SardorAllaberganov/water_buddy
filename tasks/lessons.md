@@ -2459,3 +2459,146 @@ touched no rendering-mode branch, and the full-colour render had already proved 
 
 **The rule:** check `uptime` before a SpringBoard-heavy probe step. Under that load, record the step as
 not run, with the reason, rather than spending its second attempt.
+
+## 2026-10-08 — A guard's test goes red only against the unguarded code
+
+Known issue #73's fix re-reads `remindersEnabled` in `loadFromStore()` behind an equality guard. Three of
+its four tests failed on the old code. The fourth,
+`aRefreshThatFindsTheFlagUnchangedDoesNotChurnObservers`, passed on it: code that never publishes cannot
+publish too often. A test first seen green proves nothing (rule `85-testing`), so the re-read was written
+without its guard first. That run failed the fourth test on `counter.count == 0` and passed the other
+three. Then the guard went in.
+
+**The rule:** when a test pins a guard, write the unguarded step first and watch that test fail against
+it. Three runs, not two.
+
+## 2026-10-08 — A listed simulator may have nothing on disk
+
+That evening `xcrun simctl list` still showed iPhone 17 under iOS 27.0 and under iOS 26.5. Both failed a
+real test run with "Unable to boot device because it cannot be located on disk": the devices' data
+folders were gone, and so was the watchOS 26.5 runtime (known issue #77). The build succeeded each time;
+only installing onto the device failed. The phone gate then ran on iOS 27.0, labelled as such, and the
+watch tests were recorded as not run.
+
+**The rule:** before a gate, read `xcrun simctl list runtimes`, then prove the pinned destination by
+running it. If it will not boot, say so, name the substitute in every result, and record what could not
+run — never a silent swap.
+
+## 2026-10-08 — The deny list is written down; read it before proposing a remedy
+
+The remedy for a device with no data is `xcrun simctl erase`. It was refused, and then tried twice more
+after the owner answered "1" and "go" — refused both times. Known issue #62 already said it: "`xcrun
+simctl erase` is on the deny list." A short reply does not lift a deny rule; the owner ran the command
+themselves once handed the exact line. The same happened with `sed -i` on `project.pbxproj`.
+
+**The rule:** when a command is refused, stop, and give the owner the one line to paste with a leading
+`!`. Do not try it again on a one-word answer. Check the known issues for a recorded deny before
+planning around a command.
+
+## 2026-10-08 — An archive carries the working tree, in-flight steps included
+
+The owner pasted an App Store Connect rejection in the middle of the #73 work. At that moment
+`DataManager.swift` held the deliberately unguarded re-read from the lesson above, and the #68 fix was
+staged but not committed. An archive made then would have shipped both. The upload was refused for its
+version number, so nothing went out.
+
+**The rule:** the moment the owner mentions an upload or an archive, say what the working tree holds
+that HEAD does not, and offer to finish or back out any in-flight step first. Keep an intermediate step
+in production code for one test run, no longer.
+
+## 2026-10-09 — A warning baseline can be taken after the first edit
+
+The comparison needs a clean build of the code from before the change. The edit was already made, and a
+stash would have disturbed #68's staged files. A copy of the tree in the scratchpad, with only the two
+changed files put back by `git show HEAD:<path>`, was the pre-change code exactly: `diff -rq` showed
+those two files and nothing else. Both builds gave 31 unique lines and 44 occurrences, identical per
+file and message.
+
+**The rule:** build the baseline from a scratch copy with the changed files restored from HEAD, and
+prove the copy with `diff -rq` before building. Never stash under staged work.
+
+## 2026-10-09 — A sync that runs past midnight has two dates
+
+The #73 fix and its gate ran on the evening of 2026-10-08; the `/doc_sync` began at 00:00 on the 9th. The
+first draft of the header dated everything the 8th.
+
+**The rule:** date a gate result by when it ran and a pass by when it was written. Check `date` before
+writing either.
+
+## 2026-10-09 — Release notes may name only what a device has run
+
+The *What's New* text drafted for 1.1 named the Siri phrase. Roadmap item 4 was recorded as "not done
+until the owner's device check", and `perform()` had never executed anywhere (known issue #63). The draft
+flagged that as a question. The owner's answer was the device check itself: on a TestFlight build, *Log a
+Glass* opens the app and logs nothing (#78).
+
+**The rule:** when drafting store text, list a feature only if its device check has passed. Put the
+unchecked ones in a separate list for the owner, outside the text they will paste.
+
+## 2026-10-09 — Do not call a wait bounded without reading it
+
+While looking into #78 the owner was told that both of `LogServingIntent.perform()`'s waits were
+bounded. `waitUntilActivated()` had been read, and is. `remindersSettled()` had not: it returns when the
+queued reconciles have run, with no time limit. The doc sync caught it when the claim had to be written
+down against the code, and the correction went to the owner in the same reply.
+
+**The rule:** a claim about a function is made from that function's body, read in this session. When a
+claim turns out wrong, say so to whoever heard it, in the next message.
+
+## 2026-10-09 — A deny rule names a command, not a file
+
+The fortieth pass's lesson said `sed -i` on `project.pbxproj` was refused, and a memory note turned that
+into "edits to the project file are refused". `.claude/settings.json` says otherwise: its deny list holds
+`Bash(sed -i:*)` and `Bash(xcrun simctl erase:*)`, and nothing about the file. When the owner named 3
+for the build number, the Edit tool set all fourteen sites.
+
+**The rule:** read the deny list itself to learn what is denied. A refusal of one command is not a
+refusal of the change; do the change with the tool the project allows, when the owner has asked for it.
+
+## 2026-10-09 — When every local check passes, the missing evidence is the device's
+
+#78 was reported from the owner's phone. Four suspects were tested here, each by reading or by a
+throwaway probe: the action's metadata, the Release binary, a lookup from off the main actor, and
+`perform()` itself. All four came back right. No fix was written. The simulator cannot run an App
+Shortcut from a locally signed build, so the next evidence is the phone's log, or a simulator build
+signed with the owner's identity — both theirs to give. A short reply about the build number answered
+neither, and was not taken as leave to use their signing identity.
+
+**The rule:** a fix needs a cause. When the cause is past what this machine can show, record what was
+ruled out, name the two cheapest ways to see further, and wait. Do not ship a guess, and do not read
+consent into a reply about something else.
+
+## 2026-10-09 — Xcode's Archives folder says what was uploaded
+
+While #78 was open, "which build did the owner test?" was written down as not known, and the
+forty-first pass recorded that nothing had been archived as 1.1 (3). Both could have been read off this
+Mac. `~/Library/Developer/Xcode/Archives/` held four WaterBuddy archives, each with an `Info.plist`
+giving its version, build number, time and upload record: 1.0 (1) refused, then 1.1 (1), (2) and (3)
+uploaded — the last three minutes before that sentence was written. The embedded widget's and watch
+app's own `Info.plist`s showed build (2)'s mismatch too.
+
+**The rule:** when the question is what was built, uploaded or tested, read the Archives folder before
+asking the owner or writing "not known". Say "by this session" only when the sentence also says what
+the machine shows.
+
+## 2026-10-09 — "It works now" closes the observation, not the question
+
+The owner reported that the Siri phrase works, hours after reporting that it opened the app and logged
+nothing. No code had changed. #78 was closed as *closed by observation — not fixed*, with the cause
+recorded as unknown. One difference between the builds was found — build (3) is the first whose app and
+extensions share a build number — and written down as a correlation.
+
+**The rule:** when a bug stops without a fix, close the entry on whose word, say that nothing was
+fixed, and keep what was ruled out where the next report can start from it. Never promote the one
+difference found into the cause.
+
+## 2026-10-09 — A build can reach review before any commit holds it
+
+Three archives of 1.1 were uploaded from the working tree while the fixes for #68 and #73 and the
+version change were all uncommitted. The lesson of the 8th covered saying so when an upload is
+mentioned; it did not stop the upload, and should not have — that is the owner's to do. What was missing
+was the record: known issue #79 now says no commit reproduces the binary in review.
+
+**The rule:** when a build has gone out from an uncommitted tree, open a known issue naming exactly
+what the tree held over HEAD and the commits that would close it. Offer the `/commit` order in the same
+reply.

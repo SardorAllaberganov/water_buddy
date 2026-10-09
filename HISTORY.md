@@ -6365,3 +6365,323 @@ with explicit paths: `WaterBuddyWidget/WaterBuddyWidget.swift`, `docs/AI_CONTEXT
 `docs/DESIGN.md`, `tasks/lessons.md` and this file. The five unrelated paths stay unstaged, and
 `Screenshots/census/` stays untracked. HEAD is `78ff05a`, 80 commits, level with `origin/main`. No
 `git commit` was run.
+
+## [2026-10-08] — A long-lived extension reads the reminders toggle again
+
+Known issue #73. `refresh()` re-read the goal, the quick-add vessels and the language from the shared
+suite, and left `remindersEnabled` as `init` had read it. Only the app writes that flag, but a widget
+extension's `DataManager.shared` can outlive the write, and `AddWaterIntent.perform()` files the plan
+that instance hands back. A press after reminders were switched on therefore filed an empty plan, which
+cleared them until the app next came forward. A press after they were switched off filed them again.
+
+`loadFromStore()` now re-reads the flag, compares it with the stored value, and publishes only a change —
+the shape its four neighbours already have. It reschedules nothing itself: `refresh()` always ends in a
+reschedule, after the re-read. The DocC on `remindersEnabled` says the flag is re-read, and why.
+
+### The rulings it rests on
+
+- **The owner's, 2026-10-08:** `/start_task` named no task. Offered #73, #74, #76 and the roadmap's two
+  owner's-call items, the owner chose #73, then approved the plan with "go".
+- **Rule `20-state`:** `loadFromStore()` compares each re-read value against its stored field before
+  wrapping the assignment in `withMutation`. The new read follows it.
+- **The executor's:**
+  - The flag is read with `defaults.bool(forKey:)`, as `init` reads it: a missing key means off.
+  - No reschedule was added to the re-read. Rule `80-notifications` lists `refresh()` among the callers
+    that reschedule, and it already does, with the fresh flag in hand.
+  - A fourth test was added beyond the plan's three, so that the guard has a test of its own.
+
+### Files touched
+
+| File | Lines | Change |
+|---|---|---|
+| `WaterBuddy/DataManager.swift` | 2583 | +13/−0 — the re-read in `loadFromStore()`, four lines of DocC on `remindersEnabled` |
+| `WaterBuddyTests/DataManagerTests.swift` | 1331 | +66/−0 — four tests in `ReminderSeamTests` |
+
+`DataManager.swift` is compiled into the widget extension and both watch targets. No key,
+`project.pbxproj` membership, catalogue, entitlement, Info.plist key, privacy manifest or rule changed.
+
+### Verification actually run
+
+- **RED → GREEN, three runs of `ReminderSeamTests`:**
+  1. The tests alone. Three failed: `aLongLivedExtensionPlansRemindersTurnedOnInTheApp` on
+     `!widget.currentReminderSlots().isEmpty`, `aLongLivedExtensionStopsPlanningRemindersTurnedOffInTheApp`
+     on `widget.currentReminderSlots().isEmpty`, and `refreshPublishesARemindersFlagChangedByAnotherProcess`
+     on both of its expectations. `aRefreshThatFindsTheFlagUnchangedDoesNotChurnObservers` passed.
+  2. An unguarded re-read. Those three passed, and the fourth failed on `counter.count == 0`.
+  3. The guard added: `✔ Test run with 19 tests in 1 suite passed`.
+- **The gate ran on a substitute simulator.** That evening the Mac's simulators had lost their data, and
+  the watchOS 26.5 runtime was gone (known issue #77). The pinned iOS 26.5 iPhone 17 would not boot. The
+  phone runs used iOS 27.0's iPhone 17, which the owner erased:
+  - phone unit: `✔ Test run with 377 tests in 46 suites passed`;
+  - phone UI: `Executed 26 tests, with 0 failures` — #62's test passed on the erased simulator;
+  - watch unit: **not run**, no watchOS 26 runtime. `build-for-testing -scheme WaterBuddyWatch` for the
+    generic watchOS Simulator: `** TEST BUILD SUCCEEDED **`;
+  - `WaterBuddyWidgetExtension`: built, iOS 27.0;
+  - `WaterBuddyWatchWidget`: built, for the generic watchOS Simulator.
+
+  `xcrun simctl shutdown all` was skipped, because other projects' simulators were in use.
+- **All four shipping targets compiled the changed file,** by the `SwiftCompile` lines in those logs.
+- **Warnings:** clean builds of the `WaterBuddy` scheme, of a copy of the tree with the two files put
+  back to HEAD and of the final code. 31/31 unique lines, 44 occurrences each, identical per file and
+  message.
+- **Not run:**
+  - the bug on a simulator or a device, before or after;
+  - the watch tests;
+  - anything on iOS 26.5.
+
+### Found along the way
+
+- The simulator set (#77): pinned destinations that do not resolve, and no watchOS 26 runtime.
+- `xcrun simctl erase` was refused three times, twice after a one-word answer from the owner that did
+  not lift the deny rule. The owner ran it. `tasks/lessons.md` has the rule.
+- The first RED run passed the 600-second foreground limit while the erased simulator booted, and
+  finished in the background with its result already printed.
+
+## [2026-10-08] — The version moves to 1.1
+
+The owner's own change, made during the #73 work. App Store Connect refused an upload: *"Invalid
+Pre-Release Train. The train version '1.0' is closed for new build submissions"*, and
+`CFBundleShortVersionString [1.0]` "must contain a higher version than that of the previously approved
+version [1.0]". Version 1.0 is approved.
+
+`MARKETING_VERSION` went from `1.0` to `1.1` at all fourteen sites in `project.pbxproj`: seven targets,
+Debug and Release. The owner ran the `sed` themselves, after the same edit from the session was refused.
+`CURRENT_PROJECT_VERSION` is still `1` at its fourteen.
+
+### Verification actually run
+
+- `git diff --numstat` on the project file: 14 added, 14 removed. Fourteen sites read `1.1;` and none
+  `1.0;`.
+- Every build and test run of the #73 work after its first RED run built with it.
+- **Not run:** an archive or an upload of 1.1.
+
+### Found along the way
+
+- The upload was attempted while the working tree held the uncommitted fix for #68 and an in-flight step
+  of #73. An archive carries the working tree (`tasks/lessons.md`).
+
+## [2026-10-09] — `/doc_sync`: the fortieth pass, after #73
+
+Run at 00:00, straight after the two checkpoints above.
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:**
+  - two line counts: `DataManager.swift` (2570 → 2583) and `DataManagerTests.swift` (1265 → 1331);
+  - the test count in the targets table (373 → 377);
+  - the eight `DataManager.swift` citations in *The process role*, each resolved against its symbol;
+  - #37's citation of `theOfferedRangeIsAWholeNumberOfSteps` (`:1246` → `:1312`);
+  - `DataManagerTests.swift`'s row never named `WristPublishSeamTests`, the file's fifth suite;
+  - #73 retired in the struck-through form, the original kept; #77 opened; #5, #62 and #75 annotated;
+  - #50 gains a fifth file the Xcode app rewrote, `WaterBuddy/AppShortcuts.xcstrings`, which the
+    thirty-ninth pass's "five unrelated paths" had missed;
+  - a new gate block, and a paragraph for the version;
+  - the header records this pass, with the thirty-ninth folded into a retained block.
+- **`docs/STATE.md`:**
+  - a paragraph under *The sixth key*: the flag is re-read on every `refresh()`;
+  - the seven `DataManager.swift` line numbers, re-derived;
+  - *Tests that pin this*: 199 → 203, and 68 → 72 for the first three suites, re-counted per suite;
+  - the header.
+- **`docs/WIDGET.md`:** one bullet under *The intent also reschedules reminders*; the header.
+- **`tasks/lessons.md`:** six entries.
+
+### Checked and already accurate
+
+- **`CLAUDE.md`:** the target table, the six shared files against `project.pbxproj`'s three exception
+  sets (six files each), and the nine phone keys. Not touched.
+- **`docs/DESIGN.md`:** no token or measured figure moved. Not touched; its `Last updated` stands.
+- **Keys:** eleven on `DataManager.Key.all`, eleven rows in `docs/STATE.md`.
+- **The Swift file list against the disk:** every file documented.
+- **`@Test` counts:** 377 phone and 57 watch by the attribute grep; the phone figure matches the gate.
+  The watch figure has no gate run behind it this pass.
+- **Rule citations:** all resolve.
+- **`<details>`:** fourteen opening and fourteen closing tags.
+
+### Staging
+
+Written last. **This pass staged nothing.** The six paths staged for #68 still stand in the index as the
+thirty-ninth pass left them, waiting for the owner's `/commit`. Four of them — `docs/AI_CONTEXT.md`,
+`docs/WIDGET.md`, `tasks/lessons.md` and this file — now hold this pass's edits as well, unstaged, on
+top. Staging them would fold #73 into #68's commit, and rule `90-git` asks for one logical change per
+commit. Also unstaged, for #73: `WaterBuddy/DataManager.swift`, `WaterBuddyTests/DataManagerTests.swift`
+and `docs/STATE.md`. The owner's version change sits unstaged in `project.pbxproj`. The six unrelated
+paths stay unstaged, and `Screenshots/census/` stays untracked. HEAD is `78ff05a`, 80 commits. No
+`git commit` was run.
+
+## [2026-10-09] — The Siri phrase fails on the owner's phone; the cause is not found
+
+Known issue #78, opened. The owner reported that the Siri phrase "only opens" WaterBuddy and logs
+nothing. Asked three questions, they answered: a TestFlight build of 1.1; Siri in English, spoken in
+English; and the *Log a Glass* tile in Shortcuts does the same — the app opens, nothing is logged. So
+the phrase is matched and the action does not run. It is the App Shortcut's first try on a build the
+system will run, and roadmap item 4's device check has failed.
+
+**No code changed.** This checkpoint records an investigation.
+
+### What was checked, and found right
+
+- **`LogServingIntent`:** `openAppWhenRun = false`. Its first wait is bounded at about a second.
+- **The built app,** Debug for the simulator and Release for a device (built unsigned into the
+  scratchpad): `Metadata.appintents/extract.actionsdata` identical in both. One action,
+  `LogServingIntent`, with `openAppWhenRun: false` and `supportedModes: 1`; one shortcut over it with
+  three phrase templates. `en.lproj` and `ru.lproj` each hold all three phrases.
+- **The Release binary:** the type and conformance records for the intent and its provider are present.
+- **Three throwaway probes,** `WaterBuddyTests/ZZSiriProbe.swift`, on iOS 27.0's iPhone 17 simulator,
+  deleted after each run:
+  1. The intent found by its mangled name, cast to `any AppIntent.Type` and built, all from a detached
+     task: `cast=ok`, `init=ok`; the provider lists one shortcut.
+  2. `perform()` run the same way: it returned `IntentResultContainer<Never, Never, Never,
+     IntentDialog>`, the total went 0 → 250 and the rows 0 → 1, in 3.87 seconds on a loaded Mac.
+  3. `supportedModes` at run time: raw 1, equal to `.background`.
+- **Apple's forums and documentation:** no report of this symptom.
+
+### What it rests on
+
+- **The rule against a fix without a cause.** Moving to `supportedModes` was considered and not done:
+  the intent already reports background-only.
+- **Known issue #63:** signing simulator builds with the owner's identity "is theirs to decide". It was
+  asked for, with the phone's log as the alternative. Neither is answered yet.
+
+### Found along the way
+
+- `DataManager.remindersSettled()`, `perform()`'s last wait, has no time limit. The owner had been told
+  both waits were bounded; that was wrong, and is corrected in the reply that carries this sync.
+- Probe 2 added one Glass to the simulator's own data.
+- A *What's New* text for 1.1 was drafted in conversation, in two lengths. It is not in `README.md`, and
+  its Siri line should stay out until #78 is fixed.
+
+### Verification actually run
+
+- The three probe runs above, each `✔ Test run with 1 test in 1 suite passed`.
+- A Release build of the `WaterBuddy` scheme for `generic/platform=iOS`, `CODE_SIGNING_ALLOWED=NO`:
+  `** BUILD SUCCEEDED **`.
+- **Not run:** the gate; anything on a device; the shortcut through the system's own path.
+
+## [2026-10-09] — The build number moves to 3
+
+The owner had set `CURRENT_PROJECT_VERSION` to 2 on the app target alone, which left the widget
+extension, the watch app and the watch widget at 1. App Store Connect warns when an extension's build
+number differs from its app's. Told of it, the owner said the build number after the next changes would
+be 3. All fourteen sites now read 3, set with the Edit tool; `sed -i` is on the deny list, the file is
+not.
+
+### Verification actually run
+
+- Fourteen sites read `CURRENT_PROJECT_VERSION = 3;` and none reads 1 or 2. `plutil -lint`: OK.
+  `git diff --numstat` on the project file: 28 added, 28 removed, the version's fourteen with them.
+- Probe 3 above built and ran with it.
+- **Not run:** an archive or an upload of 1.1 (3).
+
+## [2026-10-09] — `/doc_sync`: the forty-first pass
+
+Run at 08:55. No source file changed since the fortieth pass: `DataManager.swift` and
+`DataManagerTests.swift` stand at the 2583 and 1331 lines it recorded.
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:**
+  - *Current state* said "`CURRENT_PROJECT_VERSION` is still 1"; it is 3, with how it got there;
+  - a new block for the Siri phrase on a device, with the table of what was checked;
+  - #78 opened; #63 and #50 gain notes — the shortcut has now been tried on a device, and the "stale"
+    phrases were looked at and still compile;
+  - the Git section's third item names the build number;
+  - the header records this pass, with the fortieth folded into a retained block.
+- **`tasks/lessons.md`:** four entries.
+
+### Checked and already accurate
+
+- **`docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`:** nothing they describe moved. Not touched.
+- **`CLAUDE.md`:** the target table, the six shared files against the three exception sets (18 entries,
+  six each), the nine phone keys. Not touched. Its account of the Siri phrase is the design; #78 is where
+  the device's disagreement is recorded.
+- **Keys:** eleven on `DataManager.Key.all`, eleven rows in `docs/STATE.md`.
+- **The Swift file list against the disk:** every file documented; no probe file left.
+- **`@Test` counts:** 377 phone, 57 watch, by the attribute grep. No gate run stands behind them this
+  pass.
+- **Rule citations:** all resolve.
+- **`<details>`:** fifteen opening and fifteen closing tags.
+
+### Staging
+
+Written last. **This pass staged nothing,** for the fortieth's reason: the six paths staged for #68 are
+still in the index, waiting for the owner's `/commit`, and four of them hold later, unstaged edits on
+top. Unstaged: the #73 fix and its docs; `project.pbxproj`, with the version and the build number; and
+the six unrelated paths. `Screenshots/census/` stays untracked. HEAD is `78ff05a`, 80 commits, level
+with `origin/main`. No `git commit` was run.
+
+## [2026-10-09] — 1.1 goes to App Review; the Siri phrase works, on the owner's word
+
+The owner reported two things: Siri "is ok and working", and the submission is in App Store Connect's
+review. Neither can be seen from this Mac. This checkpoint records them as reported, beside what the Mac
+does show.
+
+### What the Mac shows
+
+Xcode's Archives folder holds four WaterBuddy archives. From each one's own `Info.plist`, and the
+embedded widget's and watch app's:
+
+| Archived | Version (build) | Widget and watch app | Upload |
+|---|---|---|---|
+| 2026-10-08 23:10 | 1.0 (1) | build 1 | refused — the version train was closed |
+| 2026-10-08 23:31 | 1.1 (1) | build 1 | recorded as uploaded |
+| 2026-10-09 08:20 | 1.1 (2) | build 1, under an app at 2 | recorded as uploaded |
+| 2026-10-09 08:52 | 1.1 (3) | build 3 | recorded as uploaded |
+
+The newest shipping source is `DataManager.swift`, modified at 23:19 on the 8th. So the three 1.1
+archives were built from the same sources, and differ only in build settings.
+
+### What follows from it
+
+- **Known issue #78 is closed by observation, not fixed.** No code was changed for it. The failure was
+  reported before build 3 existed, so it was on (1) or (2); where it now works, the owner has not said.
+  Build (3) is the first whose app, widget and watch app share a build number. That is recorded as a
+  correlation and nothing more.
+- **Roadmap item 4's device check stands as passed on the owner's word.** Spec §8.3's steps were not
+  reported one by one.
+- **Known issue #79 is opened: the build in review has no commit.** The archives carry HEAD `78ff05a`
+  plus the uncommitted fixes for #68 and #73 and the version change.
+
+### Not known
+
+- Which of the three uploads is attached to the submission.
+- The *What's New* text that was submitted, and whether it names the Siri phrase.
+- Whether the Lock Screen widget and the Control Center control were checked on the device (#70, #75).
+
+### Verification actually run
+
+- The four archives' `Info.plist`s, and the modification times of every file under the four shipping
+  folders since noon on the 8th.
+- **Not run:** the gate; any build; anything on a device or in App Store Connect.
+
+## [2026-10-09] — `/doc_sync`: the forty-second pass
+
+Run at 09:01, six minutes after the forty-first, on the owner's report above. No source file changed.
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:**
+  - *Current state* opens with the submission and the table of archives; the forty-first pass's account
+    of the Siri failure is kept beneath it, labelled as retained;
+  - the forty-first pass's sentence that nothing had been archived as 1.1 (3) gains a correction: one
+    had been, three minutes earlier;
+  - #78 closed in the struck-through form, as closed by observation, the entry as opened kept;
+  - #79 opened; #63 gains a note;
+  - the header records this pass, with the forty-first folded into a retained block.
+- **`tasks/lessons.md`:** three entries.
+
+### Checked and already accurate
+
+- **`docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, `CLAUDE.md`:** nothing they describe moved. Not
+  touched.
+- **The version and build number:** 1.1 and 3 at all fourteen sites, as the forty-first pass recorded.
+- **Keys, the three exception sets, the Swift file list, rule citations:** as the forty-first pass found
+  them six minutes earlier; the file list and counts were re-run, the rest re-checked below.
+- **`@Test` counts:** 377 phone, 57 watch. No gate run stands behind them this pass.
+- **`<details>`:** sixteen opening and sixteen closing tags.
+
+### Staging
+
+Written last. **This pass staged nothing.** The index still holds the six paths of #68 alone. Unstaged:
+the #73 fix and its docs, `project.pbxproj` with the version and build number, the six unrelated paths.
+`Screenshots/census/` stays untracked. HEAD is `78ff05a`, 80 commits, level with `origin/main`. No
+`git commit` was run — and until one is, #79 stands.
