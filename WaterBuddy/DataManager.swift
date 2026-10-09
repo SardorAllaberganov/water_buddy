@@ -369,6 +369,10 @@ final class DataManager {
     /// Changing it re-plans immediately, in both directions. Switching reminders **off** has to
     /// clear the schedule, not merely stop adding to it: notifications already filed with the system
     /// would otherwise keep arriving for days after the toggle said no (rule `80-notifications`).
+    ///
+    /// ``refresh()`` re-reads it, as it does ``servings`` and ``language``. Only the app writes it,
+    /// but the widget extension's instance can outlive the write, and that instance's plan is what
+    /// `AddWaterIntent` files.
     var remindersEnabled: Bool {
         get {
             access(keyPath: \.remindersEnabled)
@@ -1220,6 +1224,15 @@ final class DataManager {
         let language = Self.resolveLanguage(in: defaults)
         if language != storedLanguage {
             withMutation(keyPath: \.language) { storedLanguage = language }
+        }
+
+        // Only the app writes this flag, and a widget extension can outlive the write. Without the
+        // re-read, `AddWaterIntent` plans from the value its process launched with: an empty plan
+        // that clears the reminders just switched on, or a full one that brings back the ones just
+        // switched off. No reschedule here — `refresh()` always ends in one.
+        let reminders = defaults.bool(forKey: Key.remindersEnabled)
+        if reminders != storedRemindersEnabled {
+            withMutation(keyPath: \.remindersEnabled) { storedRemindersEnabled = reminders }
         }
     }
 

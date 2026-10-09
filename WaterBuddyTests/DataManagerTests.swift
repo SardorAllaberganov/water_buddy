@@ -737,6 +737,72 @@ struct ReminderSeamTests {
         }
     }
 
+    // MARK: The toggle is flipped in another process
+
+    // Only the app writes the flag, and a widget extension's `DataManager.shared` can outlive the
+    // write. `AddWaterIntent.perform()` files `currentReminderSlots()` straight after its
+    // `addWater(amount:)`, so the second manager in the first two tests stands in for that
+    // extension, and the plan it hands back is the plan the intent would file.
+
+    @Test func aLongLivedExtensionPlansRemindersTurnedOnInTheApp() {
+        withTempDefaults { defaults in
+            let app = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            let widget = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            app.remindersEnabled = true
+
+            widget.addWater(amount: 250)
+
+            #expect(
+                !widget.currentReminderSlots().isEmpty,
+                "an empty plan filed from the widget clears every reminder the app has just filed"
+            )
+        }
+    }
+
+    @Test func aLongLivedExtensionStopsPlanningRemindersTurnedOffInTheApp() {
+        withTempDefaults { defaults in
+            let app = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            app.remindersEnabled = true
+            let widget = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            #expect(widget.remindersEnabled, "the fixture: the extension launched with reminders on")
+            app.remindersEnabled = false
+
+            widget.addWater(amount: 250)
+
+            #expect(
+                widget.currentReminderSlots().isEmpty,
+                "a plan filed from the widget brings back reminders the user has just switched off"
+            )
+        }
+    }
+
+    @Test func refreshPublishesARemindersFlagChangedByAnotherProcess() {
+        withTempDefaults { defaults in
+            let manager = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            let counter = Counter()
+            withObservationTracking { _ = manager.remindersEnabled } onChange: { counter.count += 1 }
+
+            defaults.set(true, forKey: DataManager.Key.remindersEnabled)
+            manager.refresh()
+
+            #expect(manager.remindersEnabled)
+            #expect(counter.count == 1, "an observed property may not change silently")
+        }
+    }
+
+    @Test func aRefreshThatFindsTheFlagUnchangedDoesNotChurnObservers() {
+        withTempDefaults { defaults in
+            let manager = makeManager(defaults) { utc(2026, 8, 28, 12) }
+            manager.remindersEnabled = true
+            let counter = Counter()
+            withObservationTracking { _ = manager.remindersEnabled } onChange: { counter.count += 1 }
+
+            manager.refresh()
+
+            #expect(counter.count == 0, "`refresh()` runs on every foreground")
+        }
+    }
+
     // MARK: The goal is half of "goal reached"
 
     // `ReminderPlan` silences today once `currentWater >= dailyGoal`, so the plan depends on the
