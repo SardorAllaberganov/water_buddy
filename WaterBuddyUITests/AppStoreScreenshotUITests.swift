@@ -124,7 +124,7 @@ final class AppStoreScreenshotUITests: XCTestCase {
         // The week card is what makes this shot worth taking rather than a bare list; its absence
         // would mean the pours did not land.
         XCTAssertTrue(
-            app.otherElements["Last 7 days"].waitForExistence(timeout: 5),
+            app.staticTexts["Last 7 days"].waitForExistence(timeout: 5),
             "the week card did not draw, so the servings did not register"
         )
         Thread.sleep(forTimeInterval: settle)
@@ -235,7 +235,7 @@ extension AppStoreScreenshotUITests {
         app.buttons["History"].tap()
         XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 10))
         XCTAssertFalse(
-            app.otherElements["Last 7 days"].exists,
+            app.staticTexts["Last 7 days"].exists,
             "a week card in the empty state means the device was dirty"
         )
         Thread.sleep(forTimeInterval: settle)
@@ -261,7 +261,7 @@ extension AppStoreScreenshotUITests {
         // ── 08 · History, five rows, five distinct minutes ───────────────────────────────────────
         app.buttons["History"].tap()
         XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.otherElements["Last 7 days"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Last 7 days"].waitForExistence(timeout: 5))
         XCTAssertEqual(servingRows(in: app).count, 5)
         Thread.sleep(forTimeInterval: settle)
         capture("08-history-populated-5rows-top")

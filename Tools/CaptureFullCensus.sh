@@ -77,9 +77,9 @@ xcrun simctl ui "$PHONE" appearance dark
 xcrun simctl ui "$PHONE" content_size large
 
 echo "── 3. freeze the status bar ─────────────────────────────────────────────────"
-STATUS_TIME="$(date -v+10M '+%-l:%M')"
+# The clock is not overridden, for the reason `Tools/CaptureScreenshots.sh` gives at the same step:
+# only the real one agrees with History's rows in the device's own 12/24-hour setting.
 xcrun simctl status_bar "$PHONE" override \
-  --time "$STATUS_TIME" \
   --dataNetwork wifi --wifiMode active --wifiBars 3 \
   --cellularMode active --cellularBars 4 --operatorName "" \
   --batteryState charged --batteryLevel 100

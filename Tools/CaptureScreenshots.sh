@@ -100,12 +100,12 @@ xcrun simctl ui "$PHONE" appearance dark
 xcrun simctl ui "$PHONE" content_size large
 
 echo "── 3. freeze the status bar ─────────────────────────────────────────────────"
-# Not Apple's 9:41: the run pours five servings 65 s apart, so `HistoryView`'s newest row lands about
-# five minutes from here. A frozen 9:41 would contradict the timestamps printed directly beneath it.
-# Real clock plus six minutes agrees with them.
-STATUS_TIME="$(date -v+6M '+%-l:%M')"
+# The clock is deliberately NOT overridden. `HistoryView` prints each serving's time directly beneath
+# the status bar, in the device's own 12/24-hour setting, so the only clock that cannot contradict
+# those rows is the real one. A frozen 9:41 would; and so did the `date '+%-l:%M'` this line used
+# until 2026-10-09, which is 12-hour whatever the device is — on a 24-hour simulator at night it
+# printed 11:15 over rows reading 23:14. The cost is that the four shots are a few minutes apart.
 xcrun simctl status_bar "$PHONE" override \
-  --time "$STATUS_TIME" \
   --dataNetwork wifi --wifiMode active --wifiBars 3 \
   --cellularMode active --cellularBars 4 --operatorName "" \
   --batteryState charged --batteryLevel 100
