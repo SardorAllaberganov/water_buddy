@@ -68,6 +68,13 @@ from before this design was read, kept deliberately rather than renamed for its 
     `DataManager.requestWidgetReload()` reloads controls inside one. The floor stays 17.0, and an
     iPhone on 17 never offers the control. Like the floor itself, the 17.0 side of the check is
     compile-verified only
+  - **The second version check is the glass's.** `LiquidGlassModifier` draws Apple's glass inside
+    `#if os(iOS)` and `if #available(iOS 26.0, *)`, and `LiquidGlass.systemGlassAvailable` answers the
+    same question for the pure routing function; `theAvailabilityFlagMatchesTheRunningSystem` keeps
+    the two in step. The file compiles into four targets on two floors, so the check is compiled for
+    the widget extension and both watch targets as well; `#if os(iOS)` keeps the watch on the
+    hand-made stack until the redesign's watch stage. Below iOS 26 the path is run-verified on iOS
+    18.6 and compile-verified only at 17.0
   - **Two iPad artifacts survive the device-family change and cannot be removed from the project
     file.** Xcode 26.6's `actool` emits `AppIcon76x76@2x~ipad.png` and a `CFBundleIcons~ipad`
     Info.plist key from a modern single-size universal icon **unconditionally**, even when passed

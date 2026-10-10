@@ -5,12 +5,32 @@ globs: ["WaterBuddy/LiquidGlassModifier.swift", "WaterBuddy/AuroraBackground.swi
 
 # Design System
 
-Every surface in WaterBuddy is glass over an aurora. The tokens are derived, not chosen — retuning
-one by eye breaks a contrast figure somebody measured.
+Every surface in WaterBuddy is glass over an aurora, except the one primary surface a screen may
+carry. The tokens are derived, not chosen — retuning one by eye breaks a contrast figure somebody
+measured.
 
 ## Glass
 - Put content on glass only through `.liquidGlass(cornerRadius:…)` or `.liquidGlass(in:…)`. Never
   hand-roll a pane from `.background(.ultraThinMaterial)`, a bare fill, or a stroke
+- `.liquidGlass(…)` draws one of three panes, chosen by
+  `LiquidGlass.rendering(base:reduceTransparency:systemGlassAvailable:)`: the opaque fill under
+  Reduce Transparency; Apple's glass (`glassEffect`) for a `.material` base on iOS 26 and later; the
+  hand-made stack everywhere else — a `.flat` base, iOS 17 to 25, and the watch until its own stage.
+  Never call `glassEffect` at a call site
+- The scrim, the tint ceiling, the specular, the lit rim and the two shadows are properties of the
+  **hand-made** stack. On Apple's glass none of them is drawn; the system brings its own edge and
+  depth
+- Apple's regular glass is darkened with a black `Glass.tint`, at
+  `LiquidGlass.systemTintOpacity(for:)`; the clear variant — the vessel — takes none. The value is
+  the lightest rung that passed when every pair was rendered on iOS 27.0 and followed through the
+  aurora's swing (`docs/DESIGN.md`, *Apple's glass, measured*), and
+  `theTintIsNoLighterThanTheLightestRungThatPassed` holds it. Never retune it by eye, and never
+  estimate one value from another
+- A pane answers a tap anywhere inside its shape, on both paths. The hand-made stack gets that from
+  its fills; on Apple's glass the modifier says it with `.contentShape(shape)`. Never remove it: on
+  iOS 26.5 a serving row stopped answering on its bare glass without it
+- A selected slot or day is marked with `LiquidGlass.Selection`'s fill **and** rim, present at zero
+  opacity when unselected. Never a fill or a rim written as a literal in a view
 - Glass goes over content, imagery or colour — never over a flat background
 - Choose density by what the pane carries: `.frosted` or `.opaque` behind sentence-length text,
   `.sheer` only for short labels and controls
@@ -21,9 +41,9 @@ one by eye breaks a contrast figure somebody measured.
 - The tab bar sits at `.frosted` + `.floating`, the highest pair in the system; treat it as reserved
 - **Reduce Transparency replaces the entire stack**, not just the base — the pane branches and draws
   `opaqueFill` with no blur, no scrim, no rim
-- Elevation is always **two** shadows — a wide ambient plus a tight contact — and dark mode weights
+- On the hand-made stack, elevation is always **two** shadows — a wide ambient plus a tight contact — and dark mode weights
   both by 1.5. One shadow alone either hugs the edge or floats with no anchor
-- `compositingGroup()` precedes the shadows in both branches so the assembled pane casts **one**
+- `compositingGroup()` precedes the shadows in both hand-made branches so the assembled pane casts **one**
   shadow. Drop it and every stacked overlay casts its own
 - When elevated glass sits inside a clipping container (a `ScrollView`, a `List` row), disable the
   clip — otherwise the elevation shadows are sliced off square
@@ -31,6 +51,16 @@ one by eye breaks a contrast figure somebody measured.
   `.listRowSeparator(.hidden)`, explicit `.listRowInsets`
 - The dark-mode black scrim is what makes dark glass work. Raising the tint is the wrong fix
 - The contrast boost and the press boost multiply, and each is clamped
+
+## The primary surface
+- A screen's one main action is drawn with `.primarySurface(in:)`: solid white, `Aurora.top` content.
+  It is the only surface that is not glass, and a screen carries at most one
+- Its shade, its pressed wash, its ring and its shadows come from `LiquidGlass.Primary` and
+  `Elevation.raised`. Never hand-roll one from `.background(.white)`
+- The surface sets its content's colour. Never give a primary label a `.foregroundStyle` of its own
+- It carries no glow. The cyan glow *Get Started* and *Save* once had is retired
+- Its contrast is derived, not measured, because its fill is solid:
+  `thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`
 
 ## Interaction
 - **Currently unreachable on the watch.** This glob widened to `WaterBuddyWatch/**/*.swift`, but
@@ -45,6 +75,9 @@ one by eye breaks a contrast figure somebody measured.
   `PressStyle` stays the only writer of `EnvironmentValues.glassIsPressed`
 - Keep `interactive` opt-in (`false` by default). Pass `interactive: true` only where the glass
   itself is the pressable surface — not on a pane that merely contains buttons
+- On Apple's glass `interactive: true` becomes `Glass.interactive()`. `PressStyle` keeps its recoil on
+  both paths and stays the only writer of `glassIsPressed`, which the hand-made stack and the primary
+  surface read
 - No tint opacity exceeds `LiquidGlass.Interaction.maximumTintOpacity` (0.6) in light mode. A pressed
   pane takes its tint from `LiquidGlass.Interaction.pressedTint(_:)`, never a bare multiplication
 - The press curve is `.spring(response: 0.28, dampingFraction: 0.62)` and stays identical in
