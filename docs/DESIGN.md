@@ -7,7 +7,18 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-08 (the medium widget hero's row points to known issue #76 — by reading, its
+**Last updated:** 2026-10-10 (the redesign's stage 1, finished and staged. **Apple's glass is tinted
+black at `0.52`**, the first rung at which every measured pair passes through the aurora's whole
+swing, and the week card's goal line is white 0.55; the table is rewritten — *Apple's glass,
+measured*. The pane says its own hit region. **A new section, *The hand-made pane,
+measured again*, records that the old glass reads lighter than the figures above it** — known issue
+#85. The lozenge is measured on both paths. A second pass the same day corrected one row the first
+had left behind: the measured-contrast table still gave the goal line as white 0.45.) Previously 2026-10-09 (stage 1, staged and not finished: `liquidGlass(…)` now
+draws Apple's glass on iOS 26 and later — *Three ways to draw a pane*; the primary surface and its
+derived contrast; `LiquidGlass.Selection`. **A new section records the first measurements on Apple's
+glass, taken on iOS 27.0: most of the app's dimmed text is under its floor there, and the remedy is
+not chosen** — known issue #80. Two statements corrected: what `Base.material`'s `opaqueFill` returns,
+and "Apple's API is not reachable".) Previously 2026-10-08 (the medium widget hero's row points to known issue #76 — by reading, its
 `.accessibility1` cap does not reach the `@ScaledMetric` that sizes it; no token and no measured figure
 changed). Previously 2026-10-07 (History's day picker and serving sheet: seven figures measured off renders, one of them — the wheel's neighbouring rows — under the floor and recorded as known issue #59). Previously 2026-10-06 (the watch vessel's own scrim ramp — known issue #35 — and two watch figures measured off renders, one of them a pre-existing failure now recorded as known issue #44)
 
@@ -110,8 +121,11 @@ The saturation boost has no backdrop to act on in a flat fill, so it is applied 
 
 `opaque` is that stack composited down over the aurora — **not** the neutral
 `secondarySystemBackground` grey — so Reduce Transparency keeps the product's colour instead of
-turning the widget into a system slab. (`Base.material`'s `opaqueFill` *is*
-`Color(.secondarySystemBackground)`; only the archived base carries the product colour.)
+turning the widget into a system slab. `Base.material`'s `opaqueFill` returns
+`Base.archived.opaqueFill`, so the app, the widget and the watch draw one colour under Reduce
+Transparency; `materialAndArchivedAgreeUnderReduceTransparency` pins it. *(This sentence said the
+material's fill "is `Color(.secondarySystemBackground)`" until 2026-10-09. That stopped being true
+when the watch target joined the file: the colour does not exist on watchOS.)*
 
 **Do not delete the derivation comment because the number "looks arbitrary". The number is the
 record of the measurement.**
@@ -249,7 +263,7 @@ calibrates its ramp to where its own text sits.
 | White @ 0.55 on the week card's pane | **4.06:1** | **A real failure, caught by measuring.** The *Measured against your current goal* disclosure was drafted at 0.55 and is small text, so its floor is 4.5:1. It looked perfectly legible. Raised to **0.70 → 5.49:1**. |
 | White @ 0.60 on the week card's pane | **4.50:1** | The weekday captions as first written — *exactly* the floor, with no margin for the aurora drifting lighter beneath the pane, which it does continuously. Raised to **0.72 → 5.70:1**. |
 | White @ 0.75 on the week card's pane | **6.02:1** | The average/best figures. |
-| White @ 0.45 on the week card's pane | **3.26:1** | The goal reference line — non-text, 3:1. |
+| White @ 0.45 on the week card's pane | **3.26:1** | The goal reference line as it was drawn until 2026-10-10 — non-text, 3:1. **The line is white 0.55 now**: on Apple's glass 0.45 fell to 2.85:1 as the aurora swung (*Apple's glass, measured*); at 0.55 it reads 3.74:1 there at its worst, and 2.80:1 on the hand-made pane of iOS 18.6 (*The hand-made pane, measured again*). |
 | `Aurora.cyan` on the week card's pane | **5.22:1** | The bar fill — non-text, 3:1. |
 | `Aurora.blue` on the week card's pane | **2.72:1** | **Under the 3:1 floor**, which is why the bars are a solid cyan and not the `Aurora.blue` → `Aurora.cyan` gradient they were first drawn with. Below `t ≈ 0.15` along that gradient the fill fails, and a nearly-empty day is drawn almost entirely in that end. |
 | White @ 0.72 on the week card's pane, the full-width day row | **5.43:1** | The weekday letters, re-measured 2026-10-07 once the days became full-width buttons; pane sRGB `(0.208, 0.296, 0.444)` at the letters. Still clear of 4.5:1, a shade under the first layout's 5.70:1. |
@@ -368,16 +382,262 @@ One blur covers both, so it costs a second fill and not a second blur.
 **The widget's aurora does not move and cannot.** A widget's view is an archive replayed by another
 process, with no clock (rule `40-widget`).
 
+## Three ways to draw a pane
+
+Since the redesign's stage 1 (2026-10-09, staged), `liquidGlass(…)` draws one of three panes, and
+`LiquidGlass.rendering(base:reduceTransparency:systemGlassAvailable:)` chooses, in this order:
+
+| Condition | Pane |
+|---|---|
+| Reduce Transparency is on | the opaque fill and lit rim, on every OS (`.opaque`) |
+| the base is `.flat` — the widget's `.archived` | the hand-made stack (`.handMade`) |
+| the base is `.material`, iOS 26 or later | Apple's glass, `glassEffect(_:in:)` (`.system`) |
+| the base is `.material`, below iOS 26 — and the watch, for now | the hand-made stack |
+
+- `LiquidGlass.systemGlassAvailable` is `true` on iOS 26 and later and **`false` on watchOS**, by
+  `#if os(iOS)`. When that was written no watchOS 26 runtime was installed and a watch pane could
+  not be rendered; watchOS 27.0 has been installed since 2026-10-09, the watch app ran on it on the
+  hand-made stack, and no watch pane has been drawn on Apple's glass yet. The redesign's watch stage
+  turns it on, and measures it there. (The flag's own DocC still gives the missing runtime as its
+  reason — known issue #91.)
+- **Everything above this section describes the hand-made stack.** On Apple's glass the scrim, the
+  tint, the specular, the rim and the two shadows are not drawn, and `tint`, `tintOpacity`,
+  `elevation`, `borderWidth` and the highlight points are ignored.
+- The variant: `density: .sheer` on a pane that is not interactive takes `Glass.clear` (the vessel,
+  whose readout has its own scrim); every other pane takes `Glass.regular`. `interactive: true` adds
+  `.interactive()`. `LiquidGlass.systemVariant(density:interactive:)` is the mapping.
+- **The regular variant is darkened**, with Apple's own `Glass.tint(.black.opacity(…))`, at
+  `LiquidGlass.systemTintOpacity(for:)`: **`0.52`**. The clear variant takes none — it is the
+  vessel, and a tint would dull the water behind its readout. The value is measured, in *Apple's
+  glass, measured* below.
+- **The pane says its hit region:** `systemPane` ends in `.contentShape(shape)`. The hand-made
+  stack is hit-testable through its fills; Apple's glass is not always. On iOS 26.5 a serving row
+  in History's `List` took a tap on its text and none on the bare glass between; iOS 27.0 took
+  both. `GoalSetupUITests.testAServingRowOpensItsSheetWhereverItIsTapped` holds it.
+- `LiquidGlassRoutingTests` pins the table, the mapping, which variant is darkened and that its
+  tint is no lighter than `0.52`, without building a view.
+
+**The mapping is settled** (2026-10-10) — see *Apple's glass, measured* below.
+
+## The primary surface
+
+`primarySurface(in:ring:)` — the one surface that is not glass, for a screen's one main action.
+*Get Started* and the sheet's *Save* use it; both were frosted glass under a cyan glow.
+
+| Token (`LiquidGlass.Primary`) | Value | |
+|---|---|---|
+| fill | `.white` | no colour token added |
+| content | `Aurora.top` | the modifier sets it; a label must not set its own |
+| `shadeOpacity` | `0.12` | `Aurora.top` over the fill, clear at the head, this at the foot |
+| `pressedShadeOpacity` | `0.10` | `Aurora.top` over the whole fill while `glassIsPressed` |
+| `ringOpacity`, `ringWidth` | `0.13`, `6` | white, outside the shape; `ring: false` for a widget |
+| shadows | `Elevation.raised` | the same two shadows, after `compositingGroup()` |
+
+**Its contrast is derived, because its fill is solid** (rule `65-accessibility` requires a
+measurement only where a colour lands on a `Material`). Computed from the tokens, sRGB composited in
+encoded space:
+
+| `Aurora.top` on | Ratio |
+|---|---|
+| the head of the fill, pure white | **13.39:1** |
+| the foot, sRGB `(0.885, 0.896, 0.942)` | **10.60:1** |
+| the head, pressed | **11.03:1** |
+| the foot, pressed | **8.80:1** |
+
+`thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade` asserts the foot stays at or over 7:1.
+
+## Selection
+
+`LiquidGlass.Selection` — `fillOpacity = 0.08`, `rimOpacity = 0.55`, white, a `Capsule`. Present for
+every slot at zero opacity. History's shown day drew this pair from literals; the tab bar's active
+tab now draws it too, from the same tokens. On the hand-made pane the pair's figures are the week
+card's rows in the table above (rim 4.15:1, the letter inside 7.4:1). The tab bar's lozenge had not
+been measured on the hand-made pane when this was first written; the iOS 18.6 pass has run since.
+
+**Measured 2026-10-10**, worst pixel of clean ground, the three tabs each selected in turn — at rest,
+and on Apple's glass at the `0.48` tint of that evening (at the final `0.52`, through the aurora's
+swing, the worst of the three are rim 3.41, glyph 4.11, caption 7.25 — *Apple's glass, measured*):
+
+| The lozenge | Apple's glass, iOS 27.0 | Apple's glass, iOS 26.5 | hand-made, iOS 18.6 | Floor |
+|---|---|---|---|---|
+| the active caption inside it, white | 6.87–8.10 | 9.52–10.11 | 5.00–6.16 | 4.5 |
+| the cyan glyph, beside the caption | 3.89–4.59 | 5.40–5.73 | **2.83**–3.49 | 3 |
+| its rim, white 0.55 | 3.29–3.70 | 4.08–4.25 | **2.69**–3.10 | 3 |
+
+History's shown day, the same tokens: rim 3.45 inside and 4.10 outside on iOS 27.0, its letter 7.31.
+The two figures under 3 are at the hand-made bar's lightest end, the *Home* slot, where the shipped
+app's glyph already reads 2.49–2.90 with no lozenge (known issues #85 and #86).
+
+## Apple's glass, measured
+
+**Settled 2026-10-10: the regular variant is tinted black at `0.52`, and the week card's goal line
+is white 0.55.** Method: a throwaway UI probe walks every screen and attaches full-screen captures;
+for each text a rectangle of clean ground inside the same pane is sampled, and the figure is the
+**worst pixel** of it — the foreground's own alpha composited over that pixel. Seventy-one pairs,
+each against its floor (4.5:1 for text, 3:1 for a glyph, a rim or a rule). Two things decide where
+and when to sample:
+
+- **Where the pane is lightest.** History's fourth and fifth rows lie over the aurora's magenta
+  lobe, and Settings' cards scroll through the same place.
+- **When it is lightest.** The aurora's three lights swing over 16, 22.5 and 28.5 seconds and back,
+  from rest each time a screen appears, and the first one cross-fades blue to cyan. A capture two
+  seconds in is the resting frame and nothing else. Each screen is therefore shot every three
+  seconds for a minute, and History for three and a half; the figure is the worst frame.
+
+The climb, on iOS 27.0's iPhone 17 — each rung rendered, none estimated:
+
+| Tint | At rest, 2–4 s in | Through the swing |
+|---|---|---|
+| `0.40` | 17 of 71 pairs under their floor: the goal line 2.77; white 0.75 / 0.72 / 0.70 over the magenta lobe 4.35 / 4.14 / 4.00 | — |
+| `0.44` | 9 of 71: the goal line 2.89; white 0.72 / 0.70 over the magenta lobe 4.43 / 4.28 | — |
+| `0.48` | none | the goal line, then white 0.45, under 3 in ten frames of twenty, worst **2.85**; white 0.70 over the magenta lobe **4.50**, on the floor |
+| **`0.52`** | — | **none**: white 0.70 over the magenta lobe 4.86; the goal line, now white 0.55, 3.74 |
+
+`0.48` passed its resting frame and was adopted for an evening; the final review asked what the
+aurora does afterwards, and the answer above is why the value moved. The goal line was the one pair
+no tint in the owner's ladder carried — 3.01 at `0.52` and white 0.45 — so its own opacity was
+raised instead of darkening every pane for a one-point rule.
+
+**At `0.52`, the worst frame of the swing, iOS 27.0:**
+
+| Pair | Worst | At rest | Floor |
+|---|---|---|---|
+| Any pane over the magenta lobe: white 0.70 / 0.72 / 0.75 | **4.86** / 5.05 / 5.33 | 4.97 / 5.16 / 5.48 | 4.5 |
+| Week card: the goal line, white 0.55 | **3.74** | 4.03 | 3 |
+| Week card: weekday letters 0.72 / average and best 0.75 / disclosure 0.70 | 5.20 / 5.86 / 5.37 | 5.97 / 6.67 / 6.24 | 4.5 |
+| Week card: the shown day's rim, white 0.55, inside | 3.44 | 3.64 | 3 |
+| Tab bar: inactive caption, white 0.72 | 5.83 | 5.86 | 4.5 |
+| Tab bar: the lozenge's rim / cyan glyph / caption | 3.41 / 4.11 / 7.25 | 3.45 / 4.17 / 7.37 | 3 / 3 / 4.5 |
+| Serving row, top: time 0.75 / the drop | 5.85 / 5.39 | 7.01 / 6.45 | 4.5 / 3 |
+| Settings: range labels 0.75 / the note 0.70 | 5.44 / 5.51 | 6.05 / 5.65 | 4.5 |
+| Settings: reminders description / language footnote, 0.75 | 6.16 / 5.91 | 6.73 / 6.13 | 4.5 |
+| Sheet: *ml*, white 0.8 / *Cancel* | 6.43 / 9.09 | 7.18 / 10.09 | 4.5 |
+| Quick-add glyph / History's `+` | 7.27 / 9.19 | 7.98 / 9.33 | 3 |
+
+The three-and-a-half-minute pass over History found no frame worse than the first minute's.
+
+**At `0.48`, at rest — kept because it is the only pass that has iOS 26.5 beside iOS 27.0, the first
+run and the empty state:**
+
+| Pair | iOS 27.0 | iOS 26.5 | Floor |
+|---|---|---|---|
+| Week card: the goal line, white 0.45 | **3.04** | 3.63 | 3 |
+| Any pane over the magenta lobe: white 0.70 / 0.72 / 0.75 | **4.58** / 4.74 / 5.00 | 5.96 / 6.21 / 6.60 | 4.5 |
+| Tab bar: inactive caption, white 0.72 | 5.72 | 7.19 | 4.5 |
+| Week card: weekday letters 0.72 / average and best 0.75 / disclosure 0.70 | 5.60 / 6.25 / 5.87 | 7.22 / 8.26 / 7.52 | 4.5 |
+| Serving row, top: time 0.75 / the drop | 6.61 / 6.03 | 8.60 / 8.34 | 4.5 / 3 |
+| Settings: range labels, now 0.75 / vessel names 0.75 / the note 0.70 | 5.65 / 6.38 / 5.22 | 7.39 / 7.75 / 6.28 | 4.5 |
+| Settings: reminders description / language footnote, 0.75 | 6.21 / 5.79 | 8.27 / 7.23 | 4.5 |
+| Sheet: *ml*, white 0.8 / *Cancel* | 6.67 / 9.34 | 8.94 / 12.84 | 4.5 |
+| First run: *ml* / range labels 0.75 | 7.54 / 6.07 | — | 4.5 |
+| History, empty: the card's title / its body, 0.70 | 8.99 / 5.45 | — | 4.5 |
+| Quick-add glyph / History's `+` | 7.69 / 8.74 | 7.83 / 6.38 | 3 |
+
+- **iOS 27.0 sets the value.** Apple's glass is darker on iOS 26.5 than on 27.0 over the same
+  aurora — the week card reads about sRGB `(0.00, 0.19, 0.49)` on 26.5 and `(0.02, 0.30, 0.53)` on
+  27.0, both at `0.48` — so one value serves both, and 26.5 has room to spare.
+- **The range labels were raised, not carried.** At white 0.6 they read 3.75 at `0.40` and would
+  read 4.49 on the first-run card at `0.48`; they are 0.75 now, in `SettingsView` and
+  `GoalSetupView`.
+- **Increase Contrast** (iOS 27.0, at `0.48`, at rest): the system darkens the glass a great deal
+  by itself. None of the 71 pairs fails; the goal line 4.08 at white 0.45, white 0.70 over the
+  magenta lobe 8.62, the lozenge's rim 4.90.
+- **Reduce Transparency** (iOS 27.0, flipped through the Settings app): every pane is the opaque
+  fill with its lit rim, the vessel's ring included; the primary buttons are unchanged.
+- **Not taken at `0.52`:** iOS 26.5, the first run, the empty state and Increase Contrast. Each
+  passed at `0.48` with room, and a darker pane only adds to it — an inference, and labelled as
+  one. iOS 26.5 was not followed through the swing at either value.
+- **The tightest pair is white 0.70 over the magenta lobe, 4.86:1.** The three lights never
+  re-sync, so no finite pass sees every way they can line up; three and a half minutes found
+  nothing worse than the first. If a pair is ever seen under its floor, the next value is rendered
+  and followed through the swing like these — never estimated — and
+  `theTintIsNoLighterThanTheLightestRungThatPassed` is moved with it.
+- **The vessel is not in this table.** It takes the clear variant and no tint; its readout over
+  water is known issue #81, older than the redesign: 2.91–3.07:1 for the millilitre line on every
+  path, shipped 1.1 included.
+
+**The first pass, kept as written on 2026-10-09 — the untinted glass, and two experiments at `0.40`
+that sampled the blue lobe only.** On iOS 27.0's iPhone 17 — not the pinned 26.5, and not finished. Over this
+aurora Apple's regular glass comes out light and saturated: the pane reads about sRGB
+`(0.07, 0.50, 0.88)` on the blue lobe and `(0.68, 0.39, 0.97)` over the magenta one, where the
+hand-made pane read `(0.21, 0.30, 0.44)` and `(0.39, 0.28, 0.48)`. Every opacity in this app was
+chosen from samples of the darker pane. Worst pixel of clean ground beside each text:
+
+| Pair, on Apple's glass as built | Measured | Floor |
+|---|---|---|
+| Tab bar, inactive caption, white @ 0.72 | **2.47:1** | 4.5 |
+| Tab bar, active caption inside the lozenge | **3.01:1** | 4.5 |
+| Tab bar, `Aurora.cyan` glyph inside the lozenge / the lozenge's rim | **1.70:1** / **1.88:1** | 3 |
+| Week card: title / weekday letters @ 0.72 / average and best @ 0.75 / disclosure @ 0.70 | **3.88** / **2.90** / **3.21** / **3.14** | 4.5 |
+| Week card: the shown day's letter | **3.72:1** | 4.5 |
+| Serving row: amount / time @ 0.75 / drop glyph | 4.96 / **3.54** / **2.81** | 4.5 / 4.5 / 3 |
+| History's `+` glyph | 5.90:1 | 3 |
+| Settings: goal title / range labels @ 0.6 | **3.91** / **2.35** | 4.5 |
+| Settings: vessel names @ 0.75 / the note @ 0.70 / the glyph | **3.65** / **2.70** / **2.90** | 4.5 / 4.5 / 3 |
+| Settings: reminders title / description @ 0.75 | **3.81** / **2.82** | 4.5 |
+| Sheet: *ml* @ 0.8 / *Cancel* | **3.30** / 4.96 | 4.5 |
+| Quick-add glyph | 4.83:1 | 3 |
+
+**A real failure, and this change's own.** Two experiments were measured and **neither is adopted**:
+
+| | Tab inactive | Lozenge caption / glyph | Weekday | Disclosure | Row time | Vessels note | Range labels @ 0.6 |
+|---|---|---|---|---|---|---|---|
+| a black layer at `0.40` under the content | 5.47 | 6.99 / 3.96 | 4.98 | 5.24 | 5.94 | 4.65 | **3.84** |
+| `Glass.regular.tint(.black.opacity(0.4))` | 5.45 | 6.98 / 3.95 | 4.95 | 5.24 | 5.94 | 4.62 | **3.82** |
+
+Apple's tint and a plain black layer of the same opacity measure the same. A black layer is a
+multiply, so other values can be estimated from the first table: about 3.9:1 for the tab bar's inactive
+caption at `0.28`, and about 4.7–4.8:1 for the range labels at `0.48`–`0.50`. **Those are estimates;
+at `0.40` the estimate for the range labels was 4.15 and the render read 3.84.** Which remedy, and
+what value, is the owner's decision (known issue #80), and the figures are to be taken again on iOS
+26.5 and, for the hand-made path, iOS 18.6.
+
+One more reading from the same pass: **the vessel's millilitre line, white @ 0.85 over water and
+`WaterReadabilityScrim`, read 3.10:1** against a 4.5:1 floor, with the vessel over-full. That ground is
+water, which this change does not draw; whether it is an old failure is not yet shown (known issue #81).
+*(Shown on 2026-10-10: it is old. See the settled account above.)*
+
+## The hand-made pane, measured again
+
+**2026-10-10. The hand-made pane reads lighter than the tables above it, and several pairs they show
+passing are under their floor** (known issue #85). Two sources, the same method as *Apple's glass,
+measured*: stage 1 on a new iOS 18.6 simulator (iPhone 16), and the shipped 1.1, `8a44e8f`, in store
+captures taken on iOS 27.0 (iPhone 18 Pro Max) — both draw the hand-made stack.
+
+| Pair | Recorded above | Shipped 1.1, iOS 27.0 | Stage 1, iOS 18.6 | Floor |
+|---|---|---|---|---|
+| Week card: disclosure, white 0.70 | 5.49 | **4.18** | **4.38** | 4.5 |
+| Settings: the vessels note, white 0.70 | 5.50 | **4.32** | **4.09** | 4.5 |
+| Tab bar: inactive caption, white 0.72 | 4.89 | **4.29**–4.87 | **3.91**–4.98 | 4.5 |
+| Any pane over the magenta lobe: white 0.75 / 0.70 | — | 4.52 / **4.17** | **4.43** / **4.09** | 4.5 |
+| Goal slider: range labels, white 0.6 (0.75 since stage 1) | — | **3.01** at 0.6 | **4.03** at 0.75 | 4.5 |
+| Week card: the goal line, white 0.45 | 3.26 | **2.16** | **2.37** | 3 |
+
+- The pane beside the goal card's labels: sRGB `(0.251, 0.370, 0.507)` in the shipped app on iOS
+  27.0, `(0.251, 0.367, 0.504)` on iOS 18.6. The record for the week card's pane is
+  `(0.208, 0.296, 0.444)`.
+- **The two new sources agree with each other and not with the record.** The record was taken on
+  iOS 26.5's iPhone 17. Whether the difference is the system, the size of the screen or the moment
+  of the aurora is not established: no hand-made pane was rendered on iOS 26.5 this time.
+- **The goal line is white 0.55 since stage 1**, on both paths; the table's row was taken at 0.45.
+  From the same ground it is 2.80:1 on iOS 18.6 at 0.55 — better, and still under 3.
+- **Nothing was retuned.** Stage 1 leaves the hand-made stack as it shipped. A remedy would be the
+  stack's dark scrim, raised until the pane is as dark as these opacities were chosen for — which
+  changes the look below iOS 26 and on the watch, so it is a decision of its own.
+- Until then, **a figure in the tables above is true of the device and the day it was taken**, and
+  not a property of the pane.
+
 ## Interactive glass
 
 Adopted from Apple's *Applying Liquid Glass to custom views*, which describes `Glass.interactive()`
 as glass that "reacts to touch and pointer interactions in real time".
 
-**Apple's API is not reachable from this project.** `glassEffect(_:in:)`, `GlassEffectContainer`,
-`glassEffectID` and `.buttonStyle(.glass)` all ship in the **iOS 26 SDK**; the toolchain here is
-Xcode 16.4 with only `iphoneos18.5`. An `if #available(iOS 26, *)` guard does not help — availability
-is a runtime check on a symbol the compiler can already see, and these are undeclared rather than
-unavailable. So the *behaviour* was adopted into this system instead.
+**Apple's API is reachable, since the toolchain moved to Xcode 27.0.** `glassEffect(_:in:)`, `Glass`,
+`GlassEffectContainer` and the `.glass` button styles are declared for iOS 26.0 and watchOS 26.0 in
+the installed SDK. On iOS 26 and later an interactive pane is therefore Apple's `Glass.interactive()`
+(*Three ways to draw a pane*), and what follows is what the **hand-made stack** does instead. *(This
+paragraph said the API "is not reachable from this project" until 2026-10-09: true on Xcode 16.4 with
+only `iphoneos18.5`, where the symbols were undeclared rather than unavailable.)*
 
 `liquidGlass(…, interactive: true)` makes a pane answer a finger. Three multipliers, because the
 three layers carry the press in different schemes:
@@ -428,8 +688,9 @@ moved is not evidence until you know what else moved with it.
 
 `GlassEffectContainer` and `glassEffectID` — merging and morphing between glass shapes — need the
 renderer to blend the shapes and have no hand-rolled equivalent. The quick-add row, three glass
-circles in an `HStack`, is *literally* the example Apple's page uses. It is the first thing to
-revisit when Xcode 26 is available.
+circles in an `HStack`, is *literally* the example Apple's page uses. It was "the first thing to
+revisit when Xcode 26 is available"; the SDK now has it, and the redesign's stage 2 adds the container
+with the new quick-add row (spec `2026-10-09-premium-redesign-design.md` §3.2, §14). Not built yet.
 
 Apple also warns to "limit the use of Liquid Glass effects onscreen at the same time". Home
 currently draws **five** panes (the vessel, three vessels, the tab bar) and Settings four. Not

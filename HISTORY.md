@@ -6685,3 +6685,429 @@ Written last. **This pass staged nothing.** The index still holds the six paths 
 the #73 fix and its docs, `project.pbxproj` with the version and build number, the six unrelated paths.
 `Screenshots/census/` stays untracked. HEAD is `78ff05a`, 80 commits, level with `origin/main`. No
 `git commit` was run — and until one is, #79 stands.
+
+## [2026-10-09] — The premium redesign: designed, specified, planned; stage 1 half built and paused
+
+The owner put a redesign ahead of StoreKit: "improve the UI/UX part and make it premium before the add
+StoreKit, give me the new design look in canvas to confirm it then you will write the code."
+
+### What was decided
+
+- **Scope:** everything — the phone app, the Home Screen widget, the watch app — and it may add free
+  features. Four were chosen: a streak, a four-step welcome, insights in History, Undo on Home.
+- **The look:** three Home directions were drawn on a canvas,
+  <https://claude.ai/artifact/UYGcabBfVjduqkzvqtZ5bt>. The owner chose *Aurora, refined*, with the
+  quick-add buttons as round discs, the Glass larger and white, each with its amount and name beneath,
+  and **Apple's own Liquid Glass**. The full set of twelve boards was then confirmed ("ok").
+- **The floor stays iOS 17.0.** `glassEffect` is iOS 26.0 and watchOS 26.0 in the installed SDK (Xcode
+  27.0), so iPhones below iOS 26 keep the hand-made glass.
+- **The spec,** `docs/superpowers/specs/2026-10-09-premium-redesign-design.md`, approved with all seven
+  of its decisions as recommended ("ok, approve all"). Seven stages, each with its own plan, gate and
+  `/commit`: foundation, Home, History, Settings, welcome, widget, watch.
+- **Stage 1's plan,** `docs/superpowers/plans/2026-10-09-premium-redesign-stage-1.md`, approved ("ok,
+  go"), and with it the rule wording of its Task 6.
+
+### What stage 1 built — staged, not committed
+
+- `LiquidGlass.rendering(base:reduceTransparency:systemGlassAvailable:)`, `systemGlassAvailable` and
+  `systemVariant(density:interactive:)`: which pane a call draws, as pure functions.
+- `LiquidGlassModifier` draws Apple's glass for a `.material` base on iOS 26 and later, inside
+  `#if os(iOS)` and `#available`; the opaque pane first under Reduce Transparency; the hand-made stack
+  otherwise. No call site changed. The comments that said the API could not be called are corrected.
+- `LiquidGlass.Primary` and `primarySurface(in:ring:)`: solid white, `Aurora.top` content. *Get
+  Started* and the sheet's *Save* use it and lose their cyan glow.
+- `LiquidGlass.Selection`, read by History's shown day and by a new lozenge behind the selected tab.
+- Rule wording, as approved: `60-design-system` and `15-project`.
+
+Files: `WaterBuddy/LiquidGlassModifier.swift`, `PressStyle.swift`, `GoalSetupView.swift`,
+`HistoryView.swift`, `RootTabView.swift`; `WaterBuddyTests/LiquidGlassTests.swift`;
+`.claude/rules/60-design-system.md`, `.claude/rules/15-project.md`; the spec and the plan.
+
+### Why it is paused
+
+1. **The pinned simulators have no data.** iOS 26.5's iPhone 17 and iOS 18.6's iPhone 16 both need an
+   erase that only the owner can run. It was asked for twice.
+2. **Apple's glass is too light for the app's text.** On iOS 27.0 the regular glass reads about sRGB
+   `(0.07, 0.50, 0.88)` over the aurora, and most dimmed text is under 4.5:1: the tab bar's inactive
+   caption 2.47:1, the week card's weekday letters 2.90:1, Settings' vessels note 2.70:1. The plan's
+   one authorised fix, a black scrim capped at 0.28, cannot close it, and the plan says stop. Two
+   alternatives were measured and not adopted — a black layer at 0.40 and
+   `Glass.regular.tint(.black.opacity(0.4))` — which read the same: everything passes except Settings'
+   range labels at white 0.6, 3.8:1. The choice is the owner's (known issue #80).
+
+### Verification actually run
+
+All on iOS 27.0's iPhone 17, foreground, `-parallel-testing-enabled NO`.
+
+- `LiquidGlassRoutingTests`: red first (`type 'LiquidGlass' has no member 'rendering'`,
+  `'systemGlassAvailable'`, `'systemVariant'`), then `✔ Test run with 7 tests in 1 suite passed`.
+- The three glass suites after the modifier was routed: `✔ Test run with 16 tests in 3 suites passed`.
+- `PrimarySurfaceTests`: red first (`no member 'Primary'`), then `✔ 1 test in 1 suite passed`, before
+  and after the two call sites changed.
+- `AppTabTests` after the lozenge: `✔ Test run with 6 tests in 1 suite passed`.
+- `WaterBuddyWidgetExtension`, `WaterBuddyWatch` and `WaterBuddyWatchWidget` built, exit 0, after the
+  modifier was routed and again after the primary surface. Not repeated after the selection tokens.
+- A throwaway UI probe, deleted afterwards: `Executed 2 tests, with 0 failures`. Every interactive
+  glass control's tap landed — three vessels, a serving row, *Cancel*, `+`, *Save*. Its first two runs
+  failed on its own checks, not on the app: a dismissal asserted on an element that stays in the tree
+  behind a sheet, and a total read from a header that gives a test no value (known issue #83).
+- The contrast table: sampled off those captures; `docs/DESIGN.md`, *Apple's glass, measured*.
+- **Not run:** the whole unit suite; the UI suite; the watch tests (no watchOS 26 runtime); the warning
+  comparison; anything on iOS 26.5 or iOS 18.6; Increase Contrast; Reduce Transparency; any device.
+
+**No gate stands behind stage 1, and it should not be committed as staged.**
+
+## [2026-10-09] — `/doc_sync`: the forty-third pass
+
+Run by the owner while stage 1 is paused. No source file was touched by the sync.
+
+### Drift found and fixed
+
+- **`docs/AI_CONTEXT.md`:**
+  - the *Git* section described HEAD `78ff05a`, 80 commits and three uncommitted changes, a day after
+    `5a5368e`…`8a44e8f` committed them: rewritten from the commands, the old account kept struck through;
+  - **#79 retired** against `eba1b1e`; #77 gains a note; **#80 to #84 opened**;
+  - *Current state* opens with the redesign and what stage 1 has and has not run; the forty-second
+    pass's account is kept beneath it;
+  - 385 `@Test` functions in 48 suites, where it read 377 in 46;
+  - six stale line counts, the change's own six files;
+  - the header records this pass, with the forty-second folded into a retained block.
+- **`docs/DESIGN.md`:** new sections *Three ways to draw a pane*, *The primary surface* (its contrast
+  derived: 13.39:1 at the head of the fill, 10.60:1 at the foot), *Selection* and *Apple's glass,
+  measured*; "Apple's API is not reachable" corrected; and a wrong sentence about `Base.material`'s
+  `opaqueFill`, which returns the archived fill and has since the watch joined.
+- **`docs/WIDGET.md`:** *The two rendering modes* no longer calls the widget's glass "the app's glass
+  exactly": on iOS 26 and later the app's is Apple's, and the widget's is not.
+- **`tasks/lessons.md`:** six entries.
+
+### Checked and already accurate
+
+- **`docs/STATE.md`, `CLAUDE.md`:** no key, no stored shape, no target and no membership moved. Not
+  touched. Eleven keys in `DataManager.Key.all`; nine in the phone's suite, as `CLAUDE.md` says.
+- **The file list:** 60 `.swift` files in the seven folders, none new, none undocumented.
+- **The three exception sets:** as `CLAUDE.md` lists them.
+- **Rule citations:** every one resolves.
+- **`<details>`:** seventeen opening and seventeen closing tags.
+- **Counts:** 385 phone `@Test`, 57 watch, 13 UI `func test`. No full run stands behind 385.
+
+### Staging
+
+Written last. **This pass staged nothing.** The index holds the redesign's ten paths as before: the
+spec, stage 1's plan, six source files and two rule files. Unstaged from this pass:
+`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/WIDGET.md`, `tasks/lessons.md` and `HISTORY.md`. The six
+paths left unstaged since 2026-10-07 are as they were, and `Screenshots/census/` is untracked. HEAD is
+`8a44e8f`, 85 commits, level with `origin/main`. No `git commit` was run.
+
+## [2026-10-09] — Stage 1 resumed: Apple's glass is tinted; 0.40 is not enough; paused again
+
+The owner answered both blockers in one line: "erases done, go with tint 0.40 and the label change."
+
+### What changed — staged, not committed
+
+- `LiquidGlass.systemTintOpacity(for:)`: how much black Apple's glass is tinted with, through
+  `Glass.tint(_:)`. `0.40` for the regular variant, `0` for the clear one, which is the vessel.
+  `LiquidGlassModifier.systemGlass` applies it. Test `onlyTheRegularVariantIsDarkened`, seen failing
+  first (`type 'LiquidGlass' has no member 'systemTintOpacity'`).
+- The goal slider's two range labels go from white 0.6 to 0.75, in `SettingsView` and in
+  `GoalSetupView`, whose labels are the same code on the same kind of pane. The owner named Settings;
+  the first-run twin is this session's ruling.
+
+Files: `WaterBuddy/LiquidGlassModifier.swift`, `WaterBuddy/SettingsView.swift`,
+`WaterBuddy/GoalSetupView.swift`, `WaterBuddyTests/LiquidGlassTests.swift`.
+
+### What the measurements say
+
+On iOS 27.0's iPhone 17, sampled off this session's captures, worst pixel of clean ground:
+
+- **Passing at 0.40:** the tab bar's inactive caption 5.03:1; the lozenge's caption 6.06, its cyan
+  glyph 3.43, its rim 3.02; the week card's title 7.59, weekday letters 4.95, average and best 5.53,
+  disclosure 5.26; the top serving row's time 5.90; Settings' range labels at 0.75 **4.95** (3.75 at
+  0.6 on the same ground), the vessels note 4.60, the reminders description 5.54.
+- **Failing at 0.40, and not sampled by the earlier pass:** the week card's goal line, white 0.45,
+  **2.77:1** against 3:1 (3.26 on the hand-made pane); and every dimmed text where the pane lies over
+  the magenta lobe — white 0.75 **4.35:1**, 0.72 **4.19:1**, 0.70 **4.00:1** against 4.5:1, on
+  History's fourth and fifth rows. Settings' cards scroll through the same lobe.
+- By the multiply estimate 0.44 still fails both and 0.48 passes both (3.12 and 4.72). Neither was
+  rendered.
+
+### Why it is paused
+
+1. **The pinned simulators still have no data.** iOS 26.5's iPhone 17, its spare and iOS 18.6's
+   iPhone 16 answered "The device's data is no longer present" before and after "erases done".
+2. **The tint's value is the owner's again.** 0.40 does not carry the app's text, and the helper that
+   would have stepped the tint and rendered it was refused by the harness. No other value was set.
+
+### Verification actually run
+
+All on iOS 27.0's iPhone 17, foreground, `-parallel-testing-enabled NO`.
+
+- The four glass suites: `✔ Test run with 18 tests in 4 suites passed`.
+- The throwaway probe, recreated and deleted again: `Executed 2 tests, with 0 failures`; every
+  interactive glass control's tap landed, with the tint on.
+- Reduce Transparency, switched on through the Settings app by the probe: every pane is the opaque
+  fill with a lit rim, *Save* unchanged; switched back off, and read back.
+- The phone unit suite: `✔ Test run with 386 tests in 48 suites passed`.
+- The phone UI suite, with the screenshot harness skipped: `Executed 26 tests, with 0 failures`.
+- `build-for-testing -scheme WaterBuddyWatch`, `build -scheme WaterBuddyWidgetExtension`,
+  `build -scheme WaterBuddyWatchWidget`: each succeeded.
+- Clean builds of `8a44e8f` and of the change, compared per file and message: app 38 = 38 unique
+  warning lines, widget 19 = 19, watch 2 = 2, watch widget 19 = 19; none in a changed file.
+- **Not run:** anything on iOS 26.5 or iOS 18.6; the first-run screen; Increase Contrast; the watch
+  tests (no watchOS 26 runtime); any device. `/doc_sync` was not run: `docs/DESIGN.md`, *Apple's
+  glass, measured*, still says 0.40 passes everything but the range labels, and that is superseded
+  by the figures above.
+
+**Stage 1 is still not finished and should not be committed as staged.**
+
+### Staging
+
+Written last. The index holds eleven paths: the ten from before and `WaterBuddy/SettingsView.swift`.
+Unstaged: this checkpoint, two entries in `tasks/lessons.md`, and what was already unstaged. HEAD is
+`8a44e8f`. No `git commit` was run.
+
+## [2026-10-09] — New iPhone store screenshots for 1.1; the watch shots wait for a runtime
+
+The owner asked for new screenshots of the iPhone app and the watch app in `Screenshots/`, and for
+everything else there to be deleted. Their four answers: the build is **1.1 as committed** (`8a44e8f`),
+not the working tree with the redesign in it; **the four store shots**, 6.9 inch, English; **they will
+install a watchOS runtime**; and **delete everything old**, once the new captures exist.
+
+### What changed
+
+- `Screenshots/en-US/iPhone-6.9/`: four new captures, 1320×2868, from a clean export of `8a44e8f`
+  (`git archive`, built outside the working tree) on a new iPhone 18 Pro Max simulator, iOS 27.0.
+  Home at 65%, History with five servings, Settings, the first-run screen.
+- Deleted: `Screenshots/en-US/iPhone-6.5/` and `Screenshots/en-US/iPad-13/` (eight tracked files),
+  `Screenshots/census/iPhone-6.9/` (twenty files git never tracked) and three `.DS_Store` files.
+- **Kept, for now:** `Screenshots/en-US/AppleWatch/01-wrist.png` and the nine captures in
+  `Screenshots/census/AppleWatch/`. No new watch capture exists to replace them: the watch app needs
+  watchOS 26 and only the watchOS 11.5 runtime is installed.
+- `WaterBuddyUITests/AppStoreScreenshotUITests.swift`: `otherElements["Last 7 days"]` becomes
+  `staticTexts["Last 7 days"]`, three times. The card's title has been a static text since 2026-10-07
+  and the harness could not get past History (the first half of known issue #82).
+- `Tools/CaptureScreenshots.sh` and `Tools/CaptureFullCensus.sh` no longer override the status bar's
+  clock. The override was `date '+%-l:%M'`, 12-hour whatever the device is; the first run of the
+  evening printed 11:15 over History rows reading 23:14. The real clock cannot disagree with the rows.
+
+### Verification actually run
+
+- The first capture run, on the existing iPhone 18 Pro Max (`D0D8B927`): `Executed 1 test, with 0
+  failures`; the four captures were read, and the clock fault was found by reading them. Discarded.
+- The second, on the new simulator *WaterBuddy Screenshots 6.9* (`A92C954F`), after the script fix:
+  `Executed 1 test, with 0 failures`; all four read: 23:24 over rows 23:19 to 23:24.
+- `bash Tools/VerifyScreenshots.sh` in the repository: `14 file(s) checked — all acceptable to App
+  Store Connect`.
+- **Not run:** the census harness after its three-word fix; any watch capture.
+
+### Left behind on the simulators
+
+`D0D8B927` now carries WaterBuddy 1.1 and five servings from the discarded run. `A92C954F` is new and
+carries the same from the kept run.
+
+### Staging
+
+Written last. **Nothing was staged**: the index still holds the redesign's eleven paths. Unstaged from
+this task: eight deletions and four changed captures under `Screenshots/`, the two scripts and the
+harness. `Screenshots/census/` is still untracked. HEAD is `8a44e8f`. No `git commit` was run.
+
+## [2026-10-10] — The redesign's stage 1 is finished: tint 0.48, a tap bug found on iOS 26.5, the gate
+
+The owner looked at the new screenshots and said the app "is not as like as canvas". It is not: the
+canvas is seven stages and one was built. Four rulings followed, and they are what finished stage 1:
+build the stages **straight through**, stopping at each `/commit`; **step the tint up** until every
+pair passes; test on **iOS 27.0 and on simulators made for the purpose**; **retake the screenshots
+once the redesign is built**.
+
+### What changed — staged, not committed
+
+- **The tint is `0.48`.** `LiquidGlass.systemTintOpacity(for:)`, climbed one rung at a time, each
+  rendered and measured on 71 pairs: `0.40` failed 17, `0.44` failed 9, `0.48` fails none.
+- **`systemPane` ends in `.contentShape(shape)`.** On iOS 26.5 a serving row in History's `List`
+  took a tap on its text and none on the bare glass between; iOS 27.0 took both.
+- **`GoalSetupUITests.testAServingRowOpensItsSheetWhereverItIsTapped`**, written before the fix and
+  seen failing on iOS 26.5: "a tap on the row's bare glass did not open the sheet".
+- Rule `60-design-system`: two bullets, the tint and the hit region. The plan's Step 6: a note that
+  the owner's rulings superseded it.
+- **Unstaged, for the owner to read:** rule `85-testing`'s pin, 26.5 → 27.0, and its watch
+  destination, *Apple Watch Series 12 (46mm)*.
+
+Files: `WaterBuddy/LiquidGlassModifier.swift`, `WaterBuddyUITests/GoalSetupUITests.swift`,
+`.claude/rules/60-design-system.md`, the stage 1 plan; with the earlier checkpoint's four files.
+
+### What was found and not fixed
+
+- **The hand-made pane reads lighter than `docs/DESIGN.md` records** — on iOS 18.6 with stage 1, and
+  in the shipped 1.1 on iOS 27.0. The week card's disclosure 4.18:1 in the shipped app against a
+  recorded 5.49; the vessels note 4.32 against 5.50; the goal line 2.16 against 3.26. Cause not
+  established. Known issue #85; the lozenge's faintness on that bar, #86, follows from it.
+- **Home's millilitre line over water, #81, is older than the redesign:** 2.91–2.93:1 in the shipped
+  1.1, 3.00 on Apple's clear glass, 3.04–3.07 on iOS 18.6.
+- **The gate names one iOS.** The bug above lived on 26.5 only. Known issue #87.
+
+### Verification actually run
+
+Foreground, `-parallel-testing-enabled NO`, on the final source unless said.
+
+- `-only-testing:WaterBuddyTests`, iOS 27.0 *iPhone 17*: `✔ Test run with 386 tests in 48 suites
+  passed`.
+- `-only-testing:WaterBuddyUITests`, the screenshot harness skipped — on a clean iOS 27.0 simulator:
+  `Executed 27 tests, with 0 failures`; on iOS 26.5: `Executed 27 tests, with 0 failures`; on iOS
+  27.0's *iPhone 17* and on the iOS 18.6 simulator, each holding a night of probe servings:
+  `Executed 27 tests, with 1 failure`, `testAServingAddedToYesterdayShowsUnderYesterday` both times
+  (#62). `8a44e8f` fails it identically on the first; it passes on a clean iOS 18.6 simulator.
+- `-scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests`, watchOS 27.0: `✔ Test run with 57
+  tests in 6 suites passed`. The owner installed the runtime that evening.
+- `build -scheme WaterBuddyWidgetExtension` (iOS 27.0) and `build -scheme WaterBuddyWatchWidget`
+  (watchOS 27.0): each `** BUILD SUCCEEDED **`.
+- Clean builds of `8a44e8f` and of the change, compared per file and message: app 38 = 38 unique
+  warning lines, widget 19 = 19, watch 2 = 2, watch widget 19 = 19; none in a changed file.
+- The four glass suites on iOS 18.6: `✔ Test run with 18 tests in 4 suites passed` —
+  `theAvailabilityFlagMatchesTheRunningSystem` false below iOS 26, run for the first time.
+- The throwaway probe, rewritten and deleted again: every screen on iOS 27.0, 26.5 and 18.6; the
+  first-run screen on all three; Increase Contrast (read back `enabled` during the run, `disabled`
+  after) and Reduce Transparency on iOS 27.0; the largest text size. The watch app launched on
+  watchOS 27.0 and draws what it drew.
+- **Not run:** any device; iOS 17; the pinned destinations by name (their simulators still have no
+  data, the watch's *Series 12 (46mm)* included).
+
+### One run that proved nothing, and was caught
+
+The first Increase Contrast pass set the option on a simulator that was shut down. `simctl ui`
+refused on stderr, the probe ran with the setting off, and it passed; its figures matched the
+ordinary run's to two decimals, which is why it was run again with the device booted.
+
+## [2026-10-10] — The final review moves the tint to 0.52 and the goal line to 0.55; the gate again
+
+This supersedes the checkpoint above where they differ: **the tint is `0.52`, not `0.48`**, and the
+gate figures below are the ones that stand.
+
+### What the review found
+
+A fresh reviewer read the staged diff, the plan, the spec, the ledger and the probe's own logs. Nothing
+critical. Four findings that mattered:
+
+1. **The tint had been judged on the aurora at rest.** Every capture was taken about three seconds
+   after its screen appeared; the lights then swing for 16, 22.5 and 28.5 seconds. The reviewer found
+   the backdrop up to 1.7 times as luminous eleven seconds in, from two captures of one run.
+2. **The new row test cannot fail on iOS 27.0**, the only system the gate names.
+3. **Controls inside panes had never been operated** — sliders, the switch, the wheel, swipe-to-delete.
+4. **Two sentences in rule `60-design-system` had not been shown to the owner.**
+
+### What changed — staged, not committed
+
+- **Tint `0.52`.** The probe was given a sweep: every screen every three seconds for a minute, History
+  for three and a half. At `0.48` the goal line was under 3:1 in ten frames of twenty (2.85) and the
+  dimmest text on 4.50:1. At `0.52` none of 71 pairs goes under its floor; the tightest is white 0.70
+  over the magenta lobe, 4.86:1.
+- **`theTintIsNoLighterThanTheLightestRungThatPassed`**, seen failing at `0.48` first.
+- **The week card's goal line, white 0.45 → 0.55.** At 0.45 no rung carried it with room (3.01 at
+  `0.52`); at 0.55 it reads 3.74 through the swing. The owner did not name this one; it is this
+  session's ruling, and reported.
+- Three comments corrected: two that cited a figure true only at tint `0.40`, one that gave the tab
+  caption's contrast from before the lozenge.
+
+Files: `WaterBuddy/LiquidGlassModifier.swift`, `HistoryView.swift`, `SettingsView.swift`,
+`GoalSetupView.swift`, `RootTabView.swift`; `WaterBuddyTests/LiquidGlassTests.swift`; the plan's note.
+
+### What is unstaged, for the owner's yes
+
+- Rule `60-design-system`: the tint bullet, reworded to say what was measured, and the hit-region
+  bullet. The staged copy holds only the wording approved with the plan.
+- Rule `85-testing`: the pin, 26.5 → 27.0; and one proposed bullet — the UI suite again on iOS 26.5
+  while iOS 26 is supported — which is the answer to finding 2.
+
+### Verification actually run, on the final source
+
+Foreground, `-parallel-testing-enabled NO`.
+
+- `-only-testing:WaterBuddyTests`, iOS 27.0 *iPhone 17*: `✔ Test run with 387 tests in 48 suites
+  passed`.
+- `-only-testing:WaterBuddyUITests`, the screenshot harness skipped, each on a clean simulator made
+  for it: iOS 27.0, iOS 26.5 and iOS 18.6 — `Executed 27 tests, with 0 failures` three times. The run
+  on the 26.5 *probe* device gave 1 failure first, the #62 test, its yesterday seven rows deep.
+- `-scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests`, watchOS 27.0: `✔ Test run with 57
+  tests in 6 suites passed`.
+- `build -scheme WaterBuddyWidgetExtension`, `build -scheme WaterBuddyWatchWidget`: each `** BUILD
+  SUCCEEDED **`.
+- Clean builds of `8a44e8f` and of the index's eight source files, checked byte-equal to the index:
+  app 38 = 38 unique warning lines, widget 19 = 19, watch 2 = 2, watch widget 19 = 19; none in a
+  changed file.
+- The controls pass, one finding per line, on iOS 18.6, 26.5 and 27.0: three sliders drag; Settings
+  scrolls from a card and History from a row's bare glass; the language rows select; the switch
+  raises the system's alert; *Open iOS Settings*, a pane inside a pane, opens Settings when tapped
+  off its label; swipe-left reveals *Delete* and the total falls; the sheet's wheels move.
+- **Not run:** any device; iOS 17; iOS 26.5 through the aurora's swing; Increase Contrast, the first
+  run and the empty state at `0.52` (each passed at `0.48` with room); the widget on a Home Screen.
+
+### Staging
+
+Written last. The index holds **twelve paths**: the redesign's spec and stage 1 plan, eight source and
+test files, and rules `60-design-system` and `15-project` in the wording approved with the plan.
+Unstaged, each a change of its own: the two rule edits above; the screenshots, the two capture
+scripts and the harness; `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/WIDGET.md`, `tasks/lessons.md`
+and this file; and what has been unstaged since 2026-10-07. HEAD is `8a44e8f`, 85 commits, level with
+`origin/main`. No `git commit` was run.
+
+## [2026-10-10] — `/doc_sync`: the forty-fifth pass
+
+Run by the owner straight after stage 1 was reported finished. No source file was touched by the
+sync, and none had changed since the forty-fourth pass, which the building session wrote as its last
+task. This pass read that one against the tree.
+
+### The diff — clean
+
+- 60 `.swift` files in the seven target folders; every one is named in `docs/AI_CONTEXT.md`, no row
+  names a file that is gone, and no line count is stale.
+- 387 `@Test` in `WaterBuddyTests`, 57 in `WaterBuddyWatchTests`, 14 `func test` in
+  `WaterBuddyUITests` — nine of them in `GoalSetupUITests`, nine `@Test` in `LiquidGlassRoutingTests`.
+- Three exception sets in `project.pbxproj`, as `CLAUDE.md` lists them. Eleven keys in
+  `DataManager.Key.all`; nine in the phone's suite.
+- Every rule citation resolves. Nineteen `<details>` open and nineteen close, counted after this
+  pass added its own pair.
+- Git, read first: HEAD `8a44e8f`, 85 commits, level with `origin/main`; twelve staged paths; the
+  unstaged set as the forty-fourth pass recorded it.
+
+### Drift found and fixed — all of it the forty-fourth pass's own
+
+- **`docs/AI_CONTEXT.md`, *Shipped, but not Swift*:** still listed `Screenshots/en-US/iPhone-6.5/`,
+  `Screenshots/en-US/iPad-13/` and `Screenshots/census/iPhone-6.9/`. None is on disk. The table now
+  lists the three sets that are, and a paragraph says what went and that the first two are still in
+  `8a44e8f`.
+- **`docs/WIDGET.md`:** its header called stage 1 "staged and not finished". Rewritten as an eighteenth
+  pass: no file under `WaterBuddyWidget/` changed and no contract did; the extension built from the
+  final source; **it was not placed on a Home Screen**, and the header now says what "draws what it
+  drew" rests on.
+- **`docs/DESIGN.md`:** the measured-contrast table still drew the goal line at white 0.45, in a
+  document whose later section gives its new 0.55; the lozenge was still "not measured on the
+  hand-made pane" one line above the table that measures it; the watch was still without a runtime.
+  All three reworded. `LiquidGlassRoutingTests`' line names the floor it now pins.
+
+### One count superseded
+
+The checkpoint *New iPhone store screenshots for 1.1* says `Screenshots/census/iPhone-6.9/` held
+"twenty files git never tracked". **It held nineteen** — numbered 01 to 20 with no 11, as the listing
+printed in that session shows; with the nine watch captures that makes the 28 the forty-third pass
+counted. The figure was recalled, not printed. The entry stands as written; this one corrects it.
+
+### Checked and already accurate
+
+- **`docs/STATE.md`, `CLAUDE.md`:** no key, no stored shape, no target, no membership and no mutation
+  method moved. Not touched. `CLAUDE.md`'s `Screenshots/` row — `en-US/` and `census/` — is still
+  true: `census/` holds the watch captures.
+- **`CLAUDE.md`'s 31 unique warning lines** for a clean `-scheme WaterBuddy` build were not
+  re-measured. The 38 this session compared, equal for `8a44e8f` and for the change, are from
+  `build-for-testing`, which compiles the test targets too. A different measure, not a drift.
+- **The known issues** opened or updated by the forty-fourth pass, #45, #62, #77, #80 to #91, read
+  against the tree and the ledger: each says what is on disk.
+- **`tasks/lessons.md`:** one entry, for this pass's own finding.
+
+### Gate
+
+**Not run this pass.** No source changed. The results in `docs/AI_CONTEXT.md` are the forty-fourth
+pass's, run that night on the source that is staged now.
+
+### Staging
+
+Written last. **This pass staged nothing.** The index holds stage 1's twelve paths. Unstaged from
+this pass: `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/WIDGET.md`, `tasks/lessons.md` and this file,
+with everything the checkpoint above lists. HEAD is `8a44e8f`. No `git commit` was run.

@@ -3,7 +3,20 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-09 (sixteenth pass — `/doc_sync` after known issue #73: the reminder plan
+**Last updated:** 2026-10-10 (eighteenth pass — `/doc_sync` after the redesign's stage 1 was finished
+and staged. **No file under `WaterBuddyWidget/` changed, and no contract here did.** The shared
+`LiquidGlassModifier.swift` gained two things since the last pass, both inside the branch that draws
+Apple's glass: a black tint on the regular variant and an explicit hit region. The widget passes
+`.archived`, takes the hand-made stack, and reaches neither. The extension built for the simulator
+from the final source (`** BUILD SUCCEEDED **`, iOS 27.0); it was **not placed on a Home Screen**, so
+"draws exactly what it drew" rests on the routing test and on the hand-made branch being unchanged,
+not on a render.
+Previously: 2026-10-09, seventeenth pass — `/doc_sync` during the redesign's stage 1, which was
+staged and not finished. **No file under `WaterBuddyWidget/` changed, and the widget draws exactly
+what it drew.** One shared file did, `LiquidGlassModifier.swift`: the app now draws Apple's glass on
+iOS 26 and later, and *The two rendering modes* says why the widget cannot and does not. The
+extension built for the simulator with the change; it was not placed on a Home Screen this pass.
+Previously: sixteenth pass — `/doc_sync` after known issue #73: the reminder plan
 `AddWaterIntent` files now follows the app's reminders toggle as it stands at the press, because
 `refresh()` re-reads the flag. One bullet under *The intent also reschedules reminders*; no file under
 `WaterBuddyWidget/` changed, and no other contract.
@@ -126,9 +139,13 @@ the app and the widget never disagree about when the day turns. It falls back to
 `@Environment(\.widgetRenderingMode)`, checked in `MiniVessel`, `WidgetPane`,
 `WidgetCardBackdrop` and `WidgetAurora`.
 
-**`.fullColor`** — the ordinary Home Screen. The app's glass exactly, with
+**`.fullColor`** — the ordinary Home Screen. The hand-made glass, with
 `LiquidGlass.Base.archived` standing in for the material because there is no live backdrop to
-sample.
+sample. **It is no longer "the app's glass exactly" on iOS 26 and later:** since the redesign's stage
+1 (2026-10-09, staged) the app draws Apple's glass there, and the widget does not. `.archived` is a
+`.flat` base, and `LiquidGlass.rendering(…)` answers `.handMade` for a `.flat` base on every OS —
+`aFlatBaseIsAlwaysHandMade` pins it — so nothing in this extension reaches `glassEffect`. The widget's
+own pass of the redesign is stage 6 and is not built.
 
 **Anything else** — a tinted Home Screen, StandBy. The system treats the whole widget as a
 template: **colour is discarded and only alpha survives**, so every layer `LiquidGlass` stacks
