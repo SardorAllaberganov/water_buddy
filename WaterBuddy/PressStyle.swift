@@ -19,9 +19,10 @@ struct PressStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.93 : 1)
             .animation(.spring(response: 0.28, dampingFraction: 0.62), value: configuration.isPressed)
             // Hands the press down to any `liquidGlass(interactive: true)` pane inside the label,
-            // so the *material* answers the finger and not only the frame — Apple's
-            // `Glass.interactive()` behaviour, expressed in this system because `glassEffect(_:in:)`
-            // ships in the iOS 26 SDK and this project builds against 18.5.
+            // so the *material* answers the finger and not only the frame. On iOS 26 and later
+            // that pane is Apple's `Glass.interactive()` and reacts by itself; in any pane the
+            // hand-made stack draws, this value is what brightens the tint, the rim and the
+            // specular (`LiquidGlass.Interaction`).
             //
             // This style is the only thing in the app that knows a finger is down, and a label
             // cannot reach up into its own `ButtonStyle.Configuration` — so the state has to travel

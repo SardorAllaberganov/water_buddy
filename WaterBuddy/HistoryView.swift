@@ -518,8 +518,8 @@ private struct HistoryCard: View {
                 // against the pane beside it, sRGB (0.188, 0.277, 0.390) — over the 3:1 floor
                 // for a non-text mark.
                 Capsule()
-                    .fill(.white.opacity(isShown ? 0.08 : 0))
-                    .strokeBorder(.white.opacity(isShown ? 0.55 : 0), lineWidth: 1)
+                    .fill(.white.opacity(isShown ? LiquidGlass.Selection.fillOpacity : 0))
+                    .strokeBorder(.white.opacity(isShown ? LiquidGlass.Selection.rimOpacity : 0), lineWidth: 1)
                     .padding(.horizontal, 3)
             }
             .contentShape(Rectangle())
@@ -556,7 +556,11 @@ private struct HistoryCard: View {
     /// hit test, so a tap on the line still lands on the day beneath it.
     private var goalLine: some View {
         Rectangle()
-            .fill(.white.opacity(0.45))
+            // 0.55, not the 0.45 it was drawn at. A rule one point high has a 3:1 floor, and at
+            // 0.45 it crossed under it on Apple's glass each time the aurora's blue light swung
+            // to cyan behind the card — 2.85:1, for half of every cycle (`docs/DESIGN.md`,
+            // *Apple's glass, measured*).
+            .fill(.white.opacity(0.55))
             .frame(height: 1)
             .padding(.horizontal, barInset)
             .offset(y: slotPadding + barHeight * (1 - min(Double(manager.dailyGoal) / Double(scale), 1)))
@@ -882,16 +886,12 @@ private struct ServingSheet: View {
                     .font(.headline.weight(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.4)
-                    .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 56)
-                    .liquidGlass(in: Capsule(), density: .frosted, elevation: .raised, interactive: true)
-                    // The same lit-by-the-backdrop glow *Get Started* carries, at the same two
-                    // radii — a tight hot core the eye reads as the source, and a bloom to carry
-                    // it off the edge. Static, so it owes no Reduce Motion path.
-                    .shadow(color: Aurora.cyan.opacity(0.55), radius: 12)
-                    .shadow(color: Aurora.cyan.opacity(0.38), radius: 28)
+                    // The sheet's main action, on the primary surface like *Get Started*
+                    // (rule `60-design-system`). *Cancel* beside it stays glass.
+                    .primarySurface(in: Capsule())
             }
             .buttonStyle(PressStyle())
         }

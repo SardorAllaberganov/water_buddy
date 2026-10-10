@@ -444,7 +444,9 @@ private struct GoalCard: View {
             }
             .font(.caption.weight(.medium))
             .monospacedDigit()
-            .foregroundStyle(.white.opacity(0.6))
+            // 0.75, not the 0.6 these were drawn at: on Apple's glass 0.6 is under 4.5:1 wherever
+            // the aurora is bright behind the card (`docs/DESIGN.md`, *Apple's glass, measured*).
+            .foregroundStyle(.white.opacity(0.75))
             // The slider already announces where it is and what it can reach; as VoiceOver stops
             // these are bare numbers with nothing to attach them to.
             .accessibilityHidden(true)

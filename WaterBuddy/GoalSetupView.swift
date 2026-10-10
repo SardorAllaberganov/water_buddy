@@ -196,7 +196,9 @@ struct GoalSetupView: View {
             }
             .font(.caption.weight(.medium))
             .monospacedDigit()
-            .foregroundStyle(.white.opacity(0.6))
+            // 0.75, not the 0.6 these were drawn at: on Apple's glass 0.6 is under 4.5:1 wherever
+            // the aurora is bright behind the card (`docs/DESIGN.md`, *Apple's glass, measured*).
+            .foregroundStyle(.white.opacity(0.75))
             // The slider already announces where it is and what it can reach; these two are
             // orientation for the eye, and as VoiceOver stops they are bare numbers with nothing
             // to attach them to.
@@ -226,26 +228,14 @@ struct GoalSetupView: View {
         } label: {
             Text("Get Started", bundle: strings)
                 .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 // Comfortably past the 44pt floor, and a deliberate `minHeight` so the target
                 // grows with Dynamic Type instead of clipping the label.
                 .frame(minHeight: 56)
-                .liquidGlass(in: Capsule(), density: .frosted, elevation: .raised, interactive: true)
-                // The glow: three static layers drawn from the `Aurora` palette — the same
-                // lights already behind the glass, so the button reads as lit *by* the backdrop
-                // rather than painted on top of it.
-                //
-                // Three and not one because a single wide shadow renders as haze. A tight hot
-                // core is what the eye reads as the source; the mid bloom carries it off the
-                // edge; the wide blue layer seats it against the magenta the button happens to
-                // sit on, where a lone cyan shadow measured almost invisible on device.
-                //
-                // Static on purpose: a breathing pulse is a perpetual animation and would owe a
-                // Reduce Motion path (rule `65-accessibility`) for no gain.
-                .shadow(color: Aurora.cyan.opacity(0.55), radius: 12)
-                .shadow(color: Aurora.cyan.opacity(0.38), radius: 28)
-                .shadow(color: Aurora.blue.opacity(0.38), radius: 46, y: 10)
+                // This screen's one main action, so it is the primary surface and not glass
+                // (rule `60-design-system`). It was frosted glass under a three-layer glow, and
+                // read as a control waiting to be enabled. The surface sets the label's colour.
+                .primarySurface(in: Capsule())
         }
         .buttonStyle(PressStyle())
     }

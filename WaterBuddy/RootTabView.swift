@@ -212,6 +212,10 @@ private struct GlassTabBar: View {
                     // by the glyph's colour and glow rather than by tinting the caption below the
                     // line. All four figures were sampled from a rendered screenshot, not derived
                     // — the pane is a `Material` over the aurora and cannot be computed.
+                    //
+                    // They are the hand-made bar's figures, from before the lozenge below. With
+                    // it the active caption sits on a lighter fill and reads at least 5.0:1 on
+                    // every path (`docs/DESIGN.md`, *Selection*).
                     .foregroundStyle(.white.opacity(isActive ? 1 : 0.72))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -219,6 +223,16 @@ private struct GlassTabBar: View {
             // The whole slot is the target, not just the glyph — 44pt is the floor and the width
             // is shared evenly (rule `65-accessibility`).
             .frame(maxWidth: .infinity, minHeight: 44)
+            .background {
+                // The active tab's lozenge: History's shown-day treatment, from the same two
+                // tokens, so "selected" is drawn one way in the app. Present for every slot at
+                // zero opacity rather than inserted for one, so moving the selection animates a
+                // colour instead of a layer (rule `50-views`). It adds to the glyph's colour, its
+                // glow and the `.isSelected` trait; it replaces none of them.
+                Capsule()
+                    .fill(.white.opacity(isActive ? LiquidGlass.Selection.fillOpacity : 0))
+                    .strokeBorder(.white.opacity(isActive ? LiquidGlass.Selection.rimOpacity : 0), lineWidth: 1)
+            }
             .contentShape(Rectangle())
         }
         .buttonStyle(PressStyle())

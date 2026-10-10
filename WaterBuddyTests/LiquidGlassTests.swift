@@ -16,9 +16,9 @@ import Testing
 ///
 /// Adopted from Apple's *Applying Liquid Glass to custom views*, which describes
 /// `Glass.interactive()` as a material that "reacts to touch and pointer interactions in real
-/// time". WaterBuddy cannot call that API — it ships in the iOS 26 SDK and this project builds
-/// against 18.5 — so the behaviour is expressed in the hand-rolled system instead. `PressStyle`
-/// already recoiled the *frame*; nothing made the *material* respond.
+/// time". On iOS 26 and later an interactive pane is that glass; these numbers are what the
+/// hand-made stack does instead, below iOS 26 and wherever a pane cannot sample its backdrop.
+/// `PressStyle` already recoiled the *frame*; nothing made the *material* respond.
 ///
 /// Not `@MainActor`: these are numbers, and keeping the suite off the main actor is what stops
 /// someone moving them onto a `View` (rule `43-concurrency`).
@@ -131,5 +131,117 @@ struct LiquidGlassBaseTests {
         let fill = Color(red: 0.5, green: 0.1, blue: 0.9)
         let base = LiquidGlass.Base.flat(translucent: .clear, opaque: fill)
         #expect(base.opaqueFill == fill)
+    }
+}
+
+/// The **routing** half of the design system: which pane a `liquidGlass(…)` call draws
+/// (spec `2026-10-09-premium-redesign-design.md` §3.2).
+///
+/// Not `@MainActor`, like the two suites above — and here that is also the point being proved: the
+/// choice is made without building a view.
+struct LiquidGlassRoutingTests {
+
+    /// Built per use: `Base` carries a `Material` and is not `Sendable`, so it may not sit in a
+    /// `static let` (rule `43-concurrency`).
+    private var material: LiquidGlass.Base { .material(.ultraThinMaterial) }
+
+    /// Reduce Transparency wins over everything, on every OS and for every base. The SDK does not
+    /// say what Apple's glass does under that setting, so this system keeps its own answer.
+    @Test(arguments: [true, false])
+    func reduceTransparencyAlwaysDrawsTheOpaquePane(systemGlassAvailable: Bool) {
+        #expect(LiquidGlass.rendering(base: material, reduceTransparency: true, systemGlassAvailable: systemGlassAvailable) == .opaque)
+        #expect(LiquidGlass.rendering(base: .archived, reduceTransparency: true, systemGlassAvailable: systemGlassAvailable) == .opaque)
+    }
+
+    /// The widget's base. It exists because a widget cannot sample a backdrop, and Apple's glass
+    /// samples one — so it never reaches Apple's glass, whatever the OS.
+    @Test(arguments: [true, false])
+    func aFlatBaseIsAlwaysHandMade(systemGlassAvailable: Bool) {
+        #expect(LiquidGlass.rendering(base: .archived, reduceTransparency: false, systemGlassAvailable: systemGlassAvailable) == .handMade)
+    }
+
+    @Test func aMaterialBaseDrawsApplesGlassWhereTheSystemHasIt() {
+        #expect(LiquidGlass.rendering(base: material, reduceTransparency: false, systemGlassAvailable: true) == .system)
+    }
+
+    /// iOS 17 to 25, and for now the watch: exactly the stack every pane drew before this existed.
+    @Test func aMaterialBaseFallsBackToTheHandMadeStackWhereItHasNot() {
+        #expect(LiquidGlass.rendering(base: material, reduceTransparency: false, systemGlassAvailable: false) == .handMade)
+    }
+
+    /// The flag the modifier passes has to be the truth about the system this suite is running on.
+    /// Run on iOS 26.5 it must be `true`; run on iOS 18.6 it must be `false`.
+    @Test func theAvailabilityFlagMatchesTheRunningSystem() {
+        let isTwentySixOrLater = ProcessInfo.processInfo.isOperatingSystemAtLeast(
+            OperatingSystemVersion(majorVersion: 26, minorVersion: 0, patchVersion: 0)
+        )
+        #expect(LiquidGlass.systemGlassAvailable == isTwentySixOrLater)
+    }
+
+    /// `.sheer` asks for the least glass. Only a pane that is not a control — the vessel, whose
+    /// readout sits on its own scrim — takes Apple's clear variant for it.
+    @Test func onlyAnInertSheerPaneTakesTheClearVariant() {
+        #expect(LiquidGlass.systemVariant(density: .sheer, interactive: false) == .clear)
+        #expect(LiquidGlass.systemVariant(density: .sheer, interactive: true) == .regular)
+    }
+
+    /// Anything that carries a label straight on the glass needs the regular variant's legibility.
+    @Test(arguments: [LiquidGlass.Density.frosted, .opaque], [true, false])
+    func aPaneThatCarriesTextTakesTheRegularVariant(density: LiquidGlass.Density, interactive: Bool) {
+        #expect(LiquidGlass.systemVariant(density: density, interactive: interactive) == .regular)
+    }
+
+    /// Over this aurora Apple's regular glass comes out light, and most of the app's dimmed text
+    /// measured under 4.5:1 on it (`docs/DESIGN.md`, *Apple's glass, measured*) — so the regular
+    /// variant is darkened. The clear one is the vessel, whose readout has `WaterReadabilityScrim`
+    /// and whose water has to stay the colour it is.
+    @Test func onlyTheRegularVariantIsDarkened() {
+        #expect(LiquidGlass.systemTintOpacity(for: .regular) > 0)
+        #expect(LiquidGlass.systemTintOpacity(for: .clear) == 0)
+    }
+
+    /// A floor, and a measured one: every lighter rung was rendered and failed. At `0.44` nine
+    /// pairs were under their contrast floor; at `0.48` the dimmest text sat exactly on 4.5:1 once
+    /// the aurora had been followed through its swing, with nothing to spare. A lighter glass is
+    /// a new measurement first (`docs/DESIGN.md`, *Apple's glass, measured*), and then this number.
+    @Test func theTintIsNoLighterThanTheLightestRungThatPassed() {
+        #expect(LiquidGlass.systemTintOpacity(for: .regular) >= 0.52)
+    }
+}
+
+/// The **primary surface**: the one solid thing among the glass (spec §3.3).
+///
+/// Its fill is solid, so unlike anything on a `Material` its contrast can be derived
+/// (rule `65-accessibility`) — which is why this figure is a test and the glass figures are
+/// measurements in `docs/DESIGN.md`.
+struct PrimarySurfaceTests {
+
+    /// sRGB's transfer function and its inverse. The shade is composited the way the screen
+    /// composites it, in encoded space, and the luminance is taken from linear components.
+    private func encoded(_ linear: Double) -> Double {
+        linear <= 0.0031308 ? linear * 12.92 : 1.055 * pow(linear, 1 / 2.4) - 0.055
+    }
+
+    private func linear(_ encoded: Double) -> Double {
+        encoded <= 0.04045 ? encoded / 12.92 : pow((encoded + 0.055) / 1.055, 2.4)
+    }
+
+    private func luminance(_ channels: [Double]) -> Double {
+        0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+    }
+
+    /// `Aurora.top` on the primary fill, taken at the fill's darkest point: its foot, where the
+    /// shade toward `Aurora.top` is strongest. About 13:1 at the head and 10.6:1 here.
+    @Test func thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade() {
+        let resolved = Aurora.top.resolve(in: EnvironmentValues())
+        let ink = [resolved.linearRed, resolved.linearGreen, resolved.linearBlue].map(Double.init)
+        let shade = LiquidGlass.Primary.shadeOpacity
+
+        // White leaning toward the ink by `shade`.
+        let foot = ink.map { linear((1 - shade) + shade * encoded($0)) }
+
+        let ratio = (luminance(foot) + 0.05) / (luminance(ink) + 0.05)
+
+        #expect(ratio >= 7)
     }
 }

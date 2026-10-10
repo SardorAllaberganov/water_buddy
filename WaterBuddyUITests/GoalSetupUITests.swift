@@ -220,6 +220,43 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertTrue(yesterday.isSelected, "the screen did not stay on the day the serving landed on")
     }
 
+    /// A serving row is a control, and all of it is one: the gap between the amount and the time is
+    /// most of the row, and a tap there has to open the sheet as a tap on the text does.
+    ///
+    /// No unit test can see where a tap lands. This one exists because the row once stopped
+    /// answering there: on iOS 26.5, drawn on Apple's glass, it took a tap on its text and ignored
+    /// one on the bare glass between — while iOS 27.0 took both, so every run on the newer system
+    /// passed (`tasks/lessons.md`, 2026-10-10).
+    @MainActor
+    func testAServingRowOpensItsSheetWhereverItIsTapped() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let getStarted = app.buttons["Get Started"]
+        if getStarted.waitForExistence(timeout: 5) {
+            getStarted.tap()
+        }
+
+        // A serving today is what gives History a row.
+        let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass")).firstMatch
+        XCTAssertTrue(glass.waitForExistence(timeout: 5), "the Home tab's quick-add row did not draw")
+        glass.tap()
+
+        app.buttons["History"].tap()
+
+        let row = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "History shows no serving for today")
+
+        // The row's centre: past the amount, short of the time, on nothing but the pane.
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        let title = app.staticTexts["Edit serving"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5), "a tap on the row's bare glass did not open the sheet")
+
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(title.waitForNonExistence(timeout: 5), "Cancel did not dismiss the sheet")
+    }
+
     /// The names VoiceOver gives the week card's seven days, today first: "Today", then the six days
     /// before it as full weekdays — formatted the way the app formats them while it follows the
     /// device's language, which is how this suite runs.

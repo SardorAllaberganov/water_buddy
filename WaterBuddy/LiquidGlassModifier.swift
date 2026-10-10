@@ -19,9 +19,10 @@ enum LiquidGlass {
     ///
     /// Adopted from Apple's *Applying Liquid Glass to custom views*, which describes
     /// `Glass.interactive()` as glass that "reacts to touch and pointer interactions in real time".
-    /// **That API cannot be called here** — `glassEffect(_:in:)` and friends ship in the iOS 26 SDK
-    /// and this project builds against 18.5, so the symbols do not exist to guard with
-    /// `#available`. The behaviour is expressed in this system instead.
+    /// On iOS 26 and later an interactive pane **is** that glass
+    /// (``LiquidGlass/systemVariant(density:interactive:)``). These multipliers are what the
+    /// hand-made stack does instead, wherever ``LiquidGlass/rendering(base:reduceTransparency:systemGlassAvailable:)``
+    /// answers `.handMade`: below iOS 26, in the widget, and on the watch until its own stage.
     ///
     /// Three multipliers rather than one, because the three layers carry the press in different
     /// schemes. In **light** mode the tint does the work: frosted goes 0.45 → 0.61, clamped to the
@@ -45,6 +46,43 @@ enum LiquidGlass {
         static func pressedTint(_ resting: Double) -> Double {
             min(resting * tintBoost, maximumTintOpacity)
         }
+    }
+
+    /// The primary surface: the one solid thing among the glass, for a screen's one main action.
+    ///
+    /// Solid white, because a main action drawn as one more glass pane read as disabled — *Get
+    /// Started* was frosted glass with a glow, and looked like a control waiting to be enabled.
+    /// The content on it is `Aurora.top`, the deep blue the backdrop starts from, so the surface
+    /// borrows the product's colour without a new token
+    /// (`thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`).
+    enum Primary {
+
+        /// How far the fill leans toward `Aurora.top` at its foot. Enough to read as lit from
+        /// above; the contrast test is what stops it growing.
+        nonisolated static let shadeOpacity = 0.12
+
+        /// The wash laid over the whole fill while a finger is down — the material answering
+        /// the press, as `Interaction` does for glass.
+        nonisolated static let pressedShadeOpacity = 0.10
+
+        /// The soft ring outside the shape, and how far it reaches.
+        nonisolated static let ringOpacity = 0.13
+        nonisolated static let ringWidth: CGFloat = 6
+    }
+
+    /// How a selected slot is marked: the tab bar's active tab and History's shown day.
+    ///
+    /// A fill and a lit rim, always both and never colour alone (rule `65-accessibility`). Both
+    /// values were read off History's rendered week card before the tab bar borrowed them.
+    enum Selection {
+
+        /// The fill behind the selected slot. Low on purpose: it sits under a small white
+        /// caption, and every point of white added here comes straight off that caption's
+        /// contrast.
+        nonisolated static let fillOpacity = 0.08
+
+        /// The lit rim around it. A non-text mark, so its floor is 3:1.
+        nonisolated static let rimOpacity = 0.55
     }
 
     /// How far the pane floats above what it covers.
@@ -162,30 +200,108 @@ enum LiquidGlass {
             }
         }
     }
+
+    /// Which of the three panes a `liquidGlass(…)` call draws.
+    ///
+    /// A value rather than three `if`s inside the modifier, so the choice can be pinned by a test
+    /// that never builds a view (`LiquidGlassRoutingTests`).
+    nonisolated enum Rendering: Equatable, Sendable {
+
+        /// The opaque fill and lit rim that replace everything under Reduce Transparency.
+        case opaque
+
+        /// Apple's glass, `glassEffect(_:in:)`. The system draws the pane, its edge and its
+        /// depth; none of this file's layers is stacked on it.
+        case system
+
+        /// The stack this file has always drawn: base, scrim, tint, specular, rim, two shadows.
+        case handMade
+    }
+
+    /// Decides the pane, in this order — and the order is the ruling.
+    ///
+    /// 1. **Reduce Transparency first, on every OS.** The SDK's doc comments say nothing about
+    ///    what Apple's glass does under that setting, so this system keeps its own answer rather
+    ///    than depend on one it cannot read.
+    /// 2. **A `.flat` base is hand-made, always.** It exists for a context that cannot sample a
+    ///    backdrop — the widget — and Apple's glass samples one as a `Material` does.
+    /// 3. Otherwise Apple's glass where the system has it, and the hand-made stack where it has
+    ///    not.
+    ///
+    /// Spec `docs/superpowers/specs/2026-10-09-premium-redesign-design.md` §3.2.
+    nonisolated static func rendering(
+        base: Base,
+        reduceTransparency: Bool,
+        systemGlassAvailable: Bool
+    ) -> Rendering {
+        if reduceTransparency { return .opaque }
+
+        switch base {
+        case .flat: return .handMade
+        case .material: return systemGlassAvailable ? .system : .handMade
+        }
+    }
+
+    /// Whether this process can draw Apple's glass.
+    ///
+    /// **iOS only, for now.** watchOS 26 has the API and the watch's floor is 26.0, so the watch
+    /// could take this path today — but no watchOS 26 simulator runtime was installed where this
+    /// was built, and a pane nobody has rendered is not one to ship. The watch stage of the
+    /// redesign turns it on (spec §9, §14).
+    ///
+    /// A `static let`, resolved once: the answer cannot change while the process lives.
+    nonisolated static let systemGlassAvailable: Bool = {
+        #if os(iOS)
+        if #available(iOS 26.0, *) { return true }
+        #endif
+        return false
+    }()
+
+    /// Which of Apple's two glasses a pane takes.
+    nonisolated enum SystemVariant: Equatable, Sendable {
+
+        /// `Glass.regular` — the adaptive one, for any pane that carries a label.
+        case regular
+
+        /// `Glass.clear` — for a container whose content brings its own legibility.
+        case clear
+    }
+
+    /// `.sheer` asks for the least glass, and only a pane that is not a control gets Apple's
+    /// clear variant for it: the vessel, whose readout sits on its own scrim. A sheer *control*
+    /// — *Cancel*, *Open iOS Settings* — carries a label straight on the glass and needs the
+    /// regular variant's legibility.
+    ///
+    /// A starting mapping, settled by measurement: the figures are in `docs/DESIGN.md`.
+    nonisolated static func systemVariant(density: Density, interactive: Bool) -> SystemVariant {
+        switch density {
+        case .sheer: return interactive ? .regular : .clear
+        case .frosted, .opaque: return .regular
+        }
+    }
+
+    /// How much black Apple's glass is tinted with, through `Glass.tint(_:)`.
+    ///
+    /// **Measured, not chosen.** Over this aurora the regular glass reads about sRGB
+    /// `(0.07, 0.50, 0.88)` where the hand-made pane read `(0.21, 0.30, 0.44)`, and every dimmed
+    /// white in the app was picked from samples of the darker one: untinted, most of them fell
+    /// to 2.3–3.9:1. The value was climbed a rung at a time, each rendered on iOS 27.0 — whose
+    /// glass is lighter than iOS 26's — and followed through a minute of the aurora's swing,
+    /// because the ground under a pane keeps moving: `0.44` failed, `0.48` left the dimmest text
+    /// exactly on its floor, and this is the first rung with room. The tables are in
+    /// `docs/DESIGN.md`, *Apple's glass, measured* — re-take them before moving the number, and
+    /// never estimate one value from another.
+    ///
+    /// The clear variant takes none. It is the vessel: its readout has
+    /// ``WaterReadabilityScrim``, and a tint would dull the water behind it.
+    nonisolated static func systemTintOpacity(for variant: SystemVariant) -> Double {
+        switch variant {
+        case .regular: return 0.52
+        case .clear: return 0
+        }
+    }
 }
 
-// MARK: - Modifier
-
-/// A glossy glass surface: system blur, a white tint, a lit edge, a specular sweep, and depth.
-///
-/// The five layers, bottom to top, are what make it read as a physical pane rather than a
-/// translucent rectangle:
-///
-/// 1. ``LiquidGlass/Base`` — the real blur, sampling whatever is behind the view. Or, where
-///    nothing can be sampled, the fill that measures out to the same thing.
-/// 2. A black scrim, in Dark Mode only — see ``LiquidGlass/Density/scrimOpacity(for:)``.
-/// 3. A white tint — the body of the glass.
-/// 4. A specular gradient — a light source above and to the left, falling off fast.
-/// 5. An inset stroke that is bright where the light hits and dim where it does not.
-/// 6. Two shadows — ambient height plus a contact edge.
-///
-/// Glass is invisible without something behind it. Place it over content, imagery, or colour,
-/// never over a flat background.
-///
-/// Density is a legibility decision, not only a look: a pane is only as readable as the
-/// background it failed to hide. Use ``LiquidGlass/Density/frosted`` or
-/// ``LiquidGlass/Density/opaque`` behind body text, and keep ``LiquidGlass/Density/sheer`` for
-/// short labels and controls where a busy backdrop cannot swallow a whole sentence.
 // MARK: - The press state
 
 private struct GlassPressedKey: EnvironmentKey {
@@ -209,6 +325,33 @@ extension EnvironmentValues {
     }
 }
 
+// MARK: - Modifier
+
+/// A glass surface, drawn one of three ways. ``LiquidGlass/rendering(base:reduceTransparency:systemGlassAvailable:)``
+/// decides which, and no call site is told.
+///
+/// - **Apple's glass**, on iOS 26 and later, for a base that can sample its backdrop. The system
+///   draws the pane, its edge and its depth. `tint`, `elevation`, the border and the highlight
+///   below describe the hand-made stack, and Apple's glass takes none of them.
+/// - **The opaque pane**, under Reduce Transparency, on every OS.
+/// - **The hand-made stack**, everywhere else. Its six layers, bottom to top, are what make it
+///   read as a physical pane rather than a translucent rectangle:
+///
+///   1. ``LiquidGlass/Base`` — the real blur, sampling whatever is behind the view. Or, where
+///      nothing can be sampled, the fill that measures out to the same thing.
+///   2. A black scrim, in Dark Mode only — see ``LiquidGlass/Density/scrimOpacity(for:)``.
+///   3. A white tint — the body of the glass.
+///   4. A specular gradient — a light source above and to the left, falling off fast.
+///   5. An inset stroke that is bright where the light hits and dim where it does not.
+///   6. Two shadows — ambient height plus a contact edge.
+///
+/// Glass is invisible without something behind it. Place it over content, imagery, or colour,
+/// never over a flat background.
+///
+/// Density is a legibility decision, not only a look: a pane is only as readable as the
+/// background it failed to hide. Use ``LiquidGlass/Density/frosted`` or
+/// ``LiquidGlass/Density/opaque`` behind body text, and keep ``LiquidGlass/Density/sheer`` for
+/// short labels and controls where a busy backdrop cannot swallow a whole sentence.
 struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
 
     var shape: S
@@ -239,8 +382,7 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
     @Environment(\.glassIsPressed) private var isPressed
 
     func body(content: Content) -> some View {
-        content
-            .background(pane)
+        routed(content)
             // Scoped to the value that changed, never a bare `withAnimation` (rule `50-views`),
             // and matched to `PressStyle`'s spring so the material and the frame move together
             // rather than arriving one after the other.
@@ -251,27 +393,89 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
             .animation(.spring(response: 0.28, dampingFraction: 0.62), value: isReacting)
     }
 
-    // MARK: Layers
+    // MARK: Routing
+
+    private var rendering: LiquidGlass.Rendering {
+        LiquidGlass.rendering(
+            base: base,
+            reduceTransparency: reduceTransparency,
+            systemGlassAvailable: LiquidGlass.systemGlassAvailable
+        )
+    }
 
     @ViewBuilder
-    private var pane: some View {
-        if reduceTransparency {
-            // Translucency is the thing being turned off, so there is nothing to soften:
-            // swap in an opaque surface and keep only the edge and the depth.
-            shape
-                .fill(base.opaqueFill)
-                .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
-                .compositingGroup()
-                .modifier(Shadows(elevation: elevation, colorScheme: colorScheme))
-        } else {
-            baseLayer
-                .overlay { shape.fill(Color.black.opacity(density.scrimOpacity(for: colorScheme))) }
-                .overlay { shape.fill(tint.opacity(resolvedTintOpacity)) }
-                .overlay { shape.fill(specular) }
-                .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
-                .compositingGroup()
-                .modifier(Shadows(elevation: elevation, colorScheme: colorScheme))
+    private func routed(_ content: Content) -> some View {
+        switch rendering {
+        case .system: systemPane(content)
+        case .opaque: content.background(opaquePane)
+        case .handMade: content.background(handMadePane)
         }
+    }
+
+    /// Apple's glass. Applied **to** the content rather than laid behind it, because that is what
+    /// the API is: it anchors its shape behind the view and applies the glass's foreground
+    /// effects over it.
+    ///
+    /// The `else` and the `#else` can only be reached if `rendering` and this check ever
+    /// disagree, which `theAvailabilityFlagMatchesTheRunningSystem` exists to prevent. They draw
+    /// the hand-made stack rather than nothing.
+    @ViewBuilder
+    private func systemPane(_ content: Content) -> some View {
+        #if os(iOS)
+        if #available(iOS 26.0, *) {
+            content
+                .glassEffect(systemGlass, in: shape)
+                // A pane answers a tap anywhere inside its shape. The hand-made stack gets that
+                // from its fills; Apple's glass does not promise it. On iOS 26.5 a serving row in
+                // History's `List` took a tap on its text and ignored one on the bare glass
+                // between, while iOS 27.0 took both — so say it rather than rely on it
+                // (`testAServingRowOpensItsSheetWhereverItIsTapped`).
+                .contentShape(shape)
+        } else {
+            content.background(handMadePane)
+        }
+        #else
+        content.background(handMadePane)
+        #endif
+    }
+
+    #if os(iOS)
+    @available(iOS 26.0, *)
+    private var systemGlass: Glass {
+        let variant = LiquidGlass.systemVariant(density: density, interactive: interactive)
+        let darkening = LiquidGlass.systemTintOpacity(for: variant)
+
+        let glass: Glass
+        switch variant {
+        case .regular: glass = .regular
+        case .clear: glass = .clear
+        }
+        // `nil` rather than a clear colour: no tint at all is what the vessel is meant to get.
+        let tinted = glass.tint(darkening > 0 ? Color.black.opacity(darkening) : nil)
+        return interactive ? tinted.interactive() : tinted
+    }
+    #endif
+
+    // MARK: Layers
+
+    /// Translucency is the thing being turned off, so there is nothing to soften: an opaque
+    /// surface, keeping only the edge and the depth.
+    private var opaquePane: some View {
+        shape
+            .fill(base.opaqueFill)
+            .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
+            .compositingGroup()
+            .modifier(Shadows(elevation: elevation, colorScheme: colorScheme))
+    }
+
+    private var handMadePane: some View {
+        baseLayer
+            .overlay { shape.fill(Color.black.opacity(density.scrimOpacity(for: colorScheme))) }
+            .overlay { shape.fill(tint.opacity(resolvedTintOpacity)) }
+            .overlay { shape.fill(specular) }
+            .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
+            .compositingGroup()
+            .modifier(Shadows(elevation: elevation, colorScheme: colorScheme))
     }
 
     @ViewBuilder
@@ -362,6 +566,62 @@ private struct Shadows: ViewModifier {
     }
 }
 
+// MARK: - The primary surface
+
+/// Draws ``LiquidGlass/Primary``. In this file and not one of its own, because the widget and the
+/// watch will draw it too and the shared set does not grow (rule `15-project`).
+struct PrimarySurfaceModifier<S: Shape & InsettableShape>: ViewModifier {
+
+    var shape: S
+
+    /// The ring is the phone's. A widget's pour button is exactly its 44pt target, and its
+    /// vessel's clearance is derived from that (rule `40-widget`), so it passes `false`.
+    var ring: Bool = true
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// Set by ``PressStyle``, as for a glass pane.
+    @Environment(\.glassIsPressed) private var isPressed
+
+    func body(content: Content) -> some View {
+        content
+            // The surface owns its content's colour: a label that set `.white` itself would be
+            // white on white.
+            .foregroundStyle(Aurora.top)
+            .background(surface)
+            // The same spring as `PressStyle` and `LiquidGlassModifier`, so the wash and the
+            // frame move together (rule `60-design-system`).
+            .animation(.spring(response: 0.28, dampingFraction: 0.62), value: isPressed)
+    }
+
+    private var surface: some View {
+        shape
+            .fill(.white)
+            .overlay { shape.fill(shade) }
+            .overlay {
+                shape.fill(Aurora.top.opacity(isPressed ? LiquidGlass.Primary.pressedShadeOpacity : 0))
+            }
+            // One shadow for the assembled surface, not one per layer.
+            .compositingGroup()
+            .modifier(Shadows(elevation: .raised, colorScheme: colorScheme))
+            .background {
+                // Present at zero opacity rather than removed, so a caller that turns it off
+                // changes a colour and not the view tree.
+                shape
+                    .inset(by: -LiquidGlass.Primary.ringWidth)
+                    .fill(.white.opacity(ring ? LiquidGlass.Primary.ringOpacity : 0))
+            }
+    }
+
+    private var shade: LinearGradient {
+        LinearGradient(
+            colors: [Aurora.top.opacity(0), Aurora.top.opacity(LiquidGlass.Primary.shadeOpacity)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+}
+
 // MARK: - View API
 
 extension View {
@@ -423,6 +683,13 @@ extension View {
             highlightEnd: highlightEnd,
             interactive: interactive
         )
+    }
+
+    /// Places the content on the primary surface: solid white, `Aurora.top` content.
+    ///
+    /// One per screen, for its main action. Never give its label a foreground colour of its own.
+    func primarySurface<S: Shape & InsettableShape>(in shape: S, ring: Bool = true) -> some View {
+        modifier(PrimarySurfaceModifier(shape: shape, ring: ring))
     }
 }
 
