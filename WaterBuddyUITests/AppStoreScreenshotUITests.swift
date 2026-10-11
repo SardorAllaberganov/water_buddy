@@ -118,7 +118,7 @@ final class AppStoreScreenshotUITests: XCTestCase {
         // ── 02 · History, populated ──────────────────────────────────────────────────────────────
         app.buttons["History"].tap()
         XCTAssertTrue(
-            app.staticTexts["Today"].waitForExistence(timeout: 10),
+            app.buttons["Add a serving"].waitForExistence(timeout: 10),
             "the History tab did not draw"
         )
         // The week card is what makes this shot worth taking rather than a bare list; its absence
@@ -233,7 +233,7 @@ extension AppStoreScreenshotUITests {
         capture("04-home-empty-0")
 
         app.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 10))
         XCTAssertFalse(
             app.staticTexts["Last 7 days"].exists,
             "a week card in the empty state means the device was dirty"
@@ -260,7 +260,7 @@ extension AppStoreScreenshotUITests {
 
         // ── 08 · History, five rows, five distinct minutes ───────────────────────────────────────
         app.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Last 7 days"].waitForExistence(timeout: 5))
         XCTAssertEqual(servingRows(in: app).count, 5)
         Thread.sleep(forTimeInterval: settle)
@@ -306,7 +306,7 @@ extension AppStoreScreenshotUITests {
             XCTContext.runActivity(named: "11 skipped — the .large detent was not reached") { _ in }
         }
         if app.buttons["Cancel"].exists { app.buttons["Cancel"].tap() }
-        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
 
         // ── 12–13 · a list long enough to overflow, at both scroll positions ─────────────────────
         // Three more Cups: 1,750 ml stays under the 2,000 goal, so the confetti does not fire early.
@@ -319,14 +319,14 @@ extension AppStoreScreenshotUITests {
         XCTAssertEqual(vessel.value as? String, "88 percent. 1750 of 2000 millilitres.")
 
         app.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 10))
         XCTAssertEqual(servingRows(in: app).count, 8)
         Thread.sleep(forTimeInterval: settle)
         capture("12-history-populated-8rows-top")
 
         scrollHistoryList(app, byPoints: 200)
         capture("13-history-populated-8rows-scrolled")
-        returnToTop(of: "History", in: app, proof: app.staticTexts["Today"])
+        returnToTop(of: "History", in: app, proof: app.buttons["Add a serving"])
 
         // ── 14–15 · Settings, at rest and at max scroll ──────────────────────────────────────────
         app.buttons["Settings"].tap()

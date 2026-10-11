@@ -89,6 +89,14 @@ final class DataManager {
     /// margins are taken off, so widening the window is a layout decision as well as a fetch one.
     nonisolated static let historyWindow = 7
 
+    /// How far back ``streak`` looks, in days, a step at a time.
+    ///
+    /// The first window answers nearly everyone: a run of under a month ends inside it. The count
+    /// reads the next one only while the run reaches the window's oldest day, so a long run costs
+    /// its owner one wider fetch and nobody else anything. A run longer than the last window is
+    /// reported as that window's length.
+    nonisolated static let streakWindows = [30, 120, 480, 1_920]
+
     /// UserDefaults keys, namespaced because an App Group domain is shared by every
     /// target that joins the group.
     enum Key {
@@ -184,6 +192,7 @@ final class DataManager {
     @ObservationIgnored private var storedTodaysLogs: [WaterLog] = []
     @ObservationIgnored private var storedHistory: [DaySummary] = []
     @ObservationIgnored private var storedHistoryLogs: [Int: [WaterLog]] = [:]
+    @ObservationIgnored private var storedStreak = 0
     @ObservationIgnored private var storedRemindersEnabled: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
     @ObservationIgnored private var storedServings: [Int]
@@ -240,6 +249,8 @@ final class DataManager {
             reloadWidgets()
             publishWrist(defaults)
             rescheduleRemindersNow()
+            // The goal is half of "a day that reached it", for every day the streak counts.
+            republishStreak()
         }
     }
 
@@ -360,6 +371,25 @@ final class DataManager {
         return storedHistoryLogs
     }
 
+    /// How many days in a row the goal has been reached, today included once today reaches it.
+    ///
+    /// Derived, never stored: ``DaySummary/streak(of:goal:)`` over the rows, republished with the
+    /// history and whenever the goal moves — every day is judged against the **current** goal,
+    /// because no past goal is recorded. Days are bucketed from each serving's instant on this
+    /// model's calendar, so a change of time zone can regroup them, as it does the week card.
+    ///
+    /// **Equality-guarded**, like ``history``: an `Int` that did not move redraws nothing, and
+    /// ``refresh()`` runs on every foreground. **A failed read leaves it as it stands** — an
+    /// unreadable store is not a broken streak (rule `20-state`).
+    ///
+    /// It never leaves the app: not the widget's snapshot, not a notification, not the wrist's
+    /// mirror. Zero wherever ``role`` does not draw history. Read-only — a consequence of the
+    /// rows, never an input.
+    var streak: Int {
+        access(keyPath: \.streak)
+        return storedStreak
+    }
+
     /// Whether the user wants a nudge every two hours between 09:00 and 21:00.
     ///
     /// Settable, unlike ``isGoalSet`` — this one genuinely is a preference rather than a consequence
@@ -437,6 +467,44 @@ final class DataManager {
         let goal = dailyGoal
         guard goal > 0 else { return 0 }
         return Double(currentWater) / Double(goal)
+    }
+
+    /// Millilitres still to drink today — zero once the goal is met, never negative.
+    var remaining: Int {
+        max(0, dailyGoal - currentWater)
+    }
+
+    /// Whether today's water has reached the goal. The one spelling of "reached" a view reads;
+    /// ``ReminderPlan`` makes the same comparison to silence the rest of the day.
+    var hasReachedGoal: Bool {
+        currentWater >= dailyGoal
+    }
+
+    /// When the user last drank today, or `nil` before the day's first serving.
+    ///
+    /// Never later than now: a watch pour carries the watch's own clock, and one stamped ahead of
+    /// this one would otherwise be drawn as a drink that has not happened yet.
+    var lastDrink: Date? {
+        todaysLogs.lazy.map(\.timestamp).max().map { min($0, now()) }
+    }
+
+    /// The next reminder still planned for **today**, or `nil` — reminders off, the goal reached,
+    /// or the day's last slot behind us. Tomorrow's 09:00 is planned too, and is not "next" on a
+    /// screen headed *Today*.
+    ///
+    /// **The planned time, not a delivery promise**: iOS may hold a reminder for the Notification
+    /// Summary, which Settings discloses (rule `80-notifications`).
+    ///
+    /// It is the first slot of the plan ``currentReminderSlots()`` files, cut to today, so the
+    /// line a screen draws and the request iOS holds cannot disagree. The four `access` calls
+    /// are what make a view that reads this redraw: the plan is computed from stored values, which
+    /// register nothing by themselves.
+    var nextReminder: Date? {
+        access(keyPath: \.remindersEnabled)
+        access(keyPath: \.currentWater)
+        access(keyPath: \.dailyGoal)
+        access(keyPath: \.todaysLogs)
+        return reminderSlots(horizonDays: 0).first?.fireDate
     }
 
     /// `true` when the App Group container is reachable, meaning state is genuinely shared
@@ -554,12 +622,19 @@ final class DataManager {
     /// two processes hold their own instance, and an idle one would otherwise recompute a total
     /// from a stale figure. Non-positive amounts are ignored in both directions — use
     /// ``deleteLog(_:)`` to take a serving back off.
-    func addLog(amount: Int, at date: Date? = nil) {
-        guard amount > 0 else { return }
+    ///
+    /// - Returns: the id of the row it inserted, or `nil` for a refused amount. `HomeView` is the
+    ///   one caller that keeps it — it is what ``undoLog(id:)`` takes back — and every other
+    ///   caller discards it.
+    @discardableResult
+    func addLog(amount: Int, at date: Date? = nil) -> UUID? {
+        guard amount > 0 else { return nil }
         refresh()
 
-        modelContext.insert(WaterLog(amount: amount, timestamp: date ?? now()))
+        let log = WaterLog(amount: amount, timestamp: date ?? now())
+        modelContext.insert(log)
         saveAndRecompute()
+        return log.id
     }
 
     #if canImport(WatchConnectivity)
@@ -732,6 +807,21 @@ final class DataManager {
         saveAndRecompute()
     }
 
+    /// Takes back one serving, by the id ``addLog(amount:at:)`` returned for it.
+    ///
+    /// For Home's *Undo*, which holds an id and not a row: a ``WaterLog`` may sit in a view's
+    /// state only as a sheet's selection (rule `50-views`). The row is looked up among
+    /// **today's**, read fresh — an Undo that outlived midnight names yesterday's water, and
+    /// yesterday is history. It goes through ``deleteLog(_:)``, so the total, the widget and the
+    /// reminder plan follow as they do for any delete.
+    ///
+    /// Does nothing when the row is gone, or when today's rows cannot be read: a failed read is
+    /// not "no such row", and nothing is derived from one (rule `20-state`).
+    func undoLog(id: UUID) {
+        guard let log = readTodaysLogs()?.first(where: { $0.id == id }) else { return }
+        deleteLog(log)
+    }
+
     /// Corrects a serving's amount, its time, or both, in one save.
     ///
     /// Non-positive amounts are ignored rather than deleting the row: "set this to zero" and
@@ -863,6 +953,10 @@ final class DataManager {
     private func republishHistory() {
         guard Self.role.drawsHistory else { return }
 
+        // Before the window below, and not inside it: the bars can return early — a failed read,
+        // or a series that did not move — while a run further back still did.
+        republishStreak()
+
         let instant = now()
         guard let start = Self.historyWindowStart(endingOn: instant, calendar: calendar),
               let logs = readLogs(from: start, to: Self.nextDayBoundary(after: instant, calendar: calendar))
@@ -881,6 +975,38 @@ final class DataManager {
         )
         guard series != storedHistory else { return }
         withMutation(keyPath: \.history) { storedHistory = series }
+    }
+
+    /// Recounts ``streak`` and publishes it if it moved.
+    ///
+    /// Behind `role.drawsHistory` for ``republishHistory()``'s reason: a widget tap must not run
+    /// a month's fetch in a process that draws one number.
+    private func republishStreak() {
+        guard Self.role.drawsHistory else { return }
+        guard let counted = readStreak(), counted != storedStreak else { return }
+        withMutation(keyPath: \.streak) { storedStreak = counted }
+    }
+
+    /// The run as the store holds it now, or `nil` when the store could not be read.
+    ///
+    /// Reads ``streakWindows`` in turn and stops at the first window the run ends inside. Each
+    /// window is one fetch and one roll-up through ``DaySummary/series(from:days:endingOn:in:)``,
+    /// the same bucketing the week card uses, so the two cannot count a day differently.
+    private func readStreak() -> Int? {
+        let instant = now()
+        let end = Self.nextDayBoundary(after: instant, calendar: calendar)
+        var counted = 0
+
+        for days in Self.streakWindows {
+            guard let start = Self.windowStart(days: days, endingOn: instant, calendar: calendar),
+                  let logs = readLogs(from: start, to: end)
+            else { return nil }
+
+            let series = DaySummary.series(from: logs, days: days, endingOn: instant, in: calendar)
+            counted = DaySummary.streak(of: series, goal: storedDailyGoal)
+            guard DaySummary.streakFillsWindow(series, goal: storedDailyGoal) else { break }
+        }
+        return counted
     }
 
     /// - Returns: whether the save actually succeeded. `ingest(_:)` is the one caller that acts on
@@ -1029,6 +1155,22 @@ final class DataManager {
         return true
     }
 
+    /// The day turned, or the time zone moved, while the app was open.
+    ///
+    /// What the two observers in ``startObservingDayChanges()`` call. ``resetIfNeeded()`` clears
+    /// the cached total and nothing else; a screen left open across midnight also draws today's
+    /// rows, the week and the streak, and none of those is republished until the next
+    /// ``refresh()`` or mutation. So when the day really did turn, republish them — after the
+    /// reset, as ``refresh()`` orders it (rule `30-rollover`).
+    ///
+    /// The rows are republished and the total is **not** recomputed from them, for the reason on
+    /// ``republishTodaysLogs()``.
+    func dayDidTurn() {
+        guard resetIfNeeded() else { return }
+        republishTodaysLogs()
+        republishHistory()
+    }
+
     /// Clears today's total unconditionally, for a user-facing "start over" action.
     ///
     /// Leaves ``dailyGoal`` untouched.
@@ -1108,6 +1250,12 @@ final class DataManager {
     ///   re-plans when it also turns the day — so flying east soon after a drink can bring a kept
     ///   slot inside the hour, until the app next re-plans.
     func currentReminderSlots() -> [ReminderPlan.Slot] {
+        reminderSlots(horizonDays: ReminderPlan.horizonDays)
+    }
+
+    /// The plan out to `horizonDays`, from the state this instance holds. One spelling of the
+    /// plan's inputs, for the schedule that is filed and for ``nextReminder``.
+    private func reminderSlots(horizonDays: Int) -> [ReminderPlan.Slot] {
         ReminderPlan.slots(
             enabled: storedRemindersEnabled,
             currentWater: storedCurrentWater,
@@ -1116,7 +1264,8 @@ final class DataManager {
             // lean on a sort order chosen for a list.
             lastDrink: storedTodaysLogs.lazy.map(\.timestamp).max(),
             now: now(),
-            calendar: calendar
+            calendar: calendar,
+            horizonDays: horizonDays
         )
     }
 
@@ -1365,7 +1514,7 @@ final class DataManager {
             center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 // `queue: .main` guarantees the main thread, which is the main actor.
                 MainActor.assumeIsolated {
-                    _ = self?.resetIfNeeded()
+                    self?.dayDidTurn()
                 }
             }
         }
@@ -1816,6 +1965,27 @@ extension EnvironmentValues {
     }
 }
 
+extension Bundle {
+
+    /// A sentence with volumes in it: each figure grouped the way `locale` groups a number, then
+    /// set into the `%n$@` key this bundle resolves.
+    ///
+    /// `%1$d` never groups — `String(format:)` prints `1300` in every language — so a visible
+    /// figure is formatted first and handed over as text (`1,300`, `1 300`). **Spoken strings
+    /// keep their `%d` keys**: VoiceOver reads a bare number correctly, and the UI tests assert
+    /// those values as they are.
+    ///
+    /// Here, beside the strings environment it reads from, because every bundle that draws a
+    /// volume compiles this file and the shared set does not grow (rule `15-project`).
+    /// `nonisolated`, so a suite off the main actor can pin it.
+    nonisolated func figure(_ key: String, _ volumes: Int..., locale: Locale) -> String {
+        String(
+            format: localizedString(forKey: key, value: nil, table: nil),
+            arguments: volumes.map { $0.formatted(.number.locale(locale)) }
+        )
+    }
+}
+
 // MARK: - Per-day history
 
 /// One day's water, as a plain value.
@@ -1938,6 +2108,34 @@ extension DaySummary {
     /// The largest single day in the window, or `0` for an empty one.
     nonisolated static func best(of series: [DaySummary]) -> Int {
         series.map(\.total).max() ?? 0
+    }
+
+    /// How many days in a row the goal was reached, counted back from the end of `series`.
+    ///
+    /// The last entry is **today**, and today is still open: it joins the run once it has reached
+    /// the goal, and does not break one before then. So the count starts from today if today has
+    /// reached it, otherwise from yesterday.
+    ///
+    /// Every day is judged against the one `goal` handed in. No past goal is stored
+    /// (``DaySummary`` deliberately has no `goal` field), so this is the current goal — raising
+    /// it can shorten a run, and the week card already says "Measured against your current goal".
+    nonisolated static func streak(of series: [DaySummary], goal: Int) -> Int {
+        closedDays(of: series, goal: goal).reversed().prefix { $0.total >= goal }.count
+    }
+
+    /// Whether the run ``streak(of:goal:)`` counts reaches the window's oldest day — in which
+    /// case the real run may be longer than this window can show, and the caller should look
+    /// further back.
+    nonisolated static func streakFillsWindow(_ series: [DaySummary], goal: Int) -> Bool {
+        let days = closedDays(of: series, goal: goal)
+        return !days.isEmpty && days.allSatisfy { $0.total >= goal }
+    }
+
+    /// The days a run is counted over: the whole window, less a today that has not reached the
+    /// goal yet.
+    nonisolated private static func closedDays(of series: [DaySummary], goal: Int) -> ArraySlice<DaySummary> {
+        guard let today = series.last, today.total < goal else { return series[...] }
+        return series.dropLast()
     }
 }
 
@@ -2543,18 +2741,29 @@ extension DataManager {
         ) ?? date.addingTimeInterval(24 * 60 * 60)
     }
 
+    /// Midnight, `days` − 1 calendar days before the day containing `now`: where a window of
+    /// `days` days, today included, starts.
+    ///
+    /// The one definition of where a window starts, as ``nextDayBoundary(after:calendar:)`` is of
+    /// where a day ends. Stepped with `date(byAdding: .day,…)`: a DST day is 23 or 25 hours long,
+    /// so a walk in multiples of 86,400 seconds can land an hour off midnight (rule `30-rollover`).
+    ///
+    /// `nil` only if the calendar cannot step back.
+    nonisolated static func windowStart(days: Int, endingOn now: Date, calendar: Calendar) -> Date? {
+        calendar.date(byAdding: .day, value: -(days - 1), to: calendar.startOfDay(for: now))
+    }
+
     /// The start of the first day ``DataManager/history`` shows: midnight, ``historyWindow`` − 1
     /// calendar days before the day containing `now`.
     ///
     /// The one definition of where the week starts, as ``nextDayBoundary(after:calendar:)`` is of
     /// where a day ends. The bars' fetch and the History sheet's wheel both call it, so the oldest
-    /// bar and the earliest instant the sheet offers cannot disagree. Stepped with
-    /// `date(byAdding: .day,…)`: a DST day is 23 or 25 hours long, so six days of 86,400 seconds can
-    /// land an hour off midnight (rule `30-rollover`).
+    /// bar and the earliest instant the sheet offers cannot disagree. It is
+    /// ``windowStart(days:endingOn:calendar:)`` at ``historyWindow`` days.
     ///
     /// `nil` only if the calendar cannot step back a day.
     nonisolated static func historyWindowStart(endingOn now: Date, calendar: Calendar) -> Date? {
-        calendar.date(byAdding: .day, value: -(historyWindow - 1), to: calendar.startOfDay(for: now))
+        windowStart(days: historyWindow, endingOn: now, calendar: calendar)
     }
 }
 

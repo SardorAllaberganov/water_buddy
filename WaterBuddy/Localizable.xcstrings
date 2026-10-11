@@ -11,6 +11,75 @@
         }
       }
     },
+    "%1$@ ml": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ мл"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml"
+          }
+        }
+      }
+    },
+    "%1$@ ml to go": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml to go"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Осталось %1$@ мл"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml qoldi"
+          }
+        }
+      }
+    },
+    "%1$@ of %2$@ ml": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ of %2$@ ml"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ из %2$@ мл"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ dan %1$@ ml"
+          }
+        }
+      }
+    },
     "%1$@, add %2$d millilitres": {
       "extractionState": "manual",
       "localizations": {
@@ -34,29 +103,6 @@
         }
       }
     },
-    "%1$d / %2$d ml": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$d / %2$d ml"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$d / %2$d мл"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$d / %2$d ml"
-          }
-        }
-      }
-    },
     "%1$d millilitres": {
       "extractionState": "manual",
       "localizations": {
@@ -76,6 +122,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$d millilitr"
+          }
+        }
+      }
+    },
+    "%1$d millilitres to go": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d millilitres to go"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Осталось %1$d миллилитров"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d millilitr qoldi"
           }
         }
       }
@@ -330,6 +399,29 @@
         }
       }
     },
+    "Added %1$@ ml": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added %1$@ ml"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавлено %1$@ мл"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml qo‘shildi"
+          }
+        }
+      }
+    },
     "Adds your Glass to today's total in WaterBuddy.": {
       "extractionState": "manual",
       "localizations": {
@@ -537,6 +629,29 @@
         }
       }
     },
+    "Day streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day streak"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Серия дней"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ketma-ket kunlar"
+          }
+        }
+      }
+    },
     "Delete": {
       "localizations": {
         "en": {
@@ -670,6 +785,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stakan"
+          }
+        }
+      }
+    },
+    "Goal reached": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goal reached"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цель достигнута"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maqsadga erishildi"
           }
         }
       }
@@ -812,6 +950,29 @@
         }
       }
     },
+    "Last drink %1$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last drink %1$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Последняя порция в %1$@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oxirgi porsiya %1$@"
+          }
+        }
+      }
+    },
     "Log a Glass": {
       "extractionState": "manual",
       "localizations": {
@@ -854,6 +1015,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Joriy maqsadingizga nisbatan"
+          }
+        }
+      }
+    },
+    "Next reminder %1$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next reminder %1$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Напоминание в %1$@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyingi eslatma %1$@"
           }
         }
       }
@@ -1268,6 +1452,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ilovani ochmasdan suv iste’molini kuzating va stakan qayd eting."
+          }
+        }
+      }
+    },
+    "Undo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Undo"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отменить"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qaytarish"
           }
         }
       }

@@ -245,8 +245,8 @@ enum LiquidGlass {
     /// Whether this process can draw Apple's glass.
     ///
     /// **iOS only, for now.** watchOS 26 has the API and the watch's floor is 26.0, so the watch
-    /// could take this path today — but no watchOS 26 simulator runtime was installed where this
-    /// was built, and a pane nobody has rendered is not one to ship. The watch stage of the
+    /// could take this path today — but the watch's panes have not been rendered on Apple's
+    /// glass, and a pane nobody has rendered is not one to ship. The watch stage of the
     /// redesign turns it on (spec §9, §14).
     ///
     /// A `static let`, resolved once: the answer cannot change while the process lives.
@@ -312,10 +312,11 @@ extension EnvironmentValues {
 
     /// Whether a finger is down on the control containing this pane.
     ///
-    /// Set by ``PressStyle`` and read by ``LiquidGlassModifier``. It is an environment value for a
-    /// structural reason: `liquidGlass(…)` is applied *inside* a button's label, and
-    /// `ButtonStyle.Configuration` is only visible to the style, which wraps the label from
-    /// outside. The style can hand the state down; the label cannot reach up for it.
+    /// Set by ``PressStyle`` and read by ``LiquidGlassModifier`` and ``PrimarySurfaceModifier``.
+    /// It is an environment value for a structural reason: `liquidGlass(…)` is applied *inside*
+    /// a button's label, and `ButtonStyle.Configuration` is only visible to the style, which
+    /// wraps the label from outside. The style can hand the state down; the label cannot reach
+    /// up for it.
     ///
     /// Defaults to `false`, so a glass pane that is not inside a `PressStyle` button — the vessel,
     /// the settings cards — simply never reacts.
@@ -403,28 +404,39 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
         )
     }
 
+    /// Draws the pane this call asked for **without moving the content between branches**.
+    ///
+    /// The first version switched the content itself — `systemPane(content)` in one case,
+    /// `content.background(…)` in the others — so flipping Reduce Transparency rebuilt everything
+    /// inside the pane, and anything in there that owned state would have lost it. Now the only
+    /// things that change with ``rendering`` are the background and the glass handed to
+    /// `glassEffect`: `.identity`, which draws nothing, when the pane is not Apple's.
+    ///
+    /// The one branch left around the content is on `base`, which a call site fixes for good. A
+    /// `.flat` base never meets `glassEffect` at all: it exists for the widget, whose archive
+    /// cannot sample a backdrop (rule `40-widget`).
     @ViewBuilder
     private func routed(_ content: Content) -> some View {
-        switch rendering {
-        case .system: systemPane(content)
-        case .opaque: content.background(opaquePane)
-        case .handMade: content.background(handMadePane)
+        switch base {
+        case .flat: content.background(ownPane(systemGlassDrawn: false))
+        case .material: sampling(content)
         }
     }
 
-    /// Apple's glass. Applied **to** the content rather than laid behind it, because that is what
-    /// the API is: it anchors its shape behind the view and applies the glass's foreground
+    /// Apple's glass is applied **to** the content rather than laid behind it, because that is
+    /// what the API is: it anchors its shape behind the view and applies the glass's foreground
     /// effects over it.
     ///
-    /// The `else` and the `#else` can only be reached if `rendering` and this check ever
-    /// disagree, which `theAvailabilityFlagMatchesTheRunningSystem` exists to prevent. They draw
-    /// the hand-made stack rather than nothing.
+    /// The `else` and the `#else` draw this file's own pane. They are also reached, as
+    /// `.handMade`, if ``rendering`` and this check ever disagreed, which
+    /// `theAvailabilityFlagMatchesTheRunningSystem` exists to prevent.
     @ViewBuilder
-    private func systemPane(_ content: Content) -> some View {
+    private func sampling(_ content: Content) -> some View {
         #if os(iOS)
         if #available(iOS 26.0, *) {
             content
-                .glassEffect(systemGlass, in: shape)
+                .background(ownPane(systemGlassDrawn: true))
+                .glassEffect(rendering == .system ? systemGlass : .identity, in: shape)
                 // A pane answers a tap anywhere inside its shape. The hand-made stack gets that
                 // from its fills; Apple's glass does not promise it. On iOS 26.5 a serving row in
                 // History's `List` took a tap on its text and ignored one on the bare glass
@@ -432,11 +444,23 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
                 // (`testAServingRowOpensItsSheetWhereverItIsTapped`).
                 .contentShape(shape)
         } else {
-            content.background(handMadePane)
+            content.background(ownPane(systemGlassDrawn: false))
         }
         #else
-        content.background(handMadePane)
+        content.background(ownPane(systemGlassDrawn: false))
         #endif
+    }
+
+    /// What this file draws behind the content: the opaque pane, the hand-made stack, or nothing
+    /// where the system is drawing its own glass.
+    @ViewBuilder
+    private func ownPane(systemGlassDrawn: Bool) -> some View {
+        switch rendering {
+        case .opaque: opaquePane
+        case .handMade: handMadePane
+        case .system:
+            if !systemGlassDrawn { handMadePane }
+        }
     }
 
     #if os(iOS)
@@ -622,6 +646,32 @@ struct PrimarySurfaceModifier<S: Shape & InsettableShape>: ViewModifier {
     }
 }
 
+// MARK: - The glass group
+
+/// Groups sibling glass panes that sit close together.
+///
+/// On iOS 26 and later this is Apple's `GlassEffectContainer`: the system samples the backdrop
+/// once for the panes inside it and draws them as one layer of glass. Everywhere else it is the
+/// content, untouched — the hand-made stack needs no container.
+///
+/// The branch is on the system and nothing else, so it cannot change while the app runs and
+/// nothing inside is rebuilt. `#if os(iOS)` keeps the watch on the pass-through until its own
+/// stage, as ``LiquidGlass/systemGlassAvailable`` does for the panes.
+private struct GlassGroupModifier: ViewModifier {
+
+    func body(content: Content) -> some View {
+        #if os(iOS)
+        if #available(iOS 26.0, *) {
+            GlassEffectContainer { content }
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+}
+
 // MARK: - View API
 
 extension View {
@@ -690,6 +740,12 @@ extension View {
     /// One per screen, for its main action. Never give its label a foreground colour of its own.
     func primarySurface<S: Shape & InsettableShape>(in shape: S, ring: Bool = true) -> some View {
         modifier(PrimarySurfaceModifier(shape: shape, ring: ring))
+    }
+
+    /// Groups the glass panes inside this view, for siblings that sit close together — a row of
+    /// discs. Never write `GlassEffectContainer` at a call site (rule `60-design-system`).
+    func glassGroup() -> some View {
+        modifier(GlassGroupModifier())
     }
 }
 

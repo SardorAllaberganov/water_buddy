@@ -178,3 +178,75 @@ struct HomeServingTests {
         }
     }
 }
+
+// MARK: - Layout and Undo, as values
+
+/// The parts of Home that are decisions rather than drawing, pinned without building a view.
+/// Not `@MainActor`: everything read here is `nonisolated` on purpose (rule `43-concurrency`).
+struct HomeLayoutTests {
+
+    /// The Glass is ranked above Cup and Bottle (spec §5.2): it is the slot the widget, Siri, the
+    /// Control Center control and the watch all log.
+    @Test func onlyTheGlassIsRankedAboveTheOthers() {
+        let row = HomeView.servings(amounts: [150, 250, 500])
+
+        #expect(row.map(\.isUsual) == [false, true, false])
+        #expect(row.first(where: \.isUsual)?.nameKey == vesselSlots[DataManager.usualSlot].nameKey)
+    }
+
+    @Test func theVesselIsHeldBetweenItsFloorAndItsCeiling() {
+        #expect(HomeView.vesselRange(scaled: 300) == 200...300)
+        #expect(HomeView.vesselRange(scaled: 600) == 200...HomeView.vesselCeiling)
+        #expect(HomeView.vesselRange(scaled: 150) == 150...150, "the floor never rises above the ceiling")
+    }
+
+    /// Large text raises the vessel's ceiling and never its floor: the vessel gives way before
+    /// the quick-add row does. A floor that rose with the text size — two thirds of the scaled
+    /// size — was tried and drawn: on a 402 x 874 pt phone it put the vessels' names under the tab
+    /// bar from the second accessibility size, and left 42 pt of each disc showing at the largest.
+    @Test func largeTextRaisesTheCeilingAndNeverTheFloor() {
+        for scaled in [380.0, 417, 445, 483, 510] as [CGFloat] {
+            #expect(HomeView.vesselRange(scaled: scaled).lowerBound == HomeView.vesselFloor)
+        }
+        #expect(HomeView.vesselRange(scaled: 320).upperBound == 320)
+        #expect(HomeView.vesselRange(scaled: 510).upperBound == HomeView.vesselCeiling)
+    }
+
+    /// The vessel takes what the header, the status and the row leave of the screen. The figures
+    /// are the 375 x 667 pt phone's: 587 pt of visible height, 372.5 pt of everything else.
+    @Test func theVesselTakesWhatTheRestOfTheColumnLeaves() {
+        let range = HomeView.vesselRange(scaled: 300)
+
+        #expect(HomeView.vesselDiameter(available: 587, others: 372.5, range: range) == 214.5)
+        #expect(HomeView.vesselDiameter(available: 900, others: 372.5, range: range) == 300,
+                "room to spare does not grow it past its design size")
+        #expect(HomeView.vesselDiameter(available: 500, others: 372.5, range: range) == 200,
+                "under its floor the vessel stops shrinking, and the screen scrolls instead")
+    }
+
+    @Test func aDiscIsNeverSmallerThanAFingerNorLargerThanItsCeiling() {
+        #expect(HomeView.discDiameter(scaled: 30, ceiling: HomeView.sideDiscCeiling) == 44)
+        #expect(HomeView.discDiameter(scaled: 68, ceiling: HomeView.sideDiscCeiling) == 68)
+        #expect(HomeView.discDiameter(scaled: 400, ceiling: HomeView.sideDiscCeiling) == HomeView.sideDiscCeiling)
+    }
+
+    @Test func theGlassDiscOutgrowsItsNeighboursAllTheWayUp() {
+        #expect(HomeView.glassDiscCeiling > HomeView.sideDiscCeiling)
+        #expect(HomeView.sideDiscCeiling >= 44)
+    }
+
+    @Test func anUndoOfferStandsEightSecondsAndDoesNotExpireUnderVoiceOver() {
+        #expect(UndoOffer.lifetime(voiceOverRunning: false) == .seconds(8))
+        #expect(UndoOffer.lifetime(voiceOverRunning: true) == nil)
+    }
+
+    @Test func twoPoursOfOneAmountAreTwoOffers() {
+        #expect(UndoOffer(id: UUID(), amount: 250) != UndoOffer(id: UUID(), amount: 250))
+    }
+
+    /// An SF Symbol that does not resolve draws nothing at all.
+    @Test(arguments: HomeView.glyphs)
+    func everyHomeGlyphResolves(symbol: String) {
+        #expect(UIImage(systemName: symbol) != nil, "an unresolved SF Symbol draws an empty space")
+    }
+}

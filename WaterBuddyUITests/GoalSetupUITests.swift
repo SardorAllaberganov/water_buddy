@@ -99,7 +99,7 @@ final class GoalSetupUITests: XCTestCase {
     /// The unit suite pins the tab *menu* — the set, the order, that every symbol resolves. What it
     /// cannot see is whether tapping one actually swaps the content, which is the entire feature.
     /// Each destination is identified by something only that screen draws: the vessel on Home, the
-    /// *Today* heading in the log.
+    /// `+` in the log's header — Home has a *Today* heading of its own now.
     @MainActor
     func testTheTabBarSwitchesBetweenHomeAndHistory() throws {
         let app = XCUIApplication()
@@ -111,7 +111,7 @@ final class GoalSetupUITests: XCTestCase {
         }
 
         let vessel = app.otherElements["Today's hydration"]
-        let logHeading = app.staticTexts["Today"]
+        let logHeading = app.buttons["Add a serving"]
 
         // The app opens on Home.
         XCTAssertTrue(vessel.waitForExistence(timeout: 5), "the app did not open on the Home tab")
@@ -257,6 +257,296 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertTrue(title.waitForNonExistence(timeout: 5), "Cancel did not dismiss the sheet")
     }
 
+    // MARK: - Home's header and Undo
+
+    /// The vessel's value ends "… <total> of <goal> millilitres." — the one place a UI test can
+    /// read today's total, and why that spoken string keeps its `%d` keys.
+    private static func total(in app: XCUIApplication) -> Int {
+        let words = (app.otherElements["Today's hydration"].value as? String ?? "").split(separator: " ")
+        return words.count > 2 ? Int(words[2]) ?? -1 : -1
+    }
+
+    /// Waits until the vessel speaks `total`, and says whether it did.
+    private static func waitForTotal(_ total: Int, in app: XCUIApplication) -> Bool {
+        let spoken = NSPredicate(format: "value CONTAINS %@", " \(total) of ")
+        let reached = XCTNSPredicateExpectation(predicate: spoken, object: app.otherElements["Today's hydration"])
+        return XCTWaiter().wait(for: [reached], timeout: 5) == .completed
+    }
+
+    @MainActor
+    private func launchedOnHome() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launch()
+
+        let getStarted = app.buttons["Get Started"]
+        if getStarted.waitForExistence(timeout: 5) {
+            getStarted.tap()
+        }
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+        return app
+    }
+
+    /// Home's heading is one element, not a date and a title read as two.
+    @MainActor
+    func testHomeIsHeadedTodayOnce() throws {
+        let app = launchedOnHome()
+
+        XCTAssertEqual(
+            app.staticTexts.matching(identifier: "Today").count, 1,
+            "Home's heading must resolve to exactly one element"
+        )
+    }
+
+    /// On a screen with less height than the layout wants, the **vessel** gives way — never the
+    /// text. The status line can shrink to fit a narrow *width* (`minimumScaleFactor`), and the
+    /// column once read that as leave to squeeze it for *height* too: on an iPhone 16, 22 points
+    /// shorter than an iPhone 17, the vessel kept its full size and the line under it was drawn
+    /// at 72 %. Nothing in the unit suite lays a screen out, and on the taller phone it fitted.
+    ///
+    /// Compared with the title rather than with a number of points, so the check does not move
+    /// with the text size: a 22-point line under a 34-point title is about 0.65 of its height,
+    /// and squeezed it was 0.46.
+    @MainActor
+    func testTheStatusLineIsNeverSqueezedToMakeRoomForTheVessel() throws {
+        let app = launchedOnHome()
+
+        let title = app.staticTexts["Today"]
+        let status = app.staticTexts.matching(
+            NSPredicate(format: "label ENDSWITH %@ OR label == %@", "millilitres to go", "Goal reached")
+        ).firstMatch
+        XCTAssertTrue(status.waitForExistence(timeout: 5), "Home shows no status line")
+
+        XCTAssertGreaterThanOrEqual(
+            status.frame.height, title.frame.height * 0.6,
+            "the status line was drawn smaller than its text style — the vessel took its room"
+        )
+    }
+
+    /// The streak chip shares the title's line, and the title must not pay for it. It did: with
+    /// a chip beside it *Today* was drawn at 72 % — 29 points tall where 41 is its style — and
+    /// only on a day with a streak, which the suite had never produced on Home. The same squeeze
+    /// as the status line's, one row up, and the check above cannot see it: a smaller title only
+    /// makes that comparison easier to pass.
+    ///
+    /// A streak needs no yesterday: today counts once it reaches the goal. So this pours until
+    /// the status says so, then compares the title with the status line under it — a 34-point
+    /// title over a 22-point line is about 1.5 times its height; squeezed it was 1.1.
+    @MainActor
+    func testTheTitleKeepsItsSizeBesideTheStreak() throws {
+        let app = launchedOnHome()
+
+        let reached = app.staticTexts["Goal reached"]
+        let bottle = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Bottle,")).firstMatch
+        var pours = 0
+        while !reached.exists && pours < 20 {
+            bottle.tap()
+            pours += 1
+            _ = reached.waitForExistence(timeout: 1)
+        }
+        XCTAssertTrue(reached.exists, "the goal was not reached after \(pours) Bottles")
+
+        let chip = app.descendants(matching: .any).matching(identifier: "Day streak").firstMatch
+        XCTAssertTrue(chip.waitForExistence(timeout: 5), "a day that reached its goal shows no streak")
+        XCTAssertEqual(
+            app.descendants(matching: .any).matching(identifier: "Day streak").count, 1,
+            "the streak must resolve to exactly one element"
+        )
+
+        let title = app.staticTexts["Today"]
+        XCTAssertGreaterThanOrEqual(
+            title.frame.height, reached.frame.height * 1.3,
+            "the title was drawn smaller than its text style — the chip beside it took its room"
+        )
+    }
+
+    /// The whole of Undo, from outside the process: a pour offers it, and taking it removes that
+    /// pour and nothing else. Idempotent like the rest of this suite — it compares totals rather
+    /// than assuming an empty day.
+    @MainActor
+    func testUndoTakesBackThePourJustMade() throws {
+        let app = launchedOnHome()
+        let before = Self.total(in: app)
+        XCTAssertGreaterThanOrEqual(before, 0, "the vessel's value did not carry today's total")
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5), "a pour from Home did not offer Undo")
+        XCTAssertEqual(app.buttons.matching(identifier: "Undo").count, 1, "Undo resolves to more than one element")
+        XCTAssertGreaterThan(Self.total(in: app), before, "the pour did not reach today's total")
+
+        undo.tap()
+
+        XCTAssertTrue(Self.waitForTotal(before, in: app), "Undo did not take the pour back")
+        XCTAssertTrue(undo.waitForNonExistence(timeout: 5), "the offer stood after it was taken")
+    }
+
+    /// Two pours, one Undo: only the second comes back, and the first pour's timer must not have
+    /// cleared the second's offer.
+    @MainActor
+    func testUndoAfterTwoPoursTakesBackOnlyTheLast() throws {
+        let app = launchedOnHome()
+        let before = Self.total(in: app)
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        XCTAssertTrue(app.buttons["Undo"].waitForExistence(timeout: 5))
+        let afterGlass = Self.total(in: app)
+        XCTAssertGreaterThan(afterGlass, before)
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Cup,")).firstMatch.tap()
+        let moved = NSPredicate(format: "NOT (value CONTAINS %@)", " \(afterGlass) of ")
+        let poured = XCTNSPredicateExpectation(predicate: moved, object: app.otherElements["Today's hydration"])
+        XCTAssertEqual(XCTWaiter().wait(for: [poured], timeout: 5), .completed, "the second pour did not land")
+
+        app.buttons["Undo"].tap()
+
+        XCTAssertTrue(Self.waitForTotal(afterGlass, in: app), "Undo took back something other than the last pour")
+    }
+
+    /// An offer lasts eight seconds. Nothing in the unit suite runs the view's timer.
+    @MainActor
+    func testAnUndoOfferExpires() throws {
+        let app = launchedOnHome()
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5))
+
+        XCTAssertTrue(undo.waitForNonExistence(timeout: 14), "the offer was still standing after its eight seconds")
+    }
+
+    /// Undo is for a pour made from this screen, while this screen is up.
+    @MainActor
+    func testAnUndoOfferDoesNotOutliveItsScreen() throws {
+        let app = launchedOnHome()
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        XCTAssertTrue(app.buttons["Undo"].waitForExistence(timeout: 5))
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+        app.buttons["Home"].tap()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5))
+
+        XCTAssertFalse(app.buttons["Undo"].exists, "the offer came back with the tab")
+    }
+
+    /// Leaving the app ends the offer, as leaving the tab does. While VoiceOver runs an offer has
+    /// no deadline (spec §5.2), and without this an offer made in the morning was still standing
+    /// when the app was opened again in the afternoon — one double-tap from deleting a serving
+    /// nobody had just poured.
+    ///
+    /// VoiceOver cannot be switched on from here, so this is told apart from the eight seconds by
+    /// the clock: the app is away and back well inside them.
+    @MainActor
+    func testAnUndoOfferDoesNotOutliveTheAppLeavingTheScreen() throws {
+        let app = launchedOnHome()
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        let poured = Date()
+        XCTAssertTrue(app.buttons["Undo"].waitForExistence(timeout: 5))
+
+        XCUIDevice.shared.press(.home)
+        XCTAssertTrue(app.wait(for: .runningBackground, timeout: 5), "the app did not leave the screen")
+        app.activate()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5))
+
+        XCTAssertLessThan(
+            Date().timeIntervalSince(poured), 6,
+            "too slow to tell leaving the app from the offer's own eight seconds"
+        )
+        XCTAssertFalse(app.buttons["Undo"].exists, "the offer was still standing when the app came back")
+    }
+
+    /// An older pour's eight seconds must not end a newer pour's offer. The second pour is made
+    /// four seconds into the first's timer, and the offer is looked for well after the first's
+    /// has run out and well before the second's does. `testUndoAfterTwoPoursTakesBackOnlyTheLast`
+    /// presses Undo two seconds in, before either timer has anything to say.
+    @MainActor
+    func testAnOlderPoursTimerDoesNotEndANewerOffer() throws {
+        let app = launchedOnHome()
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        let first = Date()
+        XCTAssertTrue(app.buttons["Undo"].waitForExistence(timeout: 5))
+
+        Thread.sleep(until: first.addingTimeInterval(4))
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Cup,")).firstMatch.tap()
+        XCTAssertLessThan(
+            Date().timeIntervalSince(first), 6.5,
+            "too slow: the second pour did not land inside the first pour's eight seconds"
+        )
+
+        Thread.sleep(until: first.addingTimeInterval(9.5))
+        XCTAssertTrue(app.buttons["Undo"].exists, "the first pour's timer ended the second pour's offer")
+    }
+
+    /// A disc answers anywhere on its glass, and so does Undo — not only on the glyph or the
+    /// words. Every other test here taps a control at its centre, which is its glyph.
+    ///
+    /// **What this can see, and what it cannot.** It was seen to fail with the Cup's disc made to
+    /// answer only at its foot. It does **not** fail when the pane's content shape is taken away
+    /// on iOS 26.5 — the change that makes `testAServingRowOpensItsSheetWhereverItIsTapped` fail
+    /// there — nor with the disc answering only on its middle 20 points: a finger's tolerance
+    /// reaches the glyph from anywhere on a disc 68 points across. So this pins the outcome on
+    /// Home; the row test is the one that pins the content shape.
+    @MainActor
+    func testADiscAndUndoAnswerOffTheirGlyphs() throws {
+        let app = launchedOnHome()
+        let before = Self.total(in: app)
+
+        // High on the Cup's disc, clear of the glyph in its middle and inside its circle.
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Cup,")).firstMatch
+            .coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12)).tap()
+
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5), "a tap on a disc's bare glass poured nothing")
+        XCTAssertGreaterThan(Self.total(in: app), before, "a tap on a disc's bare glass did not reach today's total")
+
+        // At the capsule's leading end, before its first word.
+        undo.coordinate(withNormalizedOffset: CGVector(dx: 0.04, dy: 0.5)).tap()
+
+        XCTAssertTrue(Self.waitForTotal(before, in: app), "a tap on Undo's bare glass took nothing back")
+    }
+
+    /// At the largest text size *Added 250 ml* and *Undo* do not fit on one line. Shrunk until
+    /// they did, the amount was cut short — *Added 25…* — and the amount is what makes the button
+    /// safe to press. So the capsule draws the first of its forms that fits unshrunk, and its
+    /// last is the two parts one above the other.
+    ///
+    /// A cut-off text cannot be read from outside the process — its label is still the whole
+    /// string — so what is asserted is what prevents it: the amount is either above the word, or
+    /// beside it at its own size. The title is the yardstick for "its own size": at this text
+    /// size the amount's line is 0.8 of the title's, and squeezed onto one line it was 0.5.
+    @MainActor
+    func testUndoDrawsItsAmountWholeAtTheLargestTextSize() throws {
+        // Setup first, at the ordinary size, so this does not depend on the order the suite ran in.
+        launchedOnHome().terminate()
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5), "a pour from Home did not offer Undo")
+
+        let amount = undo.staticTexts.matching(NSPredicate(format: "label != %@", "Undo")).firstMatch
+        let word = undo.staticTexts["Undo"]
+        XCTAssertTrue(amount.exists && word.exists, "Undo does not draw both its amount and its word")
+
+        let stacked = word.frame.minY >= amount.frame.maxY - 1
+        let atItsOwnSize = amount.frame.height >= app.staticTexts["Today"].frame.height * 0.7
+        XCTAssertTrue(
+            stacked || atItsOwnSize,
+            "the amount was squeezed onto the word's line: \(amount.frame) beside \(word.frame)"
+        )
+
+        // Taken back, so the day's total is left as this test found it.
+        undo.tap()
+    }
+
     /// The names VoiceOver gives the week card's seven days, today first: "Today", then the six days
     /// before it as full weekdays — formatted the way the app formats them while it follows the
     /// device's language, which is how this suite runs.
@@ -325,7 +615,7 @@ final class GoalSetupUITests: XCTestCase {
         // And the log's header must not keep its own entry point beside the tab. Two routes to one
         // destination is exactly what the tab bar replaced, not something it joins.
         app.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
         XCTAssertEqual(
             app.buttons.matching(identifier: "Settings").count, 1,
             "two controls labelled Settings — the tab, and the log's old gear"

@@ -87,6 +87,22 @@ private let sharedKeys = [
     "A glass now keeps you on track for the day.",
 ]
 
+/// Home's strings. Listed by name because each is resolved with `localizedString(forKey:)` or
+/// through ``Bundle/figure(_:_:locale:)``, which the build's extraction cannot see: a key that
+/// went missing would fall back to drawing itself, in English, with nothing to notice.
+private let homeKeys = [
+    "%1$@ of %2$@ ml",
+    "%1$@ ml",
+    "%1$@ ml to go",
+    "%1$d millilitres to go",
+    "Goal reached",
+    "Next reminder %1$@",
+    "Last drink %1$@",
+    "Added %1$@ ml",
+    "Undo",
+    "Day streak",
+]
+
 private let reminderCopy = ["Time for water", "A glass now keeps you on track for the day."]
 
 /// The `.lproj` for one language inside one bundle, or `nil` if that language was not shipped.
@@ -477,5 +493,69 @@ private func specifiers(in text: String) -> Set<String> {
             #expect(value(bundle, language, "WaterBuddy") == nil,
                     "\(name): WaterBuddy has a \(language) entry — the product name is not a word")
         }
+    }
+}
+
+// MARK: - Home
+
+/// Home's own strings, in every language the app ships.
+struct HomeStringTests {
+
+    @Test(arguments: ["en"] + translated)
+    func everyHomeStringExistsAndKeepsItsArguments(language: String) {
+        for key in homeKeys {
+            let resolved = value(appBundle, language, key)
+            #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
+            if let resolved {
+                #expect(specifiers(in: resolved) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments")
+            }
+        }
+    }
+
+    /// The visible keys take `%@` — a figure already grouped — and the one spoken key takes `%d`,
+    /// the split spec §3.1 sets.
+    @Test func onlyTheSpokenHomeStringTakesARawNumber() {
+        let raw = homeKeys.filter { $0.contains("$d") }
+
+        #expect(raw == ["%1$d millilitres to go"])
+    }
+}
+
+/// ``Bundle/figure(_:_:locale:)`` — a volume grouped the way the language groups it, set into a
+/// `%@` key. Not `@MainActor`: the widget's stage will call it from a view the extension draws.
+struct GroupedFigureTests {
+
+    @Test func figuresAreGroupedTheWayTheLocaleGroups() throws {
+        let english = try #require(localization(appBundle, "en"), "the app ships no en table")
+        let russian = try #require(localization(appBundle, "ru"), "the app ships no ru table")
+        let en = Locale(identifier: "en_US")
+        let ru = Locale(identifier: "ru_RU")
+
+        #expect(english.figure("%1$@ of %2$@ ml", 1_300, 2_000, locale: en) == "1,300 of 2,000 ml")
+
+        let grouped = 1_300.formatted(.number.locale(ru))
+        #expect(grouped != "1300", "a Russian thousand is grouped too, with its own separator")
+        #expect(russian.figure("%1$@ of %2$@ ml", 1_300, 2_000, locale: ru)
+                == "\(grouped) из \(2_000.formatted(.number.locale(ru))) мл")
+    }
+
+    @Test func aFigureUnderAThousandCarriesNoSeparator() throws {
+        let english = try #require(localization(appBundle, "en"), "the app ships no en table")
+
+        #expect(english.figure("%1$@ ml to go", 700, locale: Locale(identifier: "en_US")) == "700 ml to go")
+    }
+
+    /// Uzbek puts the goal first: "2,000 dan 1,300 ml". The arguments follow the key's numbering,
+    /// not the sentence's order.
+    @Test func theArgumentsFollowTheKeysNumberingNotTheSentencesOrder() throws {
+        let uzbek = try #require(localization(appBundle, "uz"), "the app ships no uz table")
+        let uz = Locale(identifier: "uz_UZ")
+
+        let drawn = uzbek.figure("%1$@ of %2$@ ml", 1_300, 2_000, locale: uz)
+        let total = 1_300.formatted(.number.locale(uz))
+        let goal = 2_000.formatted(.number.locale(uz))
+
+        #expect(drawn == "\(goal) dan \(total) ml")
     }
 }

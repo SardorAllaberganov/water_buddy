@@ -124,7 +124,8 @@ struct HistoryServingTests {
     @Test func theServingEditorFixtureRoutesTheReminderPlanToTheInjectedSeam() throws {
         var plans = 0
         try withTempStore(onReschedule: { _ in plans += 1 }) { manager, _ in
-            manager.addLog(amount: 250)
+            // `addLog` returns the new row's id; discarded here, or it becomes the closure's result.
+            _ = manager.addLog(amount: 250)
         }
 
         #expect(plans > 0, "the fixture is reaching a real UNUserNotificationCenter")
