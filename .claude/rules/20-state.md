@@ -27,8 +27,13 @@ after the body above had already conceded it.
 - A `#Preview` may build its own throwaway suite, but must tear it down with
   `removePersistentDomain(forName:)` in the same scope
 - The public mutation surface is `addLog(amount:at:)`, `addWater(amount:)`, `removeWater(amount:)`,
-  `deleteLog(_:)`, `updateLog(_:newAmount:timestamp:)`, `saveDailyGoal(ml:)`, `resetIfNeeded()`,
-  `resetDailyProgress()` and `refresh()`. Anything new joins that list rather than reaching around it
+  `deleteLog(_:)`, `undoLog(id:)`, `updateLog(_:newAmount:timestamp:)`, `saveDailyGoal(ml:)`,
+  `resetIfNeeded()`, `dayDidTurn()`, `resetDailyProgress()` and `refresh()`. Anything new joins that
+  list rather than reaching around it
+- `addLog(amount:at:)` returns the id of the row it inserted, `nil` for a refused amount. Home's
+  *Undo* is the one caller that keeps it. `undoLog(id:)` finds that row among today's, read fresh,
+  and deletes it through `deleteLog(_:)`; it does nothing when the row is gone or today's rows
+  cannot be read
 
 ## Today's total is derived, never authored
 - `recomputeToday()` is the only place the total is computed, and it writes back **through the
@@ -71,7 +76,15 @@ after the body above had already conceded it.
   (`defaults.object(forKey:) as? Bool != true`) and the **observation** separately on
   `storedIsGoalSet`. They are not the same: `resolveIsGoalSet(in:goal:)` infers `true` from a
   non-default goal when the key is absent
-- `isGoalSet`, `todaysLogs` and `historyLogs` stay get-only. All three are consequences, not inputs
+- `isGoalSet`, `todaysLogs`, `historyLogs` and `streak` stay get-only. All four are consequences,
+  not inputs
+- `streak` is published from `republishHistory()` and from the `dailyGoal` setter, behind
+  `role.drawsHistory`, with an equality guard. A failed read leaves it as it stands, never zero.
+  Every day is judged against the current goal. It never leaves the app: not the snapshot, not a
+  notification, not the wrist's mirror
+- `remaining`, `hasReachedGoal`, `lastDrink` and `nextReminder` are computed on read from the
+  observable state and stored nowhere. `nextReminder` is the first slot of the plan
+  `currentReminderSlots()` files, cut to today
 - Do **not** add an equality guard to the `todaysLogs` or `historyLogs` republish. `WaterLog` is a
   `@Model` class hashed by `persistentModelID`, so the array after an amount edit compares equal to
   the array before it — a guard would swallow exactly the change it is meant to publish

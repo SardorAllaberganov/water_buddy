@@ -34,6 +34,8 @@ persist anything.
 - A `Slider`'s `Binding<Double>` bridge must `rounded()`, never truncate — the `step` snaps the
   value, and `rounded()` is what stops floating-point dust from reaching the store
 - Volumes stay `Int`. `Double` appears only as a drawing fraction
+- A visible volume is grouped: `strings.figure("%1$@ ml", amount, locale: locale)`, a `%n$@` key
+  fed a formatted figure. A spoken string keeps its `%n$d` key, so VoiceOver's values do not move
 
 ## Composition
 - Decompose a `body` into a `private var` per section and a `private func` per repeated item.
@@ -64,6 +66,19 @@ persist anything.
   assumption is wrong — a `precondition` in all but name, and rule `75-diagnostics` records that this
   codebase has none
 - Any such static a non-`@MainActor` test reads must be `nonisolated` (rule `43-concurrency`)
+- Home scrolls, and its column is a `Layout` — `HomeColumn` — not a stack: every part at its own
+  height, the vessel given what is left between `HomeView.vesselRange(scaled:)`'s floor and ceiling.
+  A stack inside a scroll view is never offered less than its ideal height, so it cannot shrink a
+  child; and where it is short of room it squeezes a line of text that carries a
+  `minimumScaleFactor` before a view with layout priority
+- On Home the Glass is ranked above Cup and Bottle: it is the screen's primary surface, because
+  slot `DataManager.usualSlot` is what every one-tap door logs
+- A view holds a serving's **id** when it must name one outside a sheet — `UndoOffer` — never the
+  `WaterLog`
+- A `ViewThatFits` is offered its row's whole width (`.frame(maxWidth: .infinity)`) and chooses
+  among whole controls, never among labels inside one `Button`; a one-line candidate carries
+  `.fixedSize()`. Without them Home's *Undo* was sized as one form and drew another, and drew
+  *Undo* as *U…*
 
 ## Navigation
 - Navigation is a `ZStack` switching on `@State private var tab: AppTab`, with the custom

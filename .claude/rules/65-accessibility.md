@@ -52,6 +52,11 @@ rather than re-deriving it.
 - When scaled controls overflow their row, let the row overflow and reach it through
   `ViewThatFits(in: .horizontal) { row; ScrollView(.horizontal) { row } }` — never shrink a control
   below the 44pt floor to make the set fit
+- On Home, large text raises the vessel's ceiling and never its floor (`HomeView.vesselFloor`): the
+  vessel gives way before the quick-add row does, because the row is the screen's one action
+- A line that says what a control will do is never cut short to fit. Home's *Undo* draws the first
+  of its forms that fits at its own size — *Added 250 ml | Undo*, *250 ml | Undo*, then the two
+  stacked — and the quiet line stacks its two times the same way
 - Split a name lockup into one `Text` per line inside a `VStack` and give the group `.lineLimit(1)`;
   `.minimumScaleFactor` alone does not prevent hyphenation
 - A screen that is mostly type is wrapped in
@@ -97,6 +102,12 @@ rather than re-deriving it.
 - Expose selection with `.accessibilityAddTraits(isSelected ? [.isSelected] : [])`
 - Keep every tab's title and symbol non-empty and mutually distinct; an SF Symbol must be proved to
   resolve by a test, because an unknown symbol draws nothing at all
+- Home's heading is one element: label *Today*, value the date, the header trait. The streak chip
+  is one element — label *Day streak*, value the count — and is absent at zero. The status line
+  speaks millilitres from a `%d` key while it draws a grouped figure
+- *Undo* is one button whose label is the word it draws and whose value is the amount. Its offer
+  lasts eight seconds, and does not time out while VoiceOver is running; the next pour, leaving the
+  tab and leaving the app each end it
 - The Lock Screen widget's figures are one element per shape — label *Today's hydration*, value the
   vessel's own percent-and-millilitres string — and its quiet form speaks no figure: the label alone,
   and *Log Water* on the button. A figure hidden from sight is hidden from speech

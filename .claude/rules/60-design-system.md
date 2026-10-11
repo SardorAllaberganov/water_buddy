@@ -17,6 +17,12 @@ measured.
   Reduce Transparency; Apple's glass (`glassEffect`) for a `.material` base on iOS 26 and later; the
   hand-made stack everywhere else — a `.flat` base, iOS 17 to 25, and the watch until its own stage.
   Never call `glassEffect` at a call site
+- Sibling panes that sit close together — a row of discs — are wrapped with `.glassGroup()`:
+  Apple's `GlassEffectContainer` on iOS 26 and later, the content untouched elsewhere. Never write
+  `GlassEffectContainer` at a call site
+- A pane's content is never moved between branches by a setting. `LiquidGlassModifier` changes the
+  background and the glass handed to `glassEffect` — `.identity` when the pane is not Apple's — so
+  a Reduce Transparency flip rebuilds nothing inside a pane
 - The scrim, the tint ceiling, the specular, the lit rim and the two shadows are properties of the
   **hand-made** stack. On Apple's glass none of them is drawn; the system brings its own edge and
   depth

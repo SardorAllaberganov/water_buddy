@@ -6,10 +6,10 @@
 >
 > | Target | Status |
 > |---|---|
-> | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 26.5, `@Observable` `DataManager` over SwiftData |
+> | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: two `StaticConfiguration`s over one provider — the Home Screen widget and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage) plus the Xcode template's launch tests |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — `.accessoryCircular` percentage-ring complication, reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
@@ -29,7 +29,8 @@
 > `ReminderPlan.swift` and `NotificationManager.swift` are compiled into both the app and the
 > widget extension** — they live in `WaterBuddy/` and reach
 > the extension through the synchronized-folder membership exception in `project.pbxproj`.
-> Everything else under `WaterBuddy/` is app-only. That shared set is a contract, not a
+> Everything else under `WaterBuddy/` is app-only on the phone (`WristPlan.swift` also reaches the
+> two watch targets — below). That shared set is a contract, not a
 > convenience: it is what keeps the two front doors logging the same serving and drawing the same
 > water.
 >
@@ -55,11 +56,12 @@ design:**
 
 | Store | Holds | Read by |
 |---|---|---|
-| SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app only |
+| SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared`; never the widget's draw path |
 | `UserDefaults` — nine keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
-after every mutation and written through to the cache. **The widget never opens SwiftData** — a
+after every mutation and written through to the cache. **The widget's draw path never opens
+SwiftData** — a
 timeline provider is `nonisolated` and a `ModelContext` is not `Sendable`, so reading the cache is
 what keeps the widget's read path synchronous. **`DataManager` is the only writer to either of
 these two stores** — the one honest weakening (rule `20-state`): the watch is a **third**,
@@ -190,9 +192,13 @@ something to record.
 6. **Docs Cascade**: After code changes, run `/doc_sync` per rule `99-docs-cascade`
 
 ## Architecture — One Writer, Two Front Doors
-- **`DataManager` is the only writer.** Every mutation in the product goes through
-  `addWater` / `removeWater` / `saveDailyGoal` / `resetIfNeeded`. No view, no intent and no
-  provider reaches `UserDefaults` directly (rule `20-state`)
+- **`DataManager` is the only writer.** Every mutation of the phone's two stores goes through one
+  of its methods — `addLog` / `addWater` / `removeWater` / `deleteLog` / `undoLog` / `updateLog` /
+  `saveDailyGoal` / `resetIfNeeded` / `dayDidTurn` / `resetDailyProgress` / `refresh`, and
+  `ingest` for a pour the watch sent — or one of its setters; construction and the launch-time
+  `prepareSharedStorage()` do the group's bookkeeping. On the phone no view, no intent and no
+  provider reaches `UserDefaults` directly (rule `20-state` lists the surface, `ingest` aside);
+  the watch's complication reads the watch's own suite itself, as the target table says
 - **Two front doors, one serving — now by a shared read, not a shared constant.** The quick-add
   vessels are user-editable, and the middle one is what the widget's button logs and its face
   draws. Both doors resolve it from `Key.servings` in the App Group suite, carried to the extension
@@ -207,9 +213,12 @@ something to record.
   draws the glyph at `DataManager.usualSlot` — the one name for that vessel's index — and is kept
   current by `requestWidgetReload()`'s `reloadAllControls()`
   (`docs/superpowers/specs/2026-10-08-control-center-design.md`)
-- **`addLog` is how water enters.** `addWater(amount:)` is a synonym kept for the two callers that
+- **`addLog` is how a logged serving enters.** (Two other paths insert rows: `ingest` for a pour
+  the watch sent, and the one-shot seed from a cached total.) `addWater(amount:)` is a synonym kept for the two callers that
   log the usual serving — the widget's `AddWaterIntent` and the Siri shortcut's `LogServingIntent`;
-  `HomeView`'s row offers three vessels and calls `addLog` directly
+  `HomeView`'s row offers three vessels and calls `addLog` directly. It returns the id of the row
+  it inserted, which is what Home's *Undo* hands back to `undoLog(id:)` — a view holds the id,
+  never the row
 - **Today's total is derived, never authored** — `recomputeToday()` sums today's logs and writes
   the figure through the `currentWater` setter, so the clamp, the equality guard and the widget
   doorbell all still fire exactly once per real change (rule `20-state`)
@@ -218,10 +227,13 @@ something to record.
   compute `staleTotal + amount` and write it over a newer figure (rule `20-state`)
 - **The widget reads through `WaterSnapshot`, never through `DataManager.shared`.** A timeline
   provider is `nonisolated` and cannot touch a `@MainActor` singleton — and *constructing* a
-  `DataManager` would materialise the goal, stamp the day, roll the total over and ring the
-  widget doorbell: four writes from a process whose job is to draw (rule `40-widget`)
-- **Only the app writes on behalf of the group.** Materialising the goal, stamping the day and
-  the one-shot migration are all guarded by `DataManager.role` — a four-state
+  `DataManager` there could still roll the day over (zero the total, stamp the day, ring the
+  widget doorbell) and recompute today from the rows, none of which is guarded: writes from a
+  process whose job is to draw (rule `40-widget`)
+- **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
+  fresh install, the one-shot migration, the seed from a cached total, drawing the history and
+  the streak, and filing reminders are all guarded by `DataManager.role` — seven sites, the
+  seventh the redesign's stage 2's — a four-state
   `nonisolated static let` (`.phoneApp`, `.phoneExtension`, `.watchApp`, `.watchExtension`) that
   replaced the two-state `isAppExtension` at every guard site on 2026-08-31. A grep for
   `!Self.isAppExtension` now returns zero. An extension that stamped an empty group would
@@ -240,7 +252,9 @@ something to record.
 
 ## Storage — SwiftData, cached in the App Group
 - **The App Group holds both stores** — `group.sardor.WaterBuddy`, declared in `Entitlements/` on
-  both signed targets: the SwiftData file `WaterBuddy.store` **and** the `UserDefaults` suite.
+  all four signed targets (the phone's two share this container; the watch's two resolve the same
+  identifier on another device): the SwiftData file `WaterBuddy.store` **and** the `UserDefaults`
+  suite.
   `UserDefaults(suiteName:)` returns a working object even when the entitlement is missing, so the
   container URL is the real probe for both; without it the app silently degrades to private
   storage and the widget goes blank (rule `25-shared-storage`)
@@ -266,7 +280,8 @@ something to record.
 - **Reset writes the zero before it stamps the day.** A crash between the two leaves a stale
   marker that simply resets again; the opposite order launders yesterday's water into today
   (rule `30-rollover`). It clears only the **cache** — no `WaterLog` row is touched, so yesterday
-  stays as history and `resetDailyProgress()` is the only path that deletes rows
+  stays as history and `resetDailyProgress()` is the only **reset** path that deletes rows
+  (`deleteLog`, `undoLog` and `removeWater` delete rows as ordinary edits)
 - **Every value is clamped on the way in** — `0...maximumDailyIntake` for the total, `1...` for the
   goal, so a corrupt suite cannot divide by zero or overflow the running figure
 

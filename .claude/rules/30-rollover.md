@@ -75,8 +75,10 @@ changed.
 - `resetIfNeeded()` stays idempotent and returns `true` exactly once per real day change — safe to
   call from any lifecycle hook without a caller-side "already reset today" flag
 - Keep both observers in `startObservingDayChanges()`: `NSCalendarDayChanged` **and**
-  `NSSystemTimeZoneDidChange`, hopping to `resetIfNeeded()` on the main queue, removed in `deinit`.
+  `NSSystemTimeZoneDidChange`, hopping to `dayDidTurn()` on the main queue, removed in `deinit`.
   The time-zone one is what catches the traveller mid-flight
+- `dayDidTurn()` runs `resetIfNeeded()` and, only when it reports a new day, republishes today's
+  rows and the history. It never recomputes the total from the rows
 - Keep `refresh()`'s calls in order: `loadFromStore()` → `resetIfNeeded()` → `republishTodaysLogs()`
 - `addLog(amount:at:)` and `removeWater(amount:)` call `refresh()` first, so a mutation always lands
   on the right day. Any new mutator that computes from current state must too. (`deleteLog(_:)` and
