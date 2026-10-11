@@ -3,7 +3,58 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-10 (eighteenth pass — `/doc_sync` after the redesign's stage 1 was finished
+**Last updated:** 2026-10-11 (twenty-second pass — a fourth `/doc_sync` the same day, checking only
+what the twenty-first had added. **No source changed, no contract did, nothing was built or
+rendered.** The warning paragraph's figures all reproduce from the saved logs. Tightened: why this
+scheme's build compiles the app — the scheme lists `WaterBuddy.app` as a second build entry, and
+the app embeds the watch products; "half a minute earlier" — the app's build had ended 16 and 9
+seconds before; which of the Lock Screen's gauges are hidden; "the publish `addWater` ends in";
+the Lock Screen button's spelling, `AddWaterIntent(amount: serving)`; and a flag put beside the
+bold sentence under *Building it*, which says what rule `40-widget` says and not what the build
+does (#69). In the header below: of the old "four writes" one is guarded outright and one only
+on a fresh install, not "two … guarded"; the two builds were on consecutive days, thirteen and
+a half hours apart; the radius sample also folds the code's `proportional` step into one line;
+and the sentence on the fourteen key names the two catalogues share was not listed.)
+Previously, the same day (twenty-first pass — a third `/doc_sync` the same day. **No source
+changed and no contract here did. Nothing was built or rendered.** A fresh reader checked the
+sheet against the extension's five files, the catalogue, the plist and the project file; the
+configuration, the timeline, the intent's table and every count held. Corrected: "constructing a
+`DataManager` … four writes" — two of the four are guarded and do not happen in an extension;
+"`addWater` does the real clamping" — it clamps nothing, the derived total is clamped; the Lock
+Screen line carries no `accessibilityHidden` and needs none; **both of `AddWaterIntent`'s
+initialisers activate the wrist link**, which the table did not say; a second sentence claiming
+"the app scheme never compiles this target" (#69); and the twentieth pass's own warning sentence —
+the build was not into an empty DerivedData folder, the two sides were built a day apart, and
+"19" counts distinct warnings by file and message, which is 31 unique lines and 44 in all the way
+`CLAUDE.md` counts. Left as it is: the radius sample, which drops the `: CGFloat` annotations the
+code has, under a sentence that says "typed steps".)
+Previously, the same day (twentieth pass — `/doc_sync` run again by the owner the same day, on
+the same staged tree. **No source changed and no contract here did; five statements that were
+already stale are corrected**, each with what it read before: the *Gallery name* row (a build
+setting this target does not have), "the app's 56" strings (73) and which of this catalogue's 19
+keys are hand-written (fifteen, not ten), `Log Water` drawn by the control and spoken by the Lock
+Screen button though it is not one of the ten shared keys, a flat base "always hand-made" (opaque
+under Reduce Transparency), and *Building it*'s `OS=26.5` and "38 warnings" from 2026-09-02 (27.0;
+19 unique lines for this scheme). Stage 1's "staged" under *The two rendering modes* is now its
+commit, `c9ef45d`. **Nothing was built or rendered in this pass**; the renders described next are
+the nineteenth's.)
+Previously, the same day (nineteenth pass — `/doc_sync` at the end of the redesign's stage 2,
+Home, staged. **No file under `WaterBuddyWidget/` changed, and no contract here did.** Two of the six
+shared files did. `LiquidGlassModifier.swift`: the modifier now branches on a pane's **base** — the
+widget's `.archived` is a `.flat` base, which draws its own pane as before and never meets
+`glassEffect` — and gained `.glassGroup()`, which the widget does not call. `DataManager.swift`
+gained `undoLog(id:)`, four derived figures, a published `streak` and `dayDidTurn()`; none reaches
+`WaterSnapshot`, and `streak` is computed behind `role.drawsHistory`, which the extension answers
+`false` to. **This time the widget was rendered, both ways.** Its four `.archived` pane recipes,
+drawn in a window from `b8a1386` and from the change, gave identical digests with Reduce
+Transparency off and identical ones with it on — and the two settings differ from each other, so
+both of a flat pane's branches ran. **And it was placed on a Home Screen**, small and medium, from
+each build (iOS 27.0, light): SpringBoard's tree reads `25 percent. 500 of 2000 millilitres.`,
+`500 ml`, `of 2000 ml` and `+250 ml`, and the two captures differ in no pixel of either widget —
+0 of 573,408 in the medium cell, and 34 by one level in the small cell, all outside the widget's
+rectangle. Not done: dark and tinted placements, the Lock Screen widget, the control. The extension
+built for the simulator from the staged source, `** BUILD SUCCEEDED **`.
+Previously: 2026-10-10 (eighteenth pass — `/doc_sync` after the redesign's stage 1 was finished
 and staged. **No file under `WaterBuddyWidget/` changed, and no contract here did.** The shared
 `LiquidGlassModifier.swift` gained two things since the last pass, both inside the branch that draws
 Apple's glass: a black tint on the regular variant and an explicit hit region. The widget passes
@@ -49,7 +100,7 @@ the Lock Screen button's floor too. Previously: twelfth pass — `/doc_sync` aft
 | `description` | `"Track today's hydration and log a glass without opening the app."` — **static literal** |
 | Content margins | `.contentMarginsDisabled()` |
 | Bundle | `WaterBuddyWidgetBundle` (`@main`), two widgets and a control — this one, `LockScreenWidget` (*The Lock Screen widget*, below) and, inside `if #available(iOS 18.0, *)`, `LogWaterControl` (*The Control Center control*, below) |
-| Gallery name | `INFOPLIST_KEY_CFBundleDisplayName = Hydration` |
+| Gallery name | `.configurationDisplayName("Hydration")`, the row above — the gallery reads no plist key for it. The extension's own bundle name is `CFBundleDisplayName = WaterBuddy Widget`, written by hand in `WaterBuddyWidget-Info.plist`. *(This row read `INFOPLIST_KEY_CFBundleDisplayName = Hydration` until the twentieth pass: no such build setting exists on this target — it has `GENERATE_INFOPLIST_FILE = NO` — and the only two in the project are the watch app's, `"Water Buddy"`.)* |
 | Info.plist | `WaterBuddyWidget-Info.plist` → `NSExtensionPointIdentifier = com.apple.widgetkit-extension` |
 
 **Both gallery strings must stay static literals.** They are read by the system, not rendered by
@@ -71,8 +122,13 @@ card supplies its own inset (`cardInset = 10`, `cardPadding = 12`).
 `HydrationProvider` is `nonisolated` throughout — `TimelineProvider` carries no isolation — so
 nothing in it may touch the `@MainActor` `DataManager.shared`. It reads through
 `DataManager.snapshot(defaults:calendar:now:)`, which is also the **only way to read without
-writing**: constructing a `DataManager` materialises the goal, stamps the day, can zero the total
-and rings the widget doorbell — four writes from a process whose whole job is to draw.
+writing**: constructing a `DataManager` in this process can still roll the day over — zero the
+total, stamp the day and ring the widget doorbell, none of it guarded — and it recomputes today
+from the rows, which is not guarded either. *(Until the twenty-first pass this read "materialises
+the goal, stamps the day, can zero the total and rings the widget doorbell — four writes". Two of
+those are behind `role.ownsSharedStorage` and do not happen in an extension: materialising the
+goal, and the fresh-install stamp. Rule `40-widget` has it right; the DocC on `HydrationProvider`
+still says four — `docs/AI_CONTEXT.md` known issue #103.)*
 
 **Everything the widget knows is on `WaterSnapshot`, and every field of it is derivable from the
 `UserDefaults` cache alone** — that is the whole bar for living there, because the widget may never
@@ -122,8 +178,10 @@ read `WaterSnapshot(currentWater: 0, dailyGoal: current.dailyGoal)` until 2026-0
 carries a default of `.system`, so **every field the author did not name was silently reset at local
 midnight**: a user who chose Russian in the app watched the widget revert to the *device* language
 overnight and stay there until something else reloaded the timeline. It shipped for two releases and
-nothing could see it — the app scheme never compiles this target, and the widget's rendering has no
-automated coverage at all.
+nothing could see it — the widget's rendering has no automated coverage at all. *(This sentence
+also said "the app scheme never compiles this target" until the twenty-first pass. It does — the
+app embeds the extension; known issue #69 — and a compile would not have shown a wrong language
+either.)*
 
 `rolledOver()` copies `self` and zeroes one field, so a field added later is carried across for free
 rather than needing to be remembered. `serving` was added an hour after the fix and inherited it
@@ -142,9 +200,14 @@ the app and the widget never disagree about when the day turns. It falls back to
 **`.fullColor`** — the ordinary Home Screen. The hand-made glass, with
 `LiquidGlass.Base.archived` standing in for the material because there is no live backdrop to
 sample. **It is no longer "the app's glass exactly" on iOS 26 and later:** since the redesign's stage
-1 (2026-10-09, staged) the app draws Apple's glass there, and the widget does not. `.archived` is a
-`.flat` base, and `LiquidGlass.rendering(…)` answers `.handMade` for a `.flat` base on every OS —
-`aFlatBaseIsAlwaysHandMade` pins it — so nothing in this extension reaches `glassEffect`. The widget's
+1 (2026-10-09; committed 2026-10-10 in `c9ef45d`) the app draws Apple's glass there, and the widget
+does not. `.archived` is a `.flat` base, and `LiquidGlass.rendering(…)` never answers `.system` for
+a `.flat` base on any OS: it answers `.handMade`, or `.opaque` under Reduce Transparency, which the
+function tests first. `aFlatBaseIsAlwaysHandMade` pins the first, with Reduce Transparency off and
+the availability flag both ways; `reduceTransparencyAlwaysDrawsTheOpaquePane` pins the second for
+`.archived` as well as for a material; and both branches were rendered in stage 2 (the header
+above). So nothing in this extension reaches `glassEffect`. *(Read "answers `.handMade` for a
+`.flat` base on every OS" until the twentieth pass, which left Reduce Transparency out.)* The widget's
 own pass of the redesign is stage 6 and is not built.
 
 **Anything else** — a tinted Home Screen, StandBy. The system treats the whole widget as a
@@ -211,6 +274,7 @@ and the system runs it on tap. `.buttonStyle(.plain)`, or the system draws
 | `@Parameter amount` | title `"Amount"`, description `"Millilitres of water to log."`, `default: 250`, `inclusiveRange: (1, 100_000)` |
 | `parameterSummary` | `"Log \(\.$amount) ml of water"` |
 | `init()` | sets `amount = DataManager.defaultServing` — the `AppIntent` requirement and the Shortcuts default, **not** the path the widget button takes |
+| both initialisers | also call `WristLink.live.activate()` (behind `#if canImport(WatchConnectivity)`), so the extension's `WCSession` is activating before a tap: the button builds its intent on every timeline render, and without it the publish to the watch that `addWater` reaches — through `refresh()` and the `currentWater` setter — throws `sessionNotActivated` in this process (by the DocC on the intent; not run). *(Not in this table until the twenty-first pass.)* |
 | `init(amount:)` | explicit amount — **this is what every button uses**: both widgets' with `entry.snapshot.serving`, the control's with its provider's `snapshot.serving` |
 | `perform()` | `@MainActor` → `DataManager.shared.addWater(amount:)`, then `WidgetCenter.shared.reloadAllTimelines()`, then **`await NotificationManager.reconcile(…)`** |
 
@@ -218,8 +282,11 @@ and the system runs it on tap. `.buttonStyle(.plain)`, or the system draws
 `DataManager.defaultServing` or `maximumDailyIntake` — and especially cannot spell a value the user
 edits at runtime. Those literals are only what Shortcuts pre-fills and validates against when a
 person builds an automation by hand; every button goes through `init(amount:)` — both widgets' with
-`entry.snapshot.serving`, the control's with its provider's `snapshot.serving` — and `addWater` does
-the real clamping regardless of what any caller asks for.
+`entry.snapshot.serving`, the control's with its provider's `snapshot.serving`. **`addWater` does
+not clamp the amount**: it refuses anything not above zero and stores the row as given. What is
+clamped is the total derived from the rows — the sum saturates and the `currentWater` setter
+holds it to `0...maximumDailyIntake`. *(Read "`addWater` does the real clamping regardless of what
+any caller asks for" until the twenty-first pass.)*
 
 `@MainActor` on the implementation of a `nonisolated` protocol requirement is legal and
 warning-free in **both** language modes — verified by compiling under `-swift-version 5` and
@@ -287,8 +354,16 @@ list for exactly this reason — six shared files now, not four.
 ## The extension carries its own localisation
 
 The widget ships in English, Russian and Uzbek, and **it has its own `Localizable.xcstrings`** —
-`WaterBuddyWidget/Localizable.xcstrings`, 19 keys — the 10 hand-written ones are a strict subset of
-the app's 56; the other nine were extracted by the build (see below).
+`WaterBuddyWidget/Localizable.xcstrings`, 19 keys. **Fifteen are hand-written** — marked `manual`,
+in all three languages: ten it shares with the app, a strict subset of the app's 73 and the ten
+`LocalizationTests`' `sharedKeys` names, and the five of `AddWaterIntent`'s Shortcuts vocabulary,
+which the app's catalogue does not hold. The other four are literals the build extracted, with no
+translation: `%`, `+%lld`, `1,450 ml` and `Today` (see below). Those four names are in the app's
+catalogue too — fourteen of the nineteen names are in both — but only the ten carry values here
+that a test holds equal to the app's; `Today` is translated there and empty here. *(Read "the 10 hand-written ones
+are a strict subset of the app's 56; the other nine were extracted by the build" until the
+twentieth pass: the app's catalogue has grown to 73, and five of those nine are the hand-written
+Shortcuts strings.)*
 
 That duplication is not a preference. The catalogue was first placed in `WaterBuddy/` and added to
 the widget's `membershipExceptions`, exactly the arrangement the six shared `.swift` files use. It
@@ -315,10 +390,14 @@ Two limits worth stating plainly:
   doorbell, but a timeline already built is an archive another process replays, and WidgetKit
   decides when to redraw. `SettingsView`'s language card says so rather than implying otherwise.
 
-The catalogue now holds **19 keys**, and only 10 of them were written by hand. Xcode's build
-extracts every `Text` / `Label` / `LocalizedStringResource` literal in the target and appends it, so
-the file is part hand-authored contract and part build output. The 10 deliberate ones are everything
-the extension *draws or files*:
+The catalogue now holds **19 keys**: ten shared with the app, five for Shortcuts (the next
+section) and four the build put there. Xcode's build extracts every `Text` / `Label` /
+`LocalizedStringResource` literal in the target and appends it, so the file is part hand-authored
+contract and part build output. The ten shared ones are what the Home Screen widget *draws or
+files* — **and one more string is used on a face that is not among them:** `Log Water`, one of the
+five Shortcuts strings, is also the Control Center control's title and what VoiceOver calls the
+Lock Screen rectangle's button in its quiet form, each in the app's chosen language, from the
+snapshot's bundle. The ten:
 
 | Key | Where |
 |---|---|
@@ -388,7 +467,7 @@ the authority for everything below; rules `40-widget`, `60-design-system`, `65-a
 `Text(snapshot.percentage, format: .percent.locale(locale))` inside at a `0.4` scale floor — `MiniVessel`'s
 floor; at 0.6 Russian's `38 %` truncated to `38…`. The rectangle: `%1$d ml` and `of %1$d ml` (the medium
 family's keys), an `.accessoryLinearCapacity` bar, and the **+** —
-`Button(intent: AddWaterIntent(amount: entry.snapshot.serving))`, `.buttonStyle(.plain)`, a `plus` over
+`Button(intent: AddWaterIntent(amount: serving))` — the serving handed down from `entry.snapshot` — `.buttonStyle(.plain)`, a `plus` over
 `AccessoryWidgetBackground`, framed to `PourButton.minimumTarget`. The line: a `drop.fill` and the
 percentage. The gallery draws `WaterSnapshot.sample`: **57%** (1,150 of 2,000 — `57.49999999999999`
 rounds down).
@@ -408,8 +487,10 @@ neither itself — each shape is a child view, because a view's own `@Environmen
 way: its column, `MediumColumn`, is a view of its own).
 
 **Accessibility.** One combined element per shape (label `Today's hydration`, the vessel's
-percent-and-millilitres value), the button its own; the drawn figures, gauges and glyphs also carry
-`.accessibilityHidden(true)`. The card's figures carry `.invalidatableContent()`, so a tap shows at once.
+percent-and-millilitres value), the button its own; in the circle and the rectangle the drawn
+figures and glyphs also carry `.accessibilityHidden(true)`, and so does the rectangle's gauge, in
+both of its forms; the circle's gauge is itself the combined element and carries none. The line does not need it and
+has none: its `Label` is the one element, with `children: .ignore`. The card's figures carry `.invalidatableContent()`, so a tap shows at once.
 
 **Proved and not.** On the simulator: registered in the gallery, placed, rendered and captured in all
 three languages and at three digits. **Not proved:** the **+** (`linkd` refuses the ad-hoc-signed
@@ -457,16 +538,34 @@ before the first unlock, a Lock Screen slot, the Action Button and VoiceOver (sp
 ## Building it
 
 **The app scheme does not compile the extension's own sources.** A widget-only break passes a green
-test run completely untouched:
+test run completely untouched — *so rule `40-widget` has it, and it is not what the build does:
+see the note at the foot of this section and known issue #69. The command stays in the gate
+either way:*
 
 ```
 xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension \
-                 -destination 'platform=iOS Simulator,OS=26.5,name=iPhone 17'
+                 -destination 'platform=iOS Simulator,OS=27.0,name=iPhone 17'
 ```
 
-Last run 2026-09-02: `** BUILD SUCCEEDED **`, 38 warnings — the pre-existing concurrency baseline in
-`DataManager.swift`/`NotificationManager.swift`, **not** widget code (`docs/AI_CONTEXT.md` known
-issue #29). Zero warnings originate in `WaterBuddyWidget/`.
+Last run 2026-10-11, on the redesign's staged stage 2: `** BUILD SUCCEEDED **`. The warning
+comparison built this scheme twice — from `b8a1386` on 2026-10-10 and from the change on
+2026-10-11 — each time into the DerivedData folder that the app scheme's `build-for-testing` had
+just filled (that build ended 16 and 9 seconds before this one began), **not an empty one**; it
+recompiled all the same (135 Swift compile
+tasks). Both builds printed the same **19 distinct warnings, counted by file and message**:
+seventeen in `DataManager.swift` and `NotificationManager.swift`, the pre-existing concurrency
+baseline (`docs/AI_CONTEXT.md` known issue #29), and two in `WaterBuddyWatch/WristView.swift` —
+this scheme's build compiled the app, the watch app and the watch widget as well: **the
+checked-in scheme lists `WaterBuddy.app` as a second build entry beside the extension**, and the
+app embeds the two watch products (the embedding known issue #69 records for the app scheme).
+**Zero originate in `WaterBuddyWidget/`.** Counted the
+way `CLAUDE.md` counts — whole lines, with their line and column — the same set is 31 unique
+lines and 44 in all, which are `CLAUDE.md`'s two figures.
+*(The twentieth pass wrote "a clean build … into an empty DerivedData folder the same day" and
+"19 unique warning lines"; corrected in the twenty-first from the saved logs.)*
+*(Until the twentieth pass this read "Last run 2026-09-02 … 38 warnings" beside a destination of
+`OS=26.5`: the pin moved to 27.0 on 2026-10-10, and 38 was the app scheme's figure on Xcode 26.6.
+Not run in the twentieth pass itself.)*
 
 *(Corrected 2026-09-02: this command read `OS=18.6,name=iPhone 16` until then, which had been stale
 since the runtime pin moved. Rule `85-testing` is the authority for every gate destination; when the
