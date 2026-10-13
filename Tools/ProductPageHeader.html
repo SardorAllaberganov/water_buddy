@@ -1,0 +1,163 @@
+<!doctype html>
+<!--
+  ProductPageHeader.html
+  Tools
+
+  The App Store product page header: the redesign's vessel, its three quick-add discs and one
+  short phrase, over WaterBuddy's own aurora.
+
+  Render (from the repository root, Chrome installed; the throwaway profile keeps a headless run
+  off the owner's own Chrome profile):
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+      --hide-scrollbars --force-device-scale-factor=2 --window-size=1920,823 \
+      --allow-file-access-from-files --user-data-dir="$(mktemp -d)" --virtual-time-budget=3000 \
+      --screenshot=Screenshots/en-US/ProductPageHeader/01-one-tap.png \
+      "file://$PWD/Tools/ProductPageHeader.html"
+
+  Append `?guide` to the URL to draw the safe rectangle as a dashed outline.
+
+  THE SIZE. Apple's spec for the 21:9 header is exactly 3840 x 1646 px, .png or .jpeg, and
+  "Images can't include alpha channels or transparencies" (App Store Connect Help, *Creative
+  assets specifications*). The page is laid out at 1920 x 823 CSS px and rendered at 2x. Chrome's
+  screenshot is RGB already; `sips -g hasAlpha` must read `no`, and `swift Tools/FlattenPNG.swift`
+  is the fix if it ever does not.
+
+  THE SAFE RECTANGLE. The same file is cropped differently per device and orientation, and Apple
+  publishes no safe area in pixels — only "be sure your focal point artwork is within the center".
+  The guide is one developer's measurement of Apple's design template: 1646 x 661 px, centred
+  (823 x 330.5 CSS px here). The vessel, the phrase and the discs stay inside it; the flanks carry
+  only light and bubbles, which may be cropped. Check the crop in App Store Connect's Preview tool
+  before an upload — the measurement is not Apple's.
+
+  THE PHRASE. Apple asks for "a short phrase that enhances your visual rather than describes it",
+  no pricing, and the text localized for every language the listing supports. "Never pay to log
+  water", the product's pitch, was rendered and not chosen (2026-10-13): it names no price but is
+  a claim about one, so it belongs in the subtitle or description, not in the art.
+
+  THE LOOK. The vessel, the discs and the aurora are copied from the redesign's approved canvas
+  board *Home (A · Aurora)*, not from the app as built — the header advertises the redesign, which
+  no release carries yet (2026-10-13).
+
+  The font is SF Pro Rounded, loaded from the system's own file rather than copied in. This file
+  lives in `Tools/`, outside every synchronized root group, and belongs to no build target (rule
+  `15-project`).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WaterBuddy product page header</title>
+<style>
+@font-face { font-family: "WB Rounded"; src: url("file:///System/Library/Fonts/SFNSRounded.ttf"); font-weight: 100 1000; }
+html, body { margin: 0; padding: 0; background: #0A2185; }
+* { box-sizing: border-box; }
+
+.stage {
+  position: relative; width: 1920px; height: 823px; overflow: hidden; color: #fff;
+  font-family: -apple-system, system-ui, "SF Pro Text", sans-serif;
+  background:
+    radial-gradient(circle at 760px 440px, rgba(0,217,217,.40) 0px, rgba(0,217,217,.22) 180px, rgba(0,217,217,0) 440px),
+    radial-gradient(circle at 330px 140px, rgba(0,140,255,.72) 0px, rgba(0,140,255,.52) 260px, rgba(0,140,255,0) 720px),
+    radial-gradient(circle at 1640px 760px, rgba(199,64,250,.66) 0px, rgba(199,64,250,.46) 240px, rgba(199,64,250,0) 680px),
+    radial-gradient(circle at 1500px 90px, rgba(0,140,255,.30) 0px, rgba(0,140,255,0) 420px),
+    linear-gradient(160deg, #0A2185 0%, #1A1F92 45%, #5C1A9E 100%);
+}
+
+.bubble {
+  position: absolute; border-radius: 50%;
+  background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.02) 46%), rgba(10,16,64,.16);
+  box-shadow: inset 1.5px 1.5px 0 rgba(255,255,255,.38), inset -1px -1px 0 rgba(255,255,255,.10), 0 24px 48px rgba(3,6,40,.22);
+}
+.bubble.blur { filter: blur(6px); opacity: .7; }
+
+.guide { position: absolute; left: 548.5px; top: 246.5px; width: 823px; height: 330.5px; outline: 2px dashed #FFD60A; display: none; }
+.show-guide .guide { display: block; }
+
+.block {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 62px;
+}
+
+.vessel { position: relative; width: 300px; height: 300px; flex: none; }
+.vessel .glow { position: absolute; left: 20px; right: 20px; bottom: -40px; height: 86px; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0,220,255,.62) 0%, rgba(0,200,255,0) 70%); filter: blur(12px); }
+.vessel .glass { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; border: 1.5px solid rgba(255,255,255,.4);
+  background: linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.03) 42%), rgba(10,16,64,.3);
+  box-shadow: 0 0 0 10px rgba(255,255,255,.05), 0 32px 60px rgba(3,6,40,.46), 0 4px 10px rgba(3,6,40,.3); }
+.water { position: absolute; left: 0; right: 0; bottom: 0; height: 216px; }
+.water svg { position: absolute; left: 0; display: block; }
+.water .body { position: absolute; left: 0; right: 0; top: 12px; bottom: 0; background: linear-gradient(180deg, #3D9BFF 0%, #1667EA 46%, #0B46C9 100%); }
+.scrim { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(2,10,50,.52) 0%, rgba(2,10,50,.26) 46%, rgba(2,10,50,0) 72%); }
+.spec { position: absolute; left: 30px; top: 20px; width: 128px; height: 62px; border-radius: 50%; transform: rotate(-28deg);
+  background: radial-gradient(ellipse at 40% 40%, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 70%); }
+.rim { position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 2px 2px 1px rgba(255,255,255,.45), inset -2px -2px 1px rgba(255,255,255,.18), inset 0 -16px 30px rgba(3,8,60,.3); }
+.readout { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  text-shadow: 0 2px 12px rgba(2,10,50,.5); }
+.pct { display: flex; align-items: baseline; gap: 3px; line-height: 1; font-weight: 700; font-family: "WB Rounded", ui-rounded, sans-serif; }
+.pct b { font-size: 84px; letter-spacing: -2px; font-weight: 700; }
+.pct i { font-style: normal; font-size: 30px; color: rgba(255,255,255,.88); }
+.ml { font-size: 17px; font-weight: 600; color: rgba(255,255,255,.96); }
+
+.copy { display: flex; flex-direction: column; align-items: flex-start; gap: 30px; }
+.phrase { margin: 0; font-family: "WB Rounded", ui-rounded, sans-serif; font-weight: 750; font-size: 66px; line-height: 70px; letter-spacing: -1.2px;
+  text-shadow: 0 2px 18px rgba(3,6,40,.35); white-space: nowrap; }
+.phrase .accent { background: linear-gradient(90deg, #7FF6F6 0%, #5EF0F0 40%, #8FD0FF 100%); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none;
+  filter: drop-shadow(0 2px 14px rgba(3,6,40,.30)); }
+.discs { display: flex; align-items: center; gap: 22px; }
+.disc { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.04) 100%), rgba(10,14,60,.22);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.55), inset -1px -1px 0 rgba(255,255,255,.22), 0 12px 26px rgba(3,6,40,.34); }
+.disc.small { width: 68px; height: 68px; }
+.disc.small svg { width: 28px; height: 28px; }
+.disc.primary { width: 88px; height: 88px; color: #0B2F9E; background: linear-gradient(180deg, #FFFFFF 0%, #DCE9FF 100%);
+  box-shadow: 0 0 0 8px rgba(255,255,255,.13), 0 18px 36px rgba(3,6,40,.44); }
+.disc.primary svg { width: 36px; height: 36px; }
+.disc svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <div class="bubble blur" style="left: 118px; top: 486px; width: 210px; height: 210px"></div>
+  <div class="bubble" style="left: 300px; top: 150px; width: 96px; height: 96px"></div>
+  <div class="bubble" style="left: 214px; top: 312px; width: 40px; height: 40px"></div>
+  <div class="bubble blur" style="left: 1590px; top: 96px; width: 180px; height: 180px"></div>
+  <div class="bubble" style="left: 1520px; top: 560px; width: 84px; height: 84px"></div>
+  <div class="bubble" style="left: 1712px; top: 420px; width: 36px; height: 36px"></div>
+
+  <div class="block">
+    <div class="vessel">
+      <div class="glow"></div>
+      <div class="glass">
+        <div class="water">
+          <svg viewBox="0 0 600 26" style="top: -15px; width: 600px; height: 26px; transform: translateX(-120px); fill: rgba(122,206,255,.6)"><path d="M0 12 Q 50 4 100 12 T 200 12 T 300 12 T 400 12 T 500 12 T 600 12 V 26 H 0 Z"/></svg>
+          <svg viewBox="0 0 600 26" style="top: -12px; width: 600px; height: 26px; transform: translateX(-40px); fill: #3D9BFF"><path d="M0 12 Q 37.5 2 75 12 T 150 12 T 225 12 T 300 12 T 375 12 T 450 12 T 525 12 T 600 12 V 26 H 0 Z"/></svg>
+          <div class="body"></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="spec"></div>
+        <div class="rim"></div>
+      </div>
+      <div class="readout">
+        <div class="pct"><b>72</b><i>%</i></div>
+        <div class="ml">1,440 of 2,000 ml</div>
+      </div>
+    </div>
+
+    <div class="copy">
+      <h1 class="phrase">One tap.<br><span class="accent">Watch it fill.</span></h1>
+      <div class="discs">
+        <div class="disc small"><svg viewBox="0 0 24 24"><path d="M5 8h11v3a5.5 5.5 0 0 1-11 0V8z"/><path d="M16 9h1.5a2 2 0 0 1 0 4H16"/><path d="M4 19.5h13"/></svg></div>
+        <div class="disc primary"><svg viewBox="0 0 24 24"><path d="M6.5 4h11l-1.2 15.2a1 1 0 0 1-1 .8H8.7a1 1 0 0 1-1-.8L6.5 4z"/><path d="M7.1 10h9.8"/></svg></div>
+        <div class="disc small"><svg viewBox="0 0 24 24"><path d="M10 2.5h4v2.2l1.6 2.1c.3.4.4.8.4 1.3V20a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 8 20V8.1c0-.5.1-.9.4-1.3L10 4.7V2.5z"/><path d="M8 12.5h8"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide"></div>
+</div>
+<script>
+  if (new URLSearchParams(location.search).has('guide')) document.getElementById('stage').classList.add('show-guide');
+</script>
+</body>
+</html>
