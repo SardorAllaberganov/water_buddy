@@ -3604,3 +3604,59 @@ expected to fail or not; the record says which runs carried it. As precautions, 
 anything shown to be a cure: boot the simulator once before the runs, so that `xcodebuild`
 does not boot it for each, and do not start a UI run that would be running when the day
 changes.
+
+## 2026-10-13 — I described the canvas from a render, and the owner ruled on the description
+
+Stage 3c's last question put to the owner said the canvas draws the week card's letters, labels
+and footnote in full white. It had read that off a side-by-side render. The board's own source
+says otherwise: only the letters are `#ffffff`; the labels are `.9` and the footnote `.88`. The
+owner answered "Match the canvas" to the wrong values; a fresh reader of the spec found it, and the
+owner was asked again.
+
+**The rule:** before a question to the owner quotes a value from the canvas, read the value from
+the board's source (`*.dc.html`), not from a render of it. A render shows a colour; the source
+says what was meant.
+
+## 2026-10-13 — I changed a type without reading its DocC to the end, and broke what it guarded
+
+`HistoryCard`'s DocC says the day row runs the card's full width because seven slots inside an
+inset fall under the 44-pt floor on a 375-pt phone. Stage 3c stood the row 16 pt in, to put the
+outer tracks where the canvas's padding does, and made each day 42 pt there. The floor test computed the screen's slot, not the card's, so
+it stayed green; the plan's own render of the smallest phone looked at the marks, not the widths.
+The final review found it.
+
+**The rule:** read the DocC of every type a change touches, to its end, before the change
+(rule `00-workspace`, *Before Task*). A test that guards a geometric floor measures the geometry the code
+draws — here `HistoryView.daySlot(across:count:)`, and a UI test reading the buttons' frames on the
+smallest phone — never a formula beside it.
+
+## 2026-10-13 — A sampling box finds its own mistakes only when it is looked at
+
+Four of stage 3c's clean-ground boxes first sat on something other than ground: the goal-line
+boxes across the dash itself (1.48), the `+` box on the button's lit rim (2.35), the tab bar's
+caption box on the "S" of *Settings* and then on the lozenge's rim (2.19), its glyph's box inside
+the glyph's own glow (1.24). Every one read as a failure of the product. And a minute's sweep of
+the poured screen measured a state that had ended — *Undo*'s offer lasts eight seconds — and today's
+bar, grown by a pour nobody undid, then sat in the track boxes (1.00).
+
+**The rule:** draw every box on an annotated capture and look at it before keeping a figure, on
+each layout; a figure far under its floor is first a question about the box. A sweep captures
+only for as long as the state it measures lasts, and undoes what it did before the next screen.
+
+## 2026-10-13 — A stage's closing records are not a sync, and skipped what the sync rule asks
+
+Stage 3c's own session wrote its records — a new *The look, measured* section in
+`docs/DESIGN.md`, a *Current state* block, known issues — and two fresh readers checked them.
+The owner's `/doc_sync` straight after found the sections **above** the new one still describing
+the old glass: *The stack* named a black scrim, the density table had one scrim column at the old
+values, *Three ways to draw a pane* said Apple's glass draws no rim and is tinted black at `0.52`,
+*Selection* had no ring or disc. Nine cited lines in the stage's files had moved; one of them is
+cited in `docs/STATE.md` too, which the session had not opened. The readers had been given the
+session's new text, so they checked that and not the old. And the sync itself first fixed five of
+the nine, the ones it remembered the stage touching; a reader found the other four.
+
+**The rule:** the 2026-10-11 lesson above applies to the session that closes a stage, not only
+to `/doc_sync`. Before reporting, search every sheet for the names the change replaced — here
+`scrimOpacity`, "black scrim", `0.52` — and give the readers the sheets whole, not just the new
+sections. Find moved citations by a sweep, never by recall: every `File.swift:N` the sheets cite
+into a file the change touched, HEAD's line `N` against the tree's.

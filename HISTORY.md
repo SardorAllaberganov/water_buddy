@@ -8813,3 +8813,202 @@ Read from the commands at 08:35 on 2026-10-13. **This pass ran no `git add` and 
 untracked, 10 in both — the counts of the checkpoints above. The index is still the tree
 `8c1afc06daceaef1476c9425bc1d6bc303f0f171` that was gated. Written in the repository this
 morning: `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.
+
+## [2026-10-13] — An App Store header, a roadmap, and the redesign's stage 3c: the look
+
+Later on 2026-10-13, after stage 3 and 3b were committed and pushed (`e16221e..684f3dd`), one
+session did three things for the owner. **Nothing in this entry is committed.**
+
+### The App Store product page header
+
+Asked "how can we improve our app more?", then for a product page header first. Apple's own spec
+(App Store Connect Help, *Creative assets specifications*): 3840 × 1646 px, PNG or JPEG, no alpha;
+the focal point centred (one developer's measurement of Apple's template: a 1646 × 661 safe area).
+Two phrasings were rendered from the canvas's Home board; the owner chose **A, "One tap. Watch it
+fill."** over the pitch "Never pay to log water", which Apple's asset guidance makes a pricing
+claim. `Tools/ProductPageHeader.html` renders `Screenshots/en-US/ProductPageHeader/01-one-tap.png`
+byte-identically (`cmp`), 3840 × 1646, `hasAlpha: no`.
+
+### The roadmap
+
+The owner picked every feature offered and approved a release order: **1.2** the phone redesign,
+**1.3** every surface with Apple Health and a Siri question, **1.4** Premium, **1.5** other drinks,
+a Live Activity and languages, **2.0** iCloud. Written as `docs/ROADMAP.md`, its §8 listing the
+rule changes each needs before code. Stage 3c is its item 1.2.1.
+
+### Stage 3c, the look
+
+The four letters of 2026-10-11's comparison — the glass (**a**), the vessel (**b**), the week card
+(**c**), a serving's glyph (**g**).
+
+**The owner's rulings, each by a question with written options:** where the canvas and a contrast
+floor collide, **the floors hold**; for the glass, **keep Apple's glass, tint it with `Aurora.top`,
+draw the hand-made rim and sheen over it**; the design as presented; after a throwaway probe,
+**tint 0.64**, **a blue scrim below iOS 26**, and the week card's text **as the canvas drew it**
+— asked first as "full white", which was my misreading of the canvas (only the letters are white;
+the labels are 0.9, the footnote 0.88), found by a fresh reader of the spec and asked again:
+**"Match the canvas exactly."** The spec was approved with "ok"; the plan ran under the 2026-10-09
+ruling without its own review.
+
+**What changed** (spec `docs/superpowers/specs/2026-10-13-the-look-design.md`, plan
+`docs/superpowers/plans/2026-10-13-premium-redesign-stage-3c.md`):
+
+- `LiquidGlassModifier.swift`: `systemTintColor` (`Aurora.top`), `systemTintOpacity` 0.52 → **0.64**;
+  `scrim(density:scheme:base:onPhone:)` — the phone's own panes **0.30 / 0.70 / 0.80** blue, the
+  widget's `.archived` base and the watch black at 0.16 / 0.28 / 0.40 — replacing
+  `Density.scrimOpacity(for:)`; `runsOnPhone`; `litSurface` on Apple's glass;
+  `Selection.ringOpacity` / `.ringWidth` / `.discFill`; `innerCornerRadius`; DocC.
+- `HistoryView.swift`: the week card's tracks, bars, dashed goal line (`GoalLine`), ring and letter
+  disc (`LetterCentres`), letters full white, disclosure 0.88; `dayRowInset(across:count:)`,
+  `daySlot(across:count:)`, `dayTapFloor` and the `DayRow` layout; a serving's glyph white on an
+  `Aurora.cyan` 0.16 wash; comments brought to the new figures.
+- `HomeView.swift`: the vessel's glow, halo and highlight, off under Reduce Transparency.
+- `ScreenHeader.swift`: DocC only.
+- Tests: `LiquidGlassTests.swift` (the tint floor moved to 0.64; `theGlassIsTintedWithTheSkysOwnBlue`;
+  `LiquidGlassScrimTests`, four; `theShownDaysLetterReadsOnItsDisc`), `HistoryViewTests.swift`
+  (three), `ScreenHeaderTests.swift` (the floor test now asks the card's slot),
+  `GoalSetupUITests.swift` (`testEveryDayOnTheWeekCardIsATapTarget`).
+- Rule wording in `60-design-system` and `65-accessibility`, typed in and **unstaged** for the
+  owner (#126).
+
+**Verification actually run**, each logged in the ledger
+`.superpowers/sdd/2026-10-13-premium-redesign-stage-3c/progress.md`:
+
+- Every test seen RED first: compile failures for each new symbol; the moved tint floor on its own
+  assertion (`>= 0.64`); the sheer scrim on `opacity(.sheer) == 0.30`; the tap-target UI test on
+  *WaterBuddy Small 26.5* at `("42.0") is less than ("44.0")`.
+- A throwaway probe of the working tree measured 46 pairs on the iPhone 17 layout and 47 on the
+  iPhone 16's, a minute's sweep per screen on iOS 27.0, 26.5 and 18.6 (the *Undo* pane two
+  frames; empty History and the first run at rest): nothing measured that this stage draws under
+  its floor; the vessel's ml line over water under on all three (#95). Increase Contrast and
+  Reduce Transparency rendered; the smallest phone at AXXXL; a press recorded. Tables:
+  `docs/DESIGN.md`, *The look, measured*.
+- A fresh final reviewer (`review-final.md`): one Critical — the week card's days were 42 pt on a
+  375-pt phone, against the `HistoryCard` DocC — fixed with `DayRow` and tests, RED → GREEN; two
+  Important (stale DocC and stale measured comments) fixed; eight Minor — five deferred (#125), one
+  fixed in code (the goal line's figure), two taken in these records.
+- The gate on the final tree: unit `✔ Test run with 556 tests in 69 suites passed`; UI on *Gate 27*
+  and *Gate 26.5*, 52 run each, 0 failures, one self-skipping test; watch `✔ Test run with 57 tests
+  in 6 suites passed`; `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` built. Warnings: 21
+  unique by file and message on clean builds of HEAD and of the tree, the same 21. Counts by the
+  attribute grep: 556 phone `@Test`, 57 watch, 39 UI `func test`.
+
+**Not run:** the UI suite on iOS 18.6; a device; Russian or Uzbek; the past-day empty state's line
+(#127); the pressed glyph's contrast (#124).
+
+**Opened:** known issues #123 (Reduce Transparency's purple-grey fill beside blue glass), #124,
+#125, #126, #127; #85 closed for the phone's own panes as far as they were measured (not the
+past-day empty state's line, #127) and open for the widget and the watch; #95
+given stage 3c's figures. Three lessons in `tasks/lessons.md`.
+
+**The records were read** by two fresh readers before staging (`records-reader-a.md`,
+`records-reader-b.md` in the stage's ledger folder): 11 and 9 findings, each checked against its
+source and fixed in the docs, the spec, the code's comments and the ledger; the comment fixes were
+followed by a `build-for-testing` of every test target (exit 0) and the unit suite (`✔ Test run with
+556 tests in 69 suites passed`).
+
+### Staging
+
+Read from the commands at 15:25 on 2026-10-13. **No `git commit` was run.** HEAD `684f3dd`, 104
+commits, `## main...origin/main`. **17 staged**: `HISTORY.md`, the header PNG and
+`Tools/ProductPageHeader.html`, `WaterBuddy/HistoryView.swift`, `HomeView.swift`,
+`LiquidGlassModifier.swift`, `ScreenHeader.swift`, `WaterBuddyTests/HistoryViewTests.swift`,
+`LiquidGlassTests.swift`, `ScreenHeaderTests.swift`, `WaterBuddyUITests/GoalSetupUITests.swift`,
+`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, the stage's plan and spec,
+`tasks/lessons.md`. **8 unstaged**: `.claude/rules/60-design-system.md` and
+`65-accessibility.md` (this stage's wording, for the owner's yes), and six that were unstaged before
+this session began (`.claude/settings.json`, two watch schemes, three string catalogues). **1
+untracked**: `Screenshots/census/`, as before. The header, its HTML and `docs/ROADMAP.md` are their
+own change, apart from stage 3c, for the `/commit` plan to separate.
+
+## [2026-10-13] — `/doc_sync` after stage 3c: the token sections caught up with the look
+
+The fifty-seventh pass of `docs/AI_CONTEXT.md`, run by the owner straight after stage 3c was
+staged, in the session that built it. **No source or test file changed, and nothing was built
+or run**: every figure below is a recount of the tree or a re-read of the stage's saved logs.
+
+**Drift found and fixed.**
+
+- `docs/DESIGN.md`: the stage had added *The look, measured* and left the sections a reader
+  reaches first on the old glass. *The stack* said "black scrim"; the density table had one scrim
+  column, black at 0.16 / 0.28 / 0.40, where the phone's own panes now take `Aurora.top` at 0.30 /
+  0.70 / 0.80; *Three ways to draw a pane* said Apple's glass draws no sheen or rim and is tinted
+  black at 0.52, and named `LiquidGlassRoutingTests`' floor as 0.52; *Selection* had no ring or
+  disc. Each now says the code, with the old wording noted where it stood. *Specular and edge*
+  gained a paragraph: both are laid over Apple's glass now. `innerCornerRadius` and the vessel's
+  glow, halo and highlight are written down beside the tokens they sit with.
+- Nine cited lines the stage moved, each given where it is cited: `manager.servings[1]` at
+  `HistoryView.swift:305` (was `:283` — in `docs/AI_CONTEXT.md` twice and `docs/STATE.md`),
+  `allowsFullSwipe` at `:484`, the sheet's card at `:1472`, the sheet's tick at `:1439`, History's
+  bars at `:625` and `:1068`, the shown-day DocC at `:195–196`, the preview's comment at
+  `HomeView.swift:1109`, and the "four thousandths" DocC at `LiquidGlassModifier.swift:36`.
+  `docs/AI_CONTEXT.md` #103(l) lists them. Then a sweep: every `File.swift:N` the sheets cite into
+  the stage's eight files, HEAD's line against the tree's; the rest it flagged are dated records.
+- `docs/AI_CONTEXT.md`'s targets table still gave 547 `@Test` in 68 suites and 33
+  `GoalSetupUITests`; it gives 556 in 69 and 34, the new suites and tests named. *Files on disk*:
+  eight rows re-counted, two added (`Tools/ProductPageHeader.html` and the header PNG). The
+  fifty-sixth pass's *Current state* block, which says nothing is committed, is marked superseded,
+  and *Git* is re-read. *Where the rest is written down* names `docs/ROADMAP.md` and the specs and
+  plans folders.
+
+**Two fresh readers** read the pass before it was staged (`docsync-57-reader-a.md` and
+`docsync-57-reader-b.md` in `.superpowers/sdd/2026-10-13-premium-redesign-stage-3c/`, saved as they
+arrived). Every finding was checked against the code or the logs, and all were taken:
+
+- Reader A, eleven, on `docs/DESIGN.md` and `docs/WIDGET.md`. *Contrast figures that were measured*
+  ("The line is white 0.55 now"), *Selection*, *Home, measured* and *History, measured* gave
+  pre-stage figures as current. *Motion* still had the capsule marker. *Interactive glass* did not
+  say the edge and specular boosts reach the rim over Apple's glass. *Specular and edge* said the
+  contrast boost reaches both, where `specular` has never read the setting — checked in every
+  version of the file. My new rows put the glow "just above the foot", copying a comment #125(e)
+  already lists as wrong, and the tracks at 43 pt, the canvas's, where ours are 36–42. In
+  `docs/WIDGET.md`: four comment-only hunks in `HistoryView.swift`, which the widget scheme
+  compiles, came after its last build; and the 19 warnings are the widget scheme's logs, not the
+  app's, which print 21.
+- Reader B, nine: four of the nine moved citations; *Git*; this checkpoint's account of
+  *Specular and edge*; the glow row again; the header's "clean at the start", where the targets
+  table was not; and three notes on the warning method, below. Its last, line width, is taken
+  where a line of mine ran long.
+
+**Checked and already accurate:** the 78 `.swift` files, each named in `docs/AI_CONTEXT.md`; the
+three exception sets; eleven keys on `DataManager.Key`, `DataManager.swift` untouched by the stage;
+`HistoryServingTests` (6) and `HistorySelectionTests` (5), which `docs/STATE.md` counts; every
+`` rule `nn-name` `` cited resolves; `CLAUDE.md`'s target table, shared files and storage. The
+warning figures, from the stage's saved logs of clean builds of HEAD and of the tree as it stood at
+15:07 — before four comment-only edits, so not the staged tree byte for byte: the widget scheme 19
+distinct by file and message on both, none from `WaterBuddyWidget/`; the app's 31 whole lines on
+both, with the six in two `WaterBuddyTests` files set aside, so `CLAUDE.md`'s 31 stands — it now
+says how it was re-counted. The final tree's own `build-for-testing`, not clean, gives 31 too. Both
+counts take only lines that begin with a source path: 17 distinct warnings inside test macro
+expansions (`macro expansion #expect…`) carry none, and are the same 17 at HEAD and in the tree.
+
+**Files touched:** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/STATE.md`,
+`docs/WIDGET.md`, `tasks/lessons.md` (one lesson: a stage's closing records are not a sync), this
+file. No `.claude/` file and no file under a target.
+
+**Gate:** not run in this pass. The stage's gate, on the final tree, is the checkpoint above.
+
+### Staging
+
+Read from the commands at 16:05 on 2026-10-13, after this pass's `git add` of its seven files by
+name. **No `git commit` was run.** HEAD `684f3dd`, 104 commits, `## main...origin/main`. **20
+staged**: the 17 the checkpoint above lists, and `CLAUDE.md`, `docs/STATE.md` and
+`docs/WIDGET.md`, which this pass first touched (`docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`tasks/lessons.md` and this file were among the 17 and are re-staged). **8 unstaged**, the same
+eight: the two rule files with stage 3c's wording, and six from before the stage's session. **1
+untracked**: `Screenshots/census/`. None in both.
+
+### The rule wording, approved — and staged
+
+After the pass, the owner chose "Approve rule wording": yes to stage 3c's wording in
+`.claude/rules/60-design-system.md` and `65-accessibility.md` (known issue #126). Both were staged
+by name exactly as typed — the diff read first: five bullets of rule 60's *Glass* rewritten, one of
+its *Interaction*, one bullet added to rule 65's *Reduce Transparency*. No wording was changed. One
+sentence the stage left as it was, beside the approved lines, is now untrue: the tint "is the
+lightest rung that passed", where `0.60` passed and `0.64` is the first rung with room — known
+issue #128, opened for the owner, with the test's name, which says the same.
+
+Read from the commands at 16:32. **No `git commit` was run.** HEAD `684f3dd`, 104 commits,
+`## main...origin/main`. **22 staged**: the 20 above and the two rule files. **6 unstaged**: the
+six from before the stage's session (`.claude/settings.json`, two watch schemes, three string
+catalogues). **1 untracked**: `Screenshots/census/`. None in both.

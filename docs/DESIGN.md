@@ -7,7 +7,26 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-12 (the fifty-fourth pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+**Last updated:** 2026-10-13 (the fifty-seventh pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+by the owner straight after the redesign's stage 3c, the look, was staged. **No source change in
+this pass; the tokens stage 3c changed are now said where they are defined.** The stage's session
+had added *The look, measured* and left the sections above it on the old glass. *The stack* names
+the scrim's two colours; *`LiquidGlass.Density`* has two scrim columns, the phone's `Aurora.top`
+at 0.30 / 0.70 / 0.80 and the widget's and watch's black at the old values; *Specular and edge*
+says both are laid over Apple's glass; `innerCornerRadius` is beside `cornerRadius`; *The water*
+has the vessel's glow, halo and highlight; *Three ways to draw a pane* has the tint as
+`Aurora.top` at 0.64 and the sheen and rim drawn on Apple's glass; *Selection* has the week card's
+ring and disc. Each old wording is noted where it stood. **Then a fresh reader found nine more
+things in this sheet, all fixed:** *Contrast figures that were measured*, *Selection*, *Home,
+measured* and *History, measured* gave pre-stage figures as current and say they are not now;
+*Motion*'s marker is the ring and disc; *Interactive glass*'s edge and specular boosts reach the
+rim over Apple's glass; the contrast boost was said to reach the specular, which it never has;
+the glow sits on the vessel's foot, not above it; the tracks are 36–42 pt, not 43. Stage 3 and 3b,
+which sections below call staged or unstaged, were committed on 2026-10-13 in `e0762ab` and
+`7368dec`.)
+Before that: 2026-10-13 (stage 3c's own session: a new section, *The look, measured*, and
+pointers to it from *Apple's glass, measured* and *The hand-made pane, measured again*).
+Before that: 2026-10-12 (the fifty-fourth pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
 by the owner straight after the fifty-third. **No source change and no token changed; five
 statements the fifty-third pass made here are corrected, each where it stands**, found by two
 fresh readers; a third and a fourth then read the corrections and found eight things each
@@ -130,8 +149,11 @@ changed). Previously 2026-10-07 (History's day picker and serving sheet: seven f
 
 ## The stack, bottom to top
 
-`Base` → black scrim (dark mode only) → white tint → specular gradient → inset stroke → two
-shadows. Six layers, and each one is doing a job the others cannot:
+`Base` → scrim (dark mode only) → white tint → specular gradient → inset stroke → two
+shadows. Six layers, and each one is doing a job the others cannot. The scrim is the sky's own
+blue, `Aurora.top`, on the phone's own panes and black in the widget and on the watch, since the
+redesign's stage 3c (2026-10-13; `LiquidGlass.scrim(density:scheme:base:onPhone:)`; read "black
+scrim" until the fifty-seventh pass):
 
 - **The scrim is what makes dark glass work.** White alone cannot hold back a vivid background at
   any opacity a dark UI can afford: too little and the colours punch through as a coloured film,
@@ -143,7 +165,11 @@ shadows. Six layers, and each one is doing a job the others cannot:
 - **Two shadows, not one.** One alone either hugs the edge with no sense of height, or floats with
   no contact.
 
-`cornerRadius = 28`, continuous — the iOS squircle, not a circular arc.
+`cornerRadius = 28`, continuous — the iOS squircle, not a circular arc. `innerCornerRadius = 12`
+for a rounded element inside a pane — the week card's tracks and bars, since stage 3c: the canvas's
+12, drawn there on a track about 43 pt wide. Ours are 36–42 pt wide on the four card widths
+`everyDayClearsTheTapFloor` tries (a day's slot less its 4-pt inset each side), and a pane's own 28
+would round one into a capsule.
 `borderWidth = 1`. Default `base` is `.material(.ultraThinMaterial)`, default `density` is
 `.frosted`, default `elevation` is `.resting`.
 
@@ -175,11 +201,18 @@ The tint and the blur compete: every point of tint hides a point of the material
 reading and the pane becomes flat white paint — so the scale tops out where glass still looks like
 glass.
 
-| Density | scrim (dark) | scrim (light) | tint (dark) | tint (light) |
-|---|---|---|---|---|
-| `.sheer` | `0.16` | `0` | `0.05` | `0.22` |
-| `.frosted` | `0.28` | `0` | `0.07` | `0.45` |
-| `.opaque` | `0.40` | `0` | `0.09` | `0.58` |
+| Density | scrim (dark), the phone's own panes, `Aurora.top` | scrim (dark), widget and watch, black | scrim (light) | tint (dark) | tint (light) |
+|---|---|---|---|---|---|
+| `.sheer` | `0.30` | `0.16` | `0` | `0.05` | `0.22` |
+| `.frosted` | `0.70` | `0.28` | `0` | `0.07` | `0.45` |
+| `.opaque` | `0.80` | `0.40` | `0` | `0.09` | `0.58` |
+
+The two scrim columns since stage 3c: the phone's own panes are a `.material` base on iOS, which
+draws the hand-made stack from iOS 17 to 25 only; the widget's `.archived` base and the watch kept
+black at the old values. The blue figures are measured, in *The look, measured*; opaque is not the
+lightest rung that passed, so the three stay in density order. (One column, black at
+`0.16`/`0.28`/`0.40`, until the fifty-seventh pass; the values lived on `Density.scrimOpacity(for:)`,
+which stage 3c removed.)
 
 Use `.frosted` or `.opaque` behind body text; keep `.sheer` for short labels and controls, where a
 busy backdrop cannot swallow a whole sentence. In use, every call site but the previews' own five: the three vessels — app,
@@ -212,7 +245,13 @@ axis:
 | dark | `0.55` | `0.06` |
 | light | `0.85` | `0.18` |
 
-**`colorSchemeContrast == .increased` multiplies both by 1.4**, capped at 1.
+**`colorSchemeContrast == .increased` multiplies the edge by 1.4**, capped at 1; the specular
+takes only the press boost (*Interactive glass*). *(Read "multiplies both" until the fifty-seventh
+pass; `specular` has never read the contrast setting.)*
+
+**The specular and the edge are also laid over Apple's glass**, under the content, since stage 3c —
+the modifier's `litSurface`, with the same boosts. Nothing else of the stack is: no scrim, no
+tint, no shadows.
 
 ## `LiquidGlass.Base.archived` is derived, not guessed
 
@@ -343,6 +382,18 @@ App slosh decays as `exp(-elapsed × 1.5)` over a 5-second window after a pour. 
 `padding(10)` in the app, `padding(diameter × 0.04)` in the widget — so it sits in a well and can
 never cover the vessel's lit rim.
 
+**Home's vessel has depth, since stage 3c** — the canvas's, as ratios of the diameter (`HomeView`'s
+private `Depth`), in the app only:
+
+| | shape | colour | size, as a ratio of the diameter |
+|---|---|---|---|
+| glow | an ellipse centred on the foot, blurred `0.033` — the canvas's sat just above it, and the code's comment still says so (#125(e)) | `Aurora.cyan` `0.36` → clear | `0.76` × `0.21` |
+| halo | a ring outside the rim | white `0.05` | `0.033` wide |
+| highlight | an ellipse at the top left, turned `-28°` | white `0.4` → clear | `0.427` × `0.207`, from `(0.10, 0.067)` |
+
+The glow and halo sit behind the glass; the highlight sits between the readability scrim and the
+readout, away from the readout's figures. None of the three is drawn under Reduce Transparency.
+
 ## The readability scrim
 
 **White on the bright cyan surface at full measures about 1.4:1.** `WaterReadabilityScrim` makes
@@ -396,6 +447,14 @@ calibrates its ramp to where its own text sits.
 | White @ 0.75 on the Settings cards' pane | **6.04:1** | The vessels' millilitre readouts. *(The names beside them are full white — `SettingsView` gives only the readout the 0.75; this row named both until the forty-seventh pass.)* |
 | `Aurora.cyan` on the Settings cards' pane | **5.26:1** | The vessel glyphs and the slider tint — non-text, 3:1. Comfortably clear here, unlike the same colour on the tab bar's lighter pane at 4.34:1. |
 | Black status-bar glyphs over the indigo backdrop | **1.57:1** | Why `RootTabView` uses `preferredColorScheme(.dark)` (travels *up*, sets the window style → **13.39:1**) and not `.environment(\.colorScheme, .dark)` (travels *down* only). A widget has no status bar and no hosting controller to hear a preference, so `HydrationView` uses the environment form — the shape `HomeView` rejects, for the opposite reason. |
+
+**Every row above that is on one of the phone's panes was measured before stage 3c** (2026-10-13),
+which re-tinted those panes with `Aurora.top` and redrew the week card: the disclosure is white 0.88
+now, the weekday letters full white, the shown day a ring (white 0.8, 1.5 pt) round its track with
+its letter in `Aurora.top` on a white disc, and the goal line a 1.5-pt dashed rule at white 0.62.
+Today's figures for them are in *The look, measured*; the rows stay as the record of their day.
+*(Noted in the fifty-seventh pass, after a fresh reader found "The line is white 0.55 now" still
+reading as current.)*
 
 The widget's readout carries **two** shadows — where the app had one until the redesign's stage 2,
 and has two of its own now (the end of this paragraph): `(0.3, radius 6, y 1)` plus a
@@ -599,23 +658,27 @@ Since the redesign's stage 1 (2026-10-09; committed 2026-10-10 in `c9ef45d`), `l
   turns it on, and measures it there. (The flag's own DocC gave the missing runtime as its reason
   until the redesign's stage 2 corrected it to this one — known issue #91d.)
 - **Everything above this section describes the hand-made stack.** On Apple's glass the scrim, the
-  tint, the specular, the rim and the two shadows are not drawn, and `tint`, `tintOpacity`,
-  `elevation`, `borderWidth` and the highlight points are ignored.
+  tint and the two shadows are not drawn, and `tint`, `tintOpacity` and `elevation` are ignored.
+  The specular and the lit rim **are** drawn, over the glass and under the content, since stage 3c
+  (`litSurface`), so `borderWidth` and the highlight points apply there too. (Read "the specular,
+  the rim … are not drawn" until the fifty-seventh pass.)
 - The variant: `density: .sheer` on a pane that is not interactive takes `Glass.clear` (the vessel,
   whose readout has its own scrim); every other pane takes `Glass.regular`. `interactive: true` adds
   `.interactive()`. `LiquidGlass.systemVariant(density:interactive:)` is the mapping.
-- **The regular variant is darkened**, with Apple's own `Glass.tint(.black.opacity(…))`, at
-  `LiquidGlass.systemTintOpacity(for:)`: **`0.52`**. The clear variant takes none — it is the
-  vessel, and a tint would dull the water behind its readout. The value is measured, in *Apple's
-  glass, measured* below.
+- **The regular variant is tinted with the sky's own blue**, through Apple's own `Glass.tint(_:)`:
+  `LiquidGlass.systemTintColor`, which is `Aurora.top`, at `LiquidGlass.systemTintOpacity(for:)`,
+  **`0.64`**. The clear variant takes none — it is the vessel, and a tint would dull the water
+  behind its readout. The value is measured, in *The look, measured* below. (Black at `0.52`, from
+  *Apple's glass, measured*, until stage 3c; read so here until the fifty-seventh pass.)
 - **The pane says its hit region:** `sampling(_:)` — `systemPane` until the redesign's stage 2 —
   ends in `.contentShape(shape)`, for every `.material` pane on iOS 26 and later, the opaque one
   under Reduce Transparency included. The hand-made
   stack is hit-testable through its fills; Apple's glass is not always. On iOS 26.5 a serving row
   in History's `List` took a tap on its text and none on the bare glass between; iOS 27.0 took
   both. `GoalSetupUITests.testAServingRowOpensItsSheetWhereverItIsTapped` holds it.
-- `LiquidGlassRoutingTests` pins the table, the mapping, which variant is darkened and that its
-  tint is no lighter than `0.52`, without building a view.
+- `LiquidGlassRoutingTests` pins the table, the mapping, which variant is tinted, that the tint is
+  `Aurora.top` (`theGlassIsTintedWithTheSkysOwnBlue`) and that it is no lighter than `0.64`, without
+  building a view. `LiquidGlassScrimTests` pins the hand-made stack's two scrims.
 
 **The mapping is settled** (2026-10-10) — see *Apple's glass, measured* below.
 
@@ -656,6 +719,17 @@ tab now draws it too, from the same tokens. On the hand-made pane the pair's fig
 card's rows in the table above (rim 4.15:1, the letter inside 7.4:1). The tab bar's lozenge had not
 been measured on the hand-made pane when this was first written; the iOS 18.6 pass has run since.
 
+**Since stage 3c the week card's shown day is marked another way**, from the canvas, with three
+more tokens: a ring round its track (`ringOpacity = 0.8`, white, `ringWidth = 1.5`) and a white disc
+behind its letter (`discFill`), the letter drawn in `Aurora.top` on it. There is one ring and one
+disc, which travel to the shown day (`Motion.land`) and stay at zero opacity when no day in the
+window is shown — a place animates, not a layer. The fill-and-rim pair is now the app's own tab
+bar's — below iOS 26; above it the bar is Apple's — and the sheet's shortcuts'. The ring's figures
+are in *The look, measured*; the letter on its disc is derived, by
+`theShownDaysLetterReadsOnItsDisc`. **Every figure in this section was measured before stage 3c**,
+on black-tinted glass and the black-scrim hand-made pane, and the ones that name History's shown
+day — the paragraph above's included — are of the pair it drew then.
+
 **Measured 2026-10-10**, worst pixel of clean ground, the three tabs each selected in turn — at rest,
 and on Apple's glass at the `0.48` tint of that evening (at the final `0.52`, through the aurora's
 swing, the worst of the three are rim 3.41, glyph 4.11, caption 7.25 — *Apple's glass, measured*):
@@ -683,6 +757,9 @@ aurora and it moves — on the sheet's `.frosted`, `.floating` card:
 | the selected rim, white 0.55, against the pane outside it | 5.18 | 4.66 | 3.43 | 3 |
 
 ## Apple's glass, measured
+
+*Superseded in its values on 2026-10-13 by stage 3c — the tint is `Aurora.top` at 0.64, with the
+lit rim and sheen laid over it: see* The look, measured. *Kept as the record of its day.*
 
 **Settled 2026-10-10: the regular variant is tinted black at `0.52`, and the week card's goal line
 is white 0.55.** Method: a throwaway UI probe walks every screen and attaches full-screen captures;
@@ -819,6 +896,9 @@ water, which this change does not draw; whether it is an old failure is not yet 
 
 ## The hand-made pane, measured again
 
+*Superseded for the phone's own panes on 2026-10-13 by stage 3c — the scrim is `Aurora.top` at 0.30
+/ 0.70 / 0.80: see* The look, measured. *The widget and the watch keep the black scrim.*
+
 **2026-10-10. The hand-made pane reads lighter than the tables above it, and several pairs they show
 passing are under their floor** (known issue #85). Two sources, the same method as *Apple's glass,
 measured*: stage 1 on a new iOS 18.6 simulator (iPhone 16), and the shipped 1.1, `8a44e8f`, in store
@@ -848,6 +928,11 @@ captures taken on iOS 27.0 (iPhone 18 Pro Max) — both draw the hand-made stack
   not a property of the pane.
 
 ## Home, measured
+
+*Its figures on a pane are superseded by stage 3c's re-tinted glass — *The look, measured*, below.
+The stage drew nothing new under the text on the aurora; in the vessel it added a highlight at the
+top left, and took no before-and-after figure for the line over the water (#95). Kept as the record
+of its day. (Pointer added in the fifty-seventh pass.)*
 
 **2026-10-11, the redesign's stage 2.** Most of Home's text now sits straight on the aurora — the
 date and title, the status line, the quiet line and the three discs' captions have no pane under
@@ -1011,6 +1096,11 @@ one level, all outside the widget's own rectangle.
 
 ## History, measured
 
+*Its figures on a pane are superseded by stage 3c's re-tinted glass and redrawn week card — *The
+look, measured*, below; its header on the aurora the stage did not change. Kept as the record of
+its day, when the stage was staged; stage 3 was committed in `e0762ab`. (Pointer added in the
+fifty-seventh pass.)*
+
 **2026-10-11, the redesign's stage 3, staged.** History is one list now: a header straight on
 the aurora, then three kinds of pane — the week card, the strip (*When you drank*), a serving
 row. Taken on three simulators: iOS 26.5 and 27.0 (*iPhone 17*, 402 × 874 pt, Apple's glass —
@@ -1140,6 +1230,155 @@ phones above, iOS 26.5 on a 375 × 667 pt *iPhone SE*:
 Any figure under Increase Contrast, at a text size other than the ordinary one, in Russian or
 Uzbek, on a device, or on iOS 17. The reminder's mark from a real reminder. The sheet's other
 text, which this stage did not change.
+
+## The look, measured
+
+**2026-10-13, the redesign's stage 3c** (spec `docs/superpowers/specs/2026-10-13-the-look-design.md`).
+It changed what the phone's own panes are drawn on, so **it supersedes the values of *Apple's
+glass, measured* and *The hand-made pane, measured again*** for them, and the pane figures of
+*Home, measured* and *History, measured*; those tables stay as the record of their day.
+
+**What is drawn now.**
+
+- Apple's glass (iOS 26 and later) is tinted with `Aurora.top` at **0.64**, not black at 0.52, and
+  the hand-made stack's sheen and lit rim are laid over it, under the content.
+- The phone's hand-made pane (iOS 17–25) is scrimmed with `Aurora.top` at **sheer 0.30, frosted
+  0.70, opaque 0.80**, not black at 0.16 / 0.28 / 0.40. The widget's `.archived` base and the watch
+  keep black at the old values.
+- The week card: tracks at white 0.10, a dashed goal line at white 0.62, a ring (white 0.8) and a
+  white disc on the shown day, whose letter is `Aurora.top`; the other letters full white, the
+  disclosure 0.88. A serving's glyph is white on
+  an `Aurora.cyan` 0.16 wash. Home's vessel has a glow, a halo and a highlight.
+
+**Method.** Two throwaway probes in the session's scratchpad, each seeded with the canvas's own
+week and with launch-environment knobs for the tint and the scrim: the first, before the spec, an
+export of the index with the look drawn in scratch, climbed the tint; the second, a copy of the
+working tree after the build, took the final table. Each walked every screen and captured it every
+three seconds for a minute (the *Undo* pane two frames: its offer lasts eight seconds). The figure
+is the worst pixel of a rectangle of clean ground beside each text, the text's white composited
+over it; a mark — a cyan glyph or bar — is taken at its own rendered colour. Each rectangle was
+checked by eye on an annotated capture first, and the ones found touching a rim, a glyph's own
+glow or the text itself were moved before any figure was kept (the stage's ledger lists them).
+**Clean ground is the floor** (#95). **Not done as the spec's §7.2 asked:** no beside-the-glyphs
+figure was taken, and the set is not the seventy-one pairs of *Apple's glass, measured* but the
+pairs of today's layouts below. **The scale differs from the old tables':** the first probe's
+control, black 0.52 with no rim or sheen, read the weekday letters 6.52 at rest where the record
+above has 5.97 at the same value — the card's layout and the sky's clock had changed.
+
+**The tint, climbed on iOS 27.0** (whose glass is the lightest), the rim and sheen on unless the
+row says otherwise, the weekday letters still at white 0.72 in every row:
+
+| Tint | Glyph | At rest | A minute's sweep |
+|---|---|---|---|
+| black `0.52`, no rim or sheen (the control) | cyan, wash 0 | letters 6.52, goal dashes 4.96, cyan bar 4.73 | — |
+| `Aurora.top` `0.52`, no rim or sheen | cyan, wash 0.16 | letters 4.74, cyan bar 3.43 | — |
+| `Aurora.top` `0.52` | cyan, wash 0.16 | letters **4.28**, glyph **2.46** | — |
+| `Aurora.top` `0.56` | cyan, wash 0.08 | letters **4.48**, glyph **2.66–2.79** | — |
+| `Aurora.top` `0.60` | white, wash 0.16 | nothing under | nothing under; letters **4.64**, range labels 4.68 |
+| **`Aurora.top` `0.64`** | white, wash 0.16 | nothing under | **nothing under**; letters 4.78, range labels 4.93 |
+
+The blue tint does most of the lightening (letters 6.52 → 4.74 at the same opacity), the sheen a
+further ~0.5. `0.60` passed with 0.14 to spare; `0.64` is the first rung with room. The letters
+were then raised to full white, as the canvas drew them, and read 7.58 in the final sweep.
+
+**The hand-made pane's scrim, on iOS 18.6** (iPhone 16; *Cancel* is the sheer pane, *Undo* the
+opaque one), at rest:
+
+| | sheer 0.30 / opaque 0.60 | 0.40 / 0.70 | 0.50 / 0.80 |
+|---|---|---|---|
+| *Cancel* (sheer) | 5.46 | 5.56 | 5.72 |
+| *Undo*'s line / word / glyph (opaque) | 4.90 / 8.54 / 5.28 | 4.99 / 8.95 / 5.46 | 5.03 / 9.26 / 5.57 |
+
+Frosted 0.70 is the value the probe swept before this stage's plan. **Sheer is 0.30**, the lightest
+rung tried, with 0.96 of room; nothing lighter was rendered. **Opaque is 0.80, not the lightest passing rung**: 0.60 or 0.70 would put it at or
+under frosted and invert the density scale; `thePhonesOwnPanesAreScrimmedWithTheSky` pins the order.
+At the same margins, black raised ×1.5 stayed slate grey where the blue reads like the canvas — the
+choice of the blue was the owner's, on the look.
+
+**Every measured pair, the final values, worst frame of a minute's sweep** (empty History and the
+first run at rest; iOS 27.0 and 26.5 on an iPhone 17, iOS 18.6 on an iPhone 16 with its own
+rectangles; the tab bar's pairs exist only below iOS 26, where the bar is ours):
+
+| Pair | Floor | iOS 27.0 | iOS 26.5 | iOS 18.6 |
+|---|---|---|---|---|
+| Home: streak number (1.0) | 4.5 | 10.43 | 13.44 | 10.21 |
+| Home: streak flame (cyan) | 3 | 3.84 | 4.76 | 3.77 |
+| Home: Cup disc glyph (1.0) | 3 | 7.58 | 9.51 | 7.45 |
+| Home: Bottle disc glyph (1.0) | 3 | 6.48 | 9.06 | 6.87 |
+| Home: the vessel's ml line, over water (1.0) | 4.5 | **4.05** | **4.05** | **4.20** |
+| *Undo*: line (1.0) | 4.5 | 5.21 | 6.13 | 5.05 |
+| *Undo*: word (1.0) | 4.5 | 8.34 | 11.36 | 8.96 |
+| *Undo*: glyph (cyan) | 3 | 5.01 | 6.82 | 5.44 |
+| History: `+` glyph (1.0) | 3 | 9.04 | 11.41 | 9.02 |
+| Week card: title (1.0) | 4.5 | 6.93 | 9.59 | 6.93 |
+| Week card: weekday letters (1.0) | 4.5 | 7.58 | 10.69 | 7.79 |
+| Week card: figure (1.0) | 4.5 | 8.29 | 11.73 | 8.61 |
+| Week card: *Average* (0.9) | 4.5 | 7.16 | 9.82 | 7.45 |
+| Week card: disclosure (0.88) | 4.5 | 7.42 | 9.91 | 7.60 |
+| Week card: goal dashes (0.62) | 3 | 3.67 | 4.56 | 3.71 |
+| Week card: the shown day's ring (0.8) | 3 | 6.57 | 8.62 | 6.59 |
+| Week card: cyan bar against track and gap | 3 | 3.44 | 4.57 | 3.38 |
+| Week card: today's white bar against its track | 3 | 7.00 | 9.60 | 7.00 |
+| Strip: title (1.0) | 4.5 | 8.84 | 12.00 | 8.84 |
+| Strip: hour label (0.9) | 4.5 | 7.72 | 10.04 | 7.71 |
+| Strip: cyan bar against the pane | 3 | 5.03 | 6.61 | 4.95 |
+| Row 1: amount (1.0) | 4.5 | 8.26 | 11.54 | 8.85 |
+| Row 1 / row 5: glyph, white on the wash | 3 | 4.46 / 4.66 | 5.30 / 5.41 | 4.42 / 4.42 |
+| Row 1 / row 5: name (0.9) | 4.5 | 6.96 / 7.40 | 9.34 / 9.56 | 7.39 / 7.89 |
+| Row 4: time (0.94) | 4.5 | 7.66 | 10.51 | 8.48 |
+| Sheet: *ml* (0.8) | 4.5 | 5.90 | 7.90 | 5.96 |
+| Sheet: *Cancel* (1.0) | 4.5 | 5.97 | 7.22 | 5.46 |
+| Sheet: an unselected shortcut's amount (1.0) | 4.5 | 7.74 | 10.93 | 7.87 |
+| Sheet: the selected shortcut's amount (1.0) | 4.5 | — | — | 6.96 |
+| Settings: the goal's *ml* (0.8) | 4.5 | 5.58 | 7.44 | — |
+| Settings: range labels (0.75) | 4.5 | 4.92 | 6.54 | 5.08 |
+| Settings: a vessel's readout (0.75) | 4.5 | 5.61 | 7.43 | — |
+| Settings: a vessel's glyph (cyan) | 3 | 3.50 | 4.71 | — |
+| Settings: the vessels note (0.70), top / scrolled | 4.5 | 5.19 / 5.33 | 6.71 / 6.78 | 5.34 / 5.57 |
+| Settings: *Quick-add vessels* title (1.0) | 4.5 | 7.62 | 10.83 | 7.95 |
+| Settings: reminders description (0.75) | 4.5 | 5.79 | 7.63 | 5.80 |
+| Settings: a language row (1.0) | 4.5 | 8.92 | 11.63 | 8.47 |
+| Settings: the checkmark (cyan) | 3 | 5.23 | 7.07 | 5.24 |
+| Settings: language footnote (0.75) | 4.5 | 5.80 | 7.57 | 5.94 |
+| Tab bar (ours): inactive caption (0.72) | 4.5 | — | — | 5.22 |
+| Tab bar (ours): active caption (1.0) | 4.5 | — | — | 7.92 |
+| Tab bar (ours): active glyph (cyan) | 3 | — | — | 4.49 |
+| Empty History: title (1.0) | 4.5 | 9.13 | 12.57 | 9.24 |
+| Empty History: body (0.7) | 4.5 | 5.25 | 6.86 | 5.43 |
+| Empty History: drop glyph (0.7) | 3 | 4.80 | 6.32 | 5.00 |
+| First run: *ml* (0.8) | 4.5 | 7.25 | 8.87 | 7.07 |
+| First run: range labels (0.75) | 4.5 | 6.19 | 7.56 | 6.12 |
+
+- **Nothing measured that this stage draws is under its floor, on any of the three systems.** The
+  tightest:
+  the cyan bar (3.38–3.44 on 27.0 and 18.6), the goal dashes (3.67–3.71), the vessel glyph in
+  Settings (3.50) against 3; the range labels (4.92) and *Undo*'s line (5.05) against 4.5.
+- **Under, on every system: the vessel's ml line over water**, 4.05–4.20 — water, not glass. This
+  stage drew nothing over the water (the new highlight is at the vessel's top left); no
+  before-and-after figure was taken. It is #95's line, waiting on the owner's yardstick ruling.
+- **Increase Contrast** (iOS 27.0, at rest): the system darkens the glass and every pair rises —
+  the goal dashes 4.66, the cyan bar 4.69, the vessel glyph 4.87, the range labels 6.82. The ml line
+  over water reads 4.12.
+- **Reduce Transparency** (iOS 27.0 and 18.6, switched through the Settings app): every pane is its
+  opaque fill with its rim and no sheen; the vessel draws no glow, halo or highlight. The opaque fill
+  is still `Base.archived.opaqueFill`, a purple-grey, beside blue glass everywhere else.
+- **A pressed pane** (iOS 27.0, recorded): Apple's interactive glass swells the Cup disc and
+  lightens it to lavender; the lit rim brightens with it. One reaction. While the finger is down the
+  white glyph sits on a light disc and reads faint — seen, not measured; no floor is set for a
+  pressed state.
+- **The smallest phone** (375 × 667, iOS 26.5): the week card's row stands 9.5 pt in rather than
+  16 so each day stays 44 pt wide (`HistoryView.dayRowInset(across:count:)`); the
+  ring, the disc and the dashed line sit on the tracks at the ordinary size and at
+  `AccessibilityXXXL`.
+
+**Not measured.** On iOS 18.6, Settings' goal *ml*, a vessel's readout and a vessel's glyph; on iOS
+27.0 and 26.5, the sheet's selected shortcut's amount. The shown day's letter on its disc (derived
+instead, by `theShownDaysLetterReadsOnItsDisc`). The past-day empty state (*Tap + to add a serving
+you forgot.*), Settings' *Open iOS Settings* button, the sheet's wheel (#59, accepted), the
+selected shortcut's rim, Home's
+status and quiet lines and every other text on the aurora (no pane under them, so this stage did
+not change them), Russian and Uzbek, iOS 17, a device. The probe's captures and scripts lived in
+the session's scratchpad and are not kept; this section is the record.
 
 ## Apple's tab bar, measured
 
@@ -1327,7 +1566,7 @@ Sixteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to
 | A drop, on a pour | 22 pt across, from the pressed disc to the vessel's centre along an arc lifted 56 pt above the line between — the drop itself rises 28 — in 0.42 s; whole for three quarters of the way, then taken in | `PourArcTests` |
 | The vessel, as a drop lands | to 1.025 of its size in 0.1 s and back over 0.5 s; the surface surges then | — |
 | The level | to its new mark on `water`, past it and back | `whatLandsPassesItsPlaceAndDoesNotRing` |
-| The shown day's marker | one capsule, from day to day, on `land` | `theMarkerStandsOverTheDayShown` |
+| The shown day's marker | one ring round the day's track and one disc behind its letter, from day to day, on `land` — since stage 3c; one capsule until then | `theMarkerStandsOverTheDayShown`, the ring's place; the disc is placed from the letter's own anchor and no test holds it |
 | The strip's bars | from the baseline to their heights over 0.5 s, as the page arrives and on each change of day; simply there under Reduce Motion | — |
 | The saved tick | a 16 pt check (26 at most) trimmed from nothing to whole on `land`, 1.6 s, then faded | — |
 | The figure under a held slider | 1.06 of its size, from its trailing edge | — |
@@ -1346,6 +1585,8 @@ Sixteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to
   of the status line and *Undo*'s capsule, and is gone into the vessel about 0.45 s later; the
   vessel is seen a little larger for the four frames after that.
 - **A day picked:** the marker is between days for about three frames and at rest inside 0.4 s.
+  *(The capsule, before stage 3c. The ring and disc that replaced it were not recorded frame by
+  frame.)*
 - **A goal saved:** the tick is drawn beside *Daily goal* when the slider is let go.
 - **Scrolling:** a card crossing the top is narrower than the card below it and no fainter;
   every card on screen at rest is whole.
@@ -1390,7 +1631,10 @@ as glass that "reacts to touch and pointer interactions in real time".
 the installed SDK. On iOS 26 and later an interactive pane is therefore Apple's `Glass.interactive()`
 (*Three ways to draw a pane*), and what follows is what the **hand-made stack** does instead. *(This
 paragraph said the API "is not reachable from this project" until 2026-10-09: true on Xcode 16.4 with
-only `iphoneos18.5`, where the symbols were undeclared rather than unavailable.)*
+only `iphoneos18.5`, where the symbols were undeclared rather than unavailable.)* **Since stage 3c
+the edge and specular rows apply on Apple's glass too**: the sheen and lit rim laid over it
+(`litSurface`) take the same two boosts while an interactive pane is pressed, so its rim answers on
+both paths. The tint row stays the hand-made stack's. *(Noted in the fifty-seventh pass.)*
 
 `liquidGlass(…, interactive: true)` makes a pane answer a finger. Three multipliers, because the
 three layers carry the press in different schemes:

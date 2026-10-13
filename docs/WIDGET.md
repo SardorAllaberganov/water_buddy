@@ -3,7 +3,24 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-11 (twenty-third pass — `/doc_sync` at the end of the redesign's stage 3,
+**Last updated:** 2026-10-13 (twenty-fourth pass — `/doc_sync` after the redesign's stage 3c, the
+look, staged and not committed. **No file under `WaterBuddyWidget/` changed, and no contract here
+did.** One of the six shared files did: `LiquidGlassModifier.swift` tints Apple's glass with
+`Aurora.top`, lays the hand-made sheen and lit rim over it, and scrims the phone's own hand-made
+panes with `Aurora.top` — through `LiquidGlass.scrim(density:scheme:base:onPhone:)`, which answers
+**black at 0.16 / 0.28 / 0.40, the values this extension always drew, for a `.flat` base**. The
+widget's panes are `.archived`, so they take the hand-made stack and that black scrim as before, and
+never reach Apple's glass or the sheen laid over it; the new `Selection` and `innerCornerRadius`
+tokens are not read here. The extension was built from the stage's source, `** BUILD SUCCEEDED
+**` — its own sources and the six shared files as they are staged; four comment-only hunks in
+`HistoryView.swift`, which this scheme also compiles through its `WaterBuddy.app` entry, came
+seventeen minutes later. HEAD and the tree were each built the stage's way — `build-for-testing`
+of the app into an empty folder, then this scheme into the same folder — and this scheme's two
+logs printed the same 19 distinct warnings by file and message, twelve in `DataManager.swift`,
+five in `NotificationManager.swift`, two in `WristView.swift`, none from `WaterBuddyWidget/`.
+(The app's two logs print 21: one more each in two test files.) **Nothing was rendered: no widget was
+placed.** Stage 3, which the pass below calls staged, was committed in `e0762ab`.)
+Previously: 2026-10-11 (twenty-third pass — `/doc_sync` at the end of the redesign's stage 3,
 History, staged and not committed. **No file under `WaterBuddyWidget/` changed, and no contract
 here did.** One of the six shared files did: `DataManager.swift` gained four derived answers for
 History's screen (`reached(_:)`, `daysMet(in:goal:)`, `dayFraction(of:in:)`,
@@ -561,8 +578,13 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension
                  -destination 'platform=iOS Simulator,OS=27.0,name=iPhone 17'
 ```
 
-Last run 2026-10-11, on the redesign's staged stage 3 (on *WaterBuddy Gate 27*, iOS 27.0):
-`** BUILD SUCCEEDED **`. Stage 3's warning comparison built this scheme twice more the same day —
+Last run 2026-10-13, on the redesign's staged stage 3c, with the command above:
+`** BUILD SUCCEEDED **`. Stage 3c's warning comparison built this scheme from a `git archive` of
+`684f3dd` and from a copy of the working tree, each straight after a clean `build-for-testing` of
+the app into its own folder, and each printed the same 19 distinct warnings by file and message
+as stage 3's below. The account that follows is stage 3's, kept: run 2026-10-11, on the redesign's
+staged stage 3 (on *WaterBuddy Gate 27*, iOS 27.0): `** BUILD SUCCEEDED **`. Stage 3's warning
+comparison built this scheme twice more the same day —
 from a `git archive` of `e16221e` and from a `git checkout-index` of the staged tree — each into
 the build folder the app scheme's `build-for-testing` had just filled, and each printed the same
 19 distinct warnings by file and message: twelve in `DataManager.swift`, five in
