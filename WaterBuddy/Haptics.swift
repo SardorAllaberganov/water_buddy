@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-/// The app's feedback ladder, in one place.
+/// The app's feedback ladder, in one place: three impacts of rising weight, a lighter one for
+/// something taken away, and the system's selection tick for a choice among peers.
 ///
 /// Five call sites used to spell `.impact(weight: .medium, intensity: 0.8)` by hand, which was fine
 /// while every rung was the same height and became a drift hazard the moment they were not — the
@@ -39,6 +40,11 @@ enum Haptics {
     /// for.
     static let goalIntensity: Double = 1
 
+    /// Something taken away — a serving swiped off the list. `confirm`'s intensity on a lighter
+    /// weight: felt, and never as firm as a thing confirmed
+    /// (`takingAwayIsNoFirmerThanAConfirmation`).
+    static let removeIntensity: Double = confirmIntensity
+
     static var confirm: SensoryFeedback { .impact(weight: .medium, intensity: confirmIntensity) }
 
     static var pour: SensoryFeedback { .impact(weight: .heavy, intensity: pourIntensity) }
@@ -50,4 +56,11 @@ enum Haptics {
     /// unmistakable thump in the app. The confetti carries the "well done"; this carries the
     /// landing.
     static var goalReached: SensoryFeedback { .impact(weight: .heavy, intensity: goalIntensity) }
+
+    /// A choice among peers: a tab, a day, a vessel, a step of a slider. The system's own
+    /// selection tick, which is what its pickers play — so a choice here feels like a choice
+    /// anywhere else on the phone.
+    static var select: SensoryFeedback { .selection }
+
+    static var remove: SensoryFeedback { .impact(weight: .light, intensity: removeIntensity) }
 }

@@ -123,6 +123,218 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertTrue(vessel.waitForExistence(timeout: 5), "the Home tab did not come back")
     }
 
+    /// The share of an element's own picture that is near white. What tells a control that is
+    /// drawn from one that is only present: the Glass's disc is a white surface, and a disc that
+    /// has not been drawn is a patch of the aurora with no white in it at all.
+    @MainActor
+    private func whiteShare(of element: XCUIElement) -> Double {
+        guard let image = element.screenshot().image.cgImage else { return 0 }
+        let width = image.width
+        let height = image.height
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        guard let context = CGContext(
+            data: &pixels,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return 0 }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        var white = 0
+        for index in stride(from: 0, to: pixels.count, by: 4)
+        where pixels[index] > 215 && pixels[index + 1] > 215 && pixels[index + 2] > 215 {
+            white += 1
+        }
+        return Double(white) / Double(max(width * height, 1))
+    }
+
+    /// Every screen is drawn whole when its tab is shown — the first time, and when it comes back.
+    ///
+    /// A screen's content is drawn as nothing until it has arrived, and it arrives when its tab
+    /// is shown (`Arrival`). If that ever failed to follow a tab being shown, the screen would
+    /// stand there with a title and nothing under it — and the tree could not say so: a section
+    /// that has not arrived is still present and can still be pressed. So this looks at the
+    /// picture, on each of the three screens, twice. History's header is no evidence: the `+`
+    /// in it is outside the arrival and is never hidden.
+    @MainActor
+    func testAScreenComesBackWholeAfterItsTabIsLeft() throws {
+        let app = launchedOnHome()
+        let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch
+        XCTAssertGreaterThan(whiteShare(of: glass), 0.3, "Home opened with its quick-add row undrawn")
+
+        // A serving today is what draws History's week card, and with it today's button.
+        glass.tap()
+        XCTAssertTrue(app.buttons["Undo"].waitForExistence(timeout: 5), "the Glass was not poured")
+
+        let today = app.buttons["Today"]
+        let goal = app.sliders["Daily water goal"]
+
+        for showing in ["opened", "came back"] {
+            app.buttons["History"].tap()
+            XCTAssertTrue(today.waitForExistence(timeout: 5), "History \(showing) without its week card")
+            XCTAssertTrue(today.isHittable, "History \(showing) with a week card that cannot be pressed")
+            // The shown day's letter is full white, and so is the bar of a day short of its goal.
+            XCTAssertGreaterThan(whiteShare(of: today), 0, "History \(showing) with its week card undrawn")
+
+            app.buttons["Settings"].tap()
+            XCTAssertTrue(goal.waitForExistence(timeout: 5))
+            XCTAssertTrue(goal.isHittable, "Settings \(showing) without its first card")
+            // The slider's thumb is the one white thing in its frame.
+            XCTAssertGreaterThan(whiteShare(of: goal), 0.01, "Settings \(showing) with its first card undrawn")
+
+            app.buttons["Home"].tap()
+            XCTAssertTrue(glass.waitForExistence(timeout: 5))
+            XCTAssertTrue(glass.isHittable, "Home came back without its quick-add row")
+            XCTAssertGreaterThan(whiteShare(of: glass), 0.3, "Home came back with its quick-add row undrawn")
+            XCTAssertTrue(app.otherElements["Today's hydration"].isHittable, "Home came back without its vessel")
+        }
+
+        // And it still acts. Taken back, so this leaves the day one serving longer and not two.
+        glass.tap()
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5), "a pour made after the changes of tab did not land")
+        undo.tap()
+    }
+
+    /// A screen that was left and shown again still answers a touch — its cards as well as its
+    /// header.
+    ///
+    /// A page's sections are drawn at next to no opacity until they arrive. That one is *drawn*
+    /// again is one thing and that it can be *pressed* again is another: on iOS 26.5 a pane of
+    /// Apple's glass has ignored a tap on its bare glass before, and for the one build in which
+    /// screens were kept alive while their tabs were away, a section that came back from exactly
+    /// zero opacity was drawn and could not be pressed. A page is rebuilt each time it is shown
+    /// now; this is what would say so if that ever stopped being enough.
+    @MainActor
+    func testAScreenAnswersATapWhenItIsShownAgain() throws {
+        let app = launchedOnHome()
+
+        // A serving today is what draws the week card, and with it yesterday's button.
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+
+        app.buttons["History"].tap()
+        let yesterday = app.buttons[Self.dayNames()[1]]
+        XCTAssertTrue(yesterday.waitForExistence(timeout: 5), "the week card has no button for yesterday")
+
+        // Away and back, twice: the first return and every one after it.
+        for _ in 0..<2 {
+            app.buttons["Home"].tap()
+            XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5))
+            app.buttons["History"].tap()
+            XCTAssertTrue(yesterday.waitForExistence(timeout: 5))
+        }
+
+        XCTAssertTrue(yesterday.isHittable, "a day in the week card cannot be pressed after the tab was left")
+        yesterday.tap()
+        XCTAssertTrue(yesterday.isSelected, "a day pressed after the tab was left was not picked")
+
+        app.buttons["Today"].tap()
+        let row = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres")).firstMatch
+        bringIntoView(row, in: app)
+        XCTAssertTrue(row.isHittable, "a serving cannot be pressed after the tab was left")
+        row.tap()
+        XCTAssertTrue(app.sliders["Serving amount"].waitForExistence(timeout: 5), "a serving pressed after the tab was left did not open its sheet")
+        app.buttons["Cancel"].tap()
+    }
+
+    /// On iOS 26 and later the bar is Apple's, and a press dragged along it carries the selection.
+    /// The app's own bar, below iOS 26, answers a tap only.
+    @MainActor
+    func testAPressDraggedAlongTheBarChangesTheTab() throws {
+        guard #available(iOS 26.0, *) else { throw XCTSkip("the app's own bar answers a tap only") }
+        let app = launchedOnHome()
+
+        app.buttons["Home"].press(
+            forDuration: 0.6,
+            thenDragTo: app.buttons["Settings"],
+            withVelocity: .slow,
+            thenHoldForDuration: 0.4
+        )
+        XCTAssertTrue(
+            app.sliders["Daily water goal"].waitForExistence(timeout: 5),
+            "the drag did not carry the selection to Settings"
+        )
+    }
+
+    /// The app's own bar: three captions on one line. Each hung under a glyph of its own height,
+    /// and *History* stood two and a half points above its neighbours.
+    @MainActor
+    func testTheBarsCaptionsShareALine() throws {
+        if #available(iOS 26.0, *) { throw XCTSkip("Apple's bar draws its own captions") }
+        let app = launchedOnHome()
+
+        // The lowest text of each name is its caption: no heading stands below the bar.
+        let tops = ["Home", "History", "Settings"].map { name in
+            app.staticTexts.matching(identifier: name).allElementsBoundByIndex.map(\.frame.minY).max() ?? 0
+        }
+        XCTAssertGreaterThan(tops[0], 0, "the bar's captions are not in the tree")
+        XCTAssertEqual(tops[0], tops[1], accuracy: 0.5, "History's caption is not on Home's line")
+        XCTAssertEqual(tops[1], tops[2], accuracy: 0.5, "Settings' caption is not on History's line")
+    }
+
+    /// History opens on today each time its tab is shown, because its page is rebuilt on every
+    /// change of tab. A container that kept its pages would have to do this on purpose — one
+    /// did, for one build — and this is what would catch one that did not.
+    @MainActor
+    func testHistoryReturnsToTodayWhenItsTabIsLeft() throws {
+        let app = launchedOnHome()
+
+        // A serving today is what draws the week card, and with it yesterday's button.
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        app.buttons["History"].tap()
+
+        let yesterday = app.buttons[Self.dayNames()[1]]
+        XCTAssertTrue(yesterday.waitForExistence(timeout: 5), "the week card has no button for yesterday")
+        yesterday.tap()
+        XCTAssertTrue(yesterday.isSelected, "tapping a day did not select it")
+
+        app.buttons["Home"].tap()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5))
+        app.buttons["History"].tap()
+
+        XCTAssertTrue(app.buttons["Today"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Today"].isSelected, "History came back on the day it was left on")
+    }
+
+    /// Once a change of tab has ended, the page that was left is gone — from the tree as well as
+    /// from the screen.
+    ///
+    /// The pages slide, so for the length of a slide two of them exist. The one leaving is taken
+    /// out when its slide ends, and nothing on screen says whether it was: a page a screen's
+    /// width away is still read by VoiceOver — *Today* twice, and a `+` that adds a serving to a
+    /// screen that is not there.
+    ///
+    /// **What this can and cannot catch.** The page that is leaving is also hidden from
+    /// accessibility, and Home's content honours that: a Home that was never taken out would
+    /// still pass the first half. History's rows are a `List`'s, which does not honour it — so
+    /// the second half is the one that fails when a page is left behind, and it was seen
+    /// failing with the slide's end unreported. A page left behind is also caught by what it
+    /// would bring back with it: `testAnUndoOfferDoesNotOutliveItsScreen` and
+    /// `testHistoryReturnsToTodayWhenItsTabIsLeft` both fail if a page that should have gone
+    /// is shown again with its state. For that half-second, then, History's rows are in the
+    /// tree twice over with Home's — the one thing here the hiding does not cover.
+    @MainActor
+    func testOnlyThePageShownIsInTheTreeAfterAChangeOfTab() throws {
+        let app = launchedOnHome()
+        let vessel = app.otherElements["Today's hydration"]
+        let add = app.buttons["Add a serving"]
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(add.waitForExistence(timeout: 5), "the History tab did not show its page")
+        XCTAssertTrue(vessel.waitForNonExistence(timeout: 5), "Home's page was still in the tree after History had arrived")
+
+        app.buttons["Home"].tap()
+        XCTAssertTrue(vessel.waitForExistence(timeout: 5), "the Home tab did not come back")
+        XCTAssertTrue(add.waitForNonExistence(timeout: 5), "History's page was still in the tree after Home had arrived")
+        XCTAssertEqual(
+            app.staticTexts.matching(identifier: "Today").count, 1,
+            "two headings named Today: the page that was left is still being read"
+        )
+    }
+
     /// The week card, and the one thing about it no unit test can see: its shape in the
     /// accessibility tree.
     ///
@@ -517,6 +729,70 @@ final class GoalSetupUITests: XCTestCase {
             app.staticTexts.matching(identifier: "Today").count, 1,
             "Home's heading must resolve to exactly one element"
         )
+    }
+
+    /// The title stands in one place on every tab.
+    ///
+    /// Each screen laid its own header out, in its own stage, and nothing compared them: *Today*
+    /// sat 4 pt further left and 1.3 pt lower on Home than on History, and during the change of
+    /// tab both were on screen at once. A frame read off the tree, never arithmetic over paddings
+    /// (`tasks/lessons.md`, 2026-10-11).
+    @MainActor
+    func testTheTitleHoldsItsPlaceOnEveryTab() throws {
+        assertTheTitleHoldsItsPlace(in: launchedOnHome())
+    }
+
+    /// The same, at a text size where what shares the title's line is taller than the title.
+    ///
+    /// Two things moved it there, in opposite directions, and *Today* stood 4.7 pt lower on
+    /// History than on Home. History's `+` grows with the text and is 53 pt at the third size
+    /// above the ordinary one, where the title's line is 48: the line took the button's height
+    /// and the title was centred in it, 2.7 pt down. And Home's column offered the line less
+    /// than the title's height, so the title stood 2 pt above its own line. The ordinary size
+    /// and the largest, the two that had been rendered, are not among the sizes it happened at.
+    @MainActor
+    func testTheTitleHoldsItsPlaceWhereItsAccessoryIsTaller() throws {
+        // Setup, if it is showing, and the title's ordinary height.
+        let setup = launchedOnHome()
+        let ordinary = setup.staticTexts["Today"].firstMatch.frame.height
+        setup.terminate()
+
+        let app = XCUIApplication()
+        // The category's real name: an unknown one is ignored without a word, and the run comes
+        // back at the ordinary size (rule `65-accessibility`).
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+        XCTAssertGreaterThan(
+            app.staticTexts["Today"].firstMatch.frame.height, ordinary,
+            "the larger text size did not take, so this compared nothing new"
+        )
+
+        assertTheTitleHoldsItsPlace(in: app)
+    }
+
+    /// Walks the three tabs of `app`, already on Home, and compares where each title stands.
+    @MainActor
+    private func assertTheTitleHoldsItsPlace(in app: XCUIApplication) {
+        let home = app.staticTexts["Today"].firstMatch.frame
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+        let history = app.staticTexts["Today"].firstMatch.frame
+
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5))
+        // The app's own bar draws a caption that also reads *Settings*; the heading is the higher.
+        let settings = app.staticTexts.matching(identifier: "Settings").allElementsBoundByIndex
+            .map(\.frame)
+            .min { $0.minY < $1.minY } ?? .zero
+
+        // The frames whole, so a failure says which screen moved and not only that one did.
+        let frames = "Home \(home), History \(history), Settings \(settings)"
+        XCTAssertEqual(home.minX, history.minX, accuracy: 0.5, "Today moves sideways between Home and History: \(frames)")
+        XCTAssertEqual(home.minY, history.minY, accuracy: 0.5, "Today moves up or down between Home and History: \(frames)")
+        XCTAssertEqual(home.minX, settings.minX, accuracy: 0.5, "Settings' title starts somewhere else: \(frames)")
+        XCTAssertEqual(home.minY, settings.minY, accuracy: 0.5, "Settings' title stands at another height: \(frames)")
     }
 
     /// On a screen with less height than the layout wants, the **vessel** gives way — never the

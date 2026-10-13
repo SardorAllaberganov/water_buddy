@@ -515,10 +515,9 @@ extension AppStoreScreenshotUITests {
 
     /// Bounces off another tab instead of dragging back.
     ///
-    /// `RootTabView`'s body is a `switch tab` inside a `ZStack`, so each destination is a
-    /// structurally different branch: identity does not survive the swap and the scroll container is
-    /// rebuilt at offset 0. The sleep is not belt and braces — the swap cross-fades over 0.28 s and
-    /// a shutter fired mid-fade catches both screens at partial opacity.
+    /// `RootTabView` builds a page when its tab is shown and removes it when it has left, so the
+    /// scroll container is rebuilt at offset 0. The sleep is not belt and braces — the pages
+    /// slide for 0.45 s, and a shutter fired mid-slide catches half of each.
     @MainActor
     private func returnToTop(of tab: String, in app: XCUIApplication, proof: XCUIElement) {
         let bounce = (tab == "Home") ? "History" : "Home"

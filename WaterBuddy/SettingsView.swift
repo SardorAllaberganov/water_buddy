@@ -40,6 +40,9 @@ struct SettingsView: View {
     /// Bumped when reminders are switched on, so the haptic fires on the tap.
     @State private var enables = 0
 
+    /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
+    @State private var arrived = false
+
     private let scheduler = ReminderScheduler.live()
 
     /// `true` when iOS will not deliver anything, whatever the stored flag says.
@@ -48,39 +51,49 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-
-            GeometryReader { proxy in
-                ScrollView {
-                    VStack(spacing: 22) {
-                        header
-                        // The goal leads: it is the number the whole product is measured against,
-                        // and reminders are a preference about it.
-                        GoalCard(currentGoal: manager.dailyGoal)
-                        ServingsCard(current: manager.servings)
-                        remindersCard
-                        LanguageCard()
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.horizontal, 28)
-                    .padding(.top, 24)
-                    // The language card is the tallest on this screen and sits last, so without
-                    // this its footnote rests under the floating tab bar at the un-scrolled
-                    // position. `safeAreaInset` reserves the bar's height for scrolling, not for
-                    // the resting layout.
-                    .padding(.bottom, 16)
-                    .frame(maxWidth: .infinity, alignment: .top)
-                    .frame(minHeight: proxy.size.height, alignment: .top)
+        // No backdrop of its own: the three tabs share the one `RootTabView` stands, which holds
+        // still while the pages slide over it.
+        GeometryReader { proxy in
+            ScrollView {
+                VStack(spacing: 22) {
+                    // Were Settings the page the app opens on, the cards would settle in under
+                    // the header; a page that slides in is whole as it comes (``Arrival``).
+                    // Each section recedes as it scrolls past the top or the foot of the screen
+                    // (``ScrollDepth``), the header with the rest.
+                    header.scrollDepth()
+                    // The goal leads: it is the number the whole product is measured against,
+                    // and reminders are a preference about it.
+                    GoalCard(currentGoal: manager.dailyGoal).arrives(arrived, order: 0).scrollDepth()
+                    ServingsCard(current: manager.servings).arrives(arrived, order: 1).scrollDepth()
+                    remindersCard.arrives(arrived, order: 2).scrollDepth()
+                    LanguageCard().arrives(arrived, order: 3).scrollDepth()
+                    Spacer(minLength: 0)
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                // The reminders card changes what it says, and with it its height: when
+                // permission is refused, when the notification summary is on, and when the
+                // language changes. On the whole stack, so the card below moves with it; on
+                // that card alone it grew over a third of a second while its neighbour jumped.
+                .animation(Motion.settle, value: explanation)
+                // Every tab's margin and inset (``ScreenMetrics``).
+                .padding(.horizontal, ScreenMetrics.margin)
+                .padding(.top, ScreenMetrics.topInset)
+                // The language card is the tallest on this screen and sits last, so without this
+                // its footnote rests under the floating tab bar at the un-scrolled position. The
+                // bar's height is reserved for scrolling, not for the resting layout, by
+                // `RootTabView`'s `safeAreaInset`.
+                .padding(.bottom, 16)
+                .frame(maxWidth: .infinity, alignment: .top)
+                .frame(minHeight: proxy.size.height, alignment: .top)
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollDepthContainer()
         }
         // No `.preferredColorScheme` and no `.presentationDragIndicator` here any more: this is a
         // tab, not a sheet. There is nothing to drag down, and the dark-appearance preference is
         // declared once on `RootTabView`, which owns the hosting controller all three tabs share —
         // the same move `HistoryView` made when the log stopped being a sheet.
         .sensoryFeedback(Haptics.confirm, trigger: enables)
+        .tracksArrival($arrived)
         .task { await readSystemState() }
         .onChange(of: scenePhase) { _, phase in
             // Returning from the Settings app is the whole reason this is here.
@@ -95,16 +108,17 @@ struct SettingsView: View {
     /// Just the title now. *Done* sat beside it while this was a sheet presented from the log's
     /// header; a tab is dismissed by tapping another tab, and a button that duplicates the bar is
     /// a second way to do one thing.
+    ///
+    /// Every tab's header (``ScreenHeader``), so the title stands where *Today* does on the other
+    /// two (`testTheTitleHoldsItsPlaceOnEveryTab`).
     private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
+        ScreenHeader {
             Text("Settings", bundle: strings)
-                .font(.title2.weight(.bold))
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
-
-            Spacer(minLength: 12)
+                .accessibilityAddTraits(.isHeader)
+        } detail: {
+            EmptyView()
+        } accessory: {
+            EmptyView()
         }
     }
 
@@ -121,6 +135,7 @@ struct SettingsView: View {
 
             if isBlocked {
                 openSettingsRow
+                    .transition(.opacity)
             }
         }
         .padding(.vertical, 22)
@@ -313,6 +328,9 @@ private struct LanguageCard: View {
                     // ruling `GlassTabBar` records for its glow.
                     .foregroundStyle(isSelected ? Aurora.cyan : .clear)
                     .shadow(color: isSelected ? Aurora.cyan.opacity(0.5) : .clear, radius: 8)
+                    // Once, on the row that was picked — and on the one that was left, where the
+                    // mark is clear and nothing shows.
+                    .symbolEffect(.bounce, value: isSelected)
             }
             // Past the 44pt floor, and a `minHeight` so the target grows with Dynamic Type rather
             // than clipping the name (rule `65-accessibility`).
@@ -389,6 +407,9 @@ private struct GoalCard: View {
         HStack(alignment: .firstTextBaseline) {
             Text("Daily goal", bundle: strings)
                 .font(.body.weight(.semibold))
+                // Drawn when a change has been saved. The slider has no Save button, so until
+                // now only the haptic said the goal had been kept.
+                .savedTick(commits)
 
             Spacer(minLength: 12)
 
@@ -408,6 +429,10 @@ private struct GoalCard: View {
                     .foregroundStyle(.white.opacity(0.8))
             }
             .animation(.smooth(duration: 0.35), value: goal)
+            // The figure under the finger: a little larger while the slider is held, and it
+            // lands back when it is let go. From its trailing edge, which is where it is pinned.
+            .scaleEffect(isDragging ? 1.06 : 1, anchor: .trailing)
+            .animation(Motion.land, value: isDragging)
         }
         .foregroundStyle(.white)
         .lineLimit(1)
@@ -520,6 +545,9 @@ private struct ServingsCard: View {
     /// Whether a drag is in flight — what makes one gesture one write. See ``commitIfChanged()``.
     @State private var isDragging = false
 
+    /// Which vessel's slider is held, by slot. Its figure is drawn a little larger meanwhile.
+    @State private var held: Int?
+
     /// Bumped on a committed change, so the haptic fires on the change rather than on the touch.
     @State private var commits = 0
 
@@ -532,6 +560,8 @@ private struct ServingsCard: View {
             Text("Quick-add vessels", bundle: strings)
                 .font(.headline)
                 .foregroundStyle(.white)
+                // Drawn when a vessel's new amount has been saved (``SavedTick``).
+                .savedTick(commits)
 
             ForEach(Array(vesselSlots.enumerated()), id: \.element.nameKey) { index, slot in
                 vessel(at: index, slot: slot)
@@ -573,6 +603,9 @@ private struct ServingsCard: View {
                     .font(.subheadline.weight(.semibold))
                     .monospacedDigit()
                     .foregroundStyle(.white.opacity(0.75))
+                    // The figure under the finger, as the goal's is.
+                    .scaleEffect(held == index ? 1.06 : 1, anchor: .trailing)
+                    .animation(Motion.land, value: held)
             }
             .lineLimit(1)
             .minimumScaleFactor(0.7)
@@ -587,6 +620,7 @@ private struct ServingsCard: View {
                 step: Double(HistoryView.servingStep),
                 onEditingChanged: { editing in
                     isDragging = editing
+                    held = editing ? index : nil
                     if !editing { commitIfChanged() }
                 }
             )
@@ -631,6 +665,85 @@ private struct ServingsCard: View {
     }
 }
 
+// MARK: - Saved
+
+/// A tick that draws itself when a change has been saved, stays a moment, and fades.
+///
+/// The goal and the vessels are saved when their slider is let go. There is no Save button to
+/// press, so until this only the haptic said a change had been kept — and a haptic says nothing
+/// on a phone lying on a desk.
+///
+/// A stroke trimmed from nothing to whole, so it is seen being drawn; it lands
+/// (``Motion/land``). Decoration: the slider beside it speaks its own value, so this is hidden
+/// from accessibility (rule `65-accessibility`).
+private struct SavedTick: View {
+
+    /// How many times the card has saved. Zero is the card as it opens, and draws nothing.
+    let commits: Int
+
+    /// How long the tick stays before it fades.
+    private static let stay: Duration = .milliseconds(1_600)
+
+    @State private var shown = false
+
+    /// A real magnitude, capped at its use site (rule `65-accessibility`).
+    @ScaledMetric(relativeTo: .body) private var scaledSize: CGFloat = 16
+
+    private var size: CGFloat { min(scaledSize, 26) }
+
+    var body: some View {
+        CheckShape()
+            .trim(from: 0, to: shown ? 1 : 0)
+            .stroke(Aurora.cyan, style: StrokeStyle(lineWidth: size * 0.16, lineCap: .round, lineJoin: .round))
+            .frame(width: size, height: size * 0.75)
+            .opacity(shown ? 1 : 0)
+            // Drawn on the way in, faded on the way out.
+            .animation(shown ? Motion.land : Motion.settle, value: shown)
+            .accessibilityHidden(true)
+            .task(id: commits) {
+                guard commits > 0 else { return }
+                shown = true
+                // Cancelled by the next save, which starts the wait again with the tick still
+                // drawn — and asked again after the wait, for a save that landed in the turn
+                // it ended (rule `43-concurrency`).
+                do { try await Task.sleep(for: Self.stay) } catch { return }
+                guard !Task.isCancelled else { return }
+                shown = false
+            }
+    }
+}
+
+private extension View {
+
+    /// Draws ``SavedTick`` just past this view's trailing edge, for a card that has saved
+    /// `commits` times.
+    ///
+    /// **Over the row and not in it.** As a member of the row it took its width whether or not
+    /// it was showing, and the line beside it — a goal's figure, in a row that is already
+    /// tight in Russian — was the one that gave it up.
+    func savedTick(_ commits: Int) -> some View {
+        overlay(alignment: .trailing) {
+            SavedTick(commits: commits)
+                // The overlay's trailing guide is eight points before its own leading edge:
+                // aligned to this view's trailing edge, it stands that far after it.
+                .alignmentGuide(.trailing) { $0[.leading] - 8 }
+        }
+    }
+}
+
+/// A check mark as one stroke, short arm first, so that trimming it draws it the way a hand
+/// would.
+private struct CheckShape: Shape {
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY + rect.height * 0.55))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.36, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        return path
+    }
+}
+
 // MARK: - Preview
 
 #Preview {
@@ -656,5 +769,6 @@ private struct ServingsCard: View {
     // rather than from `defaultDailyGoal` — the bug an `.task`-seeded `@State` would hide.
     manager.saveDailyGoal(ml: 2_500)
 
-    return SettingsView().environment(manager)
+    // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
+    return SettingsView().background { AuroraBackground() }.environment(manager)
 }

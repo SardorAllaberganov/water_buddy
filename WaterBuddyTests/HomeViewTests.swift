@@ -213,7 +213,9 @@ struct HomeLayoutTests {
     }
 
     /// The vessel takes what the header, the status and the row leave of the screen. The figures
-    /// are the 375 x 667 pt phone's: 587 pt of visible height, 372.5 pt of everything else.
+    /// are the 375 x 667 pt phone's as the redesign's stage 2 measured them, under the app's own
+    /// bar: 587 pt of visible height, 372.5 pt of everything else. Under Apple's bar that phone
+    /// has less, and its vessel is at the floor.
     @Test func theVesselTakesWhatTheRestOfTheColumnLeaves() {
         let range = HomeView.vesselRange(scaled: 300)
 
@@ -228,6 +230,39 @@ struct HomeLayoutTests {
         #expect(HomeView.discDiameter(scaled: 30, ceiling: HomeView.sideDiscCeiling) == 44)
         #expect(HomeView.discDiameter(scaled: 68, ceiling: HomeView.sideDiscCeiling) == 68)
         #expect(HomeView.discDiameter(scaled: 400, ceiling: HomeView.sideDiscCeiling) == HomeView.sideDiscCeiling)
+    }
+
+    /// The date under *Today* is one line that may shrink to ``HomeView/dateScaleFloor`` and no
+    /// further, and past the floor it is cut short — on the line that says which day this is.
+    /// So the floor is held against the widest date there is, in every language the app ships,
+    /// on the narrowest phone at the largest text size: every day of a year, measured in the
+    /// font the header draws its second line in (`ScreenHeader`), with the capital the line
+    /// opens with.
+    ///
+    /// Measured, because it cannot be rendered: the date is the model's today, and the widest
+    /// one, a Monday late in September, comes round on few days of a year.
+    @Test func theWidestDateFitsTheNarrowestPhoneAtTheLargestTextSize() {
+        let largest = UITraitCollection(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)
+        let font = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: largest)
+        let line = 375 - 2 * ScreenMetrics.margin
+
+        for language in AppLanguage.selectable {
+            let locale = Locale(identifier: language.code ?? "en")
+            var widest = (date: "", width: CGFloat.zero)
+            for day in 0..<365 {
+                let date = utcDay.date(byAdding: .day, value: day, to: utc(2026, 1, 1))!
+                let written = date.formatted(HomeView.dateFormat.locale(locale))
+                let drawn = written.prefix(1).uppercased(with: locale) + written.dropFirst()
+                let width = NSAttributedString(string: drawn, attributes: [.font: font]).size().width
+                if width > widest.width { widest = (drawn, width) }
+            }
+
+            #expect(widest.width > line, "the font did not resolve at the largest size, and this measured nothing")
+            #expect(
+                widest.width * HomeView.dateScaleFloor <= line,
+                "\(widest.date) is \(widest.width) pt wide and needs \(line / widest.width) of its size to fit \(line) pt"
+            )
+        }
     }
 
     @Test func theGlassDiscOutgrowsItsNeighboursAllTheWayUp() {

@@ -262,4 +262,26 @@ struct HistoryLayoutTests {
         #expect(HistoryView.stripHours == [6, 12, 18])
         #expect(HistoryView.stripFloor > 0 && HistoryView.stripFloor < 1)
     }
+
+    // MARK: The shown day's marker
+
+    /// One marker, moved from day to day: it stands at the leading edge of the slot of the day
+    /// shown. Seven days share the row evenly, so that is the day's place times a seventh.
+    ///
+    /// The widths are the day row's on the phones the app runs on — the screen less two margins
+    /// of 24 — and none of them is a whole number of sevenths, so the comparison allows a
+    /// thousandth of a point: far under a pixel, and far over a rounding in the last place.
+    @Test(arguments: [327, 345, 354, 382] as [CGFloat])
+    func theMarkerStandsOverTheDayShown(width: CGFloat) {
+        let slot = width / 7
+
+        #expect(HistoryView.markerOffset(ofDay: 0, among: 7, across: width) == 0)
+        #expect(abs(HistoryView.markerOffset(ofDay: 3, among: 7, across: width) - 3 * slot) < 0.001)
+        #expect(abs(HistoryView.markerOffset(ofDay: 6, among: 7, across: width) - (width - slot)) < 0.001)
+    }
+
+    /// A week with no days is never drawn, and must not be a division by zero if it is asked.
+    @Test func aMarkerAmongNoDaysIsNotADivisionByZero() {
+        #expect(HistoryView.markerOffset(ofDay: 0, among: 0, across: 322).isFinite)
+    }
 }

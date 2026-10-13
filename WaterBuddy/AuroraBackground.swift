@@ -35,9 +35,17 @@ import SwiftUI
 ///    beat, which the eye reads as a pulse rather than as weather — the same reason `WaterSurface`
 ///    interferes two waves at different frequencies instead of scaling one.
 ///
-/// `repeatForever` rather than a `TimelineView`: there is nothing here to recompute per frame, so
-/// handing SwiftUI two endpoints and a curve lets the render server carry the whole loop. The
-/// vessel uses `TimelineView` because its wave phase genuinely is a function of the clock.
+/// Two endpoints and a curve rather than a `TimelineView`: there is nothing here to recompute per
+/// frame, so SwiftUI is handed where each light rests, where it travels to, and ``AuroraDrift``.
+/// The vessel uses `TimelineView` because its wave phase is drawn from the clock point by point.
+///
+/// 4. **Every backdrop is the same sky.** There is more than one copy of this view: the three
+///    tabs share `RootTabView`'s, and the first-run screen and the serving sheet each stand
+///    their own. When every tab's screen stood one as well and was kept alive, each copy started
+///    its lights when it was first shown, and the backdrop changed at every change of tab.
+///    ``AuroraDrift`` places a light by ``AuroraClock``, which every copy reads, and not by how
+///    long that copy has been running — which is still what makes setup, a sheet and the tabs
+///    one surface.
 struct AuroraBackground: View {
 
     /// One of the three lights behind the glass.
@@ -107,8 +115,8 @@ struct AuroraBackground: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// Flipped once, on appear, to send every light toward its far endpoint. The `repeatForever`
-    /// curve does the rest — this is a starting pistol, not a clock.
+    /// Flipped once, on appear, to send every light toward its far endpoint. ``AuroraDrift``
+    /// does the rest — this is a starting pistol, not a clock.
     @State private var drifting = false
 
     var body: some View {
@@ -145,9 +153,61 @@ struct AuroraBackground: View {
         .animation(
             // `nil` rather than a shorter curve: Reduce Motion is aimed squarely at a loop that
             // never stops, and there is no gentler version of "forever" to offer.
-            reduceMotion ? nil : .easeInOut(duration: light.period).repeatForever(autoreverses: true),
+            reduceMotion ? nil : Animation(AuroraDrift(period: light.period)),
             value: moved
         )
+    }
+}
+
+// MARK: - One sky
+
+/// The clock every backdrop reads.
+///
+/// It starts when the first backdrop is drawn, so the app still opens on the resting frame, and
+/// runs on the device's uptime from there: a figure every copy of the backdrop can read and none
+/// of them owns. `nonisolated`, because an animation is asked for its value wherever SwiftUI
+/// likes (rule `43-concurrency`).
+nonisolated enum AuroraClock {
+
+    /// The uptime at which the clock was first read. A lazy constant: set once, by whichever
+    /// backdrop draws first.
+    static let epoch: TimeInterval = ProcessInfo.processInfo.systemUptime
+
+    /// The seconds since ``epoch``, never less than none. The uptime is a parameter so that a
+    /// test can hold it still (rule `00-workspace`).
+    static func elapsed(uptime: TimeInterval = ProcessInfo.processInfo.systemUptime) -> TimeInterval {
+        max(0, uptime - epoch)
+    }
+}
+
+/// One light's journey — out to its far point and back, for ever — placed by ``AuroraClock``.
+///
+/// The journey is the one `easeInOut(duration:).repeatForever(autoreverses: true)` drew, and
+/// that is what this replaced. A built-in animation counts from the moment it starts, so two
+/// backdrops started a minute apart stay a minute apart; this one is not asked how long it has
+/// run. It reads the shared clock, and every backdrop on it stands in the same place.
+nonisolated struct AuroraDrift: CustomAnimation {
+
+    /// Seconds for one leg of the journey.
+    let period: Double
+
+    /// How far along its travel a light is: `0` at rest, `1` at its far point. At rest for a
+    /// clock that has not started and for a period that is not one — never a division by zero.
+    static func progress(at clock: TimeInterval, period: Double) -> Double {
+        guard period > 0, clock > 0, clock.isFinite else { return 0 }
+        let legs = (clock / period).truncatingRemainder(dividingBy: 2)
+        return UnitCurve.easeInOut.value(at: legs <= 1 ? legs : 2 - legs)
+    }
+
+    /// How much of `value` — the whole distance to the far point — is covered at `clock`.
+    func displacement<V: VectorArithmetic>(of value: V, clock: TimeInterval) -> V {
+        value.scaled(by: Self.progress(at: clock, period: period))
+    }
+
+    /// Never `nil`: the journey does not end. `time`, the seconds this animation has run, is
+    /// deliberately unread.
+    func animate<V: VectorArithmetic>(value: V, time: TimeInterval, context: inout AnimationContext<V>) -> V? {
+        displacement(of: value, clock: AuroraClock.elapsed())
     }
 }
 

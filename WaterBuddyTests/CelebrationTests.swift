@@ -12,8 +12,9 @@ import Testing
 
 // MARK: - Haptics
 
-/// The feedback ladder. Three rungs, and the distance between them is the whole point — a product
-/// where every tap feels identical is one where nothing feels like an achievement.
+/// The feedback ladder. Three impacts of rising weight, and the distance between them is the whole
+/// point — a product where every tap feels identical is one where nothing feels like an
+/// achievement. Beside them, a lighter impact for something taken away and the selection tick.
 ///
 /// Not `@MainActor`: these are plain numbers, and keeping the suite off the main actor is what
 /// stops someone quietly moving them onto a `View` (rule `43-concurrency`).
@@ -33,9 +34,15 @@ struct HapticLadderTests {
     }
 
     @Test func everyRungIsWithinTheLegalRange() {
-        for intensity in [Haptics.confirmIntensity, Haptics.pourIntensity, Haptics.goalIntensity] {
+        for intensity in [Haptics.confirmIntensity, Haptics.pourIntensity, Haptics.goalIntensity, Haptics.removeIntensity] {
             #expect(intensity > 0 && intensity <= 1, "an impact intensity outside 0...1 is ignored")
         }
+    }
+
+    /// Something taken away is felt, and never more firmly than something confirmed: a delete
+    /// that thumped like a pour would read as the app applauding it.
+    @Test func takingAwayIsNoFirmerThanAConfirmation() {
+        #expect(Haptics.removeIntensity <= Haptics.confirmIntensity)
     }
 
     /// Reaching the goal is the firmest thing the app does. If a pour ever matched it, the moment

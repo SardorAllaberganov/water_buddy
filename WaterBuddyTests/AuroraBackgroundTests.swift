@@ -96,3 +96,73 @@ struct AuroraLightTests {
         #expect(light.period <= 60, "so slow the backdrop reads as static anyway")
     }
 }
+
+// MARK: - One sky
+
+/// Where a light is on its journey, as a function of one clock every backdrop reads.
+///
+/// More than one ``AuroraBackground`` is on screen in a session — the tabs' own, the first-run
+/// screen's, the serving sheet's — and each used to start its lights when it was first shown.
+/// When every tab's screen stood its own and was kept alive, the three ran out of step and the
+/// backdrop changed at every change of tab: read in the screens' side margins, three of four
+/// cuts moved it by 12.5 to 16.3 levels where four seconds of drift moves it by 3.1 to 5.5
+/// (`docs/DESIGN.md`, *One sky*).
+///
+/// Not `@MainActor`: the animation is asked for its value wherever SwiftUI likes, so everything
+/// it reads is `nonisolated` (rule `43-concurrency`).
+struct AuroraDriftTests {
+
+    /// A light rests at the start, stands at its far point one period on, and is back a period
+    /// after that — the journey `easeInOut(duration:).repeatForever(autoreverses:)` drew.
+    @Test func aLightGoesThereAndBackInTwoPeriods() {
+        #expect(abs(AuroraDrift.progress(at: 0, period: 16)) < 1e-6)
+        #expect(abs(AuroraDrift.progress(at: 16, period: 16) - 1) < 1e-6)
+        #expect(abs(AuroraDrift.progress(at: 32, period: 16)) < 1e-6)
+        #expect(abs(AuroraDrift.progress(at: 48, period: 16) - 1) < 1e-6)
+    }
+
+    /// Slow away from each end and halfway at the middle of a leg: the curve the lights have
+    /// always travelled on.
+    @Test func theJourneyEasesInAndOut() {
+        #expect(abs(AuroraDrift.progress(at: 8, period: 16) - 0.5) < 0.001)
+        #expect(AuroraDrift.progress(at: 2, period: 16) < 2.0 / 16)
+        #expect(AuroraDrift.progress(at: 14, period: 16) > 14.0 / 16)
+    }
+
+    /// The way back is the way out, run backwards — a light never jumps at its far point.
+    @Test func theWayBackMirrorsTheWayOut() {
+        for step in stride(from: 0.0, through: 16, by: 0.5) {
+            let out = AuroraDrift.progress(at: 16 - step, period: 16)
+            let back = AuroraDrift.progress(at: 16 + step, period: 16)
+            #expect(abs(out - back) < 1e-9, "the two legs part \(step) s from the far point")
+        }
+    }
+
+    /// **Where a light stands is the clock's to say, and nothing else's.** The animation is
+    /// handed the clock and the distance to cover; it is not asked how long it has been running
+    /// itself, which is what differed between a screen shown at launch and one shown a minute
+    /// later.
+    @Test func whereALightStandsIsTheClocksToSay() {
+        let drift = AuroraDrift(period: 22.5)
+
+        #expect(drift.displacement(of: 100.0, clock: 0) == 0)
+        #expect(abs(drift.displacement(of: 100.0, clock: 22.5) - 100) < 1e-4)
+        #expect(drift.displacement(of: 100.0, clock: 75) == 100 * AuroraDrift.progress(at: 75, period: 22.5))
+    }
+
+    /// The clock starts when the first backdrop is drawn and never runs backwards, so the app
+    /// still opens on the resting frame — the design that shipped.
+    @Test func theClockStartsAtNothingAndNeverRunsBackwards() {
+        #expect(abs(AuroraClock.elapsed(uptime: AuroraClock.epoch + 5) - 5) < 1e-6)
+        #expect(AuroraClock.elapsed(uptime: AuroraClock.epoch) == 0)
+        #expect(AuroraClock.elapsed(uptime: AuroraClock.epoch - 30) == 0)
+    }
+
+    /// A clock before its start, or a period that is not one, leaves a light at rest — never a
+    /// division by zero drawn as a light at infinity.
+    @Test func aBrokenClockLeavesTheLightAtRest() {
+        #expect(AuroraDrift.progress(at: -5, period: 16) == 0)
+        #expect(AuroraDrift.progress(at: 10, period: 0) == 0)
+        #expect(AuroraDrift.progress(at: .nan, period: 16) == 0)
+    }
+}

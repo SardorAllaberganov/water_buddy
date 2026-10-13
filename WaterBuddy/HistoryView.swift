@@ -153,9 +153,16 @@ struct HistoryView: View {
         return row.first { $0.isUsual && $0.amount == amount } ?? row.first { $0.amount == amount }
     }
 
-    /// The screen's side margin. The week card's seven day buttons are budgeted against it:
-    /// `(375 − 2 × 28) / 7 = 45.6` pt on the narrowest supported iPhone, over the 44-pt floor.
-    nonisolated static let margin: CGFloat = 28
+    /// The screen's side margin — the one every tab shares (``ScreenMetrics``). The week card's
+    /// seven day buttons are budgeted against it: `(375 − 2 × 24) / 7 = 46.7` pt on the narrowest
+    /// supported iPhone, over the 44-pt floor (`sevenDaysClearTheTapFloorOnTheNarrowestPhone`).
+    nonisolated static let margin = ScreenMetrics.margin
+
+    /// Where the shown day's marker stands in a row `width` wide that `count` days share
+    /// evenly: at the leading edge of the slot of the day at `index`.
+    nonisolated static func markerOffset(ofDay index: Int, among count: Int, across width: CGFloat) -> CGFloat {
+        CGFloat(index) * width / CGFloat(max(count, 1))
+    }
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
@@ -163,69 +170,105 @@ struct HistoryView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// The day the week card picked, as an ordinal — `nil` for today. Presentation state, which is
-    /// the only kind a view owns (rule `50-views`); leaving the tab resets it to today.
+    /// the only kind a view owns (rule `50-views`); leaving the tab resets it to today, when the
+    /// screen disappears.
     @State private var selectedDay: Int?
 
     /// What the serving sheet is open for. Presentation state too — the servings themselves live on
     /// the model.
     @State private var editor: ServingEditor?
 
+    /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
+    @State private var arrived = false
+
+    /// Bumped when a day is picked, and when a serving is swiped away: each haptic fires on the
+    /// user's own action, never on a change to the model (rule `60-design-system`).
+    @State private var picks = 0
+    @State private var removals = 0
+
     /// The `+`'s diameter, a real magnitude scaled with the header's own text (rule
     /// `65-accessibility`), bounded at its use site.
     @ScaledMetric(relativeTo: .title2) private var addButtonSize: CGFloat = 44
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
+        // No backdrop of its own: the three tabs share the one `RootTabView` stands, which holds
+        // still while the pages slide over it.
+        //
+        // One list, and everything on the screen is a row of it. The header and the week card
+        // stood fixed above a list of servings until a second card arrived: with both fixed, a
+        // small phone had no room left for the rows the cards describe.
+        List {
+            header
+                // Every tab's inset, less the point this list itself stands off the safe area.
+                .historyRow(top: ScreenMetrics.topInset - 1, bottom: 10)
 
-            // One list, and everything on the screen is a row of it. The header and the week card
-            // stood fixed above a list of servings until a second card arrived: with both fixed,
-            // a small phone had no room left for the rows the cards describe.
-            List {
-                header
-                    .historyRow(top: 24, bottom: 10)
-
-                // Drawn only once there is a past to show. A fresh install would otherwise open on
-                // seven empty bars, which reads as a broken chart rather than as a new account —
-                // and this is the one screen guaranteed to render its empty state for every new
-                // user. Note the condition is `history`, not `todaysLogs`: the morning after a
-                // rollover, today is empty and the week is exactly what the user wants to see.
-                if hasSomethingToShow {
-                    HistoryCard(shown: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal) { ordinal in
-                        selectedDay = Self.selection(forDay: ordinal, in: manager.history)
-                    }
-                    .historyRow()
+            // Drawn only once there is a past to show. A fresh install would otherwise open on
+            // seven empty bars, which reads as a broken chart rather than as a new account — and
+            // this is the one screen guaranteed to render its empty state for every new user.
+            // Note the condition is `history`, not `todaysLogs`: the morning after a rollover,
+            // today is empty and the week is exactly what the user wants to see.
+            if hasSomethingToShow {
+                HistoryCard(
+                    shown: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal,
+                    arrived: arrived
+                ) { ordinal in
+                    let picked = Self.selection(forDay: ordinal, in: manager.history)
+                    // A tick for a choice, and none for a tap on the day already shown.
+                    if picked != selectedDay { picks += 1 }
+                    selectedDay = picked
                 }
-
-                if shownLogs.isEmpty {
-                    emptyState
-                        .historyRow(top: 22)
-                } else {
-                    // Today's strip also marks the next reminder; a past day has none to mark.
-                    DayStrip(logs: shownLogs, marksReminder: shownPastDay == nil)
-                        .historyRow()
-
-                    servings
-                }
+                // Were History the page the app opens on, everything under the header would
+                // settle in; a page that slides in is whole as it comes (``Arrival``).
+                .arrives(arrived, order: 0)
+                .historyRow()
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            // Scoped to the value that actually changed — never a bare `withAnimation` around a model
-            // mutation. Identity, not amount: an edit redraws its own row and must not slide the list.
-            .animation(.smooth(duration: 0.35), value: shownLogs.map(\.id))
-            // One point clear of the status bar, and it is not spacing. A scroll view whose top
-            // edge meets the safe area's draws its content on up under the status bar; with
-            // nothing fixed above the list any more, the rows ran under the clock and the battery
-            // — *15:26* printed across *250 ml*. A list that stops short of that edge is clipped
-            // at its own, as it always was under the header that used to stand here.
-            .padding(.top, 1)
+
+            if shownLogs.isEmpty {
+                emptyState
+                    .arrives(arrived, order: 1)
+                    .historyRow(top: 22)
+            } else {
+                // Today's strip also marks the next reminder; a past day has none to mark.
+                DayStrip(
+                    logs: shownLogs,
+                    day: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal,
+                    marksReminder: shownPastDay == nil,
+                    arrived: arrived
+                )
+                    .arrives(arrived, order: 1)
+                    .historyRow()
+
+                servings
+            }
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        // Scoped to the value that actually changed — never a bare `withAnimation` around a model
+        // mutation. Identity, not amount: an edit redraws its own row and must not slide the list.
+        .animation(.smooth(duration: 0.35), value: shownLogs.map(\.id))
+        // One point clear of the status bar, and it is not spacing. A scroll view whose top edge
+        // meets the safe area's draws its content on up under the status bar; with nothing fixed
+        // above the list any more, the rows ran under the clock and the battery — *15:26*
+        // printed across *250 ml*. A list that stops short of that edge is clipped at its own,
+        // as it always was under the header that used to stand here.
+        .padding(.top, 1)
+        // Its rows recede as they scroll past its top and the foot of the screen
+        // (``ScrollDepth``).
+        .scrollDepthContainer()
         // No `.preferredColorScheme` and no `.presentationDragIndicator` here any more: this is a
         // tab, not a sheet. There is nothing to drag down, and the dark-appearance preference is
         // declared once on `RootTabView`, which owns the hosting controller both tabs share.
         // Another process may have logged while this one was away, and the day may have turned.
         // `refresh()` re-derives the rows as well as the total, so both arrive together.
         .onAppear { manager.refresh() }
+        // Leaving the tab returns the screen to today, and nothing here has to say so: a page
+        // is rebuilt each time it is shown (`testHistoryReturnsToTodayWhenItsTabIsLeft`). A
+        // sheet over this screen does not rebuild it, so the day a serving was just saved to
+        // stays shown.
+        .tracksArrival($arrived)
+        // A tick for a day picked, a light tap for a serving taken away.
+        .sensoryFeedback(Haptics.select, trigger: picks)
+        .sensoryFeedback(Haptics.remove, trigger: removals)
         // A selection the card can no longer show is dropped, so it cannot resurface on a later
         // serving and take the screen back to a day the user had left.
         .onChange(of: hasSomethingToShow) { _, isShowing in
@@ -288,47 +331,32 @@ struct HistoryView: View {
     ///
     /// The first row of the list, so it scrolls away with it: nothing on this screen is fixed.
     ///
-    /// **The `+` shares the title's line, and the total has the row's whole width** — Home's
-    /// header, for Home's reason. With the `+` beside both lines, the total was left a column too
-    /// narrow for it at the largest text size and was cut short: *7 150 из 2 000…*, on the line
-    /// that says how much.
+    /// **The `+` shares the title's line, and the total has the row's whole width** — every
+    /// tab's header (``ScreenHeader``). With the `+` beside both lines, the total was left a
+    /// column too narrow for it at the largest text size and was cut short: *7 150 из 2 000…*, on
+    /// the line that says how much.
     private var header: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 12) {
-                dayTitle
-                    .font(.largeTitle.weight(.bold))
-                    // First call on the line's width, and rigid in height: it may shrink for a
-                    // long day's name at a large text size, and for nothing else.
-                    .layoutPriority(1)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .legibleOnBackdrop()
-
-                // No settings gear here any more. It lived in this header while Settings was a
-                // sheet, and it became the bar's third tab: one screen of preferences reached
-                // through *another* screen's header is a route a user finds once and then hunts
-                // for. Two routes to one destination is what the tab bar replaced, not something
-                // it joins — `testSettingsIsReachableFromHomeAsATab` asserts exactly one control
-                // is labelled Settings. The `+` that sits here now is the *only* route to the
-                // serving sheet.
-                Spacer(minLength: 0)
-
-                addButton
-            }
-
+        ScreenHeader {
+            dayTitle
+        } detail: {
             // Both figures come off the model. The list adds up to this number, and a `body`
             // that computed it for itself is how the two start disagreeing
             // (rule `10-architecture`). Grouped by the app's locale, like Home's.
             Text(strings.figure("%1$@ of %2$@ ml", shownTotal, manager.dailyGoal, locale: locale))
-                .font(.headline)
                 .fontDesign(.rounded)
                 .monospacedDigit()
-                .legibleOnBackdrop()
                 .contentTransition(.numericText(value: Double(shownTotal)))
                 .accessibilityHidden(true)
+        } accessory: {
+            // No settings gear here any more. It lived in this header while Settings was a
+            // sheet, and it became the bar's third tab: one screen of preferences reached
+            // through *another* screen's header is a route a user finds once and then hunts
+            // for. Two routes to one destination is what the tab bar replaced, not something
+            // it joins — `testSettingsIsReachableFromHomeAsATab` asserts exactly one control
+            // is labelled Settings. The `+` that sits here now is the *only* route to the
+            // serving sheet.
+            addButton
         }
-        .lineLimit(1)
-        .minimumScaleFactor(0.6)
-        .foregroundStyle(.white)
         .padding(.horizontal, Self.margin)
         .animation(.smooth(duration: 0.5), value: shownTotal)
     }
@@ -428,6 +456,7 @@ struct HistoryView: View {
                 // that renames a row after the vessels are edited.
                 vessel: Self.vessel(forAmount: log.amount, amounts: manager.servings)
             ) { editor = .editing(log) }
+            .arrives(arrived, order: 2)
             // The pane is the row.
             .historyRow(top: 5, bottom: 5, sides: Self.margin)
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -435,6 +464,7 @@ struct HistoryView: View {
                 // rung by the setter, not from here (rule `20-state`).
                 Button(role: .destructive) {
                     manager.deleteLog(log)
+                    removals += 1
                 } label: {
                     // The closure form, because `Label(_:systemImage:)` has no bundle
                     // parameter and this string has to follow the chosen language like
@@ -502,8 +532,12 @@ private extension View {
     ///
     /// `sides` is zero for the header and the cards, which carry the screen's margin themselves —
     /// the week card's day row is budgeted against it — and the margin for a serving.
+    ///
+    /// Every row recedes as it scrolls past the top or the foot of the list (``ScrollDepth``),
+    /// the header included: it is a row like the rest and leaves like them.
     func historyRow(top: CGFloat = 8, bottom: CGFloat = 8, sides: CGFloat = 0) -> some View {
-        listRowBackground(Color.clear)
+        scrollDepth()
+            .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
             .listRowInsets(EdgeInsets(top: top, leading: sides, bottom: bottom, trailing: sides))
     }
@@ -531,8 +565,8 @@ private extension View {
 /// a second unmeasured contrast figure; both are measured now (`docs/DESIGN.md`).
 ///
 /// **Each day is a button, and the day row alone runs the card's full width.** Seven equal slots of
-/// `(375 − 2 × 28) / 7 = 45.6` pt on the narrowest supported iPhone clear the 44-pt floor rule
-/// `65-accessibility` sets; inside the card's 20-pt inset they would be 39.9 pt and miss it. That is
+/// `(375 − 2 × 24) / 7 = 46.7` pt on the narrowest supported iPhone clear the 44-pt floor rule
+/// `65-accessibility` sets; inside the card's 20-pt inset they would be 41.0 pt and miss it. That is
 /// the width ``DataManager/historyWindow``'s DocC budgeted, and why the title, the figures and the
 /// disclosure keep their inset while the bars sit ``barInset`` in from their own slots instead.
 ///
@@ -546,11 +580,21 @@ private struct HistoryCard: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     /// The day the list below is showing — outlined here, and announced as selected.
     let shown: Int?
 
+    /// Whether the screen has arrived (``Arrival``).
+    let arrived: Bool
+
     /// Hands the tapped day back to the screen, which owns the selection (rule `50-views`).
     let select: (Int) -> Void
+
+    /// The bars stand at nothing until the screen has arrived, and grow from the baseline as it
+    /// does. Under Reduce Motion they are simply there: growing is travel, and that setting is
+    /// what turns travel off (rule `65-accessibility`).
+    private var grown: Bool { arrived || reduceMotion }
 
     /// A real magnitude, never a unitless `1` that is then multiplied — `UIFontMetrics` rounds to
     /// the nearest third of a point, which would quantise twelve Dynamic Type categories into
@@ -650,12 +694,15 @@ private struct HistoryCard: View {
         // whose frame could give way shrank under its content, and at `AccessibilityXXXL` the bars
         // rose through the title while the weekday letters sank into the figures.
         .fixedSize(horizontal: false, vertical: true)
+        .background { marker }
         .overlay(alignment: .top) { goalLine }
         // Once per change, not perpetual, so it is deliberately **not** gated on Reduce Motion —
         // that setting is aimed at sustained motion, and the resting frame here is the design
         // (rule `65-accessibility`).
         .animation(.smooth(duration: 0.45), value: manager.history)
         .animation(.smooth(duration: 0.3), value: shown)
+        // Once, as the screen arrives, a moment after the card that carries them.
+        .animation(.smooth(duration: 0.5).delay(Arrival.delay(order: 1)), value: grown)
     }
 
     private func dayButton(for day: DaySummary) -> some View {
@@ -689,18 +736,8 @@ private struct HistoryCard: View {
             .padding(.vertical, slotPadding)
             // The whole slot is the target, never just the bar (rule `65-accessibility`).
             .frame(maxWidth: .infinity, minHeight: 44)
-            .background {
-                // The shown day's lit rim. Present for every day at zero opacity rather than
-                // inserted for one, so moving the selection animates a colour instead of a layer
-                // (rule `50-views`). A rim and a weight change, never colour alone
-                // (rule `65-accessibility`). Measured off a render, the 0.55 stroke reads 4.15:1
-                // against the pane beside it, sRGB (0.188, 0.277, 0.390) — over the 3:1 floor
-                // for a non-text mark.
-                Capsule()
-                    .fill(.white.opacity(isShown ? LiquidGlass.Selection.fillOpacity : 0))
-                    .strokeBorder(.white.opacity(isShown ? LiquidGlass.Selection.rimOpacity : 0), lineWidth: 1)
-                    .padding(.horizontal, 3)
-            }
+            // The shown day's lit rim is not drawn here: it is one capsule behind the whole row,
+            // moved from day to day (``marker``).
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -737,8 +774,36 @@ private struct HistoryCard: View {
                 .fill(day.reached(manager.dailyGoal) ? Aurora.cyan : Color.white)
                 // A day with nothing logged still draws a sliver, so the bar reads as an empty day
                 // rather than as a missing one. The series is zero-filled for the same reason.
-                .frame(height: max(barHeight * fraction, day.total > 0 ? 6 : 2))
+                .frame(height: grown ? max(barHeight * fraction, day.total > 0 ? 6 : 2) : 0)
         }
+    }
+
+    /// The shown day's lit capsule: one, behind the row of days, moved to the day that is shown.
+    ///
+    /// Every day had its own until the app was asked for more life: seven capsules at zero
+    /// opacity, one of them lit, and a change of day was two colours cross-fading. One that
+    /// travels says where the selection went. It is always there — never inserted or removed —
+    /// so what animates is a place and not a layer (rule `50-views`), and it lands
+    /// (``Motion/land``): past the day and back, once.
+    ///
+    /// The same two tokens, so "selected" is still drawn one way in the app. A rim and a weight
+    /// change, never colour alone (rule `65-accessibility`): the day's letter carries the
+    /// weight. Measured off a render, the 0.55 stroke reads 4.15:1 against the pane beside it,
+    /// sRGB (0.188, 0.277, 0.390) — over the 3:1 floor for a non-text mark.
+    private var marker: some View {
+        GeometryReader { proxy in
+            let count = manager.history.count
+            let index = manager.history.firstIndex { $0.dayOrdinal == shown }
+
+            Capsule()
+                .fill(.white.opacity(index == nil ? 0 : LiquidGlass.Selection.fillOpacity))
+                .strokeBorder(.white.opacity(index == nil ? 0 : LiquidGlass.Selection.rimOpacity), lineWidth: 1)
+                .padding(.horizontal, 3)
+                .frame(width: proxy.size.width / CGFloat(max(count, 1)))
+                .offset(x: HistoryView.markerOffset(ofDay: index ?? 0, among: count, across: proxy.size.width))
+                .animation(Motion.land, value: index)
+        }
+        .allowsHitTesting(false)
     }
 
     /// One line across all seven bars at the goal's height. Drawn over the buttons and outside the
@@ -870,8 +935,26 @@ private struct DayStrip: View {
     /// The shown day's servings.
     let logs: [WaterLog]
 
+    /// Which day these servings are from, as its ordinal. When it changes, the bars start again
+    /// from the baseline.
+    let day: Int?
+
     /// Whether to mark the next reminder — today only.
     let marksReminder: Bool
+
+    /// Whether the screen has arrived (``Arrival``).
+    let arrived: Bool
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// The day whose bars have been let grow. A turn behind ``day`` whenever that changes,
+    /// which is the moment the bars stand at nothing.
+    @State private var raised: Int?
+
+    /// As the week card's bars: nothing until the screen has arrived, then grown from the
+    /// baseline — and again each time another day is picked, so the strip is seen to be redrawn
+    /// for that day and not merely to have changed. Simply there under Reduce Motion.
+    private var grown: Bool { reduceMotion || (arrived && raised == day) }
 
     /// A real magnitude, capped at its use site (rule `65-accessibility`): a decorative
     /// dimension that grew with the text would push the servings off the screen.
@@ -936,7 +1019,7 @@ private struct DayStrip: View {
                         // A dark hairline round each bar. Two drinks inside forty minutes
                         // overlap on a plot this wide, and without an edge they are one wide bar.
                         .overlay { Capsule().strokeBorder(.black.opacity(0.45), lineWidth: 1) }
-                        .frame(width: barWidth, height: max(proxy.size.height * bar.height, barWidth))
+                        .frame(width: barWidth, height: grown ? max(proxy.size.height * bar.height, barWidth) : 0)
                         .offset(x: travel * bar.position)
                 }
 
@@ -946,6 +1029,13 @@ private struct DayStrip: View {
         }
         .frame(height: plotHeight)
         .animation(.smooth(duration: 0.45), value: bars)
+        // As the screen arrives, a moment after the card that carries them, and each time
+        // another day is picked. Only the way up is this curve's: the day being left has other
+        // bars, which fade out on the line above while the new day's grow.
+        .animation(grown ? .smooth(duration: 0.5).delay(Arrival.delay(order: 2)) : nil, value: grown)
+        // A turn after the day changes, so one frame is drawn with the new day's bars at
+        // nothing and there is something to grow from.
+        .task(id: day) { raised = day }
     }
 
     /// The next reminder, as a white rule under a bell — told from a serving by its shape as well
@@ -1231,6 +1321,9 @@ private struct ServingSheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(Haptics.pour, trigger: commits)
+        // A tick for each step of the slider and for a vessel picked. The amount under the
+        // finger is the sheet's own state and no model value (rule `60-design-system`).
+        .sensoryFeedback(Haptics.select, trigger: amount)
     }
 
     private var title: some View {
@@ -1379,6 +1472,10 @@ private struct ServingSheet: View {
                 Capsule()
                     .fill(.white.opacity(isSelected ? LiquidGlass.Selection.fillOpacity : 0))
                     .strokeBorder(.white.opacity(isSelected ? LiquidGlass.Selection.rimOpacity : 0), lineWidth: 1)
+                    // The lozenge lands on the vessel that was picked: from a little small, past
+                    // its size and back. The colour beside it still changes on `.smooth`.
+                    .scaleEffect(isSelected ? 1 : 0.9)
+                    .animation(Motion.land, value: isSelected)
             }
             .contentShape(Rectangle())
         }
@@ -1517,9 +1614,12 @@ private func previewManager(named name: String) -> DataManager {
         manager.addLog(amount: 750, at: earlier.addingTimeInterval(14 * 3_600))
     }
 
-    return HistoryView().environment(manager)
+    // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
+    return HistoryView().background { AuroraBackground() }.environment(manager)
 }
 
 #Preview("Nothing logged") {
-    HistoryView().environment(previewManager(named: "preview.waterbuddy.history.empty"))
+    HistoryView()
+        .background { AuroraBackground() }
+        .environment(previewManager(named: "preview.waterbuddy.history.empty"))
 }

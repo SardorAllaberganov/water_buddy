@@ -119,14 +119,34 @@ struct HomeView: View {
     /// read, and a screen that is short of room scrolls instead.
     nonisolated static let vesselFloor: CGFloat = 200
 
+    /// How the date under the title is written: the weekday and the month spelled out.
+    nonisolated static let dateFormat = Date.FormatStyle.dateTime.weekday(.wide).day().month(.wide)
+
+    /// The least the date under the title may be drawn at, as a share of its own size — further
+    /// than its neighbours may shrink, because it is the longest line a header draws.
+    ///
+    /// **Measured against the widest date there is.** At `0.6` the date was cut short on a
+    /// 375 pt phone at the largest text size — *Воскресенье, 11 октя…*. `0.5` held for that
+    /// day and not for every day: *Понедельник, 28 сентября* is 665.9 pt wide in the header's
+    /// second line at that size and needs 0.491 of it to fit the 327 pt between the margins
+    /// (`theWidestDateFitsTheNarrowestPhoneAtTheLargestTextSize`). At this floor the line is
+    /// still drawn larger there than at the ordinary size: 24 pt against 17.
+    nonisolated static let dateScaleFloor: CGFloat = 0.45
+
     /// Ceilings for the quick-add discs, so one vessel cannot fill the screen at the
     /// accessibility sizes. The row scrolls sideways before a disc gives up its size.
     nonisolated static let sideDiscCeiling: CGFloat = 92
     nonisolated static let glassDiscCeiling: CGFloat = 120
 
     /// The column's margins. ``HomeColumn`` is told the visible height less the top and bottom
-    /// of these, so the two cannot drift apart.
-    nonisolated static let columnPadding = EdgeInsets(top: 8, leading: 24, bottom: 20, trailing: 24)
+    /// of these, so the two cannot drift apart. The top and the sides are every tab's
+    /// (``ScreenMetrics``), which is what stands the title in one place on all three.
+    nonisolated static let columnPadding = EdgeInsets(
+        top: ScreenMetrics.topInset,
+        leading: ScreenMetrics.margin,
+        bottom: 20,
+        trailing: ScreenMetrics.margin
+    )
 
     /// The diameters the vessel may take: its scaled design size at most, less when the screen is
     /// short of room, and never under the floor.
@@ -139,7 +159,8 @@ struct HomeView: View {
     /// size and left 42 pt of each disc showing at the largest, where this floor keeps the whole
     /// row on screen up to the fourth and the discs, without their captions, at the fifth. The
     /// cost is the line inside the vessel, a ratio of it: 11 pt at the floor, whatever the text
-    /// size.
+    /// size. Those figures were taken under the app's own bar, before every tab shared a
+    /// header; under Apple's taller bar they have not been taken again.
     nonisolated static func vesselRange(scaled: CGFloat) -> ClosedRange<CGFloat> {
         let ceiling = min(scaled, vesselCeiling)
         return min(vesselFloor, ceiling)...ceiling
@@ -169,20 +190,34 @@ struct HomeView: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverRunning
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
     /// Bumped on every pour. Drives the haptic, so a daily rollover cannot fire one.
     @State private var pours = 0
+    /// The drops on their way from a disc to the vessel: one a pour, gone when it lands. None
+    /// under Reduce Motion (``PourDrop``).
+    @State private var flights: [PourFlight] = []
+    /// Bumped as a drop lands. Drives the vessel's swell.
+    @State private var landings = 0
+    /// How many times each vessel has been poured from this screen, by slot. Drives that disc's
+    /// own bounce, so only the one that was pressed answers.
+    @State private var poured: [String: Int] = [:]
     /// Bumped when a pour is taken back.
     @State private var undos = 0
+    /// Bumped when the streak goes up. Drives the flame's bounce, so a count that drops — the
+    /// pour that reached the goal, taken back — does not play it.
+    @State private var streakRises = 0
     /// Bumped each time the goal is crossed **upward**, and used as the confetti's seed as well as
     /// its trigger — so two celebrations in one day are two different bursts, not a replay.
     @State private var goalBursts = 0
     /// When water last landed. The waves read this to slosh and settle.
     @State private var lastPour = Date.distantPast
-    /// The pour this screen can take back. Presentation state: it lives and dies with the view,
-    /// which `RootTabView` rebuilds on every tab change — so leaving the tab ends the offer.
+    /// The pour this screen can take back. Presentation state: it lives with the screen, and the
+    /// screen ends it when it disappears — so leaving the tab ends the offer.
     @State private var undoOffer: UndoOffer?
+    /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
+    @State private var arrived = false
 
     /// Real magnitudes, never a unitless `1`: `@ScaledMetric` resolves through `UIFontMetrics`,
     /// which rounds to the nearest third of a point (rule `65-accessibility`).
@@ -191,33 +226,39 @@ struct HomeView: View {
     @ScaledMetric(relativeTo: .title3) private var scaledGlassDisc: CGFloat = 88
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-
-            // The app's idiom for a screen that can outgrow the display — a reader for the visible
-            // height, and a scroll view that only bounces when there is something to scroll —
-            // with ``HomeColumn`` where the other screens have a `VStack`, because this column
-            // has a part that must shrink before anything scrolls.
-            GeometryReader { proxy in
-                ScrollView {
-                    HomeColumn(
-                        height: proxy.size.height - Self.columnPadding.top - Self.columnPadding.bottom,
-                        vessel: Self.vesselRange(scaled: scaledVessel)
-                    ) {
-                        header
-                        vessel
-                        status
-                        quickAddRow
-                    }
-                    .padding(Self.columnPadding)
-                    .frame(maxWidth: .infinity)
+        // No backdrop of its own: the three tabs share the one `RootTabView` stands, which holds
+        // still while the pages slide over it.
+        //
+        // The app's idiom for a screen that can outgrow the display — a reader for the visible
+        // height, and a scroll view that only bounces when there is something to scroll — with
+        // ``HomeColumn`` where the other screens have a `VStack`, because this column has a part
+        // that must shrink before anything scrolls.
+        GeometryReader { proxy in
+            ScrollView {
+                HomeColumn(
+                    height: proxy.size.height - Self.columnPadding.top - Self.columnPadding.bottom,
+                    vessel: Self.vesselRange(scaled: scaledVessel)
+                ) {
+                    // When the app opens, everything under the header settles in; a page that
+                    // slides in is whole as it comes (``Arrival``).
+                    header
+                    vessel.arrives(arrived, order: 0)
+                    status.arrives(arrived, order: 1)
+                    quickAddRow.arrives(arrived, order: 2)
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                // The vessel floats 44 pt of shadow and throws confetti past its rim; a scroll
-                // view clips to its bounds, and both would be sliced off square
-                // (rule `60-design-system`).
-                .scrollClipDisabled()
+                .padding(Self.columnPadding)
+                .frame(maxWidth: .infinity)
+                // Over the column and inside the scroll view, so a drop is drawn where the disc
+                // and the vessel are and scrolls with them.
+                .overlayPreferenceValue(PourPlaces.self) { places in
+                    drops(between: places)
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            // The vessel floats 44 pt of shadow and throws confetti past its rim; a scroll view
+            // clips to its bounds, and both would be sliced off square
+            // (rule `60-design-system`).
+            .scrollClipDisabled()
         }
         // The dark-appearance ruling lives on `RootTabView`: one hosting controller, one place to
         // declare the preference.
@@ -240,9 +281,15 @@ struct HomeView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { undoOffer = nil }
         }
-        .animation(.smooth(duration: 0.3), value: standingOffer)
-        .animation(.smooth(duration: 0.3), value: manager.streak)
+        .onChange(of: manager.streak) { was, now in
+            if now > was { streakRises += 1 }
+        }
         .onAppear { manager.refresh() }
+        // Leaving the tab ends the offer, and nothing here has to say so: a page is rebuilt when
+        // its tab is shown, and its state with it (`testAnUndoOfferDoesNotOutliveItsScreen`).
+        // The one page that is not is one returned to before it had finished sliding out — it
+        // never left, and its offer is still its own.
+        .tracksArrival($arrived)
     }
 
     private var percentage: Int {
@@ -264,52 +311,35 @@ struct HomeView: View {
     /// title inside it as a second element named *Today* for anything that walks the tree, which
     /// is how `testHomeIsHeadedTodayOnce` first failed.
     ///
-    /// The date has the row's whole width and the chip shares the title's line. With the chip
-    /// beside both, the date was left a column too narrow for it at the largest text size and was
-    /// cut short — *Sunday, 11 O…* — on the one line that says which day this is.
+    /// **The date stands under the title**, as History's total does, so *Today* is in one place
+    /// on both (``ScreenHeader``, `testTheTitleHoldsItsPlaceOnEveryTab`). It was drawn above the
+    /// title until the two screens were first compared. There it also has the row's whole width:
+    /// beside the chip it was cut short at the largest text size — *Sunday, 11 O…* — on the one
+    /// line that says which day this is.
     private var header: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        ScreenHeader {
+            Text("Today", bundle: strings)
+                .accessibilityValue(spokenDate)
+                .accessibilityAddTraits(.isHeader)
+        } detail: {
             if let today = manager.history.last?.date {
-                Text(today, format: .dateTime.weekday(.wide).day().month(.wide))
-                    .font(.subheadline.weight(.semibold))
-                    // Further than its neighbours may shrink: at 0.6 the date was still cut
-                    // short — *Воскресенье, 11 октя…* — on a 375 pt phone at the largest text
-                    // size, and half of that size is still larger than the ordinary one.
-                    .minimumScaleFactor(0.5)
-                    .foregroundStyle(.white.opacity(0.92))
-                    .legibleOnBackdrop()
+                Text(today, format: Self.dateFormat)
+                    // Further than its neighbours may shrink (``dateScaleFloor``).
+                    .minimumScaleFactor(Self.dateScaleFloor)
                     .accessibilityHidden(true)
             }
-
-            HStack(spacing: 12) {
-                Text("Today", bundle: strings)
-                    .font(.largeTitle.weight(.bold))
-                    // First call on the row's width, and rigid in height. The title may shrink
-                    // when a long word at a large text size truly does not fit beside the chip,
-                    // and for nothing else: left to the stack, it was drawn at 72 % on every day
-                    // with a streak (`testTheTitleKeepsItsSizeBesideTheStreak`).
-                    .layoutPriority(1)
-                    .fixedSize(horizontal: false, vertical: true)
-                    // On the two texts and not on the stack: the chip is a pane, and a shadow on
-                    // the stack would be cast by it as well.
-                    .legibleOnBackdrop()
-                    .accessibilityValue(spokenDate)
-                    .accessibilityAddTraits(.isHeader)
-
-                Spacer(minLength: 0)
-
-                streakChip
-            }
+        } accessory: {
+            streakChip
+                // The chip arrives on the first day of a streak, and lands; its count rolls on
+                // the same change. On the chip and not on the screen (see ``status``).
+                .animation(Motion.land, value: manager.streak)
         }
-        .lineLimit(1)
-        .minimumScaleFactor(0.6)
-        .foregroundStyle(.white)
     }
 
     /// The month spelled out, which is how the drawn date already reads.
     private var spokenDate: Text {
         guard let today = manager.history.last?.date else { return Text(verbatim: "") }
-        return Text(today.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(locale)))
+        return Text(today.formatted(Self.dateFormat.locale(locale)))
     }
 
     /// A flame and a count: the days in a row the goal was reached. Absent at zero.
@@ -326,6 +356,9 @@ struct HomeView: View {
             HStack(spacing: 6) {
                 Image(systemName: Self.streakSymbol)
                     .foregroundStyle(Aurora.cyan)
+                    // Once, when the count goes up. The first day of a streak is the chip itself
+                    // arriving, and plays no bounce.
+                    .symbolEffect(.bounce, value: streakRises)
                 Text(manager.streak, format: .number)
                     .monospacedDigit()
                     .contentTransition(.numericText(value: Double(manager.streak)))
@@ -345,7 +378,8 @@ struct HomeView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Day streak", bundle: strings))
             .accessibilityValue(Text(manager.streak, format: .number))
-            .transition(.opacity)
+            // The first day of a streak: the chip arrives small and lands at its size.
+            .transition(.scale(scale: 0.8).combined(with: .opacity))
         }
     }
 
@@ -366,10 +400,44 @@ struct HomeView: View {
                 diameter: min(slot.size.width, slot.size.height),
                 lastPour: lastPour
             )
+            // It takes the drop: a swell as each one lands.
+            .swells(on: landings)
             // On the vessel, not on the screen. The celebration belongs to the thing that just
             // filled up, and an `overlay` does not clip, so the pieces still travel past the rim.
             .overlay { ConfettiOverlay(burst: goalBursts) }
         }
+        // Where a drop is going. Reported in layout, so the rise the vessel arrives with does
+        // not move the target.
+        .anchorPreference(key: PourPlaces.self, value: .center) { [.vessel: $0] }
+    }
+
+    /// The drops in flight, each from the disc it was poured from to the vessel.
+    ///
+    /// A drop whose disc or vessel has no place — neither can happen while both are on screen —
+    /// is not drawn, and is taken off the list by the next landing or by the screen going.
+    private func drops(between places: [PourPlace: Anchor<CGPoint>]) -> some View {
+        GeometryReader { proxy in
+            ForEach(flights) { flight in
+                if let disc = places[.disc(flight.slot)], let vessel = places[.vessel] {
+                    PourDrop(start: proxy[disc], end: proxy[vessel]) {
+                        land(flight)
+                    }
+                    // It is there at the disc and gone into the vessel: the drop fades itself
+                    // as it lands, and needs no fade of SwiftUI's on the way in or out.
+                    .transition(.identity)
+                }
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    /// A drop has reached the vessel: the surface surges, the vessel swells, and the drop and
+    /// any that left before it are done with.
+    private func land(_ flight: PourFlight) {
+        flights.removeAll { $0.id <= flight.id }
+        landings += 1
+        lastPour = Date()
     }
 
     // MARK: - Status
@@ -395,6 +463,16 @@ struct HomeView: View {
                 // One height for both of its states at the ordinary text sizes, so the row below
                 // does not jump when Undo arrives and leaves.
                 .frame(minHeight: 44)
+                // The capsule is a thing that arrives, so it lands (``Motion/land``). **Here,
+                // and not on the screen.** At the screen's root the spring also carried
+                // whatever else changed in the same update — at the large text sizes the
+                // stacked capsule is taller than the line it replaces, and the quick-add row
+                // bounced under the finger that had just pressed it.
+                //
+                // It was on `.smooth` for one build, because rule `60-design-system` names one
+                // spring; the owner, holding that build, asked for more life, and the rule's
+                // wording is proposed in the stage's spec.
+                .animation(Motion.land, value: standingOffer)
         }
     }
 
@@ -414,7 +492,9 @@ struct HomeView: View {
     private var quietLine: some View {
         if let offer = standingOffer {
             undoCapsule(offer)
-                .transition(.opacity)
+                // It arrives small and lands at its size, a little past it and back: something
+                // that has just been put down.
+                .transition(.scale(scale: 0.8).combined(with: .opacity))
         } else {
             // Re-read every minute: a reminder that has passed stops being "next", and nothing
             // else would say so on a screen nobody is touching.
@@ -686,6 +766,8 @@ struct HomeView: View {
                 disc(serving)
             }
             .buttonStyle(PressStyle())
+            // Where this vessel's drop leaves from.
+            .anchorPreference(key: PourPlaces.self, value: .center) { [.disc(serving.id): $0] }
             .accessibilityLabel(String(format: strings.localizedString(forKey: "%1$@, add %2$d millilitres", value: nil, table: nil), serving.name(in: strings), serving.amount))
 
             VStack(spacing: 1) {
@@ -719,6 +801,9 @@ struct HomeView: View {
             // A ratio of the disc it sits in, never its own text style, so it cannot grow through
             // the edge at the accessibility sizes (rule `65-accessibility`).
             .font(.system(size: diameter * 0.4, weight: .semibold))
+            // Once per pour, on the disc that was pressed: feedback under a finger, like the
+            // recoil beside it, so it has no Reduce Motion branch (rule `65-accessibility`).
+            .symbolEffect(.bounce, value: poured[serving.id, default: 0])
             .frame(width: diameter, height: diameter)
 
         if serving.isUsual {
@@ -735,8 +820,25 @@ struct HomeView: View {
         let id = manager.addLog(amount: serving.amount)
         undoOffer = id.map { UndoOffer(id: $0, amount: serving.amount) }
         pours += 1
-        lastPour = Date()
+        poured[serving.id, default: 0] += 1
+        // A drop for a pour that was logged, and none under Reduce Motion: it is travel across
+        // the screen (rule `65-accessibility`). The serving is in the store already; the drop
+        // only shows where it went.
+        if id != nil, !reduceMotion {
+            // The surface surges when the drop lands (``land(_:)``), not now: water that was
+            // already sloshing before anything reached it gave the drop nothing to do, and the
+            // waves, half died down by then, jumped back to full as it arrived.
+            flights.append(PourFlight(id: pours, slot: serving.id))
+        } else {
+            lastPour = Date()
+        }
     }
+}
+
+/// One drop in flight: which pour it is, and which disc it left.
+nonisolated private struct PourFlight: Identifiable, Equatable {
+    let id: Int
+    let slot: String
 }
 
 /// What Home's expiry task is keyed on.
@@ -753,7 +855,9 @@ nonisolated private struct UndoClock: Equatable {
 /// A `VStack` cannot do this inside a `ScrollView`, and both ways it fails were drawn before this
 /// replaced one. A scroll view asks its content for its *ideal* height, the vessel's ideal is its
 /// largest, and the column simply grew past the screen: on a 375 x 667 pt phone the vessel was
-/// 300 pt and the screen scrolled, where 214 pt fits. And where the stack was merely short of
+/// 300 pt and the screen scrolled, where 214 pt fitted under the app's own bar. (Under Apple's,
+/// which stands taller, and every tab's header, that phone's vessel is at its 200 pt floor with
+/// the row whole above the bar — rendered on iOS 26.5.) And where the stack was merely short of
 /// room it squeezed whatever could shrink — a line of text with a `minimumScaleFactor` — before
 /// the vessel: on an iPhone 16 the status line was drawn at 72 %
 /// (`testTheStatusLineIsNeverSqueezedToMakeRoomForTheVessel`).
@@ -874,7 +978,9 @@ private struct WaterVessel: View {
         .clipShape(Circle())
         // Inset so the water sits in a well and can never cover the vessel's lit rim.
         .padding(10)
-        .animation(.smooth(duration: 0.9), value: level)
+        // It lands: past its mark and back, where it used to glide. The wave clamps the level
+        // it draws, so an overshoot at the brim or the bottom stops at the glass.
+        .animation(Motion.water, value: level)
     }
 
     /// How agitated the surface is, decaying after a pour.
@@ -961,5 +1067,6 @@ private struct WaterVessel: View {
     )
     manager.addWater(amount: 1_150)
 
-    return HomeView().environment(manager)
+    // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
+    return HomeView().background { AuroraBackground() }.environment(manager)
 }
