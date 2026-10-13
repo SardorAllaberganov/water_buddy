@@ -8,6 +8,24 @@
 import SwiftData
 import SwiftUI
 
+/// One serving on the strip of the day.
+///
+/// A value at file scope, and `nonisolated`, so `HistoryLayoutTests` can read it off the main
+/// actor (rule `43-concurrency`). Both figures are drawing fractions — the one place a `Double`
+/// may stand for anything in this product.
+nonisolated struct StripBar: Equatable, Sendable, Identifiable {
+
+    /// The serving's own id, so a bar keeps its identity when a neighbour is added or removed.
+    let id: UUID
+
+    /// Where it stands across the day: `0` at the midnight that opens it, `1` at the one that
+    /// closes it.
+    let position: Double
+
+    /// How tall it stands, as a fraction of the plot.
+    let height: Double
+}
+
 /// One day's servings — today's, unless the week card has picked another — as a list the user can
 /// correct and add to.
 ///
@@ -58,10 +76,18 @@ struct HistoryView: View {
     /// and clamping the initial value into range would silently show a different figure from the
     /// row the user just tapped — so the bounds widen to contain whatever is being edited instead.
     ///
-    /// `max(1, amount)` keeps the range well-formed even for a value the store should never hold,
-    /// so a corrupt row opens an editor rather than trapping on an invalid `ClosedRange`.
-    static func sliderBounds(forAmount amount: Int) -> ClosedRange<Int> {
-        min(servingRange.lowerBound, max(1, amount))...max(servingRange.upperBound, amount)
+    /// `vessels` are the sheet's three shortcuts. A tap on one sets the amount to that vessel's,
+    /// and a slider that could not show it would be handed a value outside its own range — so the
+    /// bounds contain them too. They are the user's to edit and normally sit inside
+    /// ``servingRange``; a hand-edited suite can put one outside it.
+    ///
+    /// `max(1, …)` keeps the range well-formed even for a value the store should never hold, so a
+    /// corrupt row opens an editor rather than trapping on an invalid `ClosedRange`.
+    static func sliderBounds(forAmount amount: Int, vessels: [Int] = []) -> ClosedRange<Int> {
+        let offered = ([amount] + vessels).map { max(1, $0) }
+        let least = offered.min() ?? servingRange.lowerBound
+        let most = offered.max() ?? servingRange.upperBound
+        return min(servingRange.lowerBound, least)...max(servingRange.upperBound, most)
     }
 
     /// The day the screen shows: the selection while the window still holds it, otherwise today.
@@ -80,9 +106,61 @@ struct HistoryView: View {
         ordinal == history.last?.dayOrdinal ? nil : ordinal
     }
 
+    /// The hours the strip labels: the morning, noon and the evening. Its two ends are midnight
+    /// and need no label.
+    nonisolated static let stripHours = [6, 12, 18]
+
+    /// The shortest a bar is drawn, as a fraction of the plot. A sip still has to be seen.
+    nonisolated static let stripFloor = 0.12
+
+    /// The strip's bars: one per serving, left to right through the day, each as tall as its
+    /// amount is of the largest thing on the scale.
+    ///
+    /// **The scale is the larger of the day's largest serving and the largest current vessel.**
+    /// Against the day's own largest alone, a day of nothing but Cups would draw every bar at full
+    /// height and read as a day of large drinks. The seeded log — one row carrying a whole day's
+    /// total (rule `25-shared-storage`) — is larger than any vessel, and sets the scale itself.
+    ///
+    /// Takes each serving's position rather than its instant, and the vessels rather than the
+    /// model that holds them, which is what keeps it pure and `nonisolated`: where an instant
+    /// falls in a day is the model's answer, on the model's calendar (rule `30-rollover`).
+    nonisolated static func stripBars(
+        for servings: [(id: UUID, amount: Int, position: Double)],
+        vessels: [Int]
+    ) -> [StripBar] {
+        let scale = max(1, servings.map(\.amount).max() ?? 0, vessels.max() ?? 0)
+
+        return servings
+            .sorted { $0.position < $1.position }
+            .map { serving in
+                StripBar(
+                    id: serving.id,
+                    position: min(max(serving.position, 0), 1),
+                    height: min(max(Double(max(serving.amount, 0)) / Double(scale), stripFloor), 1)
+                )
+            }
+    }
+
+    /// The vessel a serving of `amount` is drawn as: one of the current three whose amount it
+    /// equals, or `nil`.
+    ///
+    /// **An inference, and drawn as one.** A log stores an amount and nothing else, so the name is
+    /// a guess from today's vessels: it is shown, never spoken, and it changes when the vessels
+    /// do. The Glass is checked first — it is what the widget, Siri, the Control Center control
+    /// and the watch all log, so when two vessels hold one amount it is the likelier source.
+    nonisolated static func vessel(forAmount amount: Int, amounts: [Int]) -> HomeView.Serving? {
+        let row = HomeView.servings(amounts: amounts)
+        return row.first { $0.isUsual && $0.amount == amount } ?? row.first { $0.amount == amount }
+    }
+
+    /// The screen's side margin. The week card's seven day buttons are budgeted against it:
+    /// `(375 − 2 × 28) / 7 = 45.6` pt on the narrowest supported iPhone, over the 44-pt floor.
+    nonisolated static let margin: CGFloat = 28
+
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// The day the week card picked, as an ordinal — `nil` for today. Presentation state, which is
     /// the only kind a view owns (rule `50-views`); leaving the tab resets it to today.
@@ -100,8 +178,12 @@ struct HistoryView: View {
         ZStack {
             AuroraBackground()
 
-            VStack(spacing: 20) {
+            // One list, and everything on the screen is a row of it. The header and the week card
+            // stood fixed above a list of servings until a second card arrived: with both fixed,
+            // a small phone had no room left for the rows the cards describe.
+            List {
                 header
+                    .historyRow(top: 24, bottom: 10)
 
                 // Drawn only once there is a past to show. A fresh install would otherwise open on
                 // seven empty bars, which reads as a broken chart rather than as a new account —
@@ -112,16 +194,31 @@ struct HistoryView: View {
                     HistoryCard(shown: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal) { ordinal in
                         selectedDay = Self.selection(forDay: ordinal, in: manager.history)
                     }
+                    .historyRow()
                 }
 
                 if shownLogs.isEmpty {
                     emptyState
-                    Spacer(minLength: 0)
+                        .historyRow(top: 22)
                 } else {
+                    // Today's strip also marks the next reminder; a past day has none to mark.
+                    DayStrip(logs: shownLogs, marksReminder: shownPastDay == nil)
+                        .historyRow()
+
                     servings
                 }
             }
-            .padding(.top, 24)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            // Scoped to the value that actually changed — never a bare `withAnimation` around a model
+            // mutation. Identity, not amount: an edit redraws its own row and must not slide the list.
+            .animation(.smooth(duration: 0.35), value: shownLogs.map(\.id))
+            // One point clear of the status bar, and it is not spacing. A scroll view whose top
+            // edge meets the safe area's draws its content on up under the status bar; with
+            // nothing fixed above the list any more, the rows ran under the clock and the battery
+            // — *15:26* printed across *250 ml*. A list that stops short of that edge is clipped
+            // at its own, as it always was under the header that used to stand here.
+            .padding(.top, 1)
         }
         // No `.preferredColorScheme` and no `.presentationDragIndicator` here any more: this is a
         // tab, not a sheet. There is nothing to drag down, and the dark-appearance preference is
@@ -182,54 +279,107 @@ struct HistoryView: View {
 
     // MARK: - Header
 
+    /// The shown day, its total against the goal, and the `+`.
+    ///
+    /// **One heading, not two stops** — and the title itself is that heading, with the total as
+    /// its value and the drawn figure hidden, as Home's is. A wrapper built with
+    /// `.accessibilityElement(children: .ignore)` reads the same to VoiceOver and leaves the title
+    /// inside it as a second element for anything that walks the tree.
+    ///
+    /// The first row of the list, so it scrolls away with it: nothing on this screen is fixed.
+    ///
+    /// **The `+` shares the title's line, and the total has the row's whole width** — Home's
+    /// header, for Home's reason. With the `+` beside both lines, the total was left a column too
+    /// narrow for it at the largest text size and was cut short: *7 150 из 2 000…*, on the line
+    /// that says how much.
     private var header: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 12) {
                 dayTitle
-                    .font(.title2.weight(.bold))
+                    .font(.largeTitle.weight(.bold))
+                    // First call on the line's width, and rigid in height: it may shrink for a
+                    // long day's name at a large text size, and for nothing else.
+                    .layoutPriority(1)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .legibleOnBackdrop()
 
-                // Both figures come off the model. The list adds up to this number, and a `body`
-                // that computed it for itself is how the two start disagreeing
-                // (rule `10-architecture`).
-                Text(String(format: strings.localizedString(forKey: "%1$d of %2$d ml", value: nil, table: nil), shownTotal, manager.dailyGoal))
-                    .font(.footnote.weight(.medium))
-                    .monospacedDigit()
-                    .foregroundStyle(.white.opacity(0.75))
-                    .contentTransition(.numericText(value: Double(shownTotal)))
+                // No settings gear here any more. It lived in this header while Settings was a
+                // sheet, and it became the bar's third tab: one screen of preferences reached
+                // through *another* screen's header is a route a user finds once and then hunts
+                // for. Two routes to one destination is what the tab bar replaced, not something
+                // it joins — `testSettingsIsReachableFromHomeAsATab` asserts exactly one control
+                // is labelled Settings. The `+` that sits here now is the *only* route to the
+                // serving sheet.
+                Spacer(minLength: 0)
+
+                addButton
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-            .foregroundStyle(.white)
-            .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
-            // One heading, not two stops.
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(spokenDay)
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d of %2$d millilitres", value: nil, table: nil), shownTotal, manager.dailyGoal))
 
-            // No settings gear here any more. It lived in this header while Settings was a
-            // sheet, and it became the bar's third tab: one screen of preferences reached through
-            // *another* screen's header is a route a user finds once and then hunts for. Two
-            // routes to one destination is what the tab bar replaced, not something it joins —
-            // `testSettingsIsReachableFromHomeAsATab` asserts exactly one control is labelled
-            // Settings. The `+` that sits here now is the *only* route to the serving sheet.
-            Spacer(minLength: 0)
-
-            addButton
+            // Both figures come off the model. The list adds up to this number, and a `body`
+            // that computed it for itself is how the two start disagreeing
+            // (rule `10-architecture`). Grouped by the app's locale, like Home's.
+            Text(strings.figure("%1$@ of %2$@ ml", shownTotal, manager.dailyGoal, locale: locale))
+                .font(.headline)
+                .fontDesign(.rounded)
+                .monospacedDigit()
+                .legibleOnBackdrop()
+                .contentTransition(.numericText(value: Double(shownTotal)))
+                .accessibilityHidden(true)
         }
-        .padding(.horizontal, 28)
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+        .foregroundStyle(.white)
+        .padding(.horizontal, Self.margin)
         .animation(.smooth(duration: 0.5), value: shownTotal)
     }
 
+    /// The shown day's name. Whichever form is drawn, one text of it is the screen's heading
+    /// (``heading(_:)``).
+    ///
+    /// **At an accessibility text size a past day takes two lines: the weekday, then the date.**
+    /// On one line beside the `+` it was cut at those sizes — *Saturday, 10 O…*, and in Russian
+    /// *Понедельник…* with the date gone altogether — on the line that says which day is shown.
+    /// Two texts, one to a line, and not one text given two lines: a text that may wrap breaks a
+    /// word that does not fit before it shrinks it (rule `65-accessibility`). At the ordinary
+    /// sizes the one line stays, so the cards under the header do not move as the days are
+    /// tapped.
     @ViewBuilder
     private var dayTitle: some View {
         if let day = shownPastDay {
             // Formatted through the environment locale, which the app injects from the in-app
             // language picker alongside `\.strings` — never `Locale.current` (rule `70-privacy`).
             // Formatting a label is the one use `DaySummary.date` exists for.
-            Text(day.date, format: .dateTime.weekday(.wide).day().month(.abbreviated))
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    VStack(alignment: .leading, spacing: 0) {
+                        heading(Text(day.date, format: .dateTime.weekday(.wide)))
+
+                        // Drawn, and spoken by the line above it, whose label is the whole day.
+                        Text(day.date, format: .dateTime.day().month(.abbreviated))
+                            .accessibilityHidden(true)
+                    }
+                } else {
+                    heading(Text(day.date, format: .dateTime.weekday(.wide).day().month(.abbreviated)))
+                }
+            }
+            // Further than its neighbours may shrink: a day's name is the longest word this
+            // header draws. Measured, 0.6 was nearly spent twice — *Понедельник* alone was
+            // drawn at 0.67 of its size at the largest text size on a 402 pt phone, and
+            // *Понедельник, 5 окт.* on one line at 0.615 at the largest ordinary size on a
+            // 375 pt one — and a narrower phone, or a date of two digits, asks for more.
+            .minimumScaleFactor(0.5)
         } else {
-            Text("Today", bundle: strings)
+            heading(Text("Today", bundle: strings))
         }
+    }
+
+    /// Makes `title` the screen's one heading: the shown day spelled out, its total against the
+    /// goal as the value, the header trait.
+    private func heading(_ title: Text) -> some View {
+        title
+            .accessibilityLabel(spokenDay)
+            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d of %2$d millilitres", value: nil, table: nil), shownTotal, manager.dailyGoal))
+            .accessibilityAddTraits(.isHeader)
     }
 
     /// The header's spoken name — the month spelled out, which reads better aloud than the
@@ -241,11 +391,12 @@ struct HistoryView: View {
 
     /// Adds a serving to the day on screen.
     ///
-    /// At the right of the header rather than under the list, which is where it was first sketched:
-    /// a `List` scrolls a trailing button out of reach once a day holds six or seven servings, and
-    /// this is the one route to the sheet (rule `50-views`). The vessels' own recipe — a `.frosted`,
-    /// `.raised`, pressable circle — because it belongs to the same family of controls: the ways
-    /// water enters.
+    /// At the right of the header rather than under the servings, which is where it was first
+    /// sketched: at the foot of the list it would be a whole day's servings away from where the
+    /// screen opens, and this is the one route to the sheet (rule `50-views`). The header is the
+    /// list's first row now, so the `+` scrolls away with it and comes back at the top. The
+    /// vessels' own recipe — a `.frosted`, `.raised`, pressable circle — because it belongs to
+    /// the same family of controls: the ways water enters.
     private var addButton: some View {
         let diameter = min(max(addButtonSize, 44), 56)
 
@@ -254,8 +405,9 @@ struct HistoryView: View {
         } label: {
             Image(systemName: "plus")
                 // A ratio of the circle it sits in, never its own text style, so it cannot grow
-                // through the edge (rule `65-accessibility`). 11.7:1 on the circle's glass,
-                // measured off a render.
+                // through the edge (rule `65-accessibility`). On the circle's glass, measured off
+                // renders at the worst frame of a minute of the aurora: 15.62:1 on iOS 26.5,
+                // 12.08:1 on iOS 27.0 and 6.55:1 on the hand-made pane, read on iOS 18.6.
                 .font(.system(size: diameter * 0.4, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: diameter, height: diameter)
@@ -267,38 +419,34 @@ struct HistoryView: View {
 
     // MARK: - The servings
 
+    /// The shown day's servings, newest first — rows of the screen's one list.
     private var servings: some View {
-        List {
-            ForEach(shownLogs, id: \.id) { log in
-                ServingRow(log: log) { editor = .editing(log) }
-                    // The pane is the row. A `List`'s own background and separators would draw a
-                    // second surface behind glass that is already lit (rule `60-design-system`).
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 5, leading: 28, bottom: 5, trailing: 28))
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        // The model deletes the row *and* recomputes the total; the doorbell is
-                        // rung by the setter, not from here (rule `20-state`).
-                        Button(role: .destructive) {
-                            manager.deleteLog(log)
-                        } label: {
-                            // The closure form, because `Label(_:systemImage:)` has no bundle
-                            // parameter and this string has to follow the chosen language like
-                            // every other one.
-                            Label {
-                                Text("Delete", bundle: strings)
-                            } icon: {
-                                Image(systemName: "trash")
-                            }
-                        }
+        ForEach(shownLogs, id: \.id) { log in
+            ServingRow(
+                log: log,
+                // The amounts are read here, in a `body`, which is what registers the observation
+                // that renames a row after the vessels are edited.
+                vessel: Self.vessel(forAmount: log.amount, amounts: manager.servings)
+            ) { editor = .editing(log) }
+            // The pane is the row.
+            .historyRow(top: 5, bottom: 5, sides: Self.margin)
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                // The model deletes the row *and* recomputes the total; the doorbell is
+                // rung by the setter, not from here (rule `20-state`).
+                Button(role: .destructive) {
+                    manager.deleteLog(log)
+                } label: {
+                    // The closure form, because `Label(_:systemImage:)` has no bundle
+                    // parameter and this string has to follow the chosen language like
+                    // every other one.
+                    Label {
+                        Text("Delete", bundle: strings)
+                    } icon: {
+                        Image(systemName: "trash")
                     }
+                }
             }
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        // Scoped to the value that actually changed — never a bare `withAnimation` around a model
-        // mutation. Identity, not amount: an edit redraws its own row and must not slide the list.
-        .animation(.smooth(duration: 0.35), value: shownLogs.map(\.id))
     }
 
     private var emptyState: some View {
@@ -324,7 +472,10 @@ struct HistoryView: View {
                     .font(.callout.weight(.semibold))
 
                 // Points at the `+`, because on a past day there is no vessel to pick: Home pours
-                // into today. Measured off a render: the title 8.0:1, this line 5.2:1.
+                // into today. Read off one render of each system, not a sweep of the aurora: on
+                // Apple's glass the title is 13.3:1 and this line 7.4:1 on iOS 26.5, 12.4:1 and
+                // 6.8:1 on iOS 27.0. On the hand-made pane, read on iOS 18.6, they are 5.4:1 and
+                // **3.8:1, under the 4.5:1 floor** — the lighter pane of known issue #85.
                 Text("Tap + to add a serving you forgot.", bundle: strings)
                     .font(.footnote)
                     .foregroundStyle(.white.opacity(0.7))
@@ -338,16 +489,30 @@ struct HistoryView: View {
         // `.frosted`, not `.sheer`: this pane carries a sentence, and the density scale exists
         // because tint and blur compete (rule `60-design-system`).
         .liquidGlass(density: .frosted, elevation: .raised)
-        .padding(.horizontal, 28)
-        .padding(.top, 40)
+        .padding(.horizontal, Self.margin)
         .accessibilityElement(children: .combine)
+    }
+}
+
+private extension View {
+
+    /// One row of History's list, with the list's own surfaces cleared: a `List`'s background
+    /// and separators would draw a second surface behind glass that is already lit
+    /// (rule `60-design-system`).
+    ///
+    /// `sides` is zero for the header and the cards, which carry the screen's margin themselves —
+    /// the week card's day row is budgeted against it — and the margin for a serving.
+    func historyRow(top: CGFloat = 8, bottom: CGFloat = 8, sides: CGFloat = 0) -> some View {
+        listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: top, leading: sides, bottom: bottom, trailing: sides))
     }
 }
 
 // MARK: - The week
 
-/// The last ``DataManager/historyWindow`` days as bars, with the average and the best day — and the
-/// control that picks which day the list below shows.
+/// The last ``DataManager/historyWindow`` days as bars, with the average, the best day and the
+/// days the goal was met — and the control that picks which day the rows below show.
 ///
 /// **Hand-rolled rather than drawn with Swift Charts, and that is a design-system decision rather
 /// than a dependency one.** Charts is an Apple SDK framework and would be legal under rule
@@ -359,9 +524,11 @@ struct HistoryView: View {
 /// Palette`); a `BarMark`'s `foregroundStyle` is not readable as one, so that enforcement would
 /// simply disappear.
 ///
-/// Every bar shares one fill. Goal-met is carried by height against the reference line, never by
-/// colour — rule `65-accessibility` forbids a tint being the only carrier of state, and a second
-/// hue here would be a second unmeasured contrast figure for no gain.
+/// **A day that reached the goal is cyan and one that did not is white — and never by colour
+/// alone.** Rule `65-accessibility` forbids a tint being the only carrier of state, and it is
+/// not: a met bar also stands at or above the reference line, and the card counts the met days
+/// in words. Every bar shared one fill until the redesign, on the argument that a second hue was
+/// a second unmeasured contrast figure; both are measured now (`docs/DESIGN.md`).
 ///
 /// **Each day is a button, and the day row alone runs the card's full width.** Seven equal slots of
 /// `(375 − 2 × 28) / 7 = 45.6` pt on the narrowest supported iPhone clear the 44-pt floor rule
@@ -370,9 +537,9 @@ struct HistoryView: View {
 /// disclosure keep their inset while the bars sit ``barInset`` in from their own slots instead.
 ///
 /// **VoiceOver hears a summary and seven days**, no longer one element: the title carries the
-/// average and the best as its value, each day is exactly one button marked selected when it is the
-/// one shown, and the disclosure is read as itself. The bars, weekday letters and figures are
-/// carried by those and draw nothing of their own into the tree.
+/// average, the best and the days met as its value, each day is exactly one button marked selected
+/// when it is the one shown, and the disclosure is read as itself. The bars, weekday letters and
+/// figures are carried by those and draw nothing of their own into the tree.
 private struct HistoryCard: View {
 
     @Environment(DataManager.self) private var manager
@@ -430,11 +597,12 @@ private struct HistoryCard: View {
                 // a 4.5:1 small-text floor, a real rule `65-accessibility` failure that looked
                 // perfectly legible. 0.70 measures 5.49:1. Figures in `docs/DESIGN.md`.
                 .foregroundStyle(.white.opacity(0.70))
-                // No line limit, and `fixedSize` so it claims the height it needs. The card is not
-                // in a `ScrollView` — the `List` beneath it is the only scroller — so the `VStack`
-                // gets vertically compressed and `Text` gives up lines rather than pushing back.
-                // With `.lineLimit(2)` this still read "Measured against your cur…" at
-                // `AccessibilityXXXL`; a disclosure that is itself truncated discloses nothing.
+                // No line limit, and `fixedSize` so it claims the height it needs: a `Text` gives
+                // up lines before it pushes back. The card was once squeezed between a fixed
+                // header and the list of servings, and with `.lineLimit(2)` this read "Measured
+                // against your cur…" at `AccessibilityXXXL`; a disclosure that is itself
+                // truncated discloses nothing. The card is a row of that list now and takes the
+                // height it asks for, and this stays as the statement of what it must never lose.
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 20)
         }
@@ -442,20 +610,31 @@ private struct HistoryCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
-        // The same density/elevation pair as this screen's empty state — sibling panes on one
-        // screen share one (rule `60-design-system`).
+        // The same density/elevation pair as this screen's strip and its empty state — sibling
+        // panes on one screen share one (rule `60-design-system`).
         .liquidGlass(density: .frosted, elevation: .raised)
-        .padding(.horizontal, 28)
+        .padding(.horizontal, HistoryView.margin)
     }
 
     private var title: some View {
         Text(String(format: strings.localizedString(forKey: "Last %1$d days", value: nil, table: nil), DataManager.historyWindow))
             .font(.callout.weight(.semibold))
-            .lineLimit(1)
+            // Two lines before a word is cut. On one, at the largest text size in Russian, the
+            // title read *Последние 7 дн…* — and the card is a row of the list now, with the
+            // height to give.
+            .lineLimit(2)
             .minimumScaleFactor(0.7)
-            // The card's summary, spoken once: the average and the best ride on its title as a
-            // value, and the figures row that draws them is hidden below.
-            .accessibilityValue(String(format: strings.localizedString(forKey: "Average %1$d millilitres. Best %2$d millilitres.", value: nil, table: nil), DaySummary.average(of: manager.history), DaySummary.best(of: manager.history)))
+            .fixedSize(horizontal: false, vertical: true)
+            // The card's summary, spoken once: the average, the best and the days the goal was met
+            // ride on its title as a value, and the figures that draw them are hidden below.
+            // Spoken as raw numbers, where the figures are drawn grouped.
+            .accessibilityValue(String(
+                format: strings.localizedString(forKey: "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.", value: nil, table: nil),
+                DaySummary.average(of: manager.history),
+                DaySummary.best(of: manager.history),
+                DaySummary.daysMet(in: manager.history, goal: manager.dailyGoal),
+                manager.history.count
+            ))
     }
 
     // MARK: Days
@@ -467,9 +646,9 @@ private struct HistoryCard: View {
             }
         }
         // The row claims its own height, as the bars' fixed frame did before they became buttons.
-        // The card sits above a `List` and is squeezed at the large text sizes; a slot whose frame
-        // could give way shrank under its content, and at `AccessibilityXXXL` the bars rose through
-        // the title while the weekday letters sank into the figures.
+        // While the card stood above the list and was squeezed at the large text sizes, a slot
+        // whose frame could give way shrank under its content, and at `AccessibilityXXXL` the bars
+        // rose through the title while the weekday letters sank into the figures.
         .fixedSize(horizontal: false, vertical: true)
         .overlay(alignment: .top) { goalLine }
         // Once per change, not perpetual, so it is deliberately **not** gated on Reduce Motion —
@@ -537,15 +716,25 @@ private struct HistoryCard: View {
             Capsule()
                 .fill(.white.opacity(0.12))
 
+            // Cyan for a day that reached the goal, white for one that did not — one fill whose
+            // colour changes, so a day that crosses the goal animates a colour and not a layer
+            // (rule `50-views`). **Colour is not the only carrier**: a met bar also stands at or
+            // above the goal line (rule `65-accessibility`).
+            //
             // Solid `Aurora.cyan`, **not** a `Aurora.blue` → `Aurora.cyan` gradient, and the
             // reason is a measurement rather than taste. Pure `Aurora.blue` composites to
             // **2.72:1** against this pane — under the 3:1 non-text floor — so the foot of every
             // bar failed, and a nearly-empty day is drawn almost entirely in that end. Sampling a
             // *rendered* bar gave a reassuring 3.33:1, but that is the average of the whole
             // gradient, not its endpoint: the figure was real and measured the wrong thing.
-            // `Aurora.cyan` alone measures 5.22:1. A 6–90pt bar loses nothing by being one colour.
+            //
+            // Both fills, against the pane beside the bar, at the worst frame of a minute of the
+            // aurora: on Apple's glass cyan reads 6.87:1 on iOS 26.5 and 4.91:1 on iOS 27.0, and
+            // white 12.12:1 and 8.67:1. On the hand-made pane, read on iOS 18.6, white is 4.91:1
+            // and **cyan 2.78:1, under the floor**: that pane is lighter than Apple's, which is
+            // known issue #85 and not a bar's to settle (`docs/DESIGN.md`).
             Capsule()
-                .fill(Aurora.cyan)
+                .fill(day.reached(manager.dailyGoal) ? Aurora.cyan : Color.white)
                 // A day with nothing logged still draws a sliver, so the bar reads as an empty day
                 // rather than as a missing one. The series is zero-filled for the same reason.
                 .frame(height: max(barHeight * fraction, day.total > 0 ? 6 : 2))
@@ -574,80 +763,322 @@ private struct HistoryCard: View {
         return Text(day.date.formatted(.dateTime.weekday(.wide).locale(locale)))
     }
 
-    /// Average and best, side by side while they fit and stacked when they do not.
+    /// *Average*, *Best day* and *Goal met*: three figures over their labels, side by side while
+    /// they fit and one above the other when they do not.
     ///
-    /// Two strings rather than one, and a `ViewThatFits` rather than a wrap. As a single
-    /// `"Average %1$d ml · Best %2$d ml"` it truncated outright at `AccessibilityXXXL` — the two
-    /// figures the card exists to show, cut off — and once allowed to wrap it broke after the
-    /// separator, leaving a line beginning "· Best 8050 ml". Letting the row become a column is
-    /// the shape rule `65-accessibility` asks for when scaled content overflows, and two keys also
-    /// give a translator two independent phrases instead of one word order.
+    /// A figure and its label are two strings, and the layout is chosen with `ViewThatFits`
+    /// rather than left to wrap. As one line — `"Average %1$d ml · Best %2$d ml"` — the old pair
+    /// truncated outright at `AccessibilityXXXL`, the figures the card exists to show cut off, and
+    /// once allowed to wrap it broke after the separator. Letting the columns become rows is the
+    /// shape rule `65-accessibility` asks for when scaled content overflows.
     ///
-    /// Hidden from VoiceOver: the title already speaks both figures as its value.
+    /// **Three layouts, and the first that fits at its own size is drawn**: three columns; then
+    /// three rows, a label and its figure on a line; then each label over its figure. The chooser
+    /// is offered the card's whole width and picks among whole layouts (`tasks/lessons.md`,
+    /// 2026-10-11). With only the first two, the rows were what was left at `AccessibilityXXXL`,
+    /// and a figure was shrunk as far as it would go and then cut — *2 592…* where the card means
+    /// *2 592 ml*. Only the last layout may shrink, and it has a line to itself to do it on.
+    ///
+    /// Every figure is grouped by the app's locale, like Home's. Hidden from VoiceOver: the title
+    /// already speaks all three as its value.
     private var figures: some View {
-        let average = String(format: strings.localizedString(forKey: "Average %1$d ml", value: nil, table: nil), DaySummary.average(of: manager.history))
-        let best = String(format: strings.localizedString(forKey: "Best %1$d ml", value: nil, table: nil), DaySummary.best(of: manager.history))
+        let stats: [(figure: String, label: LocalizedStringKey)] = [
+            (strings.figure("%1$@ ml", DaySummary.average(of: manager.history), locale: locale), "Average"),
+            (strings.figure("%1$@ ml", DaySummary.best(of: manager.history), locale: locale), "Best day"),
+            (
+                strings.figure(
+                    "%1$@ of %2$@",
+                    DaySummary.daysMet(in: manager.history, goal: manager.dailyGoal),
+                    manager.history.count,
+                    locale: locale
+                ),
+                "Goal met"
+            ),
+        ]
 
         return ViewThatFits(in: .horizontal) {
-            HStack(spacing: 6) {
-                Text(average)
-                Text(verbatim: "·")
-                Text(best)
+            HStack(alignment: .top, spacing: 12) {
+                ForEach(stats.indices, id: \.self) { index in
+                    VStack(alignment: .leading, spacing: 2) {
+                        figure(stats[index].figure)
+                        label(stats[index].label)
+                    }
+                    .fixedSize()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(average)
-                Text(best)
+
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(stats.indices, id: \.self) { index in
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        label(stats[index].label)
+                        Spacer(minLength: 8)
+                        figure(stats[index].figure)
+                    }
+                }
+            }
+            // Enough to absorb a rounding shortfall of a fraction of a point, which would
+            // otherwise drop a letter; never enough to be the way a line is made to fit.
+            .minimumScaleFactor(0.95)
+
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(stats.indices, id: \.self) { index in
+                    VStack(alignment: .leading, spacing: 2) {
+                        label(stats[index].label)
+                        figure(stats[index].figure)
+                    }
+                }
+            }
+            .minimumScaleFactor(0.6)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .lineLimit(1)
+        .accessibilityHidden(true)
+    }
+
+    private func figure(_ text: String) -> some View {
+        Text(text)
+            .font(.title3.weight(.bold))
+            .fontDesign(.rounded)
+            .monospacedDigit()
+    }
+
+    private func label(_ key: LocalizedStringKey) -> some View {
+        Text(key, bundle: strings)
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.white.opacity(0.9))
+    }
+}
+
+// MARK: - The day
+
+/// When the shown day's servings were poured: one bar each, across the whole day.
+///
+/// **Midnight to midnight**, not the waking hours the canvas drew: a drink at 00:30 has to
+/// appear. A bar's place is a fraction of that day's real length, asked of the model — a view
+/// holds no calendar (rule `30-rollover`) — so a 23- or 25-hour day draws correctly and an hour's
+/// label stands where a serving poured on that hour stands.
+///
+/// **VoiceOver hears the title, as a heading, and nothing else.** The bars repeat the rows under
+/// this card, each of which speaks its own amount and time; the reminder's mark repeats Home's
+/// line (rule `65-accessibility`).
+private struct DayStrip: View {
+
+    @Environment(DataManager.self) private var manager
+    @Environment(\.strings) private var strings
+
+    /// The shown day's servings.
+    let logs: [WaterLog]
+
+    /// Whether to mark the next reminder — today only.
+    let marksReminder: Bool
+
+    /// A real magnitude, capped at its use site (rule `65-accessibility`): a decorative
+    /// dimension that grew with the text would push the servings off the screen.
+    @ScaledMetric(relativeTo: .footnote) private var scaledPlotHeight: CGFloat = 64
+
+    private var plotHeight: CGFloat { min(scaledPlotHeight, 92) }
+
+    /// A bar's width. The plot's travel is its own width less this, so the first and the last
+    /// minute of the day both draw inside it.
+    private let barWidth: CGFloat = 8
+
+    private var bars: [StripBar] {
+        HistoryView.stripBars(
+            for: logs.map { (id: $0.id, amount: $0.amount, position: manager.dayFraction(of: $0.timestamp)) },
+            vessels: manager.servings
+        )
+    }
+
+    /// The labelled hours, as instants on the shown day. Any of its servings names the day.
+    private var hours: [Date] {
+        guard let anchor = logs.first?.timestamp else { return [] }
+        return manager.hours(HistoryView.stripHours, onDayOf: anchor)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("When you drank", bundle: strings)
+                .font(.callout.weight(.semibold))
+                // Two lines before a word is cut, as the week card's title has.
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityAddTraits(.isHeader)
+
+            VStack(spacing: 6) {
+                plot
+                axis
+            }
+            .accessibilityHidden(true)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(.white)
+        // The week card's pair: sibling panes on one screen share one (rule `60-design-system`).
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var plot: some View {
+        GeometryReader { proxy in
+            let travel = max(proxy.size.width - barWidth, 0)
+
+            ZStack(alignment: .bottomLeading) {
+                // The ground the bars stand on.
+                Capsule()
+                    .fill(.white.opacity(0.3))
+                    .frame(height: 1)
+
+                ForEach(bars) { bar in
+                    Capsule()
+                        .fill(Aurora.cyan)
+                        // A dark hairline round each bar. Two drinks inside forty minutes
+                        // overlap on a plot this wide, and without an edge they are one wide bar.
+                        .overlay { Capsule().strokeBorder(.black.opacity(0.45), lineWidth: 1) }
+                        .frame(width: barWidth, height: max(proxy.size.height * bar.height, barWidth))
+                        .offset(x: travel * bar.position)
+                }
+
+                reminderMark(travel: travel, height: proxy.size.height)
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .bottomLeading)
+        }
+        .frame(height: plotHeight)
+        .animation(.smooth(duration: 0.45), value: bars)
+    }
+
+    /// The next reminder, as a white rule under a bell — told from a serving by its shape as well
+    /// as its colour. Re-read every minute, as Home's line is: a reminder that has passed stops
+    /// being "next", and nothing else would say so on a screen nobody is touching.
+    @ViewBuilder
+    private func reminderMark(travel: CGFloat, height: CGFloat) -> some View {
+        if marksReminder {
+            TimelineView(.everyMinute) { _ in
+                if let next = manager.nextReminder {
+                    VStack(spacing: 2) {
+                        Image(systemName: HomeView.reminderSymbol)
+                            // A ratio of the plot it sits in, never its own text style.
+                            .font(.system(size: height * 0.19, weight: .semibold))
+                        Capsule()
+                            .frame(width: 1.5, height: height * 0.5)
+                    }
+                    .foregroundStyle(.white)
+                    .frame(width: barWidth)
+                    .offset(x: travel * manager.dayFraction(of: next))
+                }
             }
         }
-        .font(.footnote.weight(.medium))
-        .monospacedDigit()
-        .foregroundStyle(.white.opacity(0.75))
-        .lineLimit(1)
-        .minimumScaleFactor(0.6)
-        .accessibilityHidden(true)
+    }
+
+    private var axis: some View {
+        GeometryReader { proxy in
+            let travel = max(proxy.size.width - barWidth, 0)
+
+            ForEach(hours, id: \.self) { hour in
+                // The phone's own 12- or 24-hour form under the app's locale, as every time here.
+                Text(hour, format: .dateTime.hour())
+                    // A ratio of the plot it annotates, never a text style of its own
+                    // (rule `65-accessibility`). 0.18 × 64 pt is 11.5 pt.
+                    .font(.system(size: plotHeight * 0.18, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(.white.opacity(0.9))
+                    .fixedSize()
+                    .position(x: travel * manager.dayFraction(of: hour) + barWidth / 2, y: proxy.size.height / 2)
+            }
+        }
+        .frame(height: plotHeight * 0.24)
     }
 }
 
 // MARK: - A serving
 
-/// One logged serving: a frosted capsule carrying the amount and the time it landed.
+/// One logged serving: a frosted capsule carrying its glyph, its amount, the vessel it is drawn
+/// as when there is one, and the time it landed.
 ///
 /// Private because it has exactly one consumer. `AuroraBackground` and `PressStyle` earned their
 /// own files only when a second screen wanted them.
 private struct ServingRow: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     let log: WaterLog
+
+    /// The vessel this amount is drawn as, or `nil` — ``HistoryView/vessel(forAmount:amounts:)``.
+    let vessel: HomeView.Serving?
+
     let edit: () -> Void
 
+    /// The glyph's disc, a real magnitude scaled with the row's own text and capped at its use
+    /// site (rule `65-accessibility`).
+    @ScaledMetric(relativeTo: .body) private var scaledDisc: CGFloat = 36
+
+    private var disc: CGFloat { min(scaledDisc, 52) }
+
+    /// **Two layouts, and the first that fits at its own size is drawn**: the time beside the
+    /// amount, or under it. The choice is among two whole rows, in the list's whole width
+    /// (`tasks/lessons.md`, 2026-10-11).
+    ///
+    /// Squeezed onto one line at the large text sizes, the amount and the time were each offered
+    /// half of what the glyph left. The time fitted in its half; the amount was shrunk as far as
+    /// it would go and then cut — *100…* for *100 мл* — and even where it fitted it was drawn
+    /// smaller than the time beside it. The amount is the row; the time gives way.
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            row(stacked: false)
+            row(stacked: true)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func row(stacked: Bool) -> some View {
         Button(action: edit) {
             HStack(spacing: 14) {
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                // The vessel's glyph when the amount is one of the current three; the drop
+                // otherwise.
+                Image(systemName: vessel?.symbol ?? "drop.fill")
+                    // A ratio of the disc it sits in, never its own text style.
+                    .font(.system(size: disc * 0.44, weight: .semibold))
                     .foregroundStyle(Aurora.cyan)
+                    .frame(width: disc, height: disc)
+                    // A dark well, not the cyan wash the canvas drew. A wash lightens the ground
+                    // under a glyph of its own colour: on the hand-made pane the glyph read
+                    // **2.0:1** against the 3:1 floor for a non-text mark. Darkened instead, the
+                    // same glyph is measured in `docs/DESIGN.md`.
+                    .background(Circle().fill(.black.opacity(0.4)))
                     .accessibilityHidden(true)
 
-                Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), log.amount))
-                    .font(.body.weight(.semibold))
-                    .monospacedDigit()
+                if stacked {
+                    // The last layout, so the one that may shrink: each line has the row's
+                    // whole width to do it in.
+                    VStack(alignment: .leading, spacing: 1) {
+                        amount
+                        name
+                        time
+                    }
+                    .minimumScaleFactor(0.6)
 
-                Spacer(minLength: 8)
+                    Spacer(minLength: 0)
+                } else {
+                    // At their own size or not at all.
+                    VStack(alignment: .leading, spacing: 1) {
+                        amount
+                        name
+                    }
+                    .fixedSize()
 
-                // Rendered through the phone's own 12/24-hour setting rather than a fixed pattern:
-                // "14:32" on a 24-hour device, "2:32 PM" on a 12-hour one. Forcing HH:mm would
-                // override a preference the user actually chose.
-                Text(log.timestamp, format: .dateTime.hour().minute())
-                    .font(.subheadline.weight(.medium))
-                    .monospacedDigit()
-                    .foregroundStyle(.white.opacity(0.75))
+                    Spacer(minLength: 8)
+
+                    time
+                        .fixedSize()
+                }
             }
             .foregroundStyle(.white)
             .lineLimit(1)
-            .minimumScaleFactor(0.6)
-            .padding(.horizontal, 22)
-            .padding(.vertical, 16)
+            .padding(.leading, 12)
+            .padding(.trailing, 20)
+            .padding(.vertical, 10)
             // WidgetKit's 44pt floor is a widget rule, but a list row is a control here too, and a
             // `minHeight` lets it grow with Dynamic Type instead of clipping.
             .frame(minHeight: 56)
@@ -657,14 +1088,41 @@ private struct ServingRow: View {
         // One serving, one stop. The swipe action reaches VoiceOver on its own, as a rotor action.
         //
         // The label goes on the **button**, not on an `.accessibilityElement(children: .ignore)`
-        // wrapper around it. That is the idiom the vessel and this screen's own header use, and it
-        // is wrong here: those wrap plain `Text`, while this wraps a *control*, which VoiceOver
-        // surfaces regardless. The wrapper became a second element above it and every serving was
+        // wrapper around it. That is the idiom the vessel uses, and it is wrong here: the vessel
+        // wraps plain drawing, while this wraps a *control*, which VoiceOver surfaces
+        // regardless. The wrapper became a second element above it and every serving was
         // announced twice — "250 millilitres, 21:22", then "250 ml, 21:22, button". Only the real
         // accessibility tree shows that; no unit test in this project can see one.
         .accessibilityLabel(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), log.amount))
         .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
         .accessibilityHint(Text("Edits this serving", bundle: strings))
+    }
+
+    private var amount: some View {
+        Text(strings.figure("%1$@ ml", log.amount, locale: locale))
+            .font(.body.weight(.bold))
+            .fontDesign(.rounded)
+            .monospacedDigit()
+    }
+
+    /// Drawn, never spoken: the name is an inference from today's vessels.
+    @ViewBuilder
+    private var name: some View {
+        if let vessel {
+            Text(vessel.name(in: strings))
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.9))
+        }
+    }
+
+    /// Rendered through the phone's own 12/24-hour setting rather than a fixed pattern: "14:32"
+    /// on a 24-hour device, "2:32 PM" on a 12-hour one. Forcing HH:mm would override a preference
+    /// the user actually chose.
+    private var time: some View {
+        Text(log.timestamp, format: .dateTime.hour().minute())
+            .font(.subheadline.weight(.semibold))
+            .monospacedDigit()
+            .foregroundStyle(.white.opacity(0.94))
     }
 }
 
@@ -688,7 +1146,8 @@ private enum ServingEditor: Identifiable, Hashable {
 /// Deliberately the same lockup as `GoalSetupView`'s goal card — one glass pane, a hero readout
 /// with a ratio-sized unit, an `Aurora.cyan` slider — because every pane in this product is lit by
 /// the same light, and a second layout for "pick a number in millilitres" would be a second one.
-/// The time is a wheel inside the same pane: one pane asks how much and when.
+/// Under the slider sit the three vessels, as one-tap amounts; the time is a wheel inside the same
+/// pane: one pane asks how much and when.
 private struct ServingSheet: View {
 
     let editor: ServingEditor
@@ -719,6 +1178,12 @@ private struct ServingSheet: View {
 
     @ScaledMetric(relativeTo: .largeTitle) private var readoutSize: CGFloat = 52
 
+    /// A shortcut's type: a real magnitude scaled with the text (rule `65-accessibility`), and
+    /// capped where it is used.
+    @ScaledMetric(relativeTo: .subheadline) private var scaledShortcut: CGFloat = 15
+
+    private var shortcutSize: CGFloat { min(scaledShortcut, 30) }
+
     init(editor: ServingEditor, range: ClosedRange<Date>, startingAmount: Int, saved: @escaping (Date) -> Void) {
         self.editor = editor
         self.range = range
@@ -734,7 +1199,10 @@ private struct ServingSheet: View {
         _when = State(initialValue: opening.when)
     }
 
-    private var bounds: ClosedRange<Int> { HistoryView.sliderBounds(forAmount: openingAmount) }
+    /// Wide enough for the serving the sheet opened on and for each of the three shortcuts.
+    private var bounds: ClosedRange<Int> {
+        HistoryView.sliderBounds(forAmount: openingAmount, vessels: manager.servings)
+    }
 
     var body: some View {
         ZStack {
@@ -784,44 +1252,142 @@ private struct ServingSheet: View {
             readout
                 .padding(.horizontal, 24)
 
-            Slider(
-                value: sliderValue,
-                in: Double(bounds.lowerBound)...Double(bounds.upperBound),
-                step: Double(HistoryView.servingStep)
-            )
-            .tint(Aurora.cyan)
-            // A `Slider`'s stock VoiceOver value is a percentage of its range, which here would
-            // announce "21%" for 250 ml — a number that appears nowhere in the product.
-            .accessibilityLabel(Text("Serving amount", bundle: strings))
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), amount))
-            .padding(.horizontal, 24)
-
-            // Day, hour and minute on one wheel, bounded by the week and by now, so neither a day
-            // the screen cannot show nor a time that has not happened can be picked. It formats
-            // through the environment locale the app injects with `\.strings` (rule `70-privacy`).
-            //
-            // The wheel alone runs the card's full width, without the 24-pt inset. Its natural
-            // width is more than that inset leaves, and a view that will not shrink widens
-            // everything above it: the first build pushed the card and both buttons past the
-            // screen's right edge. `minWidth: 0` is what stops it reporting more than it is
-            // offered.
-            //
-            // **Its neighbouring rows fall under the text floor, and that is recorded rather than
-            // hidden.** Measured off a render, the row being set reads 5.47:1 against its band. UIKit
-            // draws the rows around it in a dimmed grey that assumes a near-black backdrop and that
-            // no public API recolours; on this pane they measure 2.4–2.8:1 against the 4.5:1 rule
-            // `65-accessibility` sets. Accepted by the owner on 2026-10-07 as the system control's
-            // own styling — `docs/AI_CONTEXT.md` known issue #59.
-            DatePicker(selection: $when, in: range, displayedComponents: [.date, .hourAndMinute]) {
-                Text("When", bundle: strings)
+            // The slider, the shortcuts and the wheel sit close: the shortcuts belong to the
+            // slider they set, and the wheel brings its own air in the faded rows above the one
+            // being set. Spaced as the readout is, the three shortcuts pushed *Save* half off the
+            // foot of a 375 × 667 pt phone at the ordinary text size.
+            VStack(spacing: 8) {
+                amountControls
+                wheel
             }
-            .datePickerStyle(.wheel)
-            .labelsHidden()
-            .frame(minWidth: 0, maxWidth: .infinity)
         }
         .padding(.vertical, 30)
         .frame(maxWidth: .infinity)
         .liquidGlass(density: .frosted, elevation: .floating)
+    }
+
+    @ViewBuilder
+    private var amountControls: some View {
+        Slider(
+            value: sliderValue,
+            in: Double(bounds.lowerBound)...Double(bounds.upperBound),
+            step: Double(HistoryView.servingStep)
+        )
+        .tint(Aurora.cyan)
+        // A `Slider`'s stock VoiceOver value is a percentage of its range, which here would
+        // announce "21%" for 250 ml — a number that appears nowhere in the product.
+        .accessibilityLabel(Text("Serving amount", bundle: strings))
+        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), amount))
+        .padding(.horizontal, 24)
+
+        shortcuts
+    }
+
+    /// Day, hour and minute on one wheel, bounded by the week and by now, so neither a day the
+    /// screen cannot show nor a time that has not happened can be picked. It formats through the
+    /// environment locale the app injects with `\.strings` (rule `70-privacy`).
+    ///
+    /// The wheel alone runs the card's full width, without the 24-pt inset. Its natural width is
+    /// more than that inset leaves, and a view that will not shrink widens everything above it:
+    /// the first build pushed the card and both buttons past the screen's right edge.
+    /// `minWidth: 0` is what stops it reporting more than it is offered.
+    ///
+    /// **Its neighbouring rows fall under the text floor, and that is recorded rather than
+    /// hidden.** Measured off a render, the row being set reads 5.47:1 against its band. UIKit
+    /// draws the rows around it in a dimmed grey that assumes a near-black backdrop and that no
+    /// public API recolours; on this pane they measure 2.4–2.8:1 against the 4.5:1 rule
+    /// `65-accessibility` sets. Accepted by the owner on 2026-10-07 as the system control's own
+    /// styling — `docs/AI_CONTEXT.md` known issue #59.
+    private var wheel: some View {
+        DatePicker(selection: $when, in: range, displayedComponents: [.date, .hourAndMinute]) {
+            Text("When", bundle: strings)
+        }
+        .datePickerStyle(.wheel)
+        .labelsHidden()
+        .frame(minWidth: 0, maxWidth: .infinity)
+    }
+
+    /// The three vessels as one-tap amounts, under the slider they set.
+    ///
+    /// **Selected with the selection tokens, not with the white the canvas drew**: a screen
+    /// carries one primary surface, and *Save* is it (rule `60-design-system`). The fill and the
+    /// rim are present at zero opacity when unselected, so moving the selection animates a colour
+    /// and not a layer (rule `50-views`) — and selection is never colour alone: the rim, the
+    /// weight and the `.isSelected` trait all carry it (rule `65-accessibility`).
+    ///
+    /// Two vessels that hold one amount are both selected, which is the truth.
+    ///
+    /// **Two layouts, and the first that fits at its own size is drawn**: a glyph beside its
+    /// figure, or the glyph over it. The choice is among whole rows of buttons, in the card's
+    /// whole width (`tasks/lessons.md`, 2026-10-11). Shrunk onto one line at `AccessibilityXXXL`,
+    /// the three glyphs grew with the text and the figures went — a cup with no number, a mug
+    /// and a *2*, a bottle and an ellipsis — and the figure is what the button sets.
+    private var shortcuts: some View {
+        ViewThatFits(in: .horizontal) {
+            shortcutRow(stacked: false)
+            shortcutRow(stacked: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+        .animation(.smooth(duration: 0.3), value: amount)
+    }
+
+    private func shortcutRow(stacked: Bool) -> some View {
+        HStack(spacing: 8) {
+            ForEach(HomeView.servings(amounts: manager.servings)) { serving in
+                shortcut(serving, stacked: stacked)
+            }
+        }
+    }
+
+    private func shortcut(_ serving: HomeView.Serving, stacked: Bool) -> some View {
+        let isSelected = amount == serving.amount
+        let glyph = Image(systemName: serving.symbol)
+        let figure = Text(serving.amount, format: .number)
+            .monospacedDigit()
+
+        return Button {
+            amount = serving.amount
+        } label: {
+            Group {
+                if stacked {
+                    // The last layout, so the one that may shrink: a four-digit amount at the
+                    // cap is a little wider than its slot.
+                    VStack(spacing: 2) {
+                        glyph
+                        figure.minimumScaleFactor(0.6)
+                    }
+                    .padding(.vertical, 6)
+                } else {
+                    // At its own size or not at all.
+                    HStack(spacing: 6) {
+                        glyph
+                        figure
+                    }
+                    .fixedSize()
+                }
+            }
+            // One size for the glyph and the figure, capped: an SF Symbol set in a text style
+            // grows with it without limit, and three of these share a row.
+            .font(.system(size: shortcutSize, weight: isSelected ? .bold : .semibold, design: .rounded))
+            .foregroundStyle(.white)
+            .lineLimit(1)
+            .padding(.horizontal, 8)
+            // The whole slot is the target, never just the glyph (rule `65-accessibility`).
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background {
+                Capsule()
+                    .fill(.white.opacity(isSelected ? LiquidGlass.Selection.fillOpacity : 0))
+                    .strokeBorder(.white.opacity(isSelected ? LiquidGlass.Selection.rimOpacity : 0), lineWidth: 1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        // The glyph is what says "cup" on screen; the name is what says it aloud, and the amount
+        // is the value.
+        .accessibilityLabel(Text(verbatim: serving.name(in: strings)))
+        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), serving.amount))
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     private var readout: some View {

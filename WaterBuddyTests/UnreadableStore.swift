@@ -13,12 +13,13 @@ import SwiftData
 /// A file-backed store whose reads can be made to fail on demand, for the tests that pin what the
 /// model does when it cannot read (rule `20-state`: a failed read is never written back).
 ///
-/// **It fails the same way every time, which the older technique does not.** `WristSyncTests`
-/// overwrites the store file with random bytes and deletes its `-wal` and `-shm` while the context
-/// holds them open. SQLite notices an unlinked file from a background queue ("vnode unlinked while
-/// in use … invalidated open fd"), so whether the next fetch fails is a race, and a second test
-/// doing the same thing in the same process moves it: with three such tests in the target, the
-/// old one failed once in four full runs and a new one once in six.
+/// **It fails the same way every time, which the older technique did not.** `WristSyncTests`
+/// overwrote the store file with random bytes and deleted its `-wal` and `-shm` while the context
+/// held them open, until it was moved here on 2026-10-11. SQLite notices an unlinked file from a
+/// background queue ("vnode unlinked while in use … invalidated open fd"), so whether the next
+/// fetch fails is a race, and a second test doing the same thing in the same process moves it:
+/// with three such tests in the target, the old one failed once in four full runs and a new one
+/// once in six.
 ///
 /// Here nothing is unlinked. The servings' table is renamed away through a second, ordinary
 /// SQLite connection, and committed; every other connection sees the new schema at its next

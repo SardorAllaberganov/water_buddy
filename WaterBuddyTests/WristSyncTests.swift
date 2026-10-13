@@ -256,16 +256,20 @@ struct WristIngestTests {
     /// "no existing rows" — that collapse is exactly what let a re-sent pour insert a permanent
     /// duplicate the moment the store degrades (rule `20-state`, `fetch(_:)`'s own DocC).
     ///
-    /// Forces a genuine SwiftData fetch failure by corrupting the on-disk store with same-size
-    /// random bytes *after* the container is already open and the manager already holds a
-    /// long-lived `ModelContext` on it — the only technique of three tried that actually makes
-    /// `try context.fetch(...)` throw. Truncating to zero bytes makes SQLite treat the file as a
-    /// fresh, valid, empty database (no error); revoking read permission on an already-open file
-    /// descriptor does not retroactively fail a read through that descriptor. Only overwriting the
-    /// file with garbage of its *original* size reliably corrupts the SQLite header in a way both
-    /// a fresh and an existing long-lived context detect.
+    /// Forces a genuine SwiftData fetch failure with ``UnreadableStore``, *after* the container
+    /// is open and the manager holds a long-lived `ModelContext` on it: the servings' table is
+    /// renamed away through a second connection, and every later statement fails with "no such
+    /// table".
     ///
-    /// **This does not isolate C1 from C2.** Corrupting the SwiftData store fails `fetch(nil)`
+    /// It used to overwrite the store file with random bytes of its own size and delete its
+    /// `-wal` and `-shm` under the open context. That fails a read only once SQLite has noticed
+    /// the unlinked files, from a background queue — a race, and one this test lost more often
+    /// as the target grew: once in twenty-two whole runs on 2026-10-11, then twice in three the
+    /// same evening, each time reading the store it had just "corrupted" and folding the pour
+    /// (`docs/AI_CONTEXT.md`, known issue #92). The store is proved unreadable before anything
+    /// is asserted about it, so a setup that did not take can no longer pass or fail as a read.
+    ///
+    /// **This does not isolate C1 from C2.** An unreadable SwiftData store fails `fetch(nil)`
     /// *and*, were the function to proceed past that guard, would fail the later `save()` too — so
     /// this pins the combined "the store cannot be read or written" behaviour, not C1's specific
     /// guard alone; disabling only C1's decline here would still return `folded == 0` via C2's
@@ -276,32 +280,21 @@ struct WristIngestTests {
     /// isolates C1.
     @Test
     func aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew() throws {
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let storeURL = dir.appendingPathComponent("corrupt.store")
-        defer { try? FileManager.default.removeItem(at: dir) }
-
-        let schema = Schema([WaterLog.self])
-        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: storeURL))
+        let store = try UnreadableStore()
+        defer { store.remove() }
 
         try withTempDefaults { defaults in
             let manager = DataManager(
-                defaults: defaults, modelContainer: container, calendar: Self.utc,
+                defaults: defaults, modelContainer: store.container, calendar: Self.utc,
                 now: { Date(timeIntervalSince1970: 1_000) },
                 reloadWidgets: {}, rescheduleReminders: { _ in }, publishWrist: { _ in }
             )
             manager.addLog(amount: 100, at: Date(timeIntervalSince1970: 1_000))
-            #expect(manager.currentWater == 100, "the store must be healthy before it is corrupted")
+            #expect(manager.currentWater == 100, "the store must be healthy before it is made unreadable")
 
-            // Corrupt the file the manager's own long-lived `ModelContext` is already open on.
-            let size = try FileManager.default.attributesOfItem(atPath: storeURL.path)[.size] as? Int ?? 4_096
-            try Data((0..<size).map { _ in UInt8.random(in: 0...255) }).write(to: storeURL)
-            for suffix in ["-wal", "-shm"] {
-                let path = storeURL.path + suffix
-                if FileManager.default.fileExists(atPath: path) {
-                    try? FileManager.default.removeItem(atPath: path)
-                }
-            }
+            // Under the manager's own long-lived `ModelContext`, which is already open on it.
+            try store.breakReads()
+            #expect(!store.stillReads, "the store still reads, so nothing below is about a failed read")
 
             let pour = WristPour(id: UUID(), amount: 250, at: Date(timeIntervalSince1970: 1_000))
             let folded = manager.ingest([pour])

@@ -151,6 +151,25 @@ struct AuroraBackground: View {
     }
 }
 
+extension View {
+
+    /// For text that sits straight on the aurora, with no pane under it.
+    ///
+    /// The aurora's lights swing under this text, and at their brightest white alone falls short
+    /// of 4.5:1 — Home's Bottle caption read 4.2:1 over the magenta light. These are the widget
+    /// readout's two shadows (rule `65-accessibility`: "a contrast threshold, not taste"): a soft
+    /// one for depth, and a tight one that is a local halo and goes wherever the glyphs go.
+    ///
+    /// Here, beside the backdrop it answers, since History's heading became the second screen to
+    /// draw text on it; it was `HomeView`'s own until then. Which of two yardsticks its figures
+    /// are read by — beside the glyphs, where the halo darkens the ground, or on clean ground a
+    /// few points out — is recorded both ways in `docs/DESIGN.md`.
+    func legibleOnBackdrop() -> some View {
+        shadow(color: .black.opacity(0.3), radius: 6, y: 1)
+            .shadow(color: .black.opacity(0.45), radius: 2)
+    }
+}
+
 #Preview {
     AuroraBackground()
 }

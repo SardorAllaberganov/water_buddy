@@ -177,7 +177,7 @@ final class GoalSetupUITests: XCTestCase {
     ///
     /// `EarlierServingTests` pins the model's half. What it cannot see is the card's button, the
     /// sheet opening on the day it was asked for, and the screen following the serving there.
-    /// Idempotent like the rest of this suite: it counts yesterday's rows before and after rather
+    /// Idempotent like the rest of this suite: it compares yesterday's total before and after rather
     /// than assuming an empty day, because the simulator keeps every serving an earlier run added.
     @MainActor
     func testAServingAddedToYesterdayShowsUnderYesterday() throws {
@@ -201,10 +201,12 @@ final class GoalSetupUITests: XCTestCase {
         yesterday.tap()
         XCTAssertTrue(yesterday.isSelected, "tapping a day did not select it")
 
-        // A serving row is labelled with its amount — "250 millilitres" — and a day with its name, so
-        // this matches the list and nothing on the card.
-        let rows = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres"))
-        let before = rows.count
+        // The day's total, off its own button. **Not a count of rows**: a lazy list builds only
+        // the rows on screen, so a count stopped moving once a day held more than the screen
+        // shows — and with two cards above the servings that is one or two of them
+        // (`docs/AI_CONTEXT.md`, known issue #62).
+        let before = Self.millilitres(on: yesterday)
+        XCTAssertGreaterThanOrEqual(before, 0, "a day's button did not carry its total")
 
         XCTAssertEqual(
             app.buttons.matching(identifier: "Add a serving").count, 1,
@@ -215,9 +217,24 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5), "the sheet did not open on its wheel")
         app.buttons["Save"].tap()
 
-        let added = XCTNSPredicateExpectation(predicate: NSPredicate(format: "count == %d", before + 1), object: rows)
-        XCTAssertEqual(XCTWaiter().wait(for: [added], timeout: 5), .completed, "the new serving is not under yesterday")
+        // Polled, because the figure is parsed out of a sentence and a predicate cannot do that.
+        let deadline = Date().addingTimeInterval(5)
+        while Self.millilitres(on: yesterday) <= before, Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.2)
+        }
+        XCTAssertGreaterThan(Self.millilitres(on: yesterday), before, "the new serving is not under yesterday")
         XCTAssertTrue(yesterday.isSelected, "the screen did not stay on the day the serving landed on")
+
+        // And it is listed there, as one control. The bar's total comes off the week's figures
+        // and would grow over an empty list; and a row is two whole layouts to choose from, which
+        // must never both be in the tree — every serving read twice (rule `65-accessibility`).
+        let row = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres")).firstMatch
+        bringIntoView(row, in: app)
+        XCTAssertTrue(row.exists, "yesterday's total grew and no serving is listed under it")
+        XCTAssertEqual(
+            app.cells.containing(.button, identifier: row.label).firstMatch.buttons.count, 1,
+            "a serving must resolve to exactly one button in its row"
+        )
     }
 
     /// A serving row is a control, and all of it is one: the gap between the amount and the time is
@@ -245,6 +262,7 @@ final class GoalSetupUITests: XCTestCase {
         app.buttons["History"].tap()
 
         let row = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres")).firstMatch
+        bringIntoView(row, in: app)
         XCTAssertTrue(row.waitForExistence(timeout: 5), "History shows no serving for today")
 
         // The row's centre: past the amount, short of the time, on nothing but the pane.
@@ -255,6 +273,210 @@ final class GoalSetupUITests: XCTestCase {
 
         app.buttons["Cancel"].tap()
         XCTAssertTrue(title.waitForNonExistence(timeout: 5), "Cancel did not dismiss the sheet")
+    }
+
+    /// History is one list now, and its second card is new: a heading, exactly once, above the
+    /// rows it describes — on a day that has servings to place.
+    @MainActor
+    func testTheStripIsOneHeadingOverADaysServings() throws {
+        let app = launchedOnHome()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+
+        XCTAssertTrue(app.staticTexts["When you drank"].waitForExistence(timeout: 5), "a day with a serving draws no strip")
+        XCTAssertEqual(
+            app.descendants(matching: .any).matching(identifier: "When you drank").count, 1,
+            "the strip's heading must resolve to exactly one element"
+        )
+    }
+
+    /// The sheet's three vessels, from outside the process: each is one button, the one whose
+    /// amount the sheet shows is selected, and a tap on another moves the slider to its amount.
+    ///
+    /// Matched by name and compared by value, never by a literal amount: the vessels are the
+    /// user's to edit, and this suite never resets the device. Nothing is saved.
+    @MainActor
+    func testTheSheetsVesselShortcutsSetTheAmount() throws {
+        let app = launchedOnHome()
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+        app.buttons["Add a serving"].tap()
+
+        let slider = app.sliders["Serving amount"]
+        XCTAssertTrue(slider.waitForExistence(timeout: 5), "the sheet did not open")
+
+        for name in ["Cup", "Glass", "Bottle"] {
+            XCTAssertEqual(
+                app.buttons.matching(identifier: name).count, 1,
+                "\(name) must be exactly one button in the sheet"
+            )
+        }
+
+        // A new serving opens on the Glass's amount, so the Glass is the one selected.
+        let glass = app.buttons["Glass"]
+        // Unwrapped first: two values that are both missing are equal too.
+        let opened = try XCTUnwrap(slider.value as? String, "the slider speaks no amount")
+        XCTAssertEqual(opened, glass.value as? String, "the sheet did not open on the Glass's amount")
+        XCTAssertTrue(glass.isSelected, "the shortcut whose amount is showing is not marked selected")
+
+        // Low on the capsule and to one side: off its glyph and its figure, on nothing but the
+        // control's own surface.
+        let bottle = app.buttons["Bottle"]
+        bottle.coordinate(withNormalizedOffset: CGVector(dx: 0.12, dy: 0.8)).tap()
+
+        let moved = NSPredicate(format: "value == %@", bottle.value as? String ?? "")
+        let set = XCTNSPredicateExpectation(predicate: moved, object: slider)
+        XCTAssertEqual(XCTWaiter().wait(for: [set], timeout: 5), .completed, "a tap on the Bottle did not set its amount")
+        XCTAssertTrue(bottle.isSelected, "the Bottle was tapped and is not marked selected")
+        if glass.value as? String != bottle.value as? String {
+            XCTAssertFalse(glass.isSelected, "two vessels of different amounts are both marked selected")
+        }
+
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(slider.waitForNonExistence(timeout: 5), "Cancel did not dismiss the sheet")
+    }
+
+    /// At the largest text size a shortcut's glyph and its figure do not fit side by side, three
+    /// to a row. Shrunk onto one line, the glyphs grew with the text and the figures were what
+    /// went: a cup with no number at all, a mug and a *2*, a bottle and an ellipsis — and the
+    /// figure is what the button sets.
+    ///
+    /// A cut-off text cannot be read from outside the process — its label is still the whole
+    /// string — so what is asserted is its shape: a figure of three digits is wider than it is
+    /// tall, and cut to one character it is not. The digits are counted from the button's own
+    /// value, because the vessels are the user's to edit.
+    @MainActor
+    func testTheSheetsShortcutsDrawTheirAmountsWholeAtTheLargestTextSize() throws {
+        // Setup first, at the ordinary size, so this does not depend on the order the suite ran in.
+        launchedOnHome().terminate()
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+        app.buttons["Add a serving"].tap()
+        XCTAssertTrue(app.sliders["Serving amount"].waitForExistence(timeout: 5), "the sheet did not open")
+
+        for name in ["Cup", "Glass", "Bottle"] {
+            let shortcut = app.buttons[name]
+            XCTAssertTrue(shortcut.exists, "the sheet has no shortcut for \(name)")
+            XCTAssertGreaterThanOrEqual(shortcut.frame.height, 44, "\(name) is shorter than a fingertip")
+
+            let figure = shortcut.staticTexts.firstMatch
+            XCTAssertTrue(figure.exists, "\(name) draws no figure at all")
+
+            let digits = (shortcut.value as? String ?? "").prefix { $0.isNumber }.count
+            XCTAssertGreaterThan(digits, 0, "\(name)'s value did not carry its amount")
+            XCTAssertGreaterThanOrEqual(
+                figure.frame.width, figure.frame.height * 0.4 * CGFloat(digits),
+                "\(name)'s figure was cut short: \(figure.frame) for \(digits) digits"
+            )
+        }
+
+        app.buttons["Cancel"].tap()
+    }
+
+    /// At the largest text size a serving's amount and its time do not fit on one line beside
+    /// the glyph. Squeezed onto one, the amount lost its unit — *100…* for *100 ml* — in the one
+    /// place a serving says how much it was. So the row draws the first of its layouts that fits
+    /// at its own size, and its second puts the time under the amount.
+    ///
+    /// A cut-off text keeps its whole label, so what is asserted is what prevents it: the time is
+    /// under the amount, or the amount is drawn at its own size. The time beside it is the
+    /// yardstick for "its own size" — an amount is set a step larger than its time at every text
+    /// size, and squeezed onto the time's line it was drawn at 60 % and came out the smaller of
+    /// the two: 38 points tall beside 45.
+    @MainActor
+    func testAServingRowDrawsItsAmountWholeAtTheLargestTextSize() throws {
+        // A serving first, at the ordinary size, where the Glass is on screen to be tapped.
+        let setup = launchedOnHome()
+        setup.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        XCTAssertTrue(setup.buttons["Undo"].waitForExistence(timeout: 5), "the Glass was not poured")
+        setup.terminate()
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+
+        let row = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", " millilitres")).firstMatch
+        bringIntoView(row, in: app)
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "History shows no serving for today")
+
+        // The amount is the row's first text. The time is the one that reads as a time: the
+        // vessel's name, when there is one, sits between them in the tree or after them.
+        let amount = row.staticTexts.element(boundBy: 0)
+        let time = row.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", ":")).firstMatch
+        XCTAssertTrue(amount.exists && time.exists, "a row draws an amount and a time")
+
+        let stacked = time.frame.minY >= amount.frame.maxY - 1
+        let atItsOwnSize = amount.frame.height >= time.frame.height * 0.95
+        XCTAssertTrue(
+            stacked || atItsOwnSize,
+            "the amount was squeezed onto the time's line: \(amount.frame) beside \(time.frame)"
+        )
+    }
+
+    /// At the largest text sizes a past day's name and its date do not fit on one line beside
+    /// the `+`. Squeezed onto one, the heading was cut — *Saturday, 10 O…*, and in Russian
+    /// *Понедельник…*, the date gone altogether — on the one line that says which day is shown.
+    ///
+    /// A cut-off text keeps its whole label, so what is asserted is its size, against *Today*:
+    /// a word that fits its line unshrunk at every size. Squeezed, a past day's heading was
+    /// drawn at 60 % of it — 43 points tall beside 72. On a line of its own the longest weekday
+    /// in English, *Wednesday*, is drawn at 81 % on a 402-point phone and by its width at about
+    /// 73 % on a 375-point one, which is why the line is drawn at seven-tenths and not higher.
+    ///
+    /// And it stays one heading: the day and its total, once.
+    @MainActor
+    func testAPastDaysHeadingKeepsItsSizeAtTheLargestTextSize() throws {
+        // A serving first, at the ordinary size: it is what draws the week card, and with it
+        // yesterday's button.
+        let setup = launchedOnHome()
+        setup.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        XCTAssertTrue(setup.buttons["Undo"].waitForExistence(timeout: 5), "the Glass was not poured")
+        setup.terminate()
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+
+        let today = app.staticTexts["Today"]
+        XCTAssertTrue(today.exists, "History did not open on today")
+        XCTAssertEqual(app.staticTexts.matching(identifier: "Today").count, 1, "History's heading must resolve to exactly one element")
+        XCTAssertTrue((today.value as? String ?? "").hasSuffix(" millilitres"), "the heading does not carry the day's total")
+        let itsOwnSize = today.frame.height
+
+        let name = Self.dayNames()[1]
+        let yesterday = app.buttons[name]
+        XCTAssertTrue(yesterday.waitForExistence(timeout: 5), "the week card has no button for yesterday")
+        yesterday.tap()
+        XCTAssertTrue(yesterday.isSelected, "tapping a day did not select it")
+
+        // The heading is spoken as the day spelled out, which opens with the weekday.
+        let headings = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", name))
+        let heading = headings.firstMatch
+        if !heading.exists { app.swipeDown() }
+        XCTAssertTrue(heading.waitForExistence(timeout: 5), "a past day has no heading")
+        XCTAssertEqual(headings.count, 1, "a past day's heading must resolve to exactly one element")
+        XCTAssertTrue((heading.value as? String ?? "").hasSuffix(" millilitres"), "the heading does not carry the day's total")
+
+        XCTAssertGreaterThanOrEqual(
+            heading.frame.height, itsOwnSize * 0.7,
+            "the day's name was squeezed onto one line: \(heading.frame) against \(itsOwnSize) for Today"
+        )
     }
 
     // MARK: - Home's header and Undo
@@ -557,6 +779,29 @@ final class GoalSetupUITests: XCTestCase {
         let calendar = Calendar.autoupdatingCurrent
         let past = (1...6).compactMap { calendar.date(byAdding: .day, value: -$0, to: Date()) }
         return ["Today"] + past.map(formatter.string(from:))
+    }
+
+    /// A day's total, off its button on the week card: the value reads "<n> millilitres".
+    @MainActor
+    private static func millilitres(on day: XCUIElement) -> Int {
+        Int((day.value as? String ?? "").split(separator: " ").first ?? "") ?? -1
+    }
+
+    /// Brings a serving row clear of the tab bar. With two cards above the servings, a day's
+    /// first row can start under the bar or below the screen, and a lazy list builds only what is
+    /// on it.
+    @MainActor
+    private func bringIntoView(_ row: XCUIElement, in app: XCUIApplication) {
+        // Given a moment to be built first: a swipe at a row that is only late scrolls a list
+        // that needed no scrolling.
+        _ = row.waitForExistence(timeout: 2)
+
+        let bar = app.buttons["History"]
+        var swipes = 0
+        while swipes < 4, !(row.exists && row.frame.maxY < bar.frame.minY - 8) {
+            app.swipeUp()
+            swipes += 1
+        }
     }
 
     /// `HomeView`'s *Today's log* button and its sheet were removed when the log became a tab.

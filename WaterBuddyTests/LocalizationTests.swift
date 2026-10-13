@@ -103,6 +103,18 @@ private let homeKeys = [
     "Day streak",
 ]
 
+/// History's strings that the build's extraction cannot see — resolved with
+/// `localizedString(forKey:)` or through ``Bundle/figure(_:_:locale:)`` — and the labels drawn
+/// beside them.
+private let historyKeys = [
+    "Average",
+    "Best day",
+    "Goal met",
+    "%1$@ of %2$@",
+    "When you drank",
+    "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.",
+]
+
 private let reminderCopy = ["Time for water", "A glass now keeps you on track for the day."]
 
 /// The `.lproj` for one language inside one bundle, or `nil` if that language was not shipped.
@@ -522,6 +534,50 @@ struct HomeStringTests {
     }
 }
 
+// MARK: - History
+
+/// History's own strings, in every language the app ships.
+struct HistoryStringTests {
+
+    @Test(arguments: ["en"] + translated)
+    func everyHistoryStringExistsAndKeepsItsArguments(language: String) {
+        for key in historyKeys {
+            let resolved = value(appBundle, language, key)
+            #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
+            if let resolved {
+                #expect(specifiers(in: resolved) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments")
+            }
+        }
+    }
+
+    /// A volume History draws is a figure already grouped (spec §3.1): a `%@` key, never a raw
+    /// `%d` beside the unit. **Read off the built table, not off a list in this file** — a key
+    /// that draws a raw `%d ml`, one of the three this stage retired or a new one, fails here
+    /// without anybody having named it.
+    ///
+    /// Three are left, and none is History's: Settings draws a vessel's amount from the first,
+    /// and all three are the widget's, kept in the app's table because the two must agree
+    /// (`sharedKeys`). They go when their own screens are redrawn, and this set shrinks with them.
+    @Test func theOnlyRawVolumesLeftToDrawAreOtherScreens() throws {
+        let english = try #require(table(appBundle, "en"), "the app ships no en table")
+
+        let raw = english.keys.filter { $0.contains("$d") && $0.hasSuffix(" ml") }
+
+        #expect(Set(raw) == ["%1$d ml", "of %1$d ml", "+%1$d ml"])
+    }
+
+    /// The keys History's ungrouped figures were drawn from are gone with their last reader, so
+    /// nothing can draw `2000` beside Home's `2,000` again.
+    @Test(arguments: ["Average %1$d ml", "Best %1$d ml", "%1$d of %2$d ml", "Average %1$d millilitres. Best %2$d millilitres."])
+    func theUngroupedHistoryKeysAreGone(key: String) throws {
+        // A table that did not resolve has no keys at all, and would pass this for nothing.
+        _ = try #require(localization(appBundle, "en"), "the app ships no en table")
+
+        #expect(value(appBundle, "en", key) == nil, "\"\(key)\" is still in the catalogue with no reader")
+    }
+}
+
 /// ``Bundle/figure(_:_:locale:)`` — a volume grouped the way the language groups it, set into a
 /// `%@` key. Not `@MainActor`: the widget's stage will call it from a view the extension draws.
 struct GroupedFigureTests {
@@ -557,5 +613,16 @@ struct GroupedFigureTests {
         let goal = 2_000.formatted(.number.locale(uz))
 
         #expect(drawn == "\(goal) dan \(total) ml")
+    }
+
+    /// *Goal met* is a count set into a key of its own, and Uzbek puts the whole first here too.
+    @Test func aCountOfDaysFollowsTheLanguagesOrder() throws {
+        let english = try #require(localization(appBundle, "en"), "the app ships no en table")
+        let russian = try #require(localization(appBundle, "ru"), "the app ships no ru table")
+        let uzbek = try #require(localization(appBundle, "uz"), "the app ships no uz table")
+
+        #expect(english.figure("%1$@ of %2$@", 6, 7, locale: Locale(identifier: "en_US")) == "6 of 7")
+        #expect(russian.figure("%1$@ of %2$@", 6, 7, locale: Locale(identifier: "ru_RU")) == "6 из 7")
+        #expect(uzbek.figure("%1$@ of %2$@", 6, 7, locale: Locale(identifier: "uz_UZ")) == "7 dan 6")
     }
 }

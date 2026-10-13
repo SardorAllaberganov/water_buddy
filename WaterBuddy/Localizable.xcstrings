@@ -57,6 +57,29 @@
         }
       }
     },
+    "%1$@ of %2$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ of %2$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ из %2$@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ dan %1$@"
+          }
+        }
+      }
+    },
     "%1$@ of %2$@ ml": {
       "extractionState": "manual",
       "localizations": {
@@ -191,29 +214,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%2$d millilitrdan %1$d"
-          }
-        }
-      }
-    },
-    "%1$d of %2$d ml": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$d of %2$d ml"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$d из %2$d мл"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%2$d dan %1$d ml"
           }
         }
       }
@@ -445,71 +445,71 @@
         }
       }
     },
-    "Average %1$d millilitres. Best %2$d millilitres.": {
+    "Average": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Average %1$d millilitres. Best %2$d millilitres."
+            "value": "Average"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "В среднем %1$d миллилитров. Лучший день %2$d миллилитров."
+            "value": "В среднем"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "O‘rtacha %1$d millilitr. Eng yaxshi kun %2$d millilitr."
+            "value": "O‘rtacha"
           }
         }
       }
     },
-    "Average %1$d ml": {
+    "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Average %1$d ml"
+            "value": "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "В среднем %1$d мл"
+            "value": "В среднем %1$d миллилитров. Лучший день %2$d миллилитров. Цель достигнута в %3$d из %4$d дней."
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "O‘rtacha %1$d ml"
+            "value": "O‘rtacha %1$d millilitr. Eng yaxshi kun %2$d millilitr. %4$d kundan %3$d kunida maqsadga erishildi."
           }
         }
       }
     },
-    "Best %1$d ml": {
+    "Best day": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Best %1$d ml"
+            "value": "Best day"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Лучший %1$d мл"
+            "value": "Лучший день"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eng yaxshi %1$d ml"
+            "value": "Eng yaxshi kun"
           }
         }
       }
@@ -785,6 +785,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stakan"
+          }
+        }
+      }
+    },
+    "Goal met": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goal met"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цель достигнута"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maqsadga erishildi"
           }
         }
       }
@@ -1554,6 +1577,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Qachon"
+          }
+        }
+      }
+    },
+    "When you drank": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When you drank"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Когда вы пили"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qachon ichdingiz"
           }
         }
       }

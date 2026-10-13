@@ -262,6 +262,159 @@ struct DaySummaryTests {
     }
 }
 
+// MARK: - Goal met
+
+/// ``DaySummary/daysMet(in:goal:)`` — the week card's *Goal met*. Not `@MainActor`, for
+/// ``DaySummaryTests``' reason: it is a pure count over values.
+struct DaysMetTests {
+
+    /// A window of consecutive days ending on the last total's day, one serving on each day that
+    /// has any water.
+    private func week(_ totals: [Int]) -> [DaySummary] {
+        let logs = totals.enumerated().compactMap { index, total in
+            total > 0 ? log(total, at: utc(2026, 8, 20 + index, 9)) : nil
+        }
+        return DaySummary.series(from: logs, days: totals.count, endingOn: utc(2026, 8, 19 + totals.count, 21), in: utcDay)
+    }
+
+    @Test func theCountIsOfTheDaysThatReachedTheGoal() {
+        let series = week([2_150, 2_300, 2_000, 2_050, 2_400, 2_100, 1_300])
+
+        #expect(DaySummary.daysMet(in: series, goal: 2_000) == 6)
+    }
+
+    @Test func aDayExactlyOnTheGoalCounts() {
+        #expect(DaySummary.daysMet(in: week([2_000]), goal: 2_000) == 1)
+        #expect(DaySummary.daysMet(in: week([1_999]), goal: 2_000) == 0)
+    }
+
+    /// Today is the last entry and is still open: it counts once it gets there, and not before.
+    @Test func anOpenTodayIsNotCountedUntilItReachesTheGoal() {
+        #expect(DaySummary.daysMet(in: week([2_000, 2_000, 500]), goal: 2_000) == 2)
+        #expect(DaySummary.daysMet(in: week([2_000, 2_000, 2_000]), goal: 2_000) == 3)
+    }
+
+    /// No past goal is stored, so every day is judged against the one handed in — and the card
+    /// says "Measured against your current goal".
+    @Test func aHigherGoalReJudgesTheWeek() {
+        let series = week([2_150, 2_300, 2_000, 2_050, 2_400, 2_100, 1_300])
+
+        #expect(DaySummary.daysMet(in: series, goal: 2_200) == 2)
+        #expect(DaySummary.daysMet(in: series, goal: 1_000) == 7)
+    }
+
+    @Test func anEmptyWindowHasMetNothing() {
+        #expect(DaySummary.daysMet(in: [], goal: 2_000) == 0)
+    }
+
+    @Test func aDayAsksOnceWhetherItReachedTheGoal() throws {
+        let day = try #require(week([1_500]).first)
+
+        #expect(day.reached(1_500))
+        #expect(!day.reached(1_501))
+    }
+
+    /// A day is one local date whatever its length: two servings 24 h 29 min apart on the
+    /// 25-hour day are one day's water, and it is met once.
+    @Test func aTwentyFiveHourDayIsMetOnce() {
+        let newYork = gregorian(in: "America/New_York")
+        let early = newYork.date(from: DateComponents(year: 2025, month: 11, day: 2, hour: 0, minute: 30))!
+        let late = newYork.date(from: DateComponents(year: 2025, month: 11, day: 2, hour: 23, minute: 59))!
+
+        let series = DaySummary.series(from: [log(1_200, at: early), log(900, at: late)], days: 2, endingOn: late, in: newYork)
+
+        #expect(DaySummary.daysMet(in: series, goal: 2_000) == 1)
+    }
+
+    @Test func aTwentyThreeHourDayIsMetOnce() {
+        let newYork = gregorian(in: "America/New_York")
+        let springForward = newYork.date(from: DateComponents(year: 2026, month: 3, day: 8, hour: 12))!
+        let dayBefore = newYork.date(from: DateComponents(year: 2026, month: 3, day: 7, hour: 12))!
+
+        let series = DaySummary.series(
+            from: [log(2_000, at: dayBefore), log(2_000, at: springForward)],
+            days: 2,
+            endingOn: springForward,
+            in: newYork
+        )
+
+        #expect(DaySummary.daysMet(in: series, goal: 2_000) == 2)
+    }
+}
+
+// MARK: - Where an instant falls in its day
+
+/// ``DataManager/dayFraction(of:in:)`` and ``DataManager/hours(_:onDayOf:in:)`` — what History's
+/// strip is placed by. Not `@MainActor`: both are `nonisolated static` and take their calendar.
+struct DayFractionTests {
+
+    private func close(_ a: Double, _ b: Double) -> Bool { abs(a - b) < 1e-9 }
+
+    @Test func noonIsHalfwayThroughAnOrdinaryDay() {
+        #expect(close(DataManager.dayFraction(of: utc(2026, 8, 30, 12), in: utcDay), 0.5))
+        #expect(close(DataManager.dayFraction(of: utc(2026, 8, 30, 6), in: utcDay), 0.25))
+    }
+
+    @Test func midnightOpensTheDayAtZero() {
+        #expect(DataManager.dayFraction(of: utc(2026, 8, 30, 0), in: utcDay) == 0)
+    }
+
+    @Test func theLastMinuteIsShortOfOne() {
+        let fraction = DataManager.dayFraction(of: utc(2026, 8, 30, 23, 59), in: utcDay)
+
+        #expect(fraction < 1)
+        #expect(fraction > 0.99)
+    }
+
+    /// The fall-back day in New York is 25 hours long, and noon is 13 of them in.
+    @Test func noonIsPastHalfwayOnATwentyFiveHourDay() {
+        let newYork = gregorian(in: "America/New_York")
+        let noon = newYork.date(from: DateComponents(year: 2025, month: 11, day: 2, hour: 12))!
+
+        #expect(close(DataManager.dayFraction(of: noon, in: newYork), 13.0 / 25.0))
+    }
+
+    /// The spring-forward day is 23 hours long, and noon is 11 of them in.
+    @Test func noonIsShortOfHalfwayOnATwentyThreeHourDay() {
+        let newYork = gregorian(in: "America/New_York")
+        let noon = newYork.date(from: DateComponents(year: 2026, month: 3, day: 8, hour: 12))!
+
+        #expect(close(DataManager.dayFraction(of: noon, in: newYork), 11.0 / 23.0))
+    }
+
+    /// One instant, two days: 00:30 in Paris is 23:30 the evening before in London.
+    @Test func theSameInstantFallsElsewhereInAnotherZonesDay() {
+        let paris = gregorian(in: "Europe/Paris")
+        let london = gregorian(in: "Europe/London")
+        let instant = paris.date(from: DateComponents(year: 2026, month: 8, day: 28, hour: 0, minute: 30))!
+
+        #expect(close(DataManager.dayFraction(of: instant, in: paris), 0.5 / 24))
+        #expect(close(DataManager.dayFraction(of: instant, in: london), 23.5 / 24))
+    }
+
+    @Test func theHoursOfADayAreThatDaysOwnInstants() {
+        let hours = DataManager.hours([6, 12, 18], onDayOf: utc(2026, 8, 30, 21, 15), in: utcDay)
+
+        #expect(hours == [utc(2026, 8, 30, 6), utc(2026, 8, 30, 12), utc(2026, 8, 30, 18)])
+    }
+
+    /// Six o'clock on the wall is five hours after midnight on the day the clocks go forward, so
+    /// its label stands where a serving poured at six stands.
+    @Test func sixOClockIsFiveHoursIntoATwentyThreeHourDay() {
+        let newYork = gregorian(in: "America/New_York")
+        let noon = newYork.date(from: DateComponents(year: 2026, month: 3, day: 8, hour: 12))!
+
+        let six = DataManager.hours([6], onDayOf: noon, in: newYork)
+
+        #expect(six.count == 1)
+        #expect(six.first.map { close(DataManager.dayFraction(of: $0, in: newYork), 5.0 / 23.0) } == true)
+    }
+
+    @Test func noHoursAskedForIsNoHours() {
+        #expect(DataManager.hours([], onDayOf: utc(2026, 8, 30), in: utcDay).isEmpty)
+    }
+}
+
 // MARK: - Store fixtures
 
 /// `withObservationTracking`'s `onChange` is `@Sendable`, so the tally needs a reference box —
@@ -434,6 +587,15 @@ struct HistoryWindowTests {
             app.refresh()
 
             #expect(app.history.last?.total == 250)
+        }
+    }
+
+    /// The instance halves answer on the model's own calendar — a view holds none
+    /// (rule `30-rollover`).
+    @Test func theModelPlacesAnInstantOnItsOwnCalendar() throws {
+        try withHistoryStore(now: { utc(2026, 8, 30, 12) }) { manager, _ in
+            #expect(abs(manager.dayFraction(of: utc(2026, 8, 30, 18)) - 0.75) < 1e-9)
+            #expect(manager.hours([6], onDayOf: utc(2026, 8, 29, 23)) == [utc(2026, 8, 29, 6)])
         }
     }
 }

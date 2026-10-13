@@ -113,6 +113,21 @@ struct HistoryServingTests {
         #expect(bounds.lowerBound >= 1, "a zero-width or non-positive offer cannot be edited")
     }
 
+    /// The sheet's three shortcuts set the amount to a vessel's, so the slider under them has to
+    /// be able to show every one — including a vessel a hand-edited suite put outside the offer.
+    @Test(arguments: [[150, 250, 500], [1, 30, 5_000], [1_000, 1_000, 1_000], []])
+    func theSliderBoundsContainEveryVesselShortcut(vessels: [Int]) {
+        let bounds = HistoryView.sliderBounds(forAmount: 250, vessels: vessels)
+
+        for vessel in vessels {
+            #expect(bounds.contains(vessel))
+        }
+        #expect(bounds.contains(250))
+        #expect(bounds.lowerBound <= HistoryView.servingRange.lowerBound)
+        #expect(bounds.upperBound >= HistoryView.servingRange.upperBound)
+        #expect(bounds.lowerBound >= 1, "a zero-width or non-positive offer cannot be edited")
+    }
+
     // MARK: The fixture itself
 
     /// The twin of ``WaterLogStoreTests/theStoreFixtureRoutesTheReminderPlanToTheInjectedSeam()``,
@@ -129,5 +144,122 @@ struct HistoryServingTests {
         }
 
         #expect(plans > 0, "the fixture is reaching a real UNUserNotificationCenter")
+    }
+}
+
+// MARK: - Layout, as values
+
+/// The parts of History that are decisions rather than drawing, pinned without building a view.
+/// Not `@MainActor`: everything read here is `nonisolated` on purpose (rule `43-concurrency`).
+struct HistoryLayoutTests {
+
+    private let first = UUID()
+    private let second = UUID()
+
+    // MARK: A row's vessel
+
+    @Test func aServingIsNamedForTheVesselItsAmountEquals() {
+        let amounts = [150, 250, 500]
+
+        #expect(HistoryView.vessel(forAmount: 150, amounts: amounts)?.nameKey == "Cup")
+        #expect(HistoryView.vessel(forAmount: 250, amounts: amounts)?.nameKey == "Glass")
+        #expect(HistoryView.vessel(forAmount: 500, amounts: amounts)?.nameKey == "Bottle")
+    }
+
+    /// A log stores an amount and nothing else, so any other amount has no name to draw.
+    @Test func anAmountNoVesselHoldsIsNotNamed() {
+        #expect(HistoryView.vessel(forAmount: 300, amounts: [150, 250, 500]) == nil)
+        #expect(HistoryView.vessel(forAmount: 250, amounts: []) == nil)
+    }
+
+    /// Two vessels may hold one amount — the user is allowed to choose that. The Glass is what
+    /// every one-tap door logs, so it is the likelier source and is checked first.
+    @Test func theGlassIsCheckedFirstWhenTwoVesselsShareAnAmount() {
+        #expect(HistoryView.vessel(forAmount: 250, amounts: [250, 250, 500])?.nameKey == "Glass")
+        #expect(HistoryView.vessel(forAmount: 250, amounts: [250, 300, 250])?.nameKey == "Cup")
+    }
+
+    // MARK: The strip
+
+    @Test func aBarStandsWhereItsServingFellInTheDay() {
+        let bars = HistoryView.stripBars(
+            for: [(id: first, amount: 250, position: 0.25), (id: second, amount: 500, position: 0.6)],
+            vessels: [150, 250, 500]
+        )
+
+        #expect(bars.map(\.id) == [first, second])
+        #expect(bars.map(\.position) == [0.25, 0.6])
+    }
+
+    /// A day lists its servings newest first; the strip reads left to right.
+    @Test func barsAreDrawnInTheOrderOfTheDay() {
+        let bars = HistoryView.stripBars(
+            for: [(id: first, amount: 250, position: 0.9), (id: second, amount: 250, position: 0.1)],
+            vessels: [150, 250, 500]
+        )
+
+        #expect(bars.map(\.id) == [second, first])
+    }
+
+    /// The largest current vessel fills the plot, so a day of Cups reads as small drinks and not
+    /// as a day of full bars.
+    @Test func aBarIsSizedAgainstTheLargestVessel() {
+        let bars = HistoryView.stripBars(
+            for: [(id: first, amount: 250, position: 0.3), (id: second, amount: 500, position: 0.5)],
+            vessels: [150, 250, 500]
+        )
+
+        #expect(bars.map(\.height) == [0.5, 1])
+    }
+
+    /// The seeded log carries a whole day's total in one row. It sets the scale, rather than
+    /// running through the top of the plot.
+    @Test func aServingLargerThanEveryVesselSetsTheScale() {
+        let bars = HistoryView.stripBars(
+            for: [(id: first, amount: 2_000, position: 0.3), (id: second, amount: 500, position: 0.5)],
+            vessels: [150, 250, 500]
+        )
+
+        #expect(bars.map(\.height) == [1, 0.25])
+    }
+
+    @Test func aSipStillDrawsABar() {
+        let bars = HistoryView.stripBars(for: [(id: first, amount: 1, position: 0.5)], vessels: [150, 250, 500])
+
+        #expect(bars.first?.height == HistoryView.stripFloor)
+    }
+
+    /// 00:00 and the last minute of the day are both inside the plot; a position from a clock
+    /// that ran ahead is pulled back in.
+    @Test func aBarNeverLeavesThePlot() {
+        let bars = HistoryView.stripBars(
+            for: [(id: first, amount: 250, position: -0.2), (id: second, amount: 250, position: 1.4)],
+            vessels: [150, 250, 500]
+        )
+
+        #expect(bars.map(\.position) == [0, 1])
+    }
+
+    @Test func twoServingsInOneMinuteAreTwoBars() {
+        let bars = HistoryView.stripBars(
+            for: [(id: first, amount: 250, position: 0.5), (id: second, amount: 250, position: 0.5)],
+            vessels: [150, 250, 500]
+        )
+
+        #expect(bars.count == 2)
+        #expect(Set(bars.map(\.id)) == [first, second])
+    }
+
+    /// A row the store should never hold — nothing poured, or less — and no vessels at all: a
+    /// floor-high bar, never a division by zero.
+    @Test func aCorruptServingAndNoVesselsStillDrawABar() {
+        let bars = HistoryView.stripBars(for: [(id: first, amount: 0, position: 0.5)], vessels: [])
+
+        #expect(bars.first?.height == HistoryView.stripFloor)
+    }
+
+    @Test func theStripLabelsTheMorningNoonAndEvening() {
+        #expect(HistoryView.stripHours == [6, 12, 18])
+        #expect(HistoryView.stripFloor > 0 && HistoryView.stripFloor < 1)
     }
 }

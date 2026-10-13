@@ -879,6 +879,21 @@ final class DataManager {
         return instant
     }
 
+    /// Where `instant` falls in its own local day — `0` at the midnight that opens it, `1` at the
+    /// one that closes it. A drawing fraction, for History's strip of the day's servings.
+    ///
+    /// On this model's calendar, like every other question about a day: a view holds none
+    /// (rule `30-rollover`).
+    func dayFraction(of instant: Date) -> Double {
+        Self.dayFraction(of: instant, in: calendar)
+    }
+
+    /// The instants at which `hours` o'clock fall on the local day containing `instant`, for
+    /// labelling that day's strip.
+    func hours(_ hours: [Int], onDayOf instant: Date) -> [Date] {
+        Self.hours(hours, onDayOf: instant, in: calendar)
+    }
+
     // MARK: - The cache
 
     /// Rewrites today's cached total from the logs.
@@ -2110,6 +2125,20 @@ extension DaySummary {
         series.map(\.total).max() ?? 0
     }
 
+    /// Whether this day's water reached `goal` — the one comparison a bar's colour, the streak
+    /// and the *Goal met* count share.
+    nonisolated func reached(_ goal: Int) -> Bool {
+        total >= goal
+    }
+
+    /// How many days of `series` reached `goal`: the week card's *Goal met*.
+    ///
+    /// A plain count, today included once it gets there. Every day is judged against the one
+    /// `goal` handed in, for ``streak(of:goal:)``'s reason: no past goal is stored.
+    nonisolated static func daysMet(in series: [DaySummary], goal: Int) -> Int {
+        series.filter { $0.reached(goal) }.count
+    }
+
     /// How many days in a row the goal was reached, counted back from the end of `series`.
     ///
     /// The last entry is **today**, and today is still open: it joins the run once it has reached
@@ -2120,7 +2149,7 @@ extension DaySummary {
     /// (``DaySummary`` deliberately has no `goal` field), so this is the current goal — raising
     /// it can shorten a run, and the week card already says "Measured against your current goal".
     nonisolated static func streak(of series: [DaySummary], goal: Int) -> Int {
-        closedDays(of: series, goal: goal).reversed().prefix { $0.total >= goal }.count
+        closedDays(of: series, goal: goal).reversed().prefix { $0.reached(goal) }.count
     }
 
     /// Whether the run ``streak(of:goal:)`` counts reaches the window's oldest day — in which
@@ -2128,13 +2157,13 @@ extension DaySummary {
     /// further back.
     nonisolated static func streakFillsWindow(_ series: [DaySummary], goal: Int) -> Bool {
         let days = closedDays(of: series, goal: goal)
-        return !days.isEmpty && days.allSatisfy { $0.total >= goal }
+        return !days.isEmpty && days.allSatisfy { $0.reached(goal) }
     }
 
     /// The days a run is counted over: the whole window, less a today that has not reached the
     /// goal yet.
     nonisolated private static func closedDays(of series: [DaySummary], goal: Int) -> ArraySlice<DaySummary> {
-        guard let today = series.last, today.total < goal else { return series[...] }
+        guard let today = series.last, !today.reached(goal) else { return series[...] }
         return series.dropLast()
     }
 }
@@ -2739,6 +2768,30 @@ extension DataManager {
             matching: DateComponents(hour: 0, minute: 0, second: 0),
             matchingPolicy: .nextTime
         ) ?? date.addingTimeInterval(24 * 60 * 60)
+    }
+
+    /// Where `instant` falls in the local day that contains it, from `0` at its first midnight to
+    /// `1` at its last.
+    ///
+    /// **A fraction of that day's real length** — from the start of the day to
+    /// ``nextDayBoundary(after:calendar:)`` — never of 86,400 seconds. A daylight-saving day is 23
+    /// or 25 hours long, and noon on one is not half-way through it (rule `30-rollover`).
+    nonisolated static func dayFraction(of instant: Date, in calendar: Calendar) -> Double {
+        let start = calendar.startOfDay(for: instant)
+        let length = nextDayBoundary(after: instant, calendar: calendar).timeIntervalSince(start)
+        guard length > 0 else { return 0 }
+        return min(max(instant.timeIntervalSince(start) / length, 0), 1)
+    }
+
+    /// The instants at which `hours` o'clock fall on the local day containing `instant`.
+    ///
+    /// Each is set on the day's own midnight with `date(bySettingHour:minute:second:of:)`, the
+    /// way a reminder's slot is (rule `80-notifications`), so six o'clock is six on the wall
+    /// whatever the day's length. An hour the calendar cannot place is left out rather than
+    /// force-unwrapped.
+    nonisolated static func hours(_ hours: [Int], onDayOf instant: Date, in calendar: Calendar) -> [Date] {
+        let start = calendar.startOfDay(for: instant)
+        return hours.compactMap { calendar.date(bySettingHour: $0, minute: 0, second: 0, of: start) }
     }
 
     /// Midnight, `days` − 1 calendar days before the day containing `now`: where a window of

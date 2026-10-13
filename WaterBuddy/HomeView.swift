@@ -931,21 +931,6 @@ private struct WaterVessel: View {
     }
 }
 
-private extension View {
-
-    /// For text that sits straight on the aurora, with no pane under it.
-    ///
-    /// The aurora's lights swing under this text, and at their brightest white alone falls short
-    /// of 4.5:1 — the Bottle's caption read 4.2:1 over the magenta light. These are the widget
-    /// readout's two shadows (rule `65-accessibility`: "a contrast threshold, not taste"): a soft
-    /// one for depth, and a tight one that is a local halo and goes wherever the glyphs go.
-    /// Measured beside the glyphs, off a sweep of the aurora (`docs/DESIGN.md`).
-    func legibleOnBackdrop() -> some View {
-        shadow(color: .black.opacity(0.3), radius: 6, y: 1)
-            .shadow(color: .black.opacity(0.45), radius: 2)
-    }
-}
-
 // MARK: - Preview
 
 #Preview {
