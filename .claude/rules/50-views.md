@@ -73,6 +73,14 @@ persist anything.
   `minimumScaleFactor` before a view with layout priority
 - On Home the Glass is ranked above Cup and Bottle: it is the screen's primary surface, because
   slot `DataManager.usualSlot` is what every one-tap door logs
+- History is one `List`, and everything on the screen is a row of it: the header, the week card,
+  the strip and the servings, each with the list's own surfaces cleared. Nothing is fixed above
+  it, so the `+` scrolls away with the header. The list stops one point short of the top safe
+  area (`.padding(.top, 1)`), so its rows are clipped under the status bar and never drawn across it
+- What History decides is a `static` on `HistoryView` that takes its state as parameters —
+  `stripBars(for:vessels:)` and `vessel(forAmount:amounts:)`, both `nonisolated`, and
+  `sliderBounds(forAmount:vessels:)`. Where an instant falls in a day is the model's answer:
+  `dayFraction(of:)` and `hours(_:onDayOf:)`
 - A view holds a serving's **id** when it must name one outside a sheet — `UndoOffer` — never the
   `WaterLog`
 - A `ViewThatFits` is offered its row's whole width (`.frame(maxWidth: .infinity)`) and chooses

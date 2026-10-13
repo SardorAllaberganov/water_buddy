@@ -83,6 +83,17 @@ rather than re-deriving it.
   + a label + an `.accessibilityValue` carrying percent and millilitres
 - The week card's summary is one element; each day is exactly one button, with `.isSelected` on the
   shown day
+- The week card's summary speaks the average, the best day and the days the goal was met. A met
+  day's bar is cyan and an unmet day's white, and never by colour alone: a met bar also stands at
+  or above the goal line
+- History's heading is one element: label the shown day, value its total against the goal, the
+  header trait. At an accessibility text size a past day's heading is drawn on two lines — the
+  weekday, which is that element, and the date, hidden — because on one line beside the `+` the
+  day's name was cut. The strip is one heading, *When you drank*, and its bars, hours and
+  reminder mark are hidden: the rows under it speak every serving
+- A serving row's vessel name is drawn and never spoken — it is an inference from today's
+  vessels. The sheet's three shortcuts are one button each: label the vessel's name, value its
+  amount, `.isSelected` on the one whose amount is showing
 - Put `.accessibilityLabel` / `.accessibilityValue` / `.accessibilityHint` / `.accessibilityAddTraits`
   **on the control itself** — never on an `.accessibilityElement(children: .ignore)` wrapper around a
   `Button`, `Toggle` or `Slider`
