@@ -4,7 +4,22 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-11 (twenty-ninth pass — `/doc_sync` at the end of the redesign's stage 3,
+**Last updated:** 2026-10-12 (thirty-first pass — after the second pass of the redesign's stage
+3b, the page slide and the small touches, unstaged. **No key, no stored byte.** It touches no
+shared file and nothing this sheet describes. One line citation moved with it: the literal
+`manager.servings[1]` is at `HistoryView.swift:283`. *Tests that pin this* is unchanged — the
+pass's 47 new tests are of motion and layout.)
+Previously: 2026-10-12 (thirtieth pass — `/doc_sync` run by the owner straight after the one
+that closed the redesign's stage 3b, navigation and motion, which is unstaged. **No key, no stored
+byte, and no source change since that sync.** Stage 3b touches no shared file, no stored shape and
+nothing this sheet describes, and the sync that closed it left the sheet alone on that ground. Two
+things here were wrong all the same, and this pass corrects them, **unstaged**: one line citation
+— stage 3b moved the literal `manager.servings[1]` from `HistoryView.swift:240` to `:271` — and
+one count that had been one short since stage 3, `HistoryServingTests` at 5 where it is 6, so
+*Tests that pin this* is seventeen suites and 204 `@Test`, recounted per suite by script. The
+sheet's other line citations — four that name a file, and the seven guard sites — were re-read
+and stand.)
+Previously: 2026-10-11 (twenty-ninth pass — `/doc_sync` at the end of the redesign's stage 3,
 History, staged and not committed. **No key, no stored byte.** The model gained four derived
 answers and stores none of them: `DaySummary.reached(_:)` and `daysMet(in:goal:)`, and
 `dayFraction(of:)` and `hours(_:onDayOf:)` — see *The week's summaries* below. `DataManager.swift`
@@ -204,7 +219,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph, and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:240` seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph, and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:283` (`:271` after the first build of the redesign's stage 3b, `:240` until it; unstaged) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours
@@ -965,16 +980,25 @@ on 2026-10-11): `UndoTests` (7), `HomeFiguresTests` (14) and `DayTurnTests` (3) 
 `StreakTests.swift`. The two that need a read to fail use `UnreadableStore`, a file-backed store
 whose servings' table is renamed away through a second connection — it fails every time, where
 overwriting the file under an open context is a race (`docs/AI_CONTEXT.md` known issue #92). The
-paragraph below is the twenty-fourth pass's and was not recounted.
+paragraph below is the twenty-fourth pass's and was not recounted then.
 
-Seventeen suites, 203 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
+**Recounted per suite by script on 2026-10-12, the thirtieth pass: it had been one short since
+stage 3.** Stage 3 gave `HistoryServingTests` a sixth test,
+`theSliderBoundsContainEveryVesselShortcut` — the paragraph said 5, and 203 — and the
+twenty-ninth pass did not recount. The other sixteen figures stand, stage 2's five above with
+them, and stage 3b changes none of the twenty-two. **Neither count includes stage 3's two
+suites on the model's derived answers**, `DaysMetTests` (8) and `DayFractionTests` (9) in
+`HistoryRangeTests.swift`, which pin `reached(_:)` and `daysMet(in:goal:)`, and `dayFraction`
+and `hours` (*The week's summaries*, above).
+
+Seventeen suites, 204 `@Test` in total. `DataManagerTests`, `DailyGoalSetupTests` and
 `ReminderSeamTests` (72 between them) cover the write path, the rollover, observation, the goal and
 the reminder seam; `WaterSnapshotTests` (28) covers the read path, the day boundary and the
 migration; `WaterLogStoreTests` (23) covers the log CRUD, the published rows and the seed migration;
 `ReminderPlanTests` (22) pins *when* to remind, the quiet hour after a drink included, and
 `NotificationManagerTests` (10) pins what happens to the plan, and `ReconcileQueueTests` (3) the
 order plans are applied in; `HomeServingTests` (7) pins the quick-add row, `AppTabTests` (6) the tab
-menu, and `HistoryServingTests` (5) the serving editor's offered range and its own fixture's
+menu, and `HistoryServingTests` (6) the serving editor's offered range and its own fixture's
 reminder seam. `HistoryLogsTests` (3), `RetimingTests` (10), `HistoryWindowStartTests` (2),
 `CorrectionRangeTests` (5) and `RetimedPourTests` (2) pin the window's published rows, re-timing a
 serving, where the window starts, what the History sheet offers and where it opens, and a re-timed

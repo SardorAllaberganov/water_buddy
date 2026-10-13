@@ -3171,3 +3171,436 @@ and compared before the stash was dropped.
 
 **The rule:** do not stash to see RED. See the test fail against the tree as it stands, or by a
 marked mutation that is restored from the index.
+
+## 2026-10-11 — Each screen was checked alone, and the owner found what is between them
+
+Stages 2 and 3 rendered, measured and gated Home and History one screen at a time. The owner
+then switched between the two tabs and said three things no capture of one screen can show: the
+word *Today* is in a different place on each, the change of page is poor, and the bar does not
+behave like iOS 26's. By the code, read and not yet rendered: Home's column starts 8 pt from the
+top with a 24 pt side margin and draws the date above the title; History's header row starts
+24 pt down with a 28 pt margin and draws the total below the title. Each header was laid out for
+its own screen's reasons, in its own stage, and neither stage's plan had a step that put the two
+side by side or watched the cross-fade between them.
+
+**The rule:** what two screens share — a title's place, the side margin, the bar — has one
+definition, and a stage that touches a screen switches to its neighbours and back before it
+calls the screen done. Motion is looked at as motion: a recording of the change, not a capture
+of each end.
+
+**Rendered the same evening, and the reading above was only half right.** Off the accessibility
+tree on iOS 27.0 the title's frame is (24.0, 90.0) on Home and (28.0, 88.67) on History: 4 pt
+across and 1.3 pt down, not the line apart that two top insets and a date suggested — the insets
+and the date's line nearly cancel. During the 0.27 s cross-fade both words are on screen at once,
+4 pt apart. The approved canvas has the larger difference, about 20 px by its CSS, and it was
+approved as still boards. A position is a frame read off a render, never arithmetic over the
+code's paddings.
+
+## 2026-10-11 — What I add to a canvas has to be where the canvas opens
+
+The owner opened the canvas to see what I had added and asked to be shown "all changes": it
+opened on its first page, which I had not touched, and the three comparison pairs were on a
+third page they had no reason to look for. I had said the page's name in the reply and nothing
+on the canvas pointed at it.
+
+**The rule:** when I add a page to something the owner will open, I make it open there
+(`launch.page`), or I put the addition where it already opens. A name in a reply is not a route.
+
+## 2026-10-12 — A remedy that showed no change had not been drawn
+
+To test whether a shade under Apple's tab bar would darken the selected tab's lozenge on iOS
+26.5, I drew one and measured: no change, 4.21 to 4.46 as before. I was a sentence away from
+writing that the lozenge does not follow its backdrop. The capture showed why: the shade ended at
+the bottom of the safe area and the bar stands below it — `.frame(height: 1)` before
+`.ignoresSafeArea` fixes the height first and extends nothing. Drawn to the foot of the screen,
+the same shade moved the caption to 6.0.
+
+**The rule:** "the remedy did nothing" is two claims — that it was applied, and that it had no
+effect. Look at the render for the first before writing the second.
+
+## 2026-10-12 — A screen can appear without being shown, and a flag set as it appears is too early
+
+The arrival motion was first driven by `onAppear` and `onDisappear`. Every UI test passed, and a
+recording read frame by frame showed History appearing whole on its first visit, with no motion.
+Two causes, one under the other. A flag set in `onAppear` is set before the first frame is drawn,
+so there is nothing to animate from; a `.task` cured that for Settings and for the launch. It did
+not cure History, because under Apple's `TabView` iOS builds the tab beside the selected one
+ahead of time: History had appeared, and run its task, before anyone looked at it. The flag is
+now keyed on which tab is selected, told to the screen by its container, and set a few frames
+after.
+
+**The rule:** `onAppear` says a view was built, not that it is on screen. What must happen when
+a screen is *shown* is keyed on the thing that shows it. And motion is checked on a recording,
+frame by frame — no test here can see that an animation did not run.
+
+## 2026-10-12 — At exactly no opacity a view leaves the accessibility tree, and a kept screen did not get it back
+
+With the hidden state at `opacity(0)`, a screen left and shown again under Apple's bar came back
+drawn and answering a finger, and every button in its returning sections reported
+`isHittable == false` until something redrew it. The tests that existed did not see it: they
+checked that elements *existed*, and they did. A throwaway walk found it by failing to tap a day.
+Posting `.layoutChanged` did not help. Hiding at `0.001` instead of `0` did: the view is never
+pruned, so there is nothing for the tree to fail to restore.
+
+**The rule:** never animate a kept view through exactly zero opacity. And "present" is not
+"pressable" is not "drawn": a test that means one of them asks for that one —
+`isHittable` for pressable, a look at the pixels for drawn.
+
+## 2026-10-12 — Evidence before a fix, and the first two guesses were wrong
+
+For the fault above I first believed it was a fault of iOS 26.5 alone, because that is where the
+walk failed; a test written for it failed on iOS 27.0 as well. Then I believed the tree needed
+telling, and it did not. What settled it was a probe that printed, for the first visit and each
+return, whether each button existed, was hittable and was selected — and pressed one at its
+middle regardless. That showed the app answered while the tree said it could not, which is a
+different fault from the one I was about to fix.
+
+**The rule:** when a tap fails, find out which of three things is false — drawn, in the tree,
+answering — before changing code. One hypothesis, one change, one run.
+
+## 2026-10-12 — A reviewer's arithmetic found a fault, and the test found a second cause under it
+
+A fresh reviewer worked out, from the code, that the title would stand at two heights at the text
+sizes between the two I had rendered: History's `+` outgrows the title's line there. I wrote the
+test at one of those sizes and it failed, by 4.7 pt where the arithmetic said 4. The fix the
+reviewer named closed 2.7 of them. The test now printed all three frames, and they put History
+and Settings where they belonged and **Home** 2 pt high: `.frame(minHeight:)` reports less than
+its content when it is offered less, a `VStack` offers its least flexible child an even share
+first, and Home's column hands the header exactly its ideal height to divide. Nothing in the
+review or in my own reading said so.
+
+Two smaller things in the same test. The category the reviewer wrote,
+`UICTContentSizeCategoryExtraExtraExtraLarge`, is not a category's name — it is
+`UICTContentSizeCategoryXXXL` — and an unknown name is ignored without a word, so the test proves
+the size took before it compares anything. And an assertion that compares two frames prints
+both: "is not equal to 78" said that something had moved and not which screen.
+
+**The rule:** a fault found by arithmetic is confirmed by a failing test before it is fixed, and
+the fix is confirmed by the same test and not by the arithmetic. A header is rendered at a text
+size between the smallest and the largest, not only at the two ends. A line that must keep its
+height is `fixedSize`, not only floored.
+
+## 2026-10-12 — Kept screens each ran their own sky, and I had looked at the cut half a second after launch
+
+Under Apple's tab bar a screen is kept while its tab is away. Each screen stands its own
+`AuroraBackground`, and each started its lights the first time it was shown — so after the first
+minute the three were out of step for the rest of the session and the backdrop changed at every
+change of tab, by 12 to 16 levels in the screens' margins against 3 to 5 for four seconds of
+drift. I had read the page change frame by frame and called it clean. That recording changed tab
+half a second after launch, when every backdrop was still at its resting frame. The reviewer
+declined to judge it; the capture that settled it took one probe.
+
+**The rule:** when a view that used to be rebuilt is kept, everything in it that started "on
+appear" now starts once — list those and look at each. And a motion that depends on elapsed time
+is recorded after time has elapsed: a cut is checked a minute into the session, not at launch.
+Copies of one thing that must look the same read one clock.
+
+## 2026-10-12 — The newer system changed the page in one frame, and the older one did not
+
+I cleared a screen's arrival flag when its tab was left, and checked the recordings on iOS 27.0,
+where the page changes in the same frame. On iOS 26.5 the system goes on showing the old page
+for about a quarter of a second after the selection moves: the screen being left stood there with
+its title and nothing under it. The stage's own ledger listed "a recording of the final code on
+iOS 26.5" as not done.
+
+**The rule:** what a view does "when its tab is left" is seen by the user for as long as the
+system keeps that view on screen, and that differs by system. State that hides content is
+cleared when the view has gone (`onDisappear`), not when the selection moves. And a recording
+listed as not done on a system the app supports is not a footnote; it is the next thing to do.
+
+## 2026-10-12 — A frame of a gesture, reported as where the screen came to rest
+
+A probe failed, and the hierarchy captured at the failure had Home's title 23 pt above its place.
+I told the owner that Home scrolls by about 23 pt on the smallest phone. The run's own recording
+showed the column rubber-banding under eight swipes and coming back to rest exactly where it
+began: the snapshot was a frame of the gesture. The same probe had also never reached the screen
+it meant to scroll — its first tap, sent during the launch zoom, missed the tab bar — so its
+swipes were scrolling Home; and a swipe that starts on a slider would have moved the slider.
+
+**The rule:** a hierarchy dumped at a failure is one instant; before a position read from it is
+reported, the recording or a second read at rest confirms it. A probe waits out the launch before
+its first tap, checks that it is on the screen it means to act on, and drags in a margin, never
+across a control.
+
+## 2026-10-12 — Two gate failures that were not the product's, and one I cannot place
+
+With two other projects' test runs going on the same Mac the load average passed 500. A UI test
+that guards itself against a slow machine failed on its guard — "too slow to tell" — and the
+same eleven tests passed at a load of 55. That one is the machine's. A second test failed once on
+iOS 26.5: a tap high on the Cup's disc lit the disc, and nothing was poured. Its own recording
+shows the press. It passed 23 times after, six of them from a cold boot, and I do not know why
+it failed.
+
+**The rule:** a failure that reruns green is still written down with what was seen, how many
+times it was rerun, and the words "cause not established" when that is the case — never folded
+into "flaky". A test's own too-slow guard is believed: rerun it when the machine is free, and
+check the load before a gate run rather than after it fails.
+
+## 2026-10-12 — The stage moved the lines, and the sync that closed it re-derived none
+
+The `/doc_sync` that closed stage 3b checked the file table, the test counts and the keys, wrote
+two new sections, and left `docs/STATE.md` alone "because no stored shape moved". The stage had
+moved lines in six app files. Fourteen line citations in `docs/AI_CONTEXT.md` and one in
+`docs/STATE.md` pointed at the wrong line when it finished — the sync after stage 3 had re-derived
+exactly these, and wrote down that it had, in the same known issue. The owner
+ran `/doc_sync` again; a script over every `File.swift:NNN` found them in one call. The same
+pass gave the stage's text to two fresh readers, which the first pass had said in its own header
+it had not done. They found nine things in prose I had written and re-read: a capture-harness
+helper that rests on the tab container the stage replaced, in a file the stage never opened; "the
+code contradicts two rules", which was two by intent and four by the letter; a sentence that
+disagreed with the table above it. And one count in `docs/STATE.md` had been one short since
+stage 3, under a sentence that said the paragraph "was not recounted".
+
+**The rule:** after a stage, take the files its diff moves lines in from `git diff -U0`'s hunk
+headers, and re-derive every line citation into them in every doc — a doc's subject can be
+untouched while a line it cites has moved. When a stage replaces a mechanism, search the whole
+repository for prose and code that names the old one — tests, harnesses and scripts too, not only
+the files in the diff. A per-suite figure is recounted by script whenever a suite a doc names
+gains a test; "not recounted" is not a state to leave a figure in. And a sync's new text goes to
+a fresh reader before the sync is called done: writing "not given to a fresh reader" in the
+header records the gap and does not close it.
+
+## 2026-10-12 — Motion I read off frames, and the owner watched on a phone
+
+The owner asked for a page change that looks premium. I built a page that changes in one frame
+and content that rises 10 pt and fades in over 0.4 s, and checked it the only way I had: frame
+by frame off simulator recordings, where every frame of it is there to count. They built it to
+their iPhone and said there was no animation — "It just appears." A frame sheet shows that
+motion exists; it does not show whether anyone would notice it at speed. And I had chosen the
+quiet version twice on my own: the title held still, the capsule kept off a spring because a
+rule names one, in answer to a request whose two words were "premium" and "interactions".
+
+**The rule:** for motion, say in the stage's records how large and how long it is in plain
+numbers — points travelled, share of the screen, seconds — and if a change is under about 20 pt
+or under a fifth of a second of visible travel, say that it will read as nothing and ask before
+building it. A recording is evidence that something plays, never that it is felt; what is
+felt waits for the owner's device, so the first thing shown to the owner is the boldest
+version, with the quiet one named as the alternative. When a rule and the owner's request pull
+apart, build what was asked and propose the rule's wording — do not shrink the request to fit
+the rule.
+
+## 2026-10-12 — The system's effect did not work in a list, and I found out from a frame at rest
+
+For "sections recede as they scroll off" I used SwiftUI's `scrollTransition`, wrote its
+arithmetic's tests, saw them pass, and recorded a walk to watch it move. Inside History's `List`
+it never reported a row as being at rest: every row on the screen stood at 0.94 and half
+strength. The tests could not know — they tested my arithmetic, which was right, and not what
+SwiftUI handed it. I saw it only because the first frame I pulled happened to be one taken at
+rest. Settings, a `ScrollView`, was fine.
+
+**The rule:** an effect whose resting state is "nothing" is checked at rest first, on every
+screen it is put on, before it is looked at moving — rest is what a user sees almost all the
+time. And a unit test of my half of an effect says nothing about the system's half: where the
+system supplies the input, either render it or compute the input myself, which is what the
+second version does.
+
+## 2026-10-12 — A fade is a change of contrast
+
+The scroll effect faded a section as well as shrinking it, as the owner had chosen. I rendered
+it, saw that cards drew back at the edge, and moved on. A fresh reviewer read my own frames and
+found what I had not looked for: a card a third of the way off the screen was at five sixths of
+its strength while the rest of it was still being read, and a line measured at 5.49:1 at rest
+read about 3.8:1 in it. I had even written the reason down, for keeping the effect off Home.
+
+**The rule:** anything that lowers the opacity of content carrying text is a contrast change at
+every position it can rest in, and is measured there against the floor or is not built. To
+show that something is receding, move or scale it. And when I write a reason for leaving an
+effect off one screen, check whether the same reason holds on the screens I am leaving it on.
+
+## 2026-10-12 — The numbers I gave the reviewer were older than the code
+
+I told the reviewer the unit suite was 531 tests and that the tab tests passed on three
+systems. The tree held 537 — six had been added after that run — and the runs on two of the
+three systems predated four of the six tasks. It read the logs' times against the files' and
+said so. Nothing was wrong underneath; the gate later ran everything on the final source. But
+I had handed over figures as the state of the tree that were not.
+
+**The rule:** a figure given to a reviewer or to the owner is from a run that started after the
+last source file was written, or it carries the time of the run and the words "before the last
+edits". Before dispatching a review, run the suite once more and take the numbers from that.
+
+## 2026-10-12 — "The simulator has no switch for it" was true of one tool
+
+For two stages the records said Reduce Motion could not be rendered: `simctl ui` has no switch
+for it. The reviewer pointed out that the simulator's own Settings app has one. A UI test can
+open `com.apple.Preferences`, go to Accessibility and Motion, and press it — and read it back.
+Ten minutes later the page change, a pour and a scroll had been run and recorded under it, and
+a column of the spec's table that had rested on reading alone had been executed.
+
+**The rule:** "cannot be done here" is a claim about every route, and I had tried one. Before
+writing that a setting cannot be turned on in a simulator, try turning it on the way a person
+would, through the system's own screens, from a UI test. Reduce Transparency is still recorded
+as unrendered and has not been tried this way.
+
+## 2026-10-12 — No test ran, and the run said it had succeeded
+
+To run the UI class in chunks I put the `-only-testing:` flags in a shell variable. The
+owner's shell is zsh, which does not split an unquoted variable into words: `xcodebuild` got
+one argument that named no test, ran none, and printed `Executed 0 tests … ** TEST SUCCEEDED **`
+with exit code 0. I caught it because I read the count.
+
+**The rule:** the verdict of a test run is the number of tests executed, then the number
+failed — never the last line alone, and never the exit code. In zsh a variable holding several
+arguments is written `${=FLAGS}`.
+
+## 2026-10-12 — Two good motions made a worse one
+
+A page slid in, and under its title its sections faded and rose into place, as they had been
+designed to before there was a slide. Each was fine. Together, the page that crossed the screen
+was a header over sections still at half strength with two thirds of the way gone — the slide
+was there and there was little on it to see slide. The reviewer said it could not judge that
+without seeing it move; I had the frames and had looked at the last one of each.
+
+**The rule:** when a motion is added on top of one that already runs at the same moment, read
+the frames from the middle of the pair, not the end, and ask what is on screen at the half-way
+point. If the answer is "not much", one of the two goes.
+
+## 2026-10-12 — I wrote "not given to a fresh reader" again, hours after the rule against it
+
+The entry above headed *The stage moved the lines* ends: "a sync's new text goes to a fresh
+reader before the sync is called done: writing 'not given to a fresh reader' in the header
+records the gap and does not close it." The same day, the records of stage 3b's second pass
+went out with that sentence in their header. The owner ran `/doc_sync`; two readers found
+fourteen things in text I had written and re-read, and I found a fifteenth. Four of them were
+in what I had just told the owner.
+
+Why it happened twice: the rule lived in this file, which is read at the start of a session.
+The records were written after the session's context had been summarised, from a task that
+said "the records" and listed the files. The step was in no list I was working from.
+
+**The rule:** the reader step is a line in the plan's records task and in the ledger's
+*Read this first*, with the file its report is saved to — a step with an output, not a lesson
+to remember. A records task whose header has to admit a gap that a rule here already names is
+not finished. Readers are briefed on parts by line range, told what is and is not a finding,
+and given the gate's logs and the saved reports to check figures against.
+
+## 2026-10-12 — "Identical", "whole", "no run retried": three absolutes, none checked at its edge
+
+Three sentences in the second pass's records, and in my closing report to the owner:
+
+- The two builds' foot of the screen on iOS 27.0 was "pixel for pixel" the same. The script
+  turns the difference to grey, counts pixels over 24 levels and reports nothing finer. Taken
+  finer: the bar itself differs by up to 11 levels in grey and 26 in blue, and what is above
+  it by 2 — no more than two captures of one build. The tolerance had hidden a small real
+  difference in the one thing the sentence was about.
+- "A page that slides in is whole." Its sections are. History's bars start at nothing on every
+  page and grow — which `Arrival`'s own DocC says in so many words — unless Reduce Motion is
+  on. (That last clause was missing from my correction, in six places: an absolute again,
+  with its exception two lines from the code I was quoting.)
+- "No run was retried." No test run was. The warnings comparison was made twice — the ledger
+  says the first "used `build` and was not like for like" — and it said so seven lines below
+  where I copied the times.
+
+Each was true of what I had in mind and false as written.
+
+**The rule:** an absolute in a record — identical, whole, none, every, never — is written with
+its measure. If a script produced it, quote the script's threshold and its finest output, not
+an adjective. If the code produced it, grep the readers of the flag or the value before
+writing "every" or "only": the exception is usually stated in a comment three files away. If
+the ledger produced it, read the ledger's parentheses.
+
+## 2026-10-12 — I joined a reviewer's arithmetic to its readings, gave a range by its middle, and then corrected it wrongly
+
+The reviewer wrote three things about the fade. Arithmetic: a 330 pt card with a third of
+itself past the top is drawn at about 0.83. Two readings, off 603 px frames it called
+indicative: with History's week card mostly out of the screen, one line read about 3.6–4.0:1,
+under the floor; with a Settings card about a third out, its caption read about 5.9–6.9:1,
+over it. In five places in the records and in a DocC I wrote that the line "read about
+3.8:1" — the middle of the first range, read by nobody. Three of the five, the entry above
+headed *A fade is a change of contrast* among them, and the DocC put it on the card a third
+of the way out, which is the second reading's card. The conclusion stands; the evidence for
+it was misdescribed in the sentence that gives the owner the reason for overriding their
+choice.
+
+Then the correction went wrong the same way. A reader's summary said no reading had been
+taken on such a card; I had the reviewer's lines printed on my own screen, the second reading
+among them, and wrote "its one reading" and "nobody read that card" into five documents from
+the summary. A third reader, given the review to check against, found it.
+
+**The rule:** a figure taken from a report is copied from the saved file, open, with its range,
+its method and the thing it was read on. A midpoint is not a reading. Findings that are
+separate in a report stay separate in the record. And a correction is checked against the
+same primary file as the claim it corrects — never against another reader's account of it.
+
+## 2026-10-12 — A spec was superseded in part and nothing in it said so
+
+The second pass's spec opens "supersedes in part" the first build's, and lists what in its §8.
+The first build's spec and plan said nothing: a reader landing on either would take the
+`TabView` container and kept screens as what the tree does. The closing checkpoint recorded
+"the first build's spec gains nothing".
+
+**The rule:** when a new document supersedes part of an older one, the older one gets a dated
+note at its head in the same pass, naming what no longer holds and where the replacement is.
+The pointer belongs in the document a reader reaches first.
+
+## 2026-10-12 — The table was checked by script and the counts in the prose beside it were not
+
+`sync_check.py` compares each of the file table's 78 rows with its file. A paragraph above the
+table still said "the other thirteen are app-only" (nineteen), one below it "the 63 above"
+(75), and neither is a row. Elsewhere: "47 new tests in all" (48 with the UI test), "the other
+two scripts" (four), and a block kept "as written" whose three figures the pass had changed.
+
+**The rule:** when a table gains rows or a constant changes, search the section and the blocks
+kept beside it for the number words and digits that count the same things. A block kept as
+written gets one line above it listing the figures in it that are no longer the tree's.
+
+## 2026-10-12 — Every round of fixes added claims, and the claims I added were the ones that were wrong
+
+Two readers found fourteen things. I fixed them; a third reader found eight in the fixes; I
+fixed those; a fourth found eight more, smaller. Almost none of the later findings were in
+what I had been asked to correct. They were in what I added while correcting: a share of
+differing pixels printed by my own script, which two captures of one build exceed; "the
+content above the bar is the same", where the measure was 2 levels; "pinned to the wrong
+card", of a sentence that named no card; and a line saying a fourth reader had read the text,
+written before that reader was dispatched.
+
+**The rule:** fix a wrong sentence by taking the wrong words out or by quoting the primary
+file — not by adding a new figure, a new cause or a new summary beside it. Every number a
+fix introduces gets a control first: the same script on two captures of one build, the same
+grep on the tree before the change. And nothing is written in the past tense about a step
+that has not happened; the record of a reader is written when its report is on disk.
+
+## 2026-10-12 — I broke the rule above in the round that wrote it
+
+The entry above says to fix by taking words out, and not to write of a step before it has
+happened. The owner ran `/doc_sync` once more and a reader went over that same round
+(`docsync-55-reader-e.md`). I had recorded the round as applied "mostly by taking words out":
+against the old words, six of the eight fixes were longer. And the sentence saying the fixes
+"were checked against their files by this session" was in `docs/AI_CONTEXT.md`, which I
+saved before I had finished editing other documents. The same reader found an entry above saying `sync_check.py` compares "each of
+the file table's 78 rows": it reads 77 of the Swift rows and one row for a PNG, and its two
+reports are that PNG row and the Swift row it does not read.
+
+**The rule:** do not characterise a round of fixes — count them from the diff or say only
+that they were made. The paragraph that closes a pass, and the git block, are written in the
+last file saved, after the last command has run, and they claim nothing about what comes
+after them. What a script covers is read off its own output line before it is called "each"
+or "all".
+
+## 2026-10-13 — The gate ran on two stages together, and the first commit was to be one of them
+
+Stage 3 sat in the index while stage 3b was built on top of it in the working tree. For a day
+the records said "stage 3 commits first, from the index as it stands", and the gate they
+reported was the working tree's: both stages at once. At `/commit` I saw that the tree of the
+first commit had not been tested in this session at all. The remedy took about forty
+minutes: export the index with `git checkout-index -a --prefix=…` to a scratch folder, build
+and test it there into its own DerivedData. It passed, one test on a second run.
+
+**The rule:** when one stage is staged and another is built over it, the staged tree is gated
+from an export of the index before anything says it is ready to commit — at the latest when
+the second stage's gate is run, in the same sitting. A gate's record names the tree it ran
+on: the working tree, or the index.
+
+## 2026-10-13 — A run I did not expect to fail sat for ten minutes when a runner was killed
+
+The first UI chunk of that gate ran without `-collect-test-diagnostics never` — the rule's
+commands do not carry it — because I did not expect it to fail. One test's runner was
+killed, the other eight passed, and `xcodebuild` sat ten minutes more before it exited (#101)
+while midnight came closer and the tests that read "today" waited. The flag changes nothing
+for a run that passes.
+
+**The rule:** every UI run I am going to wait on carries `-collect-test-diagnostics never`,
+expected to fail or not; the record says which runs carried it. As precautions, not as
+anything shown to be a cure: boot the simulator once before the runs, so that `xcodebuild`
+does not boot it for each, and do not start a UI run that would be running when the day
+changes.

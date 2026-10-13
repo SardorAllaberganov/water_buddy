@@ -4,6 +4,217 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-13 (fifty-sixth pass — `/doc_sync` run by the owner after `/commit`
+had put its plan to them, by the same session. **Nothing is committed; the plan waits for the
+owner's word.** HEAD is `e16221e`, stage 3 in the index and stage 3b unstaged, as before, and
+no source or test file has changed since 13:42:47 on the 12th. **What is new is a gate
+result: before its plan, `/commit` gated the staged tree by itself**, from an export of the
+index, because the gate of the 12th had run on stage 3 and stage 3b together. 479 unit tests
+in 60 suites; `GoalSetupUITests`' 25 and the other classes' 18 on iOS 27.0 and on 26.5; 57
+watch tests; both widget builds. **One chunk of it ended `** TEST FAILED **`:** on iOS 27.0
+the runner of `testAnUndoOfferExpires` was killed — the result bundle, read that night and
+gone from DerivedData since, said "Test crashed with signal term" — and the test passed when
+run alone. What killed it is not known: **#122, opened.** Not run: iOS
+18.6. The results are at the head of *Current state*. Clean at the start of this pass: 78
+`.swift` files, each named here; 547 `@Test`, 57 on the watch, 38 UI `func test`; eleven
+keys; three exception sets. `docs/DESIGN.md`, `docs/STATE.md`, `docs/WIDGET.md` and
+`CLAUDE.md` were not edited. **One fresh reader checked this record against the logs**
+(`docsync-56-reader-g.md`): every result, count, device and time matched, and six things in
+the wording are answered in it — among them that #122 no longer offers the simulator's boot
+as what set the killed chunk apart, since `xcodebuild` booted it for four later runs that
+passed. The answers were read by no reader. **Still true:** nothing has run on a device.)
+
+<details>
+<summary>Fifty-fifth pass — 2026-10-12, retained</summary>
+
+**Last updated:** 2026-10-12 (fifty-fifth pass — `/doc_sync` run by the owner a third time,
+after the fifty-fourth, by the same session. **No source or test file changed and nothing was
+built or run**: HEAD is `e16221e`, stage 3 in the index and stage 3b unstaged, as before.
+Clean at the start: 78 `.swift` files, each named here; 547 `@Test`, 57 on the watch, 38 UI
+`func test`; eleven keys; three exception sets; four schemes. **One fresh reader went over
+the round the header below says no reader had read**, and over that header and its
+checkpoint as wholes (`docsync-55-reader-e.md`, saved as it arrived). Of reader D's eight,
+seven fixes were right and one carried a pointer a row off. **Nine findings, none touching a
+figure from the code, the gate, the pixels, the review or git.**
+- **Two are in this file.** In the header below, which is kept as written: its last fixes
+  were not applied "mostly by taking words out" — against the old words, six of the eight
+  were longer — and its sentence that they "were checked against their files by this
+  session" was saved before that pass's last edits to other documents. So was "after its
+  last edit" under *Git*, which is kept there as that pass's block.
+- **Four are in `HISTORY.md`'s checkpoint of that pass and one in a lesson of it**; today's
+  checkpoint and a new lesson supersede them.
+- **Fixed where they stood:** History's bars are simply there under Reduce Motion, which
+  *Current state* and #120 (e) now say; and the note withdrawing a pixel share in #119 said
+  it had stood "for an hour", where it was under forty minutes. `docs/DESIGN.md` carries
+  both, and a pointer that was a row off; the second pass's spec and plan carry the first.
+
+Known issues: **#119 and #120 amended; none opened, none retired.** **The gate was not run
+in this pass**; its figures below are the second pass's. **Still true:** nothing has run on a
+device. **A last reader read this header, today's checkpoint and lesson and this pass's
+edits** (`docsync-55-reader-f.md`, saved as it arrived): none of reader E's nine left
+unanswered, and six things of its own in the new words, each answered in the text above, in
+the checkpoint or in the document it named. Those edits, this sentence and the git block
+were read by no reader.)
+
+</details>
+
+<details>
+<summary>Fifty-fourth pass — 2026-10-12, retained</summary>
+
+**Last updated:** 2026-10-12 (fifty-fourth pass — `/doc_sync` run by the owner straight after
+the fifty-third, by the same session. **No source or test file changed, nothing was built or
+run, nothing was staged and nothing is committed**: HEAD is `e16221e`, stage 3 in the index
+and stage 3b, in both its builds, unstaged, as before. The mechanical checks were clean at the
+start — 78 `.swift` files, each named here; 547 `@Test`, 57 on the watch, 38 UI `func test`;
+eleven keys; three six-file exception sets. **The fifty-third pass's text went to two fresh
+readers, which its own header said it had not: fifteen findings, fourteen theirs and one this
+pass's own, each read again against the code, the gate's logs or the saved reports before a
+word was changed.** Their reports are saved as they arrived, beside the ledger. **Four were
+things the closing report had told the owner:**
+- **"Pixel for pixel" on iOS 27.0 was a tolerance, and the bar is not quite the `TabView`'s.**
+  The measure is "no pixel of the bottom 700 differs by more than 24 levels **in grey**".
+  Taken finer: in the bar's own 83 pt, up to 11 levels in grey and 26 in blue; in the content
+  above it, 2 and 4 — which is also all that two captures of one build differ by (#119).
+- **"A page that slides in is whole" had an exception the code states.** Its sections are;
+  History's bars start at nothing on every page and grow, unless Reduce Motion is on.
+- **"No run was retried" left out a comparison made twice** — the clean build of the app
+  scheme and the widget build behind the warnings row. No test run was repeated.
+- **"About 3.8:1" was never read.** The reviewer read two frames: 3.6–4.0:1 with the week
+  card mostly out, and 5.9–6.9:1 — over the floor — with a card about a third out. 3.8 is
+  the middle of the first range. Three of the records, and a DocC, also put it on the card
+  a third out, which is the second reading's.
+
+**A third reader then read this pass's own corrections and found eight things in them**, two
+that mattered: the first version of the last bullet said the reviewer had taken one reading
+and that nobody had read a card a third out; and the builds' times and actions were given
+wrongly for the widget. All eight are applied, each against the file it comes from
+(`docsync-54-reader-c.md`). **A fourth, narrower reader then read those fixes**
+(`docsync-54-reader-d.md`): the two that mattered stand, and it found eight smaller things —
+a share of differing pixels that meant nothing, one "slides in whole" left behind, Reduce
+Motion missing from the sentence about History's bars, and five of wording. Those are
+applied too, mostly by taking words out, and **were checked against their files by this
+session and by no further reader**.
+
+**The rest:** the app-only list said thirteen files and is nineteen; "the 63 above" is 75;
+the kept first-build block's rise, stagger and *Undo* scale are not the tree's and nothing
+said so; one citation was two lines off (#103 (k)); `docs/DESIGN.md` still had no switch for
+Reduce Motion, four readers of it where there are three, and "the other two scripts" where
+there are four; the second pass's spec said no call site spells a curve, against sixteen
+that do and its own §7; its plan's *As built* missed four differences; and the first build's
+spec and plan did not say the second pass had replaced their container. **Ten comments in
+source and tests that are false, or name a mechanism that is gone — nine of them the second
+pass's doing — are listed in #117**; a doc sync edits none.
+Known issues: **#103, #117, #119, #120 and #121 amended; none opened, none retired.**
+`docs/STATE.md`, `docs/WIDGET.md` and `CLAUDE.md` were read and needed nothing. **The gate
+was not run in this pass**: its figures below are the fifty-third's, and both readers checked
+them against the logs, which are newer than the newest source file. **Still true:** nothing
+has run on a device.)
+
+</details>
+
+<details>
+<summary>Fifty-third pass — 2026-10-12, retained</summary>
+
+**Last updated:** 2026-10-12 (fifty-third pass — the records of **stage 3b's second pass**, by
+the session that built it. **It is finished, tested and unstaged, on top of stage 3b's first
+build; stage 3 is still staged; nothing is committed.** HEAD is `e16221e`. **How it came
+about:** the owner built the first build to their iPhone (iOS 27.0) and said there was no
+animation in a change of page and that it did not look premium — "It just appears." They chose
+a slide by direction and all four groups of micro-interactions. **What it is:** `RootTabView`
+is one pager on every system — one backdrop, two pages at most (`PageTurn`), a bar in the
+bottom inset; Apple's `TabView` is gone and its bar stays as a standalone `UITabBar`
+(`SystemTabBar`); a page is rebuilt each time it is shown; `Motion` names the curves; a drop
+from the disc to the vessel, a marker that glides, a tick that draws itself, sections that
+shrink as they scroll off (`PourDrop`, `ScrollDepth`). **No key added** — eleven — and no
+shared, widget or watch file touched. **78 `.swift` files, 75 in targets; 547 `@Test`
+functions in 68 suites; 57 on the watch; 38 UI `func test`, 51 executed a system.** The gate
+ran on the final source, all five invocations, the UI class in chunks on iOS 27.0, 26.5 and
+18.6, **no run retried**; no new warning against a clean build of the index. **A fresh
+reviewer read the pass's diff**: two important findings, both acted on — the scroll effect
+faded text still on screen, and its figures were not the final tree's. **Reduce Motion was run
+for the first time in this project**, switched on through the simulator's own Settings app.
+**For the owner:** on iOS 26.x the bar's glass is darker than a `TabView`'s (#119); the scroll
+effect does not fade, where they chose "fade and shrink"; a tap on the tab already shown no
+longer scrolls to the top (#120). Known issues: **#114 retired; #82, #84, #103, #104, #106,
+#111, #112, #115, #116, #117 and #118 amended; #119 to #121 opened.** Every line citation
+into the six app files the pass moved was re-derived. `docs/DESIGN.md` gains *Motion* and its
+tab-bar and arrival sections are brought up to date; `docs/STATE.md` has one citation moved;
+`docs/WIDGET.md` and `CLAUDE.md` were checked and needed nothing. **This pass's own text was
+not given to a fresh reader.**)
+
+</details>
+
+<details>
+<summary>Fifty-second pass — 2026-10-12, retained</summary>
+
+**Last updated:** 2026-10-12 (fifty-second pass — `/doc_sync` run by the owner straight after
+the fifty-first, by the same session. **No source or test file changed, nothing was built or
+run, nothing is staged and nothing is committed**: HEAD is `e16221e`, stage 3 staged and stage
+3b unstaged, as before. The mechanical checks were clean at the start — 70 `.swift` files and
+every row's line count, 500 `@Test` in 64 suites, 57 on the watch, 37 UI `func test`, eleven
+keys, the three exception sets, every rule citation, no source file newer than the docs — so
+this pass did what the fifty-first said it had not: **two fresh readers were given the stage 3b
+text**, one this file's and one `docs/DESIGN.md`'s with `CLAUDE.md`, and each finding was
+checked against the code before a word changed. **Nine findings and three smaller remarks, none
+serious, all acted on.** What was wrong: **(1) the fifty-first pass re-derived no line
+citation** after a stage that moves lines in six app files — fourteen citations in this file
+and one in `docs/STATE.md`, to twelve places in the code, pointed at the wrong line; this
+pass's own script found them, and #103 gains (i), where each stands now. **(2) The capture
+harness's `returnToTop` rests on the container stage 3b replaced**: on iOS 26 and later a kept
+screen is not rebuilt at its top — by reading only, the harness is not run by the gate (#82,
+#114, #117). **(3) "The code contradicts two rules" was an undercount by the letter**: two of
+the stage's haptics are triggered by a view's own state where two rules ask for a counter, and
+the spec proposed no wording for it (#111, and a dated note in the spec's §8). **(4) Smaller:**
+`PressStyle` is not stage 2's (#115); `ScreenMetricsTests` holds Home's and History's numbers,
+not three screens'; #106 did not say that #114 changes it; `docs/DESIGN.md` has four sentences
+corrected, each marked where it stands; and `docs/STATE.md` one count that had been one short
+since stage 3 — 204 `@Test` in its seventeen suites. What the readers checked and found right
+— every count, constant, test name and git listing they could reach — is listed in their
+reports, saved as they arrived beside the stage's ledger. **Not checkable from the tree and
+not re-checked by anyone**: by the readers' own tallies about 55 statements in this file's
+stage 3b text and about 90 in `docs/DESIGN.md`'s and `CLAUDE.md` — gate results, contrast and
+pixel figures, readings off recordings. `CLAUDE.md` and `docs/WIDGET.md` were read and needed
+nothing. Known issues: none opened and none retired; **#82, #84, #103, #104, #106, #111, #114,
+#115 and #117 amended**. **The gate was not run in this pass**; every result below is the
+fifty-first's.)
+
+</details>
+
+<details>
+<summary>Fifty-first pass — 2026-10-12, retained</summary>
+
+**Last updated:** 2026-10-12 (fifty-first pass — `/doc_sync` at the end of the redesign's stage
+3b, navigation and motion, by the session that built it. **Stage 3b is finished, tested and
+unstaged; stage 3 is still staged; nothing is committed.** HEAD is `e16221e`. **How it came
+about:** the owner, shown stage 3's History, said the title stood in a different place on Home
+and History, that the change of page looked poor, and that the bar should be iOS's own glass bar
+with its drag; shown the built screens beside the canvas with seven differences marked, they
+said "go". **What it is:** one header on every tab (`ScreenHeader`); Apple's `TabView` bar on
+iOS 26 and later and the app's own below, behind the codebase's third version check; a shade
+under Apple's bar, because its selected caption read 3.79–4.46:1 on iOS 26.5 without one; every
+screen's content settling in under a title that holds still (`Arrival`); every backdrop on one
+clock (`AuroraDrift`); and two haptics more, `select` and `remove`. **No key added** — eleven —
+and no shared file, widget or watch file touched. **70 `.swift` files, 67 in targets; 500
+`@Test` functions in 64 suites; 57 on the watch; 37 UI `func test`, 50 executed a system.** The
+gate ran on the final source: all five invocations, the UI class in chunks on iOS 27.0, 26.5 and
+18.6; no new warning against a clean build of the index. **Two chunks failed on a first run and
+passed on a second**, one on a busy Mac and one for a cause not established (#115). **A fresh
+reviewer read the stage's diff**: four important findings, all acted on — and two of the seven
+things it declined to judge were rendered and found to be defects: the backdrop changing at
+every change of tab, and on iOS 26.5 the screen being left standing empty for a quarter of a
+second. **The rule wording is in the stage's spec and in no rule file**, so the code contradicts
+two rules as they stand (#111). Known issue **#110 updated; #111 to #118 opened.**
+`docs/DESIGN.md` gains *Apple's tab bar, measured* and *The header and a screen arriving*, and
+its sections on the aurora and the haptics are brought up to date; `docs/STATE.md` and
+`docs/WIDGET.md` were read and needed nothing — no stored shape and no widget contract moved;
+`CLAUDE.md` gains one clause in its target table, **unstaged**. **This pass's own text was not
+given to a fresh reader**, as the fiftieth's was.)
+
+</details>
+
+<details>
+<summary>Fiftieth pass — 2026-10-11, retained</summary>
+
 **Last updated:** 2026-10-11 (fiftieth pass — `/doc_sync` at the end of the redesign's stage 3,
 History, by the session that built it. **Stage 3 is finished, tested and staged; nothing is
 committed.** HEAD is `e16221e`, 96 commits: **stage 2 was committed in between** — `1ced514`,
@@ -29,6 +240,8 @@ stage's ledger. Known issues **#62 and #92 retired**; #39, #82, #83, #85, #90, #
 and #105 updated; **#107 to #110 opened.** Rule wording for two rule files is written and **unstaged**,
 for the owner. `docs/DESIGN.md` gains History's measured table; `docs/STATE.md` and
 `docs/WIDGET.md` gain a dated note each; `CLAUDE.md` was read and needed nothing.)
+
+</details>
 
 <details>
 <summary>Forty-ninth pass — 2026-10-11, retained</summary>
@@ -814,8 +1027,8 @@ Since 2026-10-08 the same intent also sits behind the Control Center control (iO
 same snapshot; the one-tap doors take the Glass's index from one name, `DataManager.usualSlot`, for
 its amount and its glyph — and since stage 2 Home marks its primary disc by it. *(Read "is named
 once" until the forty-eighth pass. Two other spellings of the same index exist: a literal `[1]` in
-`HistoryView.swift:240` and the watch's own `primaryIndex = 1`, `WristView.swift:136` — known
-issue #104.)*
+`HistoryView.swift:283` (`:271` after stage 3b's first build, `:240` before it) and the
+watch's own `primaryIndex = 1`, `WristView.swift:136` — known issue #104.)*
 
 ## Targets
 
@@ -823,8 +1036,8 @@ issue #104.)*
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent`; and, from iOS 18 behind the codebase's first `if #available`, the Control Center control `LogWaterControl` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 479 `@Test` functions in 60 suites, all run on 2026-10-11 (35 tests are the redesign's stage 3, staged: four new suites — `DaysMetTests` 8, `DayFractionTests` 9, `HistoryLayoutTests` 12, `HistoryStringTests` 3 — and one test more in each of `HistoryWindowTests`, `HistoryServingTests` and `GroupedFigureTests`. Stage 2's 57 in eight suites were committed in `1ced514`: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` in `c9ef45d`). *(Read 444 in 56 until the fiftieth pass; 387 in 48 until the forty-seventh — the forty-sixth updated the header and the gate and left this row.)* |
-| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (25 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass; eleven are stage 2's, committed in `1ced514`: Home's heading, the two "never squeezed" checks, and *Undo*; five are stage 3's, staged: the strip's heading, the sheet's shortcuts, and three at the largest text size — the shortcuts' figures, a row's amount, a past day's heading), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **30 declared, 43 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. Since stage 3 the target runs as two invocations, 25 and 18: one no longer fits a 600-second foreground call (known issue #110). *(Read "20 real tests … 25 declared, 38 executed" until the fiftieth pass; "9 real tests … 14 declared, 27 executed" until the forty-seventh.)* |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, **547 `@Test` functions in 68 suites, all run on 2026-10-12** (47 are stage 3b's second pass, unstaged: four new suites — `MotionTests` 6, `PageTurnTests` 13, `PourArcTests` 6, `ScrollDepthTests` 16 — four more in `ArrivalTests`, 10, and two more in `HistoryLayoutTests`, 14). Before that: 500 in 64 suites, all run on 2026-10-12 (21 are the redesign's stage 3b, unstaged: four new suites — `ScreenMetricsTests` 4, `ArrivalTests` 6, `BarShadeTests` 3, `AuroraDriftTests` 6 — and one test more in each of `HapticLadderTests` and `HomeLayoutTests`). Before that: 479 `@Test` functions in 60 suites, all run on 2026-10-11 (35 tests are the redesign's stage 3, staged: four new suites — `DaysMetTests` 8, `DayFractionTests` 9, `HistoryLayoutTests` 12, `HistoryStringTests` 3 — and one test more in each of `HistoryWindowTests`, `HistoryServingTests` and `GroupedFigureTests`. Stage 2's 57 in eight suites were committed in `1ced514`: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` in `c9ef45d`). *(Read 444 in 56 until the fiftieth pass; 387 in 48 until the forty-seventh — the forty-sixth updated the header and the gate and left this row.)* |
+| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — **since stage 3b's second pass, unstaged 2026-10-12: `GoalSetupUITests` has 33 tests, 38 declared, 51 executed a system, one of them skipped** — one more, that only the page shown is in the tree once a change of tab has ended. Before that, **since the redesign's stage 3b, unstaged 2026-10-12: `GoalSetupUITests` has 32 tests** — seven more, for the title's place (two), a screen coming back whole, a kept screen answering a tap, the drag along Apple's bar, the app's own bar's captions, and History returning to today — **37 declared, 50 executed a system, one of them skipped** (the caption test where the bar is Apple's, the drag test where it is the app's own), and the class runs in chunks (#110). The text that follows is the fiftieth pass's. — `GoalSetupUITests` (25 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass; eleven are stage 2's, committed in `1ced514`: Home's heading, the two "never squeezed" checks, and *Undo*; five are stage 3's, staged: the strip's heading, the sheet's shortcuts, and three at the largest text size — the shortcuts' figures, a row's amount, a past day's heading), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **30 declared, 43 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. Since stage 3 the target runs as two invocations, 25 and 18: one no longer fits a 600-second foreground call (known issue #110). *(Read "20 real tests … 25 declared, 38 executed" until the fiftieth pass; "9 real tests … 14 declared, 27 executed" until the forty-seventh.)* |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
 | `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 57 `@Test` functions in 6 suites |
@@ -904,32 +1117,42 @@ They live in `WaterBuddy/` and compile into **both** phone targets — and five 
 `NotificationManager.swift`, into the two watch targets as well, so most of them are in four
 binaries (the exception sets above). Of everything else under
 `WaterBuddy/`, **`WristPlan.swift` is shared too — with the two watch targets, not with the
-widget** (the two watch exception sets above) — and the other thirteen are app-only:
+widget** (the two watch exception sets above) — and the other nineteen are app-only:
 `RootTabView.swift`, `HomeView.swift`, `WaterBuddyApp.swift`, `GoalSetupView.swift`,
 `HistoryView.swift`, `SettingsView.swift`, `AuroraBackground.swift`, `PressStyle.swift`,
-`Celebration.swift`, `Haptics.swift`, `LogServingIntent.swift`, `WaterBuddyShortcuts.swift` and
-`WristInbox.swift`. *(Until the forty-seventh pass this sentence listed eight files and called
-"everything else" app-only, `WristPlan.swift` included.)* Editing one of the
+`Celebration.swift`, `Haptics.swift`, `LogServingIntent.swift`, `WaterBuddyShortcuts.swift`,
+`WristInbox.swift`, and stage 3b's six — `Arrival.swift`, `ScreenHeader.swift`, `Motion.swift`,
+`PageTurn.swift`, `PourDrop.swift` and `ScrollDepth.swift`. *(Until the forty-seventh pass this
+sentence listed eight files and called "everything else" app-only, `WristPlan.swift` included;
+until the fifty-fourth it said thirteen and left out stage 3b's six, which the file table below
+had as app-only all along — a fresh reader counted the folder: 26 files, less the six and
+`WristPlan.swift`.)* Editing one of the
 six edits at least two processes, and four for all but `NotificationManager.swift`; adding a
 seventh means editing that list.
 
 ## Files on disk
 
 ```
-WaterBuddy/AuroraBackground.swift                175   app only — the moving backdrop all four screens share; staged 2026-10-11, the redesign's stage 3: legibleOnBackdrop(), the two shadows for text that sits straight on it, moved in from HomeView now that History draws on it too
+WaterBuddy/Arrival.swift                         154   app only — unstaged 2026-10-12, stage 3b; rewritten by its second pass: Arrival (rise 14, stagger 0.05, hiddenOpacity never zero, and the pure opacity(arrived:settles:) and lift(arrived:settles:reduceMotion:)), EnvironmentValues.pageSettlesIn — true for the page the app opens on, false for every page a turn brings in, whose sections are whole as it slides (History's bars read the flag and not this, and grow on every page) — View.arrives(_:order:) and View.tracksArrival(_:), a task that sets the flag 50 ms after the page is built. isShownTab is gone
+WaterBuddy/AuroraBackground.swift                235   app only — the moving backdrop: RootTabView's one for the three tabs since stage 3b's second pass, and the first-run screen's and the serving sheet's own; unstaged 2026-10-12, stage 3b: AuroraClock and AuroraDrift, a CustomAnimation that places a light by one clock every copy reads; staged 2026-10-11, the redesign's stage 3: legibleOnBackdrop(), the two shadows for text that sits straight on it, moved in from HomeView now that History draws on it too
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
 WaterBuddy/DataManager.swift                    2845   shared — (2026-10-11, `1ced514`: addLog returns the row's id and undoLog(id:) takes it back; remaining, hasReachedGoal, lastDrink and nextReminder, derived on read; the published streak and its growing windows; dayDidTurn(), which the two day-change observers call; Bundle.figure for grouped volumes. Staged 2026-10-11, the redesign's stage 3: DaySummary.reached(_:) and daysMet(in:goal:); dayFraction(of:) and hours(_:onDayOf:) — where an instant falls in its day, by that day's real length — each a nonisolated static over a calendar with an instance wrapper) the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's and the control's one definition) at usualSlot (its index — one of three spellings, known issue #104), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
 WaterBuddy/GoalSetupView.swift                   273   app only — first-run goal setup; Get Started on the primary surface, range labels at white 0.75 (2026-10-10, `c9ef45d`)
-WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
-WaterBuddy/HistoryView.swift                    1525   app only — staged 2026-10-11, the redesign's stage 3: one List whose rows are the header (the day at .largeTitle, its total against the goal, the +; a past day on two lines at an accessibility text size), the week card that picks the day (cyan for a day that reached the goal, white for one that did not; Average, Best day, Goal met), DayStrip (When you drank: a bar per serving by time of day, hour labels at 6, 12 and 18, a bell at the next reminder) and the servings (ServingRow: the vessel's glyph in a dark well, the amount, the vessel's name, the time; two layouts); swipe-to-delete; the + and one add/edit sheet with three vessel shortcuts under the slider and a day · hour · minute wheel; StripBar at file scope and the statics stripBars(for:vessels:), vessel(forAmount:amounts:), sliderBounds(forAmount:vessels:) (2026-10-10, `c9ef45d`: Save on the primary surface; the shown day reads LiquidGlass.Selection; the goal line at white 0.55)
-WaterBuddy/HomeView.swift                        965   app only — 2026-10-11, `1ced514`, the redesign's stage 2: the date, the title and the streak chip; the vessel, sized by HomeColumn (a Layout) between vesselFloor and a ceiling that scales with text; the status line; the quiet line (next reminder, last drink) that Undo replaces for eight seconds, in three forms chosen by fit; the ranked quick-add row — the Glass on the primary surface, Cup and Bottle on glass in one glassGroup; UndoOffer; the goal burst (vesselSlots moved out, Task 14; legibleOnBackdrop moved out to AuroraBackground.swift, staged 2026-10-11)
+WaterBuddy/Haptics.swift                          66   app only — the feedback ladder: three rungs, and unstaged 2026-10-12, stage 3b, two more — select (the system's selection tick) and remove (a light impact at confirm's intensity)
+WaterBuddy/HistoryView.swift                    1625   app only — (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; markerOffset(ofDay:among:across:) and one capsule that glides to the shown day; DayStrip grows its bars again when the day changes (not under Reduce Motion); every row recedes through historyRow's scrollDepth(); the sheet's shortcut lozenge lands; the onDisappear reset is gone — a page is rebuilt) unstaged 2026-10-12, stage 3b: the header is ScreenHeader, everything under it arrives, the bars grow as it does, a tick for a day picked and a light tap for a serving swiped away, back to today in onDisappear; staged 2026-10-11, the redesign's stage 3: one List whose rows are the header (the day at .largeTitle, its total against the goal, the +; a past day on two lines at an accessibility text size), the week card that picks the day (cyan for a day that reached the goal, white for one that did not; Average, Best day, Goal met), DayStrip (When you drank: a bar per serving by time of day, hour labels at 6, 12 and 18, a bell at the next reminder) and the servings (ServingRow: the vessel's glyph in a dark well, the amount, the vessel's name, the time; two layouts); swipe-to-delete; the + and one add/edit sheet with three vessel shortcuts under the slider and a day · hour · minute wheel; StripBar at file scope and the statics stripBars(for:vessels:), vessel(forAmount:amounts:), sliderBounds(forAmount:vessels:) (2026-10-10, `c9ef45d`: Save on the primary surface; the shown day reads LiquidGlass.Selection; the goal line at white 0.55)
+WaterBuddy/HomeView.swift                       1072   app only — (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; a drop from the pressed disc to the vessel — anchors gathered by PourPlaces, flights, land(_:) — and the vessel's swell; the level on Motion.water; the Undo capsule and the streak chip land, each animation scoped to its own view; the onDisappear reset is gone) unstaged 2026-10-12, stage 3b: the header is ScreenHeader with the date under the title (dateFormat, dateScaleFloor 0.45), the vessel, status and row arrive, a disc's glyph bounces when poured, Undo ends in onDisappear; 2026-10-11, `1ced514`, the redesign's stage 2: the date, the title and the streak chip; the vessel, sized by HomeColumn (a Layout) between vesselFloor and a ceiling that scales with text; the status line; the quiet line (next reminder, last drink) that Undo replaces for eight seconds, in three forms chosen by fit; the ranked quick-add row — the Glass on the primary surface, Cup and Bottle on glass in one glassGroup; UndoOffer; the goal burst (vesselSlots moved out, Task 14; legibleOnBackdrop moved out to AuroraBackground.swift, staged 2026-10-11)
 WaterBuddy/LiquidGlassModifier.swift             824   shared — design tokens + the glass modifier; 2026-10-11, `1ced514`: routed branches on the pane's base only, and a .material pane on iOS 26+ always carries glassEffect — .identity when it is not Apple's — so a setting never moves a pane's content (#91a); .glassGroup(), Apple's GlassEffectContainer on iOS 26+ and nothing elsewhere; committed 2026-10-10 in c9ef45d: the routing (rendering, systemGlassAvailable, systemVariant), Apple's glass on iOS 26+ behind #if os(iOS) + #available, darkened by systemTintOpacity(for:) (0.52 regular, 0 clear) and given its hit region by .contentShape(shape), LiquidGlass.Primary and primarySurface(in:ring:), LiquidGlass.Selection
 WaterBuddy/LogServingIntent.swift                 78   app only — the Siri phrase's intent ("Log a Glass"): wait for the watch link, logTheGlass, wait for the reminder queue, reply "Water logged."
-WaterBuddy/NotificationManager.swift             283   shared — ReminderScheduler + reconcile, the only code that files, removes or asks permission (SettingsView.swift:225 also reads the centre's settings directly, for the Notification Summary line; it has since the first commit, and this row said "the only UN caller" until the forty-eighth pass); ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46), and settled(), which waits for it to drain
+WaterBuddy/Motion.swift                           93   app only — unstaged 2026-10-12, stage 3b's second pass: Motion, the curves by name — page (.smooth 0.45), pageFade (0.25, under Reduce Motion), settle (0.3), land (spring 0.5 / 0.68) and landSpring, water (spring 0.8 / 0.62), drop (easeIn 0.42) — and the plain numbers behind them. Sixteen older call sites still write .smooth themselves
+WaterBuddy/NotificationManager.swift             283   shared — ReminderScheduler + reconcile, the only code that files, removes or asks permission (SettingsView.swift:240 — :234 after stage 3b's first build, :225 before it — also reads the centre's settings directly, for the Notification Summary line; it has since the first commit, and this row said "the only UN caller" until the forty-eighth pass); ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46), and settled(), which waits for it to drain
+WaterBuddy/PageTurn.swift                         94   app only — unstaged 2026-10-12, stage 3b's second pass: PageTurn, a change of tab as a value — the page shown, the page leaving, which way the shown one came, and how many turns have been made; mounted (two pages at most, in the bar's order), offset, entry, opacity, and settle(_:), which ends a turn by its number
+WaterBuddy/PourDrop.swift                        160   app only — unstaged 2026-10-12, stage 3b's second pass: PourArc (a drop's path and presence, pure), PourPlace and the PourPlaces preference key (where the discs and the vessel stand), PourDrop (one 22 pt drop flown along the arc, reporting its landing) and View.swells(on:)
 WaterBuddy/PressStyle.swift                       32   app only — the shared press recoil
 WaterBuddy/ReminderPlan.swift                    149   shared — WHEN to remind, as a pure value
-WaterBuddy/RootTabView.swift                     274   app only — AppTab (3 cases), the container, the glass tab bar with a lozenge behind the selected tab (2026-10-09, committed in `c9ef45d`) (the 420pt cap's comment rewritten 2026-09-02: it justified itself in iPad measurements, and iPad is gone — the cap is kept, because 420 is below the widest iPhone's content width)
-WaterBuddy/SettingsView.swift                    660   app only — the goal editor (range labels at white 0.75, 2026-10-10, `c9ef45d`), the vessel editor, reminders, the language picker
+WaterBuddy/RootTabView.swift                     520   app only — unstaged 2026-10-12, stage 3b; its container rewritten by the second pass: ONE pager on every system — one AuroraBackground, the page shown and, while it slides, the page leaving (PageTurn; `.transaction(value:)` with addAnimationCompletion takes the old page out), one BarShade under Apple's bar — and the bar in a bottom safeAreaInset: SystemTabBar, a standalone UITabBar behind `if #available(iOS 26.0, *)`, or the app's own GlassTabBar. No TabView, no SystemTabs, no HandMadeTabs (the first build of stage 3b had all three). AppTab (3 cases, nonisolated now), the container, the glass tab bar with a lozenge behind the selected tab (2026-10-09, committed in `c9ef45d`) (the 420pt cap's comment rewritten 2026-09-02: it justified itself in iPad measurements, and iPad is gone — the cap is kept, because 420 is below the widest iPhone's content width)
+WaterBuddy/ScreenHeader.swift                     97   app only — unstaged 2026-10-12, stage 3b: ScreenMetrics (margin 24, topInset 16, titleLine 44, slot(of:across:)) and ScreenHeader, the header every tab opens with — the title, a line under it, an accessory on the title's line that never sets its height
+WaterBuddy/ScrollDepth.swift                     167   app only — unstaged 2026-10-12, stage 3b's second pass: ScrollDepth (phase(of:within:) by what is left showing, span(from:to:), scale to 0.92, anchor — pure; it shrinks and does not fade), EnvironmentValues.scrollDepthSpan, View.scrollDepth() (a visualEffect off the section's global frame) and View.scrollDepthContainer(). On History and Settings, not Home
+WaterBuddy/SettingsView.swift                    774   app only — (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; SavedTick and CheckShape, drawn over the title of the goal's and the vessels' cards by savedTick(_:) when a change is saved; the figure under a held slider at 1.06; the language's checkmark bounces; the cards re-lay out together when the reminders card's text changes; every section recedes with scrollDepth()) unstaged 2026-10-12, stage 3b: its title is ScreenHeader and its four cards arrive; the goal editor (range labels at white 0.75, 2026-10-10, `c9ef45d`), the vessel editor, reminders, the language picker
 WaterBuddy/WaterBuddyApp.swift                   108   app only — RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch
 WaterBuddy/WaterBuddyShortcuts.swift              38   app only — the one AppShortcutsProvider: three phrases (en + ru, AppShortcuts.xcstrings), the "Log a Glass" tile
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
@@ -937,19 +1160,25 @@ WaterBuddy/WaterSurface.swift                    194   shared — waves, scrim, 
 WaterBuddy/WristInbox.swift                       90   app only, NOT shared — reassembles chunked WristBatch payloads (wrist → phone), calls DataManager.ingest(_:)
 WaterBuddy/WristPlan.swift                        80   shared (in both watch exception sets, not the phone widget's) — ReminderPlan's pure twin: buckets the outbox by the watch's day, counts the phone's total until the phone's day ends, names the complication's turnover instants (spec §17)
 WaterBuddyTests/AppLanguageTests.swift           112   AppLanguageTests — the menu and each bundle
-WaterBuddyTests/AuroraBackgroundTests.swift       98   AuroraLightTests — the backdrop's lights
-WaterBuddyTests/CelebrationTests.swift           108   HapticLadderTests + ConfettiTests
+WaterBuddyTests/ArrivalTests.swift                82   unstaged 2026-10-12, stage 3b — ArrivalTests (not @MainActor, 10): the delay grows with the order and stops, the whole arrival is short, a hidden section is never at exactly nothing; second pass, four more: a page that slid in is whole from its first frame, a section of the opening page waits hidden and low, and under Reduce Motion it does not rise
+WaterBuddyTests/AuroraBackgroundTests.swift      168   AuroraLightTests — the backdrop's lights; unstaged 2026-10-12, stage 3b: AuroraDriftTests (not @MainActor) — there and back in two periods, the curve, the clock alone says where a light stands, a broken clock leaves it at rest
+WaterBuddyTests/CelebrationTests.swift           115   HapticLadderTests (stage 3b: remove is in the legal range and no firmer than confirm) + ConfettiTests
 WaterBuddyTests/DataManagerTests.swift          1331   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + WristPublishSeamTests + LanguageSeamTests
 WaterBuddyTests/EarlierServingTests.swift        429   HistoryLogsTests + RetimingTests + HistoryWindowStartTests (not @MainActor) + CorrectionRangeTests + RetimedPourTests + HistorySelectionTests (not @MainActor) — the window's published rows, re-timing a serving, where the week starts, what the sheet offers and where it opens, a watch pour re-timed, the screen's day selection
 WaterBuddyTests/HistoryRangeTests.swift          601   DaySummaryTests (pure, not @MainActor) + HistoryWindowTests; staged 2026-10-11, the redesign's stage 3: DaysMetTests — reached(_:) and daysMet(in:goal:) — + DayFractionTests — dayFraction and hours, across a 23- and a 25-hour day — both pure, not @MainActor
-WaterBuddyTests/HistoryViewTests.swift           265   HistoryServingTests — the editor's offered range (staged 2026-10-11: its bounds contain every vessel), and the fixture's own tripwire; staged 2026-10-11, the redesign's stage 3: HistoryLayoutTests (not @MainActor) — the strip's bars, a row's vessel, the strip's hours
+WaterBuddyTests/HistoryViewTests.swift           287   (second pass of stage 3b, unstaged 2026-10-12: two more in HistoryLayoutTests, 14 — the marker stands over the day shown, on the four real row widths, and a week of no days is no division by zero) HistoryServingTests — the editor's offered range (staged 2026-10-11: its bounds contain every vessel), and the fixture's own tripwire; staged 2026-10-11, the redesign's stage 3: HistoryLayoutTests (not @MainActor) — the strip's bars, a row's vessel, the strip's hours
 WaterBuddyTests/HomeModelTests.swift             409   2026-10-11, `1ced514` — UndoTests (the id addLog returns, undo by id, after midnight, on a failed read) + HomeFiguresTests (remaining, hasReachedGoal, lastDrink, nextReminder and what each observes) + DayTurnTests (dayDidTurn republishes on a real day change and on nothing else)
-WaterBuddyTests/HomeViewTests.swift              252   HomeServingTests — the quick-add row's offered vessels — + HomeLayoutTests (not @MainActor; 2026-10-11, `1ced514`): the Glass ranked, the vessel's floor and ceiling, what the column leaves it, the discs' bounds, an offer's lifetime, Home's glyphs
+WaterBuddyTests/HomeViewTests.swift              287   (unstaged 2026-10-12, stage 3b: theWidestDateFitsTheNarrowestPhoneAtTheLargestTextSize — every day of a year in three languages, measured in iOS's own font) HomeServingTests — the quick-add row's offered vessels — + HomeLayoutTests (not @MainActor; 2026-10-11, `1ced514`): the Glass ranked, the vessel's floor and ceiling, what the column leaves it, the discs' bounds, an offer's lifetime, Home's glyphs
 WaterBuddyTests/LiquidGlassTests.swift           247   LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response; 2026-10-10, `c9ef45d`: LiquidGlassRoutingTests (which pane, which of Apple's variants, the availability flag, only the regular variant darkened, and no lighter than the lightest rung that passed) + PrimarySurfaceTests (the derived contrast); none @MainActor
 WaterBuddyTests/LocalizationTests.swift          628   (2026-10-11, `1ced514`: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders. Staged 2026-10-11, the redesign's stage 3: HistoryStringTests — History's six keys in en/ru/uz, the four retired keys gone, and the built table's raw-number volume keys exactly the three other screens still draw) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
+WaterBuddyTests/MotionTests.swift                 64   unstaged 2026-10-12, stage 3b's second pass — MotionTests (not @MainActor, 6): a page changes in under half a second and over a quarter, the fade is shorter than the slide, what lands overshoots and does not ring, neither spring is as quick as the press's, a drop is quicker than the level, a state changes quicker than a page
 WaterBuddyTests/NotificationManagerTests.swift   352   NotificationManagerTests — applying a plan, against a spy scheduler — + ReconcileQueueTests (not @MainActor), against SharedCentre, a lock-guarded stand-in two reconciles can reach at once
+WaterBuddyTests/PageTurnTests.swift              185   unstaged 2026-10-12, stage 3b's second pass — PageTurnTests (not @MainActor, 13): a tab to the right comes in from the right and the page leaving ends a whole width away; the tab already shown turns nothing; two pages at most, in the bar's order; every turn is counted; an older turn's end does not end a newer one, nor does there-back-and-there-again inside one slide; under Reduce Motion nothing travels and the page leaving fades
+WaterBuddyTests/PourDropTests.swift               68   unstaged 2026-10-12, stage 3b's second pass — PourArcTests (not @MainActor, 6): a drop starts at the disc and ends in the vessel, rises above the line between, is held at its ends, is whole on the way and gone when it lands, and goes straight up from straight below
 WaterBuddyTests/ReminderPlanTests.swift          251   the plan — pure, and no UserNotifications import
-WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab bar's offered destinations
+WaterBuddyTests/RootTabViewTests.swift           102   AppTabTests — the tab bar's offered destinations; unstaged 2026-10-12, stage 3b: BarShadeTests (not @MainActor) — the shade is no lighter than the first rung with room, leaves the aurora showing, and its ramp is no taller than Home's foot
+WaterBuddyTests/ScreenHeaderTests.swift           40   unstaged 2026-10-12, stage 3b — ScreenMetricsTests (not @MainActor): Home's column padding is ScreenMetrics' margin and top inset and History's margin is ScreenMetrics' (Settings reads ScreenMetrics directly and is not in the suite, and History's top inset, one point less for its list, is not asserted — "the three screens read one margin and one top inset" until the fifty-second pass), seven day buttons clear 44 pt on a 375 pt phone, the title's line is at least a tap target, and a slot of nothing does not divide by zero
+WaterBuddyTests/ScrollDepthTests.swift           134   unstaged 2026-10-12, stage 3b's second pass — ScrollDepthTests (not @MainActor, 16): a section at rest is whole and at the edge at its floor, the top and the foot alike; a section inside what is shown has not moved at all, half out is half gone, wholly out no further; a card taller than the screen is whole while it fills it and nothing jumps as its top crosses the edge; a span of nonsense is no span
 WaterBuddyTests/ServingSeamTests.swift           297   ServingResolutionTests (pure, not @MainActor; usualSlot is the Glass, and usualServing reads it) + ServingSeamTests
 WaterBuddyTests/SiriPhraseTests.swift            277   UsualServingTests + ReconcileQueueSettledTests (both not @MainActor) + LogServingIntentTests + LogTheGlassTests + AppShortcutPhraseTests
 WaterBuddyTests/StreakTests.swift                310   2026-10-11, `1ced514` — StreakCountTests (pure, not @MainActor: DaySummary.streak and streakFillsWindow, and three on windowStart, historyWindowStart and streakWindows) + StreakPublishingTests (the published streak: the window walk, a goal change, a failed read, and that it reaches neither the snapshot nor the wrist's mirror)
@@ -957,8 +1186,8 @@ WaterBuddyTests/UnreadableStore.swift             87   2026-10-11, `1ced514` —
 WaterBuddyTests/WaterLogTests.swift              505   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WristSyncTests.swift             882   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests; staged 2026-10-11: WristIngestTests' failed-read test makes its store unreadable with UnreadableStore, no longer by overwriting the file (known issue #92)
-WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well
-WaterBuddyUITests/GoalSetupUITests.swift         888   setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
+WaterBuddyUITests/AppStoreScreenshotUITests.swift  540   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
+WaterBuddyUITests/GoalSetupUITests.swift        1164   (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
@@ -981,7 +1210,21 @@ WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 95   .accessoryCircular percen
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
-**63 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-11 in
+**75 `.swift` files across the seven target folders**, all listed above — 78 with the three
+scripts in `Tools/`. Re-derived 2026-10-12 in the fifty-third pass, after stage 3b's second
+pass, by the same script: **eight files were undocumented, the pass's own** (`Motion`,
+`PageTurn`, `PourDrop`, `ScrollDepth` and a test file for each), and **eleven counts stale, the
+eleven existing files it edits** (`Arrival`, `AuroraBackground`, `HistoryView`, `HomeView`,
+`RootTabView`, `SettingsView`, `ArrivalTests`, `AuroraBackgroundTests`, `HistoryViewTests`,
+`AppStoreScreenshotUITests`, `GoalSetupUITests`); 78 rows compared with their files after the
+edit, none stale. *(It read 67 and 70 until this pass.)* Before that: re-derived 2026-10-12 in
+the fifty-first pass, at the end of the redesign's stage 3b, with `find` over all seven and `Tools/` against this file: **four files were
+undocumented, the stage's own** (`Arrival`, `ScreenHeader`, `ArrivalTests`,
+`ScreenHeaderTests`), and **eleven counts stale, the eleven existing files it edits**
+(`AuroraBackground`, `Haptics`, `HistoryView`, `HomeView`, `RootTabView`, `SettingsView`,
+`AuroraBackgroundTests`, `CelebrationTests`, `HomeViewTests`, `RootTabViewTests`,
+`GoalSetupUITests`); every row was compared with its file by a script after the edit. *(It read
+63 until this pass.)* Before that: re-derived 2026-10-11 in
 the fiftieth pass with `find` over all seven and `Tools/`, and a script that compares each row's
 count with its file: no file undocumented, no phantom row, and **ten counts stale — the ten
 Swift files the redesign's stage 3 and #92's fix edit** (`AuroraBackground`, `DataManager`,
@@ -1011,8 +1254,9 @@ thirty-first 5, the thirtieth 2, the twenty-ninth 8 of 56, the twenty-eighth 7 o
 ### Outside every target
 
 `Tools/` sits outside all seven `PBXFileSystemSynchronizedRootGroup`s, so nothing in it is compiled
-into anything (rule `15-project`). It is **not** part of the 63 above (read "53" until the
-thirty-eighth pass, and "60" until the forty-seventh), which is why earlier passes' "every file is documented" claim was true while
+into anything (rule `15-project`). It is **not** part of the 75 above (read "53" until the
+thirty-eighth pass, "60" until the forty-seventh, and "63" until the fifty-fourth, while the
+paragraph it points at went on to 75), which is why earlier passes' "every file is documented" claim was true while
 omitting it:
 
 ```
@@ -1257,6 +1501,298 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**The staged tree — stage 3 alone — was gated by itself on the night of 2026-10-12 to 13,
+before a commit plan was put to the owner. Nothing is committed and the plan is not approved**
+(2026-10-13, the fifty-sixth pass). The owner ran `/commit`. The gate of 2026-10-12 ran on the
+working tree, stage 3 and stage 3b together; stage 3 commits first, from the index, and that
+tree had not been tested in this session. It was exported with
+`git checkout-index -a --prefix=…` to a scratch folder — 161 files, the index's 161 — and
+built and tested there, into its own DerivedData. No file of the working tree and no entry of
+the index was changed. `git write-tree`, run to name the index's tree, wrote eight tree
+objects under `.git/objects`.
+
+| | Result |
+|---|---|
+| Phone unit, stock *iPhone 17*, iOS 27.0 | `✔ Test run with 479 tests in 60 suites passed` |
+| Phone UI, *WaterBuddy Gate 27*, iOS 27.0 | `GoalSetupUITests`: 25 of 25 passed, **24 in their chunks and one alone after its runner was killed** (below); the other classes `Executed 18 tests, with 0 failures` |
+| Phone UI, *WaterBuddy Gate 26.5*, iOS 26.5 | `GoalSetupUITests` 25 passed, 0 failures, in three chunks; the other classes `Executed 18 tests, with 0 failures` |
+| Watch unit, *WaterBuddy Watch 27* | `✔ Test run with 57 tests in 6 suites passed` |
+| `WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+
+- **One chunk ended `** TEST FAILED **`.** The first chunk on iOS 27.0, nine tests from
+  23:31:39: eight passed, and for `testAnUndoOfferExpires` the result bundle, read with
+  `xcresulttool` that night, gave "Test crashed with signal term". That bundle has since gone
+  from DerivedData; the log has "Restarting after unexpected exit, crash, or test timeout"
+  32 seconds into the test, after a last logged step of `Waiting 5.0s for "Get Started"
+  Button to exist`, and names the test under "Failing tests:". Run alone at 23:46 it passed
+  in 21.5 s. On iOS 26.5 it passed in its chunk. What sent the signal is not known (#122).
+- **Not run on iOS 18.6**, which stage 3's own gate had, and no warnings comparison: the
+  warnings baseline of 2026-10-11 was built from an export of this index.
+- The first chunk on iOS 27.0 did not carry `-collect-test-diagnostics never`, as rule
+  `85-testing`'s commands do not. Every UI run after it, and the watch unit run, did (#101).
+- The iOS 26.5 runs were held until 00:03 on the 13th, after the day had changed, with the
+  simulator booted first.
+
+**A plan of seven commits was then presented** — three for stage 3 from the index, four for
+stage 3b from the working tree — and waits for the owner's word, with one question: whether
+the two rule files that hold stage 3's wording go in. `/commit` changed no file of the working
+tree.
+
+---
+
+**Stage 3b has had a second pass — the page slide and the small touches — finished, tested and
+unstaged, on top of its first build; stage 3 is still in the index; nothing is committed**
+(2026-10-12, the fifty-third pass). Spec
+`docs/superpowers/specs/2026-10-12-page-slide-and-touches-design.md`; plan
+`docs/superpowers/plans/2026-10-12-premium-redesign-stage-3b-motion.md`; both untracked.
+
+**How it came about.** The owner built the first build of stage 3b to their iPhone 15 Pro Max
+(iOS 27.0) and said: "there is no animation in page changes and add some micro-interactions
+when working in app. it is not looks like premium." Asked what the content under the title does
+on a change of tab: "It just appears." That build changed the page in one frame and let the
+content rise 10 pt under a fade — checked frame by frame off recordings, never by eye on a
+phone. They chose a **slide, by direction**, and **all four** groups of micro-interactions.
+
+**What the second pass is.**
+
+- **A change of tab slides the pages.** They sit side by side in the bar's order; the new page
+  comes in from the side its tab is on while the old one leaves the other way, both on screen,
+  0.45 s on `.smooth`. The backdrop holds still. Under Reduce Motion the page cross-fades in
+  0.25 s and nothing travels.
+- **`RootTabView` is one pager on every system.** One `AuroraBackground` for the three tabs,
+  two pages at most (`PageTurn`, a pure value: shown, leaving, direction, a count of turns), the
+  bar in a bottom `safeAreaInset`. **Apple's `TabView` is gone**: it cuts the old page away and
+  offers no transition. Its bar stays — `SystemTabBar`, the same `UITabBar` standing alone —
+  and on iOS 27.0 the screen's foot is close to what the `TabView` drew: no pixel of the bottom
+  700 differs by more than 24 levels of 255 in grey, which is what was measured, and the bar
+  itself by up to 11 (#119). *(The fifty-third pass wrote "pixel for pixel" here; the measure
+  has a tolerance, and inside it the bar differs.)*
+- **A page is rebuilt each time it is shown**, as before stage 3b. Kept screens, `isShownTab`
+  and the two `onDisappear` resets are gone.
+- **`Motion`** names the curves: `page`, `pageFade`, `settle`, `land`, `water`, `drop`.
+- **Water:** a 22 pt drop flies from the pressed disc to the vessel in 0.42 s (`PourArc`), the
+  vessel swells 2.5 % as it lands and the surface surges then; the level rises on a spring.
+- **History:** one marker glides to the shown day; the strip's bars grow again on a change of
+  day (simply there under Reduce Motion). **Settings:** a tick draws itself when the goal or a vessel is saved; the figure under a
+  held slider grows 6 %. **Home:** the streak chip and *Undo*'s capsule land on a spring.
+- **Scrolling:** a section of History or Settings shrinks toward 0.92 as it crosses the top or
+  the foot of the screen (`ScrollDepth`). It does not fade.
+- **The settle (`Arrival`) is the opening page's only.** A page that slides in has its
+  sections whole — at full opacity, not risen. **History's bars are the exception, and meant:**
+  the week card's and the strip's stand at nothing until the page's flag is set, 50 ms after
+  it is built, and grow over half a second, so they are still growing as History comes to
+  rest (`HistoryCard.grown`, `DayStrip.grown`; `Arrival`'s DocC: "History's bars on every
+  page"). Under Reduce Motion they are simply there. *(The fifty-third pass wrote "a page that slides in is whole", without the
+  exception.)*
+
+**Decisions taken on the way, each the owner's to overturn** — the spec's §9, M1 to M11. The
+ones that change what the owner asked for or had: **the bar's glass is darker on iOS 26.x**
+than a `TabView`'s, and within 11 grey levels of it on 27.0 (M1, #119); **the scroll effect does not fade**, where
+they chose "fade and shrink" — a fade took a measured line under its contrast floor (M8);
+**a tap on the tab already shown does nothing**, where a `TabView`'s bar scrolled to the top
+(M11); two more springs against a rule that names one (M3); one backdrop for the three tabs
+against the rule that each screen stands its own (M5).
+
+**The rules are not edited.** The spec's §7 has the wording, and it replaces stage 3b's §8
+where they overlap (#111, #121).
+
+**A fresh reviewer read the pass's diff**; its report is saved as it arrived, beside the
+ledger. No critical finding, two important, eleven minor, thirteen things it declined to judge.
+
+- **The scroll effect dimmed text still on screen.** Three things in the report, which the
+  fifty-third pass ran into one sentence here. Its arithmetic: a 330 pt card with a third of
+  itself past the top is drawn at about five sixths of its strength. Its two readings, off
+  603 px video frames it called "indicative, not a `DESIGN.md` figure": with History's week
+  card mostly out of the screen, *Measured against your current goal* at about
+  **3.6–4.0:1**, where it is 5.49:1 at rest and the floor is 4.5; and with Settings' vessels
+  card about a third out, its caption at about **5.9–6.9:1**, where the same kind of line in
+  a whole card read 10–12:1 — dimmer, and over the floor. The reading under the floor is of
+  the card mostly out, not of the card a third out, and "about 3.8:1" is the middle of the
+  first range and in no report. And a card taller than the screen was never whole and
+  jumped at the edge. Fixed: counted by what is left showing, and no fade.
+- **Its figures were not the final tree's, and Reduce Motion had never been executed.** The
+  gate below is on the final source. Reduce Motion was switched on through the simulator's own
+  Settings app — the first time in this project — and eleven tests and a recorded walk ran
+  under it.
+- **Its own first build of the scroll effect, `scrollTransition`, was caught by eye before the
+  review**: inside History's `List` every row stood dimmed and shrunk at rest.
+- **A page arriving was mostly a header**: its sections faded in as it slid. Declined by the
+  reviewer as the owner's to judge; changed — a page slides in with its sections whole.
+- Minor, fixed: a slide's end is matched to the turn and not to the page (there, back and
+  there again inside one slide ended the newest one early); the landing spring is on the
+  capsule and the chip, not Home's root; Settings' cards move together; the tick takes no room
+  in its row; a re-check after the tick's wait; geometry that is not a number is no span; the
+  comments it listed as false. Deferred, for the owner: #120.
+
+**The gate, on the final source** — foreground, `-parallel-testing-enabled NO`, 2026-10-12,
+13:57 to 14:40, no `shutdown all`; the last source file was written at 13:42. **No test run
+was retried. The warnings comparison was made twice**, which the fifty-third pass's "no run
+was retried" left out. First: the clean build of the app scheme from 13:58:46 and the widget
+build from 13:59:08. The ledger's only word on that attempt, at the time, is that it "used `build` and was
+not like for like", which fits the app's build, whose baseline was taken with
+`build-for-testing`; its commands are in no file. Again: the app with `build-for-testing`
+from 13:59:50, into a new empty folder, and the widget with `build` from 14:00:14, as its
+baseline was taken. The widget build is also the gate's fourth invocation, so that one ran
+twice. The second attempt's logs replaced the first's and are what the table gives.
+
+| | Result |
+|---|---|
+| Phone unit, stock *iPhone 17*, iOS 27.0 | `✔ Test run with 547 tests in 68 suites passed` |
+| Phone UI, *WaterBuddy Gate 27*, iOS 27.0 | `GoalSetupUITests` 33 executed, 1 skipped, 0 failures, in three chunks; the other classes `Executed 18 tests, with 0 failures` |
+| Phone UI, *WaterBuddy Gate 26.5*, iOS 26.5 | 33 executed, 1 skipped, 0 failures; 18, 0 failures |
+| Phone UI, *WaterBuddy Gate 18.6*, iOS 18.6 | 33 executed, 1 skipped, 0 failures; 18, 0 failures |
+| Watch unit, *WaterBuddy Watch 27* | `✔ Test run with 57 tests in 6 suites passed` |
+| `WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+| Warnings, a clean `build-for-testing` of the app scheme and a widget build into an empty folder, against the same of the index | 50 distinct lines and 38, the same sets |
+
+**Under Reduce Motion, *WaterBuddy Probe 27*:** eleven tab and Home tests, 0 failures —
+`testOnlyThePageShownIsInTheTreeAfterAChangeOfTab` among them, so the page left behind is
+removed when the cross-fade ends. Not part of the gate: the gate's devices have it off.
+
+**Rendered, on simulators, frame by frame:** the slide on iOS 27.0, 26.5 and 18.6; the same
+change of tab under Reduce Motion; a pour's drop and the vessel's swell; the marker; the tick;
+a section crossing the top in History and in Settings, 27.0 and 26.5; landscape and a change
+of language under `SystemTabBar`; the first-run screen handing over to the app (a cross-fade
+in place — Home does not slide in); the foot of the screen against the `TabView` build's on a
+402 × 874 pt phone (27.0: no pixel of the bottom 700 differing by more than 24 levels in grey) and on
+402 × 874 and 375 × 667 pt phones on 26.5 (same layout, darker glass).
+
+**Not done.** Nothing on a device: the owner's phone is where this pass is judged. A second
+tab chosen inside the 0.45 s of a slide — XCUITest waits between taps; the value's half is
+unit-tested (#120). The bar's captions on iOS 26.5 are from seven frames — six of the walk and
+one still of Home — not a minute of the aurora. iOS 17.x is compile-only, as before.
+
+---
+
+**Stage 3b's first build, as the fifty-first pass recorded it.** Kept as written. What the
+second pass replaced in it: the `TabView` container and `SystemTabs`/`HandMadeTabs`, kept
+screens and `isShownTab`, the settle as the whole of a page change, and *Undo* on `.smooth`.
+Its header, its shade, its two haptics and its one clock for the backdrop stand. **Three
+figures in the block below are the first build's and not the tree's** (added by the
+fifty-fourth pass): a section rises **14 pt** now and each waits **50 ms** for the one above,
+where the block says 10 pt and 40 ms (`Arrival.rise`, `Arrival.stagger`), and *Undo*'s capsule
+arrives from **0.8** of its size, where it says 0.92 (`HomeView.swift:497`).
+
+**The redesign's stage 3b — navigation and motion — is finished, tested and unstaged; stage 3 is
+still in the index, and both wait for the owner's `/commit`, stage 3 first** (2026-10-12, the
+fifty-first pass). Spec `docs/superpowers/specs/2026-10-11-navigation-and-motion-design.md`; plan
+`docs/superpowers/plans/2026-10-11-premium-redesign-stage-3b.md`; both untracked. Four stages
+were to follow stage 3 directly. The owner, shown History, said instead that *Today* stood in a
+different place on Home and History, that the change of page and the small interactions looked
+poor, and that the bar should be iOS's own glass bar with its drag — and, shown the built screens
+beside the canvas with seven differences marked **a** to **g**, said "go". That was read as: fix
+them all. It was split: **3b**, this stage, is the title, the bar, the motion and the haptics
+(letter **f**); **3c**, the look — the glass (**a**), the vessel (**b**), the week card (**c**),
+a serving's glyph (**g**) — follows it; **d** and **e** stay as decided on 2026-10-09.
+
+**What stage 3b is.**
+
+- **One header.** `ScreenHeader` and `ScreenMetrics`, a new file: every tab opens with the title
+  on one line, a line under it, and an accessory on the title's line. Home's date moved from
+  above the title to under it. The title's origin is the same on all three tabs, at the ordinary
+  text size and three sizes up; two UI tests hold it.
+- **Apple's tab bar on iOS 26 and later**, the app's own below. `RootTabView` chooses between
+  `SystemTabs` — a `TabView` of three `Tab`s — and `HandMadeTabs`, the old `ZStack`, by
+  `if #available(iOS 26.0, *)`: the codebase's third version check. A press dragged along Apple's
+  bar carries the selection. **A screen is kept while its tab is away** under Apple's bar, so
+  what the rebuild did by accident is done on purpose: Home ends its *Undo* offer and History
+  returns to today in `onDisappear`.
+- **A shade under Apple's bar**, `BarShade`: the foot of each screen a quarter darker. Without it
+  the selected tab's caption read 3.79–4.46:1 on iOS 26.5. The selected tab is white.
+- **A screen arrives.** `Arrival`, a new file: everything under the title is drawn at 0.001 and
+  then rises 10 pt and fades in, each section 40 ms after the one above; History's bars grow.
+  The flag is set 50 ms after the tab is shown and cleared once a kept screen has gone.
+- **One sky.** `AuroraClock` and `AuroraDrift` in `AuroraBackground.swift`: every backdrop's
+  lights are placed by one clock, so the backdrop no longer changes at a change of tab.
+- **Touches.** Two rungs on `Haptics`, `select` and `remove`: a tick for a change of tab, a day
+  picked, a vessel shortcut and a slider's step; a light tap for a serving swiped away. A disc's
+  glyph bounces when it is poured; the flame when the streak goes up; *Undo*'s capsule arrives
+  from 0.92 of its size.
+- **No key added** — eleven, as before. Nothing in `DataManager`, the widget or the watch; no
+  target membership changed; no shared file edited. Four new files, eleven edited, all app-only
+  or tests.
+
+**Decisions taken on the way, each the owner's to overturn** — the spec's §10, N1 to N15. The
+ones nothing the owner has seen showed them: the shade (N8); the selected tab white where the
+canvas drew cyan (N10); Home's date under the title (N2); every backdrop on one clock, in a file
+the plan did not list (N13); *Undo*'s capsule on `.smooth` and not the spring the spec first
+described, because rule `60-design-system` names one spring (N12); the date's floor at 0.45
+(N15). And two things left as found: one caption at 4.01:1 on the smallest phone at the largest
+text size on iOS 26.5 (N9, #112), and Home's vessel at its floor on that phone at the ordinary
+size (N14, #113).
+
+**The rules are not edited.** The wording is written out in the spec's §8, for five rule files —
+`50-views`, `60-design-system`, `65-accessibility`, `15-project`, `85-testing`. Until the owner
+approves it the code contradicts two rules as they stand: `50-views` forbids `TabView`, and
+`60-design-system` lists three haptics (#111). *(The fifty-second pass: two more bullets are
+departed from by the letter. Two of the stage's haptics are triggered by a view's own state —
+the shown tab, the amount under the finger — where rules `50-views` and `60-design-system` ask
+for a counter, and §8 proposes no wording for it; and the arrival branches on Reduce Motion
+where rule `65-accessibility` gives an animation that runs once per tap no branch, which §8
+covers as a new bullet. #111.)*
+
+**A fresh reviewer read the whole stage's diff** on 2026-10-12; its report is saved as it
+arrived, beside the stage's ledger. No critical finding; four important, eight minor, seven
+things it declined to judge. What came of it:
+
+- **The title still stood at two heights** at the text sizes between the two that had been
+  rendered. The test written for it failed by 4.7 pt, and found a second cause the reviewer had
+  not: Home's column offered the title's line less than the title's height. Both fixed.
+- **The test that a screen comes back whole could only fail for Home.** It reads the picture of
+  all three screens now, on a first showing and a return; seen failing with History's arrival
+  taken out.
+- **The date's floor**: arithmetic said the widest Russian date would be cut; a test in iOS's own
+  font confirmed it, 0.491 against a floor of 0.5.
+- **Home on the smallest phone**, which it feared no longer fitted: rendered — whole above the
+  bar, the vessel at its floor.
+- **Two of the things it declined turned out to be defects, found by rendering them**: the
+  backdrop changing at every change of tab, and on iOS 26.5 the screen being left standing empty
+  for a quarter of a second. Both fixed, both seen on recordings before and after.
+- Minor: the wait in the arrival's task re-checks for cancellation; the shade reaches the
+  screen's edges in landscape; a tap on the day already shown no longer ticks; the flame no
+  longer bounces when the streak drops; the comments the reviewer listed as made false by the
+  stage are corrected, one in a shared file aside. #117 holds that one and two more: one in
+  the capture harness, a file the stage did not open — found by the fifty-second pass's
+  reader, and more than a comment (#82) — and one the stage wrote itself, a test's DocC that
+  rounds its figures. *("the comments the stage had made false are corrected, one in a shared
+  file aside (#117)" until that pass.)* Deferred, for the owner: #114.
+
+**The gate, on the final source** — foreground, `-parallel-testing-enabled NO`, 2026-10-12,
+02:27 to 03:45, no `shutdown all`; the last source file was written at 02:16.
+
+| | Result |
+|---|---|
+| Phone unit, stock *iPhone 17*, iOS 27.0 | `✔ Test run with 500 tests in 64 suites passed` |
+| Phone UI, *WaterBuddy Gate 27*, iOS 27.0 | `GoalSetupUITests` 32 executed, 1 skipped, 0 failures; the other classes `Executed 18 tests, with 0 failures` |
+| Phone UI, *WaterBuddy Gate 26.5*, iOS 26.5 | 32 executed, 1 skipped, 0 failures; 18, 0 failures |
+| Phone UI, *WaterBuddy Gate 18.6*, iOS 18.6 | 32 executed, 1 skipped, 0 failures; 18, 0 failures |
+| Watch unit, *WaterBuddy Watch 27* | `✔ Test run with 57 tests in 6 suites passed` |
+| `WaterBuddyWidgetExtension` | `** BUILD SUCCEEDED **` |
+| `WaterBuddyWatchWidget` | `** BUILD SUCCEEDED **` |
+| Warnings, clean build into an empty folder against a clean build of the index | 50 distinct lines in the app's log and 38 in the widget's, the same lines as the baseline: none new, none gone |
+
+- The skipped test is the caption test on iOS 27.0 and 26.5 — it is the app's own bar's — and
+  the drag test on iOS 18.6, which is Apple's bar's. Each says so with `XCTSkip`.
+- **The UI class ran in chunks by name**, three or four a system, each with
+  `-collect-test-diagnostics never` (#110): 32 tests do not fit one foreground call.
+- **Two chunks failed on their first run and passed on their second.** On iOS 27.0,
+  `testAnUndoOfferDoesNotOutliveTheAppLeavingTheScreen` tripped its own guard — "too slow to
+  tell" — with the Mac's load average over 400 from two other projects' test runs; the same
+  eleven tests passed at a load of 55. On iOS 26.5, `testADiscAndUndoAnswerOffTheirGlyphs` failed
+  once and then passed 23 times; **its cause is not established** (#115).
+- The tree also held the build inputs that are not staged and differ from HEAD — Xcode's
+  rewrites of three catalogues and the two watch schemes (#50) — as every gate since has.
+
+**Rendered at the review, on simulators:** the smallest phone (375 × 667 pt, iOS 26.5) at the
+ordinary size, and at the largest in Russian; Increase Contrast and a change of language under
+Apple's bar on iOS 26.5; landscape on iOS 27.0, for the shade's edges; the final code recorded
+on iOS 27.0, 26.5 and 18.6. **Not rendered:** Reduce Motion and Reduce Transparency. **Not on a
+device:** anything — every haptic, the drag by feel, VoiceOver on Apple's bar (#116).
+
+What follows is the fiftieth pass's account of stage 3, as written.
 
 **The redesign's stage 3 — History — is finished, tested and staged; it waits for the owner's
 `/commit`** (2026-10-11, the fiftieth pass). Eleven paths of source, tests and strings in the
@@ -2725,7 +3261,170 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Read last in the fiftieth pass (2026-10-11), after its `git add`
+**There is a git repository.** **Read in the fifty-sixth pass at 08:35 on 2026-10-13, from the
+commands themselves: `e16221e`, 96 commits, level with `origin/main`; 18 staged, 27 unstaged,
+17 untracked, 10 in both — the counts of the blocks below. The index is still the tree
+`8c1afc06daceaef1476c9425bc1d6bc303f0f171`, the one gated by itself that night.** That pass
+wrote `docs/AI_CONTEXT.md`, `tasks/lessons.md` and `HISTORY.md`, each already unstaged, and
+ran no `git add` and no `git commit`; `git write-tree` during `/commit` had written eight tree
+objects under `.git`.
+
+The fifty-fifth pass's block, kept. **Read in the fifty-fifth pass at 23:24 on 2026-10-12, from the
+commands themselves: `e16221e`, 96 commits, level with `origin/main`; 18 staged, 27 unstaged,
+17 untracked, 10 in both — the counts of the two blocks below.** That pass wrote
+`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `HISTORY.md`, `tasks/lessons.md` and the second pass's
+spec and plan, each already unstaged or untracked, and ran no `git add` and no `git commit`.
+
+The fifty-fourth pass's block, kept as that pass wrote it; its "after its last edit" was
+saved before that pass's last edits to other documents (reader E), and its counts were right.
+**Read last in the fifty-fourth pass (2026-10-12), from the
+commands themselves, after its last edit: nothing differs from the fifty-third's block
+below.** `e16221e`, 96 commits, level with `origin/main`; 18 staged, 27 unstaged, 17
+untracked, 10 in both, and the unstaged and untracked lists are the same paths. Every file
+this pass wrote was already unstaged or untracked — `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`HISTORY.md`, `tasks/lessons.md`, and stage 3b's two specs and two plans. It ran no `git add`
+and no `git commit`.
+
+The fifty-third pass's block, kept. Read last in the fifty-third pass (2026-10-12), from the
+commands themselves, after its last edit. The index is untouched — stage 3's eighteen paths —
+and stage 3b's second pass sits in the working tree on top of its first build. That pass ran
+no `git add` and no `git commit`.
+
+```
+$ git rev-parse --short HEAD
+e16221e
+$ git log --oneline | wc -l
+      96
+$ git status -sb | head -1
+## main...origin/main
+$ git diff --cached --name-only | wc -l
+      18
+$ git diff --name-only | wc -l
+      27
+$ git status --short | grep '^??'
+?? Screenshots/census/
+?? WaterBuddy/Arrival.swift
+?? WaterBuddy/Motion.swift
+?? WaterBuddy/PageTurn.swift
+?? WaterBuddy/PourDrop.swift
+?? WaterBuddy/ScreenHeader.swift
+?? WaterBuddy/ScrollDepth.swift
+?? WaterBuddyTests/ArrivalTests.swift
+?? WaterBuddyTests/MotionTests.swift
+?? WaterBuddyTests/PageTurnTests.swift
+?? WaterBuddyTests/PourDropTests.swift
+?? WaterBuddyTests/ScreenHeaderTests.swift
+?? WaterBuddyTests/ScrollDepthTests.swift
+?? docs/superpowers/plans/2026-10-11-premium-redesign-stage-3b.md
+?? docs/superpowers/plans/2026-10-12-premium-redesign-stage-3b-motion.md
+?? docs/superpowers/specs/2026-10-11-navigation-and-motion-design.md
+?? docs/superpowers/specs/2026-10-12-page-slide-and-touches-design.md
+$ comm -12 <(git diff --cached --name-only | sort) <(git diff --name-only | sort) | wc -l
+      10
+```
+
+Against the fifty-second pass's block below: two paths more are unstaged,
+`WaterBuddyTests/HistoryViewTests.swift` and `WaterBuddyUITests/AppStoreScreenshotUITests.swift`;
+ten more are untracked, the pass's eight new Swift files and its spec and plan; and
+`HistoryViewTests.swift` joins the nine paths that are in the index and changed again in the
+tree. **The order is unchanged: stage 3 commits first, from the index as it stands. What
+follows it is nineteen modified paths and sixteen new** — the twenty-seven less the eight that
+are not the stage's (the two rule files with stage 3's wording, `.claude/settings.json`, the
+two watch schemes and three catalogues), and the seventeen less `Screenshots/census/`.
+
+The fifty-second pass's block, kept. Read last in the fifty-second pass (2026-10-12), from the
+commands themselves, after its last edit: one path more is unstaged, `docs/STATE.md`, and
+nothing else differs from the fifty-first's block below. That pass ran no `git add` and no
+`git commit` either.
+
+```
+$ git rev-parse --short HEAD
+e16221e
+$ git log --oneline | wc -l
+      96
+$ git diff --cached --name-only | wc -l
+      18
+$ git diff --name-only | wc -l
+      25
+$ git status --short | grep -c '^??'
+7
+$ comm -12 <(git diff --cached --name-only | sort) <(git diff --name-only | sort)
+docs/AI_CONTEXT.md
+docs/DESIGN.md
+docs/STATE.md
+HISTORY.md
+tasks/lessons.md
+WaterBuddy/AuroraBackground.swift
+WaterBuddy/HistoryView.swift
+WaterBuddy/HomeView.swift
+WaterBuddyUITests/GoalSetupUITests.swift
+```
+
+So what follows stage 3's commit is **seventeen modified paths and six new**: the fifty-first
+pass's sixteen and six, below, and `docs/STATE.md`, in which this pass corrects one line
+citation and one count. Nine paths are in the index and changed again in the tree.
+
+The fifty-first pass's block, kept. Read last in the fifty-first pass (2026-10-12), from the commands
+themselves. **That pass ran no `git add` and no `git commit`**: the index is the fiftieth
+pass's, below, path for path, and everything of stage 3b is in the working tree.
+
+```
+$ git rev-parse --short HEAD
+e16221e
+$ git log --oneline | wc -l
+      96
+$ git status -sb | head -1
+## main...origin/main
+$ git diff --cached --name-only | wc -l
+      18
+$ git diff --name-only
+.claude/rules/50-views.md
+.claude/rules/65-accessibility.md
+.claude/settings.json
+CLAUDE.md
+HISTORY.md
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatchWidget.xcscheme
+WaterBuddy/AppShortcuts.xcstrings
+WaterBuddy/AuroraBackground.swift
+WaterBuddy/Haptics.swift
+WaterBuddy/HistoryView.swift
+WaterBuddy/HomeView.swift
+WaterBuddy/RootTabView.swift
+WaterBuddy/SettingsView.swift
+WaterBuddyTests/AuroraBackgroundTests.swift
+WaterBuddyTests/CelebrationTests.swift
+WaterBuddyTests/HomeViewTests.swift
+WaterBuddyTests/RootTabViewTests.swift
+WaterBuddyUITests/GoalSetupUITests.swift
+WaterBuddyWatch/Localizable.xcstrings
+WaterBuddyWatchWidget/Localizable.xcstrings
+docs/AI_CONTEXT.md
+docs/DESIGN.md
+tasks/lessons.md
+$ git status --short | grep '^??'
+?? Screenshots/census/
+?? WaterBuddy/Arrival.swift
+?? WaterBuddy/ScreenHeader.swift
+?? WaterBuddyTests/ArrivalTests.swift
+?? WaterBuddyTests/ScreenHeaderTests.swift
+?? docs/superpowers/plans/2026-10-11-premium-redesign-stage-3b.md
+?? docs/superpowers/specs/2026-10-11-navigation-and-motion-design.md
+```
+
+- **Stage 3b is twenty-two paths, none staged**: sixteen modified — six app sources, four unit
+  test files, the UI tests, and five docs (`HISTORY.md`, `tasks/lessons.md`, this file,
+  `docs/DESIGN.md`, `CLAUDE.md`) — and six new: two sources, two test files, the stage's spec
+  and its plan. Eight of the sixteen are also in the index with stage 3's changes, so for each
+  the index's copy is stage 3's and the tree's is stage 3b's on top of it.
+- **Stage 3 commits first, from the index as it stands.** Staging any of those eight before
+  that commit would fold stage 3b into it.
+- Unstaged and not this stage's: the two rule files with stage 3's wording, for the owner's
+  yes; `.claude/settings.json`, three Xcode-rewritten catalogues and the two watch schemes
+  (#50). `Screenshots/census/` is untracked.
+- Stage 3b's own rule wording is in no file under `.claude/` (#111).
+
+The fiftieth pass's block, kept. **Read last in the fiftieth pass (2026-10-11), after its `git add`
 of seven paths — the four sheets, the lessons, the history and the plan — from the commands
 themselves; the one `git add` that follows only re-adds this file and `HISTORY.md`, whose paths
 are already listed:
@@ -4219,6 +4918,26 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     whole screen scrolls now, so `scrollHistoryList` moves the header and the cards away with the
     rows, and its shots of History will be of the new screen. Its comment cites
     `HistoryView.swift:159` for `allowsFullSwipe`; that line is `:433`.
+    **2026-10-12, the fifty-second pass: stage 3b takes away what its `returnToTop` stands on,
+    on iOS 26 and later — by reading only, not run.** The helper returns a screen to its top
+    by tapping another tab and tapping back, and its comment
+    (`AppStoreScreenshotUITests.swift:518–521`) says why that works: "`RootTabView`'s body is a
+    `switch tab` inside a `ZStack` … identity does not survive the swap and the scroll
+    container is rebuilt at offset 0", and "the swap cross-fades over 0.28 s". That is the
+    app's own container, which stage 3b keeps below iOS 26 only. Under Apple's bar a screen is
+    kept and comes back scrolled where it was left (#114(b)), so the four calls — History once,
+    Settings three times — would leave the screen where it was, and the shots that follow
+    would be of the wrong part of it; the helper's own check, that a named control exists,
+    would still pass. The gate skips the harness and nobody ran it, so what a run shows is not
+    known. A fix is a drag back to the top, or `#114(b)`'s ruling. Found by this pass's reader
+    of the stage's text; the fifty-first pass and the stage's review did not look at the
+    harness. `allowsFullSwipe` is at `HistoryView.swift:450` since stage 3b.
+    **2026-10-12, the fifty-third pass: the paragraph above was true for one build.** Stage
+    3b's second pass builds a page when its tab is shown and removes it when it has left, on
+    every system, so `returnToTop` returns a screen to its top again; its comment
+    (`AppStoreScreenshotUITests.swift:518–520`) now says so, and that the pages slide for
+    0.45 s where it said they cross-fade over 0.28 — its 0.6 s wait still covers it. Still not
+    run. `allowsFullSwipe` is at `HistoryView.swift:462`.
 83. **History's header gave a UI test no value.** In stage 1's probe `app.staticTexts["Today"].value`
     did not carry "N of M millilitres" (it parsed as −1). The header is
     `.accessibilityElement(children: .ignore)` with a label and a value. **Whether VoiceOver speaks the
@@ -4242,6 +4961,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `HomeView.swift:170` (a *Today's log* button); `GoalSetupView.swift:14`.
     *(2026-10-11: the `HomeView.swift` one is gone — stage 2 rewrote the file and the comment went
     with it. The other citations still resolve.)*
+    *(2026-10-12, the fifty-second pass: stage 3b moved one — `SettingsView.swift:348`, the
+    `EditServingSheet` comment, is `:357`. `:13` and `GoalSetupUITests.swift:28-30` stand.)*
+    *(2026-10-12, the fifty-third pass, after stage 3b's second pass: that comment is at
+    `SettingsView.swift:366`; the other two stand.)*
     (d) No production caller: `removeWater(amount:)`, `resetDailyProgress()` and
     `WristVessel.diameter(fitting:reserving:)`, like `allLogs()` (#4). Tests pin all three.
     (e) The widget target's `WidgetBackground` and `AccentColor` colour sets appear to be referenced by
@@ -4674,11 +5397,50 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `HistoryView.swift:159` for `allowsFullSwipe`, which is `:433` (#82). *Rule lines, the
     owner's:* rule `85-testing` writes the UI gate as one invocation, which no longer fits a
     foreground call (#110).
+    **(i) The fifty-second pass, after stage 3b: where the lines above stand now. The
+    fifty-first pass did not do this**, so from the end of stage 3b until this pass every
+    citation below pointed at the wrong line. Stage 3b edits six app files and moves lines in
+    each — `AuroraBackground.swift` by 6 from `:38`, `Haptics.swift` by 1 from `:10`,
+    `HomeView.swift` and `HistoryView.swift` from `:121` and `:156` on, `SettingsView.swift`
+    from `:42`, and `RootTabView.swift` throughout — and no shared, widget or watch file, so
+    every `DataManager.swift`, `WaterBuddyWidget.swift`, `WristVessel.swift`,
+    `AddWaterIntent.swift`, `WaterLog.swift`, `WaterSnapshotTests.swift` and
+    `UnreadableStore.swift` citation in (a) to (h) stands. Each of the rest was found again by
+    its own words, on disk and in the index: in (e), `AuroraBackground.swift:69` is `:75` and
+    `:86` is `:92`; in (f), `HomeView.swift:758` is `:789`, `HomeView.swift:952` (`:937` after
+    stage 3) is `:968`, `Haptics.swift:23–24` is `:24–25`, and `HomeView.swift:56` and
+    `AuroraBackground.swift:34` stand; in (g), `RootTabView.swift:130–131` is `:272–273`, and
+    `HistoryView.swift:824` (`:1266` after stage 3) is `:1310`; in (h), `allowsFullSwipe` is
+    `HistoryView.swift:450`. `GoalSetupView.swift:149` stands; the file is not the stage's.
+    **None of those comments was changed by stage 3b, and one of them is now contradicted by
+    the stage's own code in the same file:** `AuroraBackground.swift:75` still calls a period
+    "one there-and-back", in the same file as `AuroraDrift`, whose own property is documented
+    "Seconds for one leg of the journey" (`:189`) and whose test
+    `aLightGoesThereAndBackInTwoPeriods` holds it (#117). `RootTabView.swift:272`'s
+    "the only place in the app that uses it" now stands on `GlassTabBar`, the bar below iOS 26
+    only, and is as untrue as it was. *Rule lines:* the two rule files (h) says carry stage 3's
+    unstaged wording are as (h) left them; stage 3b edits no rule file (#111).
+    **(j) The fifty-third pass, after stage 3b's second pass: where they stand now.** The pass
+    edits `HomeView`, `HistoryView`, `SettingsView`, `RootTabView`, `AuroraBackground` and
+    `Arrival` again, and no shared, widget or watch file. Found by their own words:
+    `AuroraBackground.swift:75` is `:77` and `:92` is `:94`; `HomeView.swift:789` is `:862` and
+    `:968` is `:1043`; `RootTabView.swift:272–273` is `:373–374`; `HistoryView.swift:1310`, the
+    sheet's card, is `:1359`, and `allowsFullSwipe` is `:462`. `HomeView.swift:56`,
+    `AuroraBackground.swift:34`, `Haptics.swift:24–25` and `GoalSetupView.swift:149` stand.
+    None of those comments was changed. **Two that (i) and #117 listed are corrected:** the
+    harness's comment on `returnToTop`, and the DocC on `AuroraDriftTests`, which gives the
+    table's own figures now. And `AuroraBackground.swift`'s DocC on its fourth constraint,
+    which said each screen stands its own backdrop, says what is true since this pass.
+    **(k) The fifty-fourth pass: one line (j) moved its neighbours past and left.**
+    `AuroraDrift`'s "Seconds for one leg of the journey", which (i) cites at `:189`, is at
+    `AuroraBackground.swift:191` — the second pass's two added lines of DocC moved it with
+    `:75` and `:92`, and (j) restated those two only. Found by a fresh reader opening each
+    citation.
 
 104. **The Glass's index has three spellings.** `DataManager.usualSlot` is the name the one-tap
     doors read — `usualServing(in:)`, the Control Center control's glyph and, since stage 2, Home's
-    primary disc (`HomeView.swift:107`). Two others spell the same `1`: `HistoryView.swift:240`
-    (`:143` until stage 3) seeds a new serving's amount with `manager.servings[1]`, under a comment that says why; and the
+    primary disc (`HomeView.swift:107`). Two others spell the same `1`: `HistoryView.swift:283`
+    (`:271` after stage 3b's first build, `:240` until it, `:143` until stage 3) seeds a new serving's amount with `manager.servings[1]`, under a comment that says why; and the
     watch has `nonisolated private static let primaryIndex = 1` (`WristView.swift:136`). Nothing
     disagrees today. Rule `40-widget` says "never spell the index here" of the control only, and
     until the forty-eighth pass two sheets said the index "is named once" / "is spelled once".
@@ -4706,7 +5468,8 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
 
 106. **The goal-reached haptic is triggered by a model value.** Rule `60-design-system`: "Trigger
     `.sensoryFeedback` from a counter bumped by the user's own action … never directly from a
-    model value". `HomeView.swift:226–229` is `.sensoryFeedback(trigger: manager.hasReachedGoal)`,
+    model value". `HomeView.swift:257–260` (`:226–229` until stage 3b) is
+    `.sensoryFeedback(trigger: manager.hasReachedGoal)`,
     playing `Haptics.goalReached` on the rising edge — so a goal crossed by the Siri phrase or a
     pour from the watch while Home is on screen would play it, one crossed by a widget tap would
     play it when the app next comes forward on Home, and one crossed from History's sheet does not
@@ -4715,6 +5478,16 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     By reading only — no haptic can be felt on a simulator, and none of this was run. Whether the
     celebration should follow the goal or the finger is the owner's call. *(Related: #100(a) —
     `undos` is bumped whether or not a row was taken back.)*
+    **2026-10-12, the fifty-second pass: "one crossed from History's sheet does not" holds
+    below iOS 26 only since stage 3b.** Under Apple's bar Home is kept while History shows and
+    its modifier goes on watching, so the goal crossed from the sheet may play it — #114(a),
+    which the fifty-first pass opened without a word here. And the model value is no longer
+    the only trigger that is not a counter: the tab's tick and the sheet's are driven by a
+    view's own state (#111).
+    **2026-10-12, the fifty-third pass: the note above held for one build.** Since stage 3b's
+    second pass a page is rebuilt when its tab is shown, on every system, and Home does not
+    exist while History shows: the sentence as first written is true again, and #114 is
+    retired. The modifier is at `HomeView.swift:267–270`.
 
 107. **`nextDayBoundary` answers the repeated midnight, in a zone whose clocks go back across
     it.** In America/Havana the clocks go back from 01:00 to 00:00, so 00:00–00:59 happens twice
@@ -4793,6 +5566,315 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     runs the classes; **on iOS 18.6 the eighteen ran first**. What two invocations cannot show
     is a dependence between the two classes across one process, and none is known. The rule's gate
     block is the owner's, and the stages that follow will add UI tests to the same class.
+    **Updated 2026-10-12, the fifty-first pass: the class itself no longer fits.** Stage 3b
+    added seven tests — 32 — and with the Mac busy eleven of them took 543 seconds. Its gate ran
+    the class in three or four chunks a system, each named test by test with `-only-testing:`
+    from a sorted list of the class's `func test` names, and the other classes as before: 50
+    executed a system, one of them skipped. Each chunk carried `-collect-test-diagnostics never`
+    (#101), which changes nothing a test does. **A test in the class that measures time against
+    a limit** — `testAnUndoOfferDoesNotOutliveTheAppLeavingTheScreen` — refused to conclude, as
+    it is written to, at a load average over 400 from two other projects' runs; it passed when
+    the load fell. Read `uptime` before a gate run.
+
+111. **Stage 3b's rule wording is written in its spec and applied to no rule file, so the code
+    contradicts two rules as they stand.** `50-views`, *Navigation*: "Do not introduce `TabView`"
+    — `RootTabView` builds one on iOS 26 and later. `60-design-system`, *Haptics*: "Fire only
+    through `Haptics.confirm`, `Haptics.pour` and `Haptics.goalReached`" — there are five. The
+    replacement text for both, and new bullets for `65-accessibility` (the arrival under Reduce
+    Motion; a kept view never at zero opacity), `15-project` (the third version check),
+    `85-testing` (a test that holds for one bar skips on the other) and `60-design-system` (the
+    shade; the aurora's clock), is in
+    `docs/superpowers/specs/2026-10-11-navigation-and-motion-design.md` §8. It was not typed
+    into the rule files because `50-views` and `65-accessibility` already hold stage 3's
+    wording, unstaged and unapproved, and one diff could not then be approved without the
+    other. Also stale by the same change and not a doc sync's to edit: rule `15-project`'s two
+    version checks, which are three now, and rule `65-accessibility`'s "The tab bar is three
+    slots", which is the app's own bar's.
+    **2026-10-12, the fifty-second pass: "two rules" is an undercount by the letter, and §8
+    has no wording for one of them.** Found by this pass's reader. (a) Rule `50-views`,
+    *Bindings and controls*: "A haptic is driven by a monotonically-bumped `@State` counter",
+    and rule `60-design-system`, *Haptics*: "Trigger `.sensoryFeedback` from a counter bumped
+    by the user's own action". Two of stage 3b's triggers are not counters: the tab's tick,
+    `.sensoryFeedback(Haptics.select, trigger: tab)` (`RootTabView.swift:108`), and the
+    sheet's, `trigger: amount` (`HistoryView.swift:1277`). Each is a view's own `@State` that
+    only the user's touch writes, which is what the rule is for — "so a background write or a
+    rollover cannot fire one" — and each says so in a comment that cites the rule; neither is
+    a model value. Of the app's thirteen `sensoryFeedback` sites ten are triggered by counters;
+    the thirteenth is #106's model value. **The
+    spec's §8 proposes nothing for either bullet** — its §7 does name "the value under the
+    finger in the sheet" as a trigger, and not the shown tab; a dated note in §8 now says all
+    of this — so the choice is still open: reword the
+    two bullets to allow a view's own selection state, or bump a counter beside each. (b) Rule
+    `65-accessibility`, *Reduce Motion*: an animation that runs once per tap "gets **no**
+    branch". The arrival runs once per change of tab and branches: the rise is dropped
+    (`Arrival.swift:85`) and History's bars are simply there (`HistoryView.swift:581`, `:913`).
+    §8 does carry this one, as a new bullet under *Reduce Motion* — "it is travel across the
+    screen and not feedback under a finger" — but this entry and the stage's records filed it
+    as an addition and not as a departure from the bullet above it.
+    **2026-10-12, the fifty-third pass: the second pass moves what is contradicted, and its
+    wording is in the newer spec.** `50-views`' "Do not introduce `TabView`" is obeyed again —
+    there is none. What the code departs from now is in
+    `docs/superpowers/specs/2026-10-12-page-slide-and-touches-design.md` §7, which replaces the
+    older spec's §8 where they overlap: #121. The lines cited above have moved: the tab's tick
+    is `trigger: turn.shown` at `RootTabView.swift:182`, the sheet's is `HistoryView.swift:1326`,
+    the arrival's branch is `Arrival.lift(arrived:settles:reduceMotion:)`
+    (`Arrival.swift:70–72`, used at `:106`), and History's bars are `:597` and `:957`. The
+    counter question of (a) is still open and still has no proposed wording.
+
+112. **One tab caption reads 4.01:1, under the 4.5:1 floor, and is not cured.** A 375 × 667 pt
+    phone at Accessibility XXXL on iOS 26.5: Home scrolls there, the white Glass disc rests
+    under Apple's bar beside the selected tab, and the selected caption read 4.01 in one
+    capture (*History* 4.92, *Settings* 5.47), by the first-read method `docs/DESIGN.md`
+    describes. The shade cannot darken a white surface under the bar. A hard scroll edge gives
+    6.13 and cuts content off square at the bar, so nothing shows through the glass on any
+    phone. Left as it is; the spec's decision N9. Not swept through the aurora's minute, and
+    not looked for on other phones or with History's or Settings' content under the bar at that
+    size.
+    **2026-10-12, the fifty-third pass: that was the `TabView`'s bar, and it is not the bar
+    any more.** Since stage 3b's second pass the bar on iOS 26 and later is a standalone
+    `UITabBar`, whose glass on iOS 26.5 is darker (#119): on a 402 × 874 pt phone at the
+    ordinary size every caption read 8.0:1 or better in seven frames. **This configuration
+    was not taken again** — the small phone, the largest text size, the white disc under the
+    bar. It is likely cured and is not known to be.
+
+113. **On the smallest phone, under Apple's bar, Home has no room to spare.** 375 × 667 pt, iOS
+    26.5, ordinary text size: everything is on screen above the bar and the vessel is at its
+    200 pt floor, where it was 214.5 pt under the app's own bar in stage 2 — the header is
+    taller, 13 pt by the reviewer's arithmetic, and Apple's bar stands higher than the app's. The vessels' names stand inside
+    the shade's ramp and read 5.6:1 or better in one capture. A slow swipe moved nothing and
+    eight more rubber-banded the column back to where it began, so it is taller than the
+    screen by less than can be read off a frame, if at all. **Not re-taken:** stage 2's figures
+    for what stays on screen at each accessibility size (`HomeView.vesselRange`'s DocC,
+    `docs/DESIGN.md`, *Large text: what gives way*) — they are the app's own bar's, on a
+    402 × 874 pt phone. The spec's decision N14.
+
+114. **A kept screen goes on living while its tab is away, and two consequences are the
+    owner's to rule on.** (a) Home watches `manager.hasReachedGoal` for its goal haptic and its
+    confetti, and `manager.streak` for the flame. Below iOS 26, and on every system before
+    stage 3b, Home did not exist while History was showing, so a goal crossed from History's
+    sheet played `pour` alone. Under Apple's bar Home exists: the haptic may play there and
+    then, on top of `pour`, or on the return to Home, and the confetti may play unseen. Which
+    happens was not established — a simulator plays no haptic. Gating the two on `isShownTab`
+    restores the old behaviour. It also bears on #106. (b) A kept screen keeps its scroll
+    position: History comes back on today, and wherever it was scrolled. The app's own
+    container returned it to the top by rebuilding it. **2026-10-12, the fifty-second pass:
+    one thing in the repository depends on the old behaviour** — the App Store capture
+    harness's `returnToTop`, which bounces off another tab to get back to a screen's top
+    (#82). By reading only.
+    **RETIRED 2026-10-12, the fifty-third pass — the fix is on disk, unstaged.** Stage 3b's
+    second pass builds a page when its tab is shown and removes it when it has left, on every
+    system. Home does not exist while History shows, so (a) is as it was before stage 3b; a
+    screen opens at its top and History on today, so (b) is gone and the harness's helper
+    works. `testAnUndoOfferDoesNotOutliveItsScreen`,
+    `testHistoryReturnsToTodayWhenItsTabIsLeft` and
+    `testOnlyThePageShownIsInTheTreeAfterAChangeOfTab` hold it on three systems. One page is
+    still reused: a tab returned to before its page had finished sliding out, inside 0.45 s,
+    gets that page back with its state (#120).
+
+115. **`testADiscAndUndoAnswerOffTheirGlyphs` failed once on iOS 26.5, and why is not known.**
+    In stage 3b's gate, the first test after *WaterBuddy Gate 26.5* booted, on the day's first
+    pour: a tap 12 % down the Cup's disc — clear of its glyph — and no *Undo* within five
+    seconds, the total unchanged. The run's own recording shows the disc light, grow and recoil
+    under the press. Then 23 passes: six from a cold boot, four and twelve in a row, and the
+    chunk's rerun. The disc and the test are stage 2's (`1ced514`) and `PressStyle` is older —
+    the first commit's, last touched by stage 1 (`c9ef45d`); *"The disc, `PressStyle` and the
+    test are stage 2's" until the fifty-second pass.* None had failed before
+    in this repository's records; stage 3b wrapped the quick-add row in the arrival's opacity
+    and offset and gave each glyph a `symbolEffect`. Whether either matters, or the machine —
+    its load average had just fallen from over 400 — is not known. **If a disc ever lights and
+    pours nothing on a device, this is where to start.**
+    **2026-10-12, the fifty-third pass: not seen again.** The test ran once on each of three
+    systems in the second pass's gate and twice before it on iOS 27.0, and passed each time.
+    Nothing the second pass changed bears on it by reading: the test presses a disc on the
+    page the app opens on, which still settles in as it did, and each disc now also reports
+    where it stands, for the drop. Still open: one failure, no cause.
+
+116. **Stage 3b: what was not rendered, and what waits for a device.** Not rendered: Reduce
+    Motion (the arrival should be a fade alone, History's bars simply there, the aurora at
+    rest) and Reduce Transparency under Apple's bar — `simctl ui` has no switch for either;
+    iOS 26.0 to 26.4; where the title stands at an accessibility text size since the review's
+    fix, which no test reads; Uzbek anywhere in the stage's captures. On a device: every haptic,
+    and whether iOS adds a tick of its own to a change of tab or a slider's step; the drag
+    along the bar by feel; VoiceOver on Apple's bar; the bar in daylight; whether a change of
+    tab ever shows the quarter-second the simulator shows on iOS 26.5. iOS 17.x is
+    compile-verified only, as before, and the third version check with it.
+    **2026-10-12, the fifty-third pass: Reduce Motion has been run and rendered.** There is a
+    switch after all — the simulator's own Settings app, which a UI test can drive
+    (Accessibility, Motion, *Reduce Motion*). Under it on iOS 27.0: a change of page is a
+    cross-fade in place, a pour throws no drop, nothing shrinks as it scrolls, eleven tab and
+    Home tests pass, and the page left behind is removed. **Reduce Transparency was not tried
+    the same way** and is still unrendered under Apple's bar; iOS 26.0 to 26.4 and the title
+    at an accessibility size are as they were. "The quarter-second on iOS 26.5" is gone with
+    the `TabView`. On a device, everything still waits, and the second pass adds to it: the
+    slide at speed, the drop, the frame rate of two pages of glass moving at once.
+
+117. **Comments stage 3b made false and did not correct.** `DataManager.swift`, in
+    `historyWindow`'s DocC: "`HistoryView`'s 28pt margins" — the margin is every tab's 24 pt
+    now, and the arithmetic beside it still holds with room (46.7 pt a day button). The file
+    is one of the six shared ones and the stage's plan kept them out of its diff; a DocC-only
+    edit there is the owner's to allow. `AuroraBackground.swift`'s DocC still calls a period
+    "one there-and-back" and gives 3.8 hours, which #103 already records.
+    **2026-10-12, the fifty-second pass: the heading fits the first of those two only, and
+    there is a third.** The aurora's comment was false before the stage (#103(e), which lists
+    it as older than stage 2); what stage 3b did is edit the file round it and add
+    `AuroraDrift`, whose own DocC says the opposite — it is at `:75` and `:92` now. **The third is in a file
+    the stage did not open:** `AppStoreScreenshotUITests.swift:518–521`, on `returnToTop`,
+    describes `RootTabView` as "a `switch tab` inside a `ZStack`" whose swap rebuilds the
+    scroll container and "cross-fades over 0.28 s" — the app's own container, below iOS 26
+    only now. That one is more than a comment: the helper relies on it (#82). And one of the
+    stage's own, smaller: the DocC on `AuroraDriftTests`
+    (`AuroraBackgroundTests.swift:106–107`) gives the backdrop's change as "12 to 16 levels at
+    a cut against 3 to 5 for four seconds of drift"; `docs/DESIGN.md`'s table has three cuts
+    at 12.5 to 16.3, a fourth at 5.7, and drift of 3.1 to 5.5. Found by this pass's two
+    readers. A doc sync edits no source and no test.
+    **2026-10-12, the fifty-third pass: two of the four are corrected** by stage 3b's second
+    pass, which opened both files — the harness's comment and the DocC on `AuroraDriftTests`.
+    Left: `DataManager.swift`'s "28pt margins", in a shared file, and
+    `AuroraBackground.swift:77` and `:94`, "one there-and-back" and "3.8 hours" (#103).
+    **2026-10-12, the fifty-fourth pass: the second pass left its own — eight seen by two
+    fresh readers checking the docs, two (`RootTabView.swift`'s) found by the pass itself on
+    a reader's finding about the docs — and each read again here against the code.** A doc
+    sync edits none of them; they go with the next change to each file.
+    *Say more than was measured* — the docs said the same until this pass:
+    `RootTabView.swift:228`, "no pixel of the screen's foot differed", and `:286`, "the two
+    are identical" (#119: within a tolerance, and the bar differs inside it);
+    `ScrollDepth.swift:18–20`, which has the line reading "about 3.8:1 in a frame of" a card
+    a third past the top — the reviewer read 3.6–4.0:1 with the week card mostly out, and
+    5.9–6.9:1, over the floor, with a card about a third out (*Current state*).
+    *Count wrongly:* `Motion.swift:19`, sixteen older call sites "at five lengths" — six, with
+    `Arrival.duration`'s 0.4; and `:55–56`, which calls 0.3 "the commonest" of them — it is at
+    two of the sixteen, and 0.5 at five.
+    *Describe what the pass replaced:* `RootTabViewTests.swift:76`, "the shade the screens
+    draw" — `RootTabView` draws it once; `GoalSetupUITests.swift:156–157`, a screen's content
+    "arrives when its tab is shown" — only the opening page's settles;
+    `AppStoreScreenshotUITests.swift:509–510`, History's header and week card as "*siblings*
+    of the `List`" — rows of it since stage 3 (#82).
+    *Name a mechanism that is gone, though what they promise still happens:*
+    `HomeView.swift:216–217`, the screen ends its *Undo* offer "when it disappears", and
+    `HistoryView.swift:173–174`, the shown day reset "when the screen disappears" — there is
+    no `onDisappear`; the page is removed and its state with it, except on a tab returned to
+    inside its own slide (#120 (a)).
+
+118. **Seen once under load, not reproduced.** In one recording on iOS 26.5, Settings' cards
+    stood at a faint frame for 2.6 seconds on their first showing before they finished
+    arriving; in the next recording of the same walk they took 0.3. The Mac's load average was
+    over 100. Recorded because a section drawn at 0.001 that never arrives is invisible and
+    still answers a tap — which is why the test that a screen comes back whole reads the
+    picture.
+    **2026-10-12, the fifty-third pass: it can no longer happen on a change of tab.** Since
+    stage 3b's second pass a page that slides in draws its sections whole from its first
+    frame; only the page the app opens on waits hidden for its flag. There it still could.
+
+119. **On iOS 26.x Apple's tab bar is darker than it was.** Since stage 3b's second pass the
+    bar is a `UITabBar` standing alone (`SystemTabBar`), because a `TabView` offers no
+    transition between its pages. On iOS 27.0 the foot of the screen is close to the
+    `TabView`'s: this build against that one on a 402 × 874 pt phone, no pixel of the bottom
+    700 — the bar and the row above it — differs by more than 24 levels of 255 **in grey**.
+    That is the whole of the first measure (`tools/samescreen.py`, the session's scratch
+    folder, which turns the difference to grey, counts pixels over that tolerance and reports
+    nothing finer). "Pixel for pixel" and "identical" say more than it does: this entry,
+    *Current state*, `docs/DESIGN.md`'s section and the spec said so until the fifty-fourth
+    pass; `HISTORY.md`'s checkpoint of the second pass, `docs/DESIGN.md`'s retained note and
+    two comments in `RootTabView.swift` (#117) still do. **Taken finer in that pass, on a
+    stored pair that reproduces it** — the `TabView` build's Home against this build's
+    (`tools/maxdiff.py`, `tools/bands.py`): **in the bar's own 249 px, up to 11 levels in
+    grey and 26 in blue, 14 pixels over 24 in that channel; in the 451 px above it, 2 and
+    4.** Two captures of the `TabView` build against each other differ by 2 and 4 at most,
+    bar and all. So what is above the bar is the same to within one capture and the next,
+    and **the bar itself is not quite the `TabView`'s on iOS 27.0 either** — by about 4 % of
+    the range in grey, read as the same in every side-by-side render. What in the bar differs
+    was not looked into: one stored pair, Home selected. *(A share of pixels "differing by
+    something", 21 %, was given here in the fifty-fourth pass and withdrawn in it: by the same count two captures
+    of one build differ in 14 % and 36 %.)* On iOS 26.5 it is in
+    the same place at the same size — on a 375 × 667 pt phone, this build against the
+    `TabView` build, the header does not differ at all and under it the only pixels that do
+    are the bar's own; the same of the spike's build on a 402 × 874 pt one — and **its glass
+    is smoked where the `TabView`'s was vivid** over the same aurora. Not the bar's appearance objects (a transparent and a
+    scroll-edge appearance were tried), and not cured by a tab controller only as tall as the
+    bar: it seems to need the pages inside the controller. Its captions read better for it
+    (`docs/DESIGN.md`, *Apple's tab bar, measured*). The cure is to host the pages in UIKit's
+    tab controller with a UIKit transition: kept screens again (#114), a slide that cannot be
+    interrupted, and the backdrop and the shade put into UIKit's hierarchy. The spec's
+    decision M1; the owner's phone runs iOS 27.0 and does not show it.
+
+120. **What stage 3b's second pass left for a hand, a device or the owner.**
+    (a) **A second tab chosen inside the 0.45 s of a slide** is exercised by no test and no
+    recording: XCUITest waits for the app to be idle between taps. `PageTurnTests` holds the
+    value's half — two pages at most, a slide's end matched to its turn. In the view, the
+    page that was leaving is dropped where it stands (after a fifth of a second it is three
+    quarters out; sooner it is seen to go), and a tab returned to inside its own slide gets
+    its page back with its state.
+    (b) **A tap on the tab already shown does nothing.** Inside a `TabView` Apple's bar
+    scrolled that screen to its top; alone it only reports the tap. The owner had that for
+    one build. The spec's M11.
+    (c) **The scroll effect shrinks and does not fade**, where the owner chose "fade and
+    shrink": with the fade, *Measured against your current goal*, 5.49:1 at rest, read about
+    3.6–4.0:1 on one of the two frames the reviewer sampled, History's week card mostly out
+    of the screen; on the other, a caption on a card about a third out read 5.9–6.9:1, over
+    the floor (this line gave the first range's middle, "about 3.8:1", "on a card part-way
+    off the screen", until the fifty-fourth pass). The spec's M8.
+    (d) **For half a second after leaving History its rows are still in the accessibility
+    tree** beside the page arriving: the page leaving is hidden from accessibility, and a
+    `List`'s rows do not honour it. Home and Settings do.
+    (e) **By reading only:** two turns made in one update of the view would leave a page
+    mounted off screen until the next turn — no finger does that; the strip's bars grow again
+    each time the strip is scrolled far enough away to be rebuilt by the list (not under
+    Reduce Motion, where they are simply there); the drop, when
+    the quick-add row has fallen back to its sideways scroll and been scrolled, starts
+    wherever the disc then is. `DayStrip`'s rule for when its bars are up is written inline
+    and has no test.
+    (f) **No scroll effect on Home**, which fits its screen and, when it does not, rests with
+    its last row part-way out.
+    (g) **Probe simulators were left changed** by the walks recorded on them: *WaterBuddy
+    Probe 27*'s goal is 1,800 and *Probe 26.5*'s 2,400, not the 2,000 they were seeded with,
+    and *Fallback 18.6*'s, 1,900 when its walk began, was moved and is not known now; the app
+    was removed from and put back on *WaterBuddy Screenshots 6.9* to record the first-run
+    screen, and setup was completed there. Reduce Motion was switched on on *Probe 27* and off
+    again, the switch read back both times. No gate device was touched by a probe.
+
+121. **Stage 3b's second pass: rule wording proposed and typed into no rule file.** In
+    `docs/superpowers/specs/2026-10-12-page-slide-and-touches-design.md` §7. Rule
+    `60-design-system`, *Interaction*: "State changes use `.smooth(duration:)`", beside one
+    named spring — there are three more curves now, `Motion.land` and `.water` springs among
+    them, and the proposed wording gives every new curve a name in `Motion`. *Colour*: "Every
+    full-screen view on the phone stands its own `AuroraBackground()`" — the three tabs share
+    `RootTabView`'s. Rule `50-views`, *Navigation*: the `ZStack` switching on `tab` with
+    `GlassTabBar` is a pager under one of two bars; *Animation*: the pager and the drop use
+    `.transaction(value:)` with `addAnimationCompletion`, where the rule names
+    `.animation(_:value:)`. Rule `15-project`: the third version check is the bar's. Rule
+    `65-accessibility`, *Reduce Motion*: the page, the drop and the scroll effect each branch
+    on it; the swell has no branch of its own and does not happen because no drop lands
+    (this sentence had all four branching until the fifty-fourth pass). Rule `00-workspace`,
+    one type per file: `PourDrop.swift`,
+    `ScrollDepth.swift` and `Arrival.swift` each hold a pure half with the views that use it.
+    Stage 3b's own proposals for its header, its haptics and its shade (#111) stand, less the
+    one for a kept screen.
+
+122. **A UI test's runner was killed once; what killed it is not known.** 2026-10-12, 23:33,
+    *WaterBuddy Gate 27*, iOS 27.0, the staged tree (stage 3) built from an export of the
+    index. `testAnUndoOfferExpires`, the fifth test of a chunk of nine, started at 23:33:35.
+    Its last logged step, 4 s in, is `Waiting 5.0s for "Get Started" Button to exist`. A new
+    runner logs "Running tests..." at 23:34:07, then comes "Restarting after unexpected exit,
+    crash, or test timeout", and the remaining four tests pass. The log ends with the test
+    under "Failing tests:". The result bundle, read with `xcresulttool` that night, gave
+    "Test crashed with signal term" for it; that bundle has since gone from DerivedData,
+    where only the four of the 13th are left. The same test run alone at 23:46 passed in
+    21.5 s, and passed in its chunk on iOS 26.5.
+    **Not shown to be a matter of the boot.** *Gate 27*'s `system.log` has a `syslogd` start
+    a few seconds into each of the four later runs on it, so `xcodebuild` booted that
+    simulator for each of them, as it must have for the first, which found it shut down:
+    five runs, four passed. For iOS 26.5 the simulator was booted once beforehand, with
+    `simctl boot`, and its four runs passed. Five one way with one killed, four the other
+    with none.
+    **Seen beside it, from the session's own `uptime` and `pgrep` output, kept in no log:**
+    2.65 at 23:30, before any of the runs, and "16.01 68.30 53.59" at 23:41; no other
+    `xcodebuild` running at 23:42; and across the one minute of the solo run the one-minute
+    figure went from 1.37 to 39.47.
+    **No crash report could be looked for.** `~/Library/Logs` holds nothing created before
+    23:46:14 that night and has no `DiagnosticReports` folder.
+    The chunk did not carry `-collect-test-diagnostics never`, and `xcodebuild` exited ten
+    minutes after the suite ended (#101): the log has "Failure collecting diagnostics from
+    simulator: Timed out after 600.0 seconds" at 23:45:42.
 
 ## Where the rest is written down
 

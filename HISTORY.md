@@ -8116,3 +8116,700 @@ or test file in the tree differs from the index. The throwaway probe is deleted 
 marker is left. Outside the tracked paths this session wrote the stage's git-ignored ledger with
 three reports beside it — the code reviewer's and the two readers' — its scratch folder, one
 simulator, and three files in the memory directory.
+
+## [2026-10-12] — The redesign's stage 3b: one header, Apple's tab bar, a screen arriving, one sky
+
+- **Target(s)**: WaterBuddy / WaterBuddyTests / WaterBuddyUITests. Nothing in the widget, the
+  watch or the six shared files.
+- **How it came about**: the owner ran `/start_task` with no task named and was offered stage 4.
+  They said instead — of stage 3's History and stage 2's Home — that *Today* was in a different
+  place on the two screens, that the change of page and the small interactions looked poor, and
+  that the bar should be iOS's own glass bar with its drag. Asked which bar, they chose Apple's
+  own. Asked whether the still look was right, they asked to be shown, and were: the built
+  screens beside the canvas with seven differences marked **a** to **g**. Asked which to fix,
+  they said "go". Read as all of them, and split: this stage is the title, the bar, the motion
+  and the haptics (**f**); stage 3c is the look (**a**, **b**, **c**, **g**); **d** and **e**
+  stay as decided on 2026-10-09.
+- **What**:
+  - `WaterBuddy/ScreenHeader.swift`, new — `ScreenMetrics` (margin 24, top inset 16, title line
+    44) and `ScreenHeader`: the title, a line under it, an accessory on the title's line. Home,
+    History and Settings open with it; Home's date moved under the title. *Today* stood at
+    (24, 90) on Home and (28, 88.67) on History; it stands at (24, 79.67) on all three.
+  - `WaterBuddy/RootTabView.swift` — two containers behind `if #available(iOS 26.0, *)`:
+    `SystemTabs`, a `TabView` of three `Tab`s under Apple's bar, and `HandMadeTabs`, the `ZStack`
+    and the app's own bar as before. `BarShade`: the foot of each screen a quarter darker under
+    Apple's bar. The app's own bar's three captions share a line.
+  - `WaterBuddy/Arrival.swift`, new — `Arrival`, `EnvironmentValues.isShownTab`,
+    `View.arrives(_:order:)`, `View.tracksArrival(_:)`: everything under a screen's title is
+    drawn at 0.001, then rises 10 pt and fades in, each section 40 ms after the one above.
+  - `WaterBuddy/AuroraBackground.swift` — `AuroraClock` and `AuroraDrift`: every backdrop's
+    lights are placed by one clock.
+  - `WaterBuddy/Haptics.swift` — `select` and `remove`. A tick for a change of tab, a day
+    picked, a vessel shortcut, a slider's step; a light tap for a serving swiped away.
+  - `HomeView`, `HistoryView`, `SettingsView` — the header, the arrival, the touches; Home ends
+    its *Undo* offer and History returns to today in `onDisappear`, which the rebuild used to do
+    for them.
+  - Tests: `ScreenMetricsTests` 4, `ArrivalTests` 6, `BarShadeTests` 3, `AuroraDriftTests` 6,
+    one more in `HapticLadderTests` and in `HomeLayoutTests`; seven UI tests.
+- **Decisions**, each the owner's to overturn — the spec's §10, N1 to N15. The shade (N8) and
+  the white selected tab (N10) are measurements: without the shade the selected caption read
+  3.79–4.46:1 on iOS 26.5, and cyan 3.98. One caption stays at 4.01:1 in one configuration (N9).
+  *Undo*'s capsule is on `.smooth`, not the spring the spec first described, because rule
+  `60-design-system` names one spring (N12). The backdrop's clock is in a file the plan did not
+  list (N13). **No rule file is edited**: the wording is in the spec's §8, and until the owner
+  approves it the code contradicts `50-views` on `TabView` and `60-design-system` on the list of
+  haptics.
+- **What the build found that the plan did not have**: a tint cannot fix the selected caption on
+  iOS 26.5, where the system draws the lozenge light — hence the shade; iOS builds the tab beside
+  the selected one ahead of time, so a flag set "on appear" is set before the screen is shown;
+  and a kept view drawn at exactly no opacity left the accessibility tree and did not come back.
+- **The final review** — a fresh reviewer, the whole stage's diff, its report saved as it
+  arrived. No critical finding. Four important, all acted on, each seen failing first:
+  - the title still stood at two heights at the text sizes between the two that had been
+    rendered — by 4.67 pt three sizes up, from two causes, the second of which only the test
+    found;
+  - the test that a screen comes back whole could fail for Home alone;
+  - the widest date of the year, a Monday late in September in Russian, needed 0.491 of its
+    size on the narrowest phone at the largest text size, against a floor of 0.5;
+  - Home on the smallest phone, feared not to fit: rendered — it does, with the vessel at its
+    floor.
+  And two of the seven things the reviewer declined to judge were rendered and found to be
+  defects: **the backdrop changed at every change of tab**, because kept screens each ran their
+  own lights — 12 to 16 levels at a cut against 3 to 5 for four seconds of drift, 0.56 after;
+  and **on iOS 26.5 the screen being left stood empty for a quarter of a second**, because that
+  system goes on showing the old page after the selection moves. Both fixed, both recorded
+  before and after.
+- **Gate** — on the final source, 2026-10-12, foreground, `-parallel-testing-enabled NO`:
+  1. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyTests`, stock *iPhone 17*, iOS
+     27.0 — `✔ Test run with 500 tests in 64 suites passed`.
+  2. The UI target, the harness skipped — `GoalSetupUITests` in chunks by name, then the other
+     classes: on *WaterBuddy Gate 27* (iOS 27.0), *Gate 26.5* and *Gate 18.6*, each 32 executed
+     with 1 skipped and 0 failures, and 18 with 0 failures.
+  3. `xcodebuild test -scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests`, *WaterBuddy
+     Watch 27* — `✔ Test run with 57 tests in 6 suites passed`.
+  4. `xcodebuild build -scheme WaterBuddyWidgetExtension` — `** BUILD SUCCEEDED **`.
+  5. `xcodebuild build -scheme WaterBuddyWatchWidget` — `** BUILD SUCCEEDED **`.
+  No new warning: a clean build of the tree and of the widget into an empty folder gave the
+  same 50 and 38 distinct lines as a clean build of the index.
+  **Two chunks failed on a first run.** On iOS 27.0 a test tripped its own too-slow guard with
+  the Mac's load average over 400 from two other projects' runs, and passed with its ten
+  neighbours when the load fell. On iOS 26.5 `testADiscAndUndoAnswerOffTheirGlyphs` failed once
+  — a tap high on the Cup's disc lit it and poured nothing — and passed 23 times after;
+  **its cause is not established** (known issue #115).
+- **Rendered on simulators**: the smallest phone at the ordinary size and, in Russian, at the
+  largest; Increase Contrast and a change of language under Apple's bar; landscape, for the
+  shade's edges; the final code recorded on iOS 27.0, 26.5 and 18.6. **Not rendered**: Reduce
+  Motion, Reduce Transparency. **Not on a device**: anything.
+- **Next steps**: the owner's `/commit` of stage 3 from the index, then of stage 3b; their word
+  on the rule wording, on N1 to N15, and on the two things left open in known issue #114; the
+  device check. Then stage 3c, the look, and stage 4, Settings.
+
+### The docs — `/doc_sync`, the fifty-first pass of `docs/AI_CONTEXT.md`
+
+- **Checked and already accurate:** eleven keys on `DataManager.Key`; three exception sets of
+  six; `docs/STATE.md` and `docs/WIDGET.md`, which describe nothing this stage moved.
+- **Drift found and fixed, `docs/AI_CONTEXT.md`:** four files with no row and eleven stale line
+  counts, all the stage's own — 70 rows, each compared with its file by a script; the two test
+  rows of the targets table (500 in 64 suites; 32 real UI tests, 37 declared, 50 executed a
+  system).
+- **Added there:** this stage's section at the head of *Current state*, stage 3's left under it
+  as written; **#110 updated; #111 to #118 opened** — the rule wording, the 4.01 caption, Home
+  on the smallest phone, a kept screen living while its tab is away, the disc test's one
+  failure, what was not rendered, a stale comment in a shared file, and a slow arrival seen
+  once.
+- **`docs/DESIGN.md`:** two new sections, *Apple's tab bar, measured* and *The header and a
+  screen arriving*; *One sky* under the aurora; two rungs on the haptic ladder; three dated
+  notes where older text had become true of one bar only.
+- **`CLAUDE.md`:** one clause in the target table — Apple's tab bar from iOS 26.
+- `tasks/lessons.md`: eleven entries — six from the build and five from the review. This file:
+  this checkpoint.
+- **This pass's text was not given to a fresh reader**, as the fiftieth's was.
+
+### Staging
+
+Written last, from `git diff --cached --name-only`, `git diff --name-only` and
+`git status --short` printed after this checkpoint was written. **This session ran no
+`git add` and no `git commit`.**
+
+**Staged, eighteen paths — stage 3, exactly as the checkpoint above left it.** Nothing of stage
+3b is in the index.
+
+**Unstaged, twenty-four paths.** Sixteen are stage 3b's: `WaterBuddy/AuroraBackground.swift`,
+`Haptics.swift`, `HistoryView.swift`, `HomeView.swift`, `RootTabView.swift`,
+`SettingsView.swift`; `WaterBuddyTests/AuroraBackgroundTests.swift`, `CelebrationTests.swift`,
+`HomeViewTests.swift`, `RootTabViewTests.swift`; `WaterBuddyUITests/GoalSetupUITests.swift`;
+and the docs — `HISTORY.md`, `tasks/lessons.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`CLAUDE.md`. Eight of those sixteen are also staged, with stage 3's changes —
+`AuroraBackground`, `HistoryView`, `HomeView`, `GoalSetupUITests`, and four docs: `HISTORY.md`,
+`tasks/lessons.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md` — so for each the index's copy is
+stage 3's and the tree's is stage 3b's on top of it. Two are stage 3's rule wording, still
+for the owner's yes: `.claude/rules/50-views.md` and `.claude/rules/65-accessibility.md`. Six
+are older than both stages and not touched: `.claude/settings.json`, the two watch schemes,
+`WaterBuddy/AppShortcuts.xcstrings`, `WaterBuddyWatch/Localizable.xcstrings`,
+`WaterBuddyWatchWidget/Localizable.xcstrings`.
+
+**Untracked, seven.** Six are stage 3b's: `WaterBuddy/Arrival.swift`,
+`WaterBuddy/ScreenHeader.swift`, `WaterBuddyTests/ArrivalTests.swift`,
+`WaterBuddyTests/ScreenHeaderTests.swift`,
+`docs/superpowers/plans/2026-10-11-premium-redesign-stage-3b.md` and
+`docs/superpowers/specs/2026-10-11-navigation-and-motion-design.md`. One is older:
+`Screenshots/census/`.
+
+HEAD is `e16221e`, 96 commits, level with `origin/main`. **Stage 3 commits first, from the
+index as it stands; stage 3b's sixteen paths and six new files are staged after it.** The
+throwaway probe is deleted and no mutation or experiment marker is left. Outside the tracked
+paths this session wrote two git-ignored ledgers with the reviewer's report and twelve renders
+beside one of them, its scratch folder, and files in the memory directory; it made no
+simulator.
+
+## [2026-10-12] — `/doc_sync` again after stage 3b: two fresh readers, and the line citations the first sync left behind
+
+The owner ran `/doc_sync` straight after the checkpoint above. **No source or test file was
+changed, nothing was built or run, nothing was staged and nothing is committed.** The newest
+Swift file in the seven target folders is still the one the gate ran on, written at 02:16:11.
+This is the fifty-second pass of `docs/AI_CONTEXT.md` and the thirtieth of `docs/STATE.md`.
+
+### What the pass did
+
+It began with the diff the command asks for, by script: the Swift files on disk against the
+file table, every row's line count, the `@Test` and `func test` counts, the keys on
+`DataManager.Key`, the three `membershipExceptions` lists, every rule citation. **All clean**
+— 70 `.swift` files with `Tools/`, 500 `@Test` in 64 suites, 57 on the watch, 37 UI
+`func test`, eleven keys, no citation of a rule that does not exist.
+
+Then two things the fifty-first pass had not done.
+
+**Line citations.** A script printed every `File.swift:NNN` into the six app files stage 3b
+moves lines in, with what that line holds on disk, in the index and at HEAD. Fourteen citations
+in `docs/AI_CONTEXT.md` and one in `docs/STATE.md`, to twelve places in the code, were right
+for the index and wrong for the tree. The sync after stage 3 had re-derived exactly these
+(known issue #103 (h)); the one after stage 3b did not.
+
+**Fresh readers.** Two read-only readers were given the stage 3b text — one
+`docs/AI_CONTEXT.md`'s six ranges, one `docs/DESIGN.md`'s five with the whole of `CLAUDE.md`
+and a test of the claim that `docs/STATE.md` and `docs/WIDGET.md` needed nothing. Their
+reports are saved as they arrived, beside the stage's git-ignored ledger. Nine findings and
+three smaller remarks between them, none serious; each was checked against the code before a
+doc changed.
+
+### Drift found and fixed
+
+- **Fourteen stale line citations in `docs/AI_CONTEXT.md`**: two in its live sections — the
+  literal `manager.servings[1]`, `HistoryView.swift:240`, is `:271`; the centre read in
+  `SettingsView.swift`, `:225`, is `:234` — and twelve in known issues #82, #84, #103, #104 and
+  #106. #103 gains **(i)**, where each stands after stage 3b; none of the comments those
+  issues list was changed by the stage.
+- **`docs/STATE.md`**: the same `HistoryView.swift:240`, now `:271`. And **one count that had
+  been one short since stage 3**: `HistoryServingTests` is 6 since
+  `theSliderBoundsContainEveryVesselShortcut`, so *Tests that pin this* is seventeen suites
+  and 204 `@Test`, not 203 — recounted per suite by script; the other sixteen figures and stage
+  2's five stand. The paragraph had carried the words "was not recounted".
+- **The capture harness depends on the container stage 3b replaced** — reader A's first
+  finding, in a file the stage did not open. `AppStoreScreenshotUITests`'s `returnToTop`
+  bounces off another tab to get back to a screen's top, and its comment says why that works:
+  `RootTabView` is "a `switch tab` inside a `ZStack`" and the scroll container is rebuilt.
+  On iOS 26 and later the screen is kept and comes back where it was scrolled. Four calls. By
+  reading only: the gate skips the harness and nobody ran it. Recorded in #82, #114 and #117
+  and on the file's row. **A doc sync edits no test.**
+- **"The code contradicts two rules" was an undercount by the letter.** Rules `50-views` and
+  `60-design-system` ask that a haptic be triggered by a counter; the tab's tick is triggered
+  by the shown tab and the sheet's by the amount under the finger — each a view's own state
+  only a touch writes, neither a model value, and neither a counter. The spec's §8 proposed no
+  wording for it. And the arrival's Reduce Motion branch departs from rule
+  `65-accessibility`'s "gets no branch", which §8 does cover but the records filed as an
+  addition. #111 amended, the current-state block noted, and a dated note added to the spec's
+  §8. **Which way to settle the first is the owner's**: reword the two bullets, or bump a
+  counter beside each trigger.
+- **Smaller, in `docs/AI_CONTEXT.md`:** `PressStyle` is the first commit's and stage 1's, not
+  stage 2's (#115); `ScreenMetricsTests`' row said the three screens' numbers where the suite
+  holds Home's and History's; #106 said a goal crossed from History's sheet plays no goal
+  haptic, true below iOS 26 only since #114; the review's list said the comments the stage
+  made false "are corrected, one in a shared file aside", where #117 lists two and there is a
+  third.
+- **`docs/DESIGN.md`, four sentences, each marked where it stands:** the arrival hides
+  everything under the *header*, not under the title — the date, the total, the chip and the
+  `+` are never hidden — and "whole 0.3–0.4 s after the cut" is what the frames showed, where
+  the constants end the curves at 0.45 to 0.63 s; `goalReached` is the one haptic driven by a
+  model value, not the one "not driven by a counter"; the aurora's curve is asked for a value
+  each frame since stage 3b, so "nothing to recompute per frame" became "the body is not run
+  again"; and `tools/margins.py`, `tools/sky.py` and `tools/caption.py` are in the session's
+  scratch folder, not in the repository's `Tools/`.
+- **One the stage wrote and a sync cannot touch:** the DocC on `AuroraDriftTests` gives the
+  backdrop's change as "12 to 16 levels at a cut against 3 to 5"; the table has a fourth cut at
+  5.7 and drift to 5.5. In #117.
+
+### Checked and already accurate
+
+Every count, constant, test name and git listing the readers could reach in the stage 3b text:
+`ScreenMetrics`', `Arrival`'s, `BarShade`'s and the haptics' values, the aurora's table and its
+arithmetic, every "Where" cell of the haptic ladder against a call site, the seven UI tests the
+stage added, the staged and unstaged lists path for path. `CLAUDE.md` whole — the target table,
+the three exception sets, nine phone keys and two watch keys, the mutation surface, the seven
+guard sites: **no finding**. `docs/STATE.md` and `docs/WIDGET.md` describe nothing stage 3b
+changed, and stage 3b touches no shared, widget or watch file: the fifty-first pass's claim
+holds, the citation and the count above aside. `docs/WIDGET.md` is not edited by this pass.
+
+### Not done
+
+**The gate was not run** — nothing it reads changed. About 55 statements in
+`docs/AI_CONTEXT.md`'s stage 3b text and about 90 in `docs/DESIGN.md`'s and `CLAUDE.md`, by the
+readers' own tallies, cannot be checked from the tree and were not re-checked: gate results,
+contrast and pixel figures, readings off recordings. The stage's lessons and the checkpoint
+above were not given to a reader. No rule file is edited; no known issue is opened or retired.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the pass header, the fifty-first's wrapped; two live citations, one of
+them in a row of the file table; two more rows of that table; the current-state block; known issues #82, #84, #103, #104, #106, #111,
+#114, #115, #117; the *Git* block), `docs/DESIGN.md`, `docs/STATE.md`,
+`docs/superpowers/specs/2026-10-11-navigation-and-motion-design.md` (one dated paragraph in
+§8), `tasks/lessons.md` (one entry), this file. Outside the tracked paths: the two readers'
+reports beside the stage's ledger, and three read-only scripts in the session's scratch
+folder.
+
+### Staging
+
+Written last, from `git diff --cached --name-only`, `git diff --name-only`,
+`git status --short` and `comm` over the first two, printed after everything above was
+written. **This pass ran no `git add` and no `git commit`.**
+
+**Staged, eighteen paths — stage 3, as before.** **Unstaged, twenty-five**: the twenty-four of
+the checkpoint above and `docs/STATE.md`. **Untracked, seven**, the same seven. Nine paths are
+both staged and unstaged — the eight the checkpoint above names and `docs/STATE.md` — so for
+each the index's copy is stage 3's and the tree's carries stage 3b's work or its records on
+top.
+
+HEAD is `e16221e`, 96 commits, level with `origin/main`. **The order is unchanged: stage 3
+commits first, from the index as it stands. What follows it is seventeen modified paths and six
+new** — stage 3b's sixteen and six of the checkpoint above, and `docs/STATE.md`, whose two
+corrections belong with these records.
+
+## [2026-10-12] — Stage 3b's second pass: the pages slide, Apple's bar stands alone, and the small touches
+
+The owner built stage 3b to their iPhone 15 Pro Max (iOS 27.0) and said: "there is no animation
+in page changes and add some micro-interactions when working in app. it is not looks like
+premium." Asked what the content under the title does on a change of tab: "It just appears."
+The first build changed the page in one frame and let the content rise 10 pt under a fade; it
+had been checked frame by frame off simulator recordings and never by eye on a phone. They
+chose **a slide, by direction** and **all four** groups of micro-interactions. Built on top of
+the first build, in the working tree. **Nothing is staged and nothing is committed.**
+
+### What changed
+
+- **`RootTabView` is one pager on every system.** One `AuroraBackground` for the three tabs,
+  the page shown and — while it slides — the page leaving, and the bar in a bottom
+  `safeAreaInset`. `PageTurn`, a pure value, says which pages exist, where each stands and
+  which way the turn went, and counts its turns. The page shown comes in by an insertion
+  transition; the page leaving is moved by an explicit offset and taken out when the slide's
+  animation completes (`.transaction(value:)` with `addAnimationCompletion`). 0.45 s on
+  `.smooth`; under Reduce Motion a 0.25 s cross-fade in place.
+- **Apple's `TabView` is gone, one build after it arrived**: it cuts the old page away and
+  offers no transition. Its bar stays as the same `UITabBar` standing alone (`SystemTabBar`),
+  behind the third version check. `SystemTabs`, `HandMadeTabs`, kept screens, `isShownTab` and
+  the two `onDisappear` resets go with it: a page is rebuilt each time it is shown.
+- **`Motion`** names the curves — `page`, `pageFade`, `settle`, `land`, `water`, `drop`.
+- **Water:** a 22 pt drop from the pressed disc to the vessel along an arc (`PourArc`,
+  `PourDrop`), the vessel swelling 2.5 % as it lands and the surface surging then; the level
+  on a spring.
+- **History:** one marker that glides to the shown day; the strip's bars grow again on a
+  change of day. **Settings:** a tick that draws itself when the goal or a vessel is saved;
+  the figure under a held slider at 1.06; the cards re-lay out together. **Home:** the chip
+  and *Undo*'s capsule land on a spring.
+- **Scrolling:** a section of History or Settings shrinks toward 0.92 as it crosses the top
+  or the foot of the screen (`ScrollDepth`).
+- **`Arrival` settles the opening page only.** A page that slides in is whole.
+
+### The rulings it rests on
+
+The spec's M1 to M11, each the owner's to overturn. The ones that change what they asked for
+or had:
+
+- **On iOS 26.x the bar's glass is darker** than the `TabView`'s; on iOS 27.0 the foot of the
+  screen is pixel for pixel the same. The cure is UIKit's tab controller with a UIKit
+  transition, which brings kept screens back (#119).
+- **The scroll effect does not fade**, where the owner chose "fade and shrink": a fade took a
+  line measured at 5.49:1 to about 3.8:1 on a card part-way off the screen.
+- **A tap on the tab already shown does nothing**, where a `TabView`'s bar scrolled to the top.
+- **A page that slides in is whole**: sections fading in under a moving page left it mostly a
+  header.
+- Two more springs than the rule's one; one backdrop for three tabs; one type per file bent
+  in three files. The wording is in the spec's §7 and typed into no rule file (#121).
+
+### What went wrong on the way, and what found it
+
+- **The spike** settled the container before any of it was built: a standalone `UITabBar`
+  matched the `TabView`'s on iOS 27.0 and was darker on 26.5; keeping all three pages mounted
+  failed three UI tests, because a `List`'s rows stay in the accessibility tree whatever they
+  are told.
+- **SwiftUI's `scrollTransition` did not work in a `List`.** Every row of History stood dimmed
+  and shrunk at rest. Seen on a frame taken at rest; the arithmetic's tests were green. The
+  effect now works out its own position.
+- **A fresh reviewer** read the pass's diff: no critical finding, two important, eleven minor.
+  The scroll effect, as rebuilt, still faded text that was on screen; and the figures it had
+  been handed were older than the code — 531 tests where the tree held 537, and two systems'
+  runs that predated four tasks. One fix pass, tests first: 47 new tests in all.
+- **Reduce Motion had never been executed in this project.** The records said the simulator
+  has no switch. Its Settings app has one, and a UI test can press it and read it back.
+- **A chunk of the UI class "succeeded" having run no test**: zsh does not split an unquoted
+  variable of flags.
+
+### Verification — the gate, on the final source
+
+Last source file written at 13:42:47; the gate ran 13:57 to 14:40, foreground,
+`-parallel-testing-enabled NO`, simulators by name, no `shutdown all`. **No run was retried.**
+
+- Phone unit, stock *iPhone 17*, iOS 27.0: `✔ Test run with 547 tests in 68 suites passed`.
+- Phone UI, in chunks of eleven: *WaterBuddy Gate 27* (iOS 27.0), *Gate 26.5*, *Gate 18.6* —
+  on each, `GoalSetupUITests` 33 executed, 1 skipped, 0 failures, and the other classes
+  `Executed 18 tests, with 0 failures`.
+- Watch unit, *WaterBuddy Watch 27*: `✔ Test run with 57 tests in 6 suites passed`.
+- `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`.
+- Warnings, a clean `build-for-testing` of the app scheme and a widget build into an empty
+  folder: 50 distinct lines and 38, the same sets as the baselines of the index.
+
+Outside the gate: eleven tab and Home tests under Reduce Motion on *Probe 27*, 0 failures.
+Rendered frame by frame: the slide on three systems and under Reduce Motion, the drop, the
+marker, the tick, the scroll effect on 27.0 and 26.5, landscape, a change of language, the
+first-run screen handing over, and the foot of the screen against the `TabView` build's.
+
+**Not done:** nothing on a device — the owner's phone is where this is judged. A second tab
+chosen inside the 0.45 s of a slide is exercised by no test. Reduce Transparency is still
+unrendered. iOS 17.x is compile-only.
+
+### Files touched
+
+New: `WaterBuddy/Motion.swift`, `PageTurn.swift`, `PourDrop.swift`, `ScrollDepth.swift`;
+`WaterBuddyTests/MotionTests.swift`, `PageTurnTests.swift`, `PourDropTests.swift`,
+`ScrollDepthTests.swift`; the pass's spec and plan under `docs/superpowers/`. Changed:
+`WaterBuddy/RootTabView.swift`, `Arrival.swift`, `AuroraBackground.swift` (one DocC),
+`HomeView.swift`, `HistoryView.swift`, `SettingsView.swift`; `WaterBuddyTests/ArrivalTests.swift`,
+`AuroraBackgroundTests.swift` (one DocC), `HistoryViewTests.swift`;
+`WaterBuddyUITests/GoalSetupUITests.swift`, `AppStoreScreenshotUITests.swift` (one comment).
+No shared file, no widget or watch source, no project file.
+
+### The docs
+
+`docs/AI_CONTEXT.md`, the fifty-third pass: the header, the two test rows, the file table (78
+rows, each compared with its file by script), a block above stage 3b's in *Current state*,
+**#114 retired, eleven issues amended, #119 to #121 opened**, and every line citation into
+the six app files the pass moved, re-derived. `docs/DESIGN.md`: a new section, *Motion*, and
+the tab bar's, the arrival's, the backdrop's, the haptics' and Reduce Motion's brought up to
+date. `docs/STATE.md`: one citation. `docs/WIDGET.md` and `CLAUDE.md`: checked, nothing.
+`tasks/lessons.md`: seven entries. The first build's spec gains nothing; the second pass's
+spec and plan were brought up to the code after the review. **This text was not given to a
+fresh reader.**
+
+### Staging
+
+Written last, from `git diff --cached --name-only`, `git diff --name-only`,
+`git status --short` and `comm` over the first two, printed after everything above was
+written. **This pass ran no `git add` and no `git commit`.**
+
+**Staged, eighteen paths — stage 3, as before.** **Unstaged, twenty-seven**: the twenty-five
+of the checkpoint above, and `WaterBuddyTests/HistoryViewTests.swift` and
+`WaterBuddyUITests/AppStoreScreenshotUITests.swift`. **Untracked, seventeen**: the seven of
+the checkpoint above, the pass's eight new Swift files and its spec and plan. Ten paths are
+both staged and unstaged — the nine named above and `HistoryViewTests.swift`.
+
+HEAD is `e16221e`, 96 commits, level with `origin/main`. **The order is unchanged: stage 3
+commits first, from the index as it stands. What follows it is nineteen modified paths and
+sixteen new**, the whole of stage 3b in both its builds with its records. Eight unstaged paths
+are not the stage's — the two rule files with stage 3's wording, `.claude/settings.json`, the
+two watch schemes and three catalogues — and `Screenshots/census/` is untracked and older.
+No shared, widget, watch-source or project file differs from the index. The throwaway probe
+is deleted and no marker is left; no simulator of this project is booted.
+
+## [2026-10-12] — `/doc_sync` again after the second pass: two fresh readers, and four things I had told the owner
+
+The owner ran `/doc_sync` straight after the second pass's closing report. **No source or test
+file changed, nothing was built or run, nothing was staged.** The checkpoint above ends its
+docs paragraph "This text was not given to a fresh reader", against a rule written in
+`tasks/lessons.md` the same day. This pass did what that one had not.
+
+### What was checked first, and was clean
+
+The skill's starting diff: 78 `.swift` files on disk, each named in `docs/AI_CONTEXT.md`;
+547 `@Test`, 57 on the watch, 38 UI `func test`; eleven keys on `DataManager.Key`, nine the
+phone's; three six-file exception sets. No file had changed since the gate.
+
+### What two readers found, and one thing more
+
+Each reader was given parts by line range, told what is not a finding, and pointed at the
+gate's logs and the saved review. Their reports are saved as they arrived, beside the ledger
+(`docsync-54-reader-a.md`, `docsync-54-reader-b.md`). Six findings and nine, one of them
+shared: fourteen. Each was read again against the code, the logs or the saved captures before
+a doc was changed. **Four correct the checkpoint above, which stays as written:**
+
+- **"Pixel for pixel the same" on iOS 27.0 was a tolerance, and inside it the bar differs.**
+  The script turns the difference to grey, counts pixels of the bottom 700 over 24 levels and
+  found none; it reports nothing finer. Taken finer in this pass, on a stored pair that
+  reproduces it: in the bar's own 249 px, up to 11 levels in grey and 26 in blue (14 pixels
+  over 24 in that channel); in the 451 px above it, 2 and 4. Two captures of the `TabView`
+  build against each other differ by 2 and 4 at most. So the 451 px above the bar are the
+  same to within one capture and the next, and the bar itself is not quite the `TabView`'s —
+  by about 4 % of the range in grey. What in the bar differs was not looked into.
+- **"A page that slides in is whole" has an exception.** Its sections are whole. History's
+  bars start at nothing on every page and grow over half a second — as `Arrival`'s own DocC
+  says — unless Reduce Motion is on, when they are simply there.
+- **"No run was retried" left out a comparison made twice.** The clean build of the app
+  scheme ran from 13:58:46 and the widget build from 13:59:08; then the app again from
+  13:59:50 with `build-for-testing`, into a new empty folder, and the widget from 14:00:14
+  with `build`, as each baseline was taken. Of the first attempt the ledger said only, at
+  the time, that it "used `build` and was not like for like", which fits the app's build;
+  its commands are in no file, and the second attempt's logs replaced its logs. No test run
+  was repeated.
+- **"Took a line … to about 3.8:1" was never read.** The reviewer's arithmetic: a 330 pt card
+  a third past the top is drawn at five sixths. Its two readings, off video frames it called
+  indicative: about 3.6–4.0:1 with the week card mostly out of the screen, under the floor;
+  about 5.9–6.9:1 with a Settings card about a third out, over it. In the checkpoint above
+  only the figure is wrong — 3.8 is the middle of the first range, and "a card part-way off
+  the screen" is true of that reading. Three other records and a DocC put it on the card a
+  third out.
+
+Also in that checkpoint: "47 new tests in all" is the unit count, 48 with the new UI test;
+and "nothing is staged", in its first paragraph, means nothing of the pass — eighteen paths
+of stage 3 were and are in the index, as its last paragraph says.
+
+**The rest, in the docs:** the app-only list said thirteen files and is nineteen; "the 63
+above" is 75; the first-build block kept "as written" gave a 10 pt rise, a 40 ms stagger and
+*Undo* from 0.92, where the tree has 14, 50 and 0.8, and nothing said so; one citation was
+two lines off; `docs/DESIGN.md` still said the simulator has no switch for Reduce Motion,
+counted four readers of that setting where three read it, and "the other two scripts" where
+there are four; the second pass's spec said no call site spells a curve, against sixteen
+that do and its own §7; its plan's *As built* missed four differences and had no entry for
+Task 4. **Mine:** the first build's spec and plan did not say the second pass had replaced
+their container and kept screens; the checkpoint above recorded that spec as gaining nothing.
+
+**In source, and not a doc sync's to edit:** ten comments that say more than was measured,
+count wrongly, describe what the pass replaced, or name a mechanism that is gone — eight
+seen by the readers, two found by this pass on a reader's finding. Listed with their lines
+in known issue #117.
+
+### A third reader, on this pass's own text
+
+Before the pass was called done its corrections went to a third reader
+(`docsync-54-reader-c.md`), given the review and the logs to check against. Eight findings,
+all applied above and in the docs before this checkpoint was closed. Two mattered. **The
+first version of the correction about "3.8:1" was itself wrong:** it said the reviewer had
+taken one reading and that nobody had read a card a third out, following a reader's summary
+where the review itself, already printed in this session, has the second reading. **And the
+builds' times and actions were wrong for the widget**, whose second run was `build`, as its
+baseline was. The rest: the 24 levels were not said to be in grey, beside a channel figure
+of 26; the note added to the first build's spec repeated "slides in whole"; a sixth script
+was named in `docs/DESIGN.md` beside "the other four"; two of the ten comments were credited
+to the readers; #119 said this file's earlier checkpoint "had" a wording it still has; and
+a count of lines in a lesson. Its own banding of the stored pair is what showed the
+difference to be the bar's, which this pass then reproduced (`tools/bands.py`).
+
+**A fourth, narrower reader then read those eight fixes** against the review, the logs and
+the scripts' output (`docsync-54-reader-d.md`, saved when it arrived; an earlier draft of
+this paragraph named the file before it existed). The two that mattered stand. It found
+eight smaller things: a figure, "21 % of the pixels differ by something", that is a count in
+grey and that two captures of one build exceed, now withdrawn; one "a page slides in whole"
+left in `docs/AI_CONTEXT.md`; "History's bars grow on every page" without "unless Reduce
+Motion is on", in six places; and five of wording, two of them in this checkpoint. They are
+applied, mostly by taking words out. **Those last fixes were checked against their files by
+the session that made them and by no further reader.**
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the fifty-fourth pass: a new header, corrections marked where they
+stand, #103, #117, #119, #120 and #121 amended, the git block), `docs/DESIGN.md` (five
+corrections, and finer rows in the tab bar's table), both specs and both plans of stage
+3b under `docs/superpowers/`, `tasks/lessons.md` (six entries), this file. `docs/STATE.md`,
+`docs/WIDGET.md` and `CLAUDE.md` were read and needed nothing. No rule file, no source, no
+test.
+
+### Verification
+
+**The gate was not run in this pass.** Nothing it compiles changed: the newest source file is
+still the one written at 13:42:47, older than the gate's first log. Both readers checked the
+published figures against those logs — 547 in 68 suites, 57 in 6, 33 and 18 on each of three
+systems, two builds succeeded, 50 and 38 warning lines in the same sets as the baseline —
+and found them right. Checked after the last edit: `<details>` balanced, every rule citation
+resolves, the file table's 78 rows against their files.
+
+### Staging
+
+Written last, from the commands, after everything above. **This pass ran no `git add` and no
+`git commit`.** The counts are the checkpoint above's: eighteen staged, twenty-seven unstaged,
+seventeen untracked, ten in both — every file this pass wrote was already unstaged or
+untracked. HEAD is `e16221e`, 96 commits, level with `origin/main`. The order is unchanged:
+stage 3 from the index, then stage 3b, nineteen modified paths and sixteen new.
+
+## [2026-10-12] — `/doc_sync` a third time: one reader on the last round, nine small things
+
+The owner ran `/doc_sync` again after the checkpoint above. **No source or test file changed
+and nothing was built or run.** The checkpoint above says its last round of fixes had been
+read by no reader. This pass gave that round, and the summaries written at its end,
+to one (`docsync-55-reader-e.md`, saved as it arrived).
+
+### Clean at the start
+
+78 `.swift` files on disk, each named in `docs/AI_CONTEXT.md`; 547 `@Test`, 57 on the watch,
+38 UI `func test`; eleven keys; three exception sets; four schemes by `xcodebuild -list`.
+The newest source or test file is the one written at 13:42:47.
+
+### What the reader found
+
+Nine findings. Of reader D's eight, seven fixes were right and one carried a pointer a row
+off. None of the nine touches a figure from the code, the gate, the pixels, the review or
+git.
+
+**Four are in the checkpoint above, which stays as written:**
+
+- "No file had changed since the gate" — no source or test file. `docs/STATE.md` and the
+  other records of the second pass were written after it.
+- "five of wording, two of them in this checkpoint" — three of them.
+- "as its last paragraph says", of the eighteen staged paths — its second from the end.
+- "They are applied, mostly by taking words out" — against the old words, six of the eight
+  were longer.
+
+**One is in `tasks/lessons.md`**, in an entry of the same pass: `sync_check.py` does not
+compare "each of the file table's 78 rows" — 77 of the Swift rows and one row for a PNG.
+The table itself was right: the reader compared all 78 with `wc -l`.
+
+**Two are in `docs/AI_CONTEXT.md`.** In what is now its retained header: the same "mostly by
+taking words out", and the sentence that the last fixes "were checked against their files by
+this session". Under *Git*: that pass's "after its last edit". Both sentences were saved
+before the pass's last edits to other documents.
+
+**Fixed where they stood, in documents that are not append-only:** History's bars are simply
+there under Reduce Motion, and passages that describe them growing did not say so — in the
+second pass's spec and plan, `docs/DESIGN.md` and `docs/AI_CONTEXT.md`; a pointer in
+`docs/DESIGN.md` to "two rows up" that meant three; and "stood here for an hour", of a figure
+that had stood for under forty minutes.
+
+### Files touched
+
+`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, the second pass's spec and plan under
+`docs/superpowers/`, `tasks/lessons.md` (one entry), this file. No rule file, no source, no
+test. `docs/STATE.md`, `docs/WIDGET.md` and `CLAUDE.md` were not edited, and of them this pass
+read only two *Last updated* lines; reader A checked `CLAUDE.md` against the working tree in
+the pass before, and
+no source has changed since.
+
+### Verification
+
+**The gate was not run in this pass.** The figures in `docs/AI_CONTEXT.md` are the second
+pass's; readers A, B and E each checked them against the logs.
+
+### A last reader, on this pass's own text
+
+Everything above, the header of `docs/AI_CONTEXT.md`, the new lesson and this pass's edits
+went to one more reader (`docsync-55-reader-f.md`, saved as it arrived). It found none of
+reader E's nine left unanswered, and six things of its own in the new text: "five other
+documents", where reader E's own list names six; "ends by saying", of a sentence that is not
+the checkpoint's last; the git block's "after its last edit" recorded as being in the
+retained header, where it stands under *Git*; "the check it reports came after the
+sentence", which no file shows; "read `CLAUDE.md` whole", which is not reader A's word; and
+one passage of the second pass's spec that still described the strip's bars growing without
+the exception. Each is answered in the text above or in the document named. **Those edits,
+this section and the staging block below were read by no reader.**
+
+### Staging
+
+Read from the commands at 23:24 on 2026-10-12. **This pass ran no `git add` and no
+`git commit`.**
+
+```
+$ git rev-parse --short HEAD
+e16221e
+$ git log --oneline | wc -l
+      96
+$ git status -sb | head -1
+## main...origin/main
+$ git diff --cached --name-only | wc -l
+      18
+$ git diff --name-only | wc -l
+      27
+$ git status --short | grep -c '^??'
+17
+```
+
+Ten paths are both staged and unstaged. These are the counts of the two checkpoints above.
+Written since 22:40, outside the git-ignored ledger: `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+the second pass's spec and plan, `tasks/lessons.md` and this file.
+
+## [2026-10-13] — `/commit`, and the staged tree gated by itself before its plan
+
+The owner ran `/commit` late on 2026-10-12. **Nothing was committed: its plan waits for their
+word.** They then ran `/doc_sync`, which is this checkpoint. **No source or test file has
+changed since 13:42:47 on the 12th.**
+
+### What `/commit` did before its plan
+
+The gate of 2026-10-12 ran on the working tree — stage 3 and stage 3b together. Stage 3
+commits first, from the index, and that tree had not been tested in this session. So the
+index was exported with `git checkout-index -a --prefix=…` to a scratch folder (161 files,
+the index's 161) and built and tested there, into its own DerivedData, from 23:30 on the 12th
+to 00:12 on the 13th. No file of the working tree and no entry of the index was changed;
+`git write-tree`, run to name the index's tree, wrote eight tree objects under `.git/objects`.
+
+- Phone unit, stock *iPhone 17*, iOS 27.0: `✔ Test run with 479 tests in 60 suites passed`.
+- Phone UI, *WaterBuddy Gate 27*, iOS 27.0: `GoalSetupUITests` in chunks of nine, eight and
+  eight. **The first chunk ended `** TEST FAILED **`**: eight passed and
+  for `testAnUndoOfferExpires` the result bundle, read that night and gone from DerivedData
+  since, gave "Test crashed with signal term"; the log has "Restarting after unexpected
+  exit, crash, or test timeout" and names it under "Failing tests:". Run alone at 23:46 it
+  passed. The other two chunks passed, and the other classes
+  `Executed 18 tests, with 0 failures`.
+- Phone UI, *WaterBuddy Gate 26.5*, iOS 26.5, begun at 00:03 with the simulator booted first:
+  nine, eight and eight passed, and `Executed 18 tests, with 0 failures`.
+- Watch unit, *WaterBuddy Watch 27*: `✔ Test run with 57 tests in 6 suites passed`.
+- `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`.
+
+Not run: iOS 18.6, which stage 3's own gate had. What killed the runner is not known; what
+was seen beside it is in known issue #122, opened by this pass.
+
+### The plan that waits
+
+Seven commits: three for stage 3 from the index — the code, its plan, its docs — and four for
+stage 3b from the working tree — the code, its specs and plans, its docs, `CLAUDE.md`. One
+question with it: whether `.claude/rules/50-views.md` and `65-accessibility.md`, which hold
+stage 3's wording, go in as an eighth. Left out of it: `.claude/settings.json`, the two watch
+schemes, three string catalogues and `Screenshots/census/`.
+
+### Clean at the start of this pass
+
+78 `.swift` files on disk, each named in `docs/AI_CONTEXT.md`; 547 `@Test`, 57 on the watch,
+38 UI `func test`; eleven keys; three exception sets. No file of the working tree had been
+written since the checkpoint above; under `.git`, the index file and the eight tree objects
+of `git write-tree` had, at 23:30:08.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (a block at the head of *Current state* with the staged tree's results;
+known issue #122 opened; the header; the git block), `tasks/lessons.md` (two entries), this
+file. No source, no test, no rule file. `docs/DESIGN.md`, `docs/STATE.md`, `docs/WIDGET.md`
+and `CLAUDE.md` were not edited.
+
+### A reader on this pass's text
+
+The record above went to one fresh reader (`docsync-56-reader-g.md`, saved as it arrived),
+told to check it against the logs. Every result line, count, device, system and log time
+matched. It found six things in the wording, each answered in the text above and in
+`docs/AI_CONTEXT.md`:
+
+- "The repository was not written to" — the working tree and the index's entries were not,
+  but `git write-tree` wrote the index file and eight tree objects under `.git`.
+- The failure text was quoted from a result bundle that has since gone from DerivedData; it
+  is now said to have been read that night.
+- #122 set the killed runner apart as "the first chunk after a simulator's cold boot". The
+  simulator's `system.log` shows `xcodebuild` booted it for each of the four later runs too,
+  which passed. The boot is no longer offered as what set that chunk apart.
+- "ran as rule `85-testing` writes the command" — it shared only the missing flag.
+- #122 and *Current state* told the moments before the restart differently.
+- "the git block" was listed as touched before it was written.
+
+It also found that `~/Library/Logs` holds nothing created before 23:46:14 that night, so the
+empty crash-report listing at 23:42 showed nothing either way; #122 now says no crash report
+could be looked for. **The answers to the six were read by no reader.**
+
+### Staging
+
+Read from the commands at 08:35 on 2026-10-13. **This pass ran no `git add` and no
+`git commit`.** `e16221e`, 96 commits, `## main...origin/main`; 18 staged, 27 unstaged, 17
+untracked, 10 in both — the counts of the checkpoints above. The index is still the tree
+`8c1afc06daceaef1476c9425bc1d6bc303f0f171` that was gated. Written in the repository this
+morning: `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.

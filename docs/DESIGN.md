@@ -7,7 +7,47 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-11 (the redesign's stage 3, History, finished and staged; the fiftieth
+**Last updated:** 2026-10-12 (the fifty-fourth pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+by the owner straight after the fifty-third. **No source change and no token changed; five
+statements the fifty-third pass made here are corrected, each where it stands**, found by two
+fresh readers; a third and a fourth then read the corrections and found eight things each
+in them, the fourth's all small, which are applied. The two builds' foot of the screen on iOS 27.0 agree to within a tolerance and were
+called "identical": the table in *Apple's tab bar, measured* has the finer figures now, and
+they show **the bar itself differing a little from the `TabView`'s on iOS 27.0 too**. That
+section's last line still said the simulator has no switch for Reduce Motion. *Why the scroll
+effect does not fade* gave one of the reviewer's two readings to the other's card. *Reduce
+Motion* had four things reading the setting where three do. *One sky* named "the other two
+scripts" where the stage's sections name four.)
+Before that: 2026-10-12 (the fifty-third pass of `docs/AI_CONTEXT.md`, after **stage 3b's
+second pass**, unstaged. **A new section, *Motion*:** the curves by name, the page slide, the
+drop, the marker, the tick and the scroll effect, with what each was seen to do. *Apple's tab
+bar, measured* says what the bar is now — a `UITabBar` standing alone, identical on iOS 27.0
+and darker on 26.5, where its captions read 8.0:1 or better — and that its table is the
+`TabView` bar's. *The header and a screen arriving* has `Arrival`'s new numbers and says the
+settle is the opening page's only. *One sky*, *The haptic ladder* and *Reduce Motion* each
+gain a dated note. **The scroll effect shrinks and does not fade**, and why is a contrast
+figure. No glass token changed.)
+Before that: 2026-10-12 (the fifty-second pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+by the owner straight after the fifty-first. **No source change and no figure changed.** A fresh
+reader checked this file's stage 3b sections against the code and four sentences are corrected,
+each marked where it stands: the arrival hides everything under the *header*, not under the
+title, and its "whole 0.3–0.4 s after the cut" is what the frames showed, not where the curves
+end; `goalReached` is the one haptic driven by a model value, not the one "not driven by a
+counter" — two of stage 3b's are driven by a view's own state; the aurora's curve is asked for
+a value each frame since stage 3b; and three measuring scripts named as `tools/…` are in the
+session's scratch folder, not in the repository.)
+Before that: 2026-10-12 (the redesign's stage 3b, navigation and motion, finished and
+**unstaged**; the fifty-first pass of `docs/AI_CONTEXT.md`. **Two new sections:** *Apple's tab
+bar, measured* — the bar is the system's on iOS 26 and later, the selected tab is white, and the
+foot of every screen is shaded by a quarter, `BarShade`, because the selected caption read
+3.79–4.46:1 on iOS 26.5 without it — and *The header and a screen arriving*: `ScreenMetrics`,
+where the title stands, `Arrival`'s numbers, and what was seen frame by frame on three systems.
+*The aurora moves* says how the lights are placed now: by one clock every backdrop reads,
+`AuroraClock`, because kept screens ran out of step and the backdrop changed at every change of
+tab. *The haptic ladder* gains `select` and `remove`. **One caption is under its floor in one
+configuration and stays there**; the figures by the tab bar are a first-read method and say so.
+No glass token changed.)
+Before that: 2026-10-11 (the redesign's stage 3, History, finished and staged; the fiftieth
 pass of `docs/AI_CONTEXT.md`. **A new section, *History, measured*:** the header's two lines on
 the aurora by both yardsticks, and the cards, the strip and the rows on Apple's glass and on the
 hand-made pane — 32 pairs a system, the worst frame of a minute at rest and a minute scrolled.
@@ -448,8 +488,9 @@ ratios exactly, and the ratios are the thing that stops the lights beating toget
 whole seconds the new set is 32 / 45 / 57, whose lowest common multiple is 27,360.
 
 **How long before the field repeats — recomputed in the forty-seventh pass.** A period is one
-*leg*: `AuroraBackground` animates with `.easeInOut(duration: light.period)` and
-`repeatForever(autoreverses: true)`, so a light is back where it started, moving the same way,
+*leg*: until 2026-10-12 `AuroraBackground` animated with `.easeInOut(duration: light.period)` and
+`repeatForever(autoreverses: true)`, and `AuroraDrift` draws the same journey on the same curve
+(*One sky*, below), so a light is back where it started, moving the same way,
 after two periods — 32, 45 and 57 seconds. All three are back together after their lowest common
 multiple, 27,360 seconds: **7.6 hours**. The old set's there-and-backs were 38, 54 and 68 seconds,
 and 34,884 seconds — 9.7 hours — so the new set repeats sooner, not later; either is far past
@@ -472,10 +513,59 @@ Three constraints, each with a test behind it:
   shared beat the eye reads as a pulse. Same reason `WaterSurface` interferes two waves at different
   frequencies rather than scaling one.
 
-`repeatForever` rather than a `TimelineView`: there is nothing to recompute per frame, so two
-endpoints and a curve let the render server carry the loop. The colour cross-fade is **two stacked
+Two endpoints and a curve rather than a `TimelineView`: the view's body is not run again per
+frame. *(Read "there is nothing to recompute per frame" until the fifty-second pass — true of the
+built-in repeating curve, which the render server carried whole. Since stage 3b the curve is
+`AuroraDrift`, which SwiftUI asks for the lights' place each frame and which reads the clock to
+answer — arithmetic on one number, and no body; see *One sky*.)*
+The colour cross-fade is **two stacked
 fills interpolating opacity**, not one animated `fill` — a `Shape`'s style is not itself animatable.
 One blur covers both, so it costs a second fill and not a second blur.
+
+### One sky
+
+*Added 2026-10-12, the redesign's stage 3b.* Every screen stands its own `AuroraBackground`. The
+curve was `easeInOut(duration:).repeatForever(autoreverses: true)`, which counts from the moment
+it starts, and each screen started its lights the first time it was shown. Under the app's own
+container a screen was rebuilt on every change of tab, so its backdrop restarted from rest inside
+an eight-frame cross-fade. Under Apple's `TabView` (iOS 26 and later) a screen is kept, its
+lights go on running, and the three stood out of step for the rest of the session: **the
+backdrop changed at every change of tab.**
+
+*2026-10-12, stage 3b's second pass:* the three tabs no longer stand a backdrop each. Their
+pages slide, and a backdrop inside a page would slide with it, so `RootTabView` stands one
+behind all three and the pages are clear. The first-run screen and the serving sheet still
+stand their own, and the one clock is what makes them the same sky as the tabs': the first-run
+screen hands over to the app by a cross-fade in place, and the frames of it show one backdrop.
+The figures below are the first build's, taken when each tab had its own.
+
+Read in the screens' side margins, x 2–18 pt and 384–400 pt, y 250–720 pt, on a 402 × 874 pt
+phone, iOS 27.0, nine captures of one walk (`tools/margins.py`, in the session's scratch folder
+and not in the repository, as are the other four scripts this stage's sections name — `sky.py`,
+`selected.py`, `barcontrast.py` and `caption.py`; "the other two" until the fifty-fourth pass
+of `docs/AI_CONTEXT.md`, which added two of its own there, `maxdiff.py` and `bands.py`; mean change
+over the two strips, levels of 255):
+
+| | Before | With one clock |
+|---|---|---|
+| Home → Settings, Settings shown for the first time | 16.3 | 5.7 |
+| Settings → Home | 12.5 | 4.1 |
+| Home → History, History shown for the first time | 14.8 | 6.6 |
+| History → Home | 5.7 | 5.3 |
+| Four seconds on one screen, no change of tab | 3.1–5.5 | 3.4–5.2 |
+
+Those captures are a second or more apart, so the right-hand column is drift, not a jump. Frame
+by frame off a recording, in three patches above the header where no screen draws anything
+(`tools/sky.py`, the session's scratch folder): **the largest change between consecutive frames across Home → History is 0.56
+and across History → Home 0.43, against a steady 0.3–0.5** on either side of the cut.
+
+`AuroraDrift` is a `CustomAnimation`: asked for a light's displacement, it reads `AuroraClock` —
+the device's uptime since the first backdrop was drawn — and returns the place on the journey
+that clock says, by `UnitCurve.easeInOut`. It is not asked how long it has been running. The
+clock starts at nothing, so the app still opens on the resting frame; Reduce Motion still passes
+no animation and draws the resting frame alone. `AuroraDriftTests` pins the journey, the curve's
+symmetry and that the clock alone places a light; what no test can call is `animate` itself —
+`AnimationContext` has no public initialiser — and the recording is its evidence.
 
 **The widget's aurora does not move and cannot.** A widget's view is an archive replayed by another
 process, with no clock (rule `40-widget`).
@@ -607,6 +697,10 @@ and when to sample:
   from rest each time a screen appears, and the first one cross-fades blue to cyan. A capture two
   seconds in is the resting frame and nothing else. Each screen is therefore shot every three
   seconds for a minute, and History for three and a half; the figure is the worst frame.
+  *("From rest each time a screen appears" was true when this was measured. Since 2026-10-12 the
+  lights are placed by one clock that starts when the app's first backdrop is drawn — The aurora
+  moves, One sky — so a screen opened a minute into a session is a minute into the swing. The
+  rule for sampling is unchanged; a minute from launch still covers it.)*
 
 The climb, on iOS 27.0's iPhone 17 — each rung rendered, none estimated:
 
@@ -1047,6 +1141,245 @@ Any figure under Increase Contrast, at a text size other than the ordinary one, 
 Uzbek, on a device, or on iOS 17. The reminder's mark from a real reminder. The sheet's other
 text, which this stage did not change.
 
+## Apple's tab bar, measured
+
+*Added 2026-10-12, the redesign's stage 3b.* On iOS 26 and later the three screens are the tabs
+of a `TabView` and the bar is Apple's: its glass, the lens that follows a press dragged along it.
+Below iOS 26 the app keeps its own `GlassTabBar`, which the sections above describe. The app
+gives Apple's bar three things: `.tint(.white)`, `.tabBarMinimizeBehavior(.never)`, and a shade
+under it.
+
+**2026-10-12, stage 3b's second pass: the bar is no longer a `TabView`'s, and everything
+measured below was.** A `TabView` offers no transition between its pages, so the pages are the
+app's own pager now and the bar is the same `UITabBar` standing alone (`SystemTabBar`), with a
+white `tintColor` and the same shade, drawn once by the container. It takes the height it asks
+for — 83 pt on a phone with a home indicator — and is pulled down by the bottom inset, which
+is where the system stands its own.
+
+| | iOS 27.0 | iOS 26.5 |
+|---|---|---|
+| The foot of the screen against the `TabView` build's, 402 × 874 pt, pixels differing by more than 24 levels **in grey** (the script turns the difference to grey first) | **none** in the bottom 700 px | the bar's own, and nothing above it (read off the spike's build, whose bar is laid out by the same lines) |
+| The same, taken finer in the fifty-fourth pass of `docs/AI_CONTEXT.md` on a stored pair that reproduces the row above — the `TabView` build's Home against this build's (`tools/maxdiff.py`, `tools/bands.py`, in the session's scratch folder): the largest difference, in grey and in one channel | **the bar's own 249 px: 11 and 26** (blue; 14 pixels over 24 in that channel). **The 451 px above it: 2 and 4.** (A share of pixels "differing by something", 21 %, was given here in the fifty-fourth pass and withdrawn in it: it is a count after the difference is turned to grey, and by the same count two captures of one build differ in 14 % and 36 %) | — |
+| Two captures of the `TabView` build against each other, the same bands | 2 and 4 at most, bar and all — so the bar's 11 is the bar's and not one capture against the next | — |
+| The same, 375 × 667 pt | — | the bar's own; the header not at all |
+| The bar's glass | as the `TabView`'s to the eye, and within the 11 grey levels of the row above that gives the bar's own 249 px | **darker**: smoked where the `TabView`'s was vivid over the aurora |
+| Captions, by the first-read method below, single frames | — | **every caption ≥ 8.03; the selected one ≥ 11.09**, seven frames across the three tabs: six of the recorded walk, History and Settings selected with rows and controls under the bar, and one still of Home |
+| The `TabView` build by the same script on one frame, Home selected | — | selected 5.50, *History* 8.27, *Settings* 7.56 |
+
+- **The darker glass is iOS 26.x's doing and was not asked for.** Not the bar's appearance
+  objects — a transparent and a scroll-edge appearance were tried — and not cured by a tab
+  controller only as tall as the bar. It seems to need the pages inside the controller
+  (`docs/AI_CONTEXT.md` known issue #119).
+- **The 26.5 column of the table below describes a bar the app no longer draws.** The new
+  figures are from seven frames, not a minute of the aurora, and are not a sweep.
+- **The shade is kept at 0.25.** It was measured as needed for the `TabView`'s lighter
+  lozenge; whether the darker bar needs it was not measured, and on iOS 27.0 it is part of
+  what keeps the two builds within the 24 grey levels of the table's first row — a tolerance,
+  not an identity: that script counts pixels over it and reports nothing finer, and the two
+  rows under it show the bar differing inside it.
+- **The caption under its floor on the small phone (below, #112) was not taken again.**
+- **Looked at since:** landscape and a change of language under the standalone bar on iOS
+  27.0 — the captions follow the language and the selection holds — and Reduce Motion.
+
+| Token | Value | Held by |
+|---|---|---|
+| `BarShade.opacity` | 0.25 | `theShadeIsNoLighterThanTheFirstRungWithRoom`, `theShadeLeavesTheAuroraShowing` |
+| `BarShade.ramp` | 20 pt | `theRampFitsInsideHomesFoot` |
+
+**The method is not this file's usual one, and the figures do not compare with the tables
+above.** A caption on Apple's bar is drawn in a colour the system mixes, so there is no token to
+composite: the caption's own colour is read off the render — the brightest half-percent of its
+band — against the lightest 2 % of the darker half of the same band (`tools/selected.py`,
+`tools/barcontrast.py`, in the session's scratch folder). A first-read method. 402 × 874 pt
+phone, ordinary text size, the caption band at y 828–845 pt; through a minute of the aurora on
+Home, and with History's rows and Settings' controls scrolled under the bar.
+
+| | iOS 27.0 | iOS 26.5 |
+|---|---|---|
+| White tint, no shade | every caption ≥ 5.02; the selected one 7.3–7.7 | **the selected caption 3.79–4.46** — Home 4.17, History 3.88, Settings 3.79 at worst |
+| Cyan tint, no shade | — | 3.98 |
+| Shade `0.20`, a minute | — | 4.78 at worst |
+| Shade `0.25`, 24 s | — | 5.18–5.61 |
+| Shade `0.40` | — | 6.02–6.58 |
+| **As built**: white tint, shade `0.25`, a minute and the scrolled sets | **every caption ≥ 6.77**; the selected one ≥ 9.03 | **every caption ≥ 5.10** — selected Home 5.49, History 5.17, Settings 5.10 |
+
+- **Why a shade and not a tint.** On iOS 26.5 the system draws the selected tab's lozenge lighter
+  than the bar — about sRGB (130, 57, 240) — and its caption not white but about
+  (255, 218, 255). No tint the app can give moves that pair over 4.5:1; pure white on that
+  lozenge would read 5.25–5.5 and is not on offer. The lozenge follows what is behind the bar,
+  so the ground is darkened. `0.20` passed with 0.28 to spare; `0.25` is the first rung with
+  room.
+- **Why white and not `Aurora.cyan`**, which the canvas drew: cyan read 3.98:1 on iOS 26.5
+  before the shade. **Cyan was not measured with the shade.**
+- **Where the shade is drawn.** Over the foot of each tab's screen and under the bar: a 20 pt
+  ramp ending at the bottom of the safe area, then the full shade to the foot of the screen —
+  and, in landscape, out to the screen's own edges.
+
+**One caption is under its floor, in one configuration, and is not cured.** A 375 × 667 pt
+phone at Accessibility XXXL on iOS 26.5, where Home scrolls and the white Glass disc rests under
+the bar beside the selected tab: one capture — **the selected caption 4.01:1**, *History* 4.92,
+*Settings* 5.47. `.scrollEdgeEffectStyle(.soft, for: .bottom)` gave the same figures; `.hard`
+gave 6.13 / 9.10 / 8.92 and cut the content off square at the bar's top edge, so nothing showed
+through the glass. Neither is adopted (`docs/AI_CONTEXT.md` known issue #112).
+
+**On that phone at the ordinary text size** Home is whole above the bar with the vessel at its
+200 pt floor, and the vessels' names stand inside the ramp: 8.0, 7.0 and 5.6:1 — one capture,
+the names' brightest 1 % against the median of the box around them (`tools/caption.py`, the
+session's scratch folder).
+
+**Looked at, not measured:** Increase Contrast on iOS 26.5 — Apple's bar goes dark and nearly
+opaque, white on it. **Not looked at:** Reduce Transparency; iOS 26.0–26.4; a device. *(This
+line also named Reduce Motion, "for which the simulator has no switch", until the fifty-fourth
+pass of `docs/AI_CONTEXT.md`. Its Settings app has one, and the standalone bar was looked at
+under it on iOS 27.0 — the note of 2026-10-12 above. Apple's bar inside a `TabView` never
+was, and is no longer drawn.)*
+
+## The header and a screen arriving
+
+*Added 2026-10-12, the redesign's stage 3b.*
+
+| Token | Value | What it is |
+|---|---|---|
+| `ScreenMetrics.margin` | 24 pt | every tab's side margin; `(375 − 2 × 24) / 7 = 46.7` pt a day button |
+| `ScreenMetrics.topInset` | 16 pt | from the top of the safe area to the title's line |
+| `ScreenMetrics.titleLine` | 44 pt | the least the title's line may be, and the height its accessory is laid out at |
+| `HomeView.dateScaleFloor` | 0.45 | the least the date under *Today* is drawn at |
+| `Arrival.rise` | 14 pt (10 in the first build) | how far a section of the opening page rises as it arrives |
+| `Arrival.duration` | 0.4 s | one section, on `.smooth` |
+| `Arrival.stagger` / `longestDelay` | 0.05 s (0.04) / 0.2 s | each section after the one above; the ceiling |
+| `Arrival.hiddenFirst` | 50 ms | drawn hidden before it starts, so there is a frame to arrive from |
+| `Arrival.hiddenOpacity` | 0.001 | never zero: at zero a kept view left the accessibility tree and did not come back |
+
+**2026-10-12, stage 3b's second pass: the settle is the opening page's only.** As the whole of
+a change of tab it was 10 pt under a fade, and the owner, holding it on a phone, saw the screen
+"just appear". Run on top of the page slide, it left the arriving page mostly a header: its
+first section at half strength with two thirds of the way gone. A page a turn brings in is
+told so (`pageSettlesIn`) and draws its sections whole from its first frame; History's bars
+still grow as it comes. What a change of tab looks like now is in *Motion*, below.
+
+**Where the title stands**, read off the accessibility tree on a 402 × 874 pt phone, iOS 27.0:
+
+| | Home | History | Settings |
+|---|---|---|---|
+| Before the stage, ordinary size | (24, 90) | (28, 88.67) | — |
+| As built, ordinary size | (24, 79.67) | (24, 79.67) | (24, 79.67) |
+| Three sizes up (`UICTContentSizeCategoryXXXL`), before the review's fix | (24, 76.0) | (24, 80.67) | — |
+| The same, as built | (24, 78.0) | (24, 78.0) | (24, 78.0) |
+
+The 4.67 pt at the larger size was two faults in opposite directions. History's `+` is 53.3 pt
+there and the title's line 48: the line took the button's height and centred the title 2.67 pt
+down. And Home's column handed the header its ideal height, which the header's stack divided
+evenly first: a line with only a least height reported 44 pt around a 48 pt title, which stood
+2 pt above it. The accessory is laid out at 44 pt whatever it draws, and the line is rigid.
+
+**The date under *Today*.** `.headline`, as History's total is. The widest date of a year in the
+three shipped languages, measured in iOS's own font at Accessibility XXXL, is *Понедельник,
+28 сентября*: 665.9 pt, against 327 pt between the margins of a 375 pt phone — 0.491 of its
+size. The floor was 0.5, measured on one Sunday in October. At 0.45 the line is 24 pt there,
+where it is 17 pt at the ordinary size (`theWidestDateFitsTheNarrowestPhoneAtTheLargestTextSize`).
+
+**What a change of tab looked like in the first build** — kept as it was read; the second pass
+replaced all three (see *Motion*) — frame by frame off recordings of the built code:
+
+- **iOS 27.0** — the page changes in one frame. The title is in the same place on the frame
+  before and the frame after; the backdrop does not change (*One sky*); everything under the
+  header is drawn at 0.001 for a few frames and is whole 0.3–0.4 s after the cut, read on two
+  changes of tab. *(Read "under the title" until the fifty-second pass. The whole header is
+  outside the arrival and never hidden — the title, the line under it, and the accessory on its
+  line: Home's date and streak chip, History's total and `+`. And "whole" is what the frames
+  showed, not where the curves end: by the constants a screen's first section ends 0.45 s after
+  it is shown — 50 ms hidden and 0.4 s — Home's last 0.53 s, Settings' last 0.57 s and the
+  strip's bars 0.63 s; a `.smooth` curve is all but at rest well before its end.)*
+- **iOS 26.5** — the system goes on showing the old page for 0.2–0.3 s after the selection
+  moves, while its own lens crosses the bar; then one blended frame, and the new page's content
+  arrives. The screen being left stays whole for that time: its arrival flag is cleared when it
+  has gone, not when its tab is left.
+- **iOS 18.6**, the app's own bar — the old screen fades out whole over 0.28 s as before, and the
+  new one's content arrives inside the fade.
+
+History's bars, the week's and the strip's, grow from their baseline over 0.5 s as the screen
+arrives; under Reduce Motion they are simply there and the arrival is the fade alone. *Undo*'s
+capsule arrives from 0.92 of its size on `.smooth(duration: 0.3)`. **Reduce Motion was not
+rendered.** *(All of this paragraph is the first build's too: the capsule arrives from 0.8 on
+`Motion.land` now, and Reduce Motion has been rendered — Motion, below.)*
+
+## Motion
+
+*Added 2026-10-12, stage 3b's second pass.* The owner held the first build on a phone and saw
+no animation in a change of page. What moves, and by how much, is listed here so that the next
+judgement of "too quiet" or "too much" is of numbers.
+
+| Name (`Motion`) | Curve | For |
+|---|---|---|
+| `page` | `.smooth(duration: 0.45)` | a page changing |
+| `pageFade` | `.smooth(duration: 0.25)` | the same, under Reduce Motion |
+| `settle` | `.smooth(duration: 0.3)` | a state changing |
+| `land` / `landSpring` | `.spring(response: 0.5, dampingFraction: 0.68)` | something that arrives |
+| `water` | `.spring(response: 0.8, dampingFraction: 0.62)` | the level in the vessel |
+| `drop` | `.easeIn(duration: 0.42)` | a drop on its way to the vessel |
+
+The press keeps its own spring, `0.28 / 0.62`, in `PressStyle` and `LiquidGlassModifier`.
+Sixteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to 0.5 s.
+
+| What moves | By how much | Held by |
+|---|---|---|
+| A page, on a change of tab | a whole screen's width, both pages together, 0.45 s; the backdrop and the bar not at all | `PageTurnTests`, `aPageChangesInUnderHalfASecond` |
+| A drop, on a pour | 22 pt across, from the pressed disc to the vessel's centre along an arc lifted 56 pt above the line between — the drop itself rises 28 — in 0.42 s; whole for three quarters of the way, then taken in | `PourArcTests` |
+| The vessel, as a drop lands | to 1.025 of its size in 0.1 s and back over 0.5 s; the surface surges then | — |
+| The level | to its new mark on `water`, past it and back | `whatLandsPassesItsPlaceAndDoesNotRing` |
+| The shown day's marker | one capsule, from day to day, on `land` | `theMarkerStandsOverTheDayShown` |
+| The strip's bars | from the baseline to their heights over 0.5 s, as the page arrives and on each change of day; simply there under Reduce Motion | — |
+| The saved tick | a 16 pt check (26 at most) trimmed from nothing to whole on `land`, 1.6 s, then faded | — |
+| The figure under a held slider | 1.06 of its size, from its trailing edge | — |
+| The streak chip, *Undo*'s capsule | from 0.8 of their size, on `land` | — |
+| A section scrolling off History or Settings | toward 0.92 of its size, by the share of it no longer showing, drawing back from the edge it is crossing | `ScrollDepthTests` |
+
+**What was seen**, frame by frame off recordings of the built code, 402 × 874 pt:
+
+- **iOS 27.0, 26.5 and 18.6** — both pages are on screen for the length of the slide: the old
+  one leaves by one side as the new one comes in from the other, whole, its bars growing as it
+  lands. On Apple's bar the lens crosses meanwhile; the app's own bar moves its lozenge. On
+  iOS 26.5 the quarter-second the `TabView` held the old page is gone.
+- **The first-run screen handing over to the app** is a cross-fade in place, as before. Home
+  does not slide in, and its sections settle.
+- **A pour** (iOS 26.5, the Cup): the drop is on the disc as the press ends, crosses in front
+  of the status line and *Undo*'s capsule, and is gone into the vessel about 0.45 s later; the
+  vessel is seen a little larger for the four frames after that.
+- **A day picked:** the marker is between days for about three frames and at rest inside 0.4 s.
+- **A goal saved:** the tick is drawn beside *Daily goal* when the slider is let go.
+- **Scrolling:** a card crossing the top is narrower than the card below it and no fainter;
+  every card on screen at rest is whole.
+
+**Why the scroll effect does not fade.** The owner's choice was "fade and shrink". Built that
+way — toward half strength, with the shrink — a 330 pt card with a third of itself past the
+top is drawn at about five sixths of its strength while the rest of it is still being read:
+the reviewer's arithmetic, not a reading. It read two frames. With History's week card mostly
+out of the screen, *Measured against your current goal*, 5.49:1 at rest (above), read about
+3.6–4.0:1 against its pane; undimmed text in the same frame read 9.8–10.8:1, so the reading
+was not simply low. With Settings' vessels card about a third out, its caption read about
+5.9–6.9:1, where the same kind of line in a whole card read 10–12:1: dimmer, and still over
+the floor. Off 603 px video frames: indicative, and enough. The first is under the 4.5:1
+floor, and a list can come to rest anywhere. A section a few percent smaller loses no
+contrast. *(Until the fifty-fourth pass of `docs/AI_CONTEXT.md` this said "in a frame of it",
+giving the first reading to the card a third out, whose own reading was the second. The
+other records of the pass gave the first range's middle, "about 3.8:1", as if it had been
+read.)*
+
+**Why it works out its own place.** SwiftUI's `scrollTransition` is the API for it and was
+built first. Inside History's `List` it never reported a row as being at rest: every row stood
+at 0.94 and half strength. It was seen on the first recording, on a frame taken at rest.
+
+**Under Reduce Motion**, switched on in the simulator's own Settings app and recorded on iOS
+27.0: a change of page is the two pages cross-fading where they stand, 0.25 s; a pour throws no
+drop and the vessel does not swell; nothing shrinks as it scrolls; the opening page's sections
+fade in without rising. The level, the marker, the tick, the chip and the capsule move as
+they do otherwise: each is a value changing once, under a finger. By the code, and not looked
+for in that recording: History's bars, the week's and the strip's, are simply there — they
+do not grow as the page arrives or when another day is picked (`grown`, in both).
+
+**Not seen:** any of it on a device; a second tab chosen inside the slide; the frame rate of
+two pages of glass moving at once.
+
 ## Interactive glass
 
 Adopted from Apple's *Applying Liquid Glass to custom views*, which describes `Glass.interactive()`
@@ -1127,17 +1460,39 @@ vessel, two discs and the tab bar, the Glass being the primary surface — a fif
 streak, and a sixth for the eight seconds an *Undo* stands. Settings draws **five** — its four
 cards and the tab bar — and a sixth, *Open iOS Settings*, while notifications are blocked; this
 line said four until 2026-10-11, which left the tab bar out where Home's count had it in. Worth a
-look.
+look. *(Since 2026-10-12 the tab bar in these counts is Apple's own on iOS 26 and later, and the
+app's `.frosted`/`.floating` pane only below it.)*
 
 ## The haptic ladder
 
-Three rungs, in `Haptics`. Five call sites used to spell the first one, `confirm`, by hand.
+Five rungs, in `Haptics` — three until 2026-10-12, when the redesign's stage 3b added `select`
+and `remove`. Five call sites used to spell the first one, `confirm`, by hand.
 
 | Rung | Weight | Intensity | Where |
 |---|---|---|---|
+| `select` | the system's `.selection` | — | a choice among peers: a change of tab on either bar, a day picked in the week card when the day shown changes, a vessel shortcut in the serving sheet, and each 50 ml step of the sheet's slider |
+| `remove` | `.light` | 0.8, `confirm`'s (`takingAwayIsNoFirmerThanAConfirmation`) | a serving swiped away in History |
 | `confirm` | `.medium` | 0.8 | a goal saved (first run and Settings), the reminders switch turned on (at the flip, before permission is answered), a language picked, a vessel's amount committed, and — since stage 2 — *Undo* pressed on Home (whether or not a row was there to take back) |
 | `pour` | `.heavy` | **1.0** | water logged on Home, and a serving added or edited in History's sheet |
-| `goalReached` | `.heavy` | 1.0 | the goal crossed upward **while Home is on screen** — the modifier is Home's, and it watches the model's `hasReachedGoal`, the one haptic not driven by a counter; a goal crossed from History's sheet plays `pour` alone |
+| `goalReached` | `.heavy` | 1.0 | the goal crossed upward **while Home is on screen** — the modifier is Home's, and it watches the model's `hasReachedGoal`, the one haptic driven by a model value; a goal crossed from History's sheet plays `pour` alone |
+
+*(The last row read "the one haptic not driven by a counter" until the fifty-second pass. Since
+stage 3b two more are not: the tab's tick is triggered by the shown tab and the sheet's by the
+amount under the finger — each a view's own state that only the user's touch changes, and neither
+a counter, which is what rules `50-views` and `60-design-system` ask for by the letter;
+`docs/AI_CONTEXT.md` known issue #111. The other ten `sensoryFeedback` sites in the app are
+triggered by counters.)*
+
+**`goalReached`'s "while Home is on screen" is unverified on iOS 26 and later since
+2026-10-12.** Under Apple's tab bar Home is kept while its tab is away and goes on watching the
+model, so a goal crossed from History's sheet may now play it, there or on the return to Home.
+Which, if either, needs a device (`docs/AI_CONTEXT.md` known issue #114). Below iOS 26 the row
+holds as written.
+
+*2026-10-12, stage 3b's second pass: the row holds as written on every system again.* A page is
+built when its tab is shown and removed when it has left, so Home does not exist while History
+shows, and #114 is retired. No rung was added: the page slide plays the tab's `select` tick as
+before, and the drop, the marker and the tick are silent.
 
 **The pour steps the weight because intensity alone cannot express the increase.** Water landing is
 meant to be half again firmer than a confirmation; `0.8 × 1.5` is `1.2`, and
@@ -1175,6 +1530,11 @@ exists to refuse.
 
 - **Reduce Motion** — `WaterVessel` swaps the `TimelineView` for a still frame (`phase: 0,
   slosh: 0`). The level still animates when it changes; only the perpetual travel is dropped.
+  Since stage 3b's second pass three more things read it, each travel across the screen: a
+  change of page is a cross-fade, a pour throws no drop, and no section shrinks as it scrolls
+  (*Motion*, above — run and recorded with the setting on). The vessel does not swell either,
+  and not by reading the setting: the swell answers a drop landing, and there is none. *("Four
+  more things read it" until the fifty-fourth pass of `docs/AI_CONTEXT.md`.)*
 - **Reduce Transparency** — `LiquidGlassModifier` swaps the whole stack for `base.opaqueFill` plus
   the edge and the shadows. Translucency is the thing being turned off, so there is nothing left to
   soften. In the widget, `WidgetCardBackdrop` and `WidgetAurora`'s lights drop out too, and on the
