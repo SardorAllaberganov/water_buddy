@@ -7805,3 +7805,314 @@ HEAD is `b8a1386`, 92 commits, level with `origin/main`. **No `git commit` was r
 was written under `WaterBuddy/`, `WaterBuddyWidget/`, the watch folders, any test target or
 `.claude/`. Outside the tracked paths this pass wrote the stage's git-ignored ledger (one line of
 corrections), the session's scratch folder, and nothing in the memory directory.
+
+## [2026-10-11] — The redesign's stage 3: History
+
+Stage 2 was committed in between — `1ced514`, `e7406a5`, `6b5f319`, `e16221e` — so HEAD is
+`e16221e`, 96 commits. The owner ran `/start_task` with no task named, was shown the stage's
+outline and five decisions, and answered "go". **Stage 3 is built, tested and staged. Nothing is
+committed.** Spec `docs/superpowers/specs/2026-10-09-premium-redesign-design.md` §6; plan
+`docs/superpowers/plans/2026-10-11-premium-redesign-stage-3.md`. No key added, no target
+membership changed, nothing in the widget or on the watch.
+
+### What changed
+
+- **History is one list.** The header, the week card, the strip and the servings are rows of one
+  `List`, each with the list's own surfaces cleared; nothing is fixed above it, so the `+` scrolls
+  away with the header. The list stops one point short of the top safe area, or its rows are drawn
+  on up under the status bar.
+- **The header**: the shown day at `.largeTitle` and its total against the goal straight on the
+  aurora, grouped by the app's locale, with Home's two shadows (`legibleOnBackdrop()`, moved from
+  `HomeView.swift` to `AuroraBackground.swift`). The `+` shares the title's line. At an
+  accessibility text size a past day's title is two lines, the weekday and then the date.
+- **The week card**: a day that reached the goal is cyan and one that did not is white; under the
+  bars *Average*, *Best day* and *Goal met* (`5 of 7`), in the first of three layouts that fits.
+  Its spoken summary carries the days met.
+- **When you drank**, new: one bar per serving of the shown day, placed by the fraction of that
+  day's real length and sized against the largest of the day's servings and the vessels; hour
+  labels at 6, 12 and 18; on today, a bell at the next reminder. One heading to VoiceOver, its
+  bars hidden.
+- **A serving row**: a vessel's glyph in a dark well, the amount, the vessel's name when the amount
+  is one of the current three (the Glass checked first), the time. One of two whole layouts, the
+  time beside the amount or under it. The name is drawn and never spoken.
+- **The sheet**: three vessel shortcuts under the slider set the amount; the one whose amount is
+  showing carries `LiquidGlass.Selection`'s fill and rim. The slider's bounds contain the vessels.
+- **The model** (`DataManager.swift`, compiled into four targets): `DaySummary.reached(_:)` and
+  `daysMet(in:goal:)`; `dayFraction(of:)` and `hours(_:onDayOf:)`, each a `nonisolated static`
+  over a calendar with an instance wrapper. `streak`, `streakFillsWindow` and `closedDays` are
+  respelt through `reached(_:)`.
+- **Strings**: six keys added, four removed; the app's catalogue holds 75.
+- **A second change, of two test files, staged beside the stage**: known issue #92's test moved
+  onto `UnreadableStore`. See *The gate*.
+
+### The rulings it rests on — each the owner's to overturn
+
+The five the "go" took as recommended: the header scrolls away with the list; #62's test is
+rewritten here; the sheet's selected shortcut uses `LiquidGlass.Selection`, not white; #93 is left
+out; contrast is recorded by both yardsticks of #95 with clean ground as the floor.
+
+Made while building, in order:
+
+1. No worktree, no branch, no commit; one read-only reviewer at the end, before the gate.
+2. The "day's total grew" check is a five-second poll, not a predicate block.
+3. `.padding(.top, 1)` on the list. A defect fix, and a visual decision: panes are cut by a hard
+   line under the status bar.
+4. Each strip bar carries a 1 pt dark hairline: four servings in fifteen minutes drew as one blob.
+5. A row's glyph sits in a dark well (`.black.opacity(0.4)`), not the canvas's cyan wash, which
+   read 2.0:1 under a glyph of its own colour on the hand-made pane. The plan's remedy was that
+   such a glyph "loses the disc's tint first, then goes white".
+6. The week card's figures have a third, stacked layout; the sheet's shortcuts are capped at 30 pt
+   and have two layouts; a row has two; the sheet's slider, shortcuts and wheel sit 8 pt apart
+   (they were 24), or *Save* and *Cancel* were half off a 375 × 667 pt screen.
+7. The `+` shares the title's line and the total has the row's whole width; the week's and the
+   strip's titles may take two lines. The plan printed neither.
+8. A past day's heading is two lines at an accessibility text size, chosen by the text size and
+   not by `ViewThatFits` — the app's first branch on text size — and may shrink to 0.5.
+9. The heading test's line is 0.7 of *Today*'s height, not the 0.8 it was first written at:
+   *Wednesday* alone measures 0.81 on a 402 pt phone. Seen failing again at the new line.
+10. **The total under the heading ships at 4.34–4.45:1 on clean ground against a floor of 4.5**
+    (4.62–4.68 beside its glyphs), on all three systems. Home's recipe on Home's backdrop: #95.
+11. **The strip's cyan bar ships at 2.73:1 on the hand-made pane (iOS 18.6), floor 3**, filed
+    with #85 though the mark is new — at the plot's left end, the small hours, where that
+    pane's highlight lies; 3.69 to 3.80 where the day's servings stood. 8.05 and 6.45 at the
+    same place on Apple's glass.
+12. #92 is fixed here, as its own change of two test files.
+13. The UI invocation ran as two complementary foreground invocations per system.
+
+### Files
+
+Staged, eleven of source, tests and strings: `WaterBuddy/AuroraBackground.swift`,
+`DataManager.swift`, `HistoryView.swift`, `HomeView.swift`, `Localizable.xcstrings`;
+`WaterBuddyTests/HistoryRangeTests.swift`, `HistoryViewTests.swift`, `LocalizationTests.swift`;
+`WaterBuddyUITests/GoalSetupUITests.swift`; and #92's two, `WaterBuddyTests/WristSyncTests.swift`
+and `UnreadableStore.swift`. `git diff --cached --stat` before the docs: 1,541 insertions, 272
+deletions. `HistoryView.swift` is 1,525 lines.
+
+### The gate, on the staged source
+
+Foreground, `-parallel-testing-enabled NO`, no `shutdown all`, each simulator shut by its own id.
+Another session's simulators were seen booted at times — an *iPhone 18 Pro* when the stage began,
+an *iPhone 16 Pro* during the UI gate — and left alone.
+
+| Invocation | Where | Result |
+|---|---|---|
+| Phone unit tests | iOS 27.0, *iPhone 17* | **479 tests in 60 suites passed**, five whole runs of five, the first from a cold simulator |
+| UI suite, harness skipped | iOS 27.0, *WaterBuddy Gate 27* | **43 executed, 0 failures** (25 + 18) |
+| the same | iOS 26.5, *WaterBuddy Gate 26.5* | **43 executed, 0 failures** |
+| the same | iOS 18.6, *WaterBuddy Gate 18.6* | **43 executed, 0 failures** |
+| Watch unit tests | watchOS 27.0, *WaterBuddy Watch 27* | 57 tests in 6 suites passed |
+| `WaterBuddyWidgetExtension` | iOS 27.0 | `** BUILD SUCCEEDED **` |
+| `WaterBuddyWatchWidget` | watchOS 27.0 | `** BUILD SUCCEEDED **` |
+
+- **Before the five passing unit runs, three: failed, passed, failed** — each failure
+  `WristIngestTests.aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew`
+  at `folded == 0`, known issue #92's race, in a test this stage does not touch. It lost once in
+  twenty-two runs for stage 2 and twice in the gate's first three here, with 35 more tests in the
+  process — the stage's one earlier whole-target run, in Task 4, had passed. The test
+  now uses `UnreadableStore` and proves the store unreadable before asserting; both assertions are
+  untouched, and with the store left readable all three of its expectations fail.
+- The UI target no longer fits one 600-second foreground call (25 tests of one class took 435 s
+  on iOS 27.0), so each system ran it as two invocations that together are rule `85-testing`'s
+  set: `GoalSetupUITests`, and everything else but the harness — in that order on iOS 27.0 and
+  26.5, and the other way round on iOS 18.6. 30 `func test`, 2 skipped, the launch test once
+  per configuration.
+- The watch tests and the two widget builds ran before the review's fixes. The seven shared files
+  were the same blobs afterwards, and the fixes touched nothing a watch or widget target compiles.
+  The pinned *Apple Watch Series 12 (46mm)* still cannot boot ("cannot be located on disk").
+- **Warnings: none new.** Clean builds of HEAD (`git archive`) and of the index
+  (`git checkout-index`), four schemes each into one build folder that only the app's build starts
+  empty: 38 / 19 / 2 / 19 distinct lines after path and position are cut, **the same lines and the
+  same counts** in both.
+
+### Measured
+
+Worst frame of a minute of the aurora at rest and a minute scrolled, a capture every three
+seconds, on the source as it stood before the review's fixes — which by the code change nothing
+these sweeps drew, today's screen at the ordinary text size; no capture was compared after
+them. The script's rectangles were drawn on a capture of the first iOS 26.5 sweep and looked at
+before a figure was kept, and that first set was wrong in several places; the final sweeps'
+were drawn and looked at on each system only afterwards, when a reader of the docs asked, and
+none had to move. **On iOS 18.6 the final sweep's second minute did not scroll** — the list had
+another page and did not move under the probe's swipe, why is not shown — so that system's
+scrolled figures, marked †, are an earlier sweep's of the same day, whose at-rest figures agree
+with the final one's to two decimals.
+
+| Pair | Floor | iOS 26.5 | iOS 27.0 | iOS 18.6, the hand-made pane |
+|---|---|---|---|---|
+| Heading on the aurora, clean ground / beside its glyphs | 3 | 4.74 / 5.19 | 4.74 / 5.19 | 4.61 / 5.07 |
+| **Total on the aurora, clean ground / beside its glyphs** | 4.5 | **4.45** / 4.65 | **4.44** / 4.68 | **4.34** / 4.62 |
+| `+` on its disc | 3 | 15.62 | 12.08 | 6.55 |
+| Week: a figure / a label | 4.5 | 13.64 / 11.22 | 9.94 / 8.75 | 6.34 / 5.74 |
+| Week: weekday letter | 4.5 | 7.02 | 5.32 | **3.41–3.93** |
+| Week: the disclosure | 4.5 | 7.26 | 5.92 | **4.15** |
+| Week: cyan bar beside the pane | 3 | 6.87 | 4.91 | **2.78** (3.32 at the other end) |
+| Week: white bar beside the pane | 3 | 12.12 | 8.67 | 4.91 |
+| Week: goal line over an empty day's track | 3 | 3.66 | 3.05 | **2.12** |
+| Strip: title / hour label | 4.5 | 13.75 / 10.87 | 10.39 / 8.48 | 6.78 / 5.76 |
+| **Strip: cyan bar against the pane, in the small hours / at midday / in the evening** | 3 | 8.05 / 7.43 / 7.02 | 6.45 / 5.65 / 5.58 | **2.73** / 3.80 / 3.69 |
+| Row: amount / name / time, the worse of rest and scrolled | 4.5 | 9.04 / 7.65 / 8.19 | 7.12 / 6.10 / 6.49 | 5.40 / 4.74 / 5.00 † |
+| Row: glyph in its well, the worse of the two | 3 | 8.10 | 7.05 | 3.84 † |
+
+- 32 pairs a system. **Under their floor: one on iOS 26.5 and on 27.0 — the total — and ten on
+  iOS 18.6**: the total, and nine on the hand-made pane, which is lighter than Apple's (#85). Of
+  those nine the strip's bar is new; the rest are drawn as HEAD drew them.
+- **The strip's first figure is at the plot's left end**, where the sweep's rectangle lay: no
+  probe serving stood there, though one logged at night would. The other two were measured
+  afterwards over the same at-rest captures, when a reader of the docs pointed that out. On the
+  hand-made pane the bar is under its floor at the left end only.
+- **One capture a system, not a sweep**: the sheet's shortcuts — white on an unselected slot
+  13.67 / 10.74 / 6.04, on the selected fill 10.54 / 8.37 / 5.45, the selected rim 5.18 / 4.66 /
+  3.43; and the empty state — title 13.33 / 12.37 / 5.37, its second line 7.37 / 6.84 / **3.80**
+  (floor 4.5; the empty state is HEAD's).
+
+### Rendered and driven, with a throwaway probe that is deleted again
+
+- Every control answered off its glyph on iOS 26.5, 27.0 and 18.6 — a day off its bar, a row on
+  its bare pane, a shortcut low and to one side, swipe-delete — **in walks made between 15:30
+  and 16:03, on a build older than the final one**: before the shortcuts' and the row's second
+  layouts, the sheet's spacing, the header's change and the review's fixes. On the final source
+  the gate's UI tests tap a row on its bare glass and a shortcut off its glyph on all three
+  systems and the delete probes swiped a row away; a day tapped off its bar was not repeated.
+- **Settings, on iOS 27.0, on a build older than the final one** — before the large-text fixes,
+  the header change and the review's fixes: Increase Contrast read back on and off, the walk
+  passing under it; Reduce Transparency flipped on and off under a running History, three controls
+  operated each way; Reduce Motion on, the backdrop identical twelve seconds apart.
+- **Text sizes**: XXXL and Accessibility M to XXXL in English and Russian on a 402 × 874 pt phone,
+  Uzbek at the ordinary size and at Accessibility XXXL for the header; a 375 × 667 pt phone at the
+  ordinary size, at XXXL in Russian and at Accessibility XXXL. **Found by render and fixed: five
+  lines cut short at large text** — the week's figures, the shortcuts' figures, a row's amount,
+  the header's total and the week's title — **and the sheet's two buttons half off the small
+  phone's screen** at the ordinary size. A sixth cut line, a past day's heading, was in a
+  capture of 16:29 and was not noticed there; see *The final review*.
+- **Deleting down to nothing**, two cases. A day's only serving, added and swiped away on iOS
+  27.0 and 18.6: the strip and the row went, the empty state came back, the week card stayed,
+  and the heading read that day with 0. The week's only water, deleted while a past day was
+  shown, on iOS 26.5 (the small phone) and 18.6: the card went too and the heading read *Today*
+  with 0. The `+` stood and the app was running each time.
+- The strip's bell was drawn with a stand-in time on iOS 27.0 and 26.5. Reminders could not be
+  switched on on a simulator (#94).
+
+### The final review
+
+A fresh reviewer read the staged diff and built nothing. Nothing critical. Three things it called
+important and thirteen minor; its report is saved beside the stage's ledger, as it arrived.
+
+- **Fixed, test first**: yesterday's test did not see that a serving is listed, or that it is one
+  control — it does now, and was seen failing with a row drawn as both its layouts and with a
+  past day's list left empty. A unit test that compared two literals in its own file is replaced
+  by one that reads the built string table, seen failing with a retired key put back.
+- **Fixed, and it had been graded minor on an estimate**: a past day's heading was cut at the
+  largest text sizes — *Saturday, 10 O…*, *Понедельник…*. Rendered, then a test seen failing at
+  43 pt against 72, then the two-line heading. **The stage's own walk had captured it at 16:29**,
+  more than an hour before the review — the screenshot, and a frame list giving the heading 43
+  points — and that line of the capture had not been read. This checkpoint and the lessons said
+  at first that every large-text render had shown today; a reader of the docs opened the
+  capture.
+- **Confirmed and not fixed**: in America/Havana, on the night the clocks go back across midnight,
+  `nextDayBoundary` answers the second 00:00 of the same day for the first of the two hours.
+  HEAD's function, the rollover's single definition; its own change.
+- Comments this stage had made false were corrected: the week bar's one colour, the `+`'s and the
+  empty state's figures, a row's "this screen's own header".
+
+### Not run
+
+- Anything on a device; VoiceOver itself — the tree was read, nothing was heard.
+- iOS 17: no runtime is installed.
+- The strip's reminder mark from a real reminder.
+- The three settings on the final source, and any contrast figure under Increase Contrast.
+- The final sweeps and the settings on any text size but the ordinary one.
+- Deleting the week's last serving on iOS 27.0; a worst case for the heading in Russian with a
+  two-digit date, which is arithmetic.
+- A native reader for the Uzbek.
+
+### Beyond the spec's §6, or unlike the canvas
+
+The header's size and layout; the hard edge under the status bar; the glyph's dark well in place
+of a cyan wash; the bars' hairline; hour labels at 6, 12 and 18; the strip scaled against the
+largest vessel; the slider's bounds widened by the vessels; the sheet's tighter spacing at every
+size; a past day's heading on two lines at large text.
+
+### For the owner
+
+- **The total under the heading** is 0.05 to 0.16 under the 4.5 this stage took as its floor.
+  One ruling settles it and Home's four texts together (#95).
+- **Rule wording, unstaged**: `.claude/rules/50-views.md` and `.claude/rules/65-accessibility.md`.
+- **#92's two test files** are staged beside the stage and are a separate commit.
+- **One simulator was made**: *WaterBuddy Small 26.5*, `D24E2190-9884-48D5-9C59-63D94A6A56D3`.
+- The device check at the foot of the plan, nine items.
+
+### The docs — `/doc_sync`, the fiftieth pass of `docs/AI_CONTEXT.md`
+
+Run by the session that built the stage, from the tree.
+
+- **Checked and already accurate:** 66 `.swift` files, each with a row, no phantom row; eleven
+  keys on `DataManager.Key`; three exception sets of six; every rule a doc cites has its file;
+  `CLAUDE.md`, read against the code, needed nothing.
+- **Drift found and fixed, `docs/AI_CONTEXT.md`:** ten stale line counts, the ten Swift files
+  the stage and #92's fix edit; the two test rows of the targets table (479 in 60 suites; 25 real
+  UI tests, 30 declared, 43 executed); the catalogue's count, 75; **stage 2 called staged** in
+  the file rows, the header and the *Current state* section — it was committed in `1ced514`,
+  `e7406a5`, `6b5f319` and `e16221e`; eight of the nine line citations in *The process role*,
+  moved by 15 when `DataManager.swift` grew; `HistoryView.swift:143`, now `:240`.
+- **Added there:** this stage's section at the head of *Current state*, stage 2's folded under
+  it; known issues **#62 and #92 retired**; notes on #39, #82, #83, #85, #90, #94, #95, #101,
+  #103 (a part (h): where each source and rule line it cites stands now), #104 and #105; **#107 to #110
+  opened** — the repeated midnight, Settings under the status bar, what the review left, the UI
+  target and the foreground limit.
+- **`docs/DESIGN.md`:** a new section, *History, measured*; the shortcuts under *Selection*; the
+  strip in the elevation and density lists; where `legibleOnBackdrop()` lives.
+- **`docs/STATE.md`:** seven of its eight line citations into `DataManager.swift`, moved by 15;
+  a passage on the four derived answers, none stored; the caveat of #107.
+- **`docs/WIDGET.md`:** a dated header, the app catalogue's count, the build record. Nothing in
+  the widget changed and nothing was rendered.
+- `tasks/lessons.md`: six entries. This file: this checkpoint.
+
+**Then two fresh read-only readers were given this pass's diffs and the primary evidence** — one
+the three sheets, one `docs/AI_CONTEXT.md`, this checkpoint and the lessons. Their reports are
+saved beside the stage's ledger as they arrived. Every contrast figure, gate result and source
+line citation they checked held. Twenty-six findings between them, two of which were only steps
+not yet taken; each of the rest was opened in the logs, the captures or the code, found right,
+and corrected above and in the sheets. The ones that changed what the record says:
+
+- **The cut heading had been captured by the stage itself**, at 16:29. The first text said
+  every large-text render had shown today.
+- **The strip's contrast was sampled at the plot's left end**, the small hours. Measured again
+  where the day's servings stood, a bar on the hand-made pane reads 3.69 to 3.80, not 2.73.
+- **iOS 18.6's final sweep did not scroll**, and not for want of servings. Its scrolled figures
+  are an earlier sweep's.
+- **The stage's runs carried `-collect-test-diagnostics never` until 17:43** and lost it when
+  the session's context was summarised. The first text said the stage had not used it.
+- Three counts of runs, the order of the two UI invocations on iOS 18.6, the two endings of the
+  delete probes, which build the control walks were on, and four sentences that gave a cause
+  nobody had shown.
+
+The final sweeps' own sample rectangles were drawn on a capture of each system and looked at
+for the first time in answer to a reader. None had to move.
+
+### Staging
+
+Written last, from `git diff --cached --name-only` and `git diff --name-only` printed after this
+session's `git add` of seven doc paths; one `git add` follows it, of this file and
+`docs/AI_CONTEXT.md`, both already in the list.
+
+**Staged, eighteen paths.** Nine are the stage's source, tests and strings:
+`WaterBuddy/AuroraBackground.swift`, `DataManager.swift`, `HistoryView.swift`, `HomeView.swift`,
+`Localizable.xcstrings`; `WaterBuddyTests/HistoryRangeTests.swift`, `HistoryViewTests.swift`,
+`LocalizationTests.swift`; `WaterBuddyUITests/GoalSetupUITests.swift`. Two are known issue #92's
+fix, a change of its own: `WaterBuddyTests/WristSyncTests.swift` and `UnreadableStore.swift`.
+Seven are docs: `HISTORY.md`, `tasks/lessons.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`docs/STATE.md`, `docs/WIDGET.md` and the new
+`docs/superpowers/plans/2026-10-11-premium-redesign-stage-3.md`.
+
+**Unstaged, for the owner's yes:** `.claude/rules/50-views.md` and
+`.claude/rules/65-accessibility.md`.
+
+**Unstaged since before the stage and not touched:** `.claude/settings.json`, the two watch
+schemes, `WaterBuddy/AppShortcuts.xcstrings`, `WaterBuddyWatch/Localizable.xcstrings`,
+`WaterBuddyWatchWidget/Localizable.xcstrings`. Untracked: `Screenshots/census/`.
+
+HEAD is `e16221e`, 96 commits, level with `origin/main`. **No `git commit` was run.** No source
+or test file in the tree differs from the index. The throwaway probe is deleted and no mutation
+marker is left. Outside the tracked paths this session wrote the stage's git-ignored ledger with
+three reports beside it — the code reviewer's and the two readers' — its scratch folder, one
+simulator, and three files in the memory directory.

@@ -4,7 +4,16 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-11 (twenty-eighth pass — a fourth `/doc_sync` the same day, which checked
+**Last updated:** 2026-10-11 (twenty-ninth pass — `/doc_sync` at the end of the redesign's stage 3,
+History, staged and not committed. **No key, no stored byte.** The model gained four derived
+answers and stores none of them: `DaySummary.reached(_:)` and `daysMet(in:goal:)`, and
+`dayFraction(of:)` and `hours(_:onDayOf:)` — see *The week's summaries* below. `DataManager.swift`
+grew by 53 lines, so **seven of this sheet's eight line citations into it moved by 15** — `role`
+and six of the seven guard sites — and are re-derived by `grep`; `HistoryView.swift`'s one moved
+to `:240`. One caveat is new, on the day
+boundary: `docs/AI_CONTEXT.md` known issue #107. Stage 2, which the passes recorded below call
+staged, was committed in `1ced514`.)
+Previously: 2026-10-11 (twenty-eighth pass — a fourth `/doc_sync` the same day, which checked
 only what the twenty-seventh had added. **No key, no stored byte, no source change.** Two of its
 added sentences were wrong, both copied from a stale comment in `DataManager.swift` instead of
 read off the code: that `saveDailyGoal`'s publish to the wrist is unguarded "unlike every other
@@ -195,7 +204,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph, and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:143` seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph, and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:240` seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours
@@ -498,6 +507,39 @@ scalar overwritten in place, and `SettingsView.GoalCard` lets the user move it a
 look like a record of something the store cannot know. The card compares against the current goal
 and discloses that it does.
 
+**The week's summaries, since the redesign's stage 3** (staged 2026-10-11). Four more answers are
+derived, and none is stored, cached in the suite, or sent to the widget or the wrist:
+
+- `DaySummary.reached(_ goal:)` — `total >= goal`, the goal a parameter and still not a field —
+  and `DaySummary.daysMet(in:goal:)`, a count over a series. History's card draws a day that
+  reached the goal in another colour and counts them; `streak`, `streakFillsWindow` and
+  `closedDays` ask the same `reached(_:)`, so for a day's summary "reached the goal" has one
+  spelling. Today's has its own two: `hasReachedGoal` (`currentWater >= dailyGoal`) and the
+  reminder plan's comparison of the same two figures.
+- `DataManager.dayFraction(of:in:)` — where an instant falls in its local day, `0` at the day's
+  start and under `1` at its last minute, as a fraction of **that day's real length**: from
+  `startOfDay` to `nextDayBoundary(after:calendar:)`, never of 86,400 seconds. Noon is past the
+  middle of a 25-hour day and short of it on a 23-hour one (`DayFractionTests`).
+- `DataManager.hours(_:onDayOf:in:)` — the instants of the given clock hours on that day, through
+  `Calendar.date(bySettingHour:minute:second:of:)`, an hour the calendar cannot place left out.
+
+  Both are `nonisolated static`, take the calendar as a parameter, and have an instance wrapper
+  that passes the model's injected one. History's strip is their only caller.
+
+**One caveat, older than stage 3 and found by it** (`docs/AI_CONTEXT.md` known issue #107). In a
+zone whose clocks go back across midnight — America/Havana, 01:00 to 00:00 —
+`nextDayBoundary(after:)` answers the *second* 00:00 of the same day for an instant in the first
+of the two 00:00–00:59 hours (tried at 00:30 and 00:59; at 00:00 itself the answer is right).
+Worked through for three callers, by reading each code path with that answer — nothing was run
+in the app: `fetchLogsForToday()`'s bounds
+still hold every row during that hour, since in ordinary use no row is later than now;
+`dayFraction` measures that hour against a one-hour day and puts a 00:30 serving mid-strip; and
+a widget timeline built in that hour dates its zeroed entry at the second 00:00, an hour after
+the day began, and reloads there. The wrist mirror's `phoneDayEnd`, the history fetch, the
+streak's windows and `WristPlan` — twice, one of them the watch complication's timeline
+boundaries, the twin of the widget's entry — call it too and were not worked through. Read off
+Foundation with a script that stores nothing; not fixed.
+
 ### `historyLogs` — the window's rows, from the same fetch
 
 `historyLogs` is a sixth observed property: `[Int: [WaterLog]]`, the window's servings keyed by day
@@ -757,7 +799,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1549
+nonisolated static let role: Role = {          // DataManager.swift:1564
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -775,7 +817,9 @@ the compile-time platform rather than from a second runtime probe, because rule 
 forbids a competing detection scheme: two probes can disagree and leave one guard open.
 
 **Four writes are guarded, by two of the four questions** (line numbers re-derived 2026-10-11 by
-`grep` for each guard: the redesign's stage 2 grew the file by 209 lines and moved all of them, and
+`grep` for each guard, twice: stage 3 put 15 lines above six of the seven sites, which moved by
+15, and none above the first; and before it the redesign's stage 2 grew the file by 209 lines and
+moved all of them, and
 the pass that recorded stage 2 left them where `b8a1386` had them. Before that, 2026-10-09: the fix
 for #73 moved all six, by four lines or by thirteen; and 2026-10-08: all six had moved since the
 2026-09-01 check that followed the watchOS plan's ~500-line addition. *This sentence said "by three
@@ -784,15 +828,15 @@ different questions" until the twenty-sixth pass; the four writes have only ever
 1. **Materialising `dailyGoal` in `init`** (`:551`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1146`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:1068`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1693`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1161`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:1083`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1708`, `mayHaveLegacyStandardDefaults`).
 
 Three further sites are guarded by the same enum but are not group bookkeeping:
-`republishHistory` (`:954`, `drawsHistory`, cost rather than correctness); `republishStreak`
-(`:985`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
+`republishHistory` (`:969`, `drawsHistory`, cost rather than correctness); `republishStreak`
+(`:1000`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
 because the `dailyGoal` setter calls it outside `republishHistory`); and
-`requestReminderReschedule` (`:1313`, `mayFileReminders`, the one whose wrong answer is immediately
+`requestReminderReschedule` (`:1328`, `mayFileReminders`, the one whose wrong answer is immediately
 user-visible). Rule `25-shared-storage` still counts six (`docs/AI_CONTEXT.md` known issue #103).
 
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`

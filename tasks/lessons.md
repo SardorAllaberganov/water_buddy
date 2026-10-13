@@ -3075,3 +3075,99 @@ what was only prose — is read off its diff when the diff exists, and a *checke
 list names nothing the diff touches. A record says what was wrong and what is right; why it went
 wrong is written only when it has been shown. And the next pass is given the last pass's diff:
 the new text is where the new errors are.
+
+## 2026-10-11 — Stage 3: the cut heading was in a capture, and nobody read it
+
+History was rendered at the ordinary text size and six larger ones, the larger ones in English
+and in Russian, and five cut lines were found and fixed that way. Those size renders all showed
+today. A past day's heading — *Saturday, 10 Oct*, three times the length of *Today* — was cut
+at the largest size: *Saturday, 10 O…*, and in Russian *Понедельник…* with the date gone.
+
+**It had been captured.** At 16:29 the stage's own walk at the largest size tapped yesterday and
+kept the screenshot, *Saturday, 10 O…* across its top, and the frame list beside it gave the
+heading 43 points of height where *Today* has 72. The capture was kept and that line of it was
+not read. The stage's reviewer, more than an hour later, estimated from the widths that
+the heading would be cut, said it had seen no render, and graded it minor. Only then was the
+heading looked at. The first account of this in these notes said every large-text render had
+shown today, and that was written without opening the walk's captures either.
+
+By their heights, two of the six past days in English and three in Russian stood at the scale's
+floor; two captures were looked at.
+
+**The rule:** a capture is not a check until every line on it has been read, and a frame list
+is read for any text whose height is its scale's floor. A line is rendered at large text holding
+the longest thing it can hold — a past day, the longest weekday, the language with the longest
+words — not what the screen opens on. And a reviewer's estimate that a text is cut is rendered
+before it is graded.
+
+## 2026-10-11 — A render that ran at the wrong size looked like a clean bill
+
+The probe's text size is read from `WB_VARIANT`, which reaches the runner only as
+`TEST_RUNNER_WB_VARIANT` **in `xcodebuild`'s environment**. Once it was passed as an argument
+after the command, where `xcodebuild` takes it for a build setting: the run came back at the
+ordinary size, every frame identical to the plain run beside it, and nothing failed. The
+identical frames were what gave it away. The same trap as the category name that is not a
+category, recorded above, by another door.
+
+**The rule:** a parameterised render is believed only after one figure that must differ has been
+seen to differ — at a large size, the heading's height.
+
+## 2026-10-11 — Three tries to write a test that fails for the defect
+
+A serving's amount was squeezed at the largest text size. The first assertion — air between the
+amount and the time — passed with the defect in place: a cut text's frame is narrower than its
+column. The second, with a four-digit serving, passed too. The third was written after the
+frames were printed and read: the amount is under the time, or no shorter than it.
+
+Twice more in the fix pass: a ratio of 0.8 was written from one day's render, and *Wednesday*
+alone measures 0.81 on a 402-point phone — by its width about 0.79 on the 393-point phone the
+gate also runs on, an estimate, never rendered there — so on a Thursday the test would likely
+have failed on correct code; and a mutant meant to empty a past day's list
+(`historyLogs[ordinal + 1]`) listed today's rows instead, so the test passed and the mutant had
+proved nothing.
+
+**The rule:** print the frames before writing an assertion about a layout, and write it on what
+the defect changes. A threshold is set between two measured values — the defect's, and the worst
+case of correct code, with the case named. A mutant must produce the failure the assertion
+names; when it produces another, that is a limit of the test, and it is written down.
+
+## 2026-10-11 — A flaky test left for later failed the gate two runs in three
+
+Known issue #92 was a race in one test's setup, recorded in stage 2 as "about fifteen lines and
+its own change" after it lost once in twenty-two runs. This stage added 35 tests to the same
+process and it lost twice in three, in the gate. Nothing about the product had changed.
+
+**The rule:** a race in a test gets worse with every test added beside it. A known flaky test is
+fixed before a stage adds tests to its target, not when the gate stops.
+
+## 2026-10-11 — The UI target outgrew one foreground call, and a flag was lost half-way
+
+Twenty-five tests of one class took 435 seconds on iOS 27.0; a foreground call is given 600. And
+twice, after a failing run, `xcodebuild` sat for nine and ten minutes without exiting (#101),
+which turned a forty-seven-second RED into a call moved to the background. Not every failing
+run does: the gate's first failed unit run exited at once.
+
+Known issue #101 had the remedy written down since stage 2 — `-collect-test-diagnostics never`
+ends the wait at once. **This stage's runs carried it until 17:43 and not after**: 79 of the
+120 kept test logs have it, every one from before that minute, the tasks' red runs among them;
+the 41 from 17:47 on do not — the gate, which rule `85-testing` writes without it, and with it
+the review's fix runs and the late probes. The session's context was summarised between those
+two minutes, and the summary does not mention the flag. The runs after that were watched for
+the suite's last line and stopped by hand, a workaround built for a problem whose remedy had
+been in use that afternoon.
+
+**The rule:** the UI target runs as two invocations that are complements of each other, and the
+ledger says so. A run that is expected to fail carries `-collect-test-diagnostics never`. What a
+run must carry is written in the ledger's first lines, where a resumed session reads it, not
+left to be remembered. And the known issues are searched for the symptom before a workaround is
+built for it.
+
+## 2026-10-11 — `git stash --keep-index`, then `pop`, on a file changed on both sides
+
+To see a new test fail on the staged code, the unstaged fix was stashed with `--keep-index`. The
+pop came back as a merge conflict in the one file both the index and the tree had changed. It
+was recovered from the stash itself — the index from `stash@{0}^2`, the tree from `stash@{0}` —
+and compared before the stash was dropped.
+
+**The rule:** do not stash to see RED. See the test fail against the tree as it stands, or by a
+marked mutation that is restored from the index.

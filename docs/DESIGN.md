@@ -7,7 +7,25 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-11 (a fourth `/doc_sync` the same day, the forty-ninth pass of
+**Last updated:** 2026-10-11 (the redesign's stage 3, History, finished and staged; the fiftieth
+pass of `docs/AI_CONTEXT.md`. **A new section, *History, measured*:** the header's two lines on
+the aurora by both yardsticks, and the cards, the strip and the rows on Apple's glass and on the
+hand-made pane — 32 pairs a system, the worst frame of a minute at rest and a minute scrolled.
+**One line is under its floor on every system** — the total under the heading, by the
+clean-ground yardstick — **and nine more of the swept pairs on the hand-made pane**, one of them
+new; a tenth there, the empty state's second line, is from one capture. No token changed or was
+added. New in the drawing: a day that reached the goal is cyan and one that did not is white;
+the strip's bars and their dark hairline; a row's glyph in a dark well — literals in
+`HistoryView.swift` — and the sheet's shortcuts, which use `LiquidGlass.Selection`.
+`legibleOnBackdrop()` moved to `AuroraBackground.swift`. The elevation and density lists gain
+the strip. **Older tables here keep lines for marks that are no longer drawn that way:** under
+*Apple's glass, measured*, three tables have a serving row's time at white 0.75 and its drop
+glyph, a fourth a *Row time* column, and the same three the week card's "average and best" at
+white 0.75; and *Contrast figures that were measured* has "White @ 0.75 on the week card's
+pane … the average/best figures". The row and the card's figures are drawn as *History,
+measured* describes them now.
+Stage 2, which the passes below call staged, was committed in `1ced514`.)
+Earlier the same day (a fourth `/doc_sync` the same day, the forty-ninth pass of
 `docs/AI_CONTEXT.md`, checking only what the third had added; **no source changed, nothing
 measured anew**. Wrong in the third's text: "a level neither earlier build was measured at" —
 stage 1's build was measured with the vessel over-full, so over a full vessel the `%` is **no
@@ -106,7 +124,7 @@ In use: app vessel `.floating`, app tab bar `.frosted`/`.floating`, Home's two g
 from reading as something to press), widget card `.raised`, widget vessel and
 buttons `.resting`. The Glass disc is not glass: it is the screen's primary surface. **The rest,
 which this list left out until the forty-eighth pass:** `.raised` — Settings' four cards,
-History's week card, its empty state and its `+`; `.floating` — the first-run card, the serving
+History's week card, its strip (the redesign's stage 3, staged), its empty state and its `+`; `.floating` — the first-run card, the serving
 sheet's card and the watch's vessel; `.resting` — a serving row, the sheet's *Cancel*, *Open iOS
 Settings*, and the watch's two capsules, which pass no elevation and take the default.
 
@@ -125,8 +143,8 @@ glass.
 
 Use `.frosted` or `.opaque` behind body text; keep `.sheer` for short labels and controls, where a
 busy backdrop cannot swallow a whole sentence. In use, every call site but the previews' own five: the three vessels — app,
-widget, watch — `.sheer`; the cards (first run, Settings' four, History's week card, empty state
-and sheet, the widget's), the tab bar, Home's two discs and its streak chip, History's `+` and its
+widget, watch — `.sheer`; the cards (first run, Settings' four, History's week card, strip, empty
+state and sheet, the widget's), the tab bar, Home's two discs and its streak chip, History's `+` and its
 serving rows, and the widget's two pour buttons `.frosted`; Home's *Undo* capsule `.opaque` — the
 app's first pane at that density, because it carries a line of text (*Home, measured*); and four
 small capsules `.sheer` — the sheet's *Cancel*, *Open iOS Settings* and the watch's two. *(Read
@@ -562,6 +580,18 @@ History's shown day, the same tokens: rim 3.45 inside and 4.10 outside on iOS 27
 The two figures under 3 are at the hand-made bar's lightest end, the *Home* slot, where the shipped
 app's glyph already reads 2.49–2.90 with no lozenge (known issues #85 and #86).
 
+**A third user since the redesign's stage 3 (staged 2026-10-11): the serving sheet's vessel
+shortcuts.** Any whose amount is showing carries the same fill and rim, in a `Capsule` — two,
+when two vessels hold one amount — and the rest carry them at zero opacity. **One capture a
+system, not a sweep** — the sheet has its own
+aurora and it moves — on the sheet's `.frosted`, `.floating` card:
+
+| The sheet's shortcuts | Apple's glass, iOS 26.5 | Apple's glass, iOS 27.0 | hand-made, iOS 18.6 | Floor |
+|---|---|---|---|---|
+| glyph and figure, white, on an unselected slot's pane | 13.67 | 10.74 | 6.04 | 4.5 |
+| the same, on the selected slot's fill | 10.54 | 8.37 | 5.45 | 4.5 |
+| the selected rim, white 0.55, against the pane outside it | 5.18 | 4.66 | 3.43 | 3 |
+
 ## Apple's glass, measured
 
 **Settled 2026-10-10: the regular variant is tinted black at `0.52`, and the week card's goal line
@@ -741,7 +771,9 @@ earlier build of the same day), the large-text renders (two other simulators) an
 
 ### Text on the backdrop: two shadows, and two yardsticks
 
-`legibleOnBackdrop()` — a private helper in `HomeView.swift` — is the widget readout's recipe (see
+`legibleOnBackdrop()` — a private helper in `HomeView.swift` until the redesign's stage 3, which
+moved it unchanged to `AuroraBackground.swift` for History's header to share (staged 2026-10-11)
+— is the widget readout's recipe (see
 *Contrast figures that were measured*): black 0.3, radius 6, y 1, for depth, and black 0.45, radius
 2, a halo that travels with the glyphs. The vessel's readout keeps its wider first shadow (radius
 10, y 2) and gains the second; the millilitre line carries the helper as well. Three whites the
@@ -882,6 +914,138 @@ identical digests with Reduce Transparency off, identical with it on, and the tw
 from each other — so both branches ran. Both sizes placed on a Home Screen from each build (iOS
 27.0, light): the medium widget's cell, 573,408 pixels, differs in none; the small one's in 34, by
 one level, all outside the widget's own rectangle.
+
+## History, measured
+
+**2026-10-11, the redesign's stage 3, staged.** History is one list now: a header straight on
+the aurora, then three kinds of pane — the week card, the strip (*When you drank*), a serving
+row. Taken on three simulators: iOS 26.5 and 27.0 (*iPhone 17*, 402 × 874 pt, Apple's glass —
+*WaterBuddy Probe 26.5* and *Probe 27*) and iOS 18.6 (*iPhone 16*, 393 × 852 pt, the hand-made
+stack — *WaterBuddy Fallback 18.6*). **A figure is the worst frame of a capture every three
+seconds for a minute with the list at rest, and again for a minute with it scrolled**, at the
+ordinary text size, on a day with servings. The script's rectangles were drawn on a capture of
+the first iOS 26.5 sweep and looked at before any figure was kept — that first set was wrong in
+several places and none of its figures is here. The final sweeps reuse the script, whose
+rectangles follow each element's frame; **theirs were drawn and looked at afterwards**, on a
+capture of each system, when a reader of this section asked, and none had to move. The sweeps
+ran before the stage's final review. By the code its fixes change nothing these sweeps drew —
+today's screen at the ordinary text size — and no capture was compared after them.
+
+**On iOS 18.6 the final sweep's second minute did not scroll.** The list had another page and
+did not move under the probe's swipe; why is not shown. That system's *scrolled* figures, marked
+† below, are from an earlier sweep the same day on the same simulator, taken after the row's
+well was set at black 0.4, whose at-rest figures agree with the final sweep's to two decimals.
+
+### The header: two lines on the backdrop, by both yardsticks
+
+The shown day, `.largeTitle` bold, and its total against the goal, `.headline` rounded, both
+white with `legibleOnBackdrop()`'s two shadows. *Text on the backdrop*, under *Home, measured*,
+says what the two yardsticks are; the owner's "go" to this stage took clean ground as its floor
+and both as its record (`docs/AI_CONTEXT.md`, known issue #95).
+
+| Pair | Floor | iOS 26.5 | iOS 27.0 | iOS 18.6 |
+|---|---|---|---|---|
+| the heading, clean ground | 3 | 4.74 | 4.74 | 4.61 |
+| the heading, beside its glyphs | 3 | 5.19 | 5.19 | 5.07 |
+| **the total, clean ground** | 4.5 | **4.45** | **4.44** | **4.34** |
+| the total, beside its glyphs | 4.5 | 4.65 | 4.68 | 4.62 |
+| the `+`, white on its `.frosted` disc | 3 | 15.62 | 12.08 | 6.55 |
+
+**The total is under its floor by the first yardstick on every system, by 0.05 to 0.16, and
+over it by the second.** It is not a pane's doing — the same pair fails the same way on all
+three — and it was not restyled: it is Home's recipe on Home's backdrop.
+
+### The panes
+
+| Pair | Floor | Apple's glass, iOS 26.5 | Apple's glass, iOS 27.0 | hand-made, iOS 18.6 |
+|---|---|---|---|---|
+| Week: the title / a figure, 20 pt bold | 4.5 | 12.32 / 13.64 | 8.67 / 9.94 | 4.59 / 6.34 |
+| Week: a figure's label, white 0.9 | 4.5 | 11.22 | 8.75 | 5.74 |
+| Week: a weekday letter, white 0.72 | 4.5 | 7.02–7.29 | 5.32–5.58 | **3.41–3.93** |
+| Week: the disclosure, white 0.70 | 4.5 | 7.26 | 5.92 | **4.15** |
+| Week: a cyan bar — a day that reached the goal — beside the pane | 3 | 6.87–7.22 | 4.91–5.12 | **2.78**–3.32 |
+| Week: a white bar — a day that did not — beside the pane | 3 | 12.12–12.74 | 8.67–9.04 | 4.91–5.86 |
+| Week: the goal line, white 0.55, beside a bar | 3 | 4.74–4.89 | 3.78–3.92 | **2.65–2.98** |
+| Week: over an empty day's track — the goal line / a cyan bar / a white bar | 3 | 3.66 / 4.54 / 8.01 | 3.05 / 3.47 / 6.12 | **2.12** / **1.98** / 3.49 |
+| Strip: the title / an hour label, white 0.9 | 4.5 | 13.75 / 10.87 | 10.39 / 8.48 | 6.78 / 5.76 |
+| **Strip: a serving's cyan bar against the plot's pane — in the small hours / at midday / in the evening** | 3 | 8.05 / 7.43 / 7.02 | 6.45 / 5.65 / 5.58 | **2.73** / 3.80 / 3.69 |
+| Strip: white against the same pane, the reminder's bell and rule — the same three places | 3 | 14.21 / 13.11 / 12.40 | 11.38 / 9.97 / 9.84 | 4.82 / 6.71 / 6.52 |
+| Row at rest: the amount / the name, white 0.9 / the time, white 0.94 | 4.5 | 10.97 / 9.17 / 9.87 | 8.36 / 7.11 / 7.59 | 6.64 / 5.75 / 6.10 |
+| Row scrolled: the same three | 4.5 | 9.04 / 7.65 / 8.19 | 7.12 / 6.10 / 6.49 | 5.40 / 4.74 / 5.00 † |
+| Row: the cyan glyph in its well, at rest / scrolled | 3 | 9.78 / 8.10 | 8.72 / 7.05 | 4.48 / 3.84 † |
+
+Where a week-card cell holds a range, it is the card's two ends — the first and the last
+boundary between day slots that is clear of the shown day's ring. † is the earlier iOS 18.6
+sweep, above.
+
+**Where the strip was sampled.** The sweep's own rectangle is at the plot's left end, the small
+hours, which is the first figure in each strip cell: no probe serving stood there and no
+reminder can — the plan's hours run from 9 to 21 — but a serving logged at night would. The
+other two, at 0.50 and 0.86 of the day, were measured afterwards over the same at-rest
+captures, their rectangles drawn and looked at on iOS 27.0 and 18.6, when a reader of this
+section pointed out where the first one lay.
+
+- **On Apple's glass nothing in a pane is under its floor.** The nearest is the goal line where
+  it crosses an empty day's track on iOS 27.0, **3.05 against 3** — one sweep, 0.05 to spare. The
+  line and the track are as they were before this stage.
+- **On the hand-made pane nine of the swept pairs are under** (known issue #85): the weekday
+  letters, the disclosure, the goal line three ways, the week's cyan bar two ways — each drawn
+  as it was before this stage — **and the strip's cyan bar, which is new, at the plot's left
+  end only**: 2.73 in the small hours, where the pane's highlight lies, and 3.80 and 3.69 where
+  the day's servings stood. Nearest their floor of those that pass there: the week's title,
+  4.59, and a row's name scrolled, 4.74, against 4.5. Over all eighteen of the week card's and the strip's pane samples on that system,
+  passing ones included and the track's left out, the pane read between `(0.24, 0.34, 0.48)`
+  and `(0.39, 0.47, 0.53)`, channel by channel, each at its pair's worst frame — where this
+  sheet's oldest record for the week card's pane is `(0.208, 0.296, 0.444)`. *The hand-made pane, measured again*, above, is the same finding,
+  and the remedy it names is the pane's, not one for each mark. Nothing in the hand-made stack
+  was retuned.
+- **On that pane the two bar colours pass differently:** a white bar reads 4.91 and a cyan one
+  2.78, so a day that reached the goal is the fainter of the two there. Colour is not the only
+  carrier — a met bar also stands at or above the goal line — and the goal line is under its
+  floor on the same pane.
+
+### What this stage draws that is new
+
+No token was added, and `LiquidGlassModifier.swift` is unchanged. The cyan is `Aurora.cyan` and
+the shortcuts' selection is `LiquidGlass.Selection`; the rest — the hairline, the well, the
+widths, the white opacities — are literals in `HistoryView.swift`. Most carry their reason
+beside them; the ground line's white 0.3 and the rule's 1.5 pt do not.
+
+- **Two bar colours.** A day that reached the goal is `Aurora.cyan`, one that did not is white;
+  one fill whose colour changes. Until this stage every bar was cyan.
+- **The strip's bars**: `Aurora.cyan` capsules 8 pt wide, a serving's height its amount against
+  the largest of the day's servings and the three vessels, never under `stripFloor` (0.12) of
+  the plot. **Each carries a 1 pt hairline, black 0.45**: four servings inside fifteen minutes
+  drew as one wide blob without it, and an 8 pt bar is about forty minutes of a day on this
+  width. The hairline is not counted in the 2.73 above. The ground line is white 0.3.
+- **A row's glyph in a dark well.** The vessel's glyph, `Aurora.cyan`, on a disc filled black
+  0.4. The canvas drew a cyan wash under it, and a wash lightens the ground under a glyph of
+  its own colour: on the hand-made pane the glyph read **2.00–2.02 against 3**. At black 0.3 it
+  read 3.35 scrolled and 3.73 at rest there; at 0.4, 3.84 scrolled and 4.48 at rest.
+- **The sheet's shortcuts** use `LiquidGlass.Selection` (see *Selection*), their glyph and
+  figure at one size that scales with text and stops at 30 pt.
+- **The reminder's mark** on today's strip: a white bell over a white rule 1.5 pt wide. Drawn
+  from a stand-in time for the render; reminders could not be switched on on a simulator
+  (`docs/AI_CONTEXT.md`, known issue #94).
+
+### One capture a system, not a sweep
+
+**The empty state**, which is drawn as it was before this stage. *Apple's glass, measured* has
+it at 8.99 and 5.45 on iOS 27.0 — in its table "At `0.48`, at rest", one resting frame at a
+tint that no longer ships; that section says the empty state was not taken at the final `0.52`.
+The figures here are at `0.52`, one render each, and read higher. iOS 27.0 and 18.6 on the
+phones above, iOS 26.5 on a 375 × 667 pt *iPhone SE*:
+
+| The empty state | Floor | iOS 26.5 | iOS 27.0 | iOS 18.6 |
+|---|---|---|---|---|
+| its title, white | 4.5 | 13.33 | 12.37 | 5.37 |
+| its second line, white 0.7 | 4.5 | 7.37 | 6.84 | **3.80** |
+
+### Not measured
+
+Any figure under Increase Contrast, at a text size other than the ordinary one, in Russian or
+Uzbek, on a device, or on iOS 17. The reminder's mark from a real reminder. The sheet's other
+text, which this stage did not change.
 
 ## Interactive glass
 

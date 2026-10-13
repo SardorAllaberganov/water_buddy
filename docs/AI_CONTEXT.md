@@ -4,6 +4,35 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-11 (fiftieth pass — `/doc_sync` at the end of the redesign's stage 3,
+History, by the session that built it. **Stage 3 is finished, tested and staged; nothing is
+committed.** HEAD is `e16221e`, 96 commits: **stage 2 was committed in between** — `1ced514`,
+`e7406a5`, `6b5f319`, `e16221e` — which the forty-ninth pass's text and *Git* block predate; both
+are brought up to date here. **What stage 3 is:** History as one list — the header, the week
+card (cyan for a day that reached the goal, white for one that did not; *Average*, *Best day*,
+*Goal met*), a new strip of the day's servings by time of day, and the servings as lighter rows
+that name their vessel — and three vessel shortcuts in the serving sheet. Behind it, on
+`DataManager`: `reached(_:)`, `daysMet(in:goal:)`, `dayFraction(of:)` and `hours(_:onDayOf:)`.
+**No key added** — eleven, as before. **66 `.swift` files, 63 in targets; 479 `@Test` functions
+in 60 suites; 57 on the watch; 30 UI `func test`, 43 executed.** The gate ran on the staged
+source — the unit target five times of five after known issue #92's race failed it twice in
+three, the UI suite on iOS 27.0, 26.5 and 18.6 as two invocations a system. **A fresh reviewer
+read the staged diff**: nothing critical; two test gaps closed, and one thing it had graded
+minor on an estimate was rendered and found real — a past day's heading cut at the largest text
+sizes, which one of the stage's own captures had shown for an hour unread. **Two fresh readers
+then checked this pass's own text** against the logs and the code: every contrast figure, gate
+result and source line citation they checked held, and their twenty-six findings — two of them
+only steps not yet taken — were in the prose: among them where the strip's contrast was
+sampled, why iOS 18.6's sweep did not scroll, three counts of runs, and that the stage "did not
+carry" a flag it had carried all afternoon. Each was opened and corrected; their reports are saved beside the
+stage's ledger. Known issues **#62 and #92 retired**; #39, #82, #83, #85, #90, #94, #95, #101, #103, #104
+and #105 updated; **#107 to #110 opened.** Rule wording for two rule files is written and **unstaged**,
+for the owner. `docs/DESIGN.md` gains History's measured table; `docs/STATE.md` and
+`docs/WIDGET.md` gain a dated note each; `CLAUDE.md` was read and needed nothing.)
+
+<details>
+<summary>Forty-ninth pass — 2026-10-11, retained</summary>
+
 **Last updated:** 2026-10-11 (forty-ninth pass — a fourth `/doc_sync` the same day. **No source or
 test file changed, nothing was built or run, and nothing is committed**: HEAD is `b8a1386`, stage 2
 staged as before. The tree and the mechanical checks were clean at the start, so this pass checked
@@ -29,6 +58,8 @@ phone's; three exception sets of six. **The gate was not run in this pass.** `do
 `docs/DESIGN.md` and `docs/WIDGET.md` corrected, each header saying what; `CLAUDE.md` tightened
 in two phrases, **unstaged**. Every reader's report of the last three passes, and the stage
 reviewer's, is now saved to a file beside the scratch evidence.)
+
+</details>
 
 <details>
 <summary>Forty-eighth pass — 2026-10-11, retained</summary>
@@ -783,7 +814,7 @@ Since 2026-10-08 the same intent also sits behind the Control Center control (iO
 same snapshot; the one-tap doors take the Glass's index from one name, `DataManager.usualSlot`, for
 its amount and its glyph — and since stage 2 Home marks its primary disc by it. *(Read "is named
 once" until the forty-eighth pass. Two other spellings of the same index exist: a literal `[1]` in
-`HistoryView.swift:143` and the watch's own `primaryIndex = 1`, `WristView.swift:136` — known
+`HistoryView.swift:240` and the watch's own `primaryIndex = 1`, `WristView.swift:136` — known
 issue #104.)*
 
 ## Targets
@@ -792,8 +823,8 @@ issue #104.)*
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent`; and, from iOS 18 behind the codebase's first `if #available`, the Control Center control `LogWaterControl` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 444 `@Test` functions in 56 suites, all run on 2026-10-11 (57 tests in eight suites are the redesign's stage 2, staged: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` were committed in `c9ef45d`). *(Read 387 in 48 until the forty-seventh pass — the forty-sixth updated the header and the gate and left this row.)* |
-| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (20 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass, and eleven are stage 2's, staged: Home's heading, the two "never squeezed" checks, and *Undo*), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **25 declared, 38 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. *(Read "9 real tests … 14 declared, 27 executed" until the forty-seventh pass.)* |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, 479 `@Test` functions in 60 suites, all run on 2026-10-11 (35 tests are the redesign's stage 3, staged: four new suites — `DaysMetTests` 8, `DayFractionTests` 9, `HistoryLayoutTests` 12, `HistoryStringTests` 3 — and one test more in each of `HistoryWindowTests`, `HistoryServingTests` and `GroupedFigureTests`. Stage 2's 57 in eight suites were committed in `1ced514`: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` in `c9ef45d`). *(Read 444 in 56 until the fiftieth pass; 387 in 48 until the forty-seventh — the forty-sixth updated the header and the gate and left this row.)* |
+| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (25 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass; eleven are stage 2's, committed in `1ced514`: Home's heading, the two "never squeezed" checks, and *Undo*; five are stage 3's, staged: the strip's heading, the sheet's shortcuts, and three at the largest text size — the shortcuts' figures, a row's amount, a past day's heading), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **30 declared, 43 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. Since stage 3 the target runs as two invocations, 25 and 18: one no longer fits a 600-second foreground call (known issue #110). *(Read "20 real tests … 25 declared, 38 executed" until the fiftieth pass; "9 real tests … 14 declared, 27 executed" until the forty-seventh.)* |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
 | `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 57 `@Test` functions in 6 suites |
@@ -885,14 +916,14 @@ seventh means editing that list.
 ## Files on disk
 
 ```
-WaterBuddy/AuroraBackground.swift                156   app only — the moving backdrop all four screens share
+WaterBuddy/AuroraBackground.swift                175   app only — the moving backdrop all four screens share; staged 2026-10-11, the redesign's stage 3: legibleOnBackdrop(), the two shadows for text that sits straight on it, moved in from HomeView now that History draws on it too
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2792   shared — (staged 2026-10-11: addLog returns the row's id and undoLog(id:) takes it back; remaining, hasReachedGoal, lastDrink and nextReminder, derived on read; the published streak and its growing windows; dayDidTurn(), which the two day-change observers call; Bundle.figure for grouped volumes) the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's and the control's one definition) at usualSlot (its index — one of three spellings, known issue #104), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
+WaterBuddy/DataManager.swift                    2845   shared — (2026-10-11, `1ced514`: addLog returns the row's id and undoLog(id:) takes it back; remaining, hasReachedGoal, lastDrink and nextReminder, derived on read; the published streak and its growing windows; dayDidTurn(), which the two day-change observers call; Bundle.figure for grouped volumes. Staged 2026-10-11, the redesign's stage 3: DaySummary.reached(_:) and daysMet(in:goal:); dayFraction(of:) and hours(_:onDayOf:) — where an instant falls in its day, by that day's real length — each a nonisolated static over a calendar with an instance wrapper) the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's and the control's one definition) at usualSlot (its index — one of three spellings, known issue #104), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
 WaterBuddy/GoalSetupView.swift                   273   app only — first-run goal setup; Get Started on the primary surface, range labels at white 0.75 (2026-10-10, `c9ef45d`)
 WaterBuddy/Haptics.swift                          53   app only — the three-rung feedback ladder
-WaterBuddy/HistoryView.swift                     959   app only — (2026-10-10, `c9ef45d`: Save on the primary surface; the shown day reads LiquidGlass.Selection; the goal line at white 0.55) the week card that picks the day, that day's log, swipe-to-delete, the + and one add/edit sheet with a day · hour · minute wheel
-WaterBuddy/HomeView.swift                        980   app only — staged 2026-10-11, the redesign's stage 2: the date, the title and the streak chip; the vessel, sized by HomeColumn (a Layout) between vesselFloor and a ceiling that scales with text; the status line; the quiet line (next reminder, last drink) that Undo replaces for eight seconds, in three forms chosen by fit; the ranked quick-add row — the Glass on the primary surface, Cup and Bottle on glass in one glassGroup; UndoOffer; legibleOnBackdrop; the goal burst (vesselSlots moved out, Task 14)
-WaterBuddy/LiquidGlassModifier.swift             824   shared — design tokens + the glass modifier; staged 2026-10-11: routed branches on the pane's base only, and a .material pane on iOS 26+ always carries glassEffect — .identity when it is not Apple's — so a setting never moves a pane's content (#91a); .glassGroup(), Apple's GlassEffectContainer on iOS 26+ and nothing elsewhere; committed 2026-10-10 in c9ef45d: the routing (rendering, systemGlassAvailable, systemVariant), Apple's glass on iOS 26+ behind #if os(iOS) + #available, darkened by systemTintOpacity(for:) (0.52 regular, 0 clear) and given its hit region by .contentShape(shape), LiquidGlass.Primary and primarySurface(in:ring:), LiquidGlass.Selection
+WaterBuddy/HistoryView.swift                    1525   app only — staged 2026-10-11, the redesign's stage 3: one List whose rows are the header (the day at .largeTitle, its total against the goal, the +; a past day on two lines at an accessibility text size), the week card that picks the day (cyan for a day that reached the goal, white for one that did not; Average, Best day, Goal met), DayStrip (When you drank: a bar per serving by time of day, hour labels at 6, 12 and 18, a bell at the next reminder) and the servings (ServingRow: the vessel's glyph in a dark well, the amount, the vessel's name, the time; two layouts); swipe-to-delete; the + and one add/edit sheet with three vessel shortcuts under the slider and a day · hour · minute wheel; StripBar at file scope and the statics stripBars(for:vessels:), vessel(forAmount:amounts:), sliderBounds(forAmount:vessels:) (2026-10-10, `c9ef45d`: Save on the primary surface; the shown day reads LiquidGlass.Selection; the goal line at white 0.55)
+WaterBuddy/HomeView.swift                        965   app only — 2026-10-11, `1ced514`, the redesign's stage 2: the date, the title and the streak chip; the vessel, sized by HomeColumn (a Layout) between vesselFloor and a ceiling that scales with text; the status line; the quiet line (next reminder, last drink) that Undo replaces for eight seconds, in three forms chosen by fit; the ranked quick-add row — the Glass on the primary surface, Cup and Bottle on glass in one glassGroup; UndoOffer; the goal burst (vesselSlots moved out, Task 14; legibleOnBackdrop moved out to AuroraBackground.swift, staged 2026-10-11)
+WaterBuddy/LiquidGlassModifier.swift             824   shared — design tokens + the glass modifier; 2026-10-11, `1ced514`: routed branches on the pane's base only, and a .material pane on iOS 26+ always carries glassEffect — .identity when it is not Apple's — so a setting never moves a pane's content (#91a); .glassGroup(), Apple's GlassEffectContainer on iOS 26+ and nothing elsewhere; committed 2026-10-10 in c9ef45d: the routing (rendering, systemGlassAvailable, systemVariant), Apple's glass on iOS 26+ behind #if os(iOS) + #available, darkened by systemTintOpacity(for:) (0.52 regular, 0 clear) and given its hit region by .contentShape(shape), LiquidGlass.Primary and primarySurface(in:ring:), LiquidGlass.Selection
 WaterBuddy/LogServingIntent.swift                 78   app only — the Siri phrase's intent ("Log a Glass"): wait for the watch link, logTheGlass, wait for the reminder queue, reply "Water logged."
 WaterBuddy/NotificationManager.swift             283   shared — ReminderScheduler + reconcile, the only code that files, removes or asks permission (SettingsView.swift:225 also reads the centre's settings directly, for the Notification Summary line; it has since the first commit, and this row said "the only UN caller" until the forty-eighth pass); ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46), and settled(), which waits for it to drain
 WaterBuddy/PressStyle.swift                       32   app only — the shared press recoil
@@ -910,24 +941,24 @@ WaterBuddyTests/AuroraBackgroundTests.swift       98   AuroraLightTests — the 
 WaterBuddyTests/CelebrationTests.swift           108   HapticLadderTests + ConfettiTests
 WaterBuddyTests/DataManagerTests.swift          1331   DataManagerTests + DailyGoalSetupTests + ReminderSeamTests + WristPublishSeamTests + LanguageSeamTests
 WaterBuddyTests/EarlierServingTests.swift        429   HistoryLogsTests + RetimingTests + HistoryWindowStartTests (not @MainActor) + CorrectionRangeTests + RetimedPourTests + HistorySelectionTests (not @MainActor) — the window's published rows, re-timing a serving, where the week starts, what the sheet offers and where it opens, a watch pour re-timed, the screen's day selection
-WaterBuddyTests/HistoryRangeTests.swift          439   DaySummaryTests (pure, not @MainActor) + HistoryWindowTests
-WaterBuddyTests/HistoryViewTests.swift           133   HistoryServingTests — the editor's offered range, and the fixture's own tripwire
-WaterBuddyTests/HomeModelTests.swift             409   staged 2026-10-11 — UndoTests (the id addLog returns, undo by id, after midnight, on a failed read) + HomeFiguresTests (remaining, hasReachedGoal, lastDrink, nextReminder and what each observes) + DayTurnTests (dayDidTurn republishes on a real day change and on nothing else)
-WaterBuddyTests/HomeViewTests.swift              252   HomeServingTests — the quick-add row's offered vessels — + HomeLayoutTests (not @MainActor; staged 2026-10-11): the Glass ranked, the vessel's floor and ceiling, what the column leaves it, the discs' bounds, an offer's lifetime, Home's glyphs
+WaterBuddyTests/HistoryRangeTests.swift          601   DaySummaryTests (pure, not @MainActor) + HistoryWindowTests; staged 2026-10-11, the redesign's stage 3: DaysMetTests — reached(_:) and daysMet(in:goal:) — + DayFractionTests — dayFraction and hours, across a 23- and a 25-hour day — both pure, not @MainActor
+WaterBuddyTests/HistoryViewTests.swift           265   HistoryServingTests — the editor's offered range (staged 2026-10-11: its bounds contain every vessel), and the fixture's own tripwire; staged 2026-10-11, the redesign's stage 3: HistoryLayoutTests (not @MainActor) — the strip's bars, a row's vessel, the strip's hours
+WaterBuddyTests/HomeModelTests.swift             409   2026-10-11, `1ced514` — UndoTests (the id addLog returns, undo by id, after midnight, on a failed read) + HomeFiguresTests (remaining, hasReachedGoal, lastDrink, nextReminder and what each observes) + DayTurnTests (dayDidTurn republishes on a real day change and on nothing else)
+WaterBuddyTests/HomeViewTests.swift              252   HomeServingTests — the quick-add row's offered vessels — + HomeLayoutTests (not @MainActor; 2026-10-11, `1ced514`): the Glass ranked, the vessel's floor and ceiling, what the column leaves it, the discs' bounds, an offer's lifetime, Home's glyphs
 WaterBuddyTests/LiquidGlassTests.swift           247   LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response; 2026-10-10, `c9ef45d`: LiquidGlassRoutingTests (which pane, which of Apple's variants, the availability flag, only the regular variant darkened, and no lighter than the lightest rung that passed) + PrimarySurfaceTests (the derived contrast); none @MainActor
-WaterBuddyTests/LocalizationTests.swift          561   (staged 2026-10-11: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
+WaterBuddyTests/LocalizationTests.swift          628   (2026-10-11, `1ced514`: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders. Staged 2026-10-11, the redesign's stage 3: HistoryStringTests — History's six keys in en/ru/uz, the four retired keys gone, and the built table's raw-number volume keys exactly the three other screens still draw) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
 WaterBuddyTests/NotificationManagerTests.swift   352   NotificationManagerTests — applying a plan, against a spy scheduler — + ReconcileQueueTests (not @MainActor), against SharedCentre, a lock-guarded stand-in two reconciles can reach at once
 WaterBuddyTests/ReminderPlanTests.swift          251   the plan — pure, and no UserNotifications import
 WaterBuddyTests/RootTabViewTests.swift            70   AppTabTests — the tab bar's offered destinations
 WaterBuddyTests/ServingSeamTests.swift           297   ServingResolutionTests (pure, not @MainActor; usualSlot is the Glass, and usualServing reads it) + ServingSeamTests
 WaterBuddyTests/SiriPhraseTests.swift            277   UsualServingTests + ReconcileQueueSettledTests (both not @MainActor) + LogServingIntentTests + LogTheGlassTests + AppShortcutPhraseTests
-WaterBuddyTests/StreakTests.swift                310   staged 2026-10-11 — StreakCountTests (pure, not @MainActor: DaySummary.streak and streakFillsWindow, and three on windowStart, historyWindowStart and streakWindows) + StreakPublishingTests (the published streak: the window walk, a goal change, a failed read, and that it reaches neither the snapshot nor the wrist's mirror)
-WaterBuddyTests/UnreadableStore.swift             86   staged 2026-10-11 — NOT a suite: a file-backed store whose reads fail on demand (the servings' table renamed away through a second SQLite connection, and put back), for the tests that pin what the model does when it cannot read
+WaterBuddyTests/StreakTests.swift                310   2026-10-11, `1ced514` — StreakCountTests (pure, not @MainActor: DaySummary.streak and streakFillsWindow, and three on windowStart, historyWindowStart and streakWindows) + StreakPublishingTests (the published streak: the window walk, a goal change, a failed read, and that it reaches neither the snapshot nor the wrist's mirror)
+WaterBuddyTests/UnreadableStore.swift             87   2026-10-11, `1ced514` — NOT a suite: a file-backed store whose reads fail on demand (the servings' table renamed away through a second SQLite connection, and put back), for the tests that pin what the model does when it cannot read; three tests use it since WristIngestTests' joined (staged 2026-10-11, known issue #92)
 WaterBuddyTests/WaterLogTests.swift              505   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
-WaterBuddyTests/WristSyncTests.swift             889   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests
-WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). Staged 2026-10-11, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well
-WaterBuddyUITests/GoalSetupUITests.swift         643   setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving added to yesterday, a serving row tapped on its bare glass; staged 2026-10-11, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
+WaterBuddyTests/WristSyncTests.swift             882   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests; staged 2026-10-11: WristIngestTests' failed-read test makes its store unreadable with UnreadableStore, no longer by overwriting the file (known issue #92)
+WaterBuddyUITests/AppStoreScreenshotUITests.swift  541   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well
+WaterBuddyUITests/GoalSetupUITests.swift         888   setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
@@ -951,7 +982,13 @@ WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
 ```
 
 **63 `.swift` files across the seven target folders**, all listed above. Re-derived 2026-10-11 in
-the forty-sixth pass with `find` over all seven and a two-way comparison against this file: three
+the fiftieth pass with `find` over all seven and `Tools/`, and a script that compares each row's
+count with its file: no file undocumented, no phantom row, and **ten counts stale — the ten
+Swift files the redesign's stage 3 and #92's fix edit** (`AuroraBackground`, `DataManager`,
+`HistoryView`, `HomeView`, `HistoryRangeTests`, `HistoryViewTests`, `LocalizationTests`,
+`UnreadableStore`, `WristSyncTests`, `GoalSetupUITests`); re-run after the edit, 66 rows, none
+stale. Stage 3 adds no file. Before that, the forty-sixth pass, the same day,
+with `find` over all seven and a two-way comparison against this file: three
 files were undocumented, stage 2's own (`HomeModelTests`, `StreakTests`, `UnreadableStore`), and
 eight counts were stale, eight of the nine files stage 2 edits; `AppStoreScreenshotUITests` was
 edited and kept its 541 lines. The 66 counts here — 63 files and the three Swift scripts below —
@@ -1046,7 +1083,7 @@ app's icon set and none for the widget's catalogue or the watch's.)*
 
 | | |
 |---|---|
-| `WaterBuddy/Localizable.xcstrings` | **73** keys — 69 translated into en/ru/uz, 4 deliberately not (`%`, `+%lld`, `1,450 ml`, `WaterBuddy`). *(64 and 60 until the redesign's stage 2, staged 2026-10-11: ten keys for Home — four grouped figures that take `%n$@`, the spoken `%1$d millilitres to go`, `Goal reached`, the two times, `Undo`, `Day streak` — and `%1$d / %2$d ml` removed with its only reader. Counted by script from the catalogue.)* The explicit `en` values are what make the build emit an `en.lproj` to select. *(Read 58 until the thirty-sixth pass — three passes after the earlier-servings change had made it 61.)* |
+| `WaterBuddy/Localizable.xcstrings` | **75** keys — 71 translated into en/ru/uz, 4 deliberately not (`%`, `+%lld`, `1,450 ml`, `WaterBuddy`). *(73 and 69 until the redesign's stage 3, staged 2026-10-11: six keys for History — `Average`, `Best day`, `Goal met`, `%1$@ of %2$@`, `When you drank` and the week card's spoken summary with the days met — and four removed with their last readers: `%1$d of %2$d ml`, `Average %1$d ml`, `Best %1$d ml` and the two-figure spoken summary. Counted by script from the catalogue, as staged and at HEAD.)* *(64 and 60 until the redesign's stage 2, `1ced514`: ten keys for Home — four grouped figures that take `%n$@`, the spoken `%1$d millilitres to go`, `Goal reached`, the two times, `Undo`, `Day streak` — and `%1$d / %2$d ml` removed with its only reader. Counted by script from the catalogue.)* The explicit `en` values are what make the build emit an `en.lproj` to select. *(Read 58 until the thirty-sixth pass — three passes after the earlier-servings change had made it 61.)* |
 | `WaterBuddy/AppShortcuts.xcstrings` | **3** phrases, **en and ru only** — Siri has no Uzbek, so this is the one catalogue that does not ship all three. Keys are the English phrases with `${applicationName}`; the build compiles `en.lproj`/`ru.lproj` `AppShortcuts.strings` (`AppShortcutPhraseTests`). As committed; **the working-tree copy is Xcode's unstaged rewrite, which marks two of the three phrases `"extractionState" : "stale"`** (known issue #50) |
 | `WaterBuddyWidget/Localizable.xcstrings` | **19** keys — **15** in en/ru/uz: the 10 hand-written as a strict subset of the app's (a membership exception cannot carry a resource) plus `AddWaterIntent`'s five Shortcuts strings, translated since before the repository's first commit (known issue #1, retired 2026-10-06); and **4 the build extracted** (`%`, `+%lld`, `1,450 ml`, `Today`) with no values at all, which reach no compiled table. *(This row called all nine extracted keys untranslated until the twenty-ninth pass.)* |
 | `WaterBuddyWatch/Localizable.xcstrings` | **16** keys as committed — **19 in the working tree**, where Xcode's unstaged rewrite appends three it extracted with no values (`+%lld`, `1,450 ml`, `Today`; known issue #50) — 15 in en/ru/uz (six copied value for value from the app's catalogue, nine the watch's own) and `%`, en only. Written by a script that copies the shared keys, and held to the phone's own strings by `LocalizationTests` through the built phone app |
@@ -1162,12 +1199,12 @@ in `.claude/rules/`.
 
 ## The process role
 
-`DataManager.role` (`DataManager.swift:1549`) resolves once, `nonisolated static let`, from
+`DataManager.role` (`DataManager.swift:1564`) resolves once, `nonisolated static let`, from
 `isAppExtension` plus `#if os(watchOS)` — never a second runtime probe, which rule
 `25-shared-storage` forbids because two probes can disagree and leave one guard open.
 
 ```
-enum Role: Sendable, CaseIterable {   // DataManager.swift:1558
+enum Role: Sendable, CaseIterable {   // DataManager.swift:1573
     case phoneApp, phoneExtension, watchApp, watchExtension
 }
 ```
@@ -1180,18 +1217,20 @@ answers all four for it:
 
 | Question | Gates | Sites |
 |---|---|---|
-| `ownsSharedStorage` | *is this container my own first-class home?* | `:551` goal materialisation, `:1146` fresh-install day stamp |
-| `mayHaveLegacyStandardDefaults` | *has my `.standard` ever held WaterBuddy state?* | `:1068` `seedFromCachedTotalIfNeeded`, `:1693` `migrateIfNeeded` |
-| `drawsHistory` | *do I have a history surface to draw?* | `:954` `republishHistory`, `:985` `republishStreak` — **a seventh site, the redesign's stage 2** |
-| `mayFileReminders` | *may I file notifications for this user?* | `:1313` `requestReminderReschedule` |
+| `ownsSharedStorage` | *is this container my own first-class home?* | `:551` goal materialisation, `:1161` fresh-install day stamp |
+| `mayHaveLegacyStandardDefaults` | *has my `.standard` ever held WaterBuddy state?* | `:1083` `seedFromCachedTotalIfNeeded`, `:1708` `migrateIfNeeded` |
+| `drawsHistory` | *do I have a history surface to draw?* | `:969` `republishHistory`, `:1000` `republishStreak` — **a seventh site, the redesign's stage 2** |
+| `mayFileReminders` | *may I file notifications for this user?* | `:1328` `requestReminderReschedule` |
 
 **Seven sites since 2026-10-11, where there were six.** `republishStreak()` carries its own
 `drawsHistory` guard because the `dailyGoal` setter calls it directly, outside
 `republishHistory()`. Rule `25-shared-storage` still says "**Six** sites are guarded" and gives
 `drawsHistory` one; the rule is the owner's (known issue #103).
 
-*(Every `DataManager.swift` line in this section was re-derived on 2026-10-11, in the forty-seventh
-pass, by `grep` for each guard: the file grew by 209 lines in stage 2 and the forty-sixth pass, which
+*(Every `DataManager.swift` line in this section was re-derived on 2026-10-11, in the fiftieth
+pass, by `grep` for each guard: stage 3 adds 53 lines to the file, 15 of them above eight of these
+nine citations, which each moved by 15; `:551` stands above them and did not move. Before that,
+the forty-seventh pass, the same day: the file grew by 209 lines in stage 2 and the forty-sixth pass, which
 recorded stage 2, left all eight citations where `b8a1386` had them — `role` documented at `:1400`,
 standing at `:1549`. Before that, re-derived on 2026-10-09, in the fortieth pass: the
 fix for #73 added four lines of DocC above the first site and nine in `loadFromStore()` above the last
@@ -1219,8 +1258,176 @@ issue #15.
 
 ## Current state
 
+**The redesign's stage 3 — History — is finished, tested and staged; it waits for the owner's
+`/commit`** (2026-10-11, the fiftieth pass). Eleven paths of source, tests and strings in the
+index — nine are the stage's, two are known issue #92's fix — plus the plan and the docs this
+pass writes. Four stages follow: Settings, the welcome, the widget, the watch. Spec
+`docs/superpowers/specs/2026-10-09-premium-redesign-design.md` §6; plan
+`docs/superpowers/plans/2026-10-11-premium-redesign-stage-3.md`. The owner ran `/start_task` with
+no task named, was shown the stage's outline and five decisions, and answered "go".
+
+**What History is now.** One `List`, and everything on the screen is a row of it, each with the
+list's own surfaces cleared; nothing is fixed above it, so the `+` scrolls away with the header.
+Top to bottom: the shown day at `.largeTitle` and its total against the goal, straight on the
+aurora with Home's two shadows, the `+` on the title's line; the week card, a day that reached
+the goal cyan and one that did not white, with *Average*, *Best day* and *Goal met* beneath;
+**When you drank**, new — one bar per serving placed by time of day, hour labels at 6, 12 and 18,
+and on today a bell at the next reminder; the servings, each a vessel's glyph in a dark well, the
+amount, the vessel's name when the amount is one of the current three, and the time. The sheet
+gained three vessel shortcuts under its slider. No key added — eleven, as before; nothing in the
+widget or on the watch; no target membership changed.
+
+**What the model gained** (`DataManager`, compiled into four bundles): `DaySummary.reached(_:)`
+and `daysMet(in:goal:)`; `dayFraction(of:)` and `hours(_:onDayOf:)`, each a `nonisolated static`
+over a calendar with an instance wrapper that passes the model's own. `streak`,
+`streakFillsWindow` and `closedDays` are respelt through `reached(_:)`; their behaviour is
+unchanged and their tests untouched. Nothing is stored and nothing leaves the app.
+
+**Decisions taken on the way, each the owner's to overturn.** The five the "go" took as
+recommended: the header scrolls away with the list; #62's test is rewritten here; the sheet's
+selected shortcut uses `LiquidGlass.Selection`, not white; #93 is left out; contrast is recorded
+by both yardsticks of #95, clean ground as the floor. Made while building:
+
+- **The list stops one point short of the top safe area** (`.padding(.top, 1)`). With nothing
+  fixed above it, its rows were drawn on up under the status bar — the clock across a row's
+  amount. A defect fix, and a visual one: panes are cut by a hard line there.
+- **Each strip bar carries a 1 pt dark hairline.** Four servings inside fifteen minutes drew as
+  one blob.
+- **A row's glyph sits in a dark well** (`.black.opacity(0.4)`), not the canvas's cyan wash. On
+  the hand-made pane a cyan glyph on a cyan wash read 2.00:1. The plan's remedy was that such a
+  glyph "loses the disc's tint first, then goes white".
+- **Layouts chosen by fit, where a line was cut at large text:** the week card's figures (three
+  layouts), the sheet's shortcuts (two, the type capped at 30 pt), a serving row (two). The
+  sheet's slider, shortcuts and wheel sit 8 pt apart, not 24: at 24, *Save* and *Cancel* were
+  half off a 375 × 667 pt screen at the ordinary size.
+- **The `+` shares the title's line and the total has the row's whole width**; the week's and
+  the strip's titles may take two lines. The plan printed neither.
+- **A past day's heading is two lines at an accessibility text size** — the weekday, then the
+  date — chosen by the text size (`dynamicTypeSize.isAccessibilitySize`), not by `ViewThatFits`.
+  It is the app's first branch on text size. The title may shrink to 0.5 where the header's
+  other lines stop at 0.6.
+- **Two marks ship under their floor**, each recorded with its figures below: the total under
+  the heading, by the clean-ground yardstick (#95); the strip's cyan bar on the hand-made pane,
+  at the plot's left end (#85).
+- **Known issue #92 is fixed here**, as its own change of two test files, staged beside the
+  stage.
+- **The UI target ran as two invocations a system** (#110).
+
+**The gate, in the working tree** — foreground, `-parallel-testing-enabled NO`, 2026-10-11, no
+`shutdown all`. The eleven staged files were as staged. **The tree also held the five build
+inputs that are not staged and differ from HEAD** (Xcode's rewrites of three catalogues and the
+two watch schemes, #50), as stage 2's gate did. Another session's simulators were seen booted
+at times — an *iPhone 18 Pro* when the stage began, an *iPhone 16 Pro* during the UI gate — and
+left alone.
+
+| Run | Where | Result |
+|---|---|---|
+| `-only-testing:WaterBuddyTests` | iOS 27.0, *iPhone 17* | `✔ Test run with 479 tests in 60 suites passed`, **five whole runs of five**, the first from a cold simulator |
+| `-only-testing:WaterBuddyUITests`, the harness skipped, as two invocations | iOS 27.0, *WaterBuddy Gate 27* | `Executed 25 tests, with 0 failures` and `Executed 18 tests, with 0 failures` — **43** |
+| the same | iOS 26.5, *WaterBuddy Gate 26.5* | 25 and 18, 0 failures — **43** |
+| the same | iOS 18.6, *WaterBuddy Gate 18.6* | 25 and 18, 0 failures — **43** |
+| `-only-testing:WaterBuddyWatchTests` | watchOS 27.0, *WaterBuddy Watch 27* | `✔ Test run with 57 tests in 6 suites passed` |
+| `build -scheme WaterBuddyWidgetExtension` | iOS 27.0, *WaterBuddy Gate 27* | `** BUILD SUCCEEDED **` |
+| `build -scheme WaterBuddyWatchWidget` | watchOS 27.0, *WaterBuddy Watch 27* | `** BUILD SUCCEEDED **` |
+
+- **Three whole-target unit runs came before those five: failed, passed, failed** — both
+  failures #92's test, at `folded == 0`. See #92, retired in this pass.
+- **The watch run and the two widget builds were made before the final review's fixes**, at
+  17:47–17:49. The seven shared files were the same blobs after the fixes, which touched
+  `HistoryView.swift`, three test files and `UnreadableStore.swift` — nothing a watch or widget
+  target compiles. The pinned *Apple Watch Series 12 (46mm)* still fails to boot (#77).
+- **Warnings: none new.** Clean builds of a `git archive` of HEAD and of a `git checkout-index`
+  of the index, four schemes each (the app's a `build-for-testing`), into one build folder that
+  only the app's build starts empty: **38 / 19 / 2 / 19** distinct lines after the path and the
+  position are cut — the same lines and the same counts in both. The same unit as stage 2's row.
+
+**Measured** — the worst frame of a minute of the aurora at rest and a minute scrolled, a
+capture every three seconds, each system; 32 pairs a system. The sweeps ran before the final
+review's fixes, which by the code change nothing they drew — today's screen at the ordinary
+text size; no capture was compared after them. **On iOS 18.6 the final sweep's second minute
+did not scroll** (the list had another page and did not move under the probe's swipe; why is
+not shown), so that system's scrolled figures are an earlier sweep's of the same day. The
+whole table, and how each rectangle was checked, is in `docs/DESIGN.md`, *History, measured*.
+
+- **Under its floor on all three systems: the total under the heading**, white on the aurora at
+  `.headline` — 4.45 / 4.44 / 4.34 on clean ground against 4.5, and 4.65 / 4.68 / 4.62 beside its
+  glyphs (iOS 26.5 / 27.0 / 18.6). Nothing else is under on Apple's glass.
+- **Nine more on iOS 18.6, all on the hand-made pane** (#85): weekday letters 3.41–3.93, the
+  disclosure 4.15, the goal line 2.12–2.98, the week's cyan bar 2.78 beside the pane and 1.98
+  over an empty track — each drawn as HEAD draws it — and the strip's cyan bar, new: **2.73 at
+  the plot's left end**, the small hours, where the sweep's rectangle lay and that pane's
+  highlight lies, and 3.80 and 3.69 at midday and in the evening, where the day's servings
+  stood — measured afterwards, when a reader of the docs pointed out where the first lay.
+- Tight and not under: the goal line over an empty day's track on iOS 27.0, 3.05 against 3.
+- One capture a system, not a sweep: the sheet's shortcuts, and the empty state — whose second
+  line reads 3.80 on iOS 18.6 against 4.5, on the same pane; the empty state is HEAD's.
+
+**Rendered and driven, with a throwaway probe that is deleted again.**
+
+- Every control answered off its glyph on iOS 26.5, 27.0 and 18.6 — a day off its bar, a row
+  on its bare pane, a shortcut low and to one side, swipe-delete — **in walks made between
+  15:30 and 16:03, on a build older than the final one and older than the settings passes**:
+  before the shortcuts' and the row's second layouts, the sheet's spacing, the header's change
+  and the review's fixes. On the final source the gate's UI tests tap a row on its bare glass
+  and a shortcut off its glyph on all three systems, and the delete probes swiped a row away;
+  a day tapped off its bar was not repeated.
+- **Settings, iOS 27.0 only, on a build older than the final one** — before the large-text
+  fixes, the header's change and the review's fixes. Increase Contrast read back on, then off;
+  the walk passed under it; no figure was measured under it. Reduce Transparency flipped on and
+  off under a running History, a day, a row and a shortcut operated each way. Reduce Motion on:
+  the backdrop identical twelve seconds apart; only a day button was pressed under it.
+- **Text sizes**, on a 402 × 874 pt phone: XXXL and Accessibility M, L, XL, XXL and XXXL in
+  English and Russian; Uzbek at the ordinary size, and at Accessibility XXXL for the header.
+  On a 375 × 667 pt phone: the ordinary size, XXXL in Russian, Accessibility XXXL.
+- **Found by render and fixed:** five lines cut short at large text — the week's figures, the
+  shortcuts' figures, a row's amount, the header's total, the week's title — and the sheet's
+  two buttons half off the small phone at the ordinary size. **A sixth cut line, a past day's
+  heading, was in a capture and not noticed** until the reviewer's estimate pointed at it.
+- **Deleting down to nothing**, two cases. *A day's only serving*, added through the sheet and
+  swiped away, on iOS 27.0 and 18.6: the strip and the row went, the empty state came back,
+  the week card stayed, and the day's button and the heading read that day with 0. *The week's
+  only water*, deleted while a past day was shown, on iOS 26.5 (the small phone) and 18.6: the
+  card went too, and the heading read *Today* with 0. The `+` stood and the app was running
+  each time.
+- The strip's bell was drawn with a stand-in time on iOS 27.0 and 26.5; reminders could not be
+  switched on on a simulator (#94).
+
+**Not done:** anything on a device; VoiceOver itself (the tree was read, nothing was heard);
+iOS 17 (no runtime); the strip's reminder mark from a real reminder; the three settings on the
+final source, or on iOS 26.5 or 18.6; any contrast figure at a text size other than the
+ordinary one or under Increase Contrast; deleting the week's last serving on iOS 27.0; the
+longest Russian weekday together with a two-digit date in the heading, which is arithmetic —
+this week's Monday is the 5th; the two-line heading looked at on iOS 18.6, where the gate's
+test of it passed and no capture was read; a native reader for the Uzbek.
+
+**The final review** (a fresh reviewer, read-only, on the staged diff; its report is saved
+beside the stage's ledger as it arrived) found nothing critical, three things it called
+important and thirteen minor. What came of it:
+
+- **Fixed, test first.** Yesterday's test saw neither that a serving is listed nor that it is
+  one control; it asserts both now, and was seen failing with a row drawn as both its layouts
+  and with a past day's list left empty. A unit test that compared two literals in its own
+  file is replaced by one that reads the built string table.
+- **Fixed, though graded minor on an estimate: a past day's heading was cut at the largest
+  text sizes** — *Saturday, 10 O…*, *Понедельник…*. **It was already in one of the stage's own
+  captures**: the walk at the largest size had tapped yesterday at 16:29, an hour and more
+  before the review, and kept the screenshot and a frame list that gave the heading 43 points
+  where *Today* has 72. That line of the capture was not read (`tasks/lessons.md`).
+- **Confirmed, and not this stage's to fix:** `nextDayBoundary` and a repeated midnight (#107).
+- Comments this stage had made false were corrected; the rest of what it listed is #109.
+
+**Rule wording, written and unstaged, for the owner:** `50-views` (History is one list and
+stops a point short of the top; its statics and the model's two calendar answers) and
+`65-accessibility` (the week card's summary and its two bar colours; History's heading, and its
+two lines at large text; the strip; a row's name and the sheet's shortcuts).
+
+<details>
+<summary>The redesign's stage 2 — Home — as the forty-sixth to forty-ninth passes recorded it; committed since in <code>1ced514</code>, <code>e7406a5</code>, <code>6b5f319</code> and <code>e16221e</code></summary>
+
 **The redesign's stage 2 — Home — is finished, tested and staged; it waits for the owner's
-`/commit`** (2026-10-11, the forty-sixth pass). Thirteen paths in the index, plus the docs this pass
+`/commit`** (2026-10-11, the forty-sixth pass). *(Committed the same day: `1ced514` the source,
+tests and strings, `e7406a5` the plan, `6b5f319` the docs, `e16221e` the rule wording and
+`CLAUDE.md`. Every "staged" below reads "committed".)* Thirteen paths in the index, plus the docs this pass
 writes. Five stages follow — History, Settings, the welcome, the widget, the watch. Spec
 `docs/superpowers/specs/2026-10-09-premium-redesign-design.md` §5; plan
 `docs/superpowers/plans/2026-10-10-premium-redesign-stage-2.md`, with a note at its end on where the
@@ -1381,6 +1588,9 @@ sized as one form and drew another; and a one-line form without its old scale fa
 (`.glassGroup()`, a pane's content never moved by a setting), `65-accessibility` (Home's elements,
 Undo's timing, the vessel's floor, a line never cut short) and one sentence in `CLAUDE.md`. **No
 rule was written for the two-shadow text or its yardstick** — that is #95, and the owner's first.
+*(Committed in `e16221e`, 2026-10-11.)*
+
+</details>
 
 <details>
 <summary>Stage 1, as the forty-fourth pass recorded it — committed since, in <code>c9ef45d</code></summary>
@@ -2515,12 +2725,73 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** Read last in the forty-ninth pass (2026-10-11), after its
+**There is a git repository.** Read last in the fiftieth pass (2026-10-11), after its `git add`
+of seven paths — the four sheets, the lessons, the history and the plan — from the commands
+themselves; the one `git add` that follows only re-adds this file and `HISTORY.md`, whose paths
+are already listed:
+
+```
+$ git rev-parse --short HEAD
+e16221e
+$ git log --oneline | wc -l
+      96
+$ git status -sb | head -1
+## main...origin/main
+$ git diff --cached --name-only
+HISTORY.md
+WaterBuddy/AuroraBackground.swift
+WaterBuddy/DataManager.swift
+WaterBuddy/HistoryView.swift
+WaterBuddy/HomeView.swift
+WaterBuddy/Localizable.xcstrings
+WaterBuddyTests/HistoryRangeTests.swift
+WaterBuddyTests/HistoryViewTests.swift
+WaterBuddyTests/LocalizationTests.swift
+WaterBuddyTests/UnreadableStore.swift
+WaterBuddyTests/WristSyncTests.swift
+WaterBuddyUITests/GoalSetupUITests.swift
+docs/AI_CONTEXT.md
+docs/DESIGN.md
+docs/STATE.md
+docs/WIDGET.md
+docs/superpowers/plans/2026-10-11-premium-redesign-stage-3.md
+tasks/lessons.md
+$ git diff --name-only
+.claude/rules/50-views.md
+.claude/rules/65-accessibility.md
+.claude/settings.json
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatch.xcscheme
+WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddyWatchWidget.xcscheme
+WaterBuddy/AppShortcuts.xcstrings
+WaterBuddyWatch/Localizable.xcstrings
+WaterBuddyWatchWidget/Localizable.xcstrings
+$ git status --short | grep '^??'
+?? Screenshots/census/
+```
+
+- **The index is stage 3 of the redesign and one more change: eighteen paths.** Nine of source,
+  tests and strings are the stage's, gated. Two test files —
+  `WaterBuddyTests/WristSyncTests.swift` and `WaterBuddyTests/UnreadableStore.swift` — are known
+  issue #92's fix, a change of its own that commits or reverts apart from the stage. Seven are
+  docs: the four sheets, the lessons, the history and the stage's plan, which is a new file.
+  **Nothing is committed**; HEAD is `e16221e`, level with `origin/main`.
+- **Unstaged on purpose, for the owner's yes: the rule wording** — `.claude/rules/50-views.md`
+  and `.claude/rules/65-accessibility.md`. They describe the staged code, so they belong with
+  the stage's commit or after it. `CLAUDE.md` is unchanged.
+- **Since the block below was written, four commits**: `1ced514` *feat(app): redraw Home for the
+  redesign's stage 2*, `e7406a5` its plan, `6b5f319` its docs and `e16221e` its rule wording and
+  `CLAUDE.md` — everything that block lists as staged or as unstaged for the owner.
+- Still unstaged, untouched by this stage: `.claude/settings.json`, three Xcode-rewritten
+  catalogues and the two watch schemes (#50). `Screenshots/census/` is untracked.
+- No source or test file in the working tree differs from the index, the three Xcode-rewritten
+  catalogues aside: `git diff --quiet` over the seven target folders, read after the last edit.
+
+The forty-ninth pass's block, kept. **Read last in the forty-ninth pass (2026-10-11), after its
 `git add` of six doc paths — the one that follows only re-adds this file and `HISTORY.md`,
-whose paths are already listed — from the commands themselves. **Every line is what the three
+whose paths are already listed — from the commands themselves. Every line is what the three
 passes before it read**: the same twenty paths staged, the same twelve unstaged, the same head.
-What moved in this pass is inside six of the staged files — the four sheets, the lessons and the
-history; the plan was not touched — and inside `CLAUDE.md`:
+What moved in that pass is inside six of the staged files — the four sheets, the lessons and the
+history; the plan was not touched — and inside `CLAUDE.md`. All of it has been committed since:
 
 ```
 $ git rev-parse --short HEAD
@@ -3302,6 +3573,14 @@ rather than fixed — the review's own explicit call, not an oversight:**
     discs' captions and *Undo* all group (`1 300 of 2 000 ml` under this Mac's region), and
     `GroupedFigureTests` pins it. **Still ungrouped:** History's week card and rows, Settings, and
     both widgets — so Home now reads `2 000` where History reads `2000`, until stages 3, 4 and 6.
+    **2026-10-11, the fiftieth pass: History's half is on disk, staged** (Home's was committed in
+    `1ced514`). The header's total, the week card's figures and a row's amount go through
+    `Bundle.figure`; the three keys that drew a raw number beside `ml` are removed with their
+    readers; and `theOnlyRawVolumesLeftToDrawAreOtherScreens` reads the built table rather than a
+    list: the keys that end in ` ml` and take a `%d` are exactly `%1$d ml`, `of %1$d ml` and
+    `+%1$d ml`. **Still ungrouped:** Settings' vessel amounts, which draw from the first of those;
+    and, from the widget catalogue's own copies of the same keys, the Home Screen widget (all
+    three) and the Lock Screen widget (the first two).
 
 40. **The shared Russian keys use a single plural form.** `%1$d percent. %2$d of %3$d millilitres.`
     reads `62 процентов` (correct: `процента`), and `Add %1$d millilitres` reads `Добавить 222
@@ -3612,8 +3891,18 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
 
 **Opened by the 2026-10-07 Siri-phrase change (roadmap item 4; the thirty-sixth pass):**
 
-62. **`testAServingAddedToYesterdayShowsUnderYesterday` fails on a simulator that has kept enough
-    servings.** It counts yesterday's rows before and after adding one, but a lazy list exposes only the
+62. ~~**`testAServingAddedToYesterdayShowsUnderYesterday` fails on a simulator that has kept enough
+    servings.**~~ **Retired 2026-10-11 (the fiftieth pass) — the fix is on disk, staged with the
+    redesign's stage 3.** The test reads yesterday's total off its own day button before and after
+    the save, polled for five seconds, and counts no rows. It was seen failing where it should —
+    with *Save* made to ignore the wheel, "("2250") is not greater than ("2250")". Since the
+    stage's review it also asserts that a serving is listed under yesterday, as exactly one button
+    in its row; seen failing with a row drawn as both its layouts and with a past day's list left
+    empty. **A limit, seen:** with a past day's list read from the next day's key it passes —
+    today's rows are listed under yesterday, and a row is a row; whose rows they are is
+    `HistoryLogsTests`' to pin. Before the rewrite it failed once more, the one failure of 38 in
+    the stage's first UI run on *WaterBuddy Gate 27*. The entry as it stood:
+    It counts yesterday's rows before and after adding one, but a lazy list exposes only the
     rows on screen: once yesterday held eight servings — each gate run adds one — a row landing at the
     top pushed one off the bottom and the count stood still. The serving was saved; a frame of the
     failure's recording shows the new 22:44 row. HEAD `4a7f4dd` fails identically on the same simulator,
@@ -3923,11 +4212,25 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     staged and not run:** Home's heading is now a static text *Today*, which is what both methods
     waited for to know History had come up — six waits now look for the `+` button, *Add a
     serving*. Compiled by the gate, skipped by it, and not run on an erased device.
+    **2026-10-11, the fiftieth pass: stage 3 reshapes History and the harness was neither edited
+    nor run.** By reading only: what it waits for there — *Add a serving*, *Last 7 days*, *Edit
+    serving*, a row that ends " millilitres" — still exists, and it returns to the top by
+    bouncing off another tab, which rebuilds the list. What a run would show is not known: the
+    whole screen scrolls now, so `scrollHistoryList` moves the header and the cards away with the
+    rows, and its shots of History will be of the new screen. Its comment cites
+    `HistoryView.swift:159` for `allowsFullSwipe`; that line is `:433`.
 83. **History's header gave a UI test no value.** In stage 1's probe `app.staticTexts["Today"].value`
     did not carry "N of M millilitres" (it parsed as −1). The header is
     `.accessibilityElement(children: .ignore)` with a label and a value. **Whether VoiceOver speaks the
     value has not been checked**, in the Accessibility Inspector or on a device. If it does not, that is
     an accessibility defect in a shipped screen; if it does, it is only how XCUITest reads the element.
+    **2026-10-11, the fiftieth pass: answered for the new header, staged.** Stage 3 drops the
+    wrapper and puts the label, the value and the header trait on the title's own text, as Home
+    does. From outside, `app.staticTexts["Today"].value` read "850 of 1900 millilitres" in the
+    stage's probe on iOS 26.5 and 27.0, and `testAPastDaysHeadingKeepsItsSizeAtTheLargestTextSize`
+    asserts that today's and a past day's heading each resolve to one element whose value ends
+    " millilitres" — passed on iOS 27.0, 26.5 and 18.6. **Whether VoiceOver speaks it is still
+    unheard**, for the shipped header and for this one.
 84. **Small things the redesign's read-only research turned up, none fixed:**
     (a) `LiquidGlassModifier.swift`'s `liquidGlass(in:)` comment says the content is placed on a pane
     "clipped to `shape`"; the pane is a background and the content is not clipped.
@@ -3969,6 +4272,23 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     against 3 where the pane's highlight lies beside it (3.31 above, 4.38 below, 4.71 toward the
     number), over a minute's sweep. All pass, two of them narrowly, and the same remedy would
     widen both.
+    **2026-10-11, the fiftieth pass: History on iOS 18.6, the redesign's stage 3, staged.** Over
+    all eighteen pane samples of the week card and the strip in a minute's sweep — passing pairs
+    included, the track's left out, each at its pair's worst frame — the pane read between
+    (0.24, 0.34, 0.48) and (0.39, 0.47, 0.53), channel by channel. Nine of the swept pairs are
+    under their floor on it. **Eight are drawn as HEAD draws them:** weekday letters at
+    white 0.72, 3.41–3.93 against 4.5; the disclosure at 0.70, 4.15; the goal line, 2.65–2.98
+    beside a bar and 2.12 over an empty day's track, against 3; the week's cyan bar, 2.78 beside
+    the pane (3.32 at the card's other end) and 1.98 over an empty track. **One is new: the
+    strip's cyan bar, 2.73 against 3 at the plot's left end** — the small hours, where the
+    pane's highlight lies; it reads 3.80 at midday and 3.69 in the evening, where the day's
+    servings stood. The same cyan on the same pane, with a dark hairline round it that the
+    figures do not count. In the week card a white bar passes (4.91) where a cyan one does not,
+    so on this pane a day that reached the goal is the fainter one. And, one capture and not a sweep, the empty
+    state's second line at white 0.7 reads **3.80 against 4.5** (its title 5.37); the empty state
+    is HEAD's. The stage's one mark of its own colour on this pane, a row's cyan glyph, was given
+    a dark well and reads 4.48. Nothing was retuned in the hand-made stack. Table:
+    `docs/DESIGN.md`, *History, measured*.
 86. **The tab bar's lozenge is faint on the hand-made bar.** On iOS 18.6 its rim, white 0.55, reads
     2.69–3.10:1 against 3, and the cyan glyph of the selected tab 2.83 at the *Home* slot, the bar's
     lightest end; the active caption inside it reads 5.00–6.16 and passes. The shipped 1.1 already
@@ -4028,6 +4348,18 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     "every development unit run … the flake runs" and "unit tests keep nothing on a device"; the
     first is wrong by the logs' own destinations, and the second by the project file — the unit
     target is hosted in the app, whose launch stamps the simulator's group container.)*
+    **2026-10-11, the fiftieth pass: stage 3 reused these, and made one — nine now.** Probes
+    that pour ran on *Probe 27*, *Probe 26.5*, *Fallback 18.6* and the new *Small 26.5*; the UI
+    gate and the UI tests' red and green runs went to the *Gate* devices, and so did twenty-one
+    probe runs that pour nothing — the text-size renders and the frame dumps, on *Gate 27*; the
+    watch gate went to *Watch 27*, and every unit run whose log was kept — nineteen — to the
+    stock iOS 27.0 *iPhone 17*. **Made: *WaterBuddy Small 26.5***,
+    `D24E2190-9884-48D5-9C59-63D94A6A56D3`, an iPhone SE (3rd generation) on iOS 26.5 — a 375 ×
+    667 pt screen, which none of the eight has. No `shutdown all`; each was shut by its own id.
+    What the stage left on them: *Fallback 18.6* and *Small 26.5* had every serving deleted by
+    the delete-path probe and hold one each; the *Gate* devices hold the servings each UI run
+    pours. The session's scratch folder is 4.4 GB, most of it result bundles and two build
+    folders; the data volume read 87 % used, 59 GiB free, at the end.
 91. **What the final review of stage 1 found and nothing was done about** — smaller things, each the
     owner's or a later stage's:
     **2026-10-11: (a) is retired — fixed on disk, staged in stage 2 — and two of (d)'s three
@@ -4063,8 +4395,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     (h) On Apple's glass the goal slider's accessibility frame is its whole card (346 × 156 points);
     on the hand-made glass it is the slider's own. Seen in the probe's frame lists; `adjust` works
     on both. Whether VoiceOver's focus ring looks right there is a device check.
-92. **A test that corrupts a store and expects the next read to fail is a race, and it lost twice
-    while stage 2 was built.**
+92. ~~**A test that corrupts a store and expects the next read to fail is a race, and it lost twice
+    while stage 2 was built.**~~ **Retired 2026-10-11 (the fiftieth pass) — the fix is on disk,
+    staged beside the redesign's stage 3 as its own change of two test files.** In stage 3's gate
+    the whole unit target ran three times on the stage's source: **failed, passed, failed**, each
+    failure this test at `folded == 0` (once with `manager.currentWater == 100` as well) — twice
+    in three, with 35 more tests in the process than the one-in-twenty-two below. The test now
+    builds its store with `UnreadableStore`, calls `breakReads()`, and asserts `!store.stillReads`
+    before anything else; `folded == 0` and `currentWater == 100` are untouched. With the store
+    left readable all three expectations fail. After it, five whole-target runs of five passed,
+    the first from a cold simulator. `UnreadableStore.swift`'s DocC says the older technique is
+    gone. The entry as it stood:
     `WristIngestTests.aFailedExistingLogsReadDeclinesTheWholeBatchRatherThanTreatingEverythingAsNew`
     overwrites the store file under an open context, deletes its `-wal` and `-shm`, and asserts the
     read fails; SQLite notices an unlinked file from a background queue. **First on 2026-10-10**,
@@ -4091,6 +4432,16 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     **`b8a1386`'s own build did the same on another new device**, and a second launch on a warm
     device raises it at once, every time since. A condition of the simulator, by that control; the
     cause was not shown, and it has not been tried on a device.
+    **2026-10-11, the fiftieth pass: reminders could not be switched on for stage 3, and it cost a
+    render.** The probe's reminders test tapped the switch in seven runs — five on *WaterBuddy
+    Probe 27*, two on *WaterBuddy Probe 26.5*, devices made on the night of 2026-10-09 and used
+    since, not new — and each time no alert was raised and the switch read off. **In three of the
+    seven, on both devices, Settings listed *Open iOS Settings***, which is what a refused
+    permission shows: there the cause may be an earlier refusal and not this entry's first-boot
+    condition — #90 records that the probe devices' notification permission was changed by an
+    earlier pass. Which it was is not shown. *(The stage's ledger says "three attempts on Probe
+    27 and one on Probe 26.5 … on one run"; the logs say this.)* So the bell that History's strip draws at the next reminder was rendered from a
+    stand-in time, and **its wiring to `manager.nextReminder` has not been seen drawing**.
 95. **Home's text on the aurora passes by one yardstick and not by the other — the owner's ruling.**
     Stage 2 gave that text two shadows (`legibleOnBackdrop()`, the widget readout's recipe) and
     measured it beside its glyphs, where a shadow darkens the ground, off a minute's sweep; every
@@ -4123,6 +4474,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     an earlier build, before the column's layout moved the line, and another minute of the aurora.
     The Bottle's amount has 0.09 to spare even by the first. If the second is the measure, the remedies are a pane under the captions,
     and a heavier scrim or a pane under the vessel's line — the second is the watch's #44 again.
+    **2026-10-11, the fiftieth pass: History has a line of the same kind, staged** (the redesign's
+    stage 3). The owner's "go" to that stage took clean ground as its floor and both yardsticks
+    as its record. History's heading and the total under it sit straight on the aurora with the
+    same two shadows — `legibleOnBackdrop()` now lives in `AuroraBackground.swift`. Worst frame of
+    a minute at rest and a minute scrolled, iOS 26.5 / 27.0 / 18.6: **the total, `.headline`,
+    reads 4.45 / 4.44 / 4.34 on clean ground against 4.5, and 4.65 / 4.68 / 4.62 beside its
+    glyphs**; the heading, large text with a floor of 3, reads 4.74 / 4.74 / 4.61 and 5.19 / 5.19
+    / 5.07. So by the stage's own floor one line of History ships 0.05 to 0.16 under, on every
+    system, and by the other yardstick it passes. It was not restyled: it is Home's recipe on
+    Home's backdrop, and a darker halo in the one shared function would move Home's four lines
+    with it. **One ruling settles both screens.**
 96. **Under VoiceOver an *Undo* offer stands until something ends it, and while it stands the quiet
     line is not there.** Spec §5.2 gives VoiceOver no deadline. So a VoiceOver user who pours from
     Home and stays there does not hear *Next reminder* or *Last drink* again until the tab changes,
@@ -4166,6 +4528,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     never` ends it at once, and every development run of stage 2 carried it from then on. **The gate's commands
     in rule `85-testing` do not**, so a red gate run will outlast the 600-second foreground limit.
     Adding the flag there is a rule change, and the owner's.
+    **2026-10-11, the fiftieth pass: stage 3 carried the flag until 17:43, lost it, and met this
+    twice.** Of the 120 test logs the stage kept, 79 have `-collect-test-diagnostics never` —
+    every run up to 17:43, the tasks' red runs among them — and the 41 from 17:47 on do not: the
+    gate, which the rule writes without it, and with it the review's fix runs and the late
+    probes. The session's context was summarised between those two minutes and the summary does
+    not mention the flag. After that a UI run expected to fail finished in 47 seconds and its
+    process sat for ten minutes, and a failed whole-target unit run (#92) sat for nine; both
+    were moved to the background by the foreground limit and stopped by hand, their logs
+    complete. **Not every failing run waits**: the gate's first failed unit run exited at once.
+    Later runs expected to fail were watched for their suite's last line and stopped. The flag
+    is still not in the gate's commands.
 102. **Twenty-one more simulators were made on 2026-10-10 and 11, all named *WB2 …*, and are still
     there** — beside #90's eight, on a disk that is 90 % full. Stage 2 measured on new devices
     rather than on #90's probes, so that every pass started from an empty day: *Probe*, *Final2*
@@ -4275,24 +4648,54 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     added:* `UnreadableStore.swift:23` says "Here nothing is unlinked", of how the fixture makes a
     read fail; its `remove()` does unlink the throwaway directory at the end and says so — the
     second of four parts of the stage reviewer's item 14, answered in one place and not the other.
+    **(h) The fiftieth pass, after stage 3: where the lines above stand now, and what moved in the
+    comments themselves.** Stage 3 adds 53 lines to `DataManager.swift` — 15 at `:882`, 14 at
+    `:2128`, 24 at `:2773` — takes 15 out of `HomeView.swift` at `:934`, and rewrites
+    `HistoryView.swift`. So, of the citations in (a) to (g), each re-read at its new line:
+    `DataManager.swift:985` is `:1000`, `:1119–1123` `:1134–1138`, `:1219–1220` `:1234–1235`,
+    `:1381` `:1396`, `:1456` `:1471`, `:1588` `:1603`, `:2148–2150` `:2177–2179`, `:2175–2176`
+    `:2204–2205`, `:2207–2208` `:2236–2237`, `:2269` `:2298`, `:2640` `:2669`; `:58`, `:68`,
+    `:155–158`, `:550` and `:615` stand where they did. `HomeView.swift:952` is `:937`; `:56` and
+    `:758` stand. `HistoryView.swift:824`, the sheet's card, is `:1266`.
+    `UnreadableStore.swift:23` is `:24`. **Two rule lines in (f) moved as well**, by this
+    stage's own unstaged wording above them: rule `65-accessibility`'s "full white rather than
+    the app's" is line 134 of the working-tree copy and 123 as committed, and rule `50-views`'s
+    "currently omit it" is line 142 and 134. The four rule files (g) cites are not among the two
+    this stage's wording touches.
+    **None of those comments was changed** — stage 3 opened
+    `DataManager.swift` to add, and `UnreadableStore.swift` for one paragraph above that line.
+    *Corrected by stage 3, in `HistoryView.swift`, on its reviewer's list:* a row's "the idiom the
+    vessel and this screen's own header use" (the header no longer wraps its title); the week
+    bar's "`Aurora.cyan` alone measures 5.22:1. A 6–90pt bar loses nothing by being one colour"
+    (two fills now, both with this stage's figures); the `+`'s "11.7:1" and the empty state's
+    "8.0:1 … 5.2:1" (replaced by a reading of each system). *Left by stage 3:*
+    `dayFraction(of:in:)`'s DocC says "from `0` at its first midnight to `1` at its last" with
+    no word of #107's exception; and `AppStoreScreenshotUITests.swift:270` cites
+    `HistoryView.swift:159` for `allowsFullSwipe`, which is `:433` (#82). *Rule lines, the
+    owner's:* rule `85-testing` writes the UI gate as one invocation, which no longer fits a
+    foreground call (#110).
 
 104. **The Glass's index has three spellings.** `DataManager.usualSlot` is the name the one-tap
     doors read — `usualServing(in:)`, the Control Center control's glyph and, since stage 2, Home's
-    primary disc (`HomeView.swift:107`). Two others spell the same `1`: `HistoryView.swift:143`
-    seeds a new serving's amount with `manager.servings[1]`, under a comment that says why; and the
+    primary disc (`HomeView.swift:107`). Two others spell the same `1`: `HistoryView.swift:240`
+    (`:143` until stage 3) seeds a new serving's amount with `manager.servings[1]`, under a comment that says why; and the
     watch has `nonisolated private static let primaryIndex = 1` (`WristView.swift:136`). Nothing
     disagrees today. Rule `40-widget` says "never spell the index here" of the control only, and
     until the forty-eighth pass two sheets said the index "is named once" / "is spelled once".
     Found by that pass's readers; both spellings are older than stage 2. A doc sync does not edit
-    code. **The constant's own DocC still says it** — `DataManager.swift:1456`, "Named once,
+    code. **The constant's own DocC still says it** — `DataManager.swift:1471` (`:1456` until
+    stage 3), "Named once,
     because two things read it"; three read it now — and `CLAUDE.md` calls `usualSlot` "the one
     name for that vessel's index", true of the phone's one-tap doors and not of the watch.
+    **2026-10-11, the fiftieth pass:** stage 3 rewrote `HistoryView.swift` round that literal and
+    left it a literal; and its new `HistoryView.vessel(forAmount:amounts:)` finds the Glass by
+    `isUsual`, which `HomeView.servings(amounts:)` sets from `usualSlot` — no fourth spelling.
 
 105. **Two fallbacks say nothing in `DEBUG`.** `CLAUDE.md`'s *Fail Soft, Loudly* says "a corrupt
     goal falls back to the default — but every fallback says so in `DEBUG`", and rule
     `75-diagnostics` that every fallback in the product is announced. `resolveDailyGoal(in:)`
-    (`DataManager.swift:1461`) returns `defaultDailyGoal` for a missing or corrupt goal with no
-    diagnostic, and `resolveServings(in:)` (`:1433`) discards a bad triple the same way. A missing
+    (`DataManager.swift:1476`; `:1461` until stage 3) returns `defaultDailyGoal` for a missing or corrupt goal with no
+    diagnostic, and `resolveServings(in:)` (`:1448`; `:1433`) discards a bad triple the same way. A missing
     key is the ordinary case for both — the vessels are never materialised — so a line that fired
     on absence would be noise; whether a *corrupt* value should speak is the owner's call, and
     until it is made the sentence in `CLAUDE.md` is wider than the code. Found by the
@@ -4312,6 +4715,84 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     By reading only — no haptic can be felt on a simulator, and none of this was run. Whether the
     celebration should follow the goal or the finger is the owner's call. *(Related: #100(a) —
     `undos` is bumped whether or not a row was taken back.)*
+
+107. **`nextDayBoundary` answers the repeated midnight, in a zone whose clocks go back across
+    it.** In America/Havana the clocks go back from 01:00 to 00:00, so 00:00–00:59 happens twice
+    on that night. For an instant in the first of the two hours — tried at 00:30 and 00:59;
+    at 00:00 itself the answer is right — `Calendar.nextDate(after:matching:matchingPolicy:
+    .nextTime)`, which is what `DataManager.nextDayBoundary(after:calendar:)` asks, returns the
+    **second 00:00 of the same day**, one hour after the day began; from the second 00:00 on it
+    returns the next day's, 25 hours after the day began. Read off Foundation on this Mac's toolchain for 2 November 2025 and 1 November
+    2026 with a script that reads and writes nothing; America/New_York's fall-back day, whose
+    repeated hour is 01:00, is right throughout. Found by stage 3's reviewer by inference and
+    then run. **The function is HEAD's, and rule `30-rollover` calls it "the single definition of
+    when the day turns"; stage 3 did not change it.** Its callers: today's fetch bounds, the
+    history fetch, the streak's windows, the wrist mirror's `phoneDayEnd`, `WristPlan` on the
+    watch, the widget's timeline, and — new in stage 3 — `dayFraction`. Worked through for
+    three, during that one hour: `fetchLogsForToday()` still holds every row, since in ordinary
+    use no row is later than now; `dayFraction` measures the hour against a one-hour day, so a
+    serving at 00:30 is drawn mid-strip; a widget timeline built then dates its zeroed entry an
+    hour after the day began and reloads there. The others were not worked through. No test
+    pins the right answer, and none could be added without the fix: it would be red. The fix is
+    small — ask again while the answer is still the same day — and is a change to the rollover's
+    own function, with its own test and its own review; the owner's call when. Other zones with
+    a transition at midnight were not tried.
+
+108. **Settings scrolls under the status bar.** Seen in a stage 3 capture on iOS 27.0: the clock
+    drawn over a card's slider as the screen scrolled. It is the defect stage 3 found and fixed
+    in History — a scroll view whose top edge meets the safe area's draws its content on up
+    under the status bar — in a screen stage 3 did not open. History's remedy was one point of
+    top padding on the list. Older than stage 3 by its cause; when it began was not looked for.
+    #89 is the same on the first-run screen at the largest text size. Stage 4 redraws Settings.
+
+109. **What stage 3's final review found and nothing was done about** — each small, each the
+    owner's. Its report is saved beside the stage's ledger as it arrived.
+    (a) `bringIntoView`, in the UI tests, checks only a row's foot against the tab bar. After a
+    flick on a small phone whose day holds a dozen servings, the first row built may sit mostly
+    above the list's top edge, and the bare-glass test would fail with the hit-region message.
+    No swipe is needed on the gate's phones.
+    (b) `testTheStripIsOneHeadingOverADaysServings` would not fail if the plot's
+    `accessibilityHidden` came off, and does not check the header trait.
+    (c) The shortcut-figure test at the largest text size catches a figure cut to one character,
+    not a partial cut. **And the shortcut tap test does not pin the content shape**: with
+    `.contentShape(Rectangle())` removed it still passes on iOS 26.5. That much was seen; why
+    the tap still lands — an unselected slot's background is a capsule filled at zero opacity —
+    was not looked into.
+    (d) `theModelPlacesAnInstantOnItsOwnCalendar` tells the model's calendar from
+    `.waterBuddyDay` only on a host that is not on UTC; `theStripLabelsTheMorningNoonAndEvening`
+    restates two constants; the two daylight-saving `daysMet` tests exercise `series`; nothing
+    pins that `hours` leaves out an hour the calendar cannot place, or `dayFraction`'s
+    `length > 0` guard, or that the week card's spoken summary carries the days met.
+    (e) `.raised` panes now sit in list rows with no clip disabled (rule `60-design-system`).
+    "Not sliced" was looked at on iOS 18.6 only — Apple's glass draws no hand-made shadow — and
+    iOS 17 has no runtime here.
+    (f) The week card's middle layout takes up a shortfall with `minimumScaleFactor(0.95)` where
+    the 2026-10-11 lesson's remedy is `.fixedSize()`; no failing case was found. A shortcut's
+    weight changes with selection, so at the width where the row only just fits it can change
+    layout on a tap. A day's met state is drawn — the colour, the line — and spoken only as the
+    count. A vessel under 50 ml, which only a hand-edited suite can hold, moves the slider's
+    lower bound and its 50 ml grid.
+    (g) **Stage 2's `onlyTheSpokenHomeStringTakesARawNumber`** compares one literal in the test
+    file with another, as the History twin did until stage 3 replaced it; committed in
+    `1ced514`. The new table-wide test covers what it meant to.
+    (h) Seen by the stage's own probe, older than the stage: **the empty state is two elements
+    to anything that walks the tree** — the combined one and its title inside it — on iOS 27.0
+    and 18.6. `emptyState` and its `.accessibilityElement(children: .combine)` are HEAD's. Not
+    heard with VoiceOver.
+    (i) The two-line heading's lines shrink separately, so a long weekday is drawn smaller than
+    the date under it — *Понедельник* at 0.67 over *5 окт.* at full size.
+
+110. **The UI target no longer fits one foreground call, and rule `85-testing` writes it as
+    one.** Twenty-five tests of `GoalSetupUITests` took 435 seconds on iOS 27.0, 366 on 26.5 and
+    343 on 18.6; the other eighteen 129, 88 and 83 — 565 seconds for the whole target on iOS
+    27.0, before any build, against the 600 a foreground call is given, and `CLAUDE.md` wants
+    every `xcodebuild` watched to its end. Stage 3's gate ran it as two invocations a system that
+    are complements: `-only-testing:WaterBuddyUITests/GoalSetupUITests`, and
+    `-only-testing:WaterBuddyUITests` with the harness and `GoalSetupUITests` skipped — the same
+    43 tests. On iOS 27.0 and 26.5 they ran in that order, which is the order one invocation
+    runs the classes; **on iOS 18.6 the eighteen ran first**. What two invocations cannot show
+    is a dependence between the two classes across one process, and none is known. The rule's gate
+    block is the owner's, and the stages that follow will add UI tests to the same class.
 
 ## Where the rest is written down
 

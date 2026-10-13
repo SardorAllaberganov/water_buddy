@@ -3,7 +3,20 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-11 (twenty-second pass — a fourth `/doc_sync` the same day, checking only
+**Last updated:** 2026-10-11 (twenty-third pass — `/doc_sync` at the end of the redesign's stage 3,
+History, staged and not committed. **No file under `WaterBuddyWidget/` changed, and no contract
+here did.** One of the six shared files did: `DataManager.swift` gained four derived answers for
+History's screen (`reached(_:)`, `daysMet(in:goal:)`, `dayFraction(of:in:)`,
+`hours(_:onDayOf:in:)`), none of which the extension calls or the snapshot carries. The extension
+was built from the stage's source, `** BUILD SUCCEEDED **`, and a build of the staged tree —
+into the folder the app scheme's clean build had just filled, not an empty one — printed the
+same 19 distinct warnings as HEAD's did the same way — *Building it*, below. The app's catalogue holds
+75 keys now, not 73; the ten this catalogue shares with it are untouched. **Nothing was rendered:
+no widget was placed.** One caveat is new and older than the stage: on the one night a year a
+zone's clocks go back across midnight, the timeline's midnight entry can be dated an hour after
+the day began (`docs/AI_CONTEXT.md` known issue #107). Stage 2, which the passes below call
+staged, was committed in `1ced514`.)
+Previously, the same day (twenty-second pass — a fourth `/doc_sync` the same day, checking only
 what the twenty-first had added. **No source changed, no contract did, nothing was built or
 rendered.** The warning paragraph's figures all reproduce from the saved logs. Tightened: why this
 scheme's build compiles the app — the scheme lists `WaterBuddy.app` as a second build entry, and
@@ -355,7 +368,8 @@ list for exactly this reason — six shared files now, not four.
 
 The widget ships in English, Russian and Uzbek, and **it has its own `Localizable.xcstrings`** —
 `WaterBuddyWidget/Localizable.xcstrings`, 19 keys. **Fifteen are hand-written** — marked `manual`,
-in all three languages: ten it shares with the app, a strict subset of the app's 73 and the ten
+in all three languages: ten it shares with the app, a strict subset of the app's 75 (73 until the
+redesign's stage 3, staged 2026-10-11, which touched none of the ten) and the ten
 `LocalizationTests`' `sharedKeys` names, and the five of `AddWaterIntent`'s Shortcuts vocabulary,
 which the app's catalogue does not hold. The other four are literals the build extracted, with no
 translation: `%`, `+%lld`, `1,450 ml` and `Today` (see below). Those four names are in the app's
@@ -547,7 +561,13 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension
                  -destination 'platform=iOS Simulator,OS=27.0,name=iPhone 17'
 ```
 
-Last run 2026-10-11, on the redesign's staged stage 2: `** BUILD SUCCEEDED **`. The warning
+Last run 2026-10-11, on the redesign's staged stage 3 (on *WaterBuddy Gate 27*, iOS 27.0):
+`** BUILD SUCCEEDED **`. Stage 3's warning comparison built this scheme twice more the same day —
+from a `git archive` of `e16221e` and from a `git checkout-index` of the staged tree — each into
+the build folder the app scheme's `build-for-testing` had just filled, and each printed the same
+19 distinct warnings by file and message: twelve in `DataManager.swift`, five in
+`NotificationManager.swift`, two in `WaterBuddyWatch/WristView.swift`. The account that follows
+is stage 2's, kept: on the redesign's stage 2, then staged: `** BUILD SUCCEEDED **`. The warning
 comparison built this scheme twice — from `b8a1386` on 2026-10-10 and from the change on
 2026-10-11 — each time into the DerivedData folder that the app scheme's `build-for-testing` had
 just filled (that build ended 16 and 9 seconds before this one began), **not an empty one**; it
