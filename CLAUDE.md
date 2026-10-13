@@ -148,7 +148,9 @@ something to record.
 - Treat every new warning as a failure, on **every** invocation, and a concurrency warning here is a
   Swift 6 error later. **"This codebase compiles clean" is no longer true and was retired on
   2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05, unchanged on 2026-10-06 and again on
-  2026-10-08; the 38 measured on Xcode 26.6 no longer compares), a clean `-scheme WaterBuddy` build into
+  2026-10-08, and on 2026-10-13 from a clean `build-for-testing` with the six lines in two
+  `WaterBuddyTests` files set aside, before and after the redesign's stage 3c; the 38
+  measured on Xcode 26.6 no longer compares), a clean `-scheme WaterBuddy` build into
   an empty DerivedData folder emits **31** unique warning lines (80 occurrences as counted then; 44
   primary lines on 2026-10-08 — occurrences move with the architectures a build compiles, the unique
   lines do not): the *"main actor-isolated …

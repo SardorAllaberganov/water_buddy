@@ -23,25 +23,29 @@ measured.
 - A pane's content is never moved between branches by a setting. `LiquidGlassModifier` changes the
   background and the glass handed to `glassEffect` — `.identity` when the pane is not Apple's — so
   a Reduce Transparency flip rebuilds nothing inside a pane
-- The scrim, the tint ceiling, the specular, the lit rim and the two shadows are properties of the
-  **hand-made** stack. On Apple's glass none of them is drawn; the system brings its own edge and
-  depth
-- Apple's regular glass is darkened with a black `Glass.tint`, at
+- The scrim, the tint ceiling and the two shadows are properties of the hand-made stack. The
+  specular and the lit rim are drawn on both: on Apple's glass as the pane's background, over the
+  glass and under the content, so the canvas's bright edge survives the tint
+- Apple's regular glass is darkened with `LiquidGlass.systemTintColor` — `Aurora.top`, the sky's own
+  blue; a black tint greys the aurora under it — through `Glass.tint`, at
   `LiquidGlass.systemTintOpacity(for:)`; the clear variant — the vessel — takes none. The value is
   the lightest rung that passed when every pair was rendered on iOS 27.0 and followed through the
-  aurora's swing (`docs/DESIGN.md`, *Apple's glass, measured*), and
+  aurora's swing (`docs/DESIGN.md`, *The look, measured*), and
   `theTintIsNoLighterThanTheLightestRungThatPassed` holds it. Never retune it by eye, and never
   estimate one value from another
 - A pane answers a tap anywhere inside its shape, on both paths. The hand-made stack gets that from
   its fills; on Apple's glass the modifier says it with `.contentShape(shape)`. Never remove it: on
   iOS 26.5 a serving row stopped answering on its bare glass without it
-- A selected slot or day is marked with `LiquidGlass.Selection`'s fill **and** rim, present at zero
-  opacity when unselected. Never a fill or a rim written as a literal in a view
+- A selected slot is marked with `LiquidGlass.Selection`'s fill **and** rim; the week card's shown
+  day with `Selection.ringOpacity`'s ring on its track **and** `Selection.discFill` behind its
+  letter, the letter heavier than the rest. Each mark is present at zero opacity when nothing is
+  selected. Never a fill, a rim, a ring or a disc written as a literal in a view
 - Glass goes over content, imagery or colour — never over a flat background
 - Choose density by what the pane carries: `.frosted` or `.opaque` behind sentence-length text,
   `.sheer` only for short labels and controls
 - Use `LiquidGlass.cornerRadius` for every rounded pane. Never write a corner-radius literal in a
-  view
+  view. A rounded element inside a pane — the week's tracks and bars — uses
+  `LiquidGlass.innerCornerRadius`
 - Sibling panes on one screen share a `density`/`elevation` pair, and peer controls in one row share
   a density. A one-off value needs a stated reason in the diff
 - The tab bar sits at `.frosted` + `.floating`, the highest pair in the system; treat it as reserved
@@ -55,7 +59,10 @@ measured.
   clip — otherwise the elevation shadows are sliced off square
 - A glass row in a `List` clears the list's own surfaces: `.listRowBackground(Color.clear)`,
   `.listRowSeparator(.hidden)`, explicit `.listRowInsets`
-- The dark-mode black scrim is what makes dark glass work. Raising the tint is the wrong fix
+- The dark-mode scrim is what makes dark glass work, and
+  `LiquidGlass.scrim(density:scheme:base:onPhone:)` is the one place it is decided: `Aurora.top` on
+  the phone's own panes, black for the widget's `.archived` base and for the watch. Raising the
+  white tint is the wrong fix
 - The contrast boost and the press boost multiply, and each is clamped
 
 ## The primary surface
@@ -82,8 +89,8 @@ measured.
 - Keep `interactive` opt-in (`false` by default). Pass `interactive: true` only where the glass
   itself is the pressable surface — not on a pane that merely contains buttons
 - On Apple's glass `interactive: true` becomes `Glass.interactive()`. `PressStyle` keeps its recoil on
-  both paths and stays the only writer of `glassIsPressed`, which the hand-made stack and the primary
-  surface read
+  both paths and stays the only writer of `glassIsPressed`, which the hand-made stack, the sheen and
+  lit rim laid over Apple's glass, and the primary surface read
 - No tint opacity exceeds `LiquidGlass.Interaction.maximumTintOpacity` (0.6) in light mode. A pressed
   pane takes its tint from `LiquidGlass.Interaction.pressedTint(_:)`, never a bare multiplication
 - The press curve is `.spring(response: 0.28, dampingFraction: 0.62)` and stays identical in

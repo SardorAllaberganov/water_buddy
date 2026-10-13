@@ -30,6 +30,7 @@ rather than re-deriving it.
   only the edge
 - A `flat` base's `opaque` fill is the glass stack **composited down over the aurora**, never a
   neutral system grey
+- Home's vessel draws its glow, halo and highlight only when Reduce Transparency is off
 - In the widget, `WidgetCardBackdrop` draws `Color.clear` when the setting is on, and `WidgetAurora`
   keeps its three light blobs inside `if !reduceTransparency`, leaving only `Aurora.gradient`
 - On the watch, `WristAurora` — `WidgetAurora`'s own proportional-geometry twin (rule
