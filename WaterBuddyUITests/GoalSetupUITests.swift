@@ -384,6 +384,38 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Today"].isSelected, "the card opens on today")
     }
 
+    /// Every day on the week card is a tap target, however narrow the phone.
+    ///
+    /// Stage 3c stood the row of days 16 pt in from the card, to put its outer tracks where the
+    /// canvas's padding does; on a 375-pt iPhone that left each
+    /// day 42.1 pt wide, under the 44-pt floor rule `65-accessibility` sets (stage 3c's final
+    /// review). It only fails where the width is short — run it on the smallest phone
+    /// (*WaterBuddy Small 26.5*) to see it bite; on wider phones it holds the same line.
+    @MainActor
+    func testEveryDayOnTheWeekCardIsATapTarget() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let getStarted = app.buttons["Get Started"]
+        if getStarted.waitForExistence(timeout: 5) {
+            getStarted.tap()
+        }
+
+        let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass")).firstMatch
+        XCTAssertTrue(glass.waitForExistence(timeout: 5), "the Home tab's quick-add row did not draw")
+        glass.tap()
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.staticTexts["Last 7 days"].waitForExistence(timeout: 5), "the week card did not draw")
+
+        for name in Self.dayNames() {
+            let day = app.buttons.matching(identifier: name).firstMatch
+            XCTAssertTrue(day.exists, "\(name) is not on the week card")
+            XCTAssertGreaterThanOrEqual(day.frame.width, 44, "\(name) is \(day.frame.width) pt wide, under the 44-pt floor")
+            XCTAssertGreaterThanOrEqual(day.frame.height, 44, "\(name) is \(day.frame.height) pt tall, under the 44-pt floor")
+        }
+    }
+
     /// The whole new path, from outside the process: pick yesterday on the week card, add a serving
     /// with the `+`, and find it under yesterday.
     ///

@@ -15,6 +15,10 @@ enum LiquidGlass {
     /// The default corner radius. Continuous — the iOS squircle, not a circular arc.
     static let cornerRadius: CGFloat = 28
 
+    /// A rounded element inside a pane — the week card's tracks and bars. The canvas's 12 on a
+    /// track about 43 pt wide; a pane's own radius would round a track into a capsule.
+    nonisolated static let innerCornerRadius: CGFloat = 12
+
     /// What a pane does while a finger is on it.
     ///
     /// Adopted from Apple's *Applying Liquid Glass to custom views*, which describes
@@ -22,7 +26,9 @@ enum LiquidGlass {
     /// On iOS 26 and later an interactive pane **is** that glass
     /// (``LiquidGlass/systemVariant(density:interactive:)``). These multipliers are what the
     /// hand-made stack does instead, wherever ``LiquidGlass/rendering(base:reduceTransparency:systemGlassAvailable:)``
-    /// answers `.handMade`: below iOS 26, in the widget, and on the watch until its own stage.
+    /// answers `.handMade`: below iOS 26, in the widget, and on the watch until its own stage. The
+    /// edge and specular boosts also brighten the sheen and lit rim laid over Apple's glass (stage
+    /// 3c), so a pressed pane's rim answers on both paths.
     ///
     /// Three multipliers rather than one, because the three layers carry the press in different
     /// schemes. In **light** mode the tint does the work: frosted goes 0.45 → 0.61, clamped to the
@@ -70,10 +76,12 @@ enum LiquidGlass {
         nonisolated static let ringWidth: CGFloat = 6
     }
 
-    /// How a selected slot is marked: the tab bar's active tab and History's shown day.
+    /// How a selected slot is marked: the tab bar's active tab, the sheet's shortcuts — a fill and
+    /// a lit rim — and the week card's shown day — a ring on its track and a disc behind its letter.
     ///
-    /// A fill and a lit rim, always both and never colour alone (rule `65-accessibility`). Both
-    /// values were read off History's rendered week card before the tab bar borrowed them.
+    /// Never colour alone (rule `65-accessibility`). The fill and rim values were read off
+    /// History's rendered week card before the tab bar borrowed them; the ring and the disc are the
+    /// canvas's, since stage 3c.
     enum Selection {
 
         /// The fill behind the selected slot. Low on purpose: it sits under a small white
@@ -83,6 +91,17 @@ enum LiquidGlass {
 
         /// The lit rim around it. A non-text mark, so its floor is 3:1.
         nonisolated static let rimOpacity = 0.55
+
+        /// The ring round the week card's shown track. The canvas's own value; a non-text mark, so
+        /// its floor is 3:1 against the pane beside it (`docs/DESIGN.md`, *The look, measured*).
+        nonisolated static let ringOpacity = 0.8
+
+        /// The ring's width, the canvas's 1.5 pt.
+        nonisolated static let ringWidth: CGFloat = 1.5
+
+        /// The disc behind the shown day's letter, which is drawn in `Aurora.top` on it —
+        /// `theShownDaysLetterReadsOnItsDisc` derives that pair.
+        nonisolated static let discFill = Color.white
     }
 
     /// How far the pane floats above what it covers.
@@ -171,23 +190,6 @@ enum LiquidGlass {
     enum Density: CaseIterable {
         case sheer, frosted, opaque
 
-        /// A black scrim beneath the tint, in Dark Mode only.
-        ///
-        /// This is the layer that makes dark glass work. White alone cannot hold back a vivid
-        /// background at any opacity a dark UI can afford: too little and the colours punch
-        /// straight through as a coloured film, too much and the pane turns into a light slab
-        /// with nowhere for white text to go. The scrim attenuates first; the tint then only
-        /// has to supply sheen.
-        func scrimOpacity(for scheme: ColorScheme) -> Double {
-            guard scheme == .dark else { return 0 }
-
-            return switch self {
-            case .sheer:   0.16
-            case .frosted: 0.28
-            case .opaque:  0.40
-            }
-        }
-
         /// The white body of the glass in light mode; a thin sheen over the scrim in dark.
         func tintOpacity(for scheme: ColorScheme) -> Double {
             switch (self, scheme) {
@@ -210,8 +212,9 @@ enum LiquidGlass {
         /// The opaque fill and lit rim that replace everything under Reduce Transparency.
         case opaque
 
-        /// Apple's glass, `glassEffect(_:in:)`. The system draws the pane, its edge and its
-        /// depth; none of this file's layers is stacked on it.
+        /// Apple's glass, `glassEffect(_:in:)`. The system draws the pane and its depth; this file
+        /// stacks only the hand-made sheen and lit rim on it, under the content (since stage 3c —
+        /// the modifier's `litSurface`). No scrim, no tint ceiling, no shadows.
         case system
 
         /// The stack this file has always drawn: base, scrim, tint, specular, rim, two shadows.
@@ -280,25 +283,87 @@ enum LiquidGlass {
         }
     }
 
-    /// How much black Apple's glass is tinted with, through `Glass.tint(_:)`.
+    /// What Apple's regular glass is tinted with, through `Glass.tint(_:)`: the sky's own deep blue.
     ///
-    /// **Measured, not chosen.** Over this aurora the regular glass reads about sRGB
-    /// `(0.07, 0.50, 0.88)` where the hand-made pane read `(0.21, 0.30, 0.44)`, and every dimmed
-    /// white in the app was picked from samples of the darker one: untinted, most of them fell
-    /// to 2.3–3.9:1. The value was climbed a rung at a time, each rendered on iOS 27.0 — whose
-    /// glass is lighter than iOS 26's — and followed through a minute of the aurora's swing,
-    /// because the ground under a pane keeps moving: `0.44` failed, `0.48` left the dimmest text
-    /// exactly on its floor, and this is the first rung with room. The tables are in
-    /// `docs/DESIGN.md`, *Apple's glass, measured* — re-take them before moving the number, and
-    /// never estimate one value from another.
+    /// Not black. A black tint greys the aurora under the pane, and the canvas drew its panes navy;
+    /// stage 3c rendered both and the blue reads like the canvas (spec
+    /// `2026-10-13-the-look-design.md` §3.1). It is lighter than black at the same strength — the
+    /// weekday letters read 6.52 under black `0.52` and 4.74 under this — which is why the
+    /// opacity below rose with it.
+    nonisolated static let systemTintColor: Color = Aurora.top
+
+    /// How much of ``systemTintColor`` Apple's glass is tinted with.
+    ///
+    /// **Measured, not chosen.** Climbed a rung at a time on iOS 27.0 — whose glass is the
+    /// lightest — with the lit rim and sheen drawn over it, and followed through a minute of the
+    /// aurora's swing: `0.52` and `0.56` left the weekday letters under 4.5:1, `0.60` passed with
+    /// 0.14 to spare, and this is the first rung with room. iOS 26.5's glass is darker and passed
+    /// with more. The tables are in `docs/DESIGN.md`, *The look, measured* — re-take them before
+    /// moving the number, and never estimate one value from another.
     ///
     /// The clear variant takes none. It is the vessel: its readout has
     /// ``WaterReadabilityScrim``, and a tint would dull the water behind it.
     nonisolated static func systemTintOpacity(for variant: SystemVariant) -> Double {
         switch variant {
-        case .regular: return 0.52
+        case .regular: return 0.64
         case .clear: return 0
         }
+    }
+
+    /// Whether this binary is the phone's — the app or its widget extension — rather than the
+    /// watch's. Resolved at compile time; ``scrim(density:scheme:base:onPhone:)`` takes it as a
+    /// parameter so a test can ask the watch's question on a phone.
+    nonisolated static let runsOnPhone: Bool = {
+        #if os(iOS)
+        true
+        #else
+        false
+        #endif
+    }()
+
+    /// The dark layer under the hand-made stack's white tint, in Dark Mode only — the one place it
+    /// is decided.
+    ///
+    /// This is the layer that makes dark glass work. White alone cannot hold back a vivid
+    /// background at any opacity a dark UI can afford: too little and the colours punch straight
+    /// through as a coloured film, too much and the pane turns into a light slab with nowhere for
+    /// white text to go. The scrim attenuates first; the tint then only has to supply sheen.
+    ///
+    /// - **The phone's own panes** — a `.material` base on iOS, the hand-made path from iOS 17 to
+    ///   25 — are scrimmed with the sky's blue, as Apple's glass is tinted with it, so the panes
+    ///   read alike on every system. Darker than the black they replace: that black left the
+    ///   week card's letters at 4.38:1 and its cyan bar at 2.97:1 on iOS 18.6 (#85). Frosted was
+    ///   swept on iOS 18.6; sheer and opaque were measured in stage 3c's own pass
+    ///   (`docs/DESIGN.md`, *The look, measured*). The three stay in density order — opaque is the
+    ///   lightest measured rung above frosted, though a lighter one passed — and opaque stays under
+    ///   1, or the pane is a slab.
+    /// - **The widget's `.archived` base and the watch** keep black at today's values: the archive's
+    ///   fills were derived for it (``Base/archived``), and the watch's look is its own stage's.
+    nonisolated static func scrim(
+        density: Density,
+        scheme: ColorScheme,
+        base: Base,
+        onPhone: Bool
+    ) -> (color: Color, opacity: Double) {
+        guard scheme == .dark else { return (.black, 0) }
+
+        if onPhone, case .material = base {
+            let opacity: Double = switch density {
+            case .sheer:   0.30
+            case .frosted: 0.70
+            case .opaque:  0.80
+            }
+            // The tint's own blue, read through the nonisolated constant: `Aurora` is main-actor
+            // isolated in the app target, and this function is not.
+            return (systemTintColor, opacity)
+        }
+
+        let opacity: Double = switch density {
+        case .sheer:   0.16
+        case .frosted: 0.28
+        case .opaque:  0.40
+        }
+        return (.black, opacity)
     }
 }
 
@@ -332,15 +397,16 @@ extension EnvironmentValues {
 /// decides which, and no call site is told.
 ///
 /// - **Apple's glass**, on iOS 26 and later, for a base that can sample its backdrop. The system
-///   draws the pane, its edge and its depth. `tint`, `elevation`, the border and the highlight
-///   below describe the hand-made stack, and Apple's glass takes none of them.
+///   draws the pane and its depth; this file lays the stack's sheen and lit rim over it, under the
+///   content (``litSurface``). `tint`, `elevation` and the scrim describe the hand-made stack, and
+///   Apple's glass takes none of them.
 /// - **The opaque pane**, under Reduce Transparency, on every OS.
 /// - **The hand-made stack**, everywhere else. Its six layers, bottom to top, are what make it
 ///   read as a physical pane rather than a translucent rectangle:
 ///
 ///   1. ``LiquidGlass/Base`` — the real blur, sampling whatever is behind the view. Or, where
 ///      nothing can be sampled, the fill that measures out to the same thing.
-///   2. A black scrim, in Dark Mode only — see ``LiquidGlass/Density/scrimOpacity(for:)``.
+///   2. A scrim, in Dark Mode only — see ``LiquidGlass/scrim(density:scheme:base:onPhone:)``.
 ///   3. A white tint — the body of the glass.
 ///   4. A specular gradient — a light source above and to the left, falling off fast.
 ///   5. An inset stroke that is bright where the light hits and dim where it does not.
@@ -451,16 +517,28 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
         #endif
     }
 
-    /// What this file draws behind the content: the opaque pane, the hand-made stack, or nothing
-    /// where the system is drawing its own glass.
+    /// What this file draws behind the content: the opaque pane, the hand-made stack, or — where
+    /// the system is drawing its own glass — the stack's sheen and lit rim over it.
     @ViewBuilder
     private func ownPane(systemGlassDrawn: Bool) -> some View {
         switch rendering {
         case .opaque: opaquePane
         case .handMade: handMadePane
         case .system:
-            if !systemGlassDrawn { handMadePane }
+            if systemGlassDrawn { litSurface } else { handMadePane }
         }
+    }
+
+    /// The hand-made stack's sheen and lit rim, laid over Apple's glass and under the content.
+    ///
+    /// The canvas's panes have a bright edge, and Apple's tinted glass alone reads flat beside them
+    /// (stage 3c). The same two gradients the hand-made stack draws, with the same Increase
+    /// Contrast and press boosts — nothing else of the stack: the scrim, the tint ceiling and the
+    /// shadows stay its own.
+    private var litSurface: some View {
+        shape
+            .fill(specular)
+            .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
     }
 
     #if os(iOS)
@@ -475,7 +553,7 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
         case .clear: glass = .clear
         }
         // `nil` rather than a clear colour: no tint at all is what the vessel is meant to get.
-        let tinted = glass.tint(darkening > 0 ? Color.black.opacity(darkening) : nil)
+        let tinted = glass.tint(darkening > 0 ? LiquidGlass.systemTintColor.opacity(darkening) : nil)
         return interactive ? tinted.interactive() : tinted
     }
     #endif
@@ -493,8 +571,10 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
     }
 
     private var handMadePane: some View {
-        baseLayer
-            .overlay { shape.fill(Color.black.opacity(density.scrimOpacity(for: colorScheme))) }
+        let scrim = LiquidGlass.scrim(density: density, scheme: colorScheme, base: base, onPhone: LiquidGlass.runsOnPhone)
+
+        return baseLayer
+            .overlay { shape.fill(scrim.color.opacity(scrim.opacity)) }
             .overlay { shape.fill(tint.opacity(resolvedTintOpacity)) }
             .overlay { shape.fill(specular) }
             .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }

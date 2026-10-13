@@ -200,12 +200,89 @@ struct LiquidGlassRoutingTests {
         #expect(LiquidGlass.systemTintOpacity(for: .clear) == 0)
     }
 
-    /// A floor, and a measured one: every lighter rung was rendered and failed. At `0.44` nine
-    /// pairs were under their contrast floor; at `0.48` the dimmest text sat exactly on 4.5:1 once
-    /// the aurora had been followed through its swing, with nothing to spare. A lighter glass is
-    /// a new measurement first (`docs/DESIGN.md`, *Apple's glass, measured*), and then this number.
+    /// A floor, and a measured one: every lighter rung was rendered and failed or had no room.
+    /// With `Aurora.top` as the tint, iOS 27.0, the rim and the sheen on: at `0.52` the weekday
+    /// letters read 4.28 and at `0.56` 4.48, under 4.5; `0.60` passed with 0.14 to spare; `0.64`
+    /// is the first rung with room (stage 3c's ledger; `docs/DESIGN.md`). A lighter glass is a new
+    /// measurement first, and then this number.
     @Test func theTintIsNoLighterThanTheLightestRungThatPassed() {
-        #expect(LiquidGlass.systemTintOpacity(for: .regular) >= 0.52)
+        #expect(LiquidGlass.systemTintOpacity(for: .regular) >= 0.64)
+    }
+
+    /// The sky's own blue, not black: a black tint greys the aurora under the pane, and the canvas
+    /// drew its panes navy (spec `2026-10-13-the-look-design.md` §3.1).
+    @Test func theGlassIsTintedWithTheSkysOwnBlue() {
+        #expect(LiquidGlass.systemTintColor == Aurora.top)
+    }
+}
+
+/// The hand-made stack's scrim: who gets the sky and who keeps black (spec
+/// `2026-10-13-the-look-design.md` §3.2).
+///
+/// Not `@MainActor`, like the suites above: the answer is a value, decided without a view.
+struct LiquidGlassScrimTests {
+
+    /// Built per use: `Base` carries a `Material` and is not `Sendable` (rule `43-concurrency`).
+    private var material: LiquidGlass.Base { .material(.ultraThinMaterial) }
+
+    /// The black values every pane drew before stage 3c, and the widget and the watch still do.
+    private func before(_ density: LiquidGlass.Density) -> Double {
+        switch density {
+        case .sheer: 0.16
+        case .frosted: 0.28
+        case .opaque: 0.40
+        }
+    }
+
+    private let densities: [LiquidGlass.Density] = [.sheer, .frosted, .opaque]
+
+    /// The phone's own panes below iOS 26: blue, darker than the black they replace — which left
+    /// pairs under their floor on iOS 18.6 (#85) — never a solid slab, and still in density order.
+    /// Each value is the rung stage 3c measured on iOS 18.6 (`docs/DESIGN.md`, *The look,
+    /// measured*): sheer the lightest rung tried, which left *Cancel* with room, frosted the one
+    /// swept, opaque the lightest measured rung above frosted.
+    @Test func thePhonesOwnPanesAreScrimmedWithTheSky() {
+        for density in densities {
+            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: true)
+            #expect(scrim.color == Aurora.top)
+            #expect(scrim.opacity > before(density))
+            #expect(scrim.opacity < 1)
+        }
+        let opacity = { (density: LiquidGlass.Density) in
+            LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: true).opacity
+        }
+        #expect(opacity(.sheer) == 0.30)
+        #expect(opacity(.frosted) == 0.70)
+        #expect(opacity(.opaque) == 0.80)
+        #expect(opacity(.sheer) < opacity(.frosted))
+        #expect(opacity(.frosted) < opacity(.opaque))
+    }
+
+    /// The widget's archive cannot sample a backdrop and its fills were derived for the black scrim
+    /// (`Base.archived`); the redesign keeps its glass as it is.
+    @Test func theWidgetKeepsItsBlackScrim() {
+        for density in densities {
+            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: .archived, onPhone: true)
+            #expect(scrim.color == Color.black)
+            #expect(scrim.opacity == before(density))
+        }
+    }
+
+    /// The watch draws the hand-made stack on a `.material` base, and its look is its own stage's.
+    @Test func theWatchKeepsItsBlackScrim() {
+        for density in densities {
+            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: false)
+            #expect(scrim.color == Color.black)
+            #expect(scrim.opacity == before(density))
+        }
+    }
+
+    /// Light Mode has no scrim, on any pane — as before.
+    @Test func lightModeHasNoScrim() {
+        for density in densities {
+            #expect(LiquidGlass.scrim(density: density, scheme: .light, base: material, onPhone: true).opacity == 0)
+            #expect(LiquidGlass.scrim(density: density, scheme: .light, base: .archived, onPhone: true).opacity == 0)
+        }
     }
 }
 
@@ -213,7 +290,8 @@ struct LiquidGlassRoutingTests {
 ///
 /// Its fill is solid, so unlike anything on a `Material` its contrast can be derived
 /// (rule `65-accessibility`) — which is why this figure is a test and the glass figures are
-/// measurements in `docs/DESIGN.md`.
+/// measurements in `docs/DESIGN.md`. The **solid** pairs: the primary surface, and since stage 3c the
+/// week card's shown letter on its disc.
 struct PrimarySurfaceTests {
 
     /// sRGB's transfer function and its inverse. The shade is composited the way the screen
@@ -241,6 +319,19 @@ struct PrimarySurfaceTests {
         let foot = ink.map { linear((1 - shade) + shade * encoded($0)) }
 
         let ratio = (luminance(foot) + 0.05) / (luminance(ink) + 0.05)
+
+        #expect(ratio >= 7)
+    }
+
+    /// The week card's shown letter: `Aurora.top` on the white disc behind it. Both fills are solid,
+    /// so the pair is derived, not measured — about 13:1.
+    @Test func theShownDaysLetterReadsOnItsDisc() {
+        let inkColour = Aurora.top.resolve(in: EnvironmentValues())
+        let discColour = LiquidGlass.Selection.discFill.resolve(in: EnvironmentValues())
+        let ink = luminance([inkColour.linearRed, inkColour.linearGreen, inkColour.linearBlue].map(Double.init))
+        let disc = luminance([discColour.linearRed, discColour.linearGreen, discColour.linearBlue].map(Double.init))
+
+        let ratio = (max(ink, disc) + 0.05) / (min(ink, disc) + 0.05)
 
         #expect(ratio >= 7)
     }

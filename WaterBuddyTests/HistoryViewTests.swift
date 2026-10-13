@@ -284,4 +284,25 @@ struct HistoryLayoutTests {
     @Test func aMarkerAmongNoDaysIsNotADivisionByZero() {
         #expect(HistoryView.markerOffset(ofDay: 0, among: 0, across: 322).isFinite)
     }
+
+    /// Every day on the week card is a tap target on every iPhone: the card is 327 pt wide on a
+    /// 375-pt phone, 345 on 393, 354 on 402, 382 on 430 (two margins of 24 off the screen).
+    @Test(arguments: [327, 345, 354, 382] as [CGFloat])
+    func everyDayClearsTheTapFloor(across width: CGFloat) {
+        #expect(HistoryView.daySlot(across: width, count: 7) >= 44)
+    }
+
+    /// The full 16 pt inset — the outer tracks 20 pt from the card's edge, as the canvas's padding
+    /// puts them — where the card affords it; on the narrowest phone the inset gives way — to 9.5,
+    /// which leaves each day exactly 44 — and never the days.
+    @Test func theRowTakesTheCanvasInsetWhereTheCardAffordsIt() {
+        #expect(HistoryView.dayRowInset(across: 354, count: 7) == 16)
+        #expect(HistoryView.dayRowInset(across: 327, count: 7) == 9.5)
+        #expect(HistoryView.dayRowInset(across: 300, count: 7) == 0)
+    }
+
+    /// A row of no days is never drawn, and must not be a division by zero if it is asked.
+    @Test func aRowOfNoDaysIsNotADivisionByZero() {
+        #expect(HistoryView.daySlot(across: 322, count: 0).isFinite)
+    }
 }

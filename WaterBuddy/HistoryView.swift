@@ -154,14 +154,36 @@ struct HistoryView: View {
     }
 
     /// The screen's side margin — the one every tab shares (``ScreenMetrics``). The week card's
-    /// seven day buttons are budgeted against it: `(375 − 2 × 24) / 7 = 46.7` pt on the narrowest
-    /// supported iPhone, over the 44-pt floor (`sevenDaysClearTheTapFloorOnTheNarrowestPhone`).
+    /// seven day buttons are budgeted inside it and the row's own inset
+    /// (``dayRowInset(across:count:)``): exactly 44 pt each on the narrowest supported iPhone
+    /// (`sevenDaysClearTheTapFloorOnTheNarrowestPhone`).
     nonisolated static let margin = ScreenMetrics.margin
 
     /// Where the shown day's marker stands in a row `width` wide that `count` days share
     /// evenly: at the leading edge of the slot of the day at `index`.
     nonisolated static func markerOffset(ofDay index: Int, among count: Int, across width: CGFloat) -> CGFloat {
         CGFloat(index) * width / CGFloat(max(count, 1))
+    }
+
+    /// The tap floor a day on the week card may never fall under (rule `65-accessibility`).
+    nonisolated static let dayTapFloor: CGFloat = 44
+
+    /// How far the week card's row of days stands in from the card: 16 pt — which, with each bar's
+    /// own 4, puts the outer tracks 20 pt from the card's edge, where the canvas's padding puts
+    /// them — or as much of it as the width affords. The inset gives way, never the days.
+    ///
+    /// On a 375-pt iPhone the card is 327 pt wide; the canvas's full 16 left each day 42.1 pt, under
+    /// the floor (stage 3c's final review), so there the row stands 9.5 pt in and each day is
+    /// exactly 44. From a 390-pt phone up the full 16 fits.
+    nonisolated static func dayRowInset(across width: CGFloat, count: Int) -> CGFloat {
+        let spare = (width - CGFloat(max(count, 1)) * dayTapFloor) / 2
+        return min(16, max(0, spare))
+    }
+
+    /// One day's slot on the week card: the card's width, less ``dayRowInset(across:count:)`` on
+    /// each side, shared evenly.
+    nonisolated static func daySlot(across width: CGFloat, count: Int) -> CGFloat {
+        (width - 2 * dayRowInset(across: width, count: count)) / CGFloat(max(count, 1))
     }
 
     @Environment(DataManager.self) private var manager
@@ -502,10 +524,13 @@ struct HistoryView: View {
                     .font(.callout.weight(.semibold))
 
                 // Points at the `+`, because on a past day there is no vessel to pick: Home pours
-                // into today. Read off one render of each system, not a sweep of the aurora: on
-                // Apple's glass the title is 13.3:1 and this line 7.4:1 on iOS 26.5, 12.4:1 and
-                // 6.8:1 on iOS 27.0. On the hand-made pane, read on iOS 18.6, they are 5.4:1 and
-                // **3.8:1, under the 4.5:1 floor** — the lighter pane of known issue #85.
+                // into today. Read off one render of each system before stage 3c, not a sweep of
+                // the aurora: on Apple's glass the title was 13.3:1 and this line 7.4:1 on iOS
+                // 26.5, 12.4:1 and 6.8:1 on iOS 27.0; on the hand-made pane, iOS 18.6, 5.4:1 and
+                // **3.8:1, under the 4.5:1 floor** (#85). **Not re-measured on stage 3c's panes.**
+                // Today's empty state, the same card and the same white 0.7, read 5.25 (iOS 27.0),
+                // 6.86 (26.5) and 5.43 (18.6) at rest on them (`docs/DESIGN.md`, *The look,
+                // measured*).
                 Text("Tap + to add a serving you forgot.", bundle: strings)
                     .font(.footnote)
                     .foregroundStyle(.white.opacity(0.7))
@@ -564,11 +589,14 @@ private extension View {
 /// in words. Every bar shared one fill until the redesign, on the argument that a second hue was
 /// a second unmeasured contrast figure; both are measured now (`docs/DESIGN.md`).
 ///
-/// **Each day is a button, and the day row alone runs the card's full width.** Seven equal slots of
-/// `(375 − 2 × 24) / 7 = 46.7` pt on the narrowest supported iPhone clear the 44-pt floor rule
-/// `65-accessibility` sets; inside the card's 20-pt inset they would be 41.0 pt and miss it. That is
+/// **Each day is a button, and the day row takes no more inset than its days can spare.** The
+/// canvas pads the card 20 pt, so its outer tracks stand 20 pt from the edge; here the row stands
+/// 16 pt in and each bar 4 more. Seven slots must still clear the 44-pt floor
+/// rule `65-accessibility` sets, and on the narrowest supported iPhone (a 327-pt card) the full 16
+/// left them at 42.1 pt. So the inset is ``HistoryView/dayRowInset(across:count:)`` — 16 where it
+/// fits, 9.5 on a 375-pt phone, where each day is exactly 44 — laid out by ``DayRow``. That is
 /// the width ``DataManager/historyWindow``'s DocC budgeted, and why the title, the figures and the
-/// disclosure keep their inset while the bars sit ``barInset`` in from their own slots instead.
+/// disclosure keep their own 20-pt inset while the bars sit ``barInset`` in from their own slots.
 ///
 /// **VoiceOver hears a summary and seven days**, no longer one element: the title carries the
 /// average, the best and the days met as its value, each day is exactly one button marked selected
@@ -604,9 +632,9 @@ private struct HistoryCard: View {
 
     private var barHeight: CGFloat { min(scaledBarHeight, 118) }
 
-    /// How far each bar sits in from the sides of its day's slot: 16 pt between neighbouring bars,
-    /// and 8 pt from the card's edge for the outermost two.
-    private let barInset: CGFloat = 8
+    /// How far each bar sits in from the sides of its day's slot: 8 pt between neighbouring tracks,
+    /// the canvas's gap.
+    private let barInset: CGFloat = 4
 
     /// The slot's own top and bottom padding, which the goal line has to step over to meet the bars.
     private let slotPadding: CGFloat = 8
@@ -634,13 +662,11 @@ private struct HistoryCard: View {
             // read aloud as well, where the card's old single element used to swallow it.
             Text("Measured against your current goal", bundle: strings)
                 .font(.caption2)
-                // 0.70, not the 0.55 this was drafted at. **Measured, not derived**: the pane is a
-                // `Material` over a moving aurora, so its composite cannot be computed from a
-                // token — it was sampled off a render at sRGB (0.214, 0.283, 0.398) at the card's
-                // foot, where the backdrop is lightest. White at 0.55 measured **4.06:1** against
-                // a 4.5:1 small-text floor, a real rule `65-accessibility` failure that looked
-                // perfectly legible. 0.70 measures 5.49:1. Figures in `docs/DESIGN.md`.
-                .foregroundStyle(.white.opacity(0.70))
+                // 0.88, the canvas's own value (stage 3c). It was 0.70, and 0.55 before that: on the
+                // hand-made pane white 0.55 read 4.06:1. **Measured, not derived** — the pane is a
+                // material over a moving aurora, so its composite cannot be computed from a token.
+                // Measured on stage 3c's panes in `docs/DESIGN.md`, *The look, measured*.
+                .foregroundStyle(.white.opacity(0.88))
                 // No line limit, and `fixedSize` so it claims the height it needs: a `Text` gives
                 // up lines before it pushes back. The card was once squeezed between a fixed
                 // header and the list of servings, and with `.lineLimit(2)` this read "Measured
@@ -684,7 +710,8 @@ private struct HistoryCard: View {
     // MARK: Days
 
     private var days: some View {
-        HStack(spacing: 0) {
+        // The row's inset is decided from its own width, so it is a layout and not a padding.
+        DayRow {
             ForEach(manager.history, id: \.dayOrdinal) { day in
                 dayButton(for: day)
             }
@@ -694,8 +721,9 @@ private struct HistoryCard: View {
         // whose frame could give way shrank under its content, and at `AccessibilityXXXL` the bars
         // rose through the title while the weekday letters sank into the figures.
         .fixedSize(horizontal: false, vertical: true)
-        .background { marker }
+        .backgroundPreferenceValue(LetterCentres.self) { centres in disc(over: centres) }
         .overlay(alignment: .top) { goalLine }
+        .overlay { ring }
         // Once per change, not perpetual, so it is deliberately **not** gated on Reduce Motion —
         // that setting is aimed at sustained motion, and the resting frame here is the design
         // (rule `65-accessibility`).
@@ -724,20 +752,21 @@ private struct HistoryCard: View {
                     // capped and a text style is not, so the two cross over at the accessibility
                     // sizes and the label overtakes the figure — this codebase has shipped that
                     // inversion once already (rule `65-accessibility`).
-                    .font(.system(size: barHeight * 0.14, weight: isShown ? .bold : .medium))
-                    // 0.72 measures 5.70:1 on the sampled pane, and 5.43:1 re-measured off a render
-                    // of the full-width day row (2026-10-07, pane sRGB (0.208, 0.296, 0.444)). 0.60
-                    // lands on **exactly** 4.50:1 — the floor itself, with no margin for the aurora
-                    // drifting a shade lighter under it, which it does continuously. The shown day's
-                    // is full white, and measures 7.4:1 inside its rim.
-                    .foregroundStyle(.white.opacity(isShown ? 1 : 0.72))
+                    .font(.system(size: barHeight * 0.14, weight: isShown ? .heavy : .semibold))
+                    // Full white, as the canvas drew them; the shown day's in `Aurora.top` on its
+                    // white disc (``disc(over:)``), heavier than the rest — never colour alone
+                    // (rule `65-accessibility`). Measured on stage 3c's panes in `docs/DESIGN.md`,
+                    // *The look, measured*; the shown pair is derived by
+                    // `theShownDaysLetterReadsOnItsDisc`.
+                    .foregroundStyle(isShown ? Aurora.top : Color.white)
                     .lineLimit(1)
+                    .anchorPreference(key: LetterCentres.self, value: .center) { [day.dayOrdinal: $0] }
             }
             .padding(.vertical, slotPadding)
             // The whole slot is the target, never just the bar (rule `65-accessibility`).
             .frame(maxWidth: .infinity, minHeight: 44)
-            // The shown day's lit rim is not drawn here: it is one capsule behind the whole row,
-            // moved from day to day (``marker``).
+            // The shown day's ring and disc are not drawn here: each is one mark for the whole row,
+            // moved from day to day (``ring``, ``disc(over:)``).
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -749,9 +778,13 @@ private struct HistoryCard: View {
     private func bar(for day: DaySummary) -> some View {
         let fraction = min(Double(day.total) / Double(scale), 1)
 
+        let shape = RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous)
+
         return ZStack(alignment: .bottom) {
-            Capsule()
-                .fill(.white.opacity(0.12))
+            // The canvas's track: the day's whole height, faint, so a short bar reads as a short
+            // day and not as a short slot.
+            shape
+                .fill(.white.opacity(0.10))
 
             // Cyan for a day that reached the goal, white for one that did not — one fill whose
             // colour changes, so a day that crosses the goal animates a colour and not a layer
@@ -765,12 +798,13 @@ private struct HistoryCard: View {
             // *rendered* bar gave a reassuring 3.33:1, but that is the average of the whole
             // gradient, not its endpoint: the figure was real and measured the wrong thing.
             //
-            // Both fills, against the pane beside the bar, at the worst frame of a minute of the
-            // aurora: on Apple's glass cyan reads 6.87:1 on iOS 26.5 and 4.91:1 on iOS 27.0, and
-            // white 12.12:1 and 8.67:1. On the hand-made pane, read on iOS 18.6, white is 4.91:1
-            // and **cyan 2.78:1, under the floor**: that pane is lighter than Apple's, which is
-            // known issue #85 and not a bar's to settle (`docs/DESIGN.md`).
-            Capsule()
+            // Against the ground beside the bar — the gap between tracks and the track above it —
+            // at the worst frame of a minute of the aurora, on stage 3c's panes: cyan reads 3.44:1
+            // on iOS 27.0, 4.57:1 on iOS 26.5 and 3.38:1 on iOS 18.6, over the 3:1 floor; today's
+            // white bar against its track 7.00:1 on iOS 27.0 (`docs/DESIGN.md`, *The look,
+            // measured*). On iOS 18.6 cyan read 2.78:1 before stage 3c darkened the hand-made pane
+            // (#85).
+            shape
                 .fill(day.reached(manager.dailyGoal) ? Aurora.cyan : Color.white)
                 // A day with nothing logged still draws a sliver, so the bar reads as an empty day
                 // rather than as a missing one. The series is zero-filled for the same reason.
@@ -778,30 +812,55 @@ private struct HistoryCard: View {
         }
     }
 
-    /// The shown day's lit capsule: one, behind the row of days, moved to the day that is shown.
+    /// The shown day's ring: one, round its track, moved to the day that is shown.
     ///
-    /// Every day had its own until the app was asked for more life: seven capsules at zero
-    /// opacity, one of them lit, and a change of day was two colours cross-fading. One that
-    /// travels says where the selection went. It is always there — never inserted or removed —
-    /// so what animates is a place and not a layer (rule `50-views`), and it lands
-    /// (``Motion/land``): past the day and back, once.
-    ///
-    /// The same two tokens, so "selected" is still drawn one way in the app. A rim and a weight
-    /// change, never colour alone (rule `65-accessibility`): the day's letter carries the
-    /// weight. Measured off a render, the 0.55 stroke reads 4.15:1 against the pane beside it,
-    /// sRGB (0.188, 0.277, 0.390) — over the 3:1 floor for a non-text mark.
-    private var marker: some View {
+    /// The canvas's selection, with stage 3b's travel kept: it is always there — at zero opacity
+    /// when no day in the window is shown — so what animates is a place and not a layer
+    /// (rule `50-views`), and it lands (``Motion/land``). Drawn over the row, so it lies on the
+    /// track rather than under it. A ring, a disc and a weight, never colour alone
+    /// (rule `65-accessibility`).
+    private var ring: some View {
         GeometryReader { proxy in
             let count = manager.history.count
             let index = manager.history.firstIndex { $0.dayOrdinal == shown }
+            // The same inset and slots ``DayRow`` lays the days out in.
+            let inset = HistoryView.dayRowInset(across: proxy.size.width, count: count)
+            let slot = HistoryView.daySlot(across: proxy.size.width, count: count)
 
-            Capsule()
-                .fill(.white.opacity(index == nil ? 0 : LiquidGlass.Selection.fillOpacity))
-                .strokeBorder(.white.opacity(index == nil ? 0 : LiquidGlass.Selection.rimOpacity), lineWidth: 1)
-                .padding(.horizontal, 3)
-                .frame(width: proxy.size.width / CGFloat(max(count, 1)))
-                .offset(x: HistoryView.markerOffset(ofDay: index ?? 0, among: count, across: proxy.size.width))
+            RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous)
+                .strokeBorder(
+                    .white.opacity(index == nil ? 0 : LiquidGlass.Selection.ringOpacity),
+                    lineWidth: LiquidGlass.Selection.ringWidth
+                )
+                .frame(width: max(slot - barInset * 2, 0), height: barHeight)
+                .offset(
+                    x: inset + HistoryView.markerOffset(ofDay: index ?? 0, among: count, across: proxy.size.width - 2 * inset) + barInset,
+                    y: slotPadding
+                )
                 .animation(Motion.land, value: index)
+        }
+        .allowsHitTesting(false)
+    }
+
+    /// The white disc behind the shown day's letter, placed on the letter itself.
+    ///
+    /// Centred from the letter's own anchor rather than computed from the slot: a line of text has
+    /// no height the layout states, and a disc a point off its letter reads as a mistake. Twice
+    /// the letter's size, as the canvas's 26 pt disc is to its 13 pt letter, so the two scale
+    /// together with the capped bar at every text size. Present at zero opacity when no day in
+    /// the window is shown; travels with ``Motion/land``.
+    private func disc(over centres: [Int: Anchor<CGPoint>]) -> some View {
+        GeometryReader { proxy in
+            let shownCentre = shown.flatMap { centres[$0] }
+            let restingCentre = manager.history.first.flatMap { centres[$0.dayOrdinal] }
+            let centre = (shownCentre ?? restingCentre).map { proxy[$0] } ?? .zero
+            let size = barHeight * 0.28
+
+            Circle()
+                .fill(LiquidGlass.Selection.discFill.opacity(shownCentre == nil ? 0 : 1))
+                .frame(width: size, height: size)
+                .position(centre)
+                .animation(Motion.land, value: shown)
         }
         .allowsHitTesting(false)
     }
@@ -809,16 +868,19 @@ private struct HistoryCard: View {
     /// One line across all seven bars at the goal's height. Drawn over the buttons and outside the
     /// hit test, so a tap on the line still lands on the day beneath it.
     private var goalLine: some View {
-        Rectangle()
-            // 0.55, not the 0.45 it was drawn at. A rule one point high has a 3:1 floor, and at
-            // 0.45 it crossed under it on Apple's glass each time the aurora's blue light swung
-            // to cyan behind the card — 2.85:1, for half of every cycle (`docs/DESIGN.md`,
-            // *Apple's glass, measured*).
-            .fill(.white.opacity(0.55))
-            .frame(height: 1)
-            .padding(.horizontal, barInset)
-            .offset(y: slotPadding + barHeight * (1 - min(Double(manager.dailyGoal) / Double(scale), 1)))
-            .allowsHitTesting(false)
+        GeometryReader { proxy in
+            GoalLine()
+                // The canvas's dashed rule, 1.5 pt at white 0.62. A rule has a 3:1 floor: 3.67:1 at
+                // its worst frame on iOS 27.0 at the tint, 3.71:1 on iOS 18.6's pane
+                // (`docs/DESIGN.md`, *The look, measured*). The canvas says only "dashed"; 4.5 on 3
+                // is ours.
+                .stroke(.white.opacity(0.62), style: StrokeStyle(lineWidth: 1.5, dash: [4.5, 3]))
+                .frame(height: 1.5)
+                // From the first track's edge to the last's: the row's inset and the bars' own.
+                .padding(.horizontal, HistoryView.dayRowInset(across: proxy.size.width, count: manager.history.count) + barInset)
+                .offset(y: slotPadding + barHeight * (1 - min(Double(manager.dailyGoal) / Double(scale), 1)))
+        }
+        .allowsHitTesting(false)
     }
 
     /// What VoiceOver calls a day: "Today", or its weekday in full. Seven consecutive days hold
@@ -912,6 +974,55 @@ private struct HistoryCard: View {
         Text(key, bundle: strings)
             .font(.footnote.weight(.medium))
             .foregroundStyle(.white.opacity(0.9))
+    }
+}
+
+/// The week card's seven days: equal slots across the card, inside
+/// ``HistoryView/dayRowInset(across:count:)``.
+///
+/// A layout rather than a padding because the inset is decided from the row's own width — the
+/// full 16 pt where the card affords it, less where seven 44-pt days would not fit — and a
+/// layout is handed that width without a measuring pass.
+private struct DayRow: Layout {
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.replacingUnspecifiedDimensions().width
+        let slot = HistoryView.daySlot(across: width, count: subviews.count)
+        let height = subviews.map { $0.sizeThatFits(ProposedViewSize(width: slot, height: nil)).height }.max() ?? 0
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let inset = HistoryView.dayRowInset(across: bounds.width, count: subviews.count)
+        let slot = HistoryView.daySlot(across: bounds.width, count: subviews.count)
+        for (index, subview) in subviews.enumerated() {
+            subview.place(
+                at: CGPoint(x: bounds.minX + inset + CGFloat(index) * slot, y: bounds.minY),
+                anchor: .topLeading,
+                proposal: ProposedViewSize(width: slot, height: bounds.height)
+            )
+        }
+    }
+}
+
+/// A horizontal rule through the middle of its frame, for the week card's dashed goal line.
+private struct GoalLine: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        }
+    }
+}
+
+/// Where each day's letter stands in the week card, keyed by its day ordinal — so the shown day's
+/// disc is centred on the letter it sits behind, wherever the layout put it.
+private struct LetterCentres: PreferenceKey {
+
+    static let defaultValue: [Int: Anchor<CGPoint>] = [:]
+
+    static func reduce(value: inout [Int: Anchor<CGPoint>], nextValue: () -> [Int: Anchor<CGPoint>]) {
+        value.merge(nextValue()) { _, later in later }
     }
 }
 
@@ -1130,13 +1241,15 @@ private struct ServingRow: View {
                 Image(systemName: vessel?.symbol ?? "drop.fill")
                     // A ratio of the disc it sits in, never its own text style.
                     .font(.system(size: disc * 0.44, weight: .semibold))
-                    .foregroundStyle(Aurora.cyan)
+                    // White on the canvas's cyan wash. The canvas's glyph was cyan, and a cyan
+                    // glyph on a cyan wash read 2.46–2.79:1 against the 3:1 floor for a non-text
+                    // mark at every wash tried — the wash lightens its own ground, and the sheen
+                    // lands on the row's top left, where the glyph sits. White on the 0.16 wash
+                    // read 4.42–5.30 swept (`docs/DESIGN.md`, *The look, measured*). The canvas's
+                    // wash is not an `Aurora` colour; `Aurora.cyan` stands in.
+                    .foregroundStyle(.white)
                     .frame(width: disc, height: disc)
-                    // A dark well, not the cyan wash the canvas drew. A wash lightens the ground
-                    // under a glyph of its own colour: on the hand-made pane the glyph read
-                    // **2.0:1** against the 3:1 floor for a non-text mark. Darkened instead, the
-                    // same glyph is measured in `docs/DESIGN.md`.
-                    .background(Circle().fill(.black.opacity(0.4)))
+                    .background(Circle().fill(Aurora.cyan.opacity(0.16)))
                     .accessibilityHidden(true)
 
                 if stacked {

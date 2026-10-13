@@ -939,15 +939,22 @@ private struct WaterVessel: View {
     @Environment(\.locale) private var locale
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
         ZStack {
             water
             readabilityScrim
+            // Above the scrim, under the readout, so the readout keeps both (rule
+            // `60-design-system`, *Water*). Glass decoration: gone under Reduce Transparency.
+            if !reduceTransparency { highlight }
             readout
         }
         .frame(width: diameter, height: diameter)
         .liquidGlass(in: Circle(), density: .sheer, elevation: .floating)
+        .background {
+            if !reduceTransparency { depth }
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Today's hydration", bundle: strings))
         .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d percent. %2$d of %3$d millilitres.", value: nil, table: nil), percentage, volume, goal))
@@ -1034,6 +1041,65 @@ private struct WaterVessel: View {
         .shadow(color: .black.opacity(0.3), radius: 10, y: 2)
         .shadow(color: .black.opacity(0.45), radius: 2)
         .animation(.smooth(duration: 0.5), value: percentage)
+    }
+
+    // MARK: Depth
+
+    /// The canvas's vessel, a 300 pt board (`Main.dc.html`), turned into ratios of the diameter: a
+    /// glow beneath it — `rgba(0,200,255,.36)`, not an `Aurora` colour, so `Aurora.cyan` stands in —
+    /// 36 pt in from each side, 64 pt tall, 30 pt below the foot, blurred 10; a halo, a 10 pt ring of
+    /// white at 0.05 just outside the rim; and a highlight, 128 × 62 pt at (30, 20), turned −28°.
+    private enum Depth {
+        static let glowWidth = 0.76
+        static let glowHeight = 0.21
+        static let glowOpacity = 0.36
+        static let glowBlur = 0.033
+        static let haloWidth = 0.033
+        static let haloOpacity = 0.05
+        static let highlightSize = CGSize(width: 0.427, height: 0.207)
+        static let highlightOrigin = CGPoint(x: 0.10, y: 0.067)
+        static let highlightAngle = -28.0
+        static let highlightOpacity = 0.4
+    }
+
+    /// The glow beneath and the halo, behind the glass.
+    private var depth: some View {
+        ZStack {
+            Ellipse()
+                .fill(RadialGradient(
+                    colors: [Aurora.cyan.opacity(Depth.glowOpacity), Aurora.cyan.opacity(0)],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: diameter * Depth.glowWidth / 2
+                ))
+                .frame(width: diameter * Depth.glowWidth, height: diameter * Depth.glowHeight)
+                .blur(radius: diameter * Depth.glowBlur)
+                // The canvas's glow is centred just above the vessel's foot.
+                .offset(y: diameter * 0.5)
+
+            Circle()
+                .strokeBorder(.white.opacity(Depth.haloOpacity), lineWidth: diameter * Depth.haloWidth)
+                .frame(width: diameter * (1 + 2 * Depth.haloWidth), height: diameter * (1 + 2 * Depth.haloWidth))
+        }
+        .allowsHitTesting(false)
+    }
+
+    /// The light on the glass, top left.
+    private var highlight: some View {
+        Ellipse()
+            .fill(RadialGradient(
+                colors: [.white.opacity(Depth.highlightOpacity), .white.opacity(0)],
+                center: UnitPoint(x: 0.4, y: 0.4),
+                startRadius: 0,
+                endRadius: diameter * Depth.highlightSize.width * 0.35
+            ))
+            .frame(width: diameter * Depth.highlightSize.width, height: diameter * Depth.highlightSize.height)
+            .rotationEffect(.degrees(Depth.highlightAngle))
+            .position(
+                x: diameter * (Depth.highlightOrigin.x + Depth.highlightSize.width / 2),
+                y: diameter * (Depth.highlightOrigin.y + Depth.highlightSize.height / 2)
+            )
+            .allowsHitTesting(false)
     }
 }
 

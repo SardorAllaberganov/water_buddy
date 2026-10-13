@@ -15,9 +15,9 @@ import SwiftUI
 /// *Today* stood 4 pt further left and 1.3 pt lower on Home than on History.
 nonisolated enum ScreenMetrics {
 
-    /// The side margin. History's week card budgets its day buttons against it:
-    /// `(375 − 2 × 24) / 7 = 46.7` pt on the narrowest supported iPhone, over the 44 pt floor
-    /// (`sevenDaysClearTheTapFloorOnTheNarrowestPhone`).
+    /// The side margin. History's week card budgets its day buttons inside it and the row's own
+    /// inset (`HistoryView.daySlot(across:count:)`): exactly 44 pt each on the narrowest supported
+    /// iPhone, on the floor (`sevenDaysClearTheTapFloorOnTheNarrowestPhone`).
     static let margin: CGFloat = 24
 
     /// From the top of the safe area to the top of the title's line.
@@ -29,7 +29,9 @@ nonisolated enum ScreenMetrics {
     /// them stood the title at three heights.
     static let titleLine: CGFloat = 44
 
-    /// The width of one of `count` equal slots across a screen `width` wide, inside the margin.
+    /// The width of one of `count` equal slots across a screen `width` wide, inside the margin. Not
+    /// the week card's day slot, which also stands in by the row's inset
+    /// (`HistoryView.daySlot(across:count:)`).
     static func slot(of count: Int, across width: CGFloat) -> CGFloat {
         (width - 2 * margin) / CGFloat(max(count, 1))
     }
