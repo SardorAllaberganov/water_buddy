@@ -1175,6 +1175,46 @@ final class GoalSetupUITests: XCTestCase {
         )
     }
 
+    /// Settings says which vessel the one-tap doors log, by name.
+    ///
+    /// The note used to say "the middle vessel" and named the widget alone; Siri's phrase and the
+    /// Control Center control log the same vessel (spec 2026-10-09 §7). The note is drawn text,
+    /// not a control, so it is found as a static text.
+    @MainActor
+    func testSettingsSaysWhichVesselTheOneTapDoorsLog() throws {
+        let app = launchedOnHome()
+        app.buttons["Settings"].tap()
+
+        XCTAssertTrue(
+            app.staticTexts["The Glass is the one your widget, Siri and Control Center log."].waitForExistence(timeout: 5),
+            "Settings does not say which vessel the widget, Siri and Control Center log"
+        )
+        XCTAssertFalse(
+            app.staticTexts["The middle vessel is the one your widget logs."].exists,
+            "Settings still draws the old note"
+        )
+    }
+
+    /// Every control on Settings is one element, by the label VoiceOver speaks.
+    ///
+    /// Stage 4 restyles every card and wraps nothing new, so this is a guard rather than a test
+    /// the change turns green: a label moved onto a wrapper instead of the control doubles a stop
+    /// (rule `65-accessibility`, *Proving it*).
+    @MainActor
+    func testEverySettingsControlIsOneElement() throws {
+        let app = launchedOnHome()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5), "Settings did not appear")
+
+        for name in ["Daily water goal", "Cup", "Glass", "Bottle"] {
+            XCTAssertEqual(app.sliders.matching(identifier: name).count, 1, "\(name) is not one slider")
+        }
+        XCTAssertEqual(app.switches.matching(identifier: "Smart reminders").count, 1, "the reminders switch is not one element")
+        for name in ["Follow device", "English", "Русский", "O‘zbekcha"] {
+            XCTAssertEqual(app.buttons.matching(identifier: name).count, 1, "the \(name) row is not one button")
+        }
+    }
+
     /// Guards the extraction of `AuroraBackground` and `PressStyle` out of `HomeView.swift`:
     /// the vessel is a single accessibility element, and it is the thing that would go missing
     /// if the view tree came apart.

@@ -1341,6 +1341,29 @@
         }
       }
     },
+    "The Glass is the one your widget, Siri and Control Center log.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Glass is the one your widget, Siri and Control Center log."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Виджет, Siri и Пункт управления записывают Стакан."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vidjet, Siri va Boshqaruv markazi Stakanni qayd etadi."
+          }
+        }
+      }
+    },
     "The app switches straight away. The widget follows on its next refresh.": {
       "extractionState": "manual",
       "localizations": {
@@ -1360,29 +1383,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ilova darhol almashadi. Vidjet keyingi yangilanishda o‘zgaradi."
-          }
-        }
-      }
-    },
-    "The middle vessel is the one your widget logs.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The middle vessel is the one your widget logs."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Средняя порция — та, что записывает виджет."
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O‘rtadagi idish — vidjet yozadigan porsiya."
           }
         }
       }

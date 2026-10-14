@@ -10,7 +10,8 @@ import SwiftUI
 import UIKit
 import UserNotifications
 
-/// The app's settings: the daily goal, and the reminders switch.
+/// The app's settings: the daily goal, the three quick-add vessels, the reminders switch and the
+/// language.
 ///
 /// It was built as a *Settings* screen with a section rather than a *Reminders* screen precisely so
 /// the goal editor could drop in beside the reminders card without a second surface. ``GoalCard``
@@ -55,12 +56,16 @@ struct SettingsView: View {
         // still while the pages slide over it.
         GeometryReader { proxy in
             ScrollView {
-                VStack(spacing: 22) {
+                VStack(spacing: SettingsStyle.cardGap) {
                     // Were Settings the page the app opens on, the cards would settle in under
                     // the header; a page that slides in is whole as it comes (``Arrival``).
                     // Each section recedes as it scrolls past the top or the foot of the screen
                     // (``ScrollDepth``), the header with the rest.
-                    header.scrollDepth()
+                    header
+                        // The canvas stands the first card 20 pt under the title and the cards 16
+                        // apart; the stack's own spacing is the 16.
+                        .padding(.bottom, SettingsStyle.headerGap - SettingsStyle.cardGap)
+                        .scrollDepth()
                     // The goal leads: it is the number the whole product is measured against,
                     // and reminders are a preference about it.
                     GoalCard(currentGoal: manager.dailyGoal).arrives(arrived, order: 0).scrollDepth()
@@ -76,7 +81,9 @@ struct SettingsView: View {
                 .animation(Motion.settle, value: explanation)
                 // Every tab's margin and inset (``ScreenMetrics``).
                 .padding(.horizontal, ScreenMetrics.margin)
-                .padding(.top, ScreenMetrics.topInset)
+                // Every tab's inset, less the point the reader stands off the safe area (below):
+                // the title stands where Home's and History's do (`testTheTitleHoldsItsPlaceOnEveryTab`).
+                .padding(.top, ScreenMetrics.topInset - 1)
                 // The language card is the tallest on this screen and sits last, so without this
                 // its footnote rests under the floating tab bar at the un-scrolled position. The
                 // bar's height is reserved for scrolling, not for the resting layout, by
@@ -88,6 +95,17 @@ struct SettingsView: View {
             .scrollBounceBehavior(.basedOnSize)
             .scrollDepthContainer()
         }
+        // One point clear of the status bar, and it is not spacing — History's remedy, for
+        // History's reason. A scroll view whose top edge meets the safe area's draws its content
+        // on up under the status bar, and a card scrolled to the top ran under the clock (known
+        // issue #108). On the reader rather than inside it, so the height it hands the column
+        // is the height that is left, and the screen does not gain a point of scroll.
+        .padding(.top, 1)
+        // A tab that draws model data re-reads it when it is shown (rule `50-views`): the goal,
+        // the vessels, the language and the reminders flag can each have been written since this
+        // screen was last built. The goal and vessel cards copy their values once, as they are
+        // built, and take a re-read value from there (`GoalCard`, `ServingsCard`).
+        .onAppear { manager.refresh() }
         // No `.preferredColorScheme` and no `.presentationDragIndicator` here any more: this is a
         // tab, not a sheet. There is nothing to drag down, and the dark-appearance preference is
         // declared once on `RootTabView`, which owns the hosting controller all three tabs share —
@@ -125,37 +143,33 @@ struct SettingsView: View {
     // MARK: - Reminders
 
     private var remindersCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             toggleRow
 
             Text(explanation)
-                .font(.footnote)
-                .foregroundStyle(.white.opacity(0.75))
-                .fixedSize(horizontal: false, vertical: true)
+                .cardNote()
 
             if isBlocked {
                 openSettingsRow
                     .transition(.opacity)
             }
         }
-        .padding(.vertical, 22)
-        .padding(.horizontal, 22)
-        .frame(maxWidth: .infinity, alignment: .leading)
         // `.frosted`, not `.sheer`: this pane carries sentence-length text, and the density scale
         // exists because tint and blur compete (rule `60-design-system`).
-        .liquidGlass(density: .frosted, elevation: .raised)
+        .settingsCard()
     }
 
     private var toggleRow: some View {
         Toggle(isOn: remindersBinding) {
             Text("Smart reminders", bundle: strings)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.white)
+                .cardTitle()
                 .lineLimit(2)
                 .minimumScaleFactor(0.7)
         }
         .toggleStyle(SwitchToggleStyle(tint: Aurora.cyan))
-        .frame(minHeight: 56)
+        // The floor and no more: the canvas sets the title and the switch on one line, with its
+        // sentence close under them, and a taller row only stood the sentence further off.
+        .frame(minHeight: 44)
         // The label and hint go on the `Toggle` **itself**. An
         // `.accessibilityElement(children: .ignore)` wrapper around a control adds a second element
         // above one VoiceOver surfaces anyway, and the row gets announced twice — the bug recorded
@@ -272,34 +286,32 @@ private struct LanguageCard: View {
     @State private var switches = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("Language", bundle: strings)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.white)
+                .cardTitle()
                 .lineLimit(2)
                 .minimumScaleFactor(0.7)
+                .padding(.bottom, 6)
 
             VStack(spacing: 0) {
                 ForEach(AppLanguage.allCases) { language in
                     row(language)
 
                     if language != AppLanguage.allCases.last {
-                        Divider().overlay(Color.white.opacity(0.12))
+                        Hairline()
                     }
                 }
             }
 
             Text("The app switches straight away. The widget follows on its next refresh.", bundle: strings)
-                .font(.footnote)
-                .foregroundStyle(.white.opacity(0.75))
-                .fixedSize(horizontal: false, vertical: true)
+                .cardNote()
+                .padding(.top, 10)
         }
-        .padding(.vertical, 22)
-        .padding(.horizontal, 22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        // `.frosted` and `.raised`, matching both siblings on this screen.
-        .liquidGlass(density: .frosted, elevation: .raised)
-        .sensoryFeedback(Haptics.confirm, trigger: switches)
+        // `.frosted` and `.raised`, matching every sibling on this screen.
+        .settingsCard()
+        // A choice among four peers, so the selection tick rather than `confirm`'s impact —
+        // the tick a tab or a day gives (``Haptics/select``).
+        .sensoryFeedback(Haptics.select, trigger: switches)
     }
 
     private func row(_ language: AppLanguage) -> some View {
@@ -322,7 +334,9 @@ private struct LanguageCard: View {
                 Spacer(minLength: 8)
 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 15, weight: .semibold))
+                    // About the canvas's mark — 14 pt across, drawn in a 20-pt box — at the row's
+                    // own size, so it grows with the name.
+                    .font(.body.weight(.bold))
                     // `.clear` rather than absent, so the row does not resize as the selection
                     // moves and SwiftUI animates a colour instead of inserting a layer — the same
                     // ruling `GlassTabBar` records for its glow.
@@ -332,9 +346,9 @@ private struct LanguageCard: View {
                     // mark is clear and nothing shows.
                     .symbolEffect(.bounce, value: isSelected)
             }
-            // Past the 44pt floor, and a `minHeight` so the target grows with Dynamic Type rather
-            // than clipping the name (rule `65-accessibility`).
-            .frame(minHeight: 48)
+            // Past the 44pt floor — the canvas's 50 — and a `minHeight` so the target grows with
+            // Dynamic Type rather than clipping the name (rule `65-accessibility`).
+            .frame(minHeight: 50)
             .contentShape(Rectangle())
         }
         .buttonStyle(PressStyle())
@@ -358,13 +372,20 @@ private struct LanguageCard: View {
 ///
 /// It shares setup's readout *idiom* — monospaced digits, a ratio-sized unit, a numeric transition,
 /// an `Aurora.cyan` slider — but arranges it as a settings row rather than as a hero, because on
-/// `GoalSetupView` that card is the whole page and here it is one of two. It wears `remindersCard`'s
+/// `GoalSetupView` that card is the whole page and here it is one of four. It wears `remindersCard`'s
 /// `.raised` elevation for the same reason (rule `60-design-system`).
 ///
 /// **The current goal arrives through `init`, not through `.task`.** A `@State` seeded after the
 /// first frame renders ``DataManager/defaultDailyGoal`` and then snaps, so a user whose goal is
-/// 3,500 would watch it jump up from 2,000 every time Settings opened. `EditServingSheet` takes its
-/// serving as an `init` parameter for the identical reason.
+/// 3,500 would watch it jump up from 2,000 every time Settings opened. History's serving sheet
+/// takes its serving as an `init` parameter for the identical reason.
+///
+/// **And a goal re-read after that arrives through `onChange`.** `SettingsView` re-reads the model
+/// as it appears, after this card has copied it, and a `@State` ignores every later `init` value —
+/// so a goal written meanwhile would otherwise stand on the screen beside the model's. Never under
+/// a finger: a drag in flight is the user's, and it commits its own value when it ends. The copy
+/// writes nothing and plays nothing: ``commitIfChanged()`` finds the model already holding it, and
+/// the step tick is bumped only by the slider.
 private struct GoalCard: View {
 
     @Environment(\.strings) private var strings
@@ -383,41 +404,53 @@ private struct GoalCard: View {
     /// Bumped on a committed change, so the haptic fires on the change rather than on the touch.
     @State private var commits = 0
 
-    @ScaledMetric(relativeTo: .title) private var readoutSize: CGFloat = 34
+    /// Bumped each time a drag moves the goal by a step: the tick under the finger. A counter the
+    /// slider bumps, not the goal itself, so a goal the card takes from a re-read never ticks
+    /// (rule `60-design-system`, *Haptics*).
+    @State private var steps = 0
+
+    /// The canvas's 36-pt figure, scaled as a title is.
+    @ScaledMetric(relativeTo: .title) private var readoutSize: CGFloat = 36
+
+    /// The canvas sets *ml* at 17 pt beside its 36-pt figure.
+    private static let unitRatio: CGFloat = 17 / 36
 
     init(currentGoal: Int) {
         _goal = State(initialValue: currentGoal)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 16) {
             readoutRow
             slider
         }
-        .padding(.vertical, 22)
-        .padding(.horizontal, 22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        // `.frosted` and `.raised`, matching `remindersCard`: the two panes on this screen are lit
+        // `.frosted` and `.raised`, matching `remindersCard`: the panes on this screen are lit
         // by the same light, and a one-off density here would be a second one.
-        .liquidGlass(density: .frosted, elevation: .raised)
+        .settingsCard()
         .sensoryFeedback(Haptics.confirm, trigger: commits)
+        .sensoryFeedback(Haptics.select, trigger: steps)
+        .onChange(of: manager.dailyGoal) { _, stored in
+            guard !isDragging else { return }
+            goal = stored
+        }
     }
 
     private var readoutRow: some View {
         HStack(alignment: .firstTextBaseline) {
             Text("Daily goal", bundle: strings)
-                .font(.body.weight(.semibold))
+                .cardTitle()
                 // Drawn when a change has been saved. The slider has no Save button, so until
                 // now only the haptic said the goal had been kept.
                 .savedTick(commits)
 
             Spacer(minLength: 12)
 
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text(goal, format: .number)
                     // Bounded so the largest accessibility sizes cannot push the figure through
                     // the edges of the card containing it (rule `65-accessibility`).
-                    .font(.system(size: min(readoutSize, 48), weight: .semibold, design: .rounded))
+                    .font(.system(size: min(readoutSize, 48), weight: .bold, design: .rounded))
+                    .tracking(-0.8)
                     .monospacedDigit()
                     .contentTransition(.numericText(value: Double(goal)))
 
@@ -425,8 +458,10 @@ private struct GoalCard: View {
                 // fixed style and a scaled figure cross over at the accessibility sizes and the
                 // unit ends up larger than the number.
                 Text("ml", bundle: strings)
-                    .font(.system(size: min(readoutSize, 48) * 0.4, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.8))
+                    .font(.system(size: min(readoutSize, 48) * Self.unitRatio, weight: .semibold, design: .rounded))
+                    // The canvas's 0.9: 7.76 / 10.38 / 7.82:1 on iOS 27.0 / 26.5 / 18.6
+                    // (`docs/DESIGN.md`, *Settings, measured*).
+                    .foregroundStyle(.white.opacity(0.9))
             }
             .animation(.smooth(duration: 0.35), value: goal)
             // The figure under the finger: a little larger while the slider is held, and it
@@ -467,11 +502,12 @@ private struct GoalCard: View {
                 Spacer()
                 Text(GoalSetupView.goalRange.upperBound, format: .number)
             }
-            .font(.caption.weight(.medium))
+            .font(.footnote.weight(.semibold))
             .monospacedDigit()
-            // 0.75, not the 0.6 these were drawn at: on Apple's glass 0.6 is under 4.5:1 wherever
-            // the aurora is bright behind the card (`docs/DESIGN.md`, *Apple's glass, measured*).
-            .foregroundStyle(.white.opacity(0.75))
+            // The canvas's 0.88, measured at 5.35 / 7.06 / 5.50:1 on iOS 27.0 / 26.5 / 18.6, the
+            // worst frame of a minute (`docs/DESIGN.md`, *Settings, measured*). They were 0.6
+            // until that read under 4.5:1 on Apple's glass, then 0.75.
+            .foregroundStyle(.white.opacity(0.88))
             // The slider already announces where it is and what it can reach; as VoiceOver stops
             // these are bare numbers with nothing to attach them to.
             .accessibilityHidden(true)
@@ -508,10 +544,18 @@ private struct GoalCard: View {
     ///
     /// The `step` already snaps the value; `rounded()` is what stops floating-point dust from
     /// turning 2,500 into 2,499.9999999, which truncation would then read as 2,499.
+    ///
+    /// Only the slider writes through here, so this is where a step is counted — under a finger
+    /// only: a VoiceOver adjustment commits at once and takes `confirm`'s haptic for itself.
     private var sliderValue: Binding<Double> {
         Binding(
             get: { Double(goal) },
-            set: { goal = Int($0.rounded()) }
+            set: { value in
+                let stepped = Int(value.rounded())
+                guard stepped != goal else { return }
+                goal = stepped
+                if isDragging { steps += 1 }
+            }
         )
     }
 }
@@ -520,11 +564,12 @@ private struct GoalCard: View {
 
 /// The three amounts the Home tab's quick-add row logs.
 ///
-/// **The middle vessel is also what the widget's single button logs and draws**, which is the one
-/// thing about this card a user could not otherwise discover — so it is stated on the card rather
-/// than left to be found by arithmetic. That sentence is the replacement for what used to be a
+/// **The Glass is also what the widget's button, Siri's phrase and the Control Center control
+/// log**, which is the one thing about this card a user could not otherwise discover — so it is
+/// stated on the card rather than left to be found by arithmetic, and by the vessel's name, which
+/// is what the row above it says. That sentence is the replacement for what used to be a
 /// compile-time guarantee: the amount was a constant both front doors spelled, and it is now a
-/// stored value both front doors read.
+/// stored value every one-tap door reads (``DataManager/usualServing(in:)``).
 ///
 /// Three sliders stacked is affordable here only because `SettingsView` wraps its content in the
 /// `GeometryReader`/`ScrollView`/`minHeight` shape rule `65-accessibility` prescribes — at the
@@ -536,10 +581,11 @@ private struct GoalCard: View {
 private struct ServingsCard: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
     @Environment(DataManager.self) private var manager
 
     /// The three amounts under the finger. Seeded through `init` rather than in `.task` or
-    /// `.onAppear`, for the reason ``GoalCard`` is (rule `50-views`).
+    /// `.onAppear`, and re-seeded from a re-read, for the reasons ``GoalCard`` is (rule `50-views`).
     @State private var amounts: [Int]
 
     /// Whether a drag is in flight — what makes one gesture one write. See ``commitIfChanged()``.
@@ -551,15 +597,21 @@ private struct ServingsCard: View {
     /// Bumped on a committed change, so the haptic fires on the change rather than on the touch.
     @State private var commits = 0
 
+    /// Bumped each time a drag moves a vessel by a step — ``GoalCard``'s tick, for the same reason
+    /// a counter.
+    @State private var steps = 0
+
+    /// The canvas's 26-pt glyph box, scaled with the name beside it and capped at its use site.
+    @ScaledMetric(relativeTo: .body) private var glyphBox: CGFloat = 26
+
     init(current: [Int]) {
         _amounts = State(initialValue: current)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 20) {
             Text("Quick-add vessels", bundle: strings)
-                .font(.headline)
-                .foregroundStyle(.white)
+                .cardTitle()
                 // Drawn when a vessel's new amount has been saved (``SavedTick``).
                 .savedTick(commits)
 
@@ -567,46 +619,49 @@ private struct ServingsCard: View {
                 vessel(at: index, slot: slot)
             }
 
-            Text("The middle vessel is the one your widget logs.", bundle: strings)
-                .font(.caption)
-                // 0.70 measured against this pane, not chosen: white at 0.55 lands at 4.06:1 on
-                // the frosted glass over the aurora, under the 4.5:1 small-text floor. See
-                // `docs/DESIGN.md`.
-                .foregroundStyle(.white.opacity(0.70))
-                // The card sits in a `ScrollView`, but a `Text` still gives up lines before it
-                // pushes back when the stack is tight.
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 16) {
+                Hairline()
+                Text("The Glass is the one your widget, Siri and Control Center log.", bundle: strings)
+                    .cardNote()
+            }
         }
-        .padding(.vertical, 22)
-        .padding(.horizontal, 22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .liquidGlass(density: .frosted, elevation: .raised)
+        .settingsCard()
         .sensoryFeedback(Haptics.confirm, trigger: commits)
+        .sensoryFeedback(Haptics.select, trigger: steps)
+        .onChange(of: manager.servings) { _, stored in
+            guard !isDragging else { return }
+            amounts = stored
+        }
     }
 
     private func vessel(at index: Int, slot: (nameKey: String, symbol: String)) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 10) {
-                Image(systemName: slot.symbol)
-                    .font(.body)
-                    .foregroundStyle(Aurora.cyan)
-                    // The name beside it says which vessel this is; the glyph repeating it would
-                    // be a second stop saying the same thing.
-                    .accessibilityHidden(true)
-
-                Text(verbatim: strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
-                    .font(.subheadline.weight(.medium))
-
-                Spacer(minLength: 8)
-
-                Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), amounts[index]))
-                    .font(.subheadline.weight(.semibold))
-                    .monospacedDigit()
-                    .foregroundStyle(.white.opacity(0.75))
-                    // The figure under the finger, as the goal's is.
-                    .scaleEffect(held == index ? 1.06 : 1, anchor: .trailing)
-                    .animation(Motion.land, value: held)
+        VStack(alignment: .leading, spacing: 10) {
+            // Side by side while they fit. At the accessibility text sizes on a small phone the
+            // amount was cut to "150…" beside its name; there it drops under the name instead
+            // (rule `65-accessibility`, *Dynamic Type*).
+            //
+            // **The side-by-side row is measured at its widest**, every vessel's name and the
+            // largest amount the slider reaches, drawn hidden underneath: a fit decided by the
+            // amount under the finger flipped the row to two lines as a drag passed 1,000, and
+            // left the three rows in different shapes.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    ZStack(alignment: .leading) {
+                        ForEach(vesselSlots, id: \.nameKey) { label(for: $0).hidden() }
+                        label(for: slot)
+                    }
+                    Spacer(minLength: 8)
+                    ZStack(alignment: .trailing) {
+                        amountText(HistoryView.servingRange.upperBound).hidden()
+                        amount(at: index, anchor: .trailing)
+                    }
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    label(for: slot)
+                    amount(at: index, anchor: .leading)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .foregroundStyle(.white)
@@ -642,6 +697,46 @@ private struct ServingsCard: View {
         }
     }
 
+    /// A vessel's glyph and name.
+    private func label(for slot: (nameKey: String, symbol: String)) -> some View {
+        let box = min(glyphBox, 40)
+
+        return HStack(spacing: 12) {
+            Image(systemName: slot.symbol)
+                .font(.system(size: box * 0.8))
+                // Against its 3:1 floor the Cup's, beside the card's sheen, is the tightest:
+                // 3.08 / 4.02 / 3.09:1 on iOS 27.0 / 26.5 / 18.6 (`docs/DESIGN.md`, *Settings,
+                // measured*).
+                .foregroundStyle(Aurora.cyan)
+                // One box for all three, so the names beside them start on one line whatever
+                // each glyph's own width.
+                .frame(width: box, height: box)
+                // The name beside it says which vessel this is; the glyph repeating it would be a
+                // second stop saying the same thing.
+                .accessibilityHidden(true)
+
+            Text(verbatim: strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
+                .font(.body.weight(.medium))
+        }
+    }
+
+    /// A vessel's amount, grouped as every visible volume is (rule `50-views`): a bottle of 1,000
+    /// read "1000 ml" here while Home and History drew "1,000 ml".
+    private func amountText(_ volume: Int) -> some View {
+        Text(strings.figure("%1$@ ml", volume, locale: locale))
+            .font(.body.weight(.bold))
+            .fontDesign(.rounded)
+            .monospacedDigit()
+    }
+
+    /// The amount under the finger, a little larger while its slider is held, as the goal's is —
+    /// from the edge it is pinned to, so it grows into its row and not into the card's padding.
+    private func amount(at index: Int, anchor: UnitPoint) -> some View {
+        amountText(amounts[index])
+            .scaleEffect(held == index ? 1.06 : 1, anchor: anchor)
+            .animation(Motion.land, value: held)
+    }
+
     /// One call into the model, only when something actually moved.
     ///
     /// The setter clamps each vessel, guards on equality, writes through and rings the widget
@@ -657,11 +752,93 @@ private struct ServingsCard: View {
     ///
     /// `rounded()`, never truncation: the `step` already snaps the value, and rounding is what stops
     /// floating-point dust from turning 250 into 249.9999 which truncation would read as 249.
+    /// A step under a finger is counted here, as ``GoalCard``'s is.
     private func binding(for index: Int) -> Binding<Double> {
         Binding(
             get: { Double(amounts[index]) },
-            set: { amounts[index] = Int($0.rounded()) }
+            set: { value in
+                let stepped = Int(value.rounded())
+                guard stepped != amounts[index] else { return }
+                amounts[index] = stepped
+                if isDragging { steps += 1 }
+            }
         )
+    }
+}
+
+// MARK: - The cards' type
+
+/// What every card on this screen shares: the canvas's *Settings* board, read from its source
+/// (`docs/superpowers/plans/2026-10-13-premium-redesign-stage-4.md`).
+///
+/// **One place, because the cards had drifted apart.** The four titles were drawn in two styles and
+/// the three notes in three, each card spelling its own (spec 2026-10-09 §7). The notes share the
+/// 15-pt style although the canvas draws the language footnote at 13: the spec says one, and the
+/// owner chose it (2026-10-13, S1).
+private enum SettingsStyle {
+
+    /// Every card's title — 17-pt semibold at the ordinary size.
+    static let title: Font = .body.weight(.semibold)
+
+    /// The sentence under a card's controls: the vessels note, the reminders explanation, the
+    /// language footnote.
+    static let note: Font = .subheadline
+
+    /// The canvas's 0.92. The tightest of the three notes, the reminders explanation — its first
+    /// line starts at the card's sheen — measured 4.89 / 6.37 / 4.93:1 on iOS 27.0 / 26.5 / 18.6,
+    /// the worst frame of a minute (`docs/DESIGN.md`, *Settings, measured*).
+    static let noteOpacity = 0.92
+
+    /// Inside every card, on every side.
+    static let cardPadding: CGFloat = 20
+
+    /// Between two cards.
+    static let cardGap: CGFloat = 16
+
+    /// From the title to the first card.
+    static let headerGap: CGFloat = 20
+
+    /// The rule between the language rows and above the vessels note.
+    static let hairlineOpacity = 0.16
+}
+
+private extension Text {
+
+    /// A card's title, in the one style all four share.
+    func cardTitle() -> Text {
+        font(SettingsStyle.title).foregroundStyle(.white)
+    }
+
+    /// A card's note, in the one style all three share. It wraps rather than truncates: the card
+    /// sits in a `ScrollView`, but a `Text` still gives up lines before it pushes back when the
+    /// stack is tight.
+    func cardNote() -> some View {
+        font(SettingsStyle.note)
+            .foregroundStyle(.white.opacity(SettingsStyle.noteOpacity))
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+private extension View {
+
+    /// A card: the canvas's padding, the full width, and the screen's one glass —
+    /// `.frosted` + `.raised` on every card, since siblings on one screen share a pair
+    /// (rule `60-design-system`) and every card carries sentence-length text.
+    func settingsCard() -> some View {
+        padding(SettingsStyle.cardPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .liquidGlass(density: .frosted, elevation: .raised)
+    }
+}
+
+/// A one-point rule across a card. Decoration: what it separates is already separate to VoiceOver.
+private struct Hairline: View {
+
+    var body: some View {
+        Rectangle()
+            .fill(.white.opacity(SettingsStyle.hairlineOpacity))
+            .frame(height: 1)
+            .accessibilityHidden(true)
     }
 }
 

@@ -415,6 +415,26 @@ private func specifiers(in text: String) -> Set<String> {
                 "WaterBuddy has a \(language) entry — the product name is not a word")
     }
 
+    /// **Settings' vessels note names the Glass by the word its own row uses.**
+    ///
+    /// The note is the one place a user learns which vessel the widget, Siri and Control Center log
+    /// (spec 2026-10-09 §7). Written around another word for it — *the middle vessel*, or a synonym
+    /// a translator reached for — it points at no row on the card it sits on. Read from the built
+    /// tables, in every language, because the note is resolved through the in-app picker's bundle.
+    @Test(arguments: ["en"] + translated)
+    func theVesselsNoteNamesTheGlassByItsOwnName(language: String) {
+        let note = value(appBundle, language, "The Glass is the one your widget, Siri and Control Center log.")
+        let glass = value(appBundle, language, "Glass")
+
+        #expect(note != nil, "Settings' vessels note has no \(language) entry")
+        #expect(glass != nil, "the Glass has no \(language) name")
+        if let note, let glass {
+            #expect(note.contains(glass), "the \(language) note does not call the Glass \(glass): \(note)")
+        }
+        #expect(value(appBundle, language, "The middle vessel is the one your widget logs.") == nil,
+                "the old note is still in the \(language) table")
+    }
+
     // MARK: - The watch (spec 2026-10-06 §6.3)
 
     @Test func theWatchBundlesAreWhereWeThinkTheyAre() {
@@ -556,9 +576,9 @@ struct HistoryStringTests {
     /// that draws a raw `%d ml`, one of the three this stage retired or a new one, fails here
     /// without anybody having named it.
     ///
-    /// Three are left, and none is History's: Settings draws a vessel's amount from the first,
-    /// and all three are the widget's, kept in the app's table because the two must agree
-    /// (`sharedKeys`). They go when their own screens are redrawn, and this set shrinks with them.
+    /// Three are left, and none is History's or — since the redesign's stage 4 — Settings': all
+    /// three are the widget's, kept in the app's table because the two must agree (`sharedKeys`).
+    /// They go when their own screens are redrawn, and this set shrinks with them.
     @Test func theOnlyRawVolumesLeftToDrawAreOtherScreens() throws {
         let english = try #require(table(appBundle, "en"), "the app ships no en table")
 
