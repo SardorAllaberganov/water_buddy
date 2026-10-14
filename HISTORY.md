@@ -9182,3 +9182,325 @@ Read from the commands at 09:42. **No `git commit` was run.** HEAD `c9d1f6b`, 11
 `## main...origin/main`. **16 staged**: the 13 above and the three rule files. **6 unstaged**: the
 six from before the stage's session (`.claude/settings.json`, two watch schemes, three string
 catalogues). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-14] — The redesign's stage 5: the welcome, and the goal calculator
+
+Roadmap item 1.2.3. Spec `docs/superpowers/specs/2026-10-14-welcome-design.md` and plan
+`docs/superpowers/plans/2026-10-14-premium-redesign-stage-5.md` (decisions P1–P10), both approved
+by the owner on 2026-10-14 ("ok"); run inline in the main loop under `superpowers:executing-plans`,
+no implementation subagent. Ledger, review, measurement tables, the two readers' reports and the
+final gate's logs (`final-gate/`; the `gate-*` logs beside them are an earlier run, from before
+the review's fix) in `.superpowers/sdd/2026-10-14-premium-redesign-stage-5/`. Built on HEAD `1438122` (stage 4,
+committed and pushed); nothing committed during the stage.
+
+**What changed.**
+
+- `GoalSetupView.swift` is deleted (`git rm`). The first-run screen is **`WelcomeView`**: four steps
+  — *Hello*, *Daily goal*, *Quick-add vessels*, *Reminders* — mounted side by side, slid by the
+  step on `Motion.page` (a fade on `Motion.pageFade` under Reduce Motion), under one pinned bar of
+  dots, *Back* and the main action. A turn runs to its end before the next is taken. Finishing
+  runs `WelcomeView.finish(goal:amounts:asksForReminders:on:using:)`: the vessels, then iOS's
+  question if reminders were asked for, then the goal — which is what closes the welcome.
+- **`GoalSuggestion`**, the goal step's *Work it out for me*: 30 ml a kilogram plus 0, 350 or 700 ml
+  for a light, moderate or active day, in whole numbers (a pound converted by integer arithmetic),
+  rounded half up to the slider's 100 ml and held to 1,000–4,000. Pounds first only where the
+  region measures in US units. Nothing is stored.
+- **`ReminderPermission`**, the one way the app asks for reminders and reads the answer back —
+  Settings' switch and the welcome's *Turn on reminders* ask through it; it re-reads the answer when
+  Settings appears, as Settings did before, and now on every return to the foreground too, turning
+  reminders off when iOS reads *denied* (known issue #100(d), fixed on disk).
+- **`VesselSliders`**, the three vessel rows lifted out of Settings' card so the welcome draws the
+  same rows; Settings' card commits from its own `onChange` while no drag is in flight.
+- **`-WaterBuddyFreshStart`** (DEBUG only): `WaterBuddyApp.freshStartManager(arguments:)` opens the
+  app on a throwaway suite, `uitest.waterbuddy.freshstart`, cleared at each launch, and an in-memory
+  store, so `WelcomeUITests` can see the welcome without erasing a simulator.
+- `WelcomeView.goalRange` / `goalStep` are the goal's menu now; Settings and `DailyGoalSetupTests`
+  read them there. 28 new strings in English, Russian and Uzbek (103 keys in the app's catalogue);
+  the Russian and Uzbek were drafted by this session.
+
+**The owner's rulings during the stage** (2026-10-14, asked after the first contrast sweep found
+eight things under their floor, in nine rows of its table, each with its figure in front of them): R1, the goal and vessels steps'
+lines move into their cards as each card's first line, and the reminders line stays on the aurora
+at full white; R2, the glyphs keep cyan and move — bells onto frosted discs, the sparkle after the
+words, the Cup clear of the card's sheen; R3, inactive dots at white 0.6; R4, the goal footnote at
+white 0.95; R5, both card lines full white, after the vessels card's line read 4.46 at 0.92.
+
+**My rulings, each with its cost in the ledger.** Among them: the work stays on `main`, staged,
+never committed; `xcodebuild` runs directly, since the plan's `task-done` script wraps it and is
+refused here; the warning count strips Xcode 27's diagnostic art; both footnotes on the aurora take
+0.95; a 24-hour English region's bell reads *09*, iOS's own form, where the plan expected *9*; the
+bar's buttons are disabled while a step slides (not made untouchable), and the UI tests tap the bar
+through `tapWhenReady(_:)`; landscape was rendered because the app supports it.
+
+**The final review** (one reviewer, read-only, saved verbatim as `review-final.md`): one Important
+finding, a double tap that skipped a step or finished from the vessels step unseen —
+`testADoubleTapMovesOneStep` red on iOS 27.0, then green; and the rule wording's untrue sentence
+about the fresh start, rewritten in the unstaged rule edits. Nine minors deferred: known issue #131,
+and #132 for the pre-existing stored scheduler in Settings.
+
+**Measured** (`docs/DESIGN.md`, *Welcome, measured*): 69 pairs listed a system, 68 read (*Your
+weight* has no clean ground beside it), on iOS 27.0, 26.5 and 18.6, a minute's sweep each, none
+under its floor; tightest against 4.5 Hello's line, 4.76 on all three, then on 27.0 *Work it out
+for me* 4.83 and the reminders line 4.84; against 3, the Cup's glyph 3.28 / 4.39 / 3.25.
+
+**Files touched.** New: `WaterBuddy/WelcomeView.swift`, `GoalSuggestion.swift`,
+`ReminderPermission.swift`, `VesselSliders.swift`; `WaterBuddyTests/WelcomeTests.swift`,
+`GoalSuggestionTests.swift`; `WaterBuddyUITests/WelcomeUITests.swift`. Deleted:
+`WaterBuddy/GoalSetupView.swift`. Changed: `WaterBuddy/SettingsView.swift`, `WaterBuddyApp.swift`,
+`Localizable.xcstrings`; comments only in `AuroraBackground.swift`, `HomeView.swift`,
+`HistoryView.swift`, `DataManager.swift`; `WaterBuddyTests/LocalizationTests.swift`,
+`DataManagerTests.swift`, `HistoryViewTests.swift`; `WaterBuddyUITests/GoalSetupUITests.swift`,
+`AppStoreScreenshotUITests.swift`; comments in `Tools/CaptureScreenshots.sh` and
+`Tools/CaptureFullCensus.sh`. Records: the spec, the plan, `CLAUDE.md`, `docs/AI_CONTEXT.md`,
+`docs/DESIGN.md`, `docs/ROADMAP.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md`, this
+file. Rule wording
+typed and **left unstaged for the owner**: `.claude/rules/10-architecture.md`, `43-concurrency.md`,
+`50-views.md`, `70-privacy.md`, `80-notifications.md`, `85-testing.md`. No `project.pbxproj`
+edit: every new file joins its target through its synchronized folder, and no exception set
+changed.
+
+**Verification actually run**, on an export of the index (`git checkout-index` into the session's
+scratch directory, its own empty DerivedData), so the six long-standing unstaged files stayed out:
+
+- Warnings: a clean `build-for-testing` of the app scheme and a clean widget build, counted by the
+  stage's one recipe on both HEAD and the index — **32 unique lines on each, identical by `comm`**.
+  (Not `CLAUDE.md`'s 31, which is a different count; see the ledger's Task 0 ruling.)
+- Phone unit tests, iPhone 17, iOS 27.0: `✔ Test run with 593 tests in 75 suites passed`.
+- Phone UI tests on iOS 27.0, and again on iOS 26.5: 67 executed, 1 skipped
+  (`testTheBarsCaptionsShareALine`, by design), 0 failures on each. On 27.0 the first two chunks
+  ran in one call, past the 600-s foreground limit; the second chunk's first test spent 1,948 s
+  failing to launch the app ("Timed out while launching application via Xcode") while the Mac
+  stalled, and the tests after it took up to an hour each, the chunk running 18:41–20:48. The
+  device was rebooted by its UDID and the chunk re-run alone, 9/0 in 209 s; every later chunk ran
+  alone.
+- Watch unit tests, *WaterBuddy Watch 27*: `✔ Test run with 57 tests in 6 suites passed`.
+- `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`; the watch
+  widget's only warnings outside the base are known issue #36's two.
+- Rendered and looked at: every step on three systems, before and after R1–R5; Increase Contrast,
+  Russian, Uzbek, Reduce Motion and Reduce Transparency on the build before R1–R5, which moved two
+  lines into their cards, the sparkle and the bells' glass, and raised the whites of the dots, the
+  footnotes and the lines, but no control's layout — so those renders never showed the moved sparkle or the bells' frosted discs; a 375-pt
+  phone at the ordinary and the largest text size, the largest again after R1–R5; landscape, on
+  the final source. **Not run:** the capture harness (#82), anything on a device — the haptics,
+  iOS's question about notifications, VoiceOver, and #100(d)'s revoke-and-return walk (#130).
+- Every staged file was compared with the gate's export after the gate: none differs, so the gate
+  ran on exactly what is staged.
+
+**Two fresh readers** read the records before they were staged — one on their claims against the
+code, git and the ledger, one sweeping the sheets for what the stage made untrue — and both
+reports are saved verbatim in the ledger folder (`reader-a.md`, `reader-b.md`). Every finding was
+checked against the code, the logs or the measurement tables, and all were taken in the records.
+Three are governing text and are left for the owner to word, recorded but not typed: rule
+`60-design-system`'s list of haptic counters lacks the welcome's (`docs/ROADMAP.md` §8's note);
+rule `43-concurrency`'s sentence naming the app-only `Task`s does not name the two the stage added
+(`WaterBuddyApp.swift:121`, `WelcomeView.swift:762`); and `CLAUDE.md`'s hard limit says tests get
+a UUID-named suite, where the fresh start's is a fixed name (rule `85-testing`'s typed wording says
+why). The ones that mattered most: the note on who sets `remindersEnabled` was false — Settings' switch turning off
+writes it directly, and Settings re-reads the permission when it appears; three guard-site
+citations, written without a file name, had moved and been missed, and four mappings in #103(m)
+carried numbers that were already stale through the diff without opening them; the tightest
+figures named the wrong pairs (Hello's line, 4.76, is tighter); "69 pairs" counted one never read;
+"six pairs" under the floor were eight things in nine rows; the launch failure was the chunk's
+first test, not its last; `docs/STATE.md` still said every test suite is UUID-named and the UI
+suites run with no store override; the roadmap's device sweep left out #130; the catalogue's count,
+the interactive call sites, the elevations and densities in use, the primary surface's first site
+and the older `.smooth` sites had not moved with the stage; and the typed rule `50-views` wording
+kept a sentence — two previews "omit" the reminder hook — that was false before the stage, which
+the wording now corrects.
+
+Read from the commands at 22:42 on 2026-10-14, after the records' `git add` by name. **No `git
+commit` was run.** HEAD `1438122`, 114 commits, `## main...origin/main`. **32 staged**: the stage's
+22 code, string, test and tool files (`GoalSetupView.swift`'s deletion among them), its spec and
+plan, and the eight records (`CLAUDE.md`, this file, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`docs/ROADMAP.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md`). **12 unstaged**: the six
+rule files with stage 5's wording, for the owner (`.claude/rules/10-architecture.md`,
+`43-concurrency.md`, `50-views.md`, `70-privacy.md`, `80-notifications.md`, `85-testing.md`), and
+the six from before the stage (`.claude/settings.json`, two watch schemes, three string
+catalogues). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-14] — `/doc_sync` after stage 5: the counts hold; three sections the stage left
+
+The fifty-ninth pass of `docs/AI_CONTEXT.md`, run by the owner straight after stage 5 was staged,
+in the session that built it. **No source or test file changed, and nothing was built or run**:
+every figure below is a recount of the tree or a re-count of the stage's saved build logs.
+
+**Checked and accurate:** 84 `.swift` files in the seven target folders and `Tools/`, each named in
+`docs/AI_CONTEXT.md` and each *Files on disk* row's count equal to `wc -l`, by script, with no row
+missing and none left over; 593 `@Test` and 57 on the watch by the attribute grep, 54 UI `func
+test`, as the targets table gives them; eleven keys on `DataManager.Key`, nine in the phone's suite
+as `CLAUDE.md` and `docs/STATE.md` both say; the three `membershipExceptions` sets in
+`project.pbxproj` against `CLAUDE.md`'s lists; every `` rule `nn-name` `` in `CLAUDE.md`, `docs/`,
+`tasks/` and the two source folders resolves to a file; every sheet's *Last updated* read
+(`docs/ROADMAP.md` has none, by design); the sheets read by subject for the old first-run screen,
+asking for permission, the goal's menu, the previews, haptics and the welcome's tests — every
+mention of `GoalSetupView` is dated or historical.
+
+**Drift found and fixed.**
+
+- `docs/AI_CONTEXT.md` #14 still had rule `50-views` saying `HomeView`, `GoalSetupView` and
+  `HistoryView` omit the reminder hook in their previews. All five places that build a
+  `DataManager` for a preview pass it — six `#Preview`s, `HistoryView`'s two sharing a factory —
+  and stage 5's typed rule wording, unstaged for the owner, says so: a dated note.
+- `CLAUDE.md`'s warning baseline, 31, named its re-measures through stage 4. Counted again from the
+  stage's clean app builds of HEAD (`git archive`) and of the index, the way it counts — whole
+  lines, the two `WaterBuddyTests` files set aside — it is 37 whole lines on each, 31 outside
+  `WaterBuddyTests/`, and the same 21 by file and message on both, 19 outside the tests: it stands,
+  and names stage 5 now. *Current state*'s gate bullet gives that beside the stage's own 32.
+- `docs/STATE.md`'s *Tests that pin this* counted no stage 5 suite; it has a paragraph for the three
+  of the stage's six new suites that pin stored state, 15 `@Test`.
+
+**Two fresh readers** then read the pass and the stage's corrections before anything was staged —
+one on every claim in them (`docsync-59-reader-c.md`), one cold, for figures that disagree between
+sheets and pointers that lead nowhere (`docsync-59-reader-d.md`), both saved verbatim in the
+stage's ledger folder. Every finding was checked against the code, the logs, the tables or the
+render, and taken:
+
+- #89's note said no render in the stage had looked at a step scrolled up under the clock. The
+  stage's own render of the 375-pt phone at the largest size on iOS 26.5 shows two, clipped at the
+  status bar's edge: the note says so, and *Current state* does.
+- *Welcome, measured*'s tightest bullet led with Hello's line (4.76, 0.26 over) and in the same
+  breath called Settings' Cup glyph (3.10, 0.10 over) the tightest; the welcome's Cup (3.25) is
+  tighter than Hello's line too. Settings' Cup now leads in `docs/DESIGN.md` and *Current state*,
+  and the 69 pairs are said to be 59 on the welcome and 10 on Settings.
+- `docs/WIDGET.md`'s run line said every staged file matched the gate's export. The 23 staged
+  source, test, tool, string, spec and plan files do; the eight records were written after it.
+  It is scoped now, and so is *Current state*'s.
+- #14's own new note said the rule names two previews; it names three. And it said "five previews"
+  where there are five factories and six `#Preview`s — the typed rule wording is corrected the same
+  way.
+- `docs/WIDGET.md` called the app's catalogue 75 keys; it is 103.
+- *Current state* did not say the ledger folder is git-ignored (`.gitignore:7`), so everything it
+  points at lives only on this Mac; it says so now. It did not define the stage's 32 warnings, the
+  chunks, or the export, and its "Waiting for the owner" left out the three pieces of governing
+  text the stage recorded and did not type; all are in it now, and the gate bullet marks the one
+  sentence this pass added.
+- #131 wrote the reviewer's finding numbers as `#2`, `#7` — this file's form for known issues;
+  they read "finding 2" now, and it says the review's three proposed canaries became two, and
+  names one stale comment (`WelcomeView.swift:409`). #100's heading said "none fixed"; it says (d)
+  is. #84(c) says the stage gave `WaterBuddyApp` a `ModelContainer`, so its "no `ModelContainer`"
+  comment is more wrong. `docs/STATE.md`'s isolation paragraph says `prepareSharedStorage()` still
+  runs on a fresh start, its `WelcomeFinishTests` gloss no longer claims a test pins the vessels
+  being stored before the goal, and its list of the stage's other suites names `WelcomeStringTests`.
+  `docs/AI_CONTEXT.md`'s own header said the stage checkpoint lists the notes on #82, #89 and #111;
+  it does not, and the header says what it does.
+
+**The stage checkpoint above, superseded here** — it is staged, and this file is append-only:
+its "the `gate-*` logs beside them are an earlier run" holds for the `gate-*` logs at the top of the
+ledger folder, not for `final-gate/`'s own `gate-app.log`, `gate-widget.log` and
+`gate-warnings.txt`, which are the final run's; its "tightest against 4.5 Hello's line" leaves out
+Settings' Cup glyph, the tightest pair at 3.10 against 3; its "Every staged file was compared with
+the gate's export … none differs" holds for the 23 source, test, tool, string, spec and plan files,
+not the records; and its "comments in `Tools/CaptureScreenshots.sh` and `Tools/CaptureFullCensus.sh`"
+are two comments and two lines of the stop message each script prints. And the lesson *A moved
+citation is found by its words* says all four bad mappings carried numbers recorded as moving at
+stage 3: three did; #73's `:1233` had gone stale at stage 2.
+
+**Left for the owner, not touched:** rule `25-shared-storage` still says the watch's suite holds
+three keys, none shared with "the phone's eight" (`CLAUDE.md`: nine and two), and rule `85-testing`
+still says "This codebase compiles clean", which `CLAUDE.md` retired on 2026-09-02 — both older
+than the stage, and rule text is the owner's.
+
+**Files touched:** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/STATE.md`,
+`docs/WIDGET.md`, this file; and the unstaged rule `50-views` wording the stage typed, one sentence
+corrected. No lesson: what this pass found is the 2026-10-14 entry *A claim a change makes false is
+written in more than one place*, and the readers' finds are the stage's own lessons over again.
+`docs/ROADMAP.md` was read and not changed. No file under a target.
+
+**Gate:** not run in this pass. The stage's gate, run in this session, is the checkpoint above; the
+23 staged source, test, tool, string, spec and plan files match its export.
+
+Read from the commands at 23:17 on 2026-10-14, after this pass's `git add` of its six files by
+name. **No `git commit` was run.** HEAD `1438122`, 114 commits, `## main...origin/main`. **32
+staged** — the stage's 32, this pass's six among them and re-staged. **12 unstaged**: the six rule
+files with stage 5's wording, for the owner — `50-views.md` now with this pass's one-sentence
+correction — and the six from before the stage (`.claude/settings.json`, two watch schemes, three
+string catalogues). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-14] — `/doc_sync` again after stage 5: the lists the welcome never joined
+
+The sixtieth pass of `docs/AI_CONTEXT.md`, run by the owner straight after the fifty-ninth, on the
+same staged tree. **No source or test file changed, and nothing was built or run.**
+
+**Checked and accurate, again:** 84 `.swift` files, each named in `docs/AI_CONTEXT.md` and each
+*Files on disk* row's count equal to `wc -l`, by script; 593 `@Test`, 57 on the watch, 54 UI `func
+test`; eleven keys on `DataManager.Key`, nine in the phone's suite; `project.pbxproj` unchanged
+against HEAD, so the three exception sets stand; every `` rule `nn-name` `` resolves. Read this
+time, and accurate: `docs/AI_CONTEXT.md`'s targets table and *Where the rest is written down*;
+`docs/ROADMAP.md`'s 1.2 table; `docs/DESIGN.md`'s *Motion* curve table, whose uses are written
+generally enough to hold; the open known issues' citations into the six rule files the stage
+typed wording into — all inside dated records.
+
+**Drift found and fixed** — most of it in sections that list what uses something the welcome now
+uses too, which the earlier searches, for the old screen and for the stage's subjects, had passed
+over. (Not all were unread: stage 5's own records had edited *Motion* three lines above *What
+moves*, and two of the finds below — the first run's hand-over and *The look*'s *First run* rows —
+name the old screen by its subject and were missed anyway.)
+
+- `docs/DESIGN.md` *What moves* had no row for the welcome's step slide: it has one — a screen's
+  width on `page`, a cross-fade on `pageFade` under Reduce Motion, held by `WelcomeStepTests`.
+- Its held-slider row named Settings only. The vessel rows are `VesselSliders`, drawn by Settings
+  and the welcome alike, and the welcome's goal figure does not grow while held — a dated note.
+- Its account of the first run handing over to the app was seen on `GoalSetupView`. The welcome
+  goes through the same `RootView` cross-fade, unchanged in the code, and was not recorded frame by
+  frame — a dated note.
+- *Selection* did not name the calculator's picked unit, on a capsule, and picked activity, on a
+  rounded rectangle at `innerCornerRadius` — a dated note.
+- *The look, measured*'s table, stage 3c's record, has *First run* rows of `GoalSetupView` and
+  *Settings* rows of a card stage 4 restyled — a dated note pointing at *Welcome, measured* and
+  *Settings, measured*.
+- `docs/STATE.md` called the welcome's goal slider "the setup slider" in the `isGoalSet` publish's
+  account; it says "the first-run goal", as the code's comment does.
+- Then the pass applied its own lesson — every token and helper the welcome's code reaches, by
+  `grep`, each looked up in the sheets — and found two more: `docs/DESIGN.md` named `.glassGroup()`
+  round Home's quick-add row alone, in two places, where the welcome's seven bell discs are a
+  second container; and *The header and a screen arriving* did not say the welcome's steps read
+  `ScreenMetrics` and `Arrival` — `testAStepsTitleStandsWhereATabsTitleDoes` holds the title's
+  place. Dated notes on each. `legibleOnBackdrop()`, `PressStyle`, `primarySurface`, the haptics
+  table and `vesselSlots` were looked up the same way: their sections either already name the
+  welcome (the primary surface, the haptics table) or make no list of users it should have joined.
+
+**Two fresh readers** then read the pass — one on its claims (`docsync-60-reader-e.md`), one
+applying its lesson to every new file the stage added, tokens, model calls, system APIs, patterns
+and strings alike (`docsync-60-reader-f.md`), both saved verbatim in the stage's ledger folder.
+Every finding was checked against the code and taken:
+
+- More lists the welcome had joined in the code and not in the sheets. `docs/DESIGN.md`:
+  `innerCornerRadius` is used by the welcome three times (the weight wheel's clip, the activity
+  mark, the preview's tile); the clear glass variant is taken by Hello's vessel too, which has no
+  readout and so no scrim; Reduce Motion is read by the welcome's step turn and Hello's waves; and
+  the "limit Liquid Glass" pane counts never had History and now miss the welcome's reminders
+  step, ten panes, the most of any screen. `docs/STATE.md`: the welcome's figures group by the
+  locale through `Bundle.figure`, as Home's, History's and Settings' do. `docs/AI_CONTEXT.md`:
+  #40's single-form Russian keys gain `Use %1$d millilitres` and the older `%1$d millilitres`;
+  #121's two departures from the rules — `.transaction(value:)` with `addAnimationCompletion`, and
+  a once-per-tap animation branching on Reduce Motion — are the welcome's too; #95's ruling would
+  reach the welcome's text on the aurora; and #59's system wheel has a second, the calculator's,
+  its neighbouring rows unmeasured. Dated notes on each.
+- *The header and a screen arriving*'s new note said a step a turn brings in is whole "by
+  `pageSettlesIn`". Only Hello's two sections call `.arrives`, so nothing on the other steps reads
+  that value; they are whole because nothing on them arrives. Corrected, and the code comment that
+  makes the same claim (`WelcomeView.swift:223`–`:224`) is added to #131.
+- `docs/AI_CONTEXT.md`'s *Last updated* and this checkpoint's first form said these sections had
+  never been opened by an earlier pass or reader and that none of them names the old screen;
+  both are corrected above, and so is the lesson.
+
+**Left for the owner, not touched** — rule text: rule `43-concurrency`'s list of `nonisolated`
+statics inside a view lacks `WelcomeView.bellTimes(in:)`, which `WelcomeStepTests` reads off the
+main actor; rule `75-diagnostics`' *Fail soft, loudly* list lacks the fresh start's DEBUG fallback
+(`WaterBuddyApp.swift:90`); rule `60-design-system` calls the clear variant "the vessel" and gives
+only the week card's tracks and bars as `innerCornerRadius`'s use; and the welcome departs from
+rules `65-accessibility` and `50-views` as #121 records for the tab pages.
+
+**Files touched:** `docs/AI_CONTEXT.md` (its *Last updated*, *Git*, and notes on #40, #59, #95,
+#121 and #131), `docs/DESIGN.md`, `docs/STATE.md`, `tasks/lessons.md` (one lesson: *A new screen
+is missing from the lists of what uses each token*), this file. `CLAUDE.md`, `docs/WIDGET.md` and
+`docs/ROADMAP.md` were read and not changed. No `.claude/` file and no file under a target.
+
+**Gate:** not run in this pass. The stage's gate, run in this session, is two checkpoints above.
+
+Read from the commands at 23:38 on 2026-10-14, after this pass's `git add` of its five files by
+name. **No `git commit` was run.** HEAD `1438122`, 114 commits, `## main...origin/main`. **32
+staged** — the stage's 32, this pass's five among them and re-staged. **12 unstaged**: the six rule
+files with stage 5's wording, for the owner, and the six from before the stage
+(`.claude/settings.json`, two watch schemes, three string catalogues). **1 untracked**:
+`Screenshots/census/`. None in both.

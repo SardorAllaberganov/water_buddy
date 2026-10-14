@@ -3,7 +3,17 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-14 (twenty-fifth pass — `/doc_sync` after the redesign's stage 4,
+**Last updated:** 2026-10-14, night (twenty-sixth pass — `/doc_sync` after the redesign's stage 5.
+No contract changed. Two sentences corrected, both found by a fresh reader: the app's catalogue,
+of which the widget's ten shared keys are a strict subset, is 103 keys, not 75; and the stage's
+run line said every staged file matched the gate's export, which is true of the code, tests,
+tools, strings, spec and plan, and not of the records, written after it.)
+Before that: 2026-10-14, evening (the redesign's stage 5, the welcome, staged and not
+committed; written by the session that built it. **No file under `WaterBuddyWidget/` changed, of
+the six shared files only a comment in `DataManager.swift` did, and no contract here did.** The
+stage added no key to `sharedKeys` and did not touch the widget catalogue. *Building it* has the
+stage's run.)
+Before that: 2026-10-14 (twenty-fifth pass — `/doc_sync` after the redesign's stage 4,
 Settings, staged and not committed. **No file under `WaterBuddyWidget/` changed, none of the six
 shared files did, and no contract here did.** The stage's one string is the app's own: Settings'
 vessels note now says *"The Glass is the one your widget, Siri and Control Center log."* — the
@@ -399,8 +409,9 @@ list for exactly this reason — six shared files now, not four.
 
 The widget ships in English, Russian and Uzbek, and **it has its own `Localizable.xcstrings`** —
 `WaterBuddyWidget/Localizable.xcstrings`, 19 keys. **Fifteen are hand-written** — marked `manual`,
-in all three languages: ten it shares with the app, a strict subset of the app's 75 (73 until the
-redesign's stage 3, staged 2026-10-11, which touched none of the ten) and the ten
+in all three languages: ten it shares with the app, a strict subset of the app's 103 (75 until the
+redesign's stage 5, staged 2026-10-14, which added 28 and touched none of the ten; 73 until stage
+3, staged 2026-10-11, which touched none of them either) and the ten
 `LocalizationTests`' `sharedKeys` names, and the five of `AddWaterIntent`'s Shortcuts vocabulary,
 which the app's catalogue does not hold. The other four are literals the build extracted, with no
 translation: `%`, `+%lld`, `1,450 ml` and `Today` (see below). Those four names are in the app's
@@ -592,7 +603,14 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension
                  -destination 'platform=iOS Simulator,OS=27.0,name=iPhone 17'
 ```
 
-Last run 2026-10-14 at 00:13, on the redesign's staged stage 4, with the command above:
+Last run 2026-10-14 at 18:10, on the redesign's staged stage 5, with the command above and its own
+DerivedData folder, from a `git checkout-index` export of the index (every staged source, test,
+tool, string, spec and plan file compared with the export afterwards: none differs; the records
+were written after it): `** BUILD SUCCEEDED **`, straight after a clean
+`build-for-testing` of the app into the same empty folder, and no warning from `WaterBuddyWidget/`.
+The stage changed no file under `WaterBuddyWidget/` and, of the six shared files, only a comment in
+`DataManager.swift`. Stage 4's account follows, kept: run 2026-10-14 at 00:13, on the redesign's
+staged stage 4, with the command above:
 `** BUILD SUCCEEDED **` — before two comment-only edits to `SettingsView.swift`. Stage 4's warning
 comparison built this scheme from a `git archive` of `c9d1f6b` and from a `git checkout-index`
 export of the index, made at 23:51 on 2026-10-13, each straight after a clean `build-for-testing`

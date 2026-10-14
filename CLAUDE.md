@@ -9,7 +9,7 @@
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: two `StaticConfiguration`s over one provider — the Home Screen widget and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — `.accessoryCircular` percentage-ring complication, reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
@@ -149,8 +149,9 @@ something to record.
   Swift 6 error later. **"This codebase compiles clean" is no longer true and was retired on
   2026-09-02.** On **Xcode 27.0** (re-measured 2026-10-05, unchanged on 2026-10-06 and again on
   2026-10-08, and on 2026-10-13 from a clean `build-for-testing` with the six lines in two
-  `WaterBuddyTests` files set aside, before and after the redesign's stage 3c, and again before
-  and after stage 4; the 38 measured on Xcode 26.6 no longer compares), a clean
+  `WaterBuddyTests` files set aside, before and after the redesign's stage 3c, again before
+  and after stage 4, and on 2026-10-14 before and after stage 5; the 38 measured on Xcode 26.6
+  no longer compares), a clean
   `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique warning lines (80
   occurrences as counted then; 44 primary lines on 2026-10-08 — occurrences move with the
   architectures a build compiles, the unique lines do not): the *"main actor-isolated …

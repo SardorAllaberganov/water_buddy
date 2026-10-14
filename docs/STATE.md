@@ -4,7 +4,30 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-14 (thirty-third pass — `/doc_sync` after the redesign's stage 4,
+**Last updated:** 2026-10-14, night (thirty-fifth pass — `/doc_sync` run again on the same tree. **No
+key and no stored byte changed.** One sentence: the `isGoalSet` publish's account called the
+welcome's goal slider "the setup slider"; it says the first-run goal, as the code's comment does.
+And, from a fresh reader, *The language is why nothing asks `Bundle.main`* names the welcome among
+the screens whose figures group by the locale. The key counts — eleven on `DataManager.Key`, nine
+in the phone's suite — were checked again.)
+Before that: 2026-10-14, night (thirty-fourth pass — `/doc_sync` after the redesign's stage 5,
+staged and not committed. **No key and no stored byte changed.** *Tests that pin this* gains a
+paragraph for stage 5's three suites that pin stored state — `ReminderPermissionTests`,
+`WelcomeFinishTests`, `FreshStartTests`, 15 `@Test` — counted per suite; the eleven keys on
+`DataManager.Key`, nine in the phone's suite, were checked against the code and stand. Then, from
+two fresh readers: the test-isolation paragraph says the launch's own `prepareSharedStorage()`
+still runs on a fresh start, and that the fresh start's side effects are off as a fixture's are;
+the new paragraph's gloss of `WelcomeFinishTests` claims no test the suite does not hold, and its
+list of the stage's other suites names `WelcomeStringTests`.)
+Before that: 2026-10-14, evening (the redesign's stage 5, the welcome, staged and not
+committed; written by the session that built it. **No key and no stored byte changed**, and no
+shared file but a comment in `DataManager.swift`. The first-run screen is `WelcomeView`, named
+where `GoalSetupView` was; *The sixth key* says who sets `remindersEnabled` now; four line
+citations into `DataManager.swift` moved by one — the role and three of its guard sites; the test
+isolation paragraph names the fresh start's fixed-name suite and `WelcomeUITests`' launch. The
+guard sites and the isolation paragraph were found by a fresh reader, and so was the first
+version of *The sixth key*'s note being wrong about who sets the flag.)
+Before that: 2026-10-14 (thirty-third pass — `/doc_sync` after the redesign's stage 4,
 Settings, staged and not committed. **No key, no stored byte, and no shared file changed.**
 Settings now calls `refresh()` when it appears, as Home and History already did — the same path,
 with the same rollover and reconcile, so nothing this sheet describes moved. One sentence was
@@ -396,7 +419,7 @@ withMutation(keyPath: \.isGoalSet) { storedIsGoalSet = true }
 ```
 
 **The publish between the two is not behind the setter's equality guard.** A user who accepts the
-setup slider unchanged saves exactly `defaultDailyGoal`; the `dailyGoal` setter treats that as a
+first-run goal unchanged — the welcome's goal step since stage 5 — saves exactly `defaultDailyGoal`; the `dailyGoal` setter treats that as a
 no-op and publishes nothing, yet `isGoalSet` has just changed and the mirror carries it — the
 watch's attribution line reads *Set your goal in WaterBuddy on iPhone* until a mirror says
 otherwise. This call sends that mirror at once rather than on the next foreground. It is one of
@@ -412,9 +435,9 @@ Corrected in the twenty-eighth; the comment is `docs/AI_CONTEXT.md` known issue 
 Guarding both on `storedIsGoalSet` skips the only write of that key in the product. Edit such a
 goal down to exactly `defaultDailyGoal` and the inference re-derives `false` on the next read, and
 `RootView` cross-fades the app back into setup mid-session. This was unreachable while
-`saveDailyGoal(ml:)` had one caller — `GoalSetupView` is presented only while the flag is `false`,
-so the guard could never short-circuit — and became reachable when `SettingsView`'s `GoalCard`
-became the second. `editingAnInferredGoalDownToTheDefaultPersistsTheFlag` pins it.
+`saveDailyGoal(ml:)` had one caller — `GoalSetupView` (since stage 5, `WelcomeView`) is presented
+only while the flag is `false`, so the guard could never short-circuit — and became reachable when
+`SettingsView`'s `GoalCard` became the second. `editingAnInferredGoalDownToTheDefaultPersistsTheFlag` pins it.
 
 ## How a value is clamped on the way in
 
@@ -618,6 +641,15 @@ write-through and equality guard as `currentWater` and `dailyGoal`, so a no-op w
 invalidates observers nor re-plans the day. Setting it re-plans **in both directions**: switching
 reminders off has to *clear* what is already filed with the system, not merely stop adding to it.
 
+*(2026-10-14, the redesign's stage 5: who sets it, all app-only. Turning reminders **on** — Settings'
+switch, or *Turn on reminders* on the welcome's last step — stores iOS's answer through
+`ReminderPermission.enable(on:using:)`, which asks only when iOS has not been asked. Settings'
+switch turning **off** writes `false` itself (`SettingsView.swift:189`). And
+`ReminderPermission.reconcile(_:using:)` clears it when iOS reads *denied* and changes nothing
+otherwise; it runs whenever the app comes forward (`WaterBuddyApp`) and whenever Settings appears
+or comes back to the foreground (`SettingsView.readSystemState()`). Every write is the one setter,
+so the write-through, the guard and the re-plan are unchanged; nothing new is stored.)*
+
 **It is re-read on every `refresh()`** (2026-10-08, known issue #73). Only the app writes it, but a
 widget extension's `DataManager.shared` can outlive the write, and `AddWaterIntent` files that
 instance's plan. Until then `loadFromStore()` re-read the goal, the vessels and the language and left
@@ -739,7 +771,8 @@ this:* `Text(_:format:)` on the phone, the watch's own readout (`WristVessel.rea
 the redesign's stage 2 — everything Home draws through `Bundle.figure(_:_:locale:)`, which formats
 each volume with the locale and hands it to a `%n$@` key: the vessel's `1 300 of 2 000 ml`, the
 status line, the discs' captions, *Undo*; since stage 3, History's header, week card and rows; since
-stage 4, Settings' vessel amounts. A figure still built with `String(format:)` and `%1$d` — both
+stage 4, Settings' vessel amounts; since stage 5, the welcome's — its vessel amounts, which are
+Settings' rows (`VesselSliders`), and the calculator's *Your goal is …* and *Use …*. A figure still built with `String(format:)` and `%1$d` — both
 widgets, and the watch's serving rows — groups in no language at all (`AI_CONTEXT.md` known issue
 #39). Spoken strings keep `%d` on purpose. *(Until the thirty-third pass this sentence still listed
 the week card's `Best 8050 ml`, History's rows and Settings — History's stale since stage 3.)*
@@ -833,7 +866,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1564
+nonisolated static let role: Role = {          // DataManager.swift:1565
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -862,15 +895,15 @@ different questions" until the twenty-sixth pass; the four writes have only ever
 1. **Materialising `dailyGoal` in `init`** (`:551`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1161`, `ownsSharedStorage`) — same reason.
+2. **Stamping `lastActiveDay` on a fresh install** (`:1162`, `ownsSharedStorage`) — same reason.
 3. **`seedFromCachedTotalIfNeeded`** (`:1083`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1708`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1709`, `mayHaveLegacyStandardDefaults`).
 
 Three further sites are guarded by the same enum but are not group bookkeeping:
 `republishHistory` (`:969`, `drawsHistory`, cost rather than correctness); `republishStreak`
 (`:1000`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
 because the `dailyGoal` setter calls it outside `republishHistory`); and
-`requestReminderReschedule` (`:1328`, `mayFileReminders`, the one whose wrong answer is immediately
+`requestReminderReschedule` (`:1329`, `mayFileReminders`, the one whose wrong answer is immediately
 user-visible). Rule `25-shared-storage` still counts six (`docs/AI_CONTEXT.md` known issue #103).
 
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`
@@ -993,6 +1026,18 @@ what that test asserts.
 
 ## Tests that pin this
 
+**Stage 5 adds three suites that pin stored state, 15 `@Test`** (counted per suite by the attribute
+grep on 2026-10-14, the fifty-ninth pass of `docs/AI_CONTEXT.md`), all in `WelcomeTests.swift`:
+`ReminderPermissionTests` (7) — what reaches `remindersEnabled` from iOS's answer, asked or re-read;
+`WelcomeFinishTests` (6) — vessels left as they were store nothing, vessels set are stored,
+finishing saves the goal and closes the welcome, reminders are asked for before it closes, a
+refusal still opens the app with reminders off, and *Not now* asks nothing (that the vessels are
+stored before the goal is the code's order, `WelcomeView.finish`, and no test pins it); and
+`FreshStartTests` (2, DEBUG only) — the fresh start's fixed-name suite, cleared at each launch, and
+nothing without the argument. The stage's other three new suites, `WelcomeStepTests`,
+`GoalSuggestionTests` and `WelcomeStringTests`, pin no stored state. `DailyGoalSetupTests` now reads the goal's menu from
+`WelcomeView`. The paragraphs below are older and were not recounted for it.
+
 **Stage 2 adds five suites and 43 `@Test` to the ones counted below** (counted per suite by script
 on 2026-10-11): `UndoTests` (7), `HomeFiguresTests` (14) and `DayTurnTests` (3) in
 `HomeModelTests.swift`; `StreakCountTests` (11, pure) and `StreakPublishingTests` (8) in
@@ -1039,11 +1084,22 @@ Named cases worth knowing: `travellingWestwardDoesNotWipeTheDay`,
 No unit test's own code ever reads or writes a key in `group.sardor.WaterBuddy` or
 `UserDefaults.standard` — every suite that needs a store builds a UUID-named throwaway one and
 removes it (the fixtures do call `UserDefaults.standard.removeSuite(named:)` to detach that suite,
-which touches no key; eight test files need no suite and build none). **The process the tests run
+which touches no key; sixteen test files need no suite and build none — "eight" until this was
+re-counted for stage 5, 2026-10-14, when it was already fifteen). The one exception since stage 5
+is `FreshStartTests`, which clears the DEBUG fresh start's fixed-name suite,
+`uitest.waterbuddy.freshstart`, because that name is what it tests. **The process the tests run
 in is another matter.** The unit target is hosted in the app (`TEST_HOST` is `WaterBuddy.app`), so
 before any test runs the host's own launch has called `prepareSharedStorage()` and built
 `DataManager.shared` against the group container of the simulator it runs in — as a launch of the
-app does. The UI suites launch that same real app, with no store override. No test constructs a real `UNUserNotificationCenter`
+app does. The UI suites launch that same real app, with no store override — except
+`WelcomeUITests`, which since stage 5 launches it with `-WaterBuddyFreshStart`: in a DEBUG build the
+app then runs on that throwaway suite, cleared at launch, and an in-memory store. The launch's own
+`prepareSharedStorage()` still runs first, against the simulator's group container, as on every
+launch — the app's bookkeeping on its own group, as `WaterBuddyApp.init()`'s comment says, not
+test data — and the manager built on the throwaway suite has its widget doorbell, reminder
+reschedule and wrist publish turned off, as a test fixture's are. (The app's return-to-foreground
+re-read still asks the real notification centre for its authorization status; it files and removes
+nothing.) No test constructs a real `UNUserNotificationCenter`
 either: `ReminderScheduler` is a struct of closures precisely so one can be stood behind.
 
 **That second sentence was aspirational until 2026-08-31, and is now true.** `DataManager.init`
@@ -1057,4 +1113,5 @@ issue #14, **fixed since**: each of the app's five sites that build a `DataManag
 one per file, feeding six `#Preview`s, since `HistoryView`'s two share a factory — now
 passes `rescheduleReminders: { _ in }` (`HomeView`, `GoalSetupView`, `HistoryView`, `RootTabView`,
 `SettingsView`; checked by `grep` in the twenty-sixth pass, which found this sentence still calling
-it live).
+it live). *(2026-10-14, stage 5: `GoalSetupView` is gone; `WelcomeView`'s preview takes its place
+and passes it too.)*

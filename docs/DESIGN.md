@@ -7,7 +7,34 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-14 (the fifty-eighth pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+**Last updated:** 2026-10-14, night (the sixtieth pass of `docs/AI_CONTEXT.md`, `/doc_sync` run
+again on the same tree. **No token changed.** Dated notes where the welcome had made a section
+incomplete: *Motion*'s *What moves* gains the welcome's step slide, with the tests that hold it;
+its held-slider row says the vessel rows are `VesselSliders`, drawn by Settings and the welcome,
+and the welcome's goal figure does not grow; its account of the first run handing over says it was
+seen on `GoalSetupView`; *Selection* names the calculator's unit and activity marks; *The look,
+measured* says its *First run* and *Settings* rows are of screens since deleted or restyled;
+`.glassGroup()` is named round the welcome's bell discs as well as Home's row, in two places; and
+*The header and a screen arriving* says the welcome's steps read `ScreenMetrics` and `Arrival`.
+Then, from two fresh readers: `innerCornerRadius`'s three uses in the welcome; Hello's vessel on
+the clear variant, with no readout and no scrim; the welcome's two readers of Reduce Motion; the
+pane counts against Apple's warning, which never had History and now name the welcome's
+reminders step, ten panes; and the header note's own first form, which credited `pageSettlesIn`
+with the steps being whole, corrected — nothing on them arrives.)
+Before that: 2026-10-14, night (the fifty-ninth pass of `docs/AI_CONTEXT.md`, `/doc_sync`
+after stage 5. **No token changed.** *Welcome, measured* corrected again, from a second pair of
+fresh readers: its tightest pair is Settings' Cup glyph, 3.10 on 18.6, then the welcome's Cup
+glyph, 3.25, and only then Hello's line, 4.76 — the bullet led with Hello's line and called
+Settings' Cup the tightest in the same breath; and its 69 pairs are 59 on the welcome and 10 on
+Settings, which the heading now says.)
+Before that: 2026-10-14, evening (the redesign's stage 5's own session: a new section,
+*Welcome, measured*; the haptics table's `select` and `confirm` rows and a dated note under it; a
+note under *Apple's glass, measured*, where `GoalSetupView`'s range labels were still named; then,
+from two fresh readers, dated notes where the welcome made a list untrue — the elevations and
+densities in use, the interactive call sites (eight), the primary surface's first site, and the
+older `.smooth` sites (fifteen) — and *Welcome, measured*'s own count of its first sweep, of its
+final pairs (68 read of 69) and of its tightest figures, corrected).
+Before that: 2026-10-14 (the fifty-eighth pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
 by the owner straight after the redesign's stage 4, Settings, was staged. **No source change and
 no token changed in this pass.** The stage's own session wrote its part of this sheet and left this
 line as it was. A fresh reader found two sentences the stage made untrue, both fixed where they
@@ -186,7 +213,9 @@ scrim" until the fifty-seventh pass):
 for a rounded element inside a pane — the week card's tracks and bars, since stage 3c: the canvas's
 12, drawn there on a track about 43 pt wide. Ours are 36–42 pt wide on the four card widths
 `everyDayClearsTheTapFloor` tries (a day's slot less its 4-pt inset each side), and a pane's own 28
-would round one into a capsule.
+would round one into a capsule. *(2026-10-14, the sixtieth pass: since stage 5 the welcome uses it
+three times too — the calculator's weight wheel is clipped to it, a picked activity is marked on
+it, and the reminder preview's app tile is drawn on it, `WelcomeView.swift:943`, `:1036`, `:1125`.)*
 `borderWidth = 1`. Default `base` is `.material(.ultraThinMaterial)`, default `density` is
 `.frosted`, default `elevation` is `.resting`.
 
@@ -210,6 +239,10 @@ which this list left out until the forty-eighth pass:** `.raised` — Settings' 
 History's week card, its strip (the redesign's stage 3, staged), its empty state and its `+`; `.floating` — the first-run card, the serving
 sheet's card and the watch's vessel; `.resting` — a serving row, the sheet's *Cancel*, *Open iOS
 Settings*, and the watch's two capsules, which pass no elevation and take the default.
+*(2026-10-14, the redesign's stage 5: there is no first-run card. The welcome's panes are
+`.raised` — its three cards, the calculator, the reminder's preview and *Back* — except Hello's
+vessel, `.floating` as Home's is, and *Use* and the bells' discs, `.resting`. Its main action is
+the primary surface.)*
 
 ## `LiquidGlass.Density`
 
@@ -232,7 +265,11 @@ lightest rung that passed, so the three stay in density order. (One column, blac
 which stage 3c removed.)
 
 Use `.frosted` or `.opaque` behind body text; keep `.sheer` for short labels and controls, where a
-busy backdrop cannot swallow a whole sentence. In use, every call site but the previews' own five: the three vessels — app,
+busy backdrop cannot swallow a whole sentence. *(2026-10-14, the redesign's stage 5: the list
+below predates the welcome, whose panes are `.frosted` — its three cards, the calculator, the
+reminder's preview and the bells' discs — except Hello's vessel, *Back* and *Use*, `.sheer`; and
+the previews' own are six, `VesselSliders`' the sixth. "The first run" among the cards below is
+the welcome's.)* In use, every call site but the previews' own five: the three vessels — app,
 widget, watch — `.sheer`; the cards (first run, Settings' four, History's week card, strip, empty
 state and sheet, the widget's), the tab bar, Home's two discs and its streak chip, History's `+` and its
 serving rows, and the widget's two pour buttons `.frosted`; Home's *Undo* capsule `.opaque` — the
@@ -658,7 +695,8 @@ is not Apple's, so flipping the setting under a running screen rebuilds nothing 
 then each rendering put `content` in its own branch (known issue #91a). Flipped on and off under
 Home on iOS 27.0 and 26.5: every pane went opaque and came back, and every control answered after
 each flip. **Sibling panes that sit close together are wrapped with `.glassGroup()`** — Apple's
-`GlassEffectContainer` on iOS 26 and later, nothing elsewhere — as Home's quick-add row is.
+`GlassEffectContainer` on iOS 26 and later, nothing elsewhere — as Home's quick-add row is, and,
+since stage 5, the welcome's seven bell discs (`WelcomeView.swift:1193`).
 
 Since the redesign's stage 1 (2026-10-09; committed 2026-10-10 in `c9ef45d`), `liquidGlass(…)` draws one of three panes, and
 `LiquidGlass.rendering(base:reduceTransparency:systemGlassAvailable:)` chooses, in this order:
@@ -688,7 +726,11 @@ Since the redesign's stage 1 (2026-10-09; committed 2026-10-10 in `c9ef45d`), `l
   `LiquidGlass.systemTintColor`, which is `Aurora.top`, at `LiquidGlass.systemTintOpacity(for:)`,
   **`0.64`**. The clear variant takes none — it is the vessel, and a tint would dull the water
   behind its readout. The value is measured, in *The look, measured* below. (Black at `0.52`, from
-  *Apple's glass, measured*, until stage 3c; read so here until the fifty-seventh pass.)
+  *Apple's glass, measured*, until stage 3c; read so here until the fifty-seventh pass.) *(2026-10-14,
+  the sixtieth pass: since stage 5 a second vessel takes the clear variant — Hello's, on the
+  welcome's first step (`WelcomeView.swift:840`), `.sheer` and not interactive. It draws no
+  readout, so it carries no scrim; the mapping picks it by density and interaction, not by what it
+  holds.)*
 - **The pane says its hit region:** `sampling(_:)` — `systemPane` until the redesign's stage 2 —
   ends in `.contentShape(shape)`, for every `.material` pane on iOS 26 and later, the opaque one
   under Reduce Transparency included. The hand-made
@@ -706,7 +748,10 @@ Since the redesign's stage 1 (2026-10-09; committed 2026-10-10 in `c9ef45d`), `l
 `primarySurface(in:ring:)` — the one surface that is not glass, for a screen's one main action.
 Three places use it: *Get Started* and the sheet's *Save* — both were frosted glass under a cyan
 glow — and, since the redesign's stage 2, **Home's Glass disc**, the only one on a `Circle`: the
-slot every one-tap door logs, between two glass discs.
+slot every one-tap door logs, between two glass discs. *(2026-10-14, the redesign's stage 5: the
+first is now the welcome's main action, in its bar — *Get Started*, then *Continue*, then *Turn on
+reminders* — on a rounded rectangle at `LiquidGlass.cornerRadius` (`WelcomeView.swift:677`).
+Still three places.)*
 
 | Token (`LiquidGlass.Primary`) | Value | |
 |---|---|---|
@@ -747,7 +792,10 @@ bar's — below iOS 26; above it the bar is Apple's — and the sheet's shortcut
 are in *The look, measured*; the letter on its disc is derived, by
 `theShownDaysLetterReadsOnItsDisc`. **Every figure in this section was measured before stage 3c**,
 on black-tinted glass and the black-scrim hand-made pane, and the ones that name History's shown
-day — the paragraph above's included — are of the pair it drew then.
+day — the paragraph above's included — are of the pair it drew then. *(2026-10-14, stage 5: the
+fill-and-rim pair also marks the welcome calculator's picked unit, on a capsule, and its picked
+activity, on a rounded rectangle at `innerCornerRadius` (`WelcomeView.swift:978`, `:1036`; the
+mark itself `:1103–1104`). *Welcome, measured* gives the text inside them, not the rim.)*
 
 **Measured 2026-10-10**, worst pixel of clean ground, the three tabs each selected in turn — at rest,
 and on Apple's glass at the `0.48` tint of that evening (at the final `0.52`, through the aurora's
@@ -853,7 +901,8 @@ run and the empty state:**
 - **The range labels were raised, not carried.** At white 0.6 they read 3.75 at `0.40` and would
   read 4.49 on the first-run card at `0.48`; they are 0.75 now, in `SettingsView` and
   `GoalSetupView`. *(Settings' are 0.88 since stage 4 — *Settings, measured*; noted in the
-  fifty-eighth pass. `GoalSetupView`'s are still 0.75.)*
+  fifty-eighth pass. `GoalSetupView`'s are still 0.75.)* *(Stage 5, 2026-10-14: `GoalSetupView` is
+  gone; the welcome's goal card draws its range labels at 0.88 — *Welcome, measured*.)*
 - **Increase Contrast** (iOS 27.0, at `0.48`, at rest): the system darkens the glass a great deal
   by itself. None of the 71 pairs fails; the goal line 4.08 at white 0.45, white 0.70 over the
   magenta lobe 8.62, the lozenge's rim 4.90.
@@ -1369,6 +1418,11 @@ rectangles; the tab bar's pairs exist only below iOS 26, where the bar is ours):
 | First run: *ml* (0.8) | 4.5 | 7.25 | 8.87 | 7.07 |
 | First run: range labels (0.75) | 4.5 | 6.19 | 7.56 | 6.12 |
 
+*(2026-10-14, the sixtieth pass of `docs/AI_CONTEXT.md`: this table is stage 3c's record of its
+day. Its *Settings* rows are of the card stage 4 restyled — *Settings, measured* — and its *First
+run* rows are of `GoalSetupView`, which stage 5 deleted; the welcome's figures are in *Welcome,
+measured*.)*
+
 - **Nothing measured that this stage draws is under its floor, on any of the three systems.** The
   tightest:
   the cyan bar (3.38–3.44 on 27.0 and 18.6), the goal dashes (3.67–3.71), the vessel glyph in
@@ -1472,6 +1526,116 @@ Each cell is the worst of 20 frames.
 **Not measured.** The *Open iOS Settings* button (shown only while notifications are refused);
 Settings under Reduce Transparency (this stage changes no pane); a minute's sweep on the final
 source; Russian and Uzbek figures; iOS 17; a device.
+
+## Welcome, measured
+
+**2026-10-14, the redesign's stage 5** (spec `docs/superpowers/specs/2026-10-14-welcome-design.md`;
+plan `docs/superpowers/plans/2026-10-14-premium-redesign-stage-5.md`). The first-run screen is
+`WelcomeView` — four steps, a pinned bar, the goal calculator — and `GoalSetupView` is gone.
+
+**What is drawn** (the canvas *WaterBuddy welcome*'s values, read from its boards' source, as
+`WelcomeStyle` holds them; then the owner's rulings after the first measurement):
+- A step's title is `.largeTitle` bold at the tabs' place (`ScreenMetrics`); the goal and vessels
+  steps open their card with a line in 17 pt **full white**, the reminders step keeps its line
+  under the title, on the aurora, **full white** (the canvas: 0.92 under every title). Cards 20 pt
+  padding, 16 apart, `.frosted` + `.raised`.
+- Hello: a 232-pt sheer glass circle of `WaterSurface` at half, *Welcome to* `.title2` semibold at
+  0.92 over *WaterBuddy* 42 pt heavy (capped 64), the line at 0.92.
+- The goal: the figure 60 pt bold rounded (capped 80), *ml* at 22/60 of it, white 0.9; range
+  labels `.footnote` semibold 0.88; *Work it out for me* 56 pt, the sparkle **after** the words (the
+  canvas: before them). The calculator: a 124-pt weight column (a system wheel, 160 pt, and a
+  kg | lb switch), three activity choices 50 pt tall, *Use* on sheer glass, the disclaimer
+  `.footnote` 0.88. Choices and units are marked with `LiquidGlass.Selection`'s fill and rim.
+- The bar: dots 8 pt, the current 22 pt wide, others **white 0.6** (the canvas: 0.35); *Back* 112
+  pt on sheer glass; the main action on the primary surface, both 56 pt; *Not now* 44 pt. The two
+  footnotes on the aurora at **white 0.95** (the canvas: 0.88).
+- Reminders: a notification preview on frosted glass with the reminder's own two strings; seven
+  bells on **frosted** discs (the canvas: sheer), 34 pt, over their hours.
+
+**Method.** As *Settings, measured*: a throwaway probe in a scratch copy of the index, launched with
+the DEBUG fresh start; every step and Settings captured 20 times 3 s apart; the lightest pixel of
+ground beside each text with the text's white composited over it; a cyan mark at `Aurora.cyan`.
+Bands beside each element are built from the frames the probe reads off the tree, and any band
+overlapping another element is dropped; text on the aurora is read on clean ground 10–14 pt out
+(#95) and beside its glyphs 2–6 pt out. Every band is drawn on a capture; every pair under its
+floor was looked at in a zoom before its figure was kept. iOS 27.0 and 26.5 on an iPhone 17, iOS
+18.6 on an iPhone 16.
+
+**The first sweep found eight things under their floor, in nine rows of its table** (the dots
+were read on two steps; worst frame, iOS 27.0 / 26.5 / 18.6): the goal and vessels lines under the
+title, white 0.92 on the aurora's blue light, 3.97 / 3.96 / 4.09
+— and at full white still 4.38; the reminders line 4.36 / 4.43 / 4.69; the goal footnote at 0.88,
+4.25 / 4.23 / 5.20; the sparkle in the row's lit corner, 2.84 / 3.48 / 2.89; the Cup's glyph at
+the vessels card's lit corner (no title above it there), 2.81 / 3.59 / 2.74; a bell on a sheer
+disc, 1.83 on 27.0 only; the inactive dots at 0.35, 2.20 / 2.20 / 2.17. The owner ruled each
+(R1–R4), and the line moved into the vessels card then read 4.46 at 0.92 by its lit corner — full
+white for both card lines (R5). No value was moved by eye.
+
+**On the final source, a minute's sweep a system — 69 pairs in the measurement table, 59 on the
+welcome's steps and 10 on Settings after its vessel rows moved out; 68 of them read (all but *Your
+weight*, below), none under its floor.** The table below gives the welcome's pairs and two of
+Settings':
+
+| Pair | Floor | iOS 27.0 | iOS 26.5 | iOS 18.6 |
+|---|---|---|---|---|
+| Hello: *Welcome to* (0.92) / *WaterBuddy* | 4.5 / 3 | 5.83 / 6.30 | 5.83 / 6.30 | 5.89 / 6.36 |
+| Hello: the line (0.92), clean ground | 4.5 | 4.76 | 4.76 | 4.76 |
+| Dots: current / inactive (0.6) | 3 | 7.19 / 3.66 | 7.19 / 3.66 | 6.96 / 3.57 |
+| A step's title | 3 | 6.94 | 6.99 | 6.72 |
+| The goal card's line (1.0) | 4.5 | 5.13 | 6.56 | 5.02 |
+| The goal's figure / *ml* (0.9) | 3 / 4.5 | 7.06 / 7.48 | 9.83 / 10.28 | 7.04 / 7.68 |
+| Range labels (0.88), left / right | 4.5 | 6.63 / 7.20 | 9.02 / 9.82 | 6.79 / 7.32 |
+| The goal footnote (0.95), clean ground | 4.5 | 4.91 | 4.91 | 6.11 |
+| *Work it out for me* / the sparkle (cyan) | 4.5 / 3 | 4.83 / 4.74 | 4.92 / 6.58 | 6.32 / 5.30 |
+| The chevron (0.92) / *Back* | 3 / 4.5 | 8.00 / 8.88 | 10.44 / 11.80 | 8.33 / 8.29 |
+| *How active are you?* | 4.5 | 9.31 | 12.53 | 9.13 |
+| An activity's name, worst / its line, worst | 4.5 | 7.97 / 7.01 | 10.37 / 9.19 | 7.76 / 6.92 |
+| *kg* picked / *lb* (0.88) | 4.5 | 8.10 / 7.87 | 10.14 / 10.24 | 7.68 / 7.86 |
+| *Use* / the disclaimer (0.88) | 4.5 | 8.80 / 7.45 | 12.09 / 9.91 | 8.29 / 7.71 |
+| *Your goal is …* (0.92) / its ✓ (cyan) | 4.5 / 3 | 8.17 / 6.04 | 10.90 / 7.70 | 8.02 / 5.75 |
+| The vessels card's line (1.0) | 4.5 | 4.95 | 6.29 | 4.89 |
+| Cup's name / amount | 4.5 | 6.20 / 8.66 | 8.42 / 12.09 | 6.18 / 8.65 |
+| Cup's / Glass's / Bottle's glyph (cyan) | 3 | 3.28 / 4.08 / 4.78 | 4.39 / 5.67 / 6.64 | 3.25 / 4.16 / 4.88 |
+| The Glass note (0.92) / the vessels footnote (0.95) | 4.5 | 7.90 / 5.80 | 10.56 / 5.75 | 8.02 / 6.39 |
+| The reminders line (1.0), clean ground | 4.5 | 4.84 | 4.92 | 5.22 |
+| Preview: *WaterBuddy* (0.88) / *now* / title / body (0.92) | 4.5 | 5.45 / 7.62 / 8.49 / 6.19 | 7.05 / 10.04 / 11.93 / 8.48 | 5.44 / 7.63 / 8.82 / 6.61 |
+| *Smart reminders* / the schedule sentence (0.92) | 4.5 | 4.93 / 8.00 | 6.36 / 10.08 | 4.91 / 7.75 |
+| A bell's hour (0.92), worst / a bell (cyan) | 4.5 / 3 | 5.78 / 3.72 | 7.60 / 5.36 | 6.26 / 4.53 |
+| *Not now* (0.92) | 4.5 | 7.36 | 7.36 | 7.25 |
+| Settings, after the extraction: Cup's glyph / name | 3 / 4.5 | 3.11 / 5.95 | 4.08 / 8.01 | 3.10 / 6.02 |
+
+Each cell is the worst of 20 frames. *Your weight* has no band clear of other frames; it is the same
+white, on the same row, as *How active are you?*.
+
+- **The tightest**, by its margin over the floor: Settings' Cup glyph, 3.11 / 4.08 / 3.10 against
+  3 — 0.10 over on 18.6, by its card's lit top-left corner, the sheen *Settings, measured* found
+  there (3.08 at stage 4); then the welcome's Cup glyph, 3.25 on 18.6, by the vessels card's same
+  corner; then Hello's line, 4.76 on all three systems against 4.5, on the aurora's clean ground;
+  then, on iOS 27.0, *Work it out for me* (4.83) and the reminders line (4.84), and the vessels
+  card's line (4.89 on 18.6), by the card's lit corner. *(This bullet named Hello's line first
+  until the fifty-ninth pass; a fresh reader found the two Cups tighter by margin.)*
+- **Settings is unchanged by the extraction** of its vessel rows into `VesselSliders`: its figures
+  are within a box's width of stage 4's.
+- **Increase Contrast** (27.0), **Russian and Uzbek** (27.0), **Reduce Transparency** (27.0, the
+  opaque fill on every pane) and **Reduce Motion** (27.0) were rendered, one frame a step, on the
+  build before the owner's rulings — which move two lines into their cards, the sparkle after its
+  words and the bells onto frosted discs, and raise the whites of the dots, the footnotes and the
+  lines, but no control's layout — and not
+  measured; so those renders never showed the moved sparkle or the bells' new glass. Nothing is cut in either language; Russian stacks the calculator's two
+  columns and the reminders bar's two buttons at the ordinary size, as their `ViewThatFits` allow.
+- **The smallest phone** (375 × 667, iOS 26.5): whole at the ordinary size, the bar 76 pt; at
+  `AccessibilityXXXL` nothing is cut and each step scrolls above the bar, which stands about 189 pt
+  tall on the goal step and about 321 pt on the reminders step — **about half the screen**, its
+  three controls stacked (rendered again on the final source). **Landscape** (27.0, final source):
+  every step whole and scrolling above the bar; on Hello the greeting stands below the fold.
+- **The slide** (27.0, a recording, frames 50 a second): the step arriving starts a screen's width,
+  402 pt, out and is in place about 0.6 s after the tap — most of the way in 0.3 s, then the curve's
+  tail (`Motion.page`, 0.45 s). Both steps move; the bar stands still. **Under Reduce Motion** a step
+  cross-fades in place in 0.2–0.3 s (`Motion.pageFade`, 0.25 s), and Hello's waves stand still.
+
+**Not measured.** The calculator open at the largest text size (rendered, scroll position not
+checked); VoiceOver's reading of the bell strip, the greeting and the ✓ line (XCUITest lists their
+children; a device check); iOS 17; a device.
 
 ## Apple's tab bar, measured
 
@@ -1604,6 +1768,14 @@ down. And Home's column handed the header its ideal height, which the header's s
 evenly first: a line with only a least height reported 44 pt around a 48 pt title, which stood
 2 pt above it. The accessory is laid out at 44 pt whatever it draws, and the line is rigid.
 
+*(2026-10-14, the sixtieth pass: since stage 5 the welcome's steps read the same three
+`ScreenMetrics` and put their titles where a tab's stands — `testAStepsTitleStandsWhereATabsTitleDoes`
+compares a step's title with Settings' after the welcome closes, x and y; its figures were not added
+to the table above. Hello's two sections arrive as an opening page's do, by `Arrival`. The other
+three steps are whole as they slide in because nothing on them arrives — they carry no `.arrives`,
+so the `pageSettlesIn` of `false` the welcome hands them is read by nothing, though the comment at
+`WelcomeView.swift:223`–`:224` credits it.)*
+
 **The date under *Today*.** `.headline`, as History's total is. The widest date of a year in the
 three shipped languages, measured in iOS's own font at Accessibility XXXL, is *Понедельник,
 28 сентября*: 665.9 pt, against 327 pt between the margins of a 375 pt phone — 0.491 of its
@@ -1651,18 +1823,20 @@ judgement of "too quiet" or "too much" is of numbers.
 | `drop` | `.easeIn(duration: 0.42)` | a drop on its way to the vessel |
 
 The press keeps its own spring, `0.28 / 0.62`, in `PressStyle` and `LiquidGlassModifier`.
-Sixteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to 0.5 s.
+Fifteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to 0.5 s. *(Sixteen
+until stage 5, 2026-10-14: `GoalSetupView`'s went with the file; the welcome writes none.)*
 
 | What moves | By how much | Held by |
 |---|---|---|
 | A page, on a change of tab | a whole screen's width, both pages together, 0.45 s; the backdrop and the bar not at all | `PageTurnTests`, `aPageChangesInUnderHalfASecond` |
+| A welcome step, on *Continue* or *Back* (stage 5) | a whole screen's width, both steps together, on `page`; the bar not at all; under Reduce Motion a cross-fade in place on `pageFade` | `WelcomeStepTests` — where the next and previous steps wait, a sliding step seen all the way out, nothing travelling under Reduce Motion |
 | A drop, on a pour | 22 pt across, from the pressed disc to the vessel's centre along an arc lifted 56 pt above the line between — the drop itself rises 28 — in 0.42 s; whole for three quarters of the way, then taken in | `PourArcTests` |
 | The vessel, as a drop lands | to 1.025 of its size in 0.1 s and back over 0.5 s; the surface surges then | — |
 | The level | to its new mark on `water`, past it and back | `whatLandsPassesItsPlaceAndDoesNotRing` |
 | The shown day's marker | one ring round the day's track and one disc behind its letter, from day to day, on `land` — since stage 3c; one capsule until then | `theMarkerStandsOverTheDayShown`, the ring's place; the disc is placed from the letter's own anchor and no test holds it |
 | The strip's bars | from the baseline to their heights over 0.5 s, as the page arrives and on each change of day; simply there under Reduce Motion | — |
 | The saved tick | a 16 pt check (26 at most) trimmed from nothing to whole on `land`, 1.6 s, then faded | — |
-| The figure under a held slider | 1.06 of its size, from the edge it is pinned to: the trailing edge, but a Settings vessel's amount drawn under its name — the row's form since stage 4 when the name and the widest amount do not fit side by side — from its leading edge | — |
+| The figure under a held slider | 1.06 of its size, from the edge it is pinned to: the trailing edge, but a Settings vessel's amount drawn under its name — the row's form since stage 4 when the name and the widest amount do not fit side by side — from its leading edge. *(Since stage 5 the vessel rows are `VesselSliders`, drawn by Settings and by the welcome's vessels step alike; the welcome's goal figure does not grow while held — Settings' goal is the only other.)* | — |
 | The streak chip, *Undo*'s capsule | from 0.8 of their size, on `land` | — |
 | A section scrolling off History or Settings | toward 0.92 of its size, by the share of it no longer showing, drawing back from the edge it is crossing | `ScrollDepthTests` |
 
@@ -1673,7 +1847,9 @@ Sixteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to
   lands. On Apple's bar the lens crosses meanwhile; the app's own bar moves its lozenge. On
   iOS 26.5 the quarter-second the `TabView` held the old page is gone.
 - **The first-run screen handing over to the app** is a cross-fade in place, as before. Home
-  does not slide in, and its sections settle.
+  does not slide in, and its sections settle. *(Seen on `GoalSetupView`, the first-run screen
+  then. Stage 5's welcome hands over through the same `RootView` cross-fade, unchanged in the code;
+  that hand-over was not recorded frame by frame. Its own slide is in *Welcome, measured*.)*
 - **A pour** (iOS 26.5, the Cup): the drop is on the disc as the press ends, crosses in front
   of the status line and *Undo*'s capsule, and is gone into the vessel about 0.45 s later; the
   vessel is seen a little larger for the four frames after that.
@@ -1754,9 +1930,10 @@ downward:
 `liquidGlass(…)` is applied *inside* a button's label, and `ButtonStyle.Configuration` is visible
 only to the style, which wraps the label from outside.
 
-**Interactivity is opt-in**, and only where the glass *is* the pressable surface — six call sites,
-all in the app: Home's two side discs (one site) and its *Undo* capsule, History's `+`, a serving
-row, the sheet's *Cancel*, and *Open iOS Settings*. *(Until the redesign this list named the three quick-add vessels, *Get
+**Interactivity is opt-in**, and only where the glass *is* the pressable surface — eight call
+sites, all in the app: Home's two side discs (one site) and its *Undo* capsule, History's `+`, a
+serving row, the sheet's *Cancel*, *Open iOS Settings*, and the welcome's *Back* and *Use* (six
+until stage 5, 2026-10-14). *(Until the redesign this list named the three quick-add vessels, *Get
 Started* and *Save*. The last two became primary surfaces in stage 1 and Home's Glass disc in
 stage 2; a primary surface is not glass and takes its pressed wash from `LiquidGlass.Primary`.)*
 The tab bar's glass sits outside its buttons and the settings cards sit outside their rows, so
@@ -1790,6 +1967,8 @@ stage 2 adds the container with the new quick-add row (spec `2026-10-09-premium-
 `GlassEffectContainer` on iOS 26 and later, nothing at all below it and on the watch — wraps Home's
 row, which is no longer three glass circles: two glass discs flank the primary surface, and the
 container has those two to sample together. `glassEffectID` is still not used; nothing morphs.
+*(2026-10-14, the sixtieth pass: a second container since stage 5, round the welcome's seven
+bell discs on its reminders step.)*
 
 Apple also warns to "limit the use of Liquid Glass effects onscreen at the same time". Home
 drew **five** panes (the vessel, three vessels, the tab bar); since stage 2 it draws four — the
@@ -1798,7 +1977,12 @@ streak, and a sixth for the eight seconds an *Undo* stands. Settings draws **fiv
 cards and the tab bar — and a sixth, *Open iOS Settings*, while notifications are blocked; this
 line said four until 2026-10-11, which left the tab bar out where Home's count had it in. Worth a
 look. *(Since 2026-10-12 the tab bar in these counts is Apple's own on iOS 26 and later, and the
-app's `.frosted`/`.floating` pane only below it.)*
+app's `.frosted`/`.floating` pane only below it.)* *(2026-10-14, the sixtieth pass: History was
+never counted here, and since stage 5 the welcome's reminders step draws the most glass on any
+screen — **ten** panes: the reminder's preview, the schedule card, seven bell discs in one
+`.glassGroup()`, and *Back*; its main action is the primary surface. The welcome's four steps are
+all in the tree at once, the three not shown at 0.001 opacity; whether Apple's glass costs
+anything for those was not measured.)*
 
 ## The haptic ladder
 
@@ -1807,9 +1991,9 @@ and `remove`. Five call sites used to spell the first one, `confirm`, by hand.
 
 | Rung | Weight | Intensity | Where |
 |---|---|---|---|
-| `select` | the system's `.selection` | — | a choice among peers: a change of tab on either bar, a day picked in the week card when the day shown changes, a vessel shortcut in the serving sheet, and each 50 ml step of the sheet's slider; since stage 4, a language picked in Settings, and each step of Settings' goal slider (100 ml) and vessel sliders (50 ml) while a finger drags it |
+| `select` | the system's `.selection` | — | a choice among peers: a change of tab on either bar, a day picked in the week card when the day shown changes, a vessel shortcut in the serving sheet, and each 50 ml step of the sheet's slider; since stage 4, a language picked in Settings, and each step of Settings' goal slider (100 ml) and vessel sliders (50 ml) while a finger drags it; since stage 5, a change of step in the welcome, each step of its goal slider and its vessel sliders under a finger, and a unit or an activity picked in its calculator (the weight wheel plays the system's own tick) |
 | `remove` | `.light` | 0.8, `confirm`'s (`takingAwayIsNoFirmerThanAConfirmation`) | a serving swiped away in History |
-| `confirm` | `.medium` | 0.8 | a goal saved (first run and Settings), the reminders switch turned on (at the flip, before permission is answered), a vessel's amount committed, and — since stage 2 — *Undo* pressed on Home (whether or not a row was there to take back). A language picked played `confirm` until stage 4 |
+| `confirm` | `.medium` | 0.8 | a goal saved (first run and Settings), the reminders switch turned on (at the flip, before permission is answered), a vessel's amount committed, and — since stage 2 — *Undo* pressed on Home (whether or not a row was there to take back). A language picked played `confirm` until stage 4. Since stage 5 the first run's is the welcome finishing (*Turn on reminders* or *Not now*, at the tap), and the calculator's *Use* plays it too |
 | `pour` | `.heavy` | **1.0** | water logged on Home, and a serving added or edited in History's sheet |
 | `goalReached` | `.heavy` | 1.0 | the goal crossed upward **while Home is on screen** — the modifier is Home's, and it watches the model's `hasReachedGoal`, the one haptic driven by a model value; a goal crossed from History's sheet plays `pour` alone |
 
@@ -1820,7 +2004,11 @@ a counter, which is what rules `50-views` and `60-design-system` ask for by the 
 `docs/AI_CONTEXT.md` known issue #111. The other ten `sensoryFeedback` sites in the app are
 triggered by counters.)* *(Stage 4, 2026-10-13: twelve. Settings' two step ticks are counters, each
 bumped by its slider's binding while a finger drags it — a value trigger would tick when the screen
-re-reads the model. Fifteen sites in all.)*
+re-reads the model. Fifteen sites in all.)* *(Stage 5, 2026-10-14: nineteen — the welcome's five
+(`WelcomeView.swift`), `GoalSetupView`'s one gone with the file, and the vessel sliders' tick moved
+from Settings into `VesselSliders`, which both screens draw. Fifteen are counters; the welcome's step
+tick is triggered by the step shown, a view's own state only a tap changes, as the tab's is — so
+three are of that kind, and Home's `goalReached` is still the one driven by a model value.)*
 
 **`goalReached`'s "while Home is on screen" is unverified on iOS 26 and later since
 2026-10-12.** Under Apple's tab bar Home is kept while its tab is away and goes on watching the
@@ -1873,7 +2061,10 @@ exists to refuse.
   change of page is a cross-fade, a pour throws no drop, and no section shrinks as it scrolls
   (*Motion*, above — run and recorded with the setting on). The vessel does not swell either,
   and not by reading the setting: the swell answers a drop landing, and there is none. *("Four
-  more things read it" until the fifty-fourth pass of `docs/AI_CONTEXT.md`.)*
+  more things read it" until the fifty-fourth pass of `docs/AI_CONTEXT.md`.)* *(2026-10-14, the
+  sixtieth pass: since stage 5 the welcome reads it twice more — a change of step is a cross-fade
+  in place on `pageFade` (`WelcomeView.swift:188`, `:237`), and Hello's vessel stands its waves
+  still, as `WaterVessel` does (`:823`, `:830`–`:831`). Recorded with the setting on: *Welcome, measured*.)*
 - **Reduce Transparency** — `LiquidGlassModifier` swaps the whole stack for `base.opaqueFill` plus
   the edge and the shadows. Translucency is the thing being turned off, so there is nothing left to
   soften. In the widget, `WidgetCardBackdrop` and `WidgetAurora`'s lights drop out too, and on the

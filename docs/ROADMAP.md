@@ -50,6 +50,10 @@ committed through stage 3b and is in **no release yet**: stage 1, the glass (`c9
 Home (`1ced514`); stage 3, History (`e0762ab`); stage 3b, navigation and motion (`7368dec`).
 *(2026-10-14: and stage 3c, the look — item 1.2.1 — as `a58b9e6`, committed and pushed on
 2026-10-13. Stage 4, Settings — item 1.2.2 — is built and staged, not committed.)*
+*(2026-10-14, evening: stage 4 — item 1.2.2 — is committed as `4e70235`, with its plan `c7d2661`,
+docs `d58116f` and rule wording `1438122`. **Stage 5, the welcome — item 1.2.3 — is built, gated and
+staged, not committed:** spec `docs/superpowers/specs/2026-10-14-welcome-design.md`, plan
+`docs/superpowers/plans/2026-10-14-premium-redesign-stage-5.md`.)*
 
 **The App Store product page header** — new on iOS 27, 3840 × 1646 px — is made and staged, not
 committed: `Screenshots/en-US/ProductPageHeader/01-one-tap.png`, *"One tap. Watch it fill."*, from
@@ -86,7 +90,8 @@ is in the same work: its own proposed remedy is to raise that pane's dark scrim.
 
 **1.2.3 — The goal calculator.** The welcome's goal step offers a suggestion from a weight and an
 activity level the user types in. Only the chosen goal is stored; the weight is used once and kept
-nowhere. No Health access: that is 1.3.
+nowhere. No Health access: that is 1.3. *(2026-10-14, stage 5: built — the weight is picked on a
+wheel, in kilograms or pounds, not typed, and the activity is one of three choices.)*
 
 **1.2.4 — Log from a reminder.** A *Log a Glass* button on the reminder notification itself, which
 logs the usual serving without opening the app — the product's arc, *log without opening the app*,
@@ -108,6 +113,10 @@ streak shows a bare number with no noun until this is fixed (decision D3, 2026-1
 phrase (§8.3), the Lock Screen widget (§7.5), the Control Center control (§7.4), and what stage 3b
 left for a device (#116, #120). *(2026-10-14: and what stage 4 left — #129: Settings' step ticks
 and language tick, never felt, and the vessels note's Russian name for Control Center.)*
+*(2026-10-14, evening: and what stage 5 left — #130: the welcome's haptics; iOS's question about
+notifications asked from the welcome, granted and refused; #100(d)'s walk — revoke the permission
+in iOS Settings, come back, and see *Next reminder* go; what VoiceOver stops on in the welcome; and
+the Russian and Uzbek of its 28 new strings.)*
 
 **1.2.8 — Store page.** New iPhone screenshots of the redesign (the owner's 2026-10-09 ruling was
 none until the redesign is built), the header, and the pitch in the subtitle or description — not in
@@ -242,6 +251,19 @@ re-read value while no drag is in flight), `60-design-system` (stage 3b's haptic
 the rule files unstaged, and the owner approved them the same day; they are staged as typed. The
 stage's code was built and staged first, under the 2026-10-09 ruling to build the stages straight
 through and the owner's S1 and S2 — the reverse of the order this section asks for.)*
+*(2026-10-14, evening: 1.2.3 needed six this table did not list, typed into the rule files
+unstaged for the owner — most of it written in its spec §11, and the rest after the stage's final
+review: `70-privacy` (asking for reminders from the welcome's *Turn on reminders* as well as
+Settings' switch — wording the owner approved in the redesign's spec on 2026-10-09 as D1 — and the
+calculator keeping no weight), `80-notifications` (the same, and the re-read on every return to the
+foreground), `85-testing` (the welcome's DEBUG fresh start; after the review, the two new canary
+suites and `tapWhenReady(_:)`), `50-views` (the menu on `WelcomeView`; after the review, the one
+`withTransaction` scroll), `43-concurrency` (the screen's new name; `WelcomeView.goalRange` /
+`goalStep` carry `nonisolated`; after the review, the two new canaries) and `10-architecture` (the
+screen's new name). As with 1.2.2, the code came first. Not typed, and the owner's to word: rule
+`60-design-system`'s list of haptic counters does not name the welcome's (`goalSteps`, `finishes`,
+`uses`, `picks`), and the welcome's step tick is triggered by the step itself, a view's own state,
+as #111 records.)*
 
 ## 9. Not planned
 

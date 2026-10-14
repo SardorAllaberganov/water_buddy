@@ -3704,3 +3704,86 @@ the screen's or the type's name, the known issue's number, the rule the change c
 `50-views`' grouped volume). And read every list of remaining work — a known issue's "Still …", a
 sheet's "only these sites …", a roadmap's sweep or rule table — for what the change finished or
 added. A search for what a change replaced finds what it removed, not what it finished.
+
+## 2026-10-14 — I put an estimate in front of the owner as if it were a figure
+
+Stage 5's first sweep found the goal and vessels steps' lines under their floor on the aurora. The
+question I put to the owner recommended moving each line into its card, "on glass (~7–9:1)" — a
+figure I had not measured, guessed from the card's other text. The owner chose it. Re-measured, the
+vessels card's line read 4.46 at white 0.92 beside the pane's lit top-left corner, under 4.5, and
+the owner had to be asked a second time (R5, full white: 4.95 / 5.13). Every other figure in those
+questions was measured, which is what made the guess look like one.
+
+**The rule:** a figure in a question to the owner is measured, or it is labelled an estimate and
+says what it was guessed from. When the remedy on offer moves text onto a different ground, render
+the remedy on the probe and measure it before asking — it costs one build, and the owner rules once.
+Text at the top of a pane sits beside its sheen, the lightest ground on the card.
+
+## 2026-10-14 — XCUITest does not wait for a SwiftUI slide to end
+
+The final review found a double tap on the welcome's bar skipped a step. The first fix made the bar
+untouchable (`allowsHitTesting(false)`) while a step slid: the new test passed, and three others
+failed, because XCUITest's idle wait does not cover a SwiftUI animation — the next tap landed during
+the 0.45-s slide, on a bar that silently ignored it. Nothing in the tree said so; the tests just
+found the wrong step. The fix that held: the buttons `.disabled` while a step slides, which the
+tree reports, and a helper, `tapWhenReady(_:)`, that waits for `exists && enabled` before it taps.
+
+**The rule:** when a control is unavailable for the length of an animation, make that state
+readable — `.disabled`, not `allowsHitTesting(false)` — and have UI tests wait on it before
+tapping. A guard the accessibility tree cannot see turns into a test that taps at the wrong time
+and fails somewhere else.
+
+## 2026-10-14 — Two UI chunks in one call outlast the foreground limit
+
+Stage 5's gate ran two `GoalSetupUITests` chunks in one call. Together they passed 600 s, and the
+harness moved the command to the background. The Mac then stalled: the second chunk's **first**
+test spent 1,948 s failing to launch the app ("Timed out while launching application via
+Xcode"), and the passing tests after it took up to an hour each — the chunk ran from 18:41 to
+20:48, where its re-run took three and a half minutes. It was the machine, not the product: the device was
+rebooted by its UDID and the chunk re-run alone, 9/0 in 209 s. My first account of it put the
+failure last and after the slow tests; a reader opening the log found the order.
+
+**The rule:** one UI chunk per `xcodebuild` call, in the foreground. A launch timeout is checked
+against the run's own per-test timings and `uptime` before it is called a failure — and re-run on a
+rebooted device, by UDID, with both runs recorded. Write the account of a run from its log's
+timestamps, not from memory.
+
+## 2026-10-14 — A moved citation is found by its words, not by arithmetic
+
+Stage 5 added one line to `DataManager.swift`, and I moved the sheets' citations into it by
+mapping each old number through the diff. Two kinds slipped. Four of the numbers I mapped were
+already stale before the stage — an earlier pass had recorded them moving at stage 3 — so my "+1"
+carried a wrong line to another wrong line (`:1588` to `:1589`, which is `case .phoneApp: true`,
+where the DocC it cites is at `:1604`). And my sweep matched only citations spelled with a file
+name, `DataManager.swift:N`; the process role's table and its twin in `docs/STATE.md` write bare
+`:1161`, `:1328`, `:1708` under a heading that names the file, and all three had moved. A fresh
+reader found both.
+
+**The rule:** move a citation by opening the line it names and finding the words the sheet quotes,
+never by adding an offset to the number. Sweep for bare `` `:N` `` citations as well as
+`File.swift:N`, reading the heading above to know the file.
+
+## 2026-10-14 — A new screen is missing from the lists of what uses each token
+
+Stage 5's records, two readers, a doc sync and two more readers searched the sheets mostly for the
+screen the stage replaced and for the subjects it changed — the first run, permission, the goal's
+menu, previews, haptics — and fixed a few lists of a token's users on the way (the interactive call
+sites, the elevations and densities in use, the older `.smooth` sites). The sixtieth pass still
+found lists the welcome had joined in the code and not in the sheets: `docs/DESIGN.md`'s *What
+moves* had no row for its slide, *Selection* left out the calculator's marks, the held-slider row
+named Settings only, and `.glassGroup()` was Home's alone. Two readers of that pass then found
+nine more of the same kind, across three sheets: `innerCornerRadius`'s users, the clear glass
+variant's, Reduce Motion's readers, the glass-pane counts, the figures grouped by the locale, the
+single-form Russian keys, the departures from the rules, the screens on the aurora, the system
+wheels. Most of these lists never name a screen at all, so a search for the old one cannot reach
+them: each is a list of **what uses something**, and the new screen had joined it without being
+written in.
+
+**The rule:** after a change adds a screen, list everything its code reaches — design tokens and
+helpers (`grep -oE '(Motion|LiquidGlass|Haptics|ScreenMetrics|Aurora)\.[A-Za-z.]+'`, which keeps a
+camelCase name whole), the shared views and modifiers it draws (`glassGroup`, `arrives`,
+`legibleOnBackdrop`), the model calls it makes, the system APIs and patterns it uses (a wheel, a
+Reduce Motion branch, a transaction, `Bundle.figure`) and the string keys it speaks — and read the
+sheets' section for each, asking whether its list of users or its count is still whole. A search
+for the replaced name finds what was removed; only a search for what the new code uses finds the
+lists it should have joined.
