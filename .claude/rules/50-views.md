@@ -45,11 +45,11 @@ persist anything.
 - A helper view stays a `private struct` in the file that uses it, and earns its own file only when
   a second screen wants it
 - The **menu** a screen offers is a `static let` on that view — `HistoryView.servingRange`/
-  `servingStep`, `GoalSetupView.goalRange`/`goalStep` — never on `DataManager`. A second screen
+  `servingStep`, `WelcomeView.goalRange`/`goalStep` — never on `DataManager`. A second screen
   asking the same question reads the first screen's declaration
 - A menu is what a screen *offers*; a **preference is what the user chose**, and rule `20-state`
   makes `DataManager` the only thing allowed to persist one. `dailyGoal` is the precedent: its range
-  still lives on `GoalSetupView` while its value lives on the model. The quick-add vessels are the
+  still lives on `WelcomeView` while its value lives on the model. The quick-add vessels are the
   same split — `vesselSlots` owns the names, glyphs and order, `DataManager.servings` owns the three
   amounts, and `HomeView.servings(amounts:)` is the pure function that joins them.
   **`vesselSlots` no longer lives on `HomeView`.** It moved to file scope in `WaterSurface.swift` as
@@ -118,7 +118,10 @@ persist anything.
 
 ## Animation
 - Animate with `.animation(_:value:)` scoped to the value that changed. A bare `withAnimation` is
-  banned — there is not one call site in the project
+  banned — there is not one call site in the project. One scroll runs inside
+  `withTransaction(\.animation, …)`: the welcome bringing its opened calculator into view
+  (`WelcomeView`, the stage 5 plan's decision P5), because a scroll position is not view state an
+  `.animation(_:value:)` can scope. It wraps `scrollTo` alone, never a state change
 - Animate a list on row identity (`manager.todaysLogs.map(\.id)`), never on an amount
 - A state-carrying modifier stays present in both branches with a `.clear` value rather than being
   inserted and removed, so SwiftUI animates a colour instead of a layer
@@ -141,7 +144,8 @@ persist anything.
   `ModelConfiguration`, plus `reloadWidgets: {}`. Letting `modelContainer:` default writes real rows
   into the owner's own data on every canvas rebuild
 - A preview whose screen can write water or change the goal must also inject
-  `rescheduleReminders: { _ in }`. `HomeView`, `GoalSetupView` and `HistoryView` currently omit it
-  and reconcile against a real notification centre (rule `80-notifications`)
+  `rescheduleReminders: { _ in }`, or it reconciles against a real notification centre (rule
+  `80-notifications`). All five places that build one for a preview pass it — `HomeView`,
+  `HistoryView` (one factory for its two previews), `SettingsView`, `RootTabView` and `WelcomeView`
 - Pin preview data to `Calendar.waterBuddyDay.startOfDay(for: .now)`, never an offset from `now`, so
   the sample does not fall out of "today"

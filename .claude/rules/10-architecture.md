@@ -9,7 +9,7 @@ globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch
 ```
         the app                              the widget extension
   HomeView · HistoryView                HydrationProvider ── reads ──┐
-  SettingsView · GoalSetupView                 │                     │
+  SettingsView · WelcomeView                   │                     │
           │                              AddWaterIntent ─── writes ──┤
           ▼                                    │ (@MainActor)        │
     DataManager  ◄─────────────────────────────┘                     │

@@ -29,6 +29,14 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
 - Never touch the real `group.sardor.WaterBuddy` suite or `UserDefaults.standard` — from a test, a
   preview, or any ad-hoc script. `didMigrateFromStandard` is a one-shot flag and burning it by hand
   is not recoverable from inside the app (rule `25-shared-storage`)
+- The welcome's UI tests launch with `-WaterBuddyFreshStart`, which only a DEBUG build reads, in
+  `WaterBuddyApp.init()`: the manager is built on a throwaway suite, cleared at launch, and an
+  in-memory store, with no widget, reminder or watch side effects. No other UI test passes it.
+  `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
+  that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
+  test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not
+  now*, so no permission prompt appears in a run; a tap on the welcome's bar goes through
+  `tapWhenReady(_:)`, because the bar is disabled while a step turns
 - Inject the `Calendar` and the `now: () -> Date` clock rather than waiting for a real day
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process
@@ -57,7 +65,8 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   nested `func` does not inherit the enclosing closure's isolation
 - Some suites are deliberately **not** `@MainActor` — `WaterSnapshotTests`, `WidgetLanguageTests`,
   `AppLanguageTests`, `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
-  `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`. They are
+  `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
+  `WelcomeStepTests`, `GoalSuggestionTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving

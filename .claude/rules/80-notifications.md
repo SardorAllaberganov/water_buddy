@@ -93,10 +93,12 @@ system.
   `LocalizationTests.swift`
 
 ## Authorization
-- Requested only from `SettingsView.enableReminders()`, at the moment the user flips the toggle on.
-  A refusal leaves `manager.remindersEnabled` **false** — never store the intent and hope
-- Re-read the status every time the settings screen comes forward and flip the toggle off when it
-  reads `.denied`. Do not cache the status from launch
+- Requested only through `ReminderPermission.enable(on:using:)`, and only from the two taps that ask
+  for reminders: the Settings toggle turning on, and *Turn on reminders* in the welcome. A refusal
+  leaves `manager.remindersEnabled` **false** — never store the intent and hope
+- Re-read the status every time the app comes forward (`ReminderPermission.reconcile`) and whenever
+  the settings screen appears, and clear `remindersEnabled` when it reads `.denied`. Do not cache the
+  status from launch
 
 ## Who reschedules
 - Every state change that can move the plan calls `rescheduleRemindersNow()`: the `currentWater`

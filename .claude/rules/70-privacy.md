@@ -71,8 +71,10 @@ policy rather than a draft, closing that document's own §9.3.
 - Never add an entitlement to unblock a feature: keep `interruptionLevel = .active` rather than
   `.timeSensitive`, and **state the resulting cost** — batched delivery in the Notification Summary —
   in the settings copy rather than hiding it
-- Ask for authorization only from the `set` branch of the reminders toggle, where the user has just
-  asked for reminders. Never at launch, never from the setup screen, never from a `.task`
+- Ask for authorization only in answer to the user's own tap asking for reminders: the `set` branch of
+  the Settings toggle, or *Turn on reminders* on the welcome's last step. Never at launch, never
+  when a screen or a step appears, never from a `.task`. Both taps run one implementation,
+  `ReminderPermission.enable(on:using:)`
 - Never store `remindersEnabled = true` on a refused authorization; set it from the grant result and
   clear it when the system state reads `.denied`
 - Touch only identifiers carrying `ReminderPlan.identifierPrefix` (rule `80-notifications`)
@@ -109,6 +111,10 @@ policy rather than a draft, closing that document's own §9.3.
 ## The user's data is theirs
 - Delete a serving through `DataManager.deleteLog(_:)` — or `resetDailyProgress()` for today — never
   by writing the cache directly, and keep `resetDailyProgress()` scoped to today's rows only
+- The welcome's goal calculator takes a weight and an activity level and keeps neither: they live in
+  `WelcomeView`'s state and are gone when it closes — never written to either store, never sent to
+  the watch, never in a diagnostic. Only the goal the user then chooses is stored. Reading a weight
+  from Apple Health is not this feature (`docs/ROADMAP.md` 1.3.3)
 
 ## Localization
 

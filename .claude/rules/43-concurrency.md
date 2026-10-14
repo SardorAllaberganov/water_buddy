@@ -93,9 +93,10 @@ warning here is a Swift 6 error later.
 - When a type genuinely must be nested (`AuroraBackground.Light`), conform it to `Sendable` **and**
   mark the static collection exposing it `nonisolated` — both, not one
 - Any `static` inside a `View` type that a non-isolated context reads must be `nonisolated`.
-  `HomeView.servings` and `AuroraBackground.lights` carry it; `HistoryView.servingRange` /
-  `.servingStep` and `GoalSetupView.goalRange` / `.goalStep` do not — they are latent warnings the
-  moment a non-`@MainActor` suite reads them
+  `HomeView.servings`, `AuroraBackground.lights` and `WelcomeView.goalRange` / `.goalStep` carry it —
+  the last two because `GoalSuggestion` and its non-`@MainActor` suite read them;
+  `HistoryView.servingRange` / `.servingStep` do not — they are latent warnings the moment a
+  non-`@MainActor` suite reads them
 - The cost is documented: `@Test(arguments:)` evaluates its arguments off the main actor, which
   produced three *"expression is 'async' but is not marked with 'await'; this is an error in the
   Swift 6 language mode"* warnings before `HomeView.servings` was marked
@@ -126,5 +127,6 @@ warning here is a Swift 6 error later.
   reference box, never a captured local `var`
 - Never add `@MainActor` to `WaterSnapshotTests`, `WidgetLanguageTests`, `AppLanguageTests`,
   `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
-  `LiquidGlassInteractionTests`, `NotificationManagerTests` or `ReconcileQueueTests` to make them
+  `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
+  `WelcomeStepTests` or `GoalSuggestionTests` to make them
   compile. They are compile-time canaries: fix the declaration they read instead
