@@ -101,12 +101,14 @@ persist anything.
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the
   three tabs, and separately on a sheet or the pre-setup root. Never substitute
   `.environment(\.colorScheme, .dark)` in the app (that spelling is the widget's, rule `40-widget`)
-- A tab that draws model data calls `.onAppear { manager.refresh() }`. `HomeView` and `HistoryView`
-  do; `SettingsView` does not, and reads a stale goal after an external write
+- A tab that draws model data calls `.onAppear { manager.refresh() }`. `HomeView`, `HistoryView`
+  and `SettingsView` all do
 
 ## Bindings and controls
 - When a view mirrors a model value into `@State` for a slider or field, seed it through `init`
-  (`_goal = State(initialValue: currentGoal)`) — never in `.task` or `.onAppear`
+  (`_goal = State(initialValue: currentGoal)`) — never in `.task` or `.onAppear` — and take a
+  re-read value from `.onChange(of:)` on the model's property while no drag is in flight. A
+  `@State` ignores every later `init` value, so without it a refresh leaves the old figure drawn
 - A continuous control that writes to the model commits on both `onEditingChanged` and
   `onChange(of:)` guarded by an `isDragging` flag: one gesture, one write
 - A tap target is at least 44pt via `minHeight` (never a fixed `height`), and the whole slot is the

@@ -137,10 +137,13 @@ measured.
   rounds back to `Int` on the way out
 
 ## Haptics
-- Fire only through `Haptics.confirm`, `Haptics.pour` and `Haptics.goalReached`. Never spell
-  `.impact(weight:intensity:)` at a call site, and never play one from the widget extension
+- Fire only through `Haptics.confirm`, `Haptics.pour`, `Haptics.goalReached`, `Haptics.select` and
+  `Haptics.remove`. `select` is the system's selection tick, for a choice among peers — a tab, a
+  day, a vessel, a slider's step; `remove` is a light impact, for something taken away. Never spell
+  `.impact(weight:intensity:)` or `.selection` at a call site, and never play one from the widget
+  extension
 - Trigger `.sensoryFeedback` from a counter bumped by the user's own action (`pours`, `commits`,
-  `enables`, `switches`) — never directly from a model value such as `manager.currentWater`
+  `enables`, `switches`, `steps`) — never directly from a model value such as `manager.currentWater`
 
 ## In the widget
 - Glass never uses `LiquidGlass.Base.material(_:)`; pass `base: .archived` (which `WidgetPane` does

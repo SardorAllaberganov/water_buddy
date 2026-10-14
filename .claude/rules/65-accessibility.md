@@ -69,7 +69,7 @@ rather than re-deriving it.
 
 ## Tap targets
 - Every tappable row carries an explicit `.frame(minHeight:)` of at least 44 — 44 for a tab slot,
-  48 for a language row, 56 for a serving row and the primary buttons. Never a fixed `height`
+  50 for a language row, 56 for a serving row and the primary buttons. Never a fixed `height`
 - Make the whole slot the target, not the glyph: `.frame(maxWidth: .infinity, minHeight: 44)` plus
   `.contentShape(Rectangle())` where the label does not already fill the row
 - In the widget, size every `Button(intent:)` label to at least `PourButton.minimumTarget` (44) with
