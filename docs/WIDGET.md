@@ -3,7 +3,21 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
-**Last updated:** 2026-10-13 (twenty-fourth pass — `/doc_sync` after the redesign's stage 3c, the
+**Last updated:** 2026-10-14 (twenty-fifth pass — `/doc_sync` after the redesign's stage 4,
+Settings, staged and not committed. **No file under `WaterBuddyWidget/` changed, none of the six
+shared files did, and no contract here did.** The stage's one string is the app's own: Settings'
+vessels note now says *"The Glass is the one your widget, Siri and Control Center log."* — the
+slot `DataManager.usualSlot` names, which this extension's button and control log, put in the
+words the screen draws. The widget catalogue was not touched; the stage changed no key in
+`sharedKeys`. The extension was built in the stage's gate at 00:13, `** BUILD SUCCEEDED **`; two
+comment-only edits to `SettingsView.swift`, which this scheme compiles through its
+`WaterBuddy.app` entry, came after it (the app scheme was built after each). The warning
+comparison built this scheme after a clean `build-for-testing` of HEAD (`c9d1f6b`) and of the
+index as exported at 23:51 on 2026-10-13 — the staged tree but for those two comments — each into
+its own folder: the same 19 distinct warnings by file and message, none from `WaterBuddyWidget/`.
+**Nothing was rendered: no widget was placed.** Stage 3c, which the pass below calls staged, was
+committed in `a58b9e6`.)
+Previously: 2026-10-13 (twenty-fourth pass — `/doc_sync` after the redesign's stage 3c, the
 look, staged and not committed. **No file under `WaterBuddyWidget/` changed, and no contract here
 did.** One of the six shared files did: `LiquidGlassModifier.swift` tints Apple's glass with
 `Aurora.top`, lays the hand-made sheen and lit rim over it, and scrims the phone's own hand-made
@@ -578,7 +592,13 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWidgetExtension
                  -destination 'platform=iOS Simulator,OS=27.0,name=iPhone 17'
 ```
 
-Last run 2026-10-13, on the redesign's staged stage 3c, with the command above:
+Last run 2026-10-14 at 00:13, on the redesign's staged stage 4, with the command above:
+`** BUILD SUCCEEDED **` — before two comment-only edits to `SettingsView.swift`. Stage 4's warning
+comparison built this scheme from a `git archive` of `c9d1f6b` and from a `git checkout-index`
+export of the index, made at 23:51 on 2026-10-13, each straight after a clean `build-for-testing`
+of the app into its own folder: the same 19 distinct warnings by file and message, none from
+`WaterBuddyWidget/`. Stage 3c's account follows, kept: run 2026-10-13, on the redesign's staged
+stage 3c, with the command above:
 `** BUILD SUCCEEDED **`. Stage 3c's warning comparison built this scheme from a `git archive` of
 `684f3dd` and from a copy of the working tree, each straight after a clean `build-for-testing` of
 the app into its own folder, and each printed the same 19 distinct warnings by file and message

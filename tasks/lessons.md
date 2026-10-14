@@ -3660,3 +3660,47 @@ to `/doc_sync`. Before reporting, search every sheet for the names the change re
 `scrimOpacity`, "black scrim", `0.52` — and give the readers the sheets whole, not just the new
 sections. Find moved citations by a sweep, never by recall: every `File.swift:N` the sheets cite
 into a file the change touched, HEAD's line `N` against the tree's.
+
+## 2026-10-14 — I copied a screen's remedy without the half that paid for it
+
+Settings scrolled under the status bar (#108), and History's fix was one point of top padding.
+I copied the point and not the line on its header, where History takes the same point back off its
+header's inset so the title stands where Home's does. The title would have stood a point low —
+by the final reviewer's arithmetic, more than the half point the UI test comparing the three
+titles allows. The reviewer found it by reading History's code; the test was not run on the
+unfixed code.
+
+**The rule:** when a fix is borrowed from another screen, read the whole site it was applied at —
+every line its comment points to and every value beside it that compensates — and carry all of
+it, or say why not. A remedy that moves a frame almost always has a twin that moves it back.
+
+## 2026-10-14 — A box that was clean on the sweep was not clean on the next frames
+
+The iPhone 16's box above the Cup glyph read clean ground through a minute's sweep. On the final
+source's three frames, after the row around the glyph had changed, it caught the glyph's
+anti-aliased rim and read 2.75:1, under the floor. A pixel check settled it: the "ground" was cyan
+blended into navy. Why the rim reached the box on those frames was not measured.
+
+**The rule:** after any change to a layout, draw the boxes again on the new frames before keeping
+a figure; a box is checked against the capture it measures, not the one it was drawn on.
+
+## 2026-10-14 — A claim a change makes false is written in more than one place
+
+Stage 4 grouped Settings' vessel amounts, the last of the app's screens known issue #39 listed as
+ungrouped. The stage found that claim in one place — a test comment that said "Settings draws a
+vessel's amount from the first" key, which it rewrote — and not in two others: #39 still said
+Settings was ungrouped, and `docs/STATE.md`'s sentence on which sites honour the locale still
+listed "the week card's `Best 8050 ml`, History's rows, Settings", History's half stale since
+stage 3, through four passes of that sheet. Its records had swept the sheets for the words the
+stage replaced — the old note, "language picked", "does not refresh" — and neither sentence held
+one: each named the *screen*. The sync found them by reading every Settings mention in the sheets.
+Its own readers then found two more lists of the same kind in `docs/ROADMAP.md`, a sheet it had
+searched for status words and not read: the device-check sweep, without stage 4's #129, and §8's
+rule changes, without stage 4's three.
+
+**The rule:** a sentence a change makes false is usually written in more than one place. When one
+copy is found — in code, a test or a sheet — search every sheet for the same claim by its subject:
+the screen's or the type's name, the known issue's number, the rule the change cites (here rule
+`50-views`' grouped volume). And read every list of remaining work — a known issue's "Still …", a
+sheet's "only these sites …", a roadmap's sweep or rule table — for what the change finished or
+added. A search for what a change replaced finds what it removed, not what it finished.

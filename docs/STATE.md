@@ -4,7 +4,17 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
-**Last updated:** 2026-10-13 (thirty-second pass — `/doc_sync` after the redesign's stage 3c, the
+**Last updated:** 2026-10-14 (thirty-third pass — `/doc_sync` after the redesign's stage 4,
+Settings, staged and not committed. **No key, no stored byte, and no shared file changed.**
+Settings now calls `refresh()` when it appears, as Home and History already did — the same path,
+with the same rollover and reconcile, so nothing this sheet describes moved. One sentence was
+wrong: the one that says which figures group by the locale still listed History's week card and
+rows, grouped since stage 3, and Settings, grouped since stage 4 — it lists both widgets and the
+watch's serving rows now. The literal `manager.servings[1]` is still at
+`HistoryView.swift:305`; `LocalizationTests`, where the stage's one new unit test is, is not
+among *Tests that pin this*. Stage 3c, which the pass below calls staged, was committed in
+`a58b9e6`.)
+Previously: 2026-10-13 (thirty-second pass — `/doc_sync` after the redesign's stage 3c, the
 look, staged and not committed. **No key, no stored byte.** One shared file changed —
 `LiquidGlassModifier.swift`, tokens and drawing only — and nothing this sheet describes. One line
 citation moved with the stage: the literal `manager.servings[1]` is at `HistoryView.swift:305`.
@@ -728,9 +738,11 @@ app rather than as a language it does not have. *Only sites that format against 
 this:* `Text(_:format:)` on the phone, the watch's own readout (`WristVessel.readout`), and — since
 the redesign's stage 2 — everything Home draws through `Bundle.figure(_:_:locale:)`, which formats
 each volume with the locale and hands it to a `%n$@` key: the vessel's `1 300 of 2 000 ml`, the
-status line, the discs' captions, *Undo*. A phone figure still built with `String(format:)` and
-`%1$d` — the week card's `Best 8050 ml`, History's rows, Settings, both widgets — groups in no
-language at all (`AI_CONTEXT.md` known issue #39). Spoken strings keep `%d` on purpose.
+status line, the discs' captions, *Undo*; since stage 3, History's header, week card and rows; since
+stage 4, Settings' vessel amounts. A figure still built with `String(format:)` and `%1$d` — both
+widgets, and the watch's serving rows — groups in no language at all (`AI_CONTEXT.md` known issue
+#39). Spoken strings keep `%d` on purpose. *(Until the thirty-third pass this sentence still listed
+the week card's `Best 8050 ml`, History's rows and Settings — History's stale since stage 3.)*
 
 ## The day ordinal
 

@@ -4,7 +4,31 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
-**Last updated:** 2026-10-13, afternoon (fifty-seventh pass — `/doc_sync` run by the owner
+**Last updated:** 2026-10-14, morning (fifty-eighth pass — `/doc_sync` run by the owner straight
+after stage 4 was staged, in the session that built it). **No source or test file changed, and
+nothing was built or run in this pass**; its figures are recounts of the tree and re-reads of the
+stage's saved build logs. The tree: 78 `.swift` files, each with its row in *Files on disk* and
+every count there matching `wc -l`; 557 `@Test`, 57 on the watch, 41 UI `func test`, as the
+targets table says; eleven keys; three exception sets, as `CLAUDE.md` lists them. Here: #39 has
+Settings' half — the stage grouped the amounts and left the entry as it was; #126 is retired, its
+commit having landed (`c9d1f6b`); #121 and #129 have notes; *Files on disk*'s note says what stage
+3c and the App Store header were committed as. Elsewhere: `docs/STATE.md`'s list of figures that do
+not group still named History's and Settings'; `docs/WIDGET.md`, `docs/STATE.md` and
+`docs/DESIGN.md` had their *Last updated* on stage 3c; `docs/ROADMAP.md` called the App Store header
+uncommitted, left #129 off its device-check sweep and stage 4's rule changes off its §8;
+`CLAUDE.md`'s 31 warning lines were re-counted from the stage's clean builds of HEAD and the index
+and stand. One lesson. Two fresh readers then read the pass (`docsync-58-reader-a.md`, `-b.md` in
+the stage's ledger folder); every finding was checked, and all but two were taken —
+`HISTORY.md`'s checkpoint lists them and the two. The paragraph below is the stage's own.
+
+Previously — 2026-10-14, just after midnight — **the redesign's stage 4, Settings, is built,
+gated and staged, not committed**; written by the session that built it, not a `/doc_sync` pass.
+HEAD `c9d1f6b`, level with `origin/main` (stage 3c committed and pushed on 2026-10-13). The first
+block of *Current state* has it; #108 retired, #84 and #111 noted, #129 opened. The tree now: 78
+`.swift` files (none added); 557 `@Test`, 57 on the watch, 41 UI `func test`; eleven keys; three
+exception sets. The paragraph below is the fifty-seventh pass's, as it was written.
+
+Previously — 2026-10-13, afternoon (fifty-seventh pass — `/doc_sync` run by the owner
 straight after stage 3c was staged, in the session that built it). **No source or test file
 changed, and nothing was built or run in this pass**; its figures are recounts of the tree and
 re-reads of the stage's saved build logs. The tree at the start: 78 `.swift` files, each named
@@ -1062,8 +1086,8 @@ it) and the watch's own `primaryIndex = 1`, `WristView.swift:136` — known issu
 |---|---|---|---|
 | `WaterBuddy` | `sardor.WaterBuddy` | `WaterBuddy/` | **LIVE** — SwiftUI, `@Observable` `DataManager` over SwiftData |
 | `WaterBuddyWidgetExtension` | `sardor.WaterBuddy.WaterBuddyWidget` | `WaterBuddyWidget/` **+ 6 shared files** | **LIVE** — two `StaticConfiguration`s over one provider: the Home Screen widget (small, medium) and the Lock Screen widget (circle, rectangle, line); interactive `AddWaterIntent`; and, from iOS 18 behind the codebase's first `if #available`, the Control Center control `LogWaterControl` |
-| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, **556 `@Test` functions in 69 suites, all run on 2026-10-13** (9 are the redesign's stage 3c, staged: one new suite — `LiquidGlassScrimTests` 4 — one test more in each of `LiquidGlassRoutingTests`, 10, and `PrimarySurfaceTests`, 2, and three more in `HistoryLayoutTests`, 17; recounted per suite by script in the fifty-seventh pass). Before that: 547 `@Test` functions in 68 suites, all run on 2026-10-12 (47 are stage 3b's second pass, unstaged: four new suites — `MotionTests` 6, `PageTurnTests` 13, `PourArcTests` 6, `ScrollDepthTests` 16 — four more in `ArrivalTests`, 10, and two more in `HistoryLayoutTests`, 14). Before that: 500 in 64 suites, all run on 2026-10-12 (21 are the redesign's stage 3b, unstaged: four new suites — `ScreenMetricsTests` 4, `ArrivalTests` 6, `BarShadeTests` 3, `AuroraDriftTests` 6 — and one test more in each of `HapticLadderTests` and `HomeLayoutTests`). Before that: 479 `@Test` functions in 60 suites, all run on 2026-10-11 (35 tests are the redesign's stage 3, staged: four new suites — `DaysMetTests` 8, `DayFractionTests` 9, `HistoryLayoutTests` 12, `HistoryStringTests` 3 — and one test more in each of `HistoryWindowTests`, `HistoryServingTests` and `GroupedFigureTests`. Stage 2's 57 in eight suites were committed in `1ced514`: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` in `c9ef45d`). *(Read 444 in 56 until the fiftieth pass; 387 in 48 until the forty-seventh — the forty-sixth updated the header and the gate and left this row.)* |
-| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — **since the redesign's stage 3c, staged 2026-10-13: `GoalSetupUITests` has 34 tests, 39 declared, 52 executed a system, one of them skipped** — one more, `testEveryDayOnTheWeekCardIsATapTarget`, that each of the week card's days is at least 44 × 44. Before that, **since stage 3b's second pass, unstaged 2026-10-12: `GoalSetupUITests` has 33 tests, 38 declared, 51 executed a system, one of them skipped** — one more, that only the page shown is in the tree once a change of tab has ended. Before that, **since the redesign's stage 3b, unstaged 2026-10-12: `GoalSetupUITests` has 32 tests** — seven more, for the title's place (two), a screen coming back whole, a kept screen answering a tap, the drag along Apple's bar, the app's own bar's captions, and History returning to today — **37 declared, 50 executed a system, one of them skipped** (the caption test where the bar is Apple's, the drag test where it is the app's own), and the class runs in chunks (#110). The text that follows is the fiftieth pass's. — `GoalSetupUITests` (25 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass; eleven are stage 2's, committed in `1ced514`: Home's heading, the two "never squeezed" checks, and *Undo*; five are stage 3's, staged: the strip's heading, the sheet's shortcuts, and three at the largest text size — the shortcuts' figures, a row's amount, a past day's heading), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **30 declared, 43 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. Since stage 3 the target runs as two invocations, 25 and 18: one no longer fits a 600-second foreground call (known issue #110). *(Read "20 real tests … 25 declared, 38 executed" until the fiftieth pass; "9 real tests … 14 declared, 27 executed" until the forty-seventh.)* |
+| `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, **557 `@Test` functions in 69 suites, all run on 2026-10-13** (one is the redesign's stage 4, staged: `theVesselsNoteNamesTheGlassByItsOwnName` in `LocalizationTests`). Before that: 556 `@Test` functions in 69 suites, all run on 2026-10-13 (9 are the redesign's stage 3c, staged: one new suite — `LiquidGlassScrimTests` 4 — one test more in each of `LiquidGlassRoutingTests`, 10, and `PrimarySurfaceTests`, 2, and three more in `HistoryLayoutTests`, 17; recounted per suite by script in the fifty-seventh pass). Before that: 547 `@Test` functions in 68 suites, all run on 2026-10-12 (47 are stage 3b's second pass, unstaged: four new suites — `MotionTests` 6, `PageTurnTests` 13, `PourArcTests` 6, `ScrollDepthTests` 16 — four more in `ArrivalTests`, 10, and two more in `HistoryLayoutTests`, 14). Before that: 500 in 64 suites, all run on 2026-10-12 (21 are the redesign's stage 3b, unstaged: four new suites — `ScreenMetricsTests` 4, `ArrivalTests` 6, `BarShadeTests` 3, `AuroraDriftTests` 6 — and one test more in each of `HapticLadderTests` and `HomeLayoutTests`). Before that: 479 `@Test` functions in 60 suites, all run on 2026-10-11 (35 tests are the redesign's stage 3, staged: four new suites — `DaysMetTests` 8, `DayFractionTests` 9, `HistoryLayoutTests` 12, `HistoryStringTests` 3 — and one test more in each of `HistoryWindowTests`, `HistoryServingTests` and `GroupedFigureTests`. Stage 2's 57 in eight suites were committed in `1ced514`: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` in `c9ef45d`). *(Read 444 in 56 until the fiftieth pass; 387 in 48 until the forty-seventh — the forty-sixth updated the header and the gate and left this row.)* |
+| `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — **since the redesign's stage 4, staged 2026-10-13: `GoalSetupUITests` has 36 tests, 41 declared, 54 executed a system, one of them skipped** — two more, that Settings draws the new vessels note and that each of its controls is one element. Before that, **since the redesign's stage 3c, staged 2026-10-13: `GoalSetupUITests` has 34 tests, 39 declared, 52 executed a system, one of them skipped** — one more, `testEveryDayOnTheWeekCardIsATapTarget`, that each of the week card's days is at least 44 × 44. Before that, **since stage 3b's second pass, unstaged 2026-10-12: `GoalSetupUITests` has 33 tests, 38 declared, 51 executed a system, one of them skipped** — one more, that only the page shown is in the tree once a change of tab has ended. Before that, **since the redesign's stage 3b, unstaged 2026-10-12: `GoalSetupUITests` has 32 tests** — seven more, for the title's place (two), a screen coming back whole, a kept screen answering a tap, the drag along Apple's bar, the app's own bar's captions, and History returning to today — **37 declared, 50 executed a system, one of them skipped** (the caption test where the bar is Apple's, the drag test where it is the app's own), and the class runs in chunks (#110). The text that follows is the fiftieth pass's. — `GoalSetupUITests` (25 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass; eleven are stage 2's, committed in `1ced514`: Home's heading, the two "never squeezed" checks, and *Undo*; five are stage 3's, staged: the strip's heading, the sheet's shortcuts, and three at the largest text size — the shortcuts' figures, a row's amount, a past day's heading), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **30 declared, 43 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. Since stage 3 the target runs as two invocations, 25 and 18: one no longer fits a 600-second foreground call (known issue #110). *(Read "20 real tests … 25 declared, 38 executed" until the fiftieth pass; "9 real tests … 14 declared, 27 executed" until the forty-seventh.)* |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
 | `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
 | `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, 57 `@Test` functions in 6 suites |
@@ -1158,10 +1182,14 @@ seventh means editing that list.
 
 ## Files on disk
 
-*Line counts re-derived with `wc -l` on 2026-10-13 (fifty-seventh pass): eight moved, all stage
-3c's. In the notes below, "staged 2026-10-11, the redesign's stage 3" was committed on 2026-10-13 as
-`e0762ab`, and "unstaged 2026-10-12, stage 3b" (both passes) as `7368dec`; "2026-10-13, stage 3c,
-staged" is not committed.*
+*Line counts re-derived with `wc -l` on 2026-10-14 (fifty-eighth pass), every row against its file
+by a script: none stale — the three stage 4 moved had been re-counted by its own session. In the
+notes below, "staged 2026-10-11, the redesign's stage 3" was committed on 2026-10-13 as `e0762ab`;
+"unstaged 2026-10-12, stage 3b" (both passes) as `7368dec`; and, the same day, "2026-10-13, stage
+3c, staged" as `a58b9e6` and the App Store header's "staged 2026-10-13" (its two rows only) as
+`6499619`. No note that names stage 4 is committed: its rows say "staged 2026-10-13", when the
+stage first staged its files, or — `SettingsView.swift`'s — "2026-10-14", when that file was last
+re-staged, after midnight.*
 
 ```
 WaterBuddy/Arrival.swift                         154   app only — unstaged 2026-10-12, stage 3b; rewritten by its second pass: Arrival (rise 14, stagger 0.05, hiddenOpacity never zero, and the pure opacity(arrived:settles:) and lift(arrived:settles:reduceMotion:)), EnvironmentValues.pageSettlesIn — true for the page the app opens on, false for every page a turn brings in, whose sections are whole as it slides (History's bars read the flag and not this, and grow on every page) — View.arrives(_:order:) and View.tracksArrival(_:), a task that sets the flag 50 ms after the page is built. isShownTab is gone
@@ -1175,7 +1203,7 @@ WaterBuddy/HomeView.swift                       1138   app only — (2026-10-13,
 WaterBuddy/LiquidGlassModifier.swift             904   shared — design tokens + the glass modifier; 2026-10-13, stage 3c, staged: Apple's glass tinted with systemTintColor (Aurora.top) at systemTintOpacity 0.64, the hand-made sheen and lit rim laid over it (litSurface), scrim(density:scheme:base:onPhone:) in place of Density.scrimOpacity(for:) — Aurora.top 0.30 / 0.70 / 0.80 for the phone's own panes, black 0.16 / 0.28 / 0.40 for the widget's .archived base and the watch — runsOnPhone, Selection.ringOpacity / ringWidth / discFill, innerCornerRadius; 2026-10-11, `1ced514`: routed branches on the pane's base only, and a .material pane on iOS 26+ always carries glassEffect — .identity when it is not Apple's — so a setting never moves a pane's content (#91a); .glassGroup(), Apple's GlassEffectContainer on iOS 26+ and nothing elsewhere; committed 2026-10-10 in c9ef45d: the routing (rendering, systemGlassAvailable, systemVariant), Apple's glass on iOS 26+ behind #if os(iOS) + #available, darkened by systemTintOpacity(for:) (0.52 regular, 0 clear) and given its hit region by .contentShape(shape), LiquidGlass.Primary and primarySurface(in:ring:), LiquidGlass.Selection
 WaterBuddy/LogServingIntent.swift                 78   app only — the Siri phrase's intent ("Log a Glass"): wait for the watch link, logTheGlass, wait for the reminder queue, reply "Water logged."
 WaterBuddy/Motion.swift                           93   app only — unstaged 2026-10-12, stage 3b's second pass: Motion, the curves by name — page (.smooth 0.45), pageFade (0.25, under Reduce Motion), settle (0.3), land (spring 0.5 / 0.68) and landSpring, water (spring 0.8 / 0.62), drop (easeIn 0.42) — and the plain numbers behind them. Sixteen older call sites still write .smooth themselves
-WaterBuddy/NotificationManager.swift             283   shared — ReminderScheduler + reconcile, the only code that files, removes or asks permission (SettingsView.swift:240 — :234 after stage 3b's first build, :225 before it — also reads the centre's settings directly, for the Notification Summary line; it has since the first commit, and this row said "the only UN caller" until the forty-eighth pass); ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46), and settled(), which waits for it to drain
+WaterBuddy/NotificationManager.swift             283   shared — ReminderScheduler + reconcile, the only code that files, removes or asks permission (SettingsView.swift:254 since the redesign's stage 4, :240 before it — :234 after stage 3b's first build, :225 before it — also reads the centre's settings directly, for the Notification Summary line; it has since the first commit, and this row said "the only UN caller" until the forty-eighth pass); ReconcileQueue, which runs the app's reconciles one at a time in call order (known issue #46), and settled(), which waits for it to drain
 WaterBuddy/PageTurn.swift                         94   app only — unstaged 2026-10-12, stage 3b's second pass: PageTurn, a change of tab as a value — the page shown, the page leaving, which way the shown one came, and how many turns have been made; mounted (two pages at most, in the bar's order), offset, entry, opacity, and settle(_:), which ends a turn by its number
 WaterBuddy/PourDrop.swift                        160   app only — unstaged 2026-10-12, stage 3b's second pass: PourArc (a drop's path and presence, pure), PourPlace and the PourPlaces preference key (where the discs and the vessel stand), PourDrop (one 22 pt drop flown along the arc, reporting its landing) and View.swells(on:)
 WaterBuddy/PressStyle.swift                       32   app only — the shared press recoil
@@ -1183,7 +1211,7 @@ WaterBuddy/ReminderPlan.swift                    149   shared — WHEN to remind
 WaterBuddy/RootTabView.swift                     520   app only — unstaged 2026-10-12, stage 3b; its container rewritten by the second pass: ONE pager on every system — one AuroraBackground, the page shown and, while it slides, the page leaving (PageTurn; `.transaction(value:)` with addAnimationCompletion takes the old page out), one BarShade under Apple's bar — and the bar in a bottom safeAreaInset: SystemTabBar, a standalone UITabBar behind `if #available(iOS 26.0, *)`, or the app's own GlassTabBar. No TabView, no SystemTabs, no HandMadeTabs (the first build of stage 3b had all three). AppTab (3 cases, nonisolated now), the container, the glass tab bar with a lozenge behind the selected tab (2026-10-09, committed in `c9ef45d`) (the 420pt cap's comment rewritten 2026-09-02: it justified itself in iPad measurements, and iPad is gone — the cap is kept, because 420 is below the widest iPhone's content width)
 WaterBuddy/ScreenHeader.swift                     99   app only — (2026-10-13, stage 3c, staged: DocC only — the week card's days are budgeted by HistoryView.daySlot, not by slot(of:across:)) unstaged 2026-10-12, stage 3b: ScreenMetrics (margin 24, topInset 16, titleLine 44, slot(of:across:)) and ScreenHeader, the header every tab opens with — the title, a line under it, an accessory on the title's line that never sets its height
 WaterBuddy/ScrollDepth.swift                     167   app only — unstaged 2026-10-12, stage 3b's second pass: ScrollDepth (phase(of:within:) by what is left showing, span(from:to:), scale to 0.92, anchor — pure; it shrinks and does not fade), EnvironmentValues.scrollDepthSpan, View.scrollDepth() (a visualEffect off the section's global frame) and View.scrollDepthContainer(). On History and Settings, not Home
-WaterBuddy/SettingsView.swift                    774   app only — (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; SavedTick and CheckShape, drawn over the title of the goal's and the vessels' cards by savedTick(_:) when a change is saved; the figure under a held slider at 1.06; the language's checkmark bounces; the cards re-lay out together when the reminders card's text changes; every section recedes with scrollDepth()) unstaged 2026-10-12, stage 3b: its title is ScreenHeader and its four cards arrive; the goal editor (range labels at white 0.75, 2026-10-10, `c9ef45d`), the vessel editor, reminders, the language picker
+WaterBuddy/SettingsView.swift                    951   app only — (the redesign's stage 4, staged 2026-10-14: the canvas's Settings — SettingsStyle, one title and one note style for the four cards, cardTitle()/cardNote()/settingsCard(), Hairline; the goal at 36 pt bold, its range labels white 0.88 (the 0.75 further on is from before — noted in the fifty-eighth pass); vessel amounts grouped and full white, the row a ViewThatFits measured at its widest; the note "The Glass is the one your widget, Siri and Control Center log."; .onAppear refresh with the two cards re-seeded by onChange unless a drag is in flight; step ticks (Haptics.select) from `steps` counters, the language pick on select; one point of top padding, #108; 774 lines before) (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; SavedTick and CheckShape, drawn over the title of the goal's and the vessels' cards by savedTick(_:) when a change is saved; the figure under a held slider at 1.06; the language's checkmark bounces; the cards re-lay out together when the reminders card's text changes; every section recedes with scrollDepth()) unstaged 2026-10-12, stage 3b: its title is ScreenHeader and its four cards arrive; the goal editor (range labels at white 0.75, 2026-10-10, `c9ef45d`), the vessel editor, reminders, the language picker
 WaterBuddy/WaterBuddyApp.swift                   108   app only — RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch
 WaterBuddy/WaterBuddyShortcuts.swift              38   app only — the one AppShortcutsProvider: three phrases (en + ru, AppShortcuts.xcstrings), the "Log a Glass" tile
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
@@ -1201,7 +1229,7 @@ WaterBuddyTests/HistoryViewTests.swift           308   (2026-10-13, stage 3c, st
 WaterBuddyTests/HomeModelTests.swift             409   2026-10-11, `1ced514` — UndoTests (the id addLog returns, undo by id, after midnight, on a failed read) + HomeFiguresTests (remaining, hasReachedGoal, lastDrink, nextReminder and what each observes) + DayTurnTests (dayDidTurn republishes on a real day change and on nothing else)
 WaterBuddyTests/HomeViewTests.swift              287   (unstaged 2026-10-12, stage 3b: theWidestDateFitsTheNarrowestPhoneAtTheLargestTextSize — every day of a year in three languages, measured in iOS's own font) HomeServingTests — the quick-add row's offered vessels — + HomeLayoutTests (not @MainActor; 2026-10-11, `1ced514`): the Glass ranked, the vessel's floor and ceiling, what the column leaves it, the discs' bounds, an offer's lifetime, Home's glyphs
 WaterBuddyTests/LiquidGlassTests.swift           338   (2026-10-13, stage 3c, staged: the tint floor moved to 0.64, theGlassIsTintedWithTheSkysOwnBlue, LiquidGlassScrimTests — the phone's own panes scrimmed with the sky at 0.30 / 0.70 / 0.80 in density order, the widget and the watch keeping black, Light Mode none — and theShownDaysLetterReadsOnItsDisc in PrimarySurfaceTests) LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response; 2026-10-10, `c9ef45d`: LiquidGlassRoutingTests (which pane, which of Apple's variants, the availability flag, only the regular variant darkened, and no lighter than the lightest rung that passed) + PrimarySurfaceTests (the derived contrast); none @MainActor
-WaterBuddyTests/LocalizationTests.swift          628   (2026-10-11, `1ced514`: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders. Staged 2026-10-11, the redesign's stage 3: HistoryStringTests — History's six keys in en/ru/uz, the four retired keys gone, and the built table's raw-number volume keys exactly the three other screens still draw) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
+WaterBuddyTests/LocalizationTests.swift          648   (stage 4, staged 2026-10-13: theVesselsNoteNamesTheGlassByItsOwnName — the note's key in en/ru/uz contains each table's word for Glass, and the old note's key is gone; 628 lines before) (2026-10-11, `1ced514`: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders. Staged 2026-10-11, the redesign's stage 3: HistoryStringTests — History's six keys in en/ru/uz, the four retired keys gone, and the built table's raw-number volume keys exactly the three other screens still draw) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
 WaterBuddyTests/MotionTests.swift                 64   unstaged 2026-10-12, stage 3b's second pass — MotionTests (not @MainActor, 6): a page changes in under half a second and over a quarter, the fade is shorter than the slide, what lands overshoots and does not ring, neither spring is as quick as the press's, a drop is quicker than the level, a state changes quicker than a page
 WaterBuddyTests/NotificationManagerTests.swift   352   NotificationManagerTests — applying a plan, against a spy scheduler — + ReconcileQueueTests (not @MainActor), against SharedCentre, a lock-guarded stand-in two reconciles can reach at once
 WaterBuddyTests/PageTurnTests.swift              185   unstaged 2026-10-12, stage 3b's second pass — PageTurnTests (not @MainActor, 13): a tab to the right comes in from the right and the page leaving ends a whole width away; the tab already shown turns nothing; two pages at most, in the bar's order; every turn is counted; an older turn's end does not end a newer one, nor does there-back-and-there-again inside one slide; under Reduce Motion nothing travels and the page leaving fades
@@ -1218,7 +1246,7 @@ WaterBuddyTests/WaterLogTests.swift              505   WaterLogStoreTests — on
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WristSyncTests.swift             882   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests; staged 2026-10-11: WristIngestTests' failed-read test makes its store unreadable with UnreadableStore, no longer by overwriting the file (known issue #92)
 WaterBuddyUITests/AppStoreScreenshotUITests.swift  540   NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
-WaterBuddyUITests/GoalSetupUITests.swift        1196   (2026-10-13, stage 3c, staged, 34 tests: testEveryDayOnTheWeekCardIsATapTarget — every day button at least 44 × 44, which bites on a 375-pt phone) (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
+WaterBuddyUITests/GoalSetupUITests.swift        1236   (stage 4, staged 2026-10-13, 36 tests: testSettingsSaysWhichVesselTheOneTapDoorsLog — the new note drawn, the old one not; testEverySettingsControlIsOneElement — the goal slider, three vessel sliders, the switch and four language rows one element each, a guard green before and after; 1196 lines before) (2026-10-13, stage 3c, staged, 34 tests: testEveryDayOnTheWeekCardIsATapTarget — every day button at least 44 × 44, which bites on a 375-pt phone) (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
 WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
@@ -1534,6 +1562,68 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**The redesign's stage 4, Settings, is built, gated and staged — not committed** (2026-10-13
+evening to 2026-10-14, just after midnight; written by the session that built it, not a `/doc_sync`
+pass). HEAD is `c9d1f6b`, level with `origin/main`: stage 3c, which the next block describes as
+staged, was committed and pushed on 2026-10-13 as `a58b9e6` (feat), `3b7bb1e` (spec and plan),
+`6020076` (docs) and `c9d1f6b` (its rule wording). Design: the redesign's spec §7 and the canvas's
+*Settings* board, read from its source; no separate spec. Plan
+`docs/superpowers/plans/2026-10-13-premium-redesign-stage-4.md`, run under the 2026-10-09 ruling;
+ledger `.superpowers/sdd/2026-10-13-premium-redesign-stage-4/progress.md`. Roadmap item 1.2.2.
+The owner's rulings (2026-10-13, "go"): **S1**, the three notes share one style, 15 pt at white
+0.92, where the canvas drew the language footnote at 13; **S2**, the new ticks are `Haptics.select`,
+with stage 3b's haptics wording put to them unstaged.
+
+- **What changed** (`WaterBuddy/SettingsView.swift` and one string). The four cards take the
+  canvas's padding (20), gap (16), one title style and one note style (`SettingsStyle`); the goal's
+  figure is 36-pt bold with its *ml* at white 0.9, the range labels white 0.88; a vessel's glyph
+  sits in a 26-pt box, its name and amount at 17 pt, the amount full white and grouped
+  (`strings.figure("%1$@ ml", …)`) — rule `50-views`' grouped volume, which Settings did not yet
+  draw. The vessels note reads *"The Glass is the one your widget, Siri and Control Center log."*
+  under a hairline, in English, Russian and Uzbek (*Виджет, Siri и Пункт управления записывают
+  Стакан.* / *Vidjet, Siri va Boshqaruv markazi Stakanni qayd etadi.* — drafted by this session, for
+  the owner to check); the old key is gone. Language rows are 50 pt with white 0.16 hairlines.
+- **Behaviour.** `.onAppear { manager.refresh() }`; the goal and vessel cards, which copy the
+  model once in `init`, take a re-read value through `onChange` unless a drag is in flight. A drag
+  ticks `Haptics.select` at each step (100 ml goal, 50 ml vessels) from a `steps` counter bumped in
+  the slider's binding; a language picked ticks `select` instead of `confirm`. A VoiceOver
+  adjustment still commits at once with `confirm` and no tick.
+- **Two things the stage's own checks found and fixed.** At `AccessibilityXXXL` on a 375-pt phone a
+  vessel's amount was cut to "150…" — the row is now a `ViewThatFits`, measured at its widest
+  (every vessel's name, the slider's largest amount) so all three rows choose together and a drag
+  cannot flip one. And the final reviewer (`review-final.md` in the ledger folder) found the title
+  would stand one point lower than Home's — the new top padding's point is taken back off the
+  inset, as History does (`testTheTitleHoldsItsPlaceOnEveryTab`, green; not seen red).
+- **#108 is fixed**: one point of top padding on the reader; rendered on four devices, scrolled,
+  nothing drawn under the clock.
+- **Measured** (`docs/DESIGN.md`, *Settings, measured*): nineteen pairs, a minute's sweep on iOS
+  27.0, 26.5 and 18.6 — none under its floor; tightest the Cup's glyph (3.08 / 4.02 / 3.09 against 3)
+  and the reminders explanation (4.89 / 6.37 / 4.93 against 4.5). Three frames a system at rest on
+  the final source. On the probe build before the review's changes: Increase Contrast, Russian and
+  Uzbek; the largest text size on the 375-pt phone, rendered again on the final source.
+- **The gate, on the final source** (iOS 27.0 *iPhone 17* for unit tests, *WaterBuddy Gate 27* and
+  *Gate 26.5* for UI, *WaterBuddy Watch 27*): **557 `@Test` in 69 suites passed**; UI on each system
+  three `GoalSetupUITests` chunks of 12 by name and the other classes — **54 executed, 1 skipped,
+  0 failures** on 27.0 (before midnight) and on 26.5 (after it); **57 watch tests passed**; both
+  widget builds `** BUILD SUCCEEDED **`. **Warnings: no new line** — an export of the index built
+  clean as HEAD was gives the same 21 unique lines (by file and message) and the same primary-line
+  counts, 49 and 43. Two comments in `SettingsView.swift` changed after the gate — the DocC
+  sentence that named `EditServingSheet` (#84(c)), and the Cup glyph's figure for iOS 18.6, 3.10 →
+  3.09, the measurement after its box was moved; the app was built after them. An earlier run of the first UI chunk, at
+  a load of 104, failed `testAnOlderPoursTimerDoesNotEndANewerOffer` on its own slow-machine guard
+  (7.58 s against 6.5); the gate's run of the same chunk, at a load of 7.6, passed it.
+- **Rule wording, unstaged, for the owner:** `50-views` (all three tabs refresh; a mirrored
+  `@State` re-seeded from the model's change), `60-design-system` (stage 3b's haptics bullet naming
+  `select` and `remove`, and `steps` among the counters — once approved, the haptics half of
+  #111),
+  `65-accessibility` (50 pt for a language row).
+  *After the fifty-eighth pass, 2026-10-14, the owner approved the wording ("Approve rule
+  wording"); the three files are staged as typed, with stage 4, for `/commit`.*
+- **Not done here:** a device (the ticks are felt only there), Reduce Transparency on Settings (no
+  pane changed), iOS 17. Known issue #129.
+
+*(The block below is stage 3c's, as it was written. Its "not committed" is superseded above.)*
 
 **The redesign's stage 3c, the look, is built, gated and staged — not committed** (2026-10-13,
 afternoon; written by the session that built it, not a `/doc_sync` pass). HEAD is `684f3dd`, 104
@@ -3348,7 +3438,67 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
-**There is a git repository.** **Read at 16:32 on 2026-10-13, after the owner approved stage 3c's
+**Read at 09:42 on 2026-10-14, after the owner approved stage 4's rule wording and the three rule
+files were staged by name: `c9d1f6b`, 110 commits, level with `origin/main`; 16 staged, 6
+unstaged, 1 untracked entry, none in both.** The 16 are the block below's 13 and
+`.claude/rules/50-views.md`, `60-design-system.md` and `65-accessibility.md`; the 6 unstaged are
+the six from before the stage's session. No `git commit`.
+
+```
+$ git diff --cached --name-only | wc -l
+      16
+$ git diff --name-only | wc -l
+       6
+$ git status --porcelain | grep -c '^??'
+1
+```
+
+The fifty-eighth pass's block, kept. **Read in the fifty-eighth pass at 07:38 on 2026-10-14, from the commands themselves, after its
+`git add` of its eight files by name: `c9d1f6b`, 110 commits, level with `origin/main`; 13 staged,
+9 unstaged, 1 untracked entry, none in both.** The 13 staged are the stage's 10 (below) and the
+three sheets this pass first touched: `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md`. The 9
+unstaged are the same nine: the three rule files with stage 4's wording, for the owner's yes, and
+the six from before. The untracked entry is `Screenshots/census/`. No `git commit`.
+
+```
+$ git rev-parse --short HEAD
+c9d1f6b
+$ git log --oneline | wc -l
+     110
+$ git status -sb | head -1
+## main...origin/main
+$ git diff --cached --name-only | wc -l
+      13
+$ git diff --name-only | wc -l
+       9
+$ git status --porcelain | grep -c '^??'
+1
+```
+
+The stage's block, kept. **Read at 00:26 on 2026-10-14, after the redesign's stage 4 was staged: `c9d1f6b`, 110 commits,
+level with `origin/main`; 10 staged, 9 unstaged, 1 untracked entry, none in both.** The 10 staged
+are stage 4's: `WaterBuddy/SettingsView.swift`, `WaterBuddy/Localizable.xcstrings`,
+`WaterBuddyTests/LocalizationTests.swift`, `WaterBuddyUITests/GoalSetupUITests.swift`, its plan,
+`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, `HISTORY.md`, `tasks/lessons.md`. The 9
+unstaged are the three rule files with stage 4's wording, for the owner's yes
+(`.claude/rules/50-views.md`, `60-design-system.md`, `65-accessibility.md`), and the six from before:
+`.claude/settings.json`, two watch schemes, three string catalogues. The untracked entry is
+`Screenshots/census/`. No `git commit`.
+
+```
+$ git rev-parse --short HEAD
+c9d1f6b
+$ git log --oneline | wc -l
+     110
+$ git status -sb | head -1
+## main...origin/main
+$ git diff --cached --name-only | wc -l
+      10
+$ git diff --name-only | wc -l
+       9
+```
+
+The block from before stage 3c's commit, kept. **There is a git repository.** **Read at 16:32 on 2026-10-13, after the owner approved stage 3c's
 rule wording and the two rule files were staged by name: `684f3dd`, 104 commits, level with
 `origin/main`; 22 staged, 6 unstaged, 1 untracked entry, none in both.** The 22 are the block
 below's 20 and `.claude/rules/60-design-system.md` and `65-accessibility.md`; the 6 unstaged are
@@ -4408,6 +4558,16 @@ rather than fixed — the review's own explicit call, not an oversight:**
     `+%1$d ml`. **Still ungrouped:** Settings' vessel amounts, which draw from the first of those;
     and, from the widget catalogue's own copies of the same keys, the Home Screen widget (all
     three) and the Lock Screen widget (the first two).
+    **2026-10-14, the fifty-eighth pass: Settings' half is on disk, staged** (History's was
+    committed in `e0762ab`). Since the redesign's stage 4 a vessel's amount goes through
+    `strings.figure("%1$@ ml", …)`; the goal's figure and the range labels were
+    `Text(_:format: .number)` already. No file under `WaterBuddy/` draws any of the three keys now —
+    the app's catalogue keeps them for the widget's and the watch's copies to be checked against.
+    **Still ungrouped:** the two widgets, as above. And on the watch, which this issue never
+    counted, the serving rows (`WristView.swift:445`, `%1$d ml` from the watch's catalogue), whose
+    comment still says the phone draws that key under each vessel — Home has not since stage 2
+    (`1ced514`). The stage's own records said Settings now groups, in their *Current state* block,
+    and left this entry as it was; this pass found it.
 
 40. **The shared Russian keys use a single plural form.** `%1$d percent. %2$d of %3$d millilitres.`
     reads `62 процентов` (correct: `процента`), and `Add %1$d millilitres` reads `Добавить 222
@@ -5095,6 +5255,9 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `EditServingSheet` comment, is `:357`. `:13` and `GoalSetupUITests.swift:28-30` stand.)*
     *(2026-10-12, the fifty-third pass, after stage 3b's second pass: that comment is at
     `SettingsView.swift:366`; the other two stand.)*
+    *(2026-10-14, the redesign's stage 4: both `SettingsView.swift` comments are fixed — the DocC
+    names all four cards, and the `EditServingSheet` sentence now says History's serving sheet.
+    `GoalSetupUITests.swift:28-30` stands.)*
     (d) No production caller: `removeWater(amount:)`, `resetDailyProgress()` and
     `WristVessel.diameter(fitting:reserving:)`, like `allLogs()` (#4). Tests pin all three.
     (e) The widget target's `WidgetBackground` and `AccentColor` colour sets appear to be referenced by
@@ -5667,7 +5830,11 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     own function, with its own test and its own review; the owner's call when. Other zones with
     a transition at midnight were not tried.
 
-108. **Settings scrolls under the status bar.** Seen in a stage 3 capture on iOS 27.0: the clock
+108. ~~**Settings scrolls under the status bar.**~~ **Retired 2026-10-14 — the fix is on disk,
+    staged with the redesign's stage 4:** one point of top padding on Settings' reader, History's
+    remedy, with the point taken back off the column's inset so the title holds its place;
+    in scrolled captures on iOS 27.0, 26.5, 18.6 and the 375-pt phone, content is cut at the
+    status bar's edge and nothing is drawn under the clock. The entry as it was: Seen in a stage 3 capture on iOS 27.0: the clock
     drawn over a card's slider as the screen scrolled. It is the defect stage 3 found and fixed
     in History — a scroll view whose top edge meets the safe area's draws its content on up
     under the status bar — in a screen stage 3 did not open. History's remedy was one point of
@@ -5778,6 +5945,16 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     counter question of (a) is still open and still has no proposed wording.
     **2026-10-13, the fifty-seventh pass:** stage 3c moved the two in `HistoryView.swift` — the
     sheet's tick is at `:1439`, History's bars at `:625` and `:1068`. Found by a fresh reader.
+    **2026-10-14, the redesign's stage 4:** stage 3b's wording for rule `60-design-system`'s
+    *Haptics* bullet — five rungs, `select` and `remove` named — is typed into the rule file,
+    unstaged, for the owner's yes, with `steps` added to the counter list. Settings' two new step
+    ticks are counters, so they add nothing to (a). The other rule files' wording from §7 of the
+    newer spec is still not typed.
+    **2026-10-14, after the fifty-eighth pass: the owner approved that wording**, and
+    `60-design-system.md` is staged as typed, with stage 4. When it is committed, the first
+    sentence's haptics half — "there are five" against a rule that names three — is closed; the
+    `TabView` half was closed by the second pass. (a)'s counter question, the tab's tick and the
+    sheet's on a view's own state, is untouched by the wording and still open, as is (b).
 
 112. **One tab caption reads 4.01:1, under the 4.5:1 floor, and is not cured.** A 375 × 667 pt
     phone at Accessibility XXXL on iOS 26.5: Home scrolls there, the white Glass disc rests
@@ -6008,6 +6185,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `ScrollDepth.swift` and `Arrival.swift` each hold a pure half with the views that use it.
     Stage 3b's own proposals for its header, its haptics and its shade (#111) stand, less the
     one for a kept screen.
+    *(2026-10-14, the fifty-eighth pass: one of them is typed into a rule file now — stage 4 put
+    the haptics proposal into `60-design-system`, unstaged, for the owner, as #111's note says. The
+    wording above is still in none.)* *(The same day, after that pass: the owner approved the
+    haptics wording, and it is staged.)*
 
 122. **A UI test's runner was killed once; what killed it is not known.** 2026-10-12, 23:33,
     *WaterBuddy Gate 27*, iOS 27.0, the staged tree (stage 3) built from an export of the
@@ -6057,8 +6238,11 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     are inline (`HomeView.swift`: the glow's offset 0.5, the gradient centre 0.4 / 0.4, the fade
     0.35), and the glow's comment says "just above the vessel's foot" where the code centres it at
     the foot.
-126. **Stage 3c's rule wording is typed into the rule files and unstaged.** The spec's §8 — five
-    changes in `60-design-system` *Glass* and one in `65-accessibility` *Reduce Transparency* — plus
+126. ~~**Stage 3c's rule wording is typed into the rule files and unstaged.**~~ **Retired
+    2026-10-14, in the fifty-eighth pass — on the condition the entry set:** the commit landed on
+    2026-10-13 as `c9d1f6b` (rule `60-design-system`, rule `65-accessibility`, `CLAUDE.md`) and is
+    on `origin/main`. #128, the one sentence beside the wording, stays open. The entry as it was:
+    The spec's §8 — five changes in `60-design-system` *Glass* and one in `65-accessibility` *Reduce Transparency* — plus
     one more the final review asked for (rule 60 *Interaction*: the sheen and rim over Apple's glass
     read `glassIsPressed` too) and one pointer (*Apple's glass, measured* → *The look, measured*). Until
     the owner says yes, the code contradicts rule 60's "on Apple's glass none of them is drawn",
@@ -6079,6 +6263,21 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     measured*; spec §3.1). The value and the test's floor agree; the sentence and the test's name
     do not. The rule is the owner's to word; renaming the test is a code change. Found when the
     wording was staged.
+129. **Stage 4 (Settings): what waits for a device or the owner.** (a) The step ticks under a
+    finger on the goal and vessel sliders, and the language pick's tick, have never been felt —
+    a simulator plays no haptic. (b) The new vessels note's Russian and Uzbek were drafted by the
+    session that built the stage (*Виджет, Siri и Пункт управления записывают Стакан.* / *Vidjet,
+    Siri va Boshqaruv markazi Stakanni qayd etadi.*); *Пункт управления* is Apple's Russian name
+    for Control Center as this session knows it, not checked on a device; *Boshqaruv markazi* is
+    checked against nothing. (c) The Cup's glyph is the screen's tightest pair, 3.08:1 on iOS 27.0 against its
+    3:1 floor, beside its card's top-left sheen. (d) The vessels card takes 20 pt of padding at its
+    top where the canvas has 22 — one card modifier for all four (the final reviewer's note 7).
+    (e) Not rendered: Settings under Reduce Transparency, and the *Open iOS Settings* button.
+    *(2026-10-14, the fifty-eighth pass: (a) and (b) are on `docs/ROADMAP.md`'s device-check
+    sweep, 1.2.7, now. The stage also lowered the reminders row's floor from 56 to 44 pt — the
+    canvas sets the title and the switch on one line, and the switch is the control — which only
+    `HISTORY.md`, the plan and the ledger said; and its three rule changes were not on that file's
+    list of rule changes, §8, which has a note now.)*
 
 ## Where the rest is written down
 

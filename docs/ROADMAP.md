@@ -48,10 +48,13 @@ account; its outcome is not recorded in this repository. Version 1.0 is on the A
 **The premium redesign** (`docs/superpowers/specs/2026-10-09-premium-redesign-design.md`) is
 committed through stage 3b and is in **no release yet**: stage 1, the glass (`c9ef45d`); stage 2,
 Home (`1ced514`); stage 3, History (`e0762ab`); stage 3b, navigation and motion (`7368dec`).
+*(2026-10-14: and stage 3c, the look — item 1.2.1 — as `a58b9e6`, committed and pushed on
+2026-10-13. Stage 4, Settings — item 1.2.2 — is built and staged, not committed.)*
 
 **The App Store product page header** — new on iOS 27, 3840 × 1646 px — is made and staged, not
 committed: `Screenshots/en-US/ProductPageHeader/01-one-tap.png`, *"One tap. Watch it fill."*, from
 `Tools/ProductPageHeader.html`. It shows the redesign, so it goes up with 1.2, not before.
+*(2026-10-14: committed and pushed on 2026-10-13 as `6499619`, and this file as `2991495`.)*
 
 ---
 
@@ -103,7 +106,8 @@ streak shows a bare number with no noun until this is fixed (decision D3, 2026-1
 **1.2.7 — The device-check sweep.** One sitting with the owner's iPhone and Apple Watch, before the
 1.2 submission, working through every check still open: the complication (its spec §8.3), the Siri
 phrase (§8.3), the Lock Screen widget (§7.5), the Control Center control (§7.4), and what stage 3b
-left for a device (#116, #120).
+left for a device (#116, #120). *(2026-10-14: and what stage 4 left — #129: Settings' step ticks
+and language tick, never felt, and the vessels note's Russian name for Control Center.)*
 
 **1.2.8 — Store page.** New iPhone screenshots of the redesign (the owner's 2026-10-09 ruling was
 none until the redesign is built), the header, and the pitch in the subtitle or description — not in
@@ -230,6 +234,14 @@ Each is written as an amendment for the owner to approve, before its item's code
 | `80-notifications` | A reminder carries an action | 1.2.4 |
 | `60-design-system` | The glass, per stage 3c's chosen approach | 1.2.1 |
 | `60-design-system` | A second set of `Aurora` colours | 1.4.5 |
+
+*(2026-10-14: 1.2.1's was approved on 2026-10-13 and committed as `c9d1f6b`. 1.2.2 needed three
+this table did not list — rule `50-views` (all three tabs refresh; a mirrored `@State` takes a
+re-read value while no drag is in flight), `60-design-system` (stage 3b's haptics wording, and
+`steps` among the counters) and `65-accessibility` (50 pt for a language row). They were typed into
+the rule files unstaged, and the owner approved them the same day; they are staged as typed. The
+stage's code was built and staged first, under the 2026-10-09 ruling to build the stages straight
+through and the owner's S1 and S2 — the reverse of the order this section asks for.)*
 
 ## 9. Not planned
 

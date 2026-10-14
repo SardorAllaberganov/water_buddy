@@ -7,7 +7,24 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
-**Last updated:** 2026-10-13 (the fifty-seventh pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+**Last updated:** 2026-10-14 (the fifty-eighth pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
+by the owner straight after the redesign's stage 4, Settings, was staged. **No source change and
+no token changed in this pass.** The stage's own session wrote its part of this sheet and left this
+line as it was. A fresh reader found two sentences the stage made untrue, both fixed where they
+stand: *Motion* had the figure under a held slider growing from its trailing edge — a Settings
+vessel's amount drawn under its name grows from its leading edge; and *Apple's glass, measured*
+said the range labels "are 0.75 now" in `SettingsView`, which draws them at 0.88. Checked against
+the code: the haptics table — fifteen `sensoryFeedback` sites in the app, twelve triggered by
+counters, `select` and `confirm` as the stage left them; Settings' four cards still `.frosted` +
+`.raised`, five panes with the bar and a sixth, *Open iOS Settings*, while notifications are
+blocked; *Settings, measured*'s tightest figures as the code's comments give them — the Cup glyph
+3.08 / 4.02 / 3.09, the reminders explanation 4.89 / 6.37 / 4.93. Stage 3c, which the pass below
+calls staged, was committed in `a58b9e6`.)
+Before that: 2026-10-13 to 14 (stage 4's own session: a new section, *Settings, measured*; the
+haptics table's `select` and `confirm` rows and a dated note under it; a note under *Contrast
+figures that were measured, not eyeballed* — its three Settings rows describe a card since
+restyled).
+Before that: 2026-10-13 (the fifty-seventh pass of `docs/AI_CONTEXT.md` — `/doc_sync` run
 by the owner straight after the redesign's stage 3c, the look, was staged. **No source change in
 this pass; the tokens stage 3c changed are now said where they are defined.** The stage's session
 had added *The look, measured* and left the sections above it on the old glass. *The stack* names
@@ -454,7 +471,9 @@ now, the weekday letters full white, the shown day a ring (white 0.8, 1.5 pt) ro
 its letter in `Aurora.top` on a white disc, and the goal line a 1.5-pt dashed rule at white 0.62.
 Today's figures for them are in *The look, measured*; the rows stay as the record of their day.
 *(Noted in the fifty-seventh pass, after a fresh reader found "The line is white 0.55 now" still
-reading as current.)*
+reading as current.)* *(Stage 4, 2026-10-13: the three Settings rows describe a card since restyled —
+the note now reads "The Glass is the one your widget, Siri and Control Center log." at white 0.92,
+and the vessels' amounts are full white. Today's figures are in *Settings, measured*.)*
 
 The widget's readout carries **two** shadows — where the app had one until the redesign's stage 2,
 and has two of its own now (the end of this paragraph): `(0.3, radius 6, y 1)` plus a
@@ -833,7 +852,8 @@ run and the empty state:**
   27.0, both at `0.48` — so one value serves both, and 26.5 has room to spare.
 - **The range labels were raised, not carried.** At white 0.6 they read 3.75 at `0.40` and would
   read 4.49 on the first-run card at `0.48`; they are 0.75 now, in `SettingsView` and
-  `GoalSetupView`.
+  `GoalSetupView`. *(Settings' are 0.88 since stage 4 — *Settings, measured*; noted in the
+  fifty-eighth pass. `GoalSetupView`'s are still 0.75.)*
 - **Increase Contrast** (iOS 27.0, at `0.48`, at rest): the system darkens the glass a great deal
   by itself. None of the 71 pairs fails; the goal line 4.08 at white 0.45, white 0.70 over the
   magenta lobe 8.62, the lozenge's rim 4.90.
@@ -1380,6 +1400,79 @@ status and quiet lines and every other text on the aurora (no pane under them, s
 not change them), Russian and Uzbek, iOS 17, a device. The probe's captures and scripts lived in
 the session's scratchpad and are not kept; this section is the record.
 
+## Settings, measured
+
+**2026-10-13, the redesign's stage 4** (spec `docs/superpowers/specs/2026-10-09-premium-redesign-design.md`
+§7; plan `docs/superpowers/plans/2026-10-13-premium-redesign-stage-4.md`). It restyled Settings to
+the canvas's *Settings* board, so **it supersedes the Settings rows of *The look, measured*** above
+and every older Settings figure in this file; those stay as the record of their day.
+
+**What is drawn now** (the canvas's values, read from the board's source; the plan's table gives
+each beside what it replaced). Every card: 20 pt padding (the canvas: 22 at the vessels card's
+top), 16 pt apart, 20 pt under the title,
+`.frosted` + `.raised`. Every card title 17-pt semibold, white. Every note — the vessels note, the
+reminders explanation, the language footnote — `.subheadline` (15 pt) at **white 0.92**: one style,
+where the canvas draws the language footnote at 13 pt (the owner's ruling S1). The goal's figure 36
+pt bold rounded, its *ml* at 17/36 of it, white 0.9; the range labels `.footnote` semibold, white
+0.88. A vessel's glyph `Aurora.cyan` in a 26-pt box, its name 17-pt medium, its amount 17-pt bold
+rounded **full white**, grouped. Hairlines white 0.16. The vessels note reads *"The Glass is the one
+your widget, Siri and Control Center log."*
+
+**Method.** As *The look, measured*: a throwaway probe in a scratch copy of the working tree,
+Settings captured at the top and scrolled to its end every three seconds for a minute; the worst
+pixel of clean ground beside each text with the text's white composited over it; a cyan mark at its
+own rendered colour. Each rectangle was drawn on a capture and looked at before a figure was kept —
+the Cup glyph's first foreground box sat on the cup's dark opening and read 1.08; moved onto solid
+glyph, 3.08. On the final source's frames the iPhone 16's box above the cup caught the glyph's own
+rim and read 2.75; pulled clear of it, 3.09, on those frames and on the sweep's. Clean ground is the
+floor (#95). iOS 27.0 and 26.5 on an iPhone 17, iOS 18.6 on an iPhone 16 with its own rectangles.
+
+| Pair | Floor | iOS 27.0 | iOS 26.5 | iOS 18.6 |
+|---|---|---|---|---|
+| *Daily goal* (1.0) | 4.5 | 5.27 | 6.76 | 5.25 |
+| The goal's figure (1.0) | 4.5 | 7.65 | 10.55 | 7.79 |
+| The goal's *ml* (0.9) | 4.5 | 7.76 | 10.38 | 7.82 |
+| Range labels (0.88) | 4.5 | 5.35 | 7.06 | 5.50 |
+| *Quick-add vessels* (1.0) | 4.5 | 7.10 | 9.83 | 7.22 |
+| Cup's name and amount (1.0) | 4.5 | 6.78 | 9.39 | 6.70 |
+| Glass's name and amount (1.0) | 4.5 | 8.66 | 11.70 | 8.67 |
+| Bottle's name and amount (1.0) | 4.5 | 9.11 | 12.59 | 9.38 |
+| Cup's glyph (cyan) | 3 | **3.08** | 4.02 | **3.09** |
+| Glass's glyph (cyan) | 3 | 4.76 | 6.21 | 4.66 |
+| Bottle's glyph (cyan) | 3 | 5.48 | 6.96 | 5.28 |
+| The vessels note (0.92), top / end | 4.5 | 7.75 / 7.45 | 10.62 / 10.29 | 7.97 / 7.86 |
+| *Smart reminders* (1.0) | 4.5 | 7.90 | 11.28 | 8.16 |
+| The reminders explanation (0.92) | 4.5 | **4.89** | 6.37 | **4.93** |
+| *Language* (1.0) | 4.5 | 7.09 | 9.25 | 6.86 |
+| A language row (1.0) | 4.5 | 8.50 | 11.32 | 8.35 |
+| The check (cyan) | 3 | 5.11 | 6.90 | 5.18 |
+| The language footnote (0.92) | 4.5 | 7.90 | 10.64 | 8.01 |
+
+Each cell is the worst of 20 frames.
+
+- **Nothing measured is under its floor, on any of the three systems.** The tightest: the Cup's
+  glyph (3.08 on iOS 27.0, 3.09 on 18.6, against 3) and the reminders explanation (4.89 / 4.93
+  against 4.5). Both sit by
+  their card's top-left sheen, the lightest ground on a pane: the Cup's glyph is the first thing in
+  its card under the title, and the explanation's first line starts at the sheen's edge.
+- **Increase Contrast** (iOS 27.0, one frame): every pair rises — the Cup's glyph 4.11, the
+  explanation 6.46.
+- **Russian and Uzbek** (iOS 27.0, one frame each, rendered and not measured): nothing is cut.
+- **The smallest phone** (375 × 667, iOS 26.5): whole at the ordinary size. At
+  `AccessibilityXXXL` a vessel's amount was cut to "150…" beside its name; the row is now a
+  `ViewThatFits` that puts the amount under the name, and re-rendered every amount is whole.
+- **The status bar** (#108): scrolled, content is cut at the status bar's edge and nothing is drawn
+  under the clock, on all four devices rendered.
+
+- **The final source.** The sweep ran before the vessel row became a `ViewThatFits` and before the
+  review's changes — the row measured at its widest, and the title's top inset one point less. Three frames a system at rest after them: no
+  pair under its floor, and every figure at or above its sweep's worst frame, once the Cup's box
+  was pulled clear.
+
+**Not measured.** The *Open iOS Settings* button (shown only while notifications are refused);
+Settings under Reduce Transparency (this stage changes no pane); a minute's sweep on the final
+source; Russian and Uzbek figures; iOS 17; a device.
+
 ## Apple's tab bar, measured
 
 *Added 2026-10-12, the redesign's stage 3b.* On iOS 26 and later the three screens are the tabs
@@ -1569,7 +1662,7 @@ Sixteen older call sites still write `.smooth(duration:)` themselves, at 0.28 to
 | The shown day's marker | one ring round the day's track and one disc behind its letter, from day to day, on `land` — since stage 3c; one capsule until then | `theMarkerStandsOverTheDayShown`, the ring's place; the disc is placed from the letter's own anchor and no test holds it |
 | The strip's bars | from the baseline to their heights over 0.5 s, as the page arrives and on each change of day; simply there under Reduce Motion | — |
 | The saved tick | a 16 pt check (26 at most) trimmed from nothing to whole on `land`, 1.6 s, then faded | — |
-| The figure under a held slider | 1.06 of its size, from its trailing edge | — |
+| The figure under a held slider | 1.06 of its size, from the edge it is pinned to: the trailing edge, but a Settings vessel's amount drawn under its name — the row's form since stage 4 when the name and the widest amount do not fit side by side — from its leading edge | — |
 | The streak chip, *Undo*'s capsule | from 0.8 of their size, on `land` | — |
 | A section scrolling off History or Settings | toward 0.92 of its size, by the share of it no longer showing, drawing back from the edge it is crossing | `ScrollDepthTests` |
 
@@ -1714,9 +1807,9 @@ and `remove`. Five call sites used to spell the first one, `confirm`, by hand.
 
 | Rung | Weight | Intensity | Where |
 |---|---|---|---|
-| `select` | the system's `.selection` | — | a choice among peers: a change of tab on either bar, a day picked in the week card when the day shown changes, a vessel shortcut in the serving sheet, and each 50 ml step of the sheet's slider |
+| `select` | the system's `.selection` | — | a choice among peers: a change of tab on either bar, a day picked in the week card when the day shown changes, a vessel shortcut in the serving sheet, and each 50 ml step of the sheet's slider; since stage 4, a language picked in Settings, and each step of Settings' goal slider (100 ml) and vessel sliders (50 ml) while a finger drags it |
 | `remove` | `.light` | 0.8, `confirm`'s (`takingAwayIsNoFirmerThanAConfirmation`) | a serving swiped away in History |
-| `confirm` | `.medium` | 0.8 | a goal saved (first run and Settings), the reminders switch turned on (at the flip, before permission is answered), a language picked, a vessel's amount committed, and — since stage 2 — *Undo* pressed on Home (whether or not a row was there to take back) |
+| `confirm` | `.medium` | 0.8 | a goal saved (first run and Settings), the reminders switch turned on (at the flip, before permission is answered), a vessel's amount committed, and — since stage 2 — *Undo* pressed on Home (whether or not a row was there to take back). A language picked played `confirm` until stage 4 |
 | `pour` | `.heavy` | **1.0** | water logged on Home, and a serving added or edited in History's sheet |
 | `goalReached` | `.heavy` | 1.0 | the goal crossed upward **while Home is on screen** — the modifier is Home's, and it watches the model's `hasReachedGoal`, the one haptic driven by a model value; a goal crossed from History's sheet plays `pour` alone |
 
@@ -1725,7 +1818,9 @@ stage 3b two more are not: the tab's tick is triggered by the shown tab and the 
 amount under the finger — each a view's own state that only the user's touch changes, and neither
 a counter, which is what rules `50-views` and `60-design-system` ask for by the letter;
 `docs/AI_CONTEXT.md` known issue #111. The other ten `sensoryFeedback` sites in the app are
-triggered by counters.)*
+triggered by counters.)* *(Stage 4, 2026-10-13: twelve. Settings' two step ticks are counters, each
+bumped by its slider's binding while a finger drags it — a value trigger would tick when the screen
+re-reads the model. Fifteen sites in all.)*
 
 **`goalReached`'s "while Home is on screen" is unverified on iOS 26 and later since
 2026-10-12.** Under Apple's tab bar Home is kept while its tab is away and goes on watching the

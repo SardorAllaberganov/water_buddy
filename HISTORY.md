@@ -9012,3 +9012,173 @@ Read from the commands at 16:32. **No `git commit` was run.** HEAD `684f3dd`, 10
 `## main...origin/main`. **22 staged**: the 20 above and the two rule files. **6 unstaged**: the
 six from before the stage's session (`.claude/settings.json`, two watch schemes, three string
 catalogues). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-14] — The redesign's stage 4: Settings
+
+- **Target(s)**: WaterBuddy / WaterBuddyTests / WaterBuddyUITests. Nothing in the widget, the
+  watch or the six shared files; no key, no entitlement, no target membership changed.
+- **How it came about**: the owner ran `/start_task` with no task named on the evening of
+  2026-10-13 and was offered roadmap item 1.2.2, the redesign's stage 4, with two decisions —
+  S1, one style for the three notes (15 pt at white 0.92, where the canvas draws the language
+  footnote at 13), and S2, the new ticks on `Haptics.select` with stage 3b's haptics wording put to
+  them. They said "go": both as recommended.
+- **What**:
+  - `WaterBuddy/SettingsView.swift` — the canvas's *Settings* board, read from its source:
+    `SettingsStyle` (title, note, padding 20, gap 16, header 20, hairline 0.16), `cardTitle()`,
+    `cardNote()`, `settingsCard()`, `Hairline`; the goal at 36-pt bold, *ml* white 0.9, range labels
+    white 0.88; vessels in a 26-pt glyph box, 17-pt name and amount, the amount full white and
+    grouped, the row a `ViewThatFits` measured at its widest; the new note under a hairline;
+    reminders row at 44, language rows at 50. `.onAppear { manager.refresh() }`, the goal and vessel
+    cards re-seeded through `onChange` unless a drag is in flight; `steps` counters bumped in the
+    sliders' bindings while dragging, ticking `Haptics.select`; the language pick on `select`. One
+    point of top padding on the reader, taken back off the column's inset (#108).
+  - `WaterBuddy/Localizable.xcstrings` — *"The Glass is the one your widget, Siri and Control
+    Center log."* in en, ru, uz; *"The middle vessel is the one your widget logs."* removed.
+  - Tests: `LocalizationTests.theVesselsNoteNamesTheGlassByItsOwnName` (en/ru/uz); two UI tests,
+    `testSettingsSaysWhichVesselTheOneTapDoorsLog` and `testEverySettingsControlIsOneElement`.
+- **Rulings it rests on**: the redesign's spec §7 (approved 2026-10-09); the 2026-10-09 ruling to
+  build the stages straight through; the owner's S1 and S2 (2026-10-13). This session's own, in
+  the ledger: no separate spec; ticks from a counter, only under a finger; the glyph box; 20 pt of
+  padding on every card; the reminders row at the 44-pt floor.
+- **Found by its own checks and fixed**: at `AccessibilityXXXL` on a 375-pt phone a vessel's amount
+  was cut to "150…" (now stacked under the name); the final reviewer (`review-final.md` in the
+  ledger folder) found the title would stand a point lower than Home's (the point taken back off the
+  inset — `testTheTitleHoldsItsPlaceOnEveryTab` green after, not run before), a fit decided by the
+  amount under the finger, two stale DocC lines, a false test comment, and contrast comments that
+  argued from the token (now carrying the measured figures).
+- **Verification actually run**: tests RED then GREEN (the localization test, 6 issues → passed;
+  the note's UI test failed → passed; the one-element test a guard, passed both times). Rendered and
+  measured on iOS 27.0, 26.5 and 18.6, a minute's sweep each, then three frames a system on the final
+  source — nineteen pairs, none under its floor, tightest the Cup's glyph 3.08:1 (`docs/DESIGN.md`,
+  *Settings, measured*); Increase Contrast; Russian and Uzbek; the smallest phone at the ordinary and
+  the largest text size; the canvas beside the build. The gate on the final source but two comments
+  in `SettingsView.swift` changed after it (the `EditServingSheet` sentence, and the Cup glyph's
+  18.6 figure 3.10 → 3.09; the app built after them): 557 `@Test` in
+  69 suites passed; UI 54 executed, 1 skipped, 0 failures on *WaterBuddy Gate 27* (before midnight)
+  and on *Gate 26.5* (after it); 57 watch tests passed; both widget builds succeeded; the index built
+  clean gives HEAD's 21 warning lines and no other. Not run: a device, Reduce Transparency on this
+  screen, iOS 17.
+- **Rule wording, unstaged**: `50-views`, `60-design-system`, `65-accessibility` — for the owner.
+- **Records**: two fresh readers (`records-reader-a.md`, `records-reader-b.md` in the ledger
+  folder) made eleven findings between them, one of them a code comment both caught; each was
+  checked against its source and fixed.
+
+Read from the commands at 00:26 on 2026-10-14. **No `git commit` was run.** HEAD `c9d1f6b`, 110
+commits, `## main...origin/main`. **10 staged**: the stage's four code and test files, its plan,
+and five records (`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, this file,
+`tasks/lessons.md`). **9 unstaged**: the three rule files for the owner, and the six from before
+(`.claude/settings.json`, two watch schemes, three string catalogues). **1 untracked**:
+`Screenshots/census/`. None in both.
+
+## [2026-10-14] — `/doc_sync` after stage 4: the lists of what was left, which the stage changed
+
+The fifty-eighth pass of `docs/AI_CONTEXT.md`, run by the owner straight after stage 4 was
+staged, in the session that built it. **No source or test file changed, and nothing was built or
+run**: every figure below is a recount of the tree or a re-read of the stage's saved logs.
+
+**Drift found and fixed.**
+
+- Known issue #39 still listed Settings' vessel amounts as ungrouped. Stage 4 groups them; its
+  records said so in their *Current state* block and left the entry as it was. The issue has
+  Settings' half now, and what is left: the two widgets, and, on the watch, the serving rows
+  (`WristView.swift:445`), whose comment still says the phone draws `%1$d ml` under each vessel —
+  Home has not since stage 2.
+- `docs/STATE.md`'s sentence on which figures group by the locale listed "the week card's
+  `Best 8050 ml`, History's rows, Settings, both widgets" — History's half stale since stage 3
+  (2026-10-11), through four passes of that sheet. It lists the two widgets and the watch's serving
+  rows now.
+- `docs/ROADMAP.md` called the App Store header "made and staged, not committed". It went in on
+  2026-10-13 as `6499619`, and the roadmap as `2991495`, both on `origin/main`: a dated note, as
+  the file asks.
+- `docs/AI_CONTEXT.md`'s *Files on disk* note said stage 3c was not committed; it names `a58b9e6`
+  and `6499619` now.
+- *Last updated* in `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md` was still on stage 3c —
+  `docs/DESIGN.md`'s although the stage wrote *Settings, measured* into it. `docs/WIDGET.md`'s
+  *Building it* gives stage 4's run: the extension built at 00:13, before two comment-only edits to
+  `SettingsView.swift`, which this scheme compiles.
+
+**Two fresh readers** read the pass before it was staged (`docsync-58-reader-a.md`, on this
+pass's claims, and `docsync-58-reader-b.md`, a sweep of the sheets for Settings, in
+`.superpowers/sdd/2026-10-13-premium-redesign-stage-4/`, saved as they arrived). Every finding
+was checked against the code, git or the logs; all were taken but two.
+
+- Reader A, thirteen. My #39 note said "no phone source" draws the three raw keys, where the
+  widget, which draws all three, is phone-side too — it says no file under `WaterBuddy/` now; and
+  "outside this issue's phone" is reworded. This file's header in `docs/AI_CONTEXT.md` said the
+  stage "did and did not note" its half, and pointed to readers not yet recorded. `CLAUDE.md`'s new
+  words lacked a word and ran long. The lesson put `docs/STATE.md`'s sentence under a heading about
+  what was left, which it is not under, and missed that the stage fixed the same claim in a test
+  comment — rewritten. "By the attribute grep" covered the 41, which is the `func test` grep. Stage
+  3c's commit was noted in `docs/WIDGET.md`'s new entry and not in `docs/STATE.md`'s or
+  `docs/DESIGN.md`'s. The export was made at 23:51 on 2026-10-13, not "23:52", with no date given.
+  `docs/DESIGN.md`'s new line counted five panes and not the sixth, *Open iOS Settings*. Three
+  warning figures sat side by side unexplained — below. *Files on disk* gives stage 4 two staging
+  dates, and its note now says why. And this checkpoint had no staging block yet: it is below,
+  written after the last `git add`.
+- Reader B, nine and two minor, ranked by harm. `docs/ROADMAP.md`'s device-check sweep, 1.2.7, left
+  out #129, and its §8 table of rule changes had no row for stage 4's three — rule `50-views`,
+  `60-design-system`, `65-accessibility`, typed and unstaged while the code is staged, the reverse of
+  the order its *Authority* sets — and still listed stage 3c's as pending, committed as `c9d1f6b`:
+  a dated note on each. *Files on disk*'s Settings row gave the range labels at 0.75; they are 0.88.
+  `docs/DESIGN.md`'s *Motion* row had every held figure growing from its trailing edge — a vessel's
+  amount stacked under its name grows from its leading edge; *Apple's glass, measured* said Settings'
+  range labels "are 0.75 now"; so its new *Last updated* claimed too much in saying nothing here was
+  wrong. #121 said its wording was typed into no rule file — stage 4 typed the haptics part. The
+  same pointer to readers, and the stale *Git*. Not taken: a dated line number in #103's note for
+  rule `50-views`, which the unstaged rule edit would move by two — dated, and the edit is not
+  approved. Of its two gaps, the reminders row lowered from 56 to 44 pt and not said in
+  `docs/AI_CONTEXT.md` is in #129's note now. Not taken: no Settings rows in `docs/DESIGN.md`'s
+  *Type sizing* — the table holds Home's and the widget's readouts and does not claim to list every
+  `@ScaledMetric`; History's six, the first run's one and the tab bar's glyph are not in it either.
+- Found while taking them: #126 said "Retired when that commit lands", and `c9d1f6b` landed on
+  2026-10-13 — retired.
+
+**Checked and already accurate:** the 78 `.swift` files, each with its row, and every row's count
+against `wc -l` by script; 557 `@Test`, 57 on the watch by the attribute grep, 41 UI by the
+`func test` grep, as the targets table gives them; eleven keys; the three exception sets against
+`project.pbxproj`; every `` rule `nn-name` `` resolves; every line citation into the stage's three
+files, HEAD's line against the tree's — the four into `SettingsView.swift` moved or annotated by
+the stage, the eight into `GoalSetupUITests.swift` standing, none into `LocalizationTests.swift`;
+the haptics table — fifteen `sensoryFeedback` sites, twelve on counters; Settings' four cards on
+`.frosted` + `.raised`; `docs/STATE.md`'s language row (one caller of the setter, `SettingsView`);
+`docs/WIDGET.md`'s sentence that the language card says the widget follows on its next refresh.
+The warnings, from the stage's saved logs of clean builds of HEAD (`c9d1f6b`) and of an export of
+the index made at 23:51 on 2026-10-13 — the staged tree but for two comments: the app's 37 whole
+lines on both, 31 with the six in two `WaterBuddyTests` files set aside, so `CLAUDE.md`'s 31
+stands, and it now names stage 4 among the re-counts; the widget scheme's 19 by file and message
+on both, none from `WaterBuddyWidget/`. **Three counts of the same builds, not three results:** the
+37 whole lines (path, line, column, message) collapse to 21 by file and message — the stage's
+"21 warning lines" above — 2 of them in the test files; the 31 outside the test files collapse to
+19, the widget scheme's 19.
+
+**Files touched:** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`,
+`docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` (one lesson: a claim a change makes false is
+written in more than one place), this file. No `.claude/` file and no file under a target.
+
+**Gate:** not run in this pass. The stage's gate, on the final source but two comments, is the
+checkpoint above.
+
+Read from the commands at 07:38 on 2026-10-14, after this pass's `git add` of its eight files by
+name. **No `git commit` was run.** HEAD `c9d1f6b`, 110 commits, `## main...origin/main`. **13
+staged**: the stage's 10, and `CLAUDE.md`, `docs/STATE.md` and `docs/WIDGET.md`, which this pass
+first touched (`docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this
+file were among the 10 and are re-staged). **9 unstaged**, the same nine: the three rule files with
+stage 4's wording, for the owner, and the six from before (`.claude/settings.json`, two watch
+schemes, three string catalogues). **1 untracked**: `Screenshots/census/`. None in both.
+
+### The rule wording, approved — and staged
+
+After the pass, the owner said "go". Asked which of four things it meant, they chose "Approve rule
+wording": yes to stage 4's wording in `.claude/rules/50-views.md`, `60-design-system.md` and
+`65-accessibility.md`. All three were staged by name exactly as typed — the diff read first: in
+rule 50, *Navigation*'s refresh bullet names all three tabs, and *Bindings and controls*' seeding
+bullet takes a re-read value through `.onChange(of:)` while no drag is in flight; in rule 60, the
+*Haptics* bullet names five rungs, `select` and `remove` among them, and `steps` joins the
+counters; in rule 65, a language row is 50. No wording was changed. Records: the stage's *Current
+state* bullet in `docs/AI_CONTEXT.md`, #111 (its haptics half closes with the commit; its counter
+question stays open), #121, and `docs/ROADMAP.md`'s §8 note — which still says the code came first.
+
+Read from the commands at 09:42. **No `git commit` was run.** HEAD `c9d1f6b`, 110 commits,
+`## main...origin/main`. **16 staged**: the 13 above and the three rule files. **6 unstaged**: the
+six from before the stage's session (`.claude/settings.json`, two watch schemes, three string
+catalogues). **1 untracked**: `Screenshots/census/`. None in both.
