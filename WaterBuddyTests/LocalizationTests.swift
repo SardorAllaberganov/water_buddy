@@ -115,6 +115,39 @@ private let historyKeys = [
     "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.",
 ]
 
+/// The welcome's own strings (spec 2026-10-14 §8). The keys it shares with Settings or the reminder
+/// are checked where those are.
+private let welcomeKeys = [
+    "One tap logs a glass. Watch your day fill up.",
+    "Continue",
+    "Back",
+    "Home pours these in one tap. Set each to what yours holds.",
+    "You can change these later in Settings.",
+    "Reminders",
+    "A gentle nudge when it has been a while.",
+    "Turn on reminders",
+    "Not now",
+    "Step %1$d of %2$d",
+    "now",
+    "Work it out for me",
+    "Your weight",
+    "kg",
+    "lb",
+    "%1$d kg",
+    "%1$d lb",
+    "How active are you?",
+    "Light",
+    "Moderate",
+    "Active",
+    "Mostly sitting",
+    "Exercise some days",
+    "Exercise most days",
+    "Use %1$@ ml",
+    "Use %1$d millilitres",
+    "Your goal is %1$@ ml",
+    "A starting point, not medical advice.",
+]
+
 private let reminderCopy = ["Time for water", "A glass now keeps you on track for the day."]
 
 /// The `.lproj` for one language inside one bundle, or `nil` if that language was not shipped.
@@ -595,6 +628,24 @@ struct HistoryStringTests {
         _ = try #require(localization(appBundle, "en"), "the app ships no en table")
 
         #expect(value(appBundle, "en", key) == nil, "\"\(key)\" is still in the catalogue with no reader")
+    }
+}
+
+// MARK: - The welcome
+
+/// The welcome's own strings, in every language the app ships.
+struct WelcomeStringTests {
+
+    @Test(arguments: ["en"] + translated)
+    func everyWelcomeStringExistsAndKeepsItsArguments(language: String) {
+        for key in welcomeKeys {
+            let resolved = value(appBundle, language, key)
+            #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
+            if let resolved {
+                #expect(specifiers(in: resolved) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments")
+            }
+        }
     }
 }
 

@@ -16,7 +16,7 @@
 #  and a cloned parallel run writes into a container that cannot be read back.
 #
 #  THIS SCRIPT NEVER ERASES ANYTHING. It *requires* a device with no WaterBuddy state — the run
-#  captures `GoalSetupView`, reachable only while `Key.isGoalSet` is absent, and the totals in the
+#  captures the welcome, reachable only while `Key.isGoalSet` is absent, and the totals in the
 #  other three shots are only correct from an empty store — but erasing is destructive and
 #  `Bash(xcrun simctl erase:*)` is on this project's permission deny list. So the check below is a
 #  *gate*, not a fix: if the device is dirty it prints the exact command and stops, and a human
@@ -72,7 +72,7 @@ if [ "$dirty" -ne 0 ]; then
 
   STOP — this simulator already carries WaterBuddy state.
 
-  GoalSetupView is unreachable once a goal has been committed, and the totals in the Home and
+  The welcome is unreachable once a goal has been committed, and the totals in the Home and
   History shots would be whatever a previous run left behind. The capture needs a clean container.
 
   This script will not erase it for you: that destroys everything on the device, and

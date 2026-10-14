@@ -17,7 +17,8 @@ import UserNotifications
 /// the goal editor could drop in beside the reminders card without a second surface. ``GoalCard``
 /// is that editor, and it closes the gap `docs/AI_CONTEXT.md` recorded as tech debt #1:
 /// ``DataManager/saveDailyGoal(ml:)`` used to be called exactly once in an install's life, from
-/// `GoalSetupView`, leaving a user who picked 1,500 and later wanted 2,500 with no route to it
+/// the one-screen setup (`GoalSetupView`, which the welcome replaced in stage 5), leaving a user who
+/// picked 1,500 and later wanted 2,500 with no route to it
 /// short of deleting the app — which is not even enough, because the App Group container survives
 /// an uninstall.
 ///
@@ -224,32 +225,19 @@ struct SettingsView: View {
 
     // MARK: - Permission
 
-    /// Asks once, then records the answer.
-    ///
-    /// A refusal leaves ``DataManager/remindersEnabled`` **off** rather than storing an intent iOS
-    /// will never honour: a switch that reads "on" while every notification is silently dropped is
-    /// worse than no switch at all.
+    /// Asks once, then records the answer — through ``ReminderPermission``, which the welcome's
+    /// *Turn on reminders* runs too, so the two taps that ask cannot disagree about what a refusal
+    /// stores.
     private func enableReminders() async {
-        let status = await scheduler.authorizationStatus()
-
-        if status == .notDetermined {
-            let granted = (try? await scheduler.requestAuthorization()) ?? false
-            manager.remindersEnabled = granted
-        } else {
-            manager.remindersEnabled = status != .denied
-        }
-
+        await ReminderPermission.enable(on: manager, using: scheduler)
         await readSystemState()
     }
 
+    /// What iOS says now: the permission, re-read through ``ReminderPermission`` — which turns the
+    /// switch off if it was withdrawn while the app was away — and the notification summary, which
+    /// is not a permission and stays this screen's own question.
     private func readSystemState() async {
-        authorization = await scheduler.authorizationStatus()
-
-        // Permission revoked while we were away — stop the toggle from lying, and let the model's
-        // own setter clear the schedule that is still filed with the system.
-        if authorization == .denied, manager.remindersEnabled {
-            manager.remindersEnabled = false
-        }
+        authorization = await ReminderPermission.reconcile(manager, using: scheduler)
 
         deliveryIsBatched = await UNUserNotificationCenter.current()
             .notificationSettings()
@@ -365,14 +353,14 @@ private struct LanguageCard: View {
 
 /// The daily goal, editable after setup.
 ///
-/// It offers ``GoalSetupView/goalRange`` — the same 1,000–4,000, in the same 100 ml steps, that
-/// setup offers. Those numbers are a *menu* and not the store's limit, and the two screens that ask
+/// It offers ``WelcomeView/goalRange`` — the same 1,000–4,000, in the same 100 ml steps, that
+/// the welcome offers. Those numbers are a *menu* and not the store's limit, and the two screens that ask
 /// have to offer the identical one: a range narrower here than at setup would strand a user at a
 /// goal they had already chosen and could no longer reach.
 ///
 /// It shares setup's readout *idiom* — monospaced digits, a ratio-sized unit, a numeric transition,
 /// an `Aurora.cyan` slider — but arranges it as a settings row rather than as a hero, because on
-/// `GoalSetupView` that card is the whole page and here it is one of four. It wears `remindersCard`'s
+/// the welcome's goal step that card is the whole page and here it is one of four. It wears `remindersCard`'s
 /// `.raised` elevation for the same reason (rule `60-design-system`).
 ///
 /// **The current goal arrives through `init`, not through `.task`.** A `@State` seeded after the
@@ -484,8 +472,8 @@ private struct GoalCard: View {
         VStack(spacing: 8) {
             Slider(
                 value: sliderValue,
-                in: Double(GoalSetupView.goalRange.lowerBound)...Double(GoalSetupView.goalRange.upperBound),
-                step: Double(GoalSetupView.goalStep),
+                in: Double(WelcomeView.goalRange.lowerBound)...Double(WelcomeView.goalRange.upperBound),
+                step: Double(WelcomeView.goalStep),
                 onEditingChanged: { editing in
                     isDragging = editing
                     if !editing { commitIfChanged() }
@@ -498,9 +486,9 @@ private struct GoalCard: View {
             .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), goal))
 
             HStack {
-                Text(GoalSetupView.goalRange.lowerBound, format: .number)
+                Text(WelcomeView.goalRange.lowerBound, format: .number)
                 Spacer()
-                Text(GoalSetupView.goalRange.upperBound, format: .number)
+                Text(WelcomeView.goalRange.upperBound, format: .number)
             }
             .font(.footnote.weight(.semibold))
             .monospacedDigit()
@@ -571,17 +559,17 @@ private struct GoalCard: View {
 /// compile-time guarantee: the amount was a constant both front doors spelled, and it is now a
 /// stored value every one-tap door reads (``DataManager/usualServing(in:)``).
 ///
+/// **The rows are ``VesselSliders``**, which the welcome's vessels step draws too. This card keeps
+/// what is Settings' own: the title, the note, the save as a slider is let go, the re-read, and the
+/// saved tick.
+///
 /// Three sliders stacked is affordable here only because `SettingsView` wraps its content in the
 /// `GeometryReader`/`ScrollView`/`minHeight` shape rule `65-accessibility` prescribes — at the
 /// accessibility sizes the card grows and the screen scrolls, rather than the stack compressing and
 /// its text truncating, which is exactly how the week card shipped a bug earlier in this session.
-///
-/// Ascent is deliberately **not** enforced. Making an edit to Cup push Glass out of its way would
-/// silently change what the widget logs; see ``DataManager/servings``.
 private struct ServingsCard: View {
 
     @Environment(\.strings) private var strings
-    @Environment(\.locale) private var locale
     @Environment(DataManager.self) private var manager
 
     /// The three amounts under the finger. Seeded through `init` rather than in `.task` or
@@ -591,18 +579,8 @@ private struct ServingsCard: View {
     /// Whether a drag is in flight — what makes one gesture one write. See ``commitIfChanged()``.
     @State private var isDragging = false
 
-    /// Which vessel's slider is held, by slot. Its figure is drawn a little larger meanwhile.
-    @State private var held: Int?
-
     /// Bumped on a committed change, so the haptic fires on the change rather than on the touch.
     @State private var commits = 0
-
-    /// Bumped each time a drag moves a vessel by a step — ``GoalCard``'s tick, for the same reason
-    /// a counter.
-    @State private var steps = 0
-
-    /// The canvas's 26-pt glyph box, scaled with the name beside it and capped at its use site.
-    @ScaledMetric(relativeTo: .body) private var glyphBox: CGFloat = 26
 
     init(current: [Int]) {
         _amounts = State(initialValue: current)
@@ -615,8 +593,9 @@ private struct ServingsCard: View {
                 // Drawn when a vessel's new amount has been saved (``SavedTick``).
                 .savedTick(commits)
 
-            ForEach(Array(vesselSlots.enumerated()), id: \.element.nameKey) { index, slot in
-                vessel(at: index, slot: slot)
+            VesselSliders(amounts: $amounts) { editing in
+                isDragging = editing
+                if !editing { commitIfChanged() }
             }
 
             VStack(alignment: .leading, spacing: 16) {
@@ -627,114 +606,18 @@ private struct ServingsCard: View {
         }
         .settingsCard()
         .sensoryFeedback(Haptics.confirm, trigger: commits)
-        .sensoryFeedback(Haptics.select, trigger: steps)
         .onChange(of: manager.servings) { _, stored in
             guard !isDragging else { return }
             amounts = stored
         }
-    }
-
-    private func vessel(at index: Int, slot: (nameKey: String, symbol: String)) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Side by side while they fit. At the accessibility text sizes on a small phone the
-            // amount was cut to "150…" beside its name; there it drops under the name instead
-            // (rule `65-accessibility`, *Dynamic Type*).
-            //
-            // **The side-by-side row is measured at its widest**, every vessel's name and the
-            // largest amount the slider reaches, drawn hidden underneath: a fit decided by the
-            // amount under the finger flipped the row to two lines as a drag passed 1,000, and
-            // left the three rows in different shapes.
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 12) {
-                    ZStack(alignment: .leading) {
-                        ForEach(vesselSlots, id: \.nameKey) { label(for: $0).hidden() }
-                        label(for: slot)
-                    }
-                    Spacer(minLength: 8)
-                    ZStack(alignment: .trailing) {
-                        amountText(HistoryView.servingRange.upperBound).hidden()
-                        amount(at: index, anchor: .trailing)
-                    }
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    label(for: slot)
-                    amount(at: index, anchor: .leading)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-            .foregroundStyle(.white)
-            // The slider below speaks the name and the value as one sentence, so this row would be
-            // a duplicate stop (rule `65-accessibility`).
-            .accessibilityHidden(true)
-
-            Slider(
-                value: binding(for: index),
-                in: Double(HistoryView.servingRange.lowerBound)...Double(HistoryView.servingRange.upperBound),
-                step: Double(HistoryView.servingStep),
-                onEditingChanged: { editing in
-                    isDragging = editing
-                    held = editing ? index : nil
-                    if !editing { commitIfChanged() }
-                }
-            )
-            .tint(Aurora.cyan)
-            // A `Slider`'s stock VoiceOver value is a percentage of its range, which would announce
-            // "22%" for a 250 ml glass — a number that appears nowhere in the product.
-            // Resolved through the chosen bundle rather than written as `Text(slot.nameKey,
-            // bundle:)`: that initialiser takes a `LocalizedStringKey`, which must be a literal,
-            // and a runtime key silently becomes the *fallback text* instead of a lookup.
-            .accessibilityLabel(strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), amounts[index]))
-        }
-        .onChange(of: amounts[index]) { _, _ in
+        .onChange(of: amounts) { _, _ in
             // A VoiceOver adjustment is not a drag, so a change arriving with no drag in flight
             // commits here — otherwise a vessel could only be edited by dragging, which a VoiceOver
-            // user cannot do. The guard keeps a whole drag to one write (rule `50-views`).
+            // user cannot do. The guard keeps a whole drag to one write (rule `50-views`); a re-read
+            // arrives here too, and finds the model already holding it.
             guard !isDragging else { return }
             commitIfChanged()
         }
-    }
-
-    /// A vessel's glyph and name.
-    private func label(for slot: (nameKey: String, symbol: String)) -> some View {
-        let box = min(glyphBox, 40)
-
-        return HStack(spacing: 12) {
-            Image(systemName: slot.symbol)
-                .font(.system(size: box * 0.8))
-                // Against its 3:1 floor the Cup's, beside the card's sheen, is the tightest:
-                // 3.08 / 4.02 / 3.09:1 on iOS 27.0 / 26.5 / 18.6 (`docs/DESIGN.md`, *Settings,
-                // measured*).
-                .foregroundStyle(Aurora.cyan)
-                // One box for all three, so the names beside them start on one line whatever
-                // each glyph's own width.
-                .frame(width: box, height: box)
-                // The name beside it says which vessel this is; the glyph repeating it would be a
-                // second stop saying the same thing.
-                .accessibilityHidden(true)
-
-            Text(verbatim: strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
-                .font(.body.weight(.medium))
-        }
-    }
-
-    /// A vessel's amount, grouped as every visible volume is (rule `50-views`): a bottle of 1,000
-    /// read "1000 ml" here while Home and History drew "1,000 ml".
-    private func amountText(_ volume: Int) -> some View {
-        Text(strings.figure("%1$@ ml", volume, locale: locale))
-            .font(.body.weight(.bold))
-            .fontDesign(.rounded)
-            .monospacedDigit()
-    }
-
-    /// The amount under the finger, a little larger while its slider is held, as the goal's is —
-    /// from the edge it is pinned to, so it grows into its row and not into the card's padding.
-    private func amount(at index: Int, anchor: UnitPoint) -> some View {
-        amountText(amounts[index])
-            .scaleEffect(held == index ? 1.06 : 1, anchor: anchor)
-            .animation(Motion.land, value: held)
     }
 
     /// One call into the model, only when something actually moved.
@@ -746,23 +629,6 @@ private struct ServingsCard: View {
         guard amounts != manager.servings else { return }
         manager.servings = amounts
         commits += 1
-    }
-
-    /// Bridges the `Int` this view holds to the `BinaryFloatingPoint` a `Slider` requires.
-    ///
-    /// `rounded()`, never truncation: the `step` already snaps the value, and rounding is what stops
-    /// floating-point dust from turning 250 into 249.9999 which truncation would read as 249.
-    /// A step under a finger is counted here, as ``GoalCard``'s is.
-    private func binding(for index: Int) -> Binding<Double> {
-        Binding(
-            get: { Double(amounts[index]) },
-            set: { value in
-                let stepped = Int(value.rounded())
-                guard stepped != amounts[index] else { return }
-                amounts[index] = stepped
-                if isDragging { steps += 1 }
-            }
-        )
     }
 }
 

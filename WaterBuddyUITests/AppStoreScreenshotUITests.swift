@@ -17,10 +17,10 @@ import XCTest
 /// ## Why it is excluded from the gate
 ///
 /// It is **deliberately non-idempotent**, which is the exact opposite of `GoalSetupUITests`' stance
-/// ("setup is a state that exists once per install, so a test that *required* it would pass once and
+/// ("the welcome is a state that exists once per install, so a test that *required* it would pass once and
 /// fail on every run after"). That is correct for a test and wrong for a screenshot: a capture run
 /// must start from a known-empty device or the numbers on screen are whatever the last run left
-/// behind, and `GoalSetupView` is unreachable the moment `saveDailyGoal(ml:)` flips `Key.isGoalSet`.
+/// behind, and the welcome is unreachable the moment `saveDailyGoal(ml:)` flips `Key.isGoalSet`.
 /// So this one *requires* the fresh state and fails loudly without it, and rule `85-testing`'s gate
 /// carries `-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` to keep it out of the ordinary
 /// run. Drive it through `Tools/CaptureScreenshots.sh`, which erases the device first.
@@ -34,7 +34,7 @@ import XCTest
 ///
 /// ## Capture order is not display order
 ///
-/// `GoalSetupView` exists only until the first goal is committed, so it is shot **first** and named
+/// The welcome exists only until the first goal is committed, so its goal step is shot **first** and named
 /// `04`. The names are the App Store ordering; the sequence below is the only one the app permits.
 final class AppStoreScreenshotUITests: XCTestCase {
 
@@ -77,13 +77,20 @@ final class AppStoreScreenshotUITests: XCTestCase {
         let getStarted = app.buttons["Get Started"]
         XCTAssertTrue(
             getStarted.waitForExistence(timeout: 10),
-            "GoalSetupView is not showing — the device was not erased before this run, so the "
+            "the welcome is not showing — the device was not erased before this run, so the "
                 + "captured totals would be whatever the last run left behind"
         )
+        // The shot is the goal step: the number the rest of the product is measured against.
+        getStarted.tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 10), "the goal step did not appear")
         Thread.sleep(forTimeInterval: settle)
         capture("04-goal-setup")
 
-        getStarted.tap()
+        // On through the vessels and past reminders without asking, as a new user might.
+        tapWhenReady(app.buttons["Continue"])
+        tapWhenReady(app.buttons["Continue"])
+        XCTAssertTrue(app.buttons["Not now"].waitForExistence(timeout: 10), "the welcome's last step did not appear")
+        tapWhenReady(app.buttons["Not now"])
 
         // ── pour, so Home and History have something to show ─────────────────────────────────────
         // Matched on the vessel's *name*, never its amount: the quick-add amounts are user-editable
@@ -177,7 +184,7 @@ final class AppStoreScreenshotUITests: XCTestCase {
 ///
 /// | Door | Closes forever |
 /// |---|---|
-/// | `Get Started` tapped | `GoalSetupView` — `Key.isGoalSet` is never unset |
+/// | *Not now* tapped | the welcome — `Key.isGoalSet` is never unset |
 /// | first pour | the two empty states (Home 0%, History with no week card) |
 /// | goal crossed | every below-goal Home state; `hasReachedGoal` latches |
 /// | a quick-add slider moved | every `"Glass, add 250 millilitres"` predicate |
@@ -200,12 +207,14 @@ extension AppStoreScreenshotUITests {
         let goalSlider = app.sliders["Daily water goal"]
         let vessel = app.otherElements["Today's hydration"]
 
-        // ── 01–03 · GoalSetupView, before the one-way door ───────────────────────────────────────
+        // ── 01–03 · the welcome's goal step, before the one-way door ─────────────────────────────
         let getStarted = app.buttons["Get Started"]
         XCTAssertTrue(
             getStarted.waitForExistence(timeout: 10),
-            "GoalSetupView is not showing — the device was not erased before this run"
+            "the welcome is not showing — the device was not erased before this run"
         )
+        getStarted.tap()
+        XCTAssertTrue(goalSlider.waitForExistence(timeout: 10), "the goal step did not appear")
         XCTAssertEqual(goalSlider.value as? String, "2000 millilitres")
         Thread.sleep(forTimeInterval: settle)
         capture("01-goal-setup-default-2000")
@@ -220,13 +229,16 @@ extension AppStoreScreenshotUITests {
         Thread.sleep(forTimeInterval: 1)
         capture("03-goal-setup-max-4000")
 
-        // Restore 2,000 before committing. `Get Started` saves whatever the slider shows, and every
-        // percentage in the other 22 shots is computed against this number.
+        // Restore 2,000 before committing. Finishing the welcome saves whatever the slider shows,
+        // and every percentage in the other 22 shots is computed against this number.
         goalSlider.adjust(toNormalizedSliderPosition: 0.333)
         XCTAssertEqual(goalSlider.value as? String, "2000 millilitres")
 
         // ── 04–05 · the two empty states, before any water ───────────────────────────────────────
-        getStarted.tap()
+        tapWhenReady(app.buttons["Continue"])
+        tapWhenReady(app.buttons["Continue"])
+        XCTAssertTrue(app.buttons["Not now"].waitForExistence(timeout: 10), "the welcome's last step did not appear")
+        tapWhenReady(app.buttons["Not now"])
         XCTAssertTrue(vessel.waitForExistence(timeout: 10), "the root did not swap to HomeView")
         XCTAssertEqual(vessel.value as? String, "0 percent. 0 of 2000 millilitres.")
         Thread.sleep(forTimeInterval: settle)

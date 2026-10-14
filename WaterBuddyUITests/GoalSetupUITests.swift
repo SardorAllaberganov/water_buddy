@@ -7,17 +7,18 @@
 
 import XCTest
 
-/// The one seam the unit suite structurally cannot reach: that tapping *Get Started* actually
-/// swaps the app's root from `GoalSetupView` to `HomeView`.
+/// The one seam the unit suite structurally cannot reach: that walking the welcome actually swaps
+/// the app's root from `WelcomeView` to `HomeView`.
 ///
-/// `DailyGoalSetupTests` already proves the model half — that `saveDailyGoal(ml:)` flips
-/// `isGoalSet` and invalidates its observers. What no injected `UserDefaults` can show is whether
-/// SwiftUI re-evaluates `RootView` off that invalidation and renders the other branch. That needs
-/// the real app, which is what this target is for (rule `85-testing`).
+/// `DailyGoalSetupTests` and `WelcomeFinishTests` already prove the model half — that finishing
+/// flips `isGoalSet` and invalidates its observers. What no injected `UserDefaults` can show is
+/// whether SwiftUI re-evaluates `RootView` off that invalidation and renders the other branch. That
+/// needs the real app, which is what this target is for (rule `85-testing`).
 ///
-/// Deliberately idempotent rather than assuming a fresh install: setup is a state that exists once
-/// per install, so a test that *required* it would pass once and fail on every run after. It
-/// completes setup if it is showing, and either way asserts the app proper is on screen.
+/// Deliberately idempotent rather than assuming a fresh install: the welcome is a state that exists
+/// once per install, so a test that *required* it would pass once and fail on every run after. Each
+/// test walks the welcome if it is showing (`completeWelcomeIfShown(_:)`), and either way asserts
+/// the app proper is on screen. The welcome itself is `WelcomeUITests`', on a fresh start.
 final class GoalSetupUITests: XCTestCase {
 
     override func setUpWithError() throws {
@@ -36,12 +37,9 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            // The slider is bound to the default, so this commits 2,000 ml — the amount the
-            // screen was already showing.
-            getStarted.tap()
-        }
+        // The welcome's goal opens on the default, so walking it commits 2,000 ml — the amount
+        // the screen was already showing.
+        completeWelcomeIfShown(app)
 
         // A quick-add button from `HomeView`'s row, addressed by the accessibility label a bare
         // glyph cannot supply. Its presence is the proof that the root actually swapped and drew.
@@ -70,10 +68,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         // The three vessel *names*, which are fixed — never their amounts, which the user edits.
         // Each label reads "<Name>, add <n> millilitres", so a prefix match survives any edit while
@@ -105,10 +100,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         let vessel = app.otherElements["Today's hydration"]
         let logHeading = app.buttons["Add a serving"]
@@ -354,10 +346,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         // Addressed by the label the quick-add row supplies, because the control is a bare glyph —
         // and by the vessel's *name* only, since its amount is user-editable.
@@ -396,10 +385,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass")).firstMatch
         XCTAssertTrue(glass.waitForExistence(timeout: 5), "the Home tab's quick-add row did not draw")
@@ -428,10 +414,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         // A serving today is what draws the week card, and with it yesterday's button.
         let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass")).firstMatch
@@ -493,10 +476,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         // A serving today is what gives History a row.
         let glass = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass")).firstMatch
@@ -744,10 +724,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
         XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
         return app
     }
@@ -1119,10 +1096,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5))
         XCTAssertFalse(
@@ -1141,10 +1115,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         XCTAssertTrue(
             app.otherElements["Today's hydration"].waitForExistence(timeout: 5),
@@ -1223,10 +1194,7 @@ final class GoalSetupUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let getStarted = app.buttons["Get Started"]
-        if getStarted.waitForExistence(timeout: 5) {
-            getStarted.tap()
-        }
+        completeWelcomeIfShown(app)
 
         XCTAssertTrue(
             app.otherElements["Today's hydration"].waitForExistence(timeout: 5),

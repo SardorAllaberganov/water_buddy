@@ -64,7 +64,7 @@ private func withTempStore<T>(
 // MARK: - Tests
 
 /// The serving editor's **offer**, which is deliberately narrower than what the store accepts —
-/// the same split `DailyGoalSetupTests` pins for `GoalSetupView.goalRange`.
+/// the same split `DailyGoalSetupTests` pins for `WelcomeView.goalRange`.
 ///
 /// `DataManager` clamps a serving only by rejecting anything non-positive, because that is a floor
 /// against corruption rather than a menu. These numbers are the menu, and nothing in the compiler

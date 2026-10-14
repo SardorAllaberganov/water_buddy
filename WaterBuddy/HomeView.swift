@@ -47,7 +47,7 @@ struct HomeView: View {
     /// one button now draws and logs the middle one — which is the entire point of the feature.
     ///
     /// What this type is no longer is a **menu**. ``HistoryView/servingRange`` and
-    /// ``GoalSetupView/goalRange`` still are — they are what a screen *offers* — and the editor in
+    /// ``WelcomeView/goalRange`` still are — they are what a screen *offers* — and the editor in
     /// `SettingsView` offers exactly that range. But these three numbers are now a stored
     /// preference, and rule `20-state` makes `DataManager` the only thing allowed to persist one.
     struct Serving: Identifiable, Hashable {

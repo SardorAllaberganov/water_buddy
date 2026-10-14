@@ -5,6 +5,7 @@
 //  Created by Sardor Allaberganov on 28/08/26.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
@@ -24,8 +25,18 @@ struct WaterBuddyApp: App {
         // Resolve the App Group before anything draws, so the container probe and the one-shot
         // migration out of `UserDefaults.standard` both happen here, in the app, at a moment we
         // picked — see `DataManager.prepareSharedStorage()`. If the capability is missing this is
-        // also where the DEBUG warning about it fires, instead of somewhere further in.
+        // also where the DEBUG warning about it fires, instead of somewhere further in. It runs on
+        // a fresh start too: it is the app's own bookkeeping on its own group, not test data.
         DataManager.prepareSharedStorage()
+
+        #if DEBUG
+        if let fresh = Self.freshStartManager(arguments: ProcessInfo.processInfo.arguments) {
+            manager = fresh
+            // No watch link: a paired watch's pours belong to the device's own store, which a
+            // fresh start never opens.
+            return
+        }
+        #endif
 
         // Constructing the singleton adopts today, materialises the goal, and rolls the day over
         // if the app was last open yesterday — all against the store resolved on the line above.
@@ -46,6 +57,51 @@ struct WaterBuddyApp: App {
         #endif
     }
 
+    #if DEBUG
+    /// The argument the welcome's UI tests launch with.
+    static let freshStartArgument = "-WaterBuddyFreshStart"
+
+    /// The fresh start's one suite, in the app's own preferences — never the App Group. Its name is
+    /// fixed, so there is never more than one, and it is cleared at each launch (decision W11).
+    static let freshStartSuite = "uitest.waterbuddy.freshstart"
+
+    /// A new install, for the welcome's UI tests, on a device that finished its welcome long ago
+    /// (spec 2026-10-14 §9).
+    ///
+    /// Given ``freshStartArgument``, the app is built on a throwaway suite, cleared first, and an
+    /// in-memory store. Every side effect a test fixture turns off is turned off — the widget
+    /// doorbell, the reminder reschedule, the wrist publish — the fixture discipline rule
+    /// `85-testing` sets, applied to a run of the real app. The App Group's suite and store are
+    /// never opened by it. Without the argument this is `nil`, and a Debug build runs exactly what
+    /// a Release one does; a Release build does not contain it.
+    ///
+    /// `nil`, said aloud, if the throwaway cannot be made. The run then opens on the device's own
+    /// state, and the welcome's tests fail on their first look rather than writing anywhere they
+    /// should not.
+    static func freshStartManager(arguments: [String]) -> DataManager? {
+        guard arguments.contains(freshStartArgument) else { return nil }
+
+        guard let defaults = UserDefaults(suiteName: freshStartSuite),
+              let store = try? ModelContainer(
+                  for: WaterLog.self,
+                  configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+              )
+        else {
+            print("WaterBuddy: the fresh start's throwaway suite or store could not be made, so this run opens on the device's own state.")
+            return nil
+        }
+        defaults.removePersistentDomain(forName: freshStartSuite)
+
+        return DataManager(
+            defaults: defaults,
+            modelContainer: store,
+            reloadWidgets: {},
+            rescheduleReminders: { _ in },
+            publishWrist: { _ in }
+        )
+    }
+    #endif
+
     var body: some Scene {
         WindowGroup {
             RootView()
@@ -57,6 +113,12 @@ struct WaterBuddyApp: App {
             // idempotent, so an extra call costs nothing.
             if phase == .active {
                 manager.refresh()
+
+                // And notifications may have been turned off in iOS Settings meanwhile. Noticed
+                // here, every screen stops promising a reminder that cannot fire (known issue
+                // #100(d)). The scheduler is built inside the task and never stored
+                // (rule `80-notifications`).
+                Task { await ReminderPermission.reconcile(manager, using: ReminderScheduler.live()) }
             }
         }
     }
@@ -64,13 +126,13 @@ struct WaterBuddyApp: App {
 
 // MARK: - Root
 
-/// Chooses the app's first screen: setup until the user has picked a goal of their own, the app
+/// Chooses the app's first screen: the welcome until the user has picked a goal of their own, the app
 /// itself — ``RootTabView`` and its two destinations — every launch after that.
 ///
 /// This is a `View` rather than an `if` inside `WaterBuddyApp.body` on purpose. Observation tracks
 /// reads made while a *view* body evaluates; an `App` body is not a reliable scope for it, and the
 /// gate has to re-evaluate the moment ``DataManager/isGoalSet`` flips — otherwise the first thing
-/// the user sees after tapping *Get Started* is the setup screen they just finished.
+/// the user sees after finishing the welcome is the welcome.
 private struct RootView: View {
 
     @Environment(DataManager.self) private var manager
@@ -81,12 +143,12 @@ private struct RootView: View {
                 RootTabView()
                     .transition(.opacity)
             } else {
-                GoalSetupView()
+                WelcomeView(goal: manager.dailyGoal, amounts: manager.servings)
                     .transition(.opacity)
             }
         }
         // A cross-fade rather than a hard cut, so the swap reads as the app opening rather than
-        // as a glitch — and so `GoalSetupView` outlives the tap long enough to play its haptic.
+        // as a glitch — and so the welcome outlives its last tap long enough to play its haptic.
         //
         // The `.transition(.opacity)` above is what SwiftUI would apply to an animated `if`
         // anyway; it is written out because this is a deliberate choice and not a default worth

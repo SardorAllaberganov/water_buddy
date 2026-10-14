@@ -902,7 +902,7 @@ struct WristPublishSeamTests {
         }
     }
 
-    /// Final review, A3: a user who accepts `GoalSetupView`'s slider **unchanged** saves exactly
+    /// Final review, A3: a user who accepts the first-run goal **unchanged** saves exactly
     /// `DataManager.defaultDailyGoal`, which the `dailyGoal` setter's own equality guard treats as
     /// a no-op — so `saveDailyGoal(ml:)` cannot rely on that setter's publish alone, or this user's
     /// watch never receives a mirror at all and `WristView` (gated on `mirror.isGoalSet`) sits on
@@ -1128,7 +1128,8 @@ struct DailyGoalSetupTests {
     /// app back into setup, mid-session.
     ///
     /// Unreachable until `SettingsView` gained `GoalCard`: `saveDailyGoal(ml:)` was called only
-    /// from `GoalSetupView`, which is presented only while the flag is `false`, so the guard could
+    /// from the first-run screen (`GoalSetupView` then, `WelcomeView` now), which is presented only
+    /// while the flag is `false`, so the guard could
     /// never short-circuit.
     @Test func editingAnInferredGoalDownToTheDefaultPersistsTheFlag() {
         withTempDefaults { defaults in
@@ -1293,32 +1294,32 @@ struct DailyGoalSetupTests {
 
     // MARK: - The offered range
 
-    // `GoalSetupView` offers a narrower range than the store clamps to, which is the right
+    // The welcome's goal step offers a narrower range than the store clamps to, which is the right
     // shape — 1 ml and 100,000 ml are legal to store and absurd to offer. But the two numbers
     // are declared in different files, and nothing in the compiler notices when one moves.
-    // These four pin the seams between them.
+    // These four pin the seams between them. (They read `GoalSetupView`'s until stage 5.)
 
     @Test func theOfferedGoalRangeContainsTheDefault() {
-        #expect(GoalSetupView.goalRange.contains(DataManager.defaultDailyGoal),
+        #expect(WelcomeView.goalRange.contains(DataManager.defaultDailyGoal),
                 "setup opens on the default; one outside the range clamps the slider somewhere the user never chose")
     }
 
     @Test func theDefaultGoalLandsOnASliderStep() {
-        let offset = DataManager.defaultDailyGoal - GoalSetupView.goalRange.lowerBound
-        #expect(offset % GoalSetupView.goalStep == 0,
+        let offset = DataManager.defaultDailyGoal - WelcomeView.goalRange.lowerBound
+        #expect(offset % WelcomeView.goalStep == 0,
                 "the slider opens on the default and can only rest on a step, so one between two steps shifts on first touch")
     }
 
     @Test func theOfferedRangeIsAWholeNumberOfSteps() {
-        let span = GoalSetupView.goalRange.upperBound - GoalSetupView.goalRange.lowerBound
-        #expect(span % GoalSetupView.goalStep == 0,
+        let span = WelcomeView.goalRange.upperBound - WelcomeView.goalRange.lowerBound
+        #expect(span % WelcomeView.goalStep == 0,
                 "a trailing part-step makes the maximum unreachable by dragging")
     }
 
     @Test(arguments: [\.lowerBound, \.upperBound] as [KeyPath<ClosedRange<Int>, Int>])
     func bothEndsOfTheOfferedRangeSurviveTheStorageClamp(end: KeyPath<ClosedRange<Int>, Int>) {
         withTempDefaults { defaults in
-            let offered = GoalSetupView.goalRange[keyPath: end]
+            let offered = WelcomeView.goalRange[keyPath: end]
             let manager = makeManager(defaults) { utc(2026, 8, 28) }
 
             manager.saveDailyGoal(ml: offered)

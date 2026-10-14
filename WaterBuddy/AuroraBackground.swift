@@ -11,7 +11,7 @@ import SwiftUI
 /// decoration: a perfectly smooth gradient gives the material nothing to blur, and the glass
 /// disappears.
 ///
-/// Lives in its own file because all three tabs and `GoalSetupView` stand glass on it. A second
+/// Lives in its own file because all three tabs and the welcome stand glass on it. A second
 /// copy would be a second light source, which is the one thing the design system exists to
 /// prevent — every pane in this product is lit by the same light.
 ///

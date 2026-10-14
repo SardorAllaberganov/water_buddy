@@ -49,7 +49,7 @@ if [ "$dirty" -ne 0 ]; then
 
   STOP — this simulator already carries WaterBuddy state.
 
-  The census opens on GoalSetupView and shoots two empty states before the first pour. All three are
+  The census opens on the welcome and shoots two empty states before the first pour. All three are
   unreachable on a device that has run the app: the goal screen dies when Key.isGoalSet is set, and
   the empty states die at the first serving. Every percentage in the other 22 shots is also computed
   against a 2,000 ml goal and a store that starts empty.
@@ -71,7 +71,7 @@ xcrun simctl bootstatus "$PHONE" -b
 
 echo "── 2. pin the environment ───────────────────────────────────────────────────"
 # Every root in this product declares .preferredColorScheme(.dark) — RootTabView for the three tabs,
-# GoalSetupView for setup, HistoryView for the edit sheet's own hosting controller — so there is no
+# WelcomeView for setup, HistoryView for the edit sheet's own hosting controller — so there is no
 # light appearance to capture and `appearance dark` is determinism only, not a variant.
 xcrun simctl ui "$PHONE" appearance dark
 xcrun simctl ui "$PHONE" content_size large

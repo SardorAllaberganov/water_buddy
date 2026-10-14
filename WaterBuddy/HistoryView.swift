@@ -52,7 +52,7 @@ nonisolated struct StripBar: Equatable, Sendable, Identifiable {
 struct HistoryView: View {
 
     /// The range the serving editor offers, which is intentionally *narrower* than what the store
-    /// accepts — the same split ``GoalSetupView/goalRange`` draws, for the same reason.
+    /// accepts — the same split ``WelcomeView/goalRange`` draws, for the same reason.
     ///
     /// `DataManager` rejects only a non-positive serving, because that is a floor against a corrupt
     /// store rather than a menu: 1 ml and 100,000 ml are both legal to save and absurd to offer.
@@ -1346,7 +1346,7 @@ private enum ServingEditor: Identifiable, Hashable {
 
 /// Adds a serving, or corrects one's amount and time.
 ///
-/// Deliberately the same lockup as `GoalSetupView`'s goal card — one glass pane, a hero readout
+/// Deliberately the same lockup as the welcome's goal card — one glass pane, a hero readout
 /// with a ratio-sized unit, an `Aurora.cyan` slider — because every pane in this product is lit by
 /// the same light, and a second layout for "pick a number in millilitres" would be a second one.
 /// Under the slider sit the three vessels, as one-tap amounts; the time is a wheel inside the same

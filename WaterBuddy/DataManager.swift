@@ -1114,7 +1114,8 @@ final class DataManager {
     /// `RootView` cross-fades the whole app back into setup, mid-session, for a user who only moved
     /// a slider.
     ///
-    /// That was unreachable while this ran once per install from `GoalSetupView`, which is
+    /// That was unreachable while this ran once per install from the first-run screen
+    /// (`GoalSetupView` then, `WelcomeView` now), which is
     /// presented *only* while the flag is `false` — so the guard could never short-circuit.
     /// `SettingsView`'s `GoalCard` is the second caller that made it reachable, and
     /// `editingAnInferredGoalDownToTheDefaultPersistsTheFlag` is what failed before this shape.
@@ -1130,7 +1131,7 @@ final class DataManager {
         }
 
         // Unconditional, unlike the `dailyGoal` setter's own guarded publish above: a user who
-        // accepts `GoalSetupView`'s slider unchanged saves exactly `defaultDailyGoal`, which the
+        // accepts the first-run goal unchanged saves exactly `defaultDailyGoal`, which the
         // setter's equality guard treats as a no-op — no mirror is ever published for that user,
         // and `WristView` gates its whole UI on `mirror.isGoalSet`, so their watch would be stuck on
         // the empty state forever. `isGoalSet` genuinely changed here even when `dailyGoal` did not,

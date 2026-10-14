@@ -126,6 +126,52 @@
         }
       }
     },
+    "%1$d kg": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d kg"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d кг"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d kg"
+          }
+        }
+      }
+    },
+    "%1$d lb": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d lb"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d фнт"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d funt"
+          }
+        }
+      }
+    },
     "%1$d millilitres": {
       "extractionState": "manual",
       "localizations": {
@@ -284,6 +330,29 @@
         }
       }
     },
+    "A gentle nudge when it has been a while.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A gentle nudge when it has been a while."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мягкое напоминание, если вы давно не пили."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anchadan beri suv ichmagan bo‘lsangiz, yumshoq eslatma."
+          }
+        }
+      }
+    },
     "A glass now keeps you on track for the day.": {
       "extractionState": "manual",
       "localizations": {
@@ -349,6 +418,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "9:00 dan 21:00 gacha har ikki soatda eslatma, agar maqsadga hali erishmagan va undan oldingi bir soat ichida suv ichmagan bo‘lsangiz. Bildirishnomalar jamlanmasi yoqilgan, shuning uchun eslatmalar soat sayin emas, to‘plam bo‘lib kelishi mumkin."
+          }
+        }
+      }
+    },
+    "A starting point, not medical advice.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A starting point, not medical advice."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это ориентир, а не медицинская рекомендация."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu boshlang‘ich mo‘ljal, tibbiy maslahat emas."
+          }
+        }
+      }
+    },
+    "Active": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Высокая"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yuqori"
           }
         }
       }
@@ -491,6 +606,29 @@
         }
       }
     },
+    "Back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Назад"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orqaga"
+          }
+        }
+      }
+    },
     "Best day": {
       "extractionState": "manual",
       "localizations": {
@@ -556,6 +694,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bekor qilish"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Davom etish"
           }
         }
       }
@@ -716,6 +877,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu porsiyani tahrirlaydi"
+          }
+        }
+      }
+    },
+    "Exercise most days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exercise most days"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тренируюсь почти каждый день"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deyarli har kuni mashq qilaman"
+          }
+        }
+      }
+    },
+    "Exercise some days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exercise some days"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тренируюсь иногда"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba’zan mashq qilaman"
           }
         }
       }
@@ -881,6 +1088,52 @@
         }
       }
     },
+    "Home pours these in one tap. Set each to what yours holds.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home pours these in one tap. Set each to what yours holds."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На Главной они наливаются одним касанием. Укажите, сколько вмещает каждая."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bosh sahifa ularni bir teginishda quyadi. Har birini o‘z idishingiz hajmiga sozlang."
+          }
+        }
+      }
+    },
+    "How active are you?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How active are you?"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Насколько вы активны?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qanchalik faolsiz?"
+          }
+        }
+      }
+    },
     "How much water do you want to drink each day?": {
       "extractionState": "manual",
       "localizations": {
@@ -996,6 +1249,29 @@
         }
       }
     },
+    "Light": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Низкая"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past"
+          }
+        }
+      }
+    },
     "Log a Glass": {
       "extractionState": "manual",
       "localizations": {
@@ -1042,6 +1318,52 @@
         }
       }
     },
+    "Moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Средняя"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O‘rtacha"
+          }
+        }
+      }
+    },
+    "Mostly sitting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostly sitting"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В основном сижу"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asosan o‘tiraman"
+          }
+        }
+      }
+    },
     "Next reminder %1$@": {
       "extractionState": "manual",
       "localizations": {
@@ -1061,6 +1383,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Keyingi eslatma %1$@"
+          }
+        }
+      }
+    },
+    "Not now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не сейчас"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hozir emas"
           }
         }
       }
@@ -1134,6 +1479,29 @@
         }
       }
     },
+    "One tap logs a glass. Watch your day fill up.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One tap logs a glass. Watch your day fill up."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Одно касание — и стакан записан. Смотрите, как наполняется ваш день."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir teginish — va stakan qayd etildi. Kuningiz qanday to‘layotganini kuzating."
+          }
+        }
+      }
+    },
     "Open iOS Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -1199,6 +1567,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tez qo‘shish idishlari"
+          }
+        }
+      }
+    },
+    "Reminders": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminders"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Напоминания"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslatmalar"
           }
         }
       }
@@ -1314,6 +1705,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aqlli eslatmalar"
+          }
+        }
+      }
+    },
+    "Step %1$d of %2$d": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Step %1$d of %2$d"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Шаг %1$d из %2$d"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d-qadam, jami %2$d"
           }
         }
       }
@@ -1479,6 +1893,29 @@
         }
       }
     },
+    "Turn on reminders": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on reminders"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включить напоминания"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslatmalarni yoqish"
+          }
+        }
+      }
+    },
     "Undo": {
       "extractionState": "manual",
       "localizations": {
@@ -1498,6 +1935,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Qaytarish"
+          }
+        }
+      }
+    },
+    "Use %1$@ ml": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use %1$@ ml"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбрать %1$@ мл"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanlash: %1$@ ml"
+          }
+        }
+      }
+    },
+    "Use %1$d millilitres": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use %1$d millilitres"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбрать %1$d миллилитров"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanlash: %1$d millilitr"
           }
         }
       }
@@ -1604,6 +2087,52 @@
         }
       }
     },
+    "Work it out for me": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Work it out for me"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Рассчитать за меня"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Men uchun hisoblang"
+          }
+        }
+      }
+    },
+    "You can change these later in Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can change these later in Settings."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Их можно изменить позже в настройках."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ularni keyinroq Sozlamalarda o‘zgartirishingiz mumkin."
+          }
+        }
+      }
+    },
     "You can change this later in Settings.": {
       "extractionState": "manual",
       "localizations": {
@@ -1627,6 +2156,98 @@
         }
       }
     },
+    "Your goal is %1$@ ml": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your goal is %1$@ ml"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваша цель — %1$@ мл"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maqsadingiz — %1$@ ml"
+          }
+        }
+      }
+    },
+    "Your weight": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your weight"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваш вес"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vazningiz"
+          }
+        }
+      }
+    },
+    "kg": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kg"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "кг"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kg"
+          }
+        }
+      }
+    },
+    "lb": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "lb"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "фнт"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "funt"
+          }
+        }
+      }
+    },
     "ml": {
       "extractionState": "manual",
       "localizations": {
@@ -1646,6 +2267,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "ml"
+          }
+        }
+      }
+    },
+    "now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "now"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "сейчас"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hozir"
           }
         }
       }
