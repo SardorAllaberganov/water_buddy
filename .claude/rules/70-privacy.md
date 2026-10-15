@@ -101,6 +101,12 @@ policy rather than a draft, closing that document's own §9.3.
   logging water is harmless, and nothing is said back. What iOS does with that press on a locked
   iPhone, and before the first unlock after a restart, is proved only on a device. A figure added to
   the control later needs its own ruling here first
+- **The reminder's button says nothing either.** *Log a Glass* carries no digit in any shipped
+  language — the reminder copy's tests read it too — and its press says nothing back. It runs without
+  unlocking, as the Siri phrase and the control do: the action is not `.authenticationRequired`,
+  because logging water is harmless, and a reminder reaches Apple Watch exactly when the phone is
+  locked. What iOS does with a press before the first unlock after a restart is proved only on a
+  device (known issue #72)
 
 ## Diagnostics carry no user data
 - A `#if DEBUG` diagnostic may name the failing condition and the App Group identifier only — never

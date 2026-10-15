@@ -81,6 +81,13 @@ warning here is a Swift 6 error later.
   itself, where a `WCSessionDelegate` callback is explicitly **not** guaranteed to be on the main
   queue and `assumeIsolated` would trap rather than merely warn — which is exactly why `WristLink`
   posts instead of hopping, and leaves the hop to callers who can actually make that guarantee
+- **`ReminderResponder` is main-actor, the opposite of `WristLink`.** Everything a press does is
+  main-actor work, and the responder implements the `async` `userNotificationCenter(_:didReceive:)`
+  as a main-actor method: under this target's approachable concurrency the conformance is inferred
+  main-actor-isolated and compiles clean, and whichever queue the centre calls on, the thunk hops to
+  the main actor, awaits the body, then completes — so everything a press needs is awaited before the
+  method returns. Never `@preconcurrency` on the conformance (it warns, "has no
+  effect"), and never a `nonisolated` `didReceive`, which completes off the main thread
 - Spell static properties on a `Sendable` type as `static let`. The two `static var`s are
   `AddWaterIntent.parameterSummary` and `WaterBuddyShortcuts.appShortcuts`, both computed and both
   required by their protocols

@@ -41,7 +41,7 @@ system.
   `"sardor.WaterBuddy.reminder." + dayOrdinal + "." + String(format: "%02d", hour)` — a pure function
   of day and hour. Never add a timestamp, a UUID, a total, or anything that varies between two
   computations of the same slot
-- Every identifier is built from the `identifierPrefix` constant. Never hand-write a literal
+- Every request identifier is built from the `identifierPrefix` constant. Never hand-write a literal
   identifier at a call site
 - Identifiers must be unique **within one plan**: `add` replaces a request with the same identifier,
   so a collision silently drops a reminder rather than erroring
@@ -53,7 +53,7 @@ system.
   `ReminderScheduler.live()`. A diff that widens either closure, or reaches
   `UNUserNotificationCenter.current()` for removal outside that seam, is rejected
 - `reconcile` filters the pending set by `identifierPrefix` **before** computing anything to remove.
-  Never operate on the raw result of `pendingIdentifiers()`
+  Never operate on the raw result of `pending()`
 - When a slot drops out of the plan, clear it from the delivered list as well as the pending one —
   `removePending` and `removeDelivered` take the same `stale` array
 
@@ -61,17 +61,23 @@ system.
 - `NotificationManager.reconcile` contains no scheduling policy — no hour arithmetic, no goal
   comparison, no `enabled` check. It diffs the given `[ReminderPlan.Slot]` against the pending set
   and files or unfiles
-- Skip any slot whose identifier is already pending; never unconditionally re-`add` the whole plan
+- Skip a slot already pending **with the wording it would be filed with now** — the title, body and
+  category `reminderContent(in:)` gives it in the bundle passed. File again a pending reminder of ours
+  whose wording differs: `add` replaces it under the same identifier, so nothing is removed and no
+  slot moves. That is how a reminder filed before an update gains the button, and one filed before a
+  language change is put into the new language. Never unconditionally re-`add` the whole plan
 - A failed `add` appends to `outcome.failed` and continues the loop. Only
   `UNErrorDomain` + `UNError.Code.notificationsNotAllowed` sets `deniedAuthorization`. Never `throw`
   out of the loop or return early on a single failure
-- A pass that removes but adds nothing still ends on an awaited `scheduler.pendingIdentifiers()`
+- A pass that removes but adds nothing still ends on an awaited `scheduler.pending()`
   round trip — do not delete or short-circuit that trailing await
 - `ReconcileOutcome` is **returned, never logged** — the caller is the only thing that can react
   (rule `75-diagnostics`). Both production callers currently discard it
 - `ReminderScheduler` stays a struct of closures and never traffics in a `UNNotificationSettings`:
   `UNUserNotificationCenter.init` is `NS_UNAVAILABLE`, so a subclass cannot be compiled and a
-  protocol seam would be untestable
+  protocol seam would be untestable. It is `nonisolated`: its closures are called on both sides of
+  the main actor — off it by the app's queue, on it by `ReminderPermission` — and a synchronous
+  closure read off a main-actor struct from nonisolated code warns
 - `ReminderScheduler.live()` stays a `static func`, not a `static let`, and every closure calls
   `UNUserNotificationCenter.current()` in its own body rather than capturing a stored centre. Build
   it **inside** the `Task` closure, never hoisted
@@ -90,7 +96,30 @@ system.
   widget process would otherwise file a reminder in the wrong language
 - Any new or changed reminder string goes into **both** `WaterBuddy/Localizable.xcstrings` and
   `WaterBuddyWidget/Localizable.xcstrings`, with its key added to `sharedKeys` in
-  `LocalizationTests.swift`
+  `LocalizationTests.swift` — except the button's title, *Log a Glass*, which only the app resolves:
+  it is the Siri phrase's title, the same act in the same words
+
+## The button
+- A reminder carries one action, *Log a Glass*, in one category. Both identifiers are constants on
+  `NotificationManager` — `reminderCategoryIdentifier` and `logTheGlassActionIdentifier`, never a
+  literal at a call site, and never built from `identifierPrefix`, which names requests — and
+  `reminderContent(in:)` sets the category, so a reminder the widget extension files carries the
+  button too
+- The category is built by `NotificationManager.reminderCategory(in:)`, whose bundle is never
+  defaulted, and registered **only by the app**: `DataManager.requestReminderReschedule` registers it
+  through the scheduler's `setCategories`, inside its queued operation, in the bundle it files the
+  copy in, before the reconcile. Never from `reconcile` itself, which the extension runs —
+  `setNotificationCategories` replaces every category the app has
+- The action's options are empty: not `.foreground`, because the press logs without opening the app;
+  not `.authenticationRequired` (rule `70-privacy`); not `.destructive`. Its icon is the Glass's glyph,
+  `vesselSlots[DataManager.usualSlot].symbol`
+- The press is answered by `ReminderResponder`, the app's notification delegate, installed in
+  `WaterBuddyApp.init()` and held by its `static let shared` — the centre holds its delegate weakly.
+  It logs only for `logTheGlassActionIdentifier`; a tap on the reminder opens the app as it always
+  did. It implements no `willPresent`, so a reminder due while the app is open is still not shown
+- The press logs the Glass read when it is pressed, through `LogServingIntent.logTheGlassInTheBackground()`
+  — the steps the Siri phrase takes — and returns only after it has awaited the watch link and
+  `DataManager.remindersSettled()`: returning is the completion, after which iOS may suspend the launch
 
 ## Authorization
 - Requested only through `ReminderPermission.enable(on:using:)`, and only from the two taps that ask
@@ -102,8 +131,9 @@ system.
 
 ## Who reschedules
 - Every state change that can move the plan calls `rescheduleRemindersNow()`: the `currentWater`
-  path via `recomputeToday()`, the `dailyGoal` setter, the `remindersEnabled` setter,
-  `applyDailyReset(on:)` and `refresh()`. A new mutation path without that call is incomplete
+  path via `recomputeToday()`, the `dailyGoal` setter, the `remindersEnabled` setter, the `language`
+  setter — which moves no slot, but every pending reminder's wording —, `applyDailyReset(on:)` and
+  `refresh()`. A new mutation path without that call is incomplete
 - Never guard the reschedule on `remindersEnabled` — always call through and let `slots` return `[]`.
   **An empty plan is the instruction to clear the schedule**
 - `DataManager.requestReminderReschedule` keeps its `guard role.mayFileReminders else { return }` —
@@ -123,8 +153,8 @@ system.
   the drink dropped. `anOlderPlanCannotRefileTheSlotANewerPlanDropped` pins it
 - `refresh()`'s unconditional reconcile on every foreground is the backstop for a widget tap the
   extension sandbox may not have permitted. Do not remove it as redundant
-- `LogServingIntent.perform()` holds the app process open until the reminder queue has run what its
-  mutation asked for — `await DataManager.remindersSettled()` — never by calling `reconcile` itself,
+- `LogServingIntent.logTheGlassInTheBackground()` — what `perform()` and the reminder's button both
+  run — holds the app process open until the reminder queue has run what its mutation asked for — `await DataManager.remindersSettled()` — never by calling `reconcile` itself,
   which would run outside the queue
 
 ## Tests

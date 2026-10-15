@@ -165,8 +165,9 @@ and Lock Screen widgets, its Control Center control, and the watch's `.accessory
 proved only by placing them and looking.
 
 After any change to storage, entitlements, target membership or the widget's view tree: run the app
-on the simulator and put the widget on the Home Screen — in light, in dark, and tinted — and put the
-control in Control Center. The same
+on the simulator and put the widget on the Home Screen — in light, in dark, and tinted — put the
+control in Control Center, and, after a change to reminders, press a reminder's *Log a Glass* with the
+app not running. The same
 applies to the watch face: install `WaterBuddyWatch` and add the widget to a watch face by hand: no
 part of the automated gate renders it.
 
