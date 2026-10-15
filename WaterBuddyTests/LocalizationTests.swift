@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UserNotifications
 @testable import WaterBuddy
 
 // MARK: - Fixtures
@@ -279,6 +280,33 @@ private func specifiers(in text: String) -> Set<String> {
                         "\(name): the \(language) reminder copy contains a digit — \"\(resolved)\"")
             }
         }
+
+        // The button's title, which only the app resolves (rule `80-notifications`) — so read in the
+        // app's bundle alone, and required there: a missing key would pass for a title with no digit.
+        let button = value(appBundle, language, "Log a Glass")
+        #expect(button != nil, "app: the \(language) catalogue has no \"Log a Glass\"")
+        if let button {
+            let carriesADigit = button.contains(where: \.isNumber)
+            #expect(!carriesADigit, "app: the \(language) reminder button contains a digit — \"\(button)\"")
+        }
+    }
+
+    /// Spec 2026-10-15 §3.7. The app's queue and the widget's `AddWaterIntent` both reconcile, each in
+    /// its own bundle, and each files again any reminder whose words differ from its own. Composed in
+    /// different words, every foreground and every widget tap would file the other's reminders again.
+    @Test(arguments: ["en"] + translated)
+    func theAppAndTheWidgetFileRemindersInTheSameWords(language: String) throws {
+        let app = try #require(localization(appBundle, language), "the app ships no \(language)")
+        let widget = try #require(localization(widgetBundle, language), "the widget ships no \(language)")
+
+        let filedByTheWidget = PendingReminder(UNNotificationRequest(
+            identifier: "\(ReminderPlan.identifierPrefix)20260828.09",
+            content: NotificationManager.reminderContent(in: widget),
+            trigger: nil
+        ))
+
+        #expect(filedByTheWidget.isWorded(like: NotificationManager.reminderContent(in: app)),
+                "\(language): the app would file the widget's reminders again")
     }
 
     /// **Russian and Uzbek cover exactly the same keys.**

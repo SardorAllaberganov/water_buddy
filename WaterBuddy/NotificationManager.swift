@@ -21,7 +21,7 @@ import UserNotifications
 /// `DataManager.init`'s `reloadWidgets: @escaping () -> Void = DataManager.requestWidgetReload` is
 /// a side effect on a system singleton, injected, defaulted, and counted in tests by a spy.
 ///
-/// ## Three details that are Swift 6 requirements, not taste
+/// ## Four details that are Swift 6 requirements, not taste
 ///
 /// 1. ``live()`` is a **`func`, not a `let`**. A `static let` of a non-`Sendable` struct is
 ///    nonisolated global mutable state, which is an error in the Swift 6 language mode
@@ -31,19 +31,32 @@ import UserNotifications
 ///    centre is not `Sendable` and must never be captured — the same treatment
 ///    `DataManager.requestWidgetReload` gives `WidgetCenter.shared`.
 /// 3. ``removePending`` is not `async` **because it cannot be**. See ``NotificationManager``.
-struct ReminderScheduler {
+/// 4. The struct is **`nonisolated`**, stated outright. This file also compiles into the app, whose
+///    default isolation is the main actor, and the closures here are called from both sides of it —
+///    off it by the app's reminder queue, on it by `ReminderPermission`. An awaited closure read off a
+///    main-actor struct hops and says nothing; a synchronous one read from nonisolated code warns, as
+///    ``removePending`` and ``removeDelivered`` did until 2026-10-15, and ``setCategories`` is
+///    synchronous.
+nonisolated struct ReminderScheduler {
 
-    var pendingIdentifiers: () async -> [String]
+    /// Every pending request, read back with the words it was filed in — what
+    /// ``NotificationManager/reconcile(_:calendar:strings:using:)`` compares to decide whether a
+    /// reminder is already filed as it would be now.
+    var pending: () async -> [PendingReminder]
     var add: (UNNotificationRequest) async throws -> Void
     var removePending: ([String]) -> Void
     var removeDelivered: ([String]) -> Void
+    /// Replaces **every** category the app has registered (`setNotificationCategories`). Only the
+    /// app calls it, and only from `DataManager.requestReminderReschedule` — see
+    /// ``NotificationManager/reminderCategory(in:)``.
+    var setCategories: (Set<UNNotificationCategory>) -> Void
     var authorizationStatus: () async -> UNAuthorizationStatus
     var requestAuthorization: () async throws -> Bool
 
     static func live() -> ReminderScheduler {
         ReminderScheduler(
-            pendingIdentifiers: {
-                await UNUserNotificationCenter.current().pendingNotificationRequests().map(\.identifier)
+            pending: {
+                await UNUserNotificationCenter.current().pendingNotificationRequests().map(PendingReminder.init)
             },
             add: { request in
                 try await UNUserNotificationCenter.current().add(request)
@@ -54,6 +67,9 @@ struct ReminderScheduler {
             removeDelivered: { identifiers in
                 UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: identifiers)
             },
+            setCategories: { categories in
+                UNUserNotificationCenter.current().setNotificationCategories(categories)
+            },
             authorizationStatus: {
                 await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
             },
@@ -63,6 +79,49 @@ struct ReminderScheduler {
                 // a writer this product does not have.
                 try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
             }
+        )
+    }
+}
+
+/// A pending request as ``NotificationManager`` reads it back: its identifier, and the words it was
+/// filed in.
+///
+/// The words are what tell a reminder filed before an update — with no button — or before a change
+/// of language apart from one filed now.
+/// ``NotificationManager/reconcile(_:calendar:strings:using:)`` files such a reminder again under its
+/// own identifier, which replaces it (spec 2026-10-15 §3.7).
+///
+/// A plain value rather than the `UNNotificationRequest`, so a test can write one down, and
+/// `Sendable`, so it can come back from the centre. `nonisolated` stated outright, as on
+/// ``ReminderScheduler``: it is read on either side of the main actor. In this file rather than one of
+/// its own for ``ReconcileQueue``'s reason — a file of its own would have to join the widget's
+/// exception set, and rule `40-widget` forbids a seventh.
+nonisolated struct PendingReminder: Equatable, Sendable {
+    var identifier: String
+    var title: String
+    var body: String
+    var category: String
+
+    /// Whether this reminder already reads as `content` would: the same title, body and category.
+    /// Sound and interruption level are not compared — they are the same in every build so far, and
+    /// a reminder is filed again only for what the user sees.
+    func isWorded(like content: UNNotificationContent) -> Bool {
+        title == content.title && body == content.body && category == content.categoryIdentifier
+    }
+}
+
+extension PendingReminder {
+    /// Read off a request the centre holds.
+    ///
+    /// `nonisolated` here as well as on the type: in an extension this initializer otherwise took the
+    /// main actor, and ``ReminderScheduler/live()`` hands it to `map` off it (measured, 2026-10-15).
+    /// In an extension rather than the body, so the memberwise initializer a test writes survives.
+    nonisolated init(_ request: UNNotificationRequest) {
+        self.init(
+            identifier: request.identifier,
+            title: request.content.title,
+            body: request.content.body,
+            category: request.content.categoryIdentifier
         )
     }
 }
@@ -120,6 +179,11 @@ enum NotificationManager {
     /// forbids adding a capability to unblock something. The cost is real and is stated in the
     /// settings screen rather than hidden — an `.active` reminder is eligible for iOS's scheduled
     /// Notification Summary and may be delivered in a batch hours later.
+    ///
+    /// **It names the button's category**, ``reminderCategoryIdentifier``, so a reminder the widget
+    /// extension files carries the button too: iOS looks the category up among the app's registered
+    /// ones when it shows the notification, and an extension files under the containing app's
+    /// identity. The category itself is registered only by the app (``reminderCategory(in:)``).
     /// - Parameter bundle: the strings to compose in. Taken rather than read from `Bundle.main`
     ///   because this file compiles into **both** targets and the copy must follow the user's
     ///   chosen language in either — and because `Bundle.main` in a widget process is the `.appex`,
@@ -132,7 +196,52 @@ enum NotificationManager {
         )
         content.sound = .default
         content.interruptionLevel = .active
+        content.categoryIdentifier = reminderCategoryIdentifier
         return content
+    }
+
+    /// The category every reminder names, so iOS draws the button under it.
+    ///
+    /// **Permanent in practice.** It is stored inside each pending request, so a renamed category
+    /// would leave every reminder already filed without its button until each was filed again. Not
+    /// built from `ReminderPlan.identifierPrefix`, which names *requests* —
+    /// ``reconcile(_:calendar:strings:using:)`` filters the pending set by it, and a category is
+    /// another namespace.
+    nonisolated static let reminderCategoryIdentifier = "sardor.WaterBuddy.reminderCategory"
+
+    /// The reminder's one button, *Log a Glass*. `ReminderResponder` logs for this and for nothing else.
+    nonisolated static let logTheGlassActionIdentifier = "sardor.WaterBuddy.logTheGlass"
+
+    /// The reminder's category: one button, *Log a Glass*, that logs the Glass without opening the
+    /// app (spec 2026-10-15 §3.4).
+    ///
+    /// - The action's options are **empty**. Not `.foreground` — the point is not opening the app; not
+    ///   `.authenticationRequired` — logging water is harmless, and a reminder reaches Apple Watch
+    ///   exactly when the phone is locked (rule `70-privacy`); not `.destructive`.
+    /// - Its title is the Siri phrase's, *Log a Glass* — the same act in the same words. Only the app
+    ///   resolves it, so the widget's catalogue carries no copy.
+    /// - Its icon is the Glass's glyph, the one the control draws, through the one name for that slot.
+    /// - The category takes no options, so a dismissal never reaches the app.
+    ///
+    /// **Registered only by the app**, through ``ReminderScheduler/setCategories``, in
+    /// `DataManager.requestReminderReschedule`'s queued operation. Never from
+    /// ``reconcile(_:calendar:strings:using:)``, which the widget extension runs:
+    /// `setNotificationCategories` replaces every category the app has.
+    /// - Parameter bundle: the strings to compose the title in. **Not defaulted**, as on
+    ///   ``reminderContent(in:)`` and for its reason.
+    nonisolated static func reminderCategory(in bundle: Bundle) -> UNNotificationCategory {
+        let logTheGlass = UNNotificationAction(
+            identifier: logTheGlassActionIdentifier,
+            title: bundle.localizedString(forKey: "Log a Glass", value: nil, table: nil),
+            options: [],
+            icon: UNNotificationActionIcon(systemImageName: vesselSlots[DataManager.usualSlot].symbol)
+        )
+        return UNNotificationCategory(
+            identifier: reminderCategoryIdentifier,
+            actions: [logTheGlass],
+            intentIdentifiers: [],
+            options: []
+        )
     }
 
     @discardableResult
@@ -150,22 +259,25 @@ enum NotificationManager {
 
         // Only ever this product's own reminders. Anything else in the set belongs to someone else
         // — and from the extension, "everything" would mean the app's entire set.
-        let pending = await scheduler.pendingIdentifiers()
-        let ours = pending.filter { $0.hasPrefix(ReminderPlan.identifierPrefix) }
+        let pending = await scheduler.pending()
+        let ours = pending.filter { $0.identifier.hasPrefix(ReminderPlan.identifierPrefix) }
         let wanted = Set(slots.map(\.identifier))
 
-        let stale = ours.filter { !wanted.contains($0) }
+        let stale = ours.map(\.identifier).filter { !wanted.contains($0) }
         if !stale.isEmpty {
             scheduler.removePending(stale)
             scheduler.removeDelivered(stale)
             outcome.removed = stale
         }
 
-        // An identifier already pending is already correct: a slot's fire time is a function of the
-        // day and hour its identifier names, so it cannot have moved. Skipping it is what makes
-        // this safe to call on every foreground.
-        let alreadyPending = Set(ours)
-        for slot in slots where !alreadyPending.contains(slot.identifier) {
+        // A reminder already pending in the words it would be filed in now is already correct: a
+        // slot's fire time is a function of the day and hour its identifier names, so it cannot
+        // have moved. Skipping it is what makes this safe to call on every foreground. One in other
+        // words — filed before the button existed, or before a change of language — is filed again
+        // under its own identifier, which replaces it: nothing is removed, and no slot moves.
+        let current = reminderContent(in: strings)
+        let alreadyFiled = Set(ours.filter { $0.isWorded(like: current) }.map(\.identifier))
+        for slot in slots where !alreadyFiled.contains(slot.identifier) {
             let request = UNNotificationRequest(
                 identifier: slot.identifier,
                 content: reminderContent(in: strings),
@@ -195,7 +307,7 @@ enum NotificationManager {
         // Nothing was awaited, but something was removed — see the type's note on why that needs a
         // round trip before this process is allowed to die.
         if outcome.added.isEmpty, !outcome.removed.isEmpty {
-            _ = await scheduler.pendingIdentifiers()
+            _ = await scheduler.pending()
         }
 
         return outcome

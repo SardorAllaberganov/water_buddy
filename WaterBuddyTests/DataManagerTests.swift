@@ -724,6 +724,37 @@ struct ReminderSeamTests {
         }
     }
 
+    /// A change of language moves no slot, but every pending reminder is in the words of the language
+    /// it was filed in. The re-plan files them again in the new one
+    /// (`aReconcileInAnotherLanguageFilesEveryPendingReminderAgainInIt`) and registers the button in it.
+    @Test func changingTheLanguageRePlans() {
+        withTempDefaults { defaults in
+            var plans = 0
+            var latest: [ReminderPlan.Slot] = []
+            let manager = makeManager(defaults, onReschedule: { plans += 1; latest = $0 }) { utc(2026, 8, 28, 12) }
+            manager.remindersEnabled = true
+            let after = plans
+
+            manager.language = .russian
+
+            #expect(plans == after + 1, "the pending reminders would keep the old language until each fired")
+            #expect(!latest.isEmpty)
+        }
+    }
+
+    @Test func choosingTheSameLanguageAgainDoesNotRePlan() {
+        withTempDefaults { defaults in
+            var plans = 0
+            let manager = makeManager(defaults, onReschedule: { _ in plans += 1 }) { utc(2026, 8, 28, 12) }
+            manager.language = .russian
+            let after = plans
+
+            manager.language = .russian
+
+            #expect(plans == after, "a no-op write must not re-plan the day")
+        }
+    }
+
     @Test func aDisabledManagerStillHandsOutAnEmptyPlanRatherThanSkippingTheCall() {
         withTempDefaults { defaults in
             var calls = 0

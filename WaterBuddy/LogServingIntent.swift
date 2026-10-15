@@ -45,7 +45,8 @@ struct LogServingIntent: AppIntent {
     /// this intent actually speaks.
     static let reply: LocalizedStringResource = "Water logged."
 
-    /// What `perform()` does between its two waits: log the Glass once, on the day it is now.
+    /// What ``logTheGlassInTheBackground()`` does between its two waits: log the Glass once, on the
+    /// day it is now.
     ///
     /// A function of a manager and a suite rather than an inline call on ``DataManager/shared``, so
     /// the one part of this intent a test can run is tested (`LogTheGlassTests`) — no simulator here
@@ -59,20 +60,31 @@ struct LogServingIntent: AppIntent {
         manager.addWater(amount: DataManager.usualServing(in: defaults))
     }
 
-    /// `@MainActor` on a `nonisolated` requirement, as on `AddWaterIntent`, so the body reaches
-    /// ``DataManager/shared`` directly.
+    /// Everything a one-tap log from the app's own process does: wait for the watch link, log the
+    /// Glass once, and wait for the re-plan to reach the notification centre. Siri's ``perform()``
+    /// and the reminder's *Log a Glass* (`ReminderResponder`) both run it, so the two doors log the
+    /// same Glass the same way.
+    ///
+    /// When the app is not running, both launch it in the background, and iOS may suspend it once they
+    /// return — so this returns only after both waits (rule `80-notifications`).
     @MainActor
-    func perform() async throws -> some IntentResult & ProvidesDialog {
+    static func logTheGlassInTheBackground() async {
         // The watch link first: this launch started activating it in `WaterBuddyApp.init()`, and a
         // publish before it is up is dropped.
         await WristLink.waitUntilActivated()
 
-        Self.logTheGlass(into: .shared, from: DataManager.sharedDefaults)
+        logTheGlass(into: .shared, from: DataManager.sharedDefaults)
 
         // The re-plan `addWater` queued must reach the notification centre before the system can
         // suspend this background launch (rule `80-notifications`).
         await DataManager.remindersSettled()
+    }
 
+    /// `@MainActor` on a `nonisolated` requirement, as on `AddWaterIntent`, so the body reaches
+    /// ``DataManager/shared`` directly.
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        await Self.logTheGlassInTheBackground()
         return .result(dialog: IntentDialog(Self.reply))
     }
 }

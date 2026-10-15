@@ -55,6 +55,11 @@ struct WaterBuddyApp: App {
         // land the moment the session comes up.
         WristLink.live.activate()
         #endif
+
+        // The reminder's *Log a Glass* launches the app in the background, and iOS hands the press to
+        // the centre's delegate only if one is set before the app finishes launching; this runs
+        // first. After the fresh start's return, so a UI test's fresh start installs nothing.
+        ReminderResponder.install()
     }
 
     #if DEBUG

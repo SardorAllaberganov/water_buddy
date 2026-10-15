@@ -75,10 +75,11 @@ private final class PermissionSpy {
 
     func scheduler() -> ReminderScheduler {
         ReminderScheduler(
-            pendingIdentifiers: { [] },
+            pending: { [] },
             add: { _ in },
             removePending: { _ in },
             removeDelivered: { _ in },
+            setCategories: { _ in },
             authorizationStatus: { [self] in
                 statusReads += 1
                 return status

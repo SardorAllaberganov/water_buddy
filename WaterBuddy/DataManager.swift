@@ -432,6 +432,11 @@ final class DataManager {
     /// reminder, `languageCode` is a field on the wire protocol (`WristMirror.languageCode`), so a
     /// language change is state the watch has to hear about too, the same way `currentWater`,
     /// `dailyGoal` and `servings` already do on their own setters below.
+    ///
+    /// **And it re-plans the reminders** — not because the plan moves, since a language moves no
+    /// slot, but because every pending reminder is in the words of the language it was filed in. The
+    /// re-plan's queued operation registers the button in the new language, and its reconcile files
+    /// each reminder again in it (`NotificationManager.reconcile`, spec 2026-10-15 §3.7).
     var language: AppLanguage {
         get {
             access(keyPath: \.language)
@@ -450,6 +455,9 @@ final class DataManager {
             }
             reloadWidgets()
             publishWrist(defaults)
+            // Every pending reminder is in the old language: the re-plan registers the button in the
+            // new one and files the reminders again in it (rule `80-notifications`). It moves no slot.
+            rescheduleRemindersNow()
         }
     }
 
@@ -1318,6 +1326,12 @@ final class DataManager {
     /// from after it and file the slot the drink dropped — the one reminder the drink exists to skip.
     /// The queue runs them one at a time, in the order they were asked for (``ReconcileQueue``).
     ///
+    /// **It also registers the reminder's button**, in the same operation and the same bundle, just
+    /// before the reconcile — so the button's title is in the language of the copy that pass files,
+    /// and is registered on every launch (`init` reschedules), as iOS requires. Only the app ever
+    /// registers it: `AddWaterIntent` awaits ``NotificationManager/reconcile(_:calendar:strings:using:)``
+    /// alone (``NotificationManager/reminderCategory(in:)``).
+    ///
     /// `role.mayFileReminders` is already `false` on both watch roles, so the body below never runs
     /// there — but `NotificationManager.swift` is deliberately excluded from the watch target's
     /// membership exceptions (rule `80-notifications`, Task 9), so `NotificationManager`,
@@ -1333,14 +1347,16 @@ final class DataManager {
         reminderReconciles.enqueue {
             // Built inside the operation: `UNUserNotificationCenter` is not `Sendable` and the
             // scheduler that wraps it must not cross into the queue (rule `43-concurrency`).
-            await NotificationManager.reconcile(
-                slots,
-                calendar: calendar,
-                // Resolved from the suite rather than from `DataManager.shared`: this is
-                // `nonisolated` and may not touch the main actor (rule `43-concurrency`).
-                strings: resolveLanguage(in: sharedDefaults).bundle,
-                using: ReminderScheduler.live()
-            )
+            let scheduler = ReminderScheduler.live()
+            // Resolved from the suite rather than from `DataManager.shared`: this is `nonisolated`
+            // and may not touch the main actor (rule `43-concurrency`). Once, so the button and the
+            // copy filed beside it are in one language.
+            let strings = resolveLanguage(in: sharedDefaults).bundle
+            // The button, registered before the reminders that name it — here and only here: the
+            // call replaces every category the app has, and the widget extension, which reconciles
+            // too, must never make it (rule `80-notifications`).
+            scheduler.setCategories([NotificationManager.reminderCategory(in: strings)])
+            await NotificationManager.reconcile(slots, calendar: calendar, strings: strings, using: scheduler)
         }
         #endif
     }
@@ -1915,7 +1931,11 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
     /// inside it — **including English**, which is why the catalogues carry explicit `en` values:
     /// without them the development language lives in the binary with no `en.lproj`, and choosing
     /// *English* on a Russian phone would resolve through `Bundle.main` and draw Russian.
-    var bundle: Bundle {
+    ///
+    /// `nonisolated`, as ``code`` is: `DataManager.requestReminderReschedule`'s queued operation reads
+    /// it once, off the main actor, for the reminder's button and its copy alike. It reads only
+    /// `Bundle.main` and ``code``.
+    nonisolated var bundle: Bundle {
         guard let code,
               let url = Bundle.main.url(forResource: code, withExtension: "lproj"),
               let resolved = Bundle(url: url)

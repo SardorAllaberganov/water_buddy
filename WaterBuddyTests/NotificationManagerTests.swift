@@ -32,7 +32,10 @@ private func utc(_ year: Int, _ month: Int, _ day: Int, _ hour: Int = 12) -> Dat
 /// either. That is why ``ReminderScheduler`` is a struct of closures rather than a protocol: the
 /// seam is the only thing a test can stand behind.
 private final class SchedulerSpy {
-    var pending: [String] = []
+    /// What the centre holds, as the seam reads it back: each request with the words it was filed in.
+    var held: [PendingReminder] = []
+    /// The identifiers in ``held``, for the tests that only ask what is filed.
+    var pending: [String] { held.map(\.identifier) }
     var added: [String] = []
     var removedPending: [String] = []
     var removedDelivered: [String] = []
@@ -43,20 +46,23 @@ private final class SchedulerSpy {
 
     func scheduler() -> ReminderScheduler {
         ReminderScheduler(
-            pendingIdentifiers: { [self] in
+            pending: { [self] in
                 pendingReads += 1
-                return pending
+                return held
             },
             add: { [self] request in
                 if let error = failures[request.identifier] { throw error }
                 added.append(request.identifier)
-                pending.append(request.identifier)
+                // As the centre does: a request under an identifier already pending replaces it.
+                held.removeAll { $0.identifier == request.identifier }
+                held.append(PendingReminder(request))
             },
             removePending: { [self] ids in
                 removedPending.append(contentsOf: ids)
-                pending.removeAll { ids.contains($0) }
+                held.removeAll { ids.contains($0.identifier) }
             },
             removeDelivered: { [self] ids in removedDelivered.append(contentsOf: ids) },
+            setCategories: { _ in },
             authorizationStatus: { [self] in status },
             requestAuthorization: { true }
         )
@@ -83,10 +89,10 @@ private func plan(now: Date = utc(2026, 8, 28, 12), water: Int = 0, horizonDays:
 /// its state behind a lock. `@unchecked` because the lock, not the compiler, is what makes it safe.
 private final class SharedCentre: @unchecked Sendable {
     private let lock = NSLock()
-    private var pending: [String] = []
+    private var pending: [PendingReminder] = []
     private var added: [String] = []
 
-    var pendingNow: [String] { lock.withLock { pending } }
+    var pendingNow: [String] { lock.withLock { pending.map(\.identifier) } }
     var addedSoFar: [String] { lock.withLock { added } }
 
     /// - Parameter readDelay: how long *this* scheduler's read of the pending set takes. It answers
@@ -94,20 +100,22 @@ private final class SharedCentre: @unchecked Sendable {
     ///   pass has already changed the set — the overtaking this exists to stage.
     func scheduler(readDelay: Duration = .zero) -> ReminderScheduler {
         ReminderScheduler(
-            pendingIdentifiers: { [self] in
+            pending: { [self] in
                 if readDelay > .zero { try? await Task.sleep(for: readDelay) }
                 return lock.withLock { pending }
             },
             add: { [self] request in
                 lock.withLock {
                     added.append(request.identifier)
-                    pending.append(request.identifier)
+                    pending.removeAll { $0.identifier == request.identifier }
+                    pending.append(PendingReminder(request))
                 }
             },
             removePending: { [self] identifiers in
-                lock.withLock { pending.removeAll { identifiers.contains($0) } }
+                lock.withLock { pending.removeAll { identifiers.contains($0.identifier) } }
             },
             removeDelivered: { _ in },
+            setCategories: { _ in },
             authorizationStatus: { .authorized },
             requestAuthorization: { true }
         )
@@ -177,7 +185,10 @@ struct NotificationManagerTests {
     /// entire set — the centre an extension resolves is the containing app's, not its own.
     @Test func reconcileNeverTouchesRequestsItDoesNotOwn() async {
         let spy = SchedulerSpy()
-        spy.pending = ["com.someone.else.request", "\(ReminderPlan.identifierPrefix)19990101.09"]
+        spy.held = [
+            PendingReminder(identifier: "com.someone.else.request", title: "", body: "", category: ""),
+            PendingReminder(identifier: "\(ReminderPlan.identifierPrefix)19990101.09", title: "", body: "", category: ""),
+        ]
 
         _ = await NotificationManager.reconcile(plan(), calendar: utcDay, strings: .main, using: spy.scheduler())
 
@@ -246,11 +257,143 @@ struct NotificationManagerTests {
     /// boundary. The copy names no total, no goal and no serving.
     @Test func theReminderCopyCarriesNoUserValues() {
         let content = NotificationManager.reminderContent(in: .main)
+        let button = NotificationManager.reminderCategory(in: .main).actions.map(\.title)
 
-        let text = content.title + " " + content.body
+        let text = ([content.title, content.body] + button).joined(separator: " ")
         let carriesAFigure = text.contains { $0.isNumber }
         #expect(!carriesAFigure, "reminder copy must not carry a figure: \(text)")
         #expect(content.interruptionLevel == .active, ".timeSensitive would need an entitlement")
+    }
+
+    /// So a reminder the widget extension files carries the button too: iOS looks the category up
+    /// among the app's registered ones when it shows the notification.
+    @Test func theReminderCarriesTheButtonsCategory() {
+        let content = NotificationManager.reminderContent(in: .main)
+
+        #expect(content.categoryIdentifier == NotificationManager.reminderCategoryIdentifier)
+    }
+
+    /// One button, and a press that runs where the user is: not `.foreground`, which would open the
+    /// app; not `.authenticationRequired`, which would ask for the passcode (rule `70-privacy`); not
+    /// `.destructive`.
+    @Test func theCategoryOffersOneButtonThatLogsWithoutOpeningTheApp() throws {
+        let category = NotificationManager.reminderCategory(in: .main)
+
+        #expect(category.identifier == NotificationManager.reminderCategoryIdentifier)
+        #expect(category.options.isEmpty, "no category option — a dismissal must not reach the app")
+        #expect(category.actions.count == 1)
+        let action = try #require(category.actions.first)
+        #expect(action.identifier == NotificationManager.logTheGlassActionIdentifier)
+        #expect(action.options.isEmpty, "not .foreground, .authenticationRequired or .destructive")
+        #expect(action.icon != nil, "the Glass's glyph")
+    }
+
+    /// The title follows the bundle passed — never `Bundle.main` — so the button is in the language
+    /// the reminder beside it was filed in.
+    @Test func theButtonsTitleIsComposedInTheBundlePassed() throws {
+        let russian = try #require(Bundle.main.url(forResource: "ru", withExtension: "lproj").flatMap(Bundle.init(url:)))
+        let expected = russian.localizedString(forKey: "Log a Glass", value: nil, table: nil)
+        try #require(expected != "Log a Glass", "the Russian bundle must translate it, or this proves nothing")
+
+        let action = try #require(NotificationManager.reminderCategory(in: russian).actions.first)
+
+        #expect(action.title == expected)
+    }
+
+    /// Only the button logs. A tap on the reminder itself opens the app, as it always did, and logs
+    /// nothing; a dismissal never reaches the app, but would log nothing either.
+    @Test func onlyTheButtonLogsTheGlass() {
+        #expect(ReminderResponder.logsTheGlass(for: NotificationManager.logTheGlassActionIdentifier))
+        #expect(!ReminderResponder.logsTheGlass(for: UNNotificationDefaultActionIdentifier))
+        #expect(!ReminderResponder.logsTheGlass(for: UNNotificationDismissActionIdentifier))
+    }
+
+    // MARK: Wording
+
+    /// What the seam reads back: the identifier and the three things a reminder shows.
+    @Test func aPendingReminderIsReadOffItsRequest() {
+        let identifier = "\(ReminderPlan.identifierPrefix)20260828.09"
+        let content = UNMutableNotificationContent()
+        content.title = "Title"
+        content.body = "Body"
+        content.categoryIdentifier = "category"
+
+        let read = PendingReminder(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
+
+        #expect(read == PendingReminder(identifier: identifier, title: "Title", body: "Body", category: "category"))
+        #expect(read.isWorded(like: content))
+        content.body = "Other"
+        #expect(!read.isWorded(like: content), "a reminder in other words must not read as filed")
+        content.body = "Body"
+        content.categoryIdentifier = ""
+        #expect(!read.isWorded(like: content), "a reminder under another category must not read as filed")
+    }
+
+    /// A reminder pending in other words is filed again under its own identifier — which replaces
+    /// it — rather than skipped because its identifier is pending. Nothing is removed and no slot
+    /// moves (spec 2026-10-15 §3.7).
+    @Test func aPendingReminderInOtherWordsIsFiledAgainInPlace() async throws {
+        let spy = SchedulerSpy()
+        let slots = plan()
+        _ = await NotificationManager.reconcile(slots, calendar: utcDay, strings: .main, using: spy.scheduler())
+        let filed = spy.pending
+        try #require(spy.held.count >= 2)
+        let otherTitle = spy.held[0].identifier
+        let otherBody = spy.held[1].identifier
+        spy.held[0].title = "Old words"
+        spy.held[1].body = "Old words"
+        spy.added.removeAll()
+
+        let outcome = await NotificationManager.reconcile(slots, calendar: utcDay, strings: .main, using: spy.scheduler())
+
+        #expect(spy.added.sorted() == [otherTitle, otherBody].sorted())
+        #expect(outcome.added.sorted() == [otherTitle, otherBody].sorted())
+        #expect(spy.removedPending.isEmpty, "a re-file replaces; it never removes")
+        #expect(spy.pending.sorted() == filed.sorted(), "no slot moved")
+        let content = NotificationManager.reminderContent(in: .main)
+        #expect(spy.held.allSatisfy { $0.isWorded(like: content) })
+    }
+
+    /// What the language setter's re-plan does: every pending reminder, filed in English, is filed
+    /// again in Russian.
+    @Test func aReconcileInAnotherLanguageFilesEveryPendingReminderAgainInIt() async throws {
+        let english = try #require(Bundle.main.url(forResource: "en", withExtension: "lproj").flatMap(Bundle.init(url:)))
+        let russian = try #require(Bundle.main.url(forResource: "ru", withExtension: "lproj").flatMap(Bundle.init(url:)))
+        let inRussian = NotificationManager.reminderContent(in: russian)
+        try #require(
+            inRussian.title != NotificationManager.reminderContent(in: english).title,
+            "the two languages must differ, or this proves nothing"
+        )
+        let spy = SchedulerSpy()
+        let slots = plan()
+        _ = await NotificationManager.reconcile(slots, calendar: utcDay, strings: english, using: spy.scheduler())
+        let filed = spy.pending
+        spy.added.removeAll()
+
+        _ = await NotificationManager.reconcile(slots, calendar: utcDay, strings: russian, using: spy.scheduler())
+
+        #expect(spy.added.sorted() == filed.sorted())
+        #expect(spy.removedPending.isEmpty)
+        #expect(spy.held.allSatisfy { $0.isWorded(like: inRussian) })
+    }
+
+    /// The update from 1.1: up to 28 reminders pending in the same words with no category. Skipped
+    /// by identifier, they would show no button for up to four days — in the release whose notes
+    /// announce it. The first reconcile after the update files every one again, with it.
+    @Test func aReminderFiledBeforeTheButtonIsFiledAgainWithIt() async {
+        let spy = SchedulerSpy()
+        let slots = plan()
+        _ = await NotificationManager.reconcile(slots, calendar: utcDay, strings: .main, using: spy.scheduler())
+        let filed = spy.pending
+        // As 1.1 filed them: the same words, no category.
+        for index in spy.held.indices { spy.held[index].category = "" }
+        spy.added.removeAll()
+
+        _ = await NotificationManager.reconcile(slots, calendar: utcDay, strings: .main, using: spy.scheduler())
+
+        #expect(spy.added.sorted() == filed.sorted())
+        #expect(spy.removedPending.isEmpty)
+        #expect(spy.held.allSatisfy { $0.category == NotificationManager.reminderCategoryIdentifier })
     }
 }
 
