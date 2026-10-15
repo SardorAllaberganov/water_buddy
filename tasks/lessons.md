@@ -3787,3 +3787,69 @@ Reduce Motion branch, a transaction, `Bundle.figure`) and the string keys it spe
 sheets' section for each, asking whether its list of users or its count is still whole. A search
 for the replaced name finds what was removed; only a search for what the new code uses finds the
 lists it should have joined.
+
+## 2026-10-15 — A synchronous closure read off a main-actor struct warns; an awaited one does not
+
+**What happened.** The reminder button needed one more closure on `ReminderScheduler`,
+`setCategories`, called from `DataManager.requestReminderReschedule`'s nonisolated queue. The struct
+had no isolation of its own, so in the app target it took the default, the main actor. HEAD's clean
+build already carried the evidence: `reconcile`'s two **synchronous** seam calls, `removePending` and
+`removeDelivered`, warned "main actor-isolated property … cannot be accessed from outside of the
+actor", while its two **awaited** ones, `pendingIdentifiers` and `add`, printed nothing — an `await`
+lets the read hop. A synchronous `setCategories`, read from the nonisolated queue, would by the same
+token have warned too (inferred from those two lines; that variant was never built). Measured in a
+scratch prototype before the plan was written: with `nonisolated` on the struct, the clean build had
+those two warnings fewer and none new. Two other prototype builds showed two more of the kind: the
+first build warned on an initializer in a plain extension of the `nonisolated` struct, which took the
+main actor even so; and a build with `nonisolated` taken off `AppLanguage.bundle` on purpose warned on
+reading it once off the main actor.
+
+**The rule:** before adding a member to a type that compiles into the app, read the clean baseline for
+that type's existing warnings — they say which isolation it has taken. A synchronous member on a type
+the target made main-actor warned where nonisolated code read it, as `reconcile`'s two reads did; the
+fix is on the type (`nonisolated`), never an `await` sprinkled at a call site to hide it. Build the change in a scratch
+copy and compare by file and message before the plan names its signature.
+
+## 2026-10-15 — On the simulator, a long press does not open a reminder
+
+**What happened.** The throwaway probe pressed a lone reminder in Notification Center for 1.5 and then
+2.5 seconds: iOS 27.0's simulator left it in its short look, so the button was never found. With two
+reminders present, presses of 1.0 and 2.0 seconds expanded the app's *group* ("Show less"), still not
+one reminder. A diagnostic test that tried three gestures in turn, with a screenshot and the list of
+SpringBoard's buttons after each, found the way in one run: swiping a reminder left offers
+*Options*, *View* and *Clear*, and *View* opens it with its actions. A tap on a reminder in
+Notification Center — the first match, then a visible card — did not open the app either; a pushed
+reminder's **banner** on the Home Screen did. Each fix changed the probe's gesture, never what it
+expected.
+
+**The rule:** when a SpringBoard probe cannot find an element, print the tree and take a screenshot at
+the failure before changing anything, and try gestures in one diagnostic run rather than one rebuild at
+a time. For a notification's actions use swipe-left → *View*; for its default action use a banner. What
+the simulator could not show — the long press and the Notification Center tap — goes to the device
+sweep, said as such.
+
+## 2026-10-15 — A feature's records search the known issues and the product's own words for its subject
+
+**What happened.** 1.2.4's records were read by two fresh readers and fixed, and the owner's
+`/doc_sync` straight after still found five things the build had left:
+- known issue #3, *The reminder has no action button*, open beside the change that fixed it;
+- #29, the warning baseline's history, without the change's re-measurement;
+- the *Last updated* lines of the three sheets that have one, among the four it had edited, still
+  dated the day before;
+- `docs/STATE.md`'s `servings` row, a list of the doors that log the Glass, without the new door;
+- the app's own vessels note, *"The Glass is the one your widget, Siri and Control Center log."*,
+  drawn in Settings and the welcome, now incomplete.
+
+The records had been searched for the files and symbols the change touched, and the readers were
+briefed on the passages written. That search could not reach #3, an old issue about the feature's
+**subject** — a reminder with no button — or the vessels note, a user-facing sentence listing the same
+set the change grew. The other three were reachable and were missed: the `servings` row sits in a
+sheet one reader checked, and that reader did find two other lists of the same doors outside its
+passages; the *Last updated* lines and #29 were on neither the plan's records task nor the readers'
+briefs.
+
+**The rule:** before a feature's closing report, search the known issues and the string catalogues for
+its subject in plain words (here "action", "button", "Siri and Control Center"), not only for the
+names of what it changed; retire what it fixed, and open an issue for product copy it made incomplete
+— copy is the owner's to reword. Refresh the *Last updated* line of every sheet the change edited,
+and add the change's measurements to the issues that keep their history (the warning baseline, #29).

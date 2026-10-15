@@ -99,7 +99,13 @@ reaching the one surface it does not reach yet. Its design must answer: the cate
 registered by the app at launch, while reminders are also filed by the widget extension
 (`AddWaterIntent` reconciles), so the content's category identifier lives in the shared
 `NotificationManager`; the button's text is digit-free in all three languages (rule `70-privacy`);
-and what a press does on a locked phone.
+and what a press does on a locked phone. *(2026-10-15: built in the tree, awaiting `/commit` and the
+device sweep's eight steps (spec `2026-10-15-log-from-a-reminder-design.md` §7.4). Only the app
+registers the category, in its queued reconcile; the action is not `.authenticationRequired`, so a
+press is meant to run without unlocking, as the Siri phrase and the control do — proved only on an
+unlocked simulator; and pending reminders still in the plan are filed again when their words differ,
+so ones filed by 1.1 gain the button and ones filed before a change of language are put into the new
+language.)*
 
 **1.2.5 — Rating prompt.** Apple's own review request, asked at a moment of success (say, a goal
 reached on a later day, never in the first session). Apple caps how often it can show. **Needs a
@@ -116,7 +122,11 @@ and language tick, never felt, and the vessels note's Russian name for Control C
 *(2026-10-14, evening: and what stage 5 left — #130: the welcome's haptics; iOS's question about
 notifications asked from the welcome, granted and refused; #100(d)'s walk — revoke the permission
 in iOS Settings, come back, and see *Next reminder* go; what VoiceOver stops on in the welcome; and
-the Russian and Uzbek of its 28 new strings.)*
+the Russian and Uzbek of its 28 new strings.)* *(2026-10-15: and what 1.2.4 left — #133: its spec
+§7.4's eight steps for the reminder's *Log a Glass* — unlocked, locked, on the watch, Double Tap, the
+watch out of reach, before the first unlock (#72), an update over 1.1, VoiceOver — and whether a long
+press and a tap in Notification Center behave on a device as the simulator did not; and #134's
+*Follow device* case.)*
 
 **1.2.8 — Store page.** New iPhone screenshots of the redesign (the owner's 2026-10-09 ruling was
 none until the redesign is built), the header, and the pitch in the subtitle or description — not in
@@ -198,8 +208,8 @@ theme's contrast is measured to the same floors before it ships.
 **1.5.1 — Other drinks.** A drink type stored on every serving: a change to `WaterLog`, the source
 of truth, and so a SwiftData migration, with consequences for the widget, the watch's wire format,
 Siri, Control Center and Apple Health. Questions for its design: whether every drink counts in full
-toward the goal; whether the one-tap doors (widget, Siri, Control Center, the watch) keep logging
-water only.
+toward the goal; whether the one-tap doors (widget, Siri, Control Center, the watch, and since
+2026-10-15 the reminder's *Log a Glass*) keep logging water only.
 
 **1.5.2 — Live Activity.** Today's progress on the Lock Screen and in the Dynamic Island. **With no
 server, it can only be updated when the app or one of its intents runs** — a pour from the app, a
@@ -264,6 +274,12 @@ screen's new name). As with 1.2.2, the code came first. Not typed, and the owner
 `60-design-system`'s list of haptic counters does not name the welcome's (`goalSteps`, `finishes`,
 `uses`, `picks`), and the welcome's step tick is triggered by the step itself, a view's own state,
 as #111 records.)*
+*(2026-10-15: 1.2.4 needed three besides `80-notifications`, typed into the rule files unstaged for
+the owner as its spec §5 words them: `70-privacy` (the button says nothing and runs without
+unlocking), `43-concurrency` (`ReminderResponder` is main-actor) and `85-testing` (press a reminder's
+*Log a Glass* with the app not running). After the final review, `80-notifications` and
+`43-concurrency` were reworded — the scheduler is called on both sides of the main actor, the
+responder does not rest on the centre's thread, and *Identifiers* names request identifiers.)*
 
 ## 9. Not planned
 

@@ -9504,3 +9504,140 @@ staged** — the stage's 32, this pass's five among them and re-staged. **12 uns
 files with stage 5's wording, for the owner, and the six from before the stage
 (`.claude/settings.json`, two watch schemes, three string catalogues). **1 untracked**:
 `Screenshots/census/`. None in both.
+
+## [2026-10-15] — Roadmap item 1.2.4: Log a Glass from a reminder
+
+**What changed.** A reminder carries one button, *Log a Glass*, with the Glass's glyph. Pressed, it
+logs the Glass without opening the app. It is built to run without unlocking and from Apple Watch — the
+action is not `.authenticationRequired`, and the iPhone app registers it — but only the unlocked
+simulator was tried; the locked phone and the watch are device steps (known issue #133).
+- **The responder.** `ReminderResponder.swift` (new, app-only) is the notification centre's main-actor
+  delegate, installed in `WaterBuddyApp.init()`. A press runs
+  `LogServingIntent.logTheGlassInTheBackground()`: the Siri phrase's three steps, moved out of
+  `perform()` so both doors call one function.
+- **The category.** `NotificationManager.swift` holds the category and its action
+  (`reminderCategoryIdentifier`, `logTheGlassActionIdentifier`, `reminderCategory(in:)`), and
+  `reminderContent(in:)` names it. Only the app registers it, through the scheduler's new
+  `setCategories`, in `requestReminderReschedule`'s queued operation and the bundle it files the copy in.
+- **The re-file.** `reconcile` files again a reminder still in the plan that is pending in other
+  words — title, body, category — than it would file now, so reminders filed by 1.1 gain the button at the first launch.
+  The `language` setter now re-plans, and the same re-file puts reminders already filed into the new
+  language.
+- **The seam.** `ReminderScheduler` is `nonisolated`, and its pending read returns `PendingReminder`s.
+  `AppLanguage.bundle` is `nonisolated`.
+
+**Rulings it rests on.** The owner's D1 (a press runs without unlocking, as the Siri phrase and the
+control do) and D2 (re-file reminders in other words; the language setter reschedules), 2026-10-15.
+The plan's P1–P3 came from a scratch prototype built before the plan was written: without P2 or P3,
+a new warning each (measured); without P1, the synchronous `setCategories` would warn as HEAD's
+`removePending` does (inferred from that line, not built). The spec was amended for them, and for what the simulator showed: the glyph is drawn before
+the title, and a delivered reminder's button follows the category registered when it is shown.
+
+**Files touched.**
+- Code: `WaterBuddy/NotificationManager.swift`, `WaterBuddy/DataManager.swift`,
+  `WaterBuddy/LogServingIntent.swift`, `WaterBuddy/ReminderResponder.swift` (new),
+  `WaterBuddy/WaterBuddyApp.swift`.
+- Tests: `WaterBuddyTests/NotificationManagerTests.swift`, `WelcomeTests.swift`,
+  `LocalizationTests.swift`, `DataManagerTests.swift`.
+- The spec and the plan.
+- Records: `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
+  `docs/ROADMAP.md`, `tasks/lessons.md` (two lessons), this file.
+- Unstaged, for the owner: rules `80-notifications`, `70-privacy`, `43-concurrency`, `85-testing`.
+
+**Verification, run in this session.**
+- **Tests first.** Each code task's tests ran before its code: tests that named new symbols failed to
+  build, and the re-file and language-setter tests failed at run time. Four could not fail before their
+  change. Two were proved by mutation (`theAppAndTheWidgetFileRemindersInTheSameWords`,
+  `choosingTheSameLanguageAgainDoesNotRePlan`). The two digit checks on the button's title, which
+  already shipped digit-free for Siri, were not.
+- **Gate, after the review's fixes.**
+  - Unit: 604 tests in 75 suites passed (593 before).
+  - UI, on *WaterBuddy Gate 27* and *Gate 26.5*: `GoalSetupUITests` 36 executed in four chunks, 1
+    skipped (`testTheBarsCaptionsShareALine`), and the other classes 31, with 0 failures on each system.
+  - Watch: 57 tests in 6 suites passed.
+  - Both widget schemes built.
+- **Warnings.** HEAD and the staged index, each built clean, compared by file and message: none new.
+  Two are gone (`removePending`, `removeDelivered`); 52 unique lines against 54.
+- **Simulator** (*WaterBuddy Probe 27*, a throwaway XCUITest probe, deleted; reminders sent with
+  `xcrun simctl push`):
+  - With the app terminated, the press launched it in the background, left it there, and logged the
+    Glass once.
+  - A Glass edited to 700 ml logged 700.
+  - In Russian the button read *Записать стакан*.
+  - Tapping a banner opened the app and logged nothing.
+  - Pressed with Notification Center over the open app, the total rose by one Glass.
+  - Not proved there: a long press opening a reminder (on a lone reminder it left the short look; with
+    two it expanded the group — swipe-left → *View* was used), and a tap on a reminder in Notification
+    Center. Both are listed for the device sweep in known issue #133, with its eight steps.
+- **Review.** A fresh reviewer found no Critical or Important issues and seven Minor. Three were
+  re-graded and fixed as text, and four deferred (#134, #135, and two in the ledger).
+- **Records.** Two fresh readers found 16 and 17 errors in these records, the spec's amendments and the
+  new DocC. All but two were fixed by deleting or quoting the source; the two left (a tap "opens the
+  app as it always did"; "`NotificationManager` only files and unfiles") are rulings in the ledger.
+  Three DocC passages changed after the gate, comments only; the unit suite ran again: 604 tests
+  passed.
+
+Read from the commands at 13:42 on 2026-10-15, after the `git add` of the 18 paths by name. **No
+`git commit` was run.** HEAD `6010e25`, 118 commits, `## main...origin/main`. **18 staged**: the five
+code files (`ReminderResponder.swift` added), the four test files, the spec and plan (added),
+`CLAUDE.md`, the four `docs/` sheets, this file and `tasks/lessons.md`. **10 unstaged**: the four
+rule files with 1.2.4's wording, for the owner, and the six from before (`.claude/settings.json`, two
+watch schemes, three string catalogues). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-15] — `/doc_sync` after 1.2.4: one issue retired, one opened, three dates moved
+
+**What changed.** The owner's `/doc_sync` on the staged tree (the sixty-first pass of
+`docs/AI_CONTEXT.md`). No source or test file changed, and nothing was built or run for it.
+
+**Drift found and fixed.**
+- Known issue #3, *The reminder has no action button*, was still open; 1.2.4 is its fix. Retired, with
+  the original kept.
+- #29 had no entry for 1.2.4's re-measurement. It now records 29 shipping lines against 31, with the
+  two lines gone.
+- `docs/STATE.md`'s `servings` row named the widget, the Siri shortcut and the control as the doors
+  that log the Glass, not the reminder's *Log a Glass*. It now names the button too.
+- The *Last updated* lines of `docs/AI_CONTEXT.md`, `docs/STATE.md` and `docs/WIDGET.md` were still
+  2026-10-14. Each gains a 2026-10-15 paragraph above the old one.
+- **Not fixed, opened:** #136. The vessels note *"The Glass is the one your widget, Siri and Control
+  Center log."* (`SettingsView.swift:603`, `WelcomeView.swift:569`, in three languages) leaves out the
+  reminder's button. It is product copy, the owner's to word.
+
+**Checked and already accurate.**
+- The documented file list: 85 tracked `.swift` files, each with a row whose count equals its lines.
+- The test counts: 604 `@Test`, 57 on the watch, 54 UI `func test`.
+- The three exception sets in `project.pbxproj`, unchanged.
+- Every `` rule `nn-name` `` citation resolves.
+- `docs/STATE.md`'s 11 key rows against `DataManager.Key`.
+- No statement found that the button made false besides those above. Searched for a notification
+  delegate, a category, "no action" and "opens the app".
+- `docs/DESIGN.md` names nothing the button uses (no `mug.fill`, `usualSlot`, `vesselSlots` or
+  notification seam), so its *Last updated* stays.
+- `docs/ROADMAP.md` has no *Last updated* line, and none was invented.
+
+**Files touched:** `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `tasks/lessons.md` (one
+lesson: *A feature's records search the known issues and the product's own words for its subject*),
+this file. `CLAUDE.md`, `docs/DESIGN.md` and `docs/ROADMAP.md` were read and not changed. No `.claude/`
+file and no file under a target.
+
+**Gate:** not run in this pass. 1.2.4's gate, run earlier the same day, is the checkpoint above.
+
+**Two fresh readers** of this pass (`docsync-61-reader-C.md`, `-D.md`, in 1.2.4's ledger folder) found
+six errors, all fixed by quoting the source:
+- **#136's heading** said the note "no longer" names every door. It never named the watch's primary
+  pour either.
+- **#29 and the 1.2.4 block** said the warning build was of "the staged index". It was the index as
+  exported at 13:21; three files' comments changed after it, line for line.
+- **The `servings` line above** left out the widget.
+- **The lesson** counted four finds, not five. It counted three edited sheets, not four (three with a
+  *Last updated* line). And it called all its misses unreachable; the `servings` row, the *Last
+  updated* lines and #29 were reachable and missed.
+
+A reader also noted that `docs/DESIGN.md:1472` quotes the vessels note in the present tense. #136 now
+names it, and the stage 4 block's quote, as places to change with the note.
+
+Read from the commands at 13:53 on 2026-10-15, after this pass's `git add` of its five files by name.
+**No `git commit` was run.** HEAD `6010e25`, 118 commits, `## main...origin/main`. **18 staged** —
+1.2.4's 18, this pass's five (`docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
+`tasks/lessons.md`, this file) among them and re-staged. **10 unstaged**: the four rule files with
+1.2.4's wording, for the owner, and the six from before. **1 untracked**: `Screenshots/census/`. None in
+both.

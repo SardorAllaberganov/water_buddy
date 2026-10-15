@@ -3,6 +3,16 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-15 (twenty-seventh pass — roadmap item 1.2.4's records, checked by the
+owner's `/doc_sync`). **No widget contract changed:** `AddWaterIntent.perform()`'s code is the same.
+One bullet, in *The intent also reschedules reminders*, says what it now files:
+- the reminders name the *Log a Glass* button's category, which only the app registers;
+- its reconcile files again a planned reminder pending in other words;
+- both processes compose the same words in every explicitly chosen language, with *Follow device*
+  not pinned (`docs/AI_CONTEXT.md` #134).
+
+The paragraph below is the twenty-sixth pass's, as it was written.
+
 **Last updated:** 2026-10-14, night (twenty-sixth pass — `/doc_sync` after the redesign's stage 5.
 No contract changed. Two sentences corrected, both found by a fresh reader: the app's catalogue,
 of which the widget's ten shared keys are a strict subset, is 103 keys, not 75; and the stage's
@@ -381,6 +391,12 @@ at all:
   reminders were switched on filed an empty plan, which cleared them, and a press after they were
   switched off filed them again (known issue #73, retired — pinned by tests, never reproduced on a
   device).
+- Since 2026-10-15 (roadmap item 1.2.4) the reminders it files name the *Log a Glass* button's
+  category, which only the app registers, and its reconcile files again a reminder still in the plan
+  that is pending in other words than its own. In every language the user picks explicitly, both processes compose the
+  same words — `theAppAndTheWidgetFileRemindersInTheSameWords` pins it — so neither re-files the
+  other's; *Follow device* is not pinned (`docs/AI_CONTEXT.md` known issue #134). `perform()`'s code
+  is unchanged.
 
 **Unverified:** whether WidgetKit's sandbox *permits* the call at runtime. The addressing is proven;
 the permission is not, and sandbox profiles are kernel-compiled. `DataManager.refresh()` reconciles

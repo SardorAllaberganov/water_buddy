@@ -152,7 +152,10 @@ something to record.
   `WaterBuddyTests` files set aside, before and after the redesign's stage 3c, again before
   and after stage 4, and on 2026-10-14 before and after stage 5; the 38 measured on Xcode 26.6
   no longer compares), a clean
-  `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique warning lines (80
+  `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique warning lines —
+  **29 since 2026-10-15**, when roadmap item 1.2.4's `nonisolated` `ReminderScheduler` removed the
+  `removePending` and `removeDelivered` lines in `NotificationManager.swift`, measured on the staged
+  tree (80
   occurrences as counted then; 44 primary lines on 2026-10-08 — occurrences move with the
   architectures a build compiles, the unique lines do not): the *"main actor-isolated …
   cannot be referenced from a nonisolated context"* family in `DataManager.swift` and
@@ -215,7 +218,11 @@ something to record.
   fourth:** `LogWaterControl` runs `AddWaterIntent(amount: snapshot.serving)` from the same snapshot,
   draws the glyph at `DataManager.usualSlot` — the one name for that vessel's index — and is kept
   current by `requestWidgetReload()`'s `reloadAllControls()`
-  (`docs/superpowers/specs/2026-10-08-control-center-design.md`)
+  (`docs/superpowers/specs/2026-10-08-control-center-design.md`). **A reminder's *Log a Glass* is a
+  fifth:** pressed on the notification, it runs `LogServingIntent.logTheGlassInTheBackground()` in
+  the app's own process through `ReminderResponder`, without opening the app — proved on the iPhone
+  simulator; from Apple Watch and on a locked phone it is built for but device-unproven
+  (`docs/superpowers/specs/2026-10-15-log-from-a-reminder-design.md`, `docs/AI_CONTEXT.md` #133)
 - **`addLog` is how a logged serving enters.** (Two other paths insert rows: `ingest` for a pour
   the watch sent, and the one-shot seed from a cached total.) `addWater(amount:)` is a synonym kept for the two callers that
   log the usual serving — the widget's `AddWaterIntent` and the Siri shortcut's `LogServingIntent`;

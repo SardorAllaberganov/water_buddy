@@ -4,6 +4,17 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-15 (thirty-sixth pass — roadmap item 1.2.4's records, then the owner's
+`/doc_sync` on the staged tree). **No key and no stored byte changed:** the words a reminder was filed
+in live in the notification centre's own requests, not in either store.
+- The reminder hook fires from seven places — the `language` setter joined.
+- *What the reconcile reads back* is new: `pending()` returns `PendingReminder`s; a planned reminder
+  pending in other words is filed again in place; the category is the app's alone to register.
+- The `usualSlot` and `servings` rows name the reminder's *Log a Glass* among what draws and logs the
+  Glass (the second by the sync).
+
+The paragraph below is the thirty-fifth pass's, as it was written.
+
 **Last updated:** 2026-10-14, night (thirty-fifth pass — `/doc_sync` run again on the same tree. **No
 key and no stored byte changed.** One sentence: the `isGoalSet` publish's account called the
 welcome's goal slider "the setup slider"; it says the first-run goal, as the code's comment does.
@@ -259,7 +270,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph, and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours
@@ -277,7 +288,7 @@ until the twenty-sixth pass; the table has had nine rows since `wristApplied` jo
 | `sardor.WaterBuddy.dailyGoal` | `Int` | `1...100_000` | **app only** | The target. Clamped to ≥ 1 so `progress` cannot divide by zero. Materialised at app launch so a widget never reads a missing key as `0` and shows the first sip as 100%. |
 | `sardor.WaterBuddy.lastActiveDay` | `Int` | `yyyyMMdd` ordinal | app + extension — **the fresh-install stamp is the app's alone**; the rollover's is unguarded, so a widget tap that is the first act of a new day writes it, in the same call that zeroes `currentWater` | The day `currentWater` belongs to. An ordinal, not a `Date`, so travel cannot re-interpret it (see below). |
 | `sardor.WaterBuddy.isGoalSet` | `Bool` | — | app only | Whether the user has *chosen* a goal, so setup is shown once. **Deliberately never materialised — its absence carries meaning.** |
-| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut and the Control Center control log** — read through `DataManager.usualServing(in:)`, the one definition they all call, at the index `DataManager.usualSlot` names — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
+| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut, the Control Center control and — since 2026-10-15 — a reminder's *Log a Glass* log** — read through `DataManager.usualServing(in:)`, the one definition they all call, at the index `DataManager.usualSlot` names — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
 | `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
 | `sardor.WaterBuddy.language` | `String` | — | app only — the `language` setter, whose one caller is `SettingsView`. The widget *reads* it, and the watch reads it secondhand, as `WristMirror.languageCode` | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
@@ -668,7 +679,8 @@ reschedules, after the re-read (its last call is the wrist's publish). `aLongLiv
 rescheduleReminders: @escaping ([ReminderPlan.Slot]) -> Void = DataManager.requestReminderReschedule
 ```
 
-Fired from **six** places, because one is not enough:
+Fired from **seven** places, because one is not enough (six until 2026-10-15, when the `language`
+setter joined):
 
 | Where | Why |
 |---|---|
@@ -677,7 +689,20 @@ Fired from **six** places, because one is not enough:
 | `refresh()` | idempotent reconciliation on foreground — the backstop for a widget tap |
 | the `remindersEnabled` setter | the preference itself, in both directions |
 | the `dailyGoal` setter | **the goal is half of "goal reached"** — see below |
+| the `language` setter | it moves no slot, but every pending reminder is in the old words; the queued operation registers the button in the new language and the reconcile files each reminder again in it (2026-10-15) |
 | `init` | an instance that never mutates anything still has to arrive at a correct schedule |
+
+**What the reconcile reads back** (2026-10-15, roadmap item 1.2.4). The scheduler's pending read,
+`pending()`, returns each request with the words it was filed in — a `PendingReminder` of its
+identifier, title, body and category — and `reconcile` files again, under its own identifier, a
+reminder still in the plan that is pending in other words than it would file now (one no longer in
+the plan is removed, as before). `add` replaces a request
+with the same identifier, so nothing is removed and no slot moves. That is how reminders filed before
+the update gain the *Log a Glass* button, and how a change of language reaches reminders already
+filed. The category the button lives in is registered by the app alone, through the scheduler's
+`setCategories`, inside the queued operation that reconciles — never by the widget extension: whether
+an extension's call reaches the app's set is unconfirmed, and if it does it replaces it (spec §3.5). Nothing new is stored: the words live in the notification
+centre's own requests (`docs/superpowers/specs/2026-10-15-log-from-a-reminder-design.md` §3.5, §3.7).
 
 **The plan depends on the goal exactly as much as on the water.** `ReminderPlan` silences today
 once `currentWater >= dailyGoal`, so raising the goal un-meets a met goal and the rest of today has
