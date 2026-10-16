@@ -127,6 +127,11 @@ final class DataManager {
         /// per-key fallback could resolve a triple nobody wrote — Cup stored at 500 beside a Glass
         /// that fell back to 250.
         static let servings = prefix + "servings"
+        /// The app's version — its `CFBundleShortVersionString`, e.g. `"1.2"` — the last time it
+        /// asked iOS for a rating. **Absent means never asked**, so nothing materialises it, like
+        /// ``remindersEnabled`` and ``language``. Written only by
+        /// ``DataManager/claimReviewRequest(version:)``; no snapshot, mirror or notification reads it.
+        static let reviewRequestedVersion = prefix + "reviewRequestedVersion"
         /// The watch's own pending pours, JSON-encoded `[WristPour]`. Written only by `WristModel`, in
         /// the watch's local App Group suite — never read or written from the phone.
         static let wristOutbox = prefix + "wristOutbox"
@@ -158,7 +163,7 @@ final class DataManager {
         /// disagree. Production code never reads this — it names the constants directly.
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
-            didMigrateFromStandard, remindersEnabled, language, servings,
+            didMigrateFromStandard, remindersEnabled, language, servings, reviewRequestedVersion,
             wristOutbox, wristMirror, wristApplied,
         ]
     }
@@ -1248,6 +1253,67 @@ final class DataManager {
         // last-write-wins property update, not a queued send, so a call that changes nothing costs
         // nothing on the wire and is safe to repeat as often as this method already runs.
         publishWrist(defaults)
+    }
+
+    // MARK: - The rating request
+
+    /// How many goal days in a row, today the last of them, before the app may ask iOS for a
+    /// rating (`docs/superpowers/specs/2026-10-15-rating-prompt-design.md`, D1).
+    ///
+    /// Three: the request can then never fall in the first session or on the first day, and it
+    /// comes to someone the app is plainly working for. It reads ``streak``, so it costs no count
+    /// of its own.
+    nonisolated static let reviewStreak = 3
+
+    /// Whether the app may ask for a rating now — the whole decision, pure, so a test can hold it.
+    ///
+    /// All four must hold:
+    /// - `reachedToday`: a run of three can end yesterday while today is still short, and the
+    ///   request belongs to the day that completed the run;
+    /// - `streak` is at least ``reviewStreak``;
+    /// - `version` is not empty: an empty version could never be told from the next one;
+    /// - `askedVersion` is not `version`: at most once per version, as Apple's own sample asks
+    ///   (spec §3.2). Apple's cap of three requests a year applies on top.
+    nonisolated static func mayRequestReview(
+        reachedToday: Bool,
+        streak: Int,
+        askedVersion: String?,
+        version: String
+    ) -> Bool {
+        reachedToday && streak >= reviewStreak && !version.isEmpty && askedVersion != version
+    }
+
+    /// Decides whether to ask for a rating now and, if so, records that it did — one call, so
+    /// nothing can ask without recording it.
+    ///
+    /// **The version is written before this answers `true`.** The caller then asks iOS, which may
+    /// show nothing and never says whether it did. Recording first is what Apple's own sample does,
+    /// and it is what keeps "once per version" true whatever iOS chose.
+    ///
+    /// It writes ``Key/reviewRequestedVersion`` and nothing else: no row, no doorbell — no widget
+    /// reads the key — and no reschedule. No ``refresh()`` first, unlike ``addLog(amount:at:)``:
+    /// only this method writes the key, so no other process holds a newer figure for a stale
+    /// instance to overwrite.
+    ///
+    /// No ``role`` guard: ``streak`` is zero wherever ``Role/drawsHistory`` is `false`, so the
+    /// decision already answers `false` in every process but the phone app. `HomeView` is its one
+    /// caller (rule `70-privacy`, *The review request is the one use of StoreKit*).
+    ///
+    /// - Parameter version: the app's `CFBundleShortVersionString` (`ReviewPrompt.version`).
+    /// - Returns: whether the caller should ask iOS now.
+    func claimReviewRequest(version: String) -> Bool {
+        // `object(forKey:) as? String`, never `string(forKey:)`, which hands back a stored number
+        // as a string: anything but a string reads as never asked (plan P1).
+        let asked = defaults.object(forKey: Key.reviewRequestedVersion) as? String
+        guard Self.mayRequestReview(
+            reachedToday: hasReachedGoal,
+            streak: streak,
+            askedVersion: asked,
+            version: version
+        ) else { return false }
+
+        defaults.set(version, forKey: Key.reviewRequestedVersion)
+        return true
     }
 
     // MARK: - Reminders

@@ -5,6 +5,7 @@
 //  Created by Sardor Allaberganov on 28/08/26.
 //
 
+import StoreKit
 import SwiftData
 import SwiftUI
 
@@ -192,6 +193,10 @@ struct HomeView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverRunning
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    /// Whether Home is the page shown, and not the one sliding out after a change of tab.
+    @Environment(\.pageIsShown) private var pageIsShown
+    /// StoreKit's rating request — the one use of StoreKit in the product (rule `70-privacy`).
+    @Environment(\.requestReview) private var requestReview
 
     /// Bumped on every pour. Drives the haptic, so a daily rollover cannot fire one.
     @State private var pours = 0
@@ -211,6 +216,14 @@ struct HomeView: View {
     /// Bumped each time the goal is crossed **upward**, and used as the confetti's seed as well as
     /// its trigger — so two celebrations in one day are two different bursts, not a replay.
     @State private var goalBursts = 0
+    /// Bumped when a pour **on this screen** takes today across the goal — and only then. A crossing
+    /// `refresh()` picks up as the app comes forward is right after launch, which is no time to ask
+    /// for a rating (spec D5). Keys the wait before the request (``askForARating(after:)``).
+    @State private var goalPours = 0
+    /// The crossing whose rating request is still waiting; `nil` once its pause has ended, whatever
+    /// came of it, or as soon as Home stops being the page shown or the app stops being active
+    /// (plan P2).
+    @State private var ratingWait: Int?
     /// When water last landed. The waves read this to slosh and settle.
     @State private var lastPour = Date.distantPast
     /// The pour this screen can take back. Presentation state: it lives with the screen, and the
@@ -274,12 +287,23 @@ struct HomeView: View {
             if isReached && !wasReached { goalBursts += 1 }
         }
         .task(id: undoClock) { await expire(undoClock) }
+        .task(id: goalPours) { await askForARating(after: goalPours) }
         // Leaving the app ends the offer, as leaving the tab does. Under VoiceOver an offer has no
         // deadline, and one made in the morning would otherwise still be standing in the
         // afternoon. Only the background: Control Center or a notification pulled over the screen
         // is not leaving it.
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { undoOffer = nil }
+            // Anything that takes the app out of `.active` ends a rating's wait — Control Center
+            // too, which the offer survives: the request would otherwise meet the user on their
+            // way back.
+            if phase != .active { ratingWait = nil }
+        }
+        // A change of tab ends it at the turn. The page stays in the tree while it slides out, so
+        // the wait's own task is not cancelled until the slide has ended — and a request asked in
+        // that time lands on the page sliding in (``EnvironmentValues/pageIsShown``).
+        .onChange(of: pageIsShown) { _, shown in
+            if !shown { ratingWait = nil }
         }
         .onChange(of: manager.streak) { was, now in
             if now > was { streakRises += 1 }
@@ -817,10 +841,17 @@ struct HomeView: View {
 
     /// One call into the model, and the offer to take it back (rule `50-views`).
     private func pour(_ serving: Serving) {
+        let wasReached = manager.hasReachedGoal
         let id = manager.addLog(amount: serving.amount)
         undoOffer = id.map { UndoOffer(id: $0, amount: serving.amount) }
         pours += 1
         poured[serving.id, default: 0] += 1
+        // Two reads around the one call, not a second call: the pour that reached the goal is the
+        // one moment a rating may be asked for.
+        if !wasReached, manager.hasReachedGoal {
+            goalPours += 1
+            ratingWait = goalPours
+        }
         // A drop for a pour that was logged, and none under Reduce Motion: it is travel across
         // the screen (rule `65-accessibility`). The serving is in the store already; the drop
         // only shows where it went.
@@ -832,6 +863,30 @@ struct HomeView: View {
         } else {
             lastPour = Date()
         }
+    }
+
+    // MARK: - Rating
+
+    /// Asks iOS for a rating once the confetti of the pour that reached the goal has landed — if the
+    /// model says this is the moment (rule `70-privacy`, *The review request is the one use of
+    /// StoreKit*).
+    ///
+    /// Keyed on ``goalPours``, so the next crossing starts the wait again. After the pause it asks
+    /// only if the wait still stands — Home stayed the page shown and the app stayed active, either
+    /// of which clears ``ratingWait`` the moment it changes — and today is still at the goal, so an
+    /// *Undo* inside the pause asks nothing. The task's own cancellation is not relied on: a page
+    /// that is left stays in the tree until its slide has ended, and so does this task. The model
+    /// then decides and records in one call, and StoreKit decides whether anything shows.
+    private func askForARating(after crossing: Int) async {
+        guard crossing > 0, ReviewPrompt.isEnabledHere else { return }
+        do { try await Task.sleep(for: ReviewPrompt.pause) } catch { return }
+        // Re-checked after the sleep, as `expire(_:)` does (rule `43-concurrency`).
+        guard ratingWait == crossing else { return }
+        ratingWait = nil
+        guard manager.hasReachedGoal,
+              manager.claimReviewRequest(version: ReviewPrompt.version)
+        else { return }
+        requestReview()
     }
 }
 

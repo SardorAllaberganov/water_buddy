@@ -137,6 +137,11 @@ struct DataManagerTests {
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
             manager.addLog(amount: 250)               // currentWater
+            // Two goal days behind today and the goal reached today: the claim's own moment.
+            manager.addLog(amount: 2_500, at: utc(2026, 8, 26))
+            manager.addLog(amount: 2_500, at: utc(2026, 8, 27))
+            manager.addLog(amount: 2_500)
+            _ = manager.claimReviewRequest(version: "1.2")   // reviewRequestedVersion
             _ = manager.ingest([WristPour(id: UUID(), amount: 100, at: now())])  // wristApplied
             _ = manager.resetIfNeeded()               // lastActiveDay
 
@@ -159,6 +164,11 @@ struct DataManagerTests {
             // Guards the guard: if the writers above stopped writing, the subtraction above would
             // be vacuously empty and this test would pass while proving nothing.
             #expect(live.count >= 8, "only \(live.count) keys landed — the writers above are not exercising the store")
+            // The claim is a writer the count above cannot see: the others meet it without it.
+            #expect(
+                live.contains(DataManager.Key.reviewRequestedVersion),
+                "the claim wrote nothing, so the roster's check never saw its key"
+            )
         }
     }
 

@@ -141,6 +141,7 @@ struct RootTabView: View {
                         // The page the app opens on settles in, section by section; a page that
                         // slides in is whole as it comes (``Arrival``).
                         .environment(\.pageSettlesIn, turn.turns == 0)
+                        .environment(\.pageIsShown, tab == turn.shown)
                         // The page shown stands in place; the one leaving is moved a whole width
                         // out the far side, by the same animation that brings the other in.
                         .offset(x: turn.offset(of: tab, across: width, slides: slides))
@@ -267,6 +268,27 @@ struct RootTabView: View {
             .allowsHitTesting(false)
             .accessibilityHidden(true)
         }
+    }
+}
+
+// MARK: - Whether a page is the one shown
+
+private struct PageIsShownKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+
+    /// Whether this page is the one shown, and not the one sliding out.
+    ///
+    /// A page that is left is not taken out of the tree at the turn: it stays, moved off by the
+    /// slide, until the slide has ended (``PageTurn/mounted``). Its `.task`s are therefore not
+    /// cancelled for the length of a slide, so work that must stop the moment its page is left
+    /// reads this instead — Home's wait before a rating (`HomeView.askForARating(after:)`).
+    /// `true` for a screen standing alone.
+    var pageIsShown: Bool {
+        get { self[PageIsShownKey.self] }
+        set { self[PageIsShownKey.self] = newValue }
     }
 }
 

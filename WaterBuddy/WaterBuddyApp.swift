@@ -77,8 +77,9 @@ struct WaterBuddyApp: App {
     /// in-memory store. Every side effect a test fixture turns off is turned off — the widget
     /// doorbell, the reminder reschedule, the wrist publish — the fixture discipline rule
     /// `85-testing` sets, applied to a run of the real app. The App Group's suite and store are
-    /// never opened by it. Without the argument this is `nil`, and a Debug build runs exactly what
-    /// a Release one does; a Release build does not contain it.
+    /// never opened by it. Without the argument this is `nil`, and a Debug build runs what a Release
+    /// one does — save the rating request, which a Debug build asks only when launched with
+    /// `ReviewPrompt.launchArgument`; a Release build does not contain it.
     ///
     /// `nil`, said aloud, if the throwaway cannot be made. The run then opens on the device's own
     /// state, and the welcome's tests fail on their first look rather than writing anywhere they
