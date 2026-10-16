@@ -37,6 +37,12 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not
   now*, so no permission prompt appears in a run; a tap on the welcome's bar goes through
   `tapWhenReady(_:)`, because the bar is disabled while a step turns
+- `-WaterBuddyReviewPrompt` is DEBUG's opt-in to the rating request, read through
+  `ReviewPrompt.isEnabled(arguments:)`. Without it a DEBUG build never claims, never writes
+  `Key.reviewRequestedVersion` and never asks — StoreKit shows the request every time in development,
+  and a UI test whose pour crossed the goal on a long-gated simulator would meet a system alert. No
+  UI test passes it. The request itself has no automated coverage: prove it by hand on a simulator
+  launched with the argument
 - Inject the `Calendar` and the `now: () -> Date` clock rather than waiting for a real day
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process

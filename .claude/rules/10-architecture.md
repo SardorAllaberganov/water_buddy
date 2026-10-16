@@ -18,7 +18,7 @@ globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch
     ┌─────┴─────────────────┐                                        │
     ▼                       ▼                                        │
 SwiftData                UserDefaults suite  ◄───────────────────────┘
-WaterBuddy.store         9 keys, derived cache
+WaterBuddy.store         10 keys, derived cache
 source of truth          read by the app AND the widget
 app only
 ```
@@ -29,7 +29,8 @@ device, never the same container) and is written only by `WristModel`, never by 
 exchanges data with the diagram above solely through `WristLink`'s `WatchConnectivity` session — see
 rule `70-privacy`'s *WatchConnectivity is a ruling, not an omission* and rule `25-shared-storage`'s
 *The watch's own, separate suite*. `Key.wristApplied`, the phone-side half of that exchange's apply
-ledger, lives in the 9 keys above, bringing the phone suite from 8 to 9.
+ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
+`Key.reviewRequestedVersion`, the version the app last asked for a rating in, brings it to 10.
 
 ## The rulings
 - **One writer per store — the one honest weakening.** `DataManager` remains the only writer to

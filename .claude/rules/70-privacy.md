@@ -10,8 +10,8 @@ That is a property to defend, not a phase.
 
 ## Nothing leaves the device
 - Import no networking, analytics or sensor framework: `URLSession`, `Network`, `CoreLocation`,
-  `HealthKit`, `CloudKit`, `StoreKit`, `AdSupport`, `AppTrackingTransparency` — and no third-party
-  SDK (rule `95-dependencies`)
+  `HealthKit`, `CloudKit`, `StoreKit` (one exception, below), `AdSupport`,
+  `AppTrackingTransparency` — and no third-party SDK (rule `95-dependencies`)
 - Keep `com.apple.security.application-groups` the only entitlement on either signed target. Adding
   any other capability requires a written justification in this file first
 - Add no `NS*UsageDescription` key to any Info.plist. The project carries zero, and notification
@@ -58,6 +58,25 @@ Three limits are conditions of the permission:
 Approved by the owner: `docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §14 records
 the explicit ruling ("§9's `70-privacy` amendment is approved as written") that made this text live
 policy rather than a draft, closing that document's own §9.3.
+
+## The review request is the one use of StoreKit
+
+`StoreKit` stays banned, with one exception: `HomeView.swift`, in the app target, imports it for
+`@Environment(\.requestReview)` and nothing else. iOS draws the request, decides whether to show it,
+and sends any rating or review to Apple itself, under the user's own Apple Account and only on the
+user's own tap. The app hands it nothing — no figure, no identifier, no account — and learns nothing
+back, not even whether it was shown. It needs no entitlement and no usage-description key.
+
+Three limits are conditions of the permission:
+- **One file.** No widget or watch file imports `StoreKit`, and neither does `DataManager.swift`,
+  which compiles into all four targets
+- **One call.** No product, purchase, transaction or subscription API until roadmap item 1.4.1 writes
+  its own amendment here. A *Rate WaterBuddy* link to the App Store is not part of this permission
+  either
+- **One moment.** Asked only after the user's own pour on Home reaches the goal on the third day in
+  a row, at most once per app version, after the confetti lands — never at launch, never from a
+  button whose answer is the request, never from the widget, Siri, the control, a reminder's button,
+  the watch or History
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

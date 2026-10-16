@@ -30,8 +30,8 @@ it is the only thing the widget can read.
   prefix. No raw key string appears anywhere else
 - An App Group domain is shared by every target that joins it, so an un-prefixed key is a collision
   waiting for the next extension
-- Absence carries meaning for `Key.isGoalSet` and `Key.language`: never materialise a sentinel for
-  "not chosen". The `language` setter calls `removeObject(forKey:)` for `.system`, because a stored
+- Absence carries meaning for `Key.isGoalSet`, `Key.language` and `Key.reviewRequestedVersion`
+  (never asked): never materialise a sentinel for "not chosen". The `language` setter calls `removeObject(forKey:)` for `.system`, because a stored
   code would pin the app to today's system language forever
 - Validate on the way out, not just on the way in: read the goal with `object(forKey:) as? Int` (not
   `integer(forKey:)`, which reads a missing key as 0), clamp `currentWater` to

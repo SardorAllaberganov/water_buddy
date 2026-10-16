@@ -30,6 +30,10 @@ after the body above had already conceded it.
   `deleteLog(_:)`, `undoLog(id:)`, `updateLog(_:newAmount:timestamp:)`, `saveDailyGoal(ml:)`,
   `resetIfNeeded()`, `dayDidTurn()`, `resetDailyProgress()` and `refresh()`. Anything new joins that
   list rather than reaching around it
+- `claimReviewRequest(version:)` joins that surface. It writes `Key.reviewRequestedVersion` and
+  nothing else: it decides through `mayRequestReview(reachedToday:streak:askedVersion:version:)` and
+  writes the version **before** it answers `true`, so nothing can ask without recording it. It
+  touches no row, rings no doorbell and reschedules nothing
 - `addLog(amount:at:)` returns the id of the row it inserted, `nil` for a refused amount. Home's
   *Undo* is the one caller that keeps it. `undoLog(id:)` finds that row among today's, read fresh,
   and deletes it through `deleteLog(_:)`; it does nothing when the row is gone or today's rows
