@@ -57,7 +57,7 @@ design:**
 | Store | Holds | Read by |
 |---|---|---|
 | SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared`; never the widget's draw path |
-| `UserDefaults` — nine keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger — a **derived cache** | the app *and* the widget |
+| `UserDefaults` — ten keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget's draw path never opens
@@ -155,7 +155,7 @@ something to record.
   `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique warning lines —
   **29 since 2026-10-15**, when roadmap item 1.2.4's `nonisolated` `ReminderScheduler` removed the
   `removePending` and `removeDelivered` lines in `NotificationManager.swift`, measured on the staged
-  tree (80
+  tree, and unchanged by roadmap item 1.2.5 the same day (80
   occurrences as counted then; 44 primary lines on 2026-10-08 — occurrences move with the
   architectures a build compiles, the unique lines do not): the *"main actor-isolated …
   cannot be referenced from a nonisolated context"* family in `DataManager.swift` and
@@ -201,7 +201,8 @@ something to record.
 - **`DataManager` is the only writer.** Every mutation of the phone's two stores goes through one
   of its methods — `addLog` / `addWater` / `removeWater` / `deleteLog` / `undoLog` / `updateLog` /
   `saveDailyGoal` / `resetIfNeeded` / `dayDidTurn` / `resetDailyProgress` / `refresh`, and
-  `ingest` for a pour the watch sent — or one of its setters; construction and the launch-time
+  `ingest` for a pour the watch sent, and `claimReviewRequest` for the rating request's mark — or
+  one of its setters; construction and the launch-time
   `prepareSharedStorage()` do the group's bookkeeping. On the phone no view, no intent and no
   provider reaches `UserDefaults` directly (rule `20-state` lists the surface, `ingest` aside);
   the watch's complication reads the watch's own suite itself, as the target table says

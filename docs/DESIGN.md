@@ -7,6 +7,11 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-16 (the sixty-third pass of `docs/AI_CONTEXT.md`, the owner's `/doc_sync`
+after roadmap item 1.2.5). **No token changed.** One dated note: *The goal-reached burst* gains the
+rating request, which waits on the burst's length (`ReviewPrompt.pause`), so the burst's 1.8 s is no
+longer read by the overlay alone. The paragraph below is the sixtieth pass's, as it was written.
+
 **Last updated:** 2026-10-14, night (the sixtieth pass of `docs/AI_CONTEXT.md`, `/doc_sync` run
 again on the same tree. **No token changed.** Dated notes where the welcome had made a section
 incomplete: *Motion*'s *What moves* gains the welcome's step slide, with the tests that hold it;
@@ -2052,6 +2057,14 @@ is the burst *counter*, so two crossings in one day are two different bursts rat
 
 No package. A confetti dependency for forty lines of arithmetic is what rule `95-dependencies`
 exists to refuse.
+
+*(2026-10-16, the sixty-third pass: **the burst's length also times the rating request.** Since
+roadmap item 1.2.5, a pour on Home that reaches the goal on the third day in a row may be followed by
+iOS's rating request, which waits `ReviewPrompt.pause` — `Confetti.duration` plus the 0.4 s the
+overlay keeps the burst — so the request meets a screen whose confetti has landed. Lengthen the burst
+and the request waits with it; change the overlay's 0.4 alone and the two drift apart, which nothing
+catches (`docs/AI_CONTEXT.md` known issue #138). Under Reduce Motion no confetti is drawn and the wait
+is the same.)*
 
 ## Reduce Motion / Reduce Transparency
 

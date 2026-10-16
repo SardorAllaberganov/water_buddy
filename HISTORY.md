@@ -9641,3 +9641,142 @@ Read from the commands at 13:53 on 2026-10-15, after this pass's `git add` of it
 `tasks/lessons.md`, this file) among them and re-staged. **10 unstaged**: the four rule files with
 1.2.4's wording, for the owner, and the six from before. **1 untracked**: `Screenshots/census/`. None in
 both.
+
+## [2026-10-15] — Roadmap item 1.2.5: the rating prompt
+
+**What changed.** Apple's own rating request, `@Environment(\.requestReview)`, asked about 2.2 s
+after the user's own pour on Home reaches the goal on the third goal day in a row, at most once per
+app version. `DataManager.swift` gains `Key.reviewRequestedVersion` (the phone's tenth key), the pure
+`mayRequestReview(reachedToday:streak:askedVersion:version:)` and `claimReviewRequest(version:)`,
+which records the version before it answers `true`. New app-only `ReviewPrompt.swift` holds the
+pause, the version and the DEBUG opt-in. `HomeView.swift`, the only file that imports `StoreKit`,
+counts the crossings its own pours make, waits, re-checks and asks. `RootTabView.swift` gains
+`EnvironmentValues.pageIsShown`, the final review's fix. `WaterBuddyApp.swift`'s DocC gains one
+clause. No string, entitlement, Info.plist key, privacy manifest or `project.pbxproj` line.
+
+**Rulings it rests on.** The owner's, in conversation on 2026-10-15, as recommended:
+- **D1:** the third goal day in a row.
+- **D2:** once per version.
+- **D3:** `StoreKit` for the review request only — one file, one call.
+- **D4:** a DEBUG build never asks unless launched with `-WaterBuddyReviewPrompt` (the code checks
+  the argument is present, so any value after it turns it on).
+- **D5:** only Home's own pour, never a crossing picked up on return. Taken after the outline's
+  approval, from Apple's *"Avoid showing a request … immediately when a user launches your app"*,
+  and approved with the spec.
+
+The plan's own decisions:
+- **P1:** read the key with `object(forKey:) as? String`; proved by mutation.
+- **P2:** the "still active" check is a `@State`.
+- **P3:** computed statics.
+- **P4:** two stubs for RED.
+- **P5:** the roster test names the claim's key.
+
+Spec `docs/superpowers/specs/2026-10-15-rating-prompt-design.md`, plan
+`docs/superpowers/plans/2026-10-15-rating-prompt.md`; the rule wording was typed before the code this
+time.
+
+**What the final review changed.** A fresh read-only reviewer (Opus) found one Important: a tab
+changed in the last ~0.45 s of the pause still asked, over the page sliding in, because the pager
+keeps a page that is left in the tree for its slide. It was seen RED by a probe (the sheet over
+History), fixed with `pageIsShown`, and seen GREEN (nothing), the tab tapped 1.96 s after the pour
+both times by the probe's own stamp. Three Minors
+were re-graded and fixed as text: a DocC giving a false reason, a comment contradicting the block
+above, and `freshStartManager`'s "a Debug build runs exactly what a Release one does". One was taken
+as verification: the watch builds' warnings. Six were deferred (known issue #138).
+
+**Files touched:**
+- code: `WaterBuddy/DataManager.swift`, `WaterBuddy/ReviewPrompt.swift` (new), `WaterBuddy/HomeView.swift`,
+  `WaterBuddy/RootTabView.swift`, `WaterBuddy/WaterBuddyApp.swift`;
+- tests: `WaterBuddyTests/ReviewRequestTests.swift` (new), `WaterBuddyTests/DataManagerTests.swift`;
+- records: the spec, the plan, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/ROADMAP.md`,
+  `tasks/lessons.md`, this file;
+- unstaged for the owner: the rule wording in `.claude/rules/70-privacy.md`, `20-state.md`,
+  `25-shared-storage.md`, `10-architecture.md` and `85-testing.md`.
+
+**Verification that was run** (2026-10-15, after the fix pass):
+- **Unit**, stock iOS 27.0 *iPhone 17*: 616 of 616 (604 before).
+- **UI**, on *WaterBuddy Gate 27* and *Gate 26.5*: `GoalSetupUITests` 36 in four chunks of nine, with
+  1 skipped by design, and the other classes 31 executed, with 0 failures on each system.
+- **Watch**, *WaterBuddy Watch 27*: 57 of 57.
+- **Both widget schemes:** `BUILD SUCCEEDED`.
+- **Warnings**, clean builds of HEAD against the staged index:
+  - phone, app and widget: 36 by file and message, none new and none gone, after one new line in
+    the new test file was fixed;
+  - the two watch schemes: 17, none new.
+- **Probe, after the fix:** a throwaway UI probe on *WaterBuddy Probe 27*, DEBUG fresh start,
+  deleted — the ordinary request, the early tab change and the late one passed.
+
+**Run before the fix pass, and not repeated after it** (the fix changed no import and no path these
+cases take):
+- **Links:** only the app's binary links `StoreKit`.
+- **Probe:** the *Undo* inside the pause, the Home Screen and back, a run without the argument and
+  History's **+** passed, as did the ordinary request and the early tab change. Seven cases in all,
+  counting the late tab change, and every shot was read.
+- **Not run:** a device (#137), and a Release or App Store build, which is the only place iOS's own
+  limits apply.
+
+**Records read by two fresh readers** (`reader-1-ai-context-claude.md`, `reader-2-state-roadmap-history.md`,
+in the ledger folder). Every finding was checked against its source and fixed:
+- **#29 called `WristView.swift`'s 2 shipping lines uncompiled by the phone build.** They are
+  compiled: the app embeds the watch app. 21 + 6 + 2 = 29.
+- **The new key's row was cut off from its table** by a blank line.
+- **Three citations had kept an error HEAD already had** — `role`, `enum Role`, and `STATE.md`'s
+  `role` — and three others in #37, #104 and #105 were already off at HEAD. All now name their code.
+- **The DEBUG opt-in was stated as `… YES`.** The code checks that the argument is present.
+- **"Never asks"** is now "never starts one", with the watch/Siri exception stated.
+- **1.96 s and 1.97 s came from two clocks.** Both runs were 1.96 s by the probe's own stamp.
+- **The verification list mixed runs from before the fix pass** with runs from after it.
+
+Read from the commands at 17:41 on 2026-10-15, after this change's `git add` of its fifteen files by
+name. **No `git commit` was run.** HEAD `450d76f`, 122 commits, `## main...origin/main`. **15
+staged**: the seven Swift files, the spec, the plan, `CLAUDE.md`, `docs/AI_CONTEXT.md`,
+`docs/STATE.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file. **11 unstaged**: the five rule
+files with 1.2.5's wording, for the owner, and the six from before. **1 untracked**:
+`Screenshots/census/`. None in both.
+
+## [2026-10-16] — `/doc_sync` after 1.2.5: two standing questions the change's records had not answered
+
+**What changed.** The owner's `/doc_sync` on the staged tree (the sixty-third pass of
+`docs/AI_CONTEXT.md`). No source or test file changed, and nothing was built or run for it.
+
+**Drift found and fixed.** Each was a place the change left incomplete, not wrong:
+- **`docs/DESIGN.md`, *The goal-reached burst*.** It described the burst's 1.8 s as the overlay's
+  alone, but the rating request now waits on it (`ReviewPrompt.pause` = `Confetti.duration` + 0.4). A
+  dated note says so and points at #138's duplicated 0.4. The *Last updated* line gains a paragraph.
+- **`docs/STATE.md`, *What Apple is told about all of this*.** It asks, for any added key, whether it
+  brings a new required-reason category, and nothing had answered for `reviewRequestedVersion`. A
+  dated note answers it: none.
+  - The answer was checked: the four `PrivacyInfo.xcprivacy` files are byte-identical and unchanged
+    from HEAD; no banned framework is imported; `StoreKit` is imported only by `HomeView.swift`.
+  - The *Last updated* line gains a paragraph.
+- **`docs/AI_CONTEXT.md`.**
+  - #120(a), on a page kept through its slide, gains the rating request's case.
+  - The *Last updated* line gains the sixty-third pass's paragraph.
+
+**Checked and already accurate.**
+- The documented file list: 87 tracked `.swift` files, each row's count equal to `wc -l`. That is 84 in
+  the seven target folders and three in `Tools/`; one row with no description was first misread by
+  the check's own pattern.
+- Test counts: 616 `@Test`, 57 on the watch, 54 UI `func test`. The target rows say 616 in 77 suites,
+  and 54 declared and 67 executed a system.
+- The three exception sets: 18 entries, unchanged.
+- Twelve keys on `DataManager.Key`, ten in the phone's suite — `CLAUDE.md` and `docs/STATE.md` agree.
+- Every `` rule `nn-name` `` resolves.
+- `CLAUDE.md`'s target table, shared files, storage row, writer list and baseline clause.
+- `docs/WIDGET.md`, which describes nothing 1.2.5 changed; its *Last updated* stays.
+- Retired #114, which still holds: a page is removed when its slide has ended.
+- `docs/ROADMAP.md`, which has no *Last updated* line; none was invented.
+
+**Files touched:** `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/DESIGN.md`, `tasks/lessons.md` (one
+lesson: *The sheets ask standing questions of every change of a kind, and a change's records must
+answer them*), this file. Nothing under a target, and no `.claude/` file.
+
+**Gate:** not run in this pass. 1.2.5's gate, run on 2026-10-15 after its fix pass, is the
+checkpoint above.
+
+Read from the commands at 10:02 on 2026-10-16, after this pass's `git add` of its five files by name.
+**No `git commit` was run.** HEAD `450d76f`, 122 commits, `## main...origin/main`. **16 staged** —
+1.2.5's fifteen, with this pass's four already among them (`docs/AI_CONTEXT.md`, `docs/STATE.md`,
+`tasks/lessons.md`, this file) re-staged, and `docs/DESIGN.md` new to the index. **11 unstaged**:
+the five rule files with 1.2.5's wording, for the owner, and the six from before. **1 untracked**:
+`Screenshots/census/`. None in both.

@@ -3853,3 +3853,42 @@ its subject in plain words (here "action", "button", "Siri and Control Center"),
 names of what it changed; retire what it fixed, and open an issue for product copy it made incomplete
 — copy is the owner's to reword. Refresh the *Last updated* line of every sheet the change edited,
 and add the change's measurements to the issues that keep their history (the warning baseline, #29).
+
+## 2026-10-15 — A page that is left is still in the tree, and a probe in the middle of a window proves nothing about its edge
+
+**What happened.** The rating request (1.2.5) waits 2.2 s after the pour that reached the goal, in a
+`.task(id:)` on Home. The spec said SwiftUI cancels that task when Home leaves the screen, marked
+**inferred**, and the probe "proved" it: a tab tapped 1.06 s into the pause asked nothing. The final
+reviewer read `RootTabView` and `PageTurn` and found the window the probe never reached. A page that
+is left is not removed at the turn: `PageTurn.mounted` keeps it, sliding out, until the slide's
+completion runs `settle` (0.45 s). Its `.task`s live on, so a tab tapped in the last ~0.45 s of the
+pause let the request fire over the page sliding in. A probe tapping 1.96 s after the pour showed the sheet over
+History. The fix is an environment value the pager sets at the turn (`pageIsShown`), which Home
+watches to end the wait. The same probe, tapping at 1.96 s again, showed nothing. The early-tap probe had passed
+because it tested the one part of the window that was always safe.
+
+**The rule:** in this app, "the view left the screen" is the pager's decision, not SwiftUI's. Before
+relying on a `.task`'s cancellation or an `onDisappear`, read `PageTurn` and `RootTabView`. A page
+outlives its turn by its slide. And when a probe checks a timed window, put a case at the window's
+far edge, not only its middle, with guards on the measured moment so a case that missed the edge
+fails as "proves nothing". Stamp that moment just before the tap. A stamp taken before XCUITest's
+wait for the element includes the wait (here a second), and one taken after the tap includes its
+wait for idle.
+
+## 2026-10-16 — The sheets ask standing questions of every change of a kind, and a change's records must answer them
+
+**What happened.** 1.2.5's records added the new key everywhere a key is counted or listed, and two
+fresh readers passed them. The owner's `/doc_sync` straight after found two places left incomplete:
+- `docs/STATE.md`'s *What Apple is told about all of this* says "**If a key is added, ask whether it
+  brings a new required-reason category with it.**" Nobody had asked it for `reviewRequestedVersion`.
+- `docs/DESIGN.md`'s *The goal-reached burst* describes the burst's 1.8 s as the overlay's alone,
+  and the rating request now waits on it too.
+
+Neither sentence was wrong, and neither names the change's subject, so a search for "key", "rating"
+or "StoreKit" did not reach the first. The second is a token gaining a reader in another file, which
+the 2026-10-14 lesson on token users predicts.
+
+**The rule:** before a change's closing report, search the sheets for the standing questions that
+apply to its kind — "if a key is added", "if a token changes", "a new … must" — and answer each one in
+place, with a dated note even when the answer is "none". When code starts reading a value the design
+sheet describes, name the new reader in that value's section.

@@ -109,7 +109,12 @@ language.)*
 
 **1.2.5 — Rating prompt.** Apple's own review request, asked at a moment of success (say, a goal
 reached on a later day, never in the first session). Apple caps how often it can show. **Needs a
-rule change:** `StoreKit` is banned by name in rule `70-privacy` (§8).
+rule change:** `StoreKit` is banned by name in rule `70-privacy` (§8). *(2026-10-15: built in the
+tree, awaiting `/commit` and the device sweep (#137). Spec `2026-10-15-rating-prompt-design.md`: asked
+about 2.2 s after the user's own pour on Home reaches the goal on the third day in a row, at most
+once per app version; only Home's own pour starts the wait, so a goal reached anywhere else never
+starts a request; a DEBUG build asks only when launched with the `-WaterBuddyReviewPrompt` argument. Whether it should wait for the eight-second *Undo* offer to end
+is open, for the owner (#138).)*
 
 **1.2.6 — Russian plurals (#40).** The shared Russian keys use one plural form. The redesign's
 streak shows a bare number with no noun until this is fixed (decision D3, 2026-10-09).
@@ -280,6 +285,12 @@ unlocking), `43-concurrency` (`ReminderResponder` is main-actor) and `85-testing
 *Log a Glass* with the app not running). After the final review, `80-notifications` and
 `43-concurrency` were reworded — the scheduler is called on both sides of the main actor, the
 responder does not rest on the centre's thread, and *Identifiers* names request identifiers.)*
+*(2026-10-15, later: 1.2.5's `StoreKit` row was approved for the review request only — one file,
+`HomeView.swift`, one call (decision D3) — so 1.4.1 writes its own amendment. It also needed four
+the table did not list, worded in its spec §5 and typed into the rule files unstaged: `20-state`
+(the claim joins the mutation surface), `25-shared-storage` (its key's absence means never asked),
+`10-architecture` (ten keys) and `85-testing` (the DEBUG opt-in). This time the wording came before
+the code.)*
 
 ## 9. Not planned
 

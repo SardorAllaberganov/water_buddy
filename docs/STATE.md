@@ -4,6 +4,26 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-16 (thirty-eighth pass — the owner's `/doc_sync` after roadmap item
+1.2.5, on the staged tree). **No key and no stored byte changed.** Checked and standing: twelve keys
+on `DataManager.Key`, ten in the phone's suite, as `CLAUDE.md` says; the new row and its claims
+against the code. One gap: *What Apple is told about all of this* asks, for any added key, whether it
+brings a new required-reason category, and nothing had answered it for `reviewRequestedVersion` — a
+dated note there now does (none). The paragraph below is the thirty-seventh pass's, as it was
+written.
+
+**Last updated:** 2026-10-15 (thirty-seventh pass — roadmap item 1.2.5's records, the rating
+request). **One key joins the phone's suite: `reviewRequestedVersion`**, the version the app last
+asked iOS for a rating in — absent means never asked, written only by
+`DataManager.claimReviewRequest(version:)`, read with `object(forKey:) as? String`, never
+materialised, not migrated, not in the snapshot or the mirror. The phone's suite holds **ten** keys,
+`Key.all` **twelve**. Two citations re-pointed: `HomeView.swift:108`, moved with its code, and the
+`role` declaration's, now `DataManager.swift:1647` — it had named a line of the DocC above it. The
+shorthand ones in *Who may write on behalf of the group* already named other lines at HEAD
+`450d76f` and are left for a sync.
+
+The paragraph below is the thirty-sixth pass's, as it was written.
+
 **Last updated:** 2026-10-15 (thirty-sixth pass — roadmap item 1.2.4's records, then the owner's
 `/doc_sync` on the staged tree). **No key and no stored byte changed:** the words a reminder was filed
 in live in the notification centre's own requests, not in either store.
@@ -216,7 +236,7 @@ and which is authoritative matters more than either on its own:
 
 | | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
 |---|---|---|
-| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | nine keys (below) |
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | ten keys (below) |
 | Status | **source of truth** | **derived cache** |
 | Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
 | Read by | the app — and the extension's own `DataManager`, inside `AddWaterIntent.perform()` and nowhere else | the app **and the widget** |
@@ -270,17 +290,18 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:107`); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
-## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours
+## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours — and a tenth, the rating request's mark
 
 Every key is built in `DataManager.Key` from the prefix **`sardor.WaterBuddy.`**. An App Group
 domain is shared by every target that joins it, so an un-prefixed key is a collision waiting for
-the next extension. `Key.all` — the roster the widget tripwires read — now lists **eleven** keys in
-total: the nine in this table — the eight and `wristApplied` — and the watch's two, documented in
-*The watch's own suite* further down. *(Read "the eight below plus three more, all documented" there
-until the twenty-sixth pass; the table has had nine rows since `wristApplied` joined it.)*
+the next extension. `Key.all` — the roster the widget tripwires read — now lists **twelve** keys in
+total: the ten in this table — the eight, `wristApplied` and `reviewRequestedVersion` — and the
+watch's two, documented in *The watch's own suite* further down. *(Read "the eight below plus three
+more, all documented" there until the twenty-sixth pass; the table has had nine rows since
+`wristApplied` joined it, and ten since 2026-10-15, roadmap item 1.2.5.)*
 
 | Stored key | Type | Range / clamp | Written by | Why it exists |
 |---|---|---|---|---|
@@ -293,8 +314,9 @@ until the twenty-sixth pass; the table has had nine rows since `wristApplied` jo
 | `sardor.WaterBuddy.language` | `String` | — | app only — the `language` setter, whose one caller is `SettingsView`. The widget *reads* it, and the watch reads it secondhand, as `WristMirror.languageCode` | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
 | `sardor.WaterBuddy.wristApplied` | `Data` (JSON `[Int: [UUID]]`) | **unbounded per day, until the 90-day trim** — see note below | **app only, via `ingest(_:)`** | The phone's per-day applied ledger for wrist-authored pours — day ordinal → the `WaterLog.id`s already folded in. `nonisolated`, unlike the eight keys above it (and the watch's two), because `readAppliedLedger(from:)`/`writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` and a nested type's members otherwise infer the enclosing `@MainActor` class's isolation. Trimmed to the last `appliedLedgerRetentionDays` (90) real calendar days on every write — never by subtracting a raw integer from the `yyyyMMdd` ordinal, which borrows across the month/day radix incorrectly (a real bug this plan introduced and fixed in its own Task 4, before it shipped). A write also protects any day it just folded into, even one already older than the 90-day cutoff, so the same write that adds an entry can never be the write that trims it (final review, `ingest(_:)`'s cutoff is `min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)`). |
+| `sardor.WaterBuddy.reviewRequestedVersion` | `String` | — (read with `object(forKey:) as? String`; anything else reads as never asked) | **app only, via `claimReviewRequest(version:)`** | The app's version (`CFBundleShortVersionString`, e.g. `"1.2"`) the last time it asked iOS for a rating (roadmap 1.2.5, `docs/superpowers/specs/2026-10-15-rating-prompt-design.md`). **Absent means never asked**, so it is never materialised. The claim writes it **before** answering `true`, so nothing asks without recording it, and Home asks at most once per version. It writes nothing else: no row, no widget doorbell, no reschedule — no widget, snapshot, mirror or notification reads it. Not `string(forKey:)`, which hands back a stored number as a string: a stored `1.2` would read as version 1.2 asked (`aStoredNumberCountsAsNeverAsked`, seen to fail against that read). No role guard: `streak` is zero in every process but the phone app, so the claim refuses there by construction. |
 
-> **This ledger is not capped at `maximumAckedIds` (256).** That cap belongs to a different, related
+> **The `wristApplied` ledger is not capped at `maximumAckedIds` (256).** That cap belongs to a different, related
 > but distinct thing: `WristMirror.acked`, the wire mirror's own array, sent phone → wrist on every
 > publish. The mirror flattens *this* ledger across every retained day and truncates the result to
 > 256 ids, newest day first, so the cap is a property of what goes out over `WatchConnectivity`, not
@@ -312,7 +334,7 @@ until the twenty-sixth pass; the table has had nine rows since `wristApplied` jo
 `WaterBuddyWatch` and `WaterBuddyWatchWidget` resolve the identical App Group *identifier string*,
 `group.sardor.WaterBuddy`, through the same `DataManager.sharedDefaults` accessor the phone uses —
 but the watch is a **different physical device**, so this is a different container on disk, holding
-none of the phone's nine keys above and read by none of the phone-side code. Never confuse "same
+none of the phone's ten keys above and read by none of the phone-side code. Never confuse "same
 identifier" with "same storage": nothing written on one device is visible on the other except
 through an explicit `WatchConnectivity` transfer (rule `70-privacy`).
 
@@ -325,12 +347,13 @@ Both are written **only** by `WristModel`, never by `DataManager` — the one ho
 `20-state` now states plainly: one writer per store, not one writer full stop. `WristModel` never
 opens SwiftData and never touches the phone's own App Group container.
 
-**Of the phone's nine keys, four are carried by the migration** — `currentWater`, `dailyGoal`,
+**Of the phone's ten keys, four are carried by the migration** — `currentWater`, `dailyGoal`,
 `lastActiveDay`, `isGoalSet` (`migrateIfNeeded(from:into:)` names exactly those).
 `didMigrateFromStandardDefaults` is not, because it *is* the bookkeeping; and `language` is not,
 because it did not exist before the App Group did, so there is nothing in a pre-capability
 `UserDefaults.standard` to carry. `remindersEnabled`, `servings` and `wristApplied` are not in
-the list either; this sheet has never recorded a reason for those three. *(This paragraph is
+the list either; this sheet has never recorded a reason for those three. `reviewRequestedVersion`
+is not, for `language`'s reason: it was born in the App Group, in 1.2.5. *(This paragraph is
 about the phone's suite and sits under the watch's table; the twenty-seventh pass left it where
 it stood and said so.)*
 
@@ -363,7 +386,7 @@ This is the same discipline as the App Group migration (rule `25-shared-storage`
 adopting a new store looks exactly like data loss.
 ### `Key.all` — the roster the tripwires read
 
-`DataManager.Key.all` lists all eleven keys — the phone's own nine plus the watch's two
+`DataManager.Key.all` lists all twelve keys — the phone's own ten plus the watch's two
 (`wristOutbox`, `wristMirror`) — directly under the declarations it mirrors, below its own DocC.
 Production code never reads it; it exists so the widget's two read-path tripwires —
 `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys` — can prove a snapshot
@@ -378,7 +401,9 @@ precisely this: the helper "will not notice a new one on its own".
 Keeping the roster beside the declarations is what makes the omission hard rather than likely.
 **What catches an omission is `DataManagerTests.everyKeyTheProductWritesIsOnTheRoster`**: it drives
 `DataManager`'s real writers and the migration, reads back every `sardor.WaterBuddy.` key that
-landed in the suite, and requires the roster to hold it. **That covers the phone's nine keys and
+landed in the suite, and requires the roster to hold it — and, since 1.2.5, requires the claim's
+own key among them, because its count guard (`>= 8`) cannot see the claim: the other writers meet
+it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's ten keys and
 not the watch's two**: `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
 target the phone's tests cannot reach, and no watch test reads `Key.all` — so nothing would catch
 either of those two going missing from the roster. `theTripwireHelperEnumeratesEveryStoredKey` does not — the helper
@@ -547,7 +572,7 @@ It differs from `todaysLogs` in three ways, each for a stated reason:
   `recomputeToday()` is deliberately unguarded, so `AddWaterIntent` reaches `saveAndRecompute()` on
   every widget tap — without the guard, that tap runs a seven-day fetch and a full roll-up inside
   the `.appex`. Nothing about history crosses to the widget: a per-day series is derivable from
-  none of the phone's nine keys.
+  none of the phone's ten keys.
 - **It is republished from four sites**, not one — `init`, `refresh()`, `saveAndRecompute()` and,
   since the redesign's stage 2, `dayDidTurn()` — because a mutation must show up on the card
   immediately, `addLog` calls `refresh()` *before* it inserts, and a day that turns under an open
@@ -891,7 +916,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1565
+nonisolated static let role: Role = {          // DataManager.swift:1647 (read :1565, a line of its DocC, until 1.2.5)
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -967,6 +992,11 @@ and no networking import anywhere in the tree (rule `70-privacy`, rule `95-depen
 are file timestamp, disk space, system boot time and active keyboard — none of which this product
 touches today. A new category means editing all four manifests together, exactly as a new key means
 touching both this file's count and `CLAUDE.md`'s.
+
+*(2026-10-16, the thirty-eighth pass: asked for `reviewRequestedVersion`, the key roadmap item 1.2.5
+added — it brings none. It is `UserDefaults` in the App Group, the use `1C8F.1` already declares, and
+StoreKit's review request, the one other thing 1.2.5 brought, is not a required-reason API. The four
+manifests are unchanged, and no networking framework is imported.)*
 
 Separately and unrelated to privacy: `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` on the app
 target's two configurations only. Extensions and the watch app inherit the containing app's answer;
@@ -1050,6 +1080,17 @@ true by reading — the reminder copy takes no value at all (rule `80-notificati
 what that test asserts.
 
 ## Tests that pin this
+
+**Roadmap item 1.2.5 adds two suites, 12 `@Test`** (counted per suite by the attribute grep on
+2026-10-15), in `ReviewRequestTests.swift`: `ReviewRequestTests` (8) — the decision (a streak of 2
+refused and 3 asked, a run ending yesterday refused, a version asked in refused and a new one asked,
+an empty version refused) and the claim (it records before answering and answers once per version;
+a refusal writes nothing, on the second goal day and with today short; a stored number reads as
+never asked) — and `ReviewPromptTests` (4), which pin no stored state: DEBUG asks only with its
+launch argument, the gate's own run is not launched to ask, the pause outlasts the confetti, the
+version is the bundle's. `everyKeyTheProductWritesIsOnTheRoster` drives the claim and requires
+`reviewRequestedVersion` among the keys it reads back. Not pinned: that the claim rings no doorbell
+and reschedules nothing (the final review's Minor 6, deferred).
 
 **Stage 5 adds three suites that pin stored state, 15 `@Test`** (counted per suite by the attribute
 grep on 2026-10-14, the fifty-ninth pass of `docs/AI_CONTEXT.md`), all in `WelcomeTests.swift`:
