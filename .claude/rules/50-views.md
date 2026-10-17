@@ -34,8 +34,11 @@ persist anything.
 - A `Slider`'s `Binding<Double>` bridge must `rounded()`, never truncate — the `step` snaps the
   value, and `rounded()` is what stops floating-point dust from reaching the store
 - Volumes stay `Int`. `Double` appears only as a drawing fraction
-- A visible volume is grouped: `strings.figure("%1$@ ml", amount, locale: locale)`, a `%n$@` key
-  fed a formatted figure. A spoken string keeps its `%n$d` key, so VoiceOver's values do not move
+- A sentence built from a key with an argument goes through one of two helpers, with the injected
+  `\.locale`: `strings.figure(_:_:locale:)` for a `%n$@` key fed volumes it formats itself, and
+  `strings.localized(_:_:locale:)` for everything else. Never `String(format:)` over a resolved
+  key: without a locale Foundation does not take a counted noun's form from the app's language,
+  and groups nothing. A figure is grouped wherever it appears — drawn or spoken
 
 ## Composition
 - Decompose a `body` into a `private var` per section and a `private func` per repeated item.

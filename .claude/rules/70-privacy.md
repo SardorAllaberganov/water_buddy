@@ -169,7 +169,11 @@ Three limits are conditions of the permission:
 - Give every key an explicit `en` value so a real `en.lproj` is emitted, and keep the
   deliberately-English-only list short and argued
 - Use positional format specifiers (`%1$d`, `%2$@`) in every key, never bare `%d`, and never drop or
-  invent one in a translation
+  invent one in a translation — in each plural form and substitution as in a plain value
+- A count beside a noun takes plural variations in every catalogue that holds the key: *one* and
+  *other* in English; *one*, *few*, *many* and *other* in Russian, where *other* — reached only by
+  a fraction — takes the genitive singular. Uzbek keeps one value, because Uzbek puts a noun after
+  a number in the singular
 - Store "follow the device" as the **absence** of `Key.language`, never the string `"system"`, and
   reject `"system"` in `AppLanguage(code:)`
 - Fall back to `.system` / `Bundle.main` for an unrecognised code, and say so only under `#if DEBUG`

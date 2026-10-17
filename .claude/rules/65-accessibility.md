@@ -90,8 +90,9 @@ rather than re-deriving it.
 - History's heading is one element: label the shown day, value its total against the goal, the
   header trait. At an accessibility text size a past day's heading is drawn on two lines — the
   weekday, which is that element, and the date, hidden — because on one line beside the `+` the
-  day's name was cut. The strip is one heading, *When you drank*, and its bars, hours and
-  reminder mark are hidden: the rows under it speak every serving
+  day's name was cut. The strip is one heading — label *When you drank*, value the count of
+  servings it draws, which is hidden — and its bars, hours and reminder mark are hidden: the rows
+  under it speak every serving
 - A serving row's vessel name is drawn and never spoken — it is an inference from today's
   vessels. The sheet's three shortcuts are one button each: label the vessel's name, value its
   amount, `.isSelected` on the one whose amount is showing
@@ -115,8 +116,10 @@ rather than re-deriving it.
 - Keep every tab's title and symbol non-empty and mutually distinct; an SF Symbol must be proved to
   resolve by a test, because an unknown symbol draws nothing at all
 - Home's heading is one element: label *Today*, value the date, the header trait. The streak chip
-  is one element — label *Day streak*, value the count — and is absent at zero. The status line
-  speaks millilitres from a `%d` key while it draws a grouped figure
+  is one element — label *Day streak*, value the count with its noun, what it draws where the noun
+  fits — and is absent at zero. Where the noun does not fit beside the title, the chip draws the
+  count alone and still speaks the noun. The status line speaks millilitres from a `%d` key with
+  plural forms while it draws them from a `%@` key
 - *Undo* is one button whose label is the word it draws and whose value is the amount. Its offer
   lasts eight seconds, and does not time out while VoiceOver is running; the next pour, leaving the
   tab and leaving the app each end it
