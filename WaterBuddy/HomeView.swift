@@ -366,45 +366,61 @@ struct HomeView: View {
         return Text(today.formatted(Self.dateFormat.locale(locale)))
     }
 
-    /// A flame and a count: the days in a row the goal was reached. Absent at zero.
+    /// A flame, a count and its noun: the days in a row the goal was reached — *12 days*. Absent at
+    /// zero.
     ///
-    /// **No noun.** "12 days" needs plural forms in English and Russian that this app's string
-    /// path cannot produce yet (known issue #40), so the glyph says what the number counts and
-    /// VoiceOver is given the words.
+    /// **The noun yields before the title does.** It shares a line with *Today* — *Сегодня* — and the
+    /// title has the line first (``ScreenHeader``). Where the whole chip does not fit beside it, the
+    /// chip draws the count alone rather than *12 д…*; it speaks the noun at every size
+    /// (spec 2026-10-16 §3.4, rule `65-accessibility`).
     ///
     /// `.frosted` like the discs, and `.resting` where they are `.raised`: it is a label, and
     /// sitting lower is what keeps it from reading as something to press.
     @ViewBuilder
     private var streakChip: some View {
         if manager.streak > 0 {
-            HStack(spacing: 6) {
-                Image(systemName: Self.streakSymbol)
-                    .foregroundStyle(Aurora.cyan)
-                    // Once, when the count goes up. The first day of a streak is the chip itself
-                    // arriving, and plays no bounce.
-                    .symbolEffect(.bounce, value: streakRises)
-                Text(manager.streak, format: .number)
-                    .monospacedDigit()
-                    .contentTransition(.numericText(value: Double(manager.streak)))
+            // Each candidate at its own width, so the fit is decided on the whole chip.
+            ViewThatFits(in: .horizontal) {
+                streakCapsule(Text(streakDays))
+                streakCapsule(Text(manager.streak, format: .number))
             }
-            .font(.subheadline.weight(.bold))
-            .fontDesign(.rounded)
-            .foregroundStyle(.white)
-            .lineLimit(1)
-            .padding(.leading, 10)
-            .padding(.trailing, 14)
-            // Nothing at the ordinary sizes, where the 36 pt floor is taller than the line and
-            // this together. At the accessibility sizes the line is the taller, and without it
-            // the flame stood past the capsule's edge.
-            .padding(.vertical, 6)
-            .frame(minHeight: 36)
-            .liquidGlass(in: Capsule(), density: .frosted, elevation: .resting)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Day streak", bundle: strings))
-            .accessibilityValue(Text(manager.streak, format: .number))
+            .accessibilityValue(Text(streakDays))
             // The first day of a streak: the chip arrives small and lands at its size.
             .transition(.scale(scale: 0.8).combined(with: .opacity))
         }
+    }
+
+    /// *12 days*, *12 дней*, *12 kun*.
+    private var streakDays: String {
+        strings.localized("%1$d days", manager.streak, locale: locale)
+    }
+
+    private func streakCapsule(_ count: Text) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: Self.streakSymbol)
+                .foregroundStyle(Aurora.cyan)
+                // Once, when the count goes up. The first day of a streak is the chip itself
+                // arriving, and plays no bounce.
+                .symbolEffect(.bounce, value: streakRises)
+            count
+                .monospacedDigit()
+                .contentTransition(.numericText(value: Double(manager.streak)))
+        }
+        .font(.subheadline.weight(.bold))
+        .fontDesign(.rounded)
+        .foregroundStyle(.white)
+        .lineLimit(1)
+        .padding(.leading, 10)
+        .padding(.trailing, 14)
+        // Nothing at the ordinary sizes, where the 36 pt floor is taller than the line and
+        // this together. At the accessibility sizes the line is the taller, and without it
+        // the flame stood past the capsule's edge.
+        .padding(.vertical, 6)
+        .frame(minHeight: 36)
+        .liquidGlass(in: Capsule(), density: .frosted, elevation: .resting)
+        .fixedSize()
     }
 
     // MARK: - Vessel
@@ -509,7 +525,7 @@ struct HomeView: View {
     private var spokenStatus: String {
         manager.hasReachedGoal
             ? strings.localizedString(forKey: "Goal reached", value: nil, table: nil)
-            : String(format: strings.localizedString(forKey: "%1$d millilitres to go", value: nil, table: nil), manager.remaining)
+            : strings.localized("%1$d millilitres to go", manager.remaining, locale: locale)
     }
 
     @ViewBuilder
@@ -588,10 +604,7 @@ struct HomeView: View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Image(systemName: symbol)
                 .accessibilityHidden(true)
-            Text(String(
-                format: strings.localizedString(forKey: key, value: nil, table: nil),
-                date.formatted(.dateTime.hour().minute().locale(locale))
-            ))
+            Text(strings.localized(key, date.formatted(.dateTime.hour().minute().locale(locale)), locale: locale))
         }
     }
 
@@ -684,7 +697,7 @@ struct HomeView: View {
         }
         .buttonStyle(PressStyle())
         .accessibilityLabel(Text("Undo", bundle: strings))
-        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), offer.amount))
+        .accessibilityValue(strings.localized("%1$d millilitres", offer.amount, locale: locale))
     }
 
     /// The capsule on one line: the amount, a hairline, the word.
@@ -792,7 +805,7 @@ struct HomeView: View {
             .buttonStyle(PressStyle())
             // Where this vessel's drop leaves from.
             .anchorPreference(key: PourPlaces.self, value: .center) { [.disc(serving.id): $0] }
-            .accessibilityLabel(String(format: strings.localizedString(forKey: "%1$@, add %2$d millilitres", value: nil, table: nil), serving.name(in: strings), serving.amount))
+            .accessibilityLabel(strings.localized("%1$@, add %2$d millilitres", serving.name(in: strings), serving.amount, locale: locale))
 
             VStack(spacing: 1) {
                 Text(strings.figure("%1$@ ml", serving.amount, locale: locale))
@@ -1012,7 +1025,7 @@ private struct WaterVessel: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Today's hydration", bundle: strings))
-        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d percent. %2$d of %3$d millilitres.", value: nil, table: nil), percentage, volume, goal))
+        .accessibilityValue(strings.localized("%1$d percent. %2$d of %3$d millilitres.", percentage, volume, goal, locale: locale))
     }
 
     // MARK: Water

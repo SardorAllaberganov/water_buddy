@@ -107,6 +107,7 @@ struct WelcomeView: View {
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// The step on screen. Presentation state, and only the user's taps change it.
@@ -642,8 +643,7 @@ struct WelcomeView: View {
         }
         // One element: *Step 2 of 4*.
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(format: strings.localizedString(forKey: "Step %1$d of %2$d", value: nil, table: nil),
-                                   step.number, WelcomeStep.allCases.count))
+        .accessibilityLabel(strings.localized("Step %1$d of %2$d", step.number, WelcomeStep.allCases.count, locale: locale))
     }
 
     /// *Back* and the step's main action side by side while both fit on one line. At the largest
@@ -799,9 +799,10 @@ struct WelcomeView: View {
             .padding(.top, WelcomeStyle.footnoteGap)
     }
 
-    /// A volume as VoiceOver reads it: a `%1$d` key, never the grouped figure (rule `50-views`).
+    /// A volume as VoiceOver reads it: the noun in the form its count takes, the figure grouped as
+    /// the language groups it (rule `50-views`).
     private func spokenMillilitres(_ volume: Int) -> String {
-        String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), volume)
+        strings.localized("%1$d millilitres", volume, locale: locale)
     }
 }
 
@@ -956,7 +957,7 @@ private struct CalculatorPanel: View {
         case .kilograms: "%1$d kg"
         case .pounds: "%1$d lb"
         }
-        return String(format: strings.localizedString(forKey: key, value: nil, table: nil), value)
+        return strings.localized(key, value, locale: locale)
     }
 
     private var unitSwitch: some View {
@@ -1092,7 +1093,7 @@ private struct CalculatorPanel: View {
                                  density: .sheer, elevation: .resting, interactive: true)
             }
             .buttonStyle(PressStyle())
-            .accessibilityLabel(String(format: strings.localizedString(forKey: "Use %1$d millilitres", value: nil, table: nil), suggestion))
+            .accessibilityLabel(strings.localized("Use %1$d millilitres", suggestion, locale: locale))
         }
     }
 

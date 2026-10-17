@@ -103,7 +103,7 @@ struct VesselSliders: View {
             // bundle:)`: that initialiser takes a `LocalizedStringKey`, which must be a literal,
             // and a runtime key silently becomes the *fallback text* instead of a lookup.
             .accessibilityLabel(strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), amounts[index]))
+            .accessibilityValue(strings.localized("%1$d millilitres", amounts[index], locale: locale))
         }
     }
 

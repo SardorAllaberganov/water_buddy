@@ -2069,13 +2069,31 @@ extension EnvironmentValues {
 
 extension Bundle {
 
+    /// A sentence from a key with arguments, formatted with `locale`: a count takes the plural form
+    /// its language gives it, and every figure is grouped the way the language groups it.
+    ///
+    /// **The locale chooses the form, not this bundle.** Foundation reads a key's plural variations
+    /// by the locale handed to the format; with none, it does not take the form from the app's
+    /// language — on an English phone the Russian table gave *Добавить 5 миллилитра*
+    /// (spec 2026-10-16 §2). Formatted with a locale, a `%d` is grouped too, which is why VoiceOver is
+    /// handed *2,000* as the screen draws it (rule `50-views`).
+    ///
+    /// `nonisolated`, as ``figure(_:_:locale:)`` is, so a suite off the main actor can pin it and the
+    /// widget's views can call it. Here, beside it, because every bundle that draws a sentence compiles
+    /// this file and the shared set does not grow (rule `15-project`).
+    nonisolated func localized(_ key: String, _ arguments: any CVarArg..., locale: Locale) -> String {
+        String(format: localizedString(forKey: key, value: nil, table: nil),
+               locale: locale, arguments: arguments)
+    }
+
     /// A sentence with volumes in it: each figure grouped the way `locale` groups a number, then
     /// set into the `%n$@` key this bundle resolves.
     ///
-    /// `%1$d` never groups — `String(format:)` prints `1300` in every language — so a visible
-    /// figure is formatted first and handed over as text (`1,300`, `1 300`). **Spoken strings
-    /// keep their `%d` keys**: VoiceOver reads a bare number correctly, and the UI tests assert
-    /// those values as they are.
+    /// The keys it serves were written as `%n$@` when a `%1$d` key could not group: formatted
+    /// without a locale, `String(format:)` prints `1300` in every language. ``localized(_:_:locale:)``
+    /// formats with one and groups a `%d` too, so the two give the same figures; these keys stay as
+    /// they are (spec 2026-10-16 §3.7). Spoken figures are grouped as well — VoiceOver is handed
+    /// *2,000 millilitres* where the screen draws *2,000 ml* (rule `50-views`).
     ///
     /// Here, beside the strings environment it reads from, because every bundle that draws a
     /// volume compiles this file and the shared set does not grow (rule `15-project`).

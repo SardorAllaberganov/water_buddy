@@ -82,6 +82,7 @@ struct WristView: View {
     @State private var isMenuPresented = false
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     private let clock = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
@@ -145,7 +146,7 @@ struct WristView: View {
     /// `syncedCaption(composedAt: nil, …)`) unreachable in production while their tests stayed green.
     ///
     /// The number is never presented as more certain than it is: ``WristModel/displayGoal`` names
-    /// the goal actually in use, and ``attribution(mirror:now:strings:)`` — always on screen,
+    /// the goal actually in use, and ``attribution(mirror:now:strings:locale:)`` — always on screen,
     /// outside every branch, as spec §8 requires — says whether it came from the phone or is still
     /// the default.
     ///
@@ -232,8 +233,8 @@ struct WristView: View {
             .accessibilityLabel(Text("Today's hydration", bundle: strings))
             // The phone vessel's own sentence, so VoiceOver reads the same figures the same way on
             // both devices (spec 2026-10-06 §3, ruling 5).
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d percent. %2$d of %3$d millilitres.", value: nil, table: nil), percentage, model.todaysTotal, model.displayGoal))
-            .accessibilityHint(String(format: strings.localizedString(forKey: "Logs %1$d millilitres", value: nil, table: nil), serving.amount))
+            .accessibilityValue(strings.localized("%1$d percent. %2$d of %3$d millilitres.", percentage, model.todaysTotal, model.displayGoal, locale: locale))
+            .accessibilityHint(strings.localized("Logs %1$d millilitres", serving.amount, locale: locale))
             .position(x: proxy.size.width / 2, y: diameter / 2)
         }
         .frame(height: height)
@@ -242,11 +243,11 @@ struct WristView: View {
     // MARK: - The attribution line and the menu
 
     /// Named `attributionLine`, not `attribution`: a private computed property of that name shadows
-    /// the `static func attribution(mirror:now:strings:)` it is trying to call, and
+    /// the `static func attribution(mirror:now:strings:locale:)` it is trying to call, and
     /// `Self.attribution(…)` then fails to resolve. Caught at compile time here, but the same
     /// collision with a *different* return type would have compiled and drawn the wrong thing.
     private var attributionLine: some View {
-        Text(Self.attribution(mirror: model.mirror, now: now, strings: strings))
+        Text(Self.attribution(mirror: model.mirror, now: now, strings: strings, locale: locale))
             .font(.caption2)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
@@ -360,7 +361,7 @@ struct WristView: View {
     /// - **a mirror, but the phone has no goal yet** (`isGoalSet == false`) — the *only* case where
     ///   reaching for the phone is genuinely the fix, so it is the only case that asks.
     /// - **a mirror with a goal** — ordinary attribution, delegated to
-    ///   ``syncedCaption(composedAt:now:strings:)``.
+    ///   ``syncedCaption(composedAt:now:strings:locale:)``.
     ///
     /// Kept `nonisolated static` and free of view state for the same reason its siblings are:
     /// `WristViewLogicTests` pins every branch without instantiating a `View`.
@@ -369,14 +370,15 @@ struct WristView: View {
     /// stored string is what lets a language switch reach it (`tasks/lessons.md`, 2026-08-29), and a
     /// defaulted parameter would quietly mean `Bundle.main` — the device's language, not the one the
     /// phone chose. Rule `80-notifications` holds `reconcile`'s `strings:` to the same.
-    nonisolated static func attribution(mirror: WristMirror?, now: Date, strings: Bundle) -> String {
+    /// It takes the locale beside it, for the same reason and with no default either.
+    nonisolated static func attribution(mirror: WristMirror?, now: Date, strings: Bundle, locale: Locale) -> String {
         guard let mirror else {
             return strings.localizedString(forKey: "Not yet synced · default goal", value: nil, table: nil)
         }
         guard mirror.isGoalSet else {
             return strings.localizedString(forKey: "Set your goal in WaterBuddy on iPhone", value: nil, table: nil)
         }
-        return syncedCaption(composedAt: mirror.composedAt, now: now, strings: strings)
+        return syncedCaption(composedAt: mirror.composedAt, now: now, strings: strings, locale: locale)
     }
 
     /// "Synced Nm ago", rounded to whole minutes; "Synced just now" under a minute — and for a
@@ -384,13 +386,13 @@ struct WristView: View {
     /// synced" without a date — attribution, always present, never an alert (spec §8).
     ///
     /// The `nil` branch is unreachable from production today: `WristMirror.composedAt` is
-    /// non-optional, and `attribution(mirror:now:strings:)` answers a missing mirror before it gets
+    /// non-optional, and `attribution(mirror:now:strings:locale:)` answers a missing mirror before it gets
     /// here. Kept, and translated, because the parameter is optional
     /// (`docs/superpowers/specs/2026-10-06-watch-localization-design.md` §8.3).
     ///
     /// Russian writes the minutes as `мин`, which needs no plural form, and Uzbek takes none after a
     /// numeral — so one `%1$d` key serves every count.
-    nonisolated static func syncedCaption(composedAt: Date?, now: Date, strings: Bundle) -> String {
+    nonisolated static func syncedCaption(composedAt: Date?, now: Date, strings: Bundle, locale: Locale) -> String {
         guard let composedAt else {
             return strings.localizedString(forKey: "Not yet synced", value: nil, table: nil)
         }
@@ -398,7 +400,7 @@ struct WristView: View {
         guard minutes >= 1 else {
             return strings.localizedString(forKey: "Synced just now", value: nil, table: nil)
         }
-        return String(format: strings.localizedString(forKey: "Synced %1$dm ago", value: nil, table: nil), minutes)
+        return strings.localized("Synced %1$dm ago", minutes, locale: locale)
     }
 }
 
@@ -420,6 +422,7 @@ private struct WristServingMenu: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     var body: some View {
         ZStack {
@@ -442,7 +445,7 @@ private struct WristServingMenu: View {
                                 Image(systemName: serving.symbol)
                             }
                             Spacer(minLength: 8)
-                            Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), serving.amount))
+                            Text(strings.localized("%1$d ml", serving.amount, locale: locale))
                                 .foregroundStyle(.secondary)
                         }
                         .lineLimit(1)

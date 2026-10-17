@@ -102,6 +102,7 @@ private let homeKeys = [
     "Added %1$@ ml",
     "Undo",
     "Day streak",
+    "%1$d days",
 ]
 
 /// History's strings that the build's extraction cannot see — resolved with
@@ -113,6 +114,7 @@ private let historyKeys = [
     "Goal met",
     "%1$@ of %2$@",
     "When you drank",
+    "%1$d servings",
     "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.",
 ]
 
@@ -171,15 +173,51 @@ private func value(_ bundle: Bundle?, _ language: String, _ key: String) -> Stri
     return resolved == missingMarker ? nil : resolved
 }
 
-/// The whole compiled table for one language, straight out of the bundle.
+/// Every key one language's table holds, with every sentence it can produce: a plain value, or — for a
+/// key with plural forms, which the build moves out of `Localizable.strings` into
+/// `Localizable.stringsdict` — each form.
 ///
-/// `Localizable.strings` in a built bundle is a binary plist, which `NSDictionary` reads. Going
-/// through the table rather than key-by-key is what lets a test assert something about *all* the
-/// strings without a hardcoded list that would itself go stale.
-private func table(_ bundle: Bundle?, _ language: String) -> [String: String]? {
-    guard let url = localization(bundle, language)?
-        .url(forResource: "Localizable", withExtension: "strings") else { return nil }
-    return NSDictionary(contentsOf: url) as? [String: String]
+/// Both files are binary plists in a built bundle, which `NSDictionary` reads. Reading only the first
+/// lost every key with forms from English and Russian while Uzbek, which keeps one value, still had it
+/// (spec 2026-10-16 §6.2). Going through the table rather than key by key is what lets a test assert
+/// something about *all* the strings without a hardcoded list that would itself go stale.
+private func table(_ bundle: Bundle?, _ language: String) -> [String: [String]]? {
+    guard let lproj = localization(bundle, language) else { return nil }
+    let plain = lproj.url(forResource: "Localizable", withExtension: "strings")
+        .flatMap { NSDictionary(contentsOf: $0) as? [String: String] }
+    let plural = lproj.url(forResource: "Localizable", withExtension: "stringsdict")
+        .flatMap { NSDictionary(contentsOf: $0) as? [String: [String: Any]] }
+    guard plain != nil || plural != nil else { return nil }
+
+    var table = (plain ?? [:]).mapValues { [$0] }
+    for (key, entry) in plural ?? [:] {
+        table[key] = forms(of: entry)
+    }
+    return table
+}
+
+/// A `.stringsdict` entry's sentences: its format key with each `%#@name@` replaced by every form of
+/// that substitution, in every combination — in a fixed order, so two bundles compare form by form.
+private func forms(of entry: [String: Any]) -> [String] {
+    guard let format = entry["NSStringLocalizedFormatKey"] as? String else { return [] }
+    var sentences = [format]
+    for name in entry.keys.sorted() where name != "NSStringLocalizedFormatKey" {
+        guard let rule = entry[name] as? [String: String] else { continue }
+        let variants = rule.keys.sorted().filter { !$0.hasPrefix("NSString") }.compactMap { rule[$0] }
+        sentences = sentences.flatMap { sentence in
+            variants.map {
+                sentence.replacingOccurrences(of: "%(\\d+\\$)?#@\(name)@",
+                                              with: NSRegularExpression.escapedTemplate(for: $0),
+                                              options: .regularExpression)
+            }
+        }
+    }
+    return sentences
+}
+
+/// Every sentence `key` gives in one language, or `nil` if the table has no such key.
+private func sentences(_ bundle: Bundle?, _ language: String, _ key: String) -> [String]? {
+    table(bundle, language)?[key]
 }
 
 /// Every `%1$d` / `%2$@` token in a format string, as a set.
@@ -247,7 +285,7 @@ private func specifiers(in text: String) -> Set<String> {
     @Test(arguments: translated)
     func theWidgetAgreesWithTheAppOnEverySharedString(language: String) {
         for key in sharedKeys {
-            #expect(value(appBundle, language, key) == value(widgetBundle, language, key),
+            #expect(sentences(appBundle, language, key) == sentences(widgetBundle, language, key),
                     "\"\(key)\" differs between the app and the widget in \(language)")
         }
     }
@@ -259,10 +297,11 @@ private func specifiers(in text: String) -> Set<String> {
     func everyTranslationKeepsTheFormatArgumentsOfItsKey(language: String) {
         for key in sharedKeys {
             let expected = specifiers(in: key)
-            guard !expected.isEmpty, let resolved = value(appBundle, language, key) else { continue }
-
-            #expect(specifiers(in: resolved) == expected,
-                    "\"\(key)\" in \(language) does not carry the same format arguments")
+            guard !expected.isEmpty, let resolved = sentences(appBundle, language, key) else { continue }
+            for sentence in resolved {
+                #expect(specifiers(in: sentence) == expected,
+                        "\"\(key)\" in \(language) does not carry the same format arguments: \(sentence)")
+            }
         }
     }
 
@@ -335,6 +374,15 @@ private func specifiers(in text: String) -> Set<String> {
         }
     }
 
+    /// The readers in this file see a key with plural forms, which the build moves out of
+    /// `Localizable.strings` into `Localizable.stringsdict` (spec 2026-10-16 §6.2): two forms in
+    /// English, four in Russian, and Uzbek's one value.
+    @Test func theTablesSeeAKeyWithPluralForms() {
+        #expect(table(appBundle, "en")?["Add %1$d millilitres"]?.count == 2)
+        #expect(table(appBundle, "ru")?["Add %1$d millilitres"]?.count == 4)
+        #expect(table(appBundle, "uz")?["Add %1$d millilitres"]?.count == 1)
+    }
+
     /// Every string in the app, not just the shared ten, keeps its positional arguments in both
     /// languages. `String(format:)` given the wrong argument set prints nonsense silently.
     @Test(arguments: translated)
@@ -343,11 +391,13 @@ private func specifiers(in text: String) -> Set<String> {
             Issue.record("could not read the \(language) table")
             return
         }
-        for (key, translation) in strings {
+        for (key, translations) in strings {
             let expected = specifiers(in: key)
             guard !expected.isEmpty else { continue }
-            #expect(specifiers(in: translation) == expected,
-                    "\"\(key)\" in \(language) does not carry the same format arguments")
+            for translation in translations {
+                #expect(specifiers(in: translation) == expected,
+                        "\"\(key)\" in \(language) does not carry the same format arguments: \(translation)")
+            }
         }
     }
 
@@ -521,9 +571,9 @@ private func specifiers(in text: String) -> Set<String> {
     @Test(arguments: ["en"] + translated)
     func theWatchAgreesWithThePhoneOnEverySharedString(language: String) {
         for key in watchSharedKeys {
-            let phone = value(appBundle, language, key)
+            let phone = sentences(appBundle, language, key)
             #expect(phone != nil, "\"\(key)\" is missing from the phone's \(language) table — nothing to agree with")
-            #expect(value(watchBundle, language, key) == phone,
+            #expect(sentences(watchBundle, language, key) == phone,
                     "\"\(key)\" differs between the phone and the watch in \(language)")
         }
         let description = "Today's hydration"
@@ -546,11 +596,13 @@ private func specifiers(in text: String) -> Set<String> {
                 Issue.record("\(name): could not read the \(language) table")
                 continue
             }
-            for (key, translation) in strings {
+            for (key, translations) in strings {
                 let expected = specifiers(in: key)
                 guard !expected.isEmpty else { continue }
-                #expect(specifiers(in: translation) == expected,
-                        "\(name): \"\(key)\" in \(language) does not carry the same format arguments")
+                for translation in translations {
+                    #expect(specifiers(in: translation) == expected,
+                            "\(name): \"\(key)\" in \(language) does not carry the same format arguments: \(translation)")
+                }
             }
         }
     }
@@ -597,21 +649,22 @@ struct HomeStringTests {
     @Test(arguments: ["en"] + translated)
     func everyHomeStringExistsAndKeepsItsArguments(language: String) {
         for key in homeKeys {
-            let resolved = value(appBundle, language, key)
+            let resolved = sentences(appBundle, language, key)
             #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
-            if let resolved {
-                #expect(specifiers(in: resolved) == specifiers(in: key),
-                        "\"\(key)\" in \(language) does not carry the same format arguments")
+            for sentence in resolved ?? [] {
+                #expect(specifiers(in: sentence) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments: \(sentence)")
             }
         }
     }
 
-    /// The visible keys take `%@` — a figure already grouped — and the one spoken key takes `%d`,
-    /// the split spec §3.1 sets.
-    @Test func onlyTheSpokenHomeStringTakesARawNumber() {
+    /// Home's keys that take a raw number are its two counted ones: the status line's, and the
+    /// streak's. Both are formatted through ``Bundle/localized(_:_:locale:)``, so both are grouped
+    /// and take their plural forms (spec 2026-10-16 §3.6); the drawn volumes keep their `%@` keys.
+    @Test func theHomeKeysThatTakeARawNumberAreTheCountedOnes() {
         let raw = homeKeys.filter { $0.contains("$d") }
 
-        #expect(raw == ["%1$d millilitres to go"])
+        #expect(raw == ["%1$d millilitres to go", "%1$d days"])
     }
 }
 
@@ -623,11 +676,11 @@ struct HistoryStringTests {
     @Test(arguments: ["en"] + translated)
     func everyHistoryStringExistsAndKeepsItsArguments(language: String) {
         for key in historyKeys {
-            let resolved = value(appBundle, language, key)
+            let resolved = sentences(appBundle, language, key)
             #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
-            if let resolved {
-                #expect(specifiers(in: resolved) == specifiers(in: key),
-                        "\"\(key)\" in \(language) does not carry the same format arguments")
+            for sentence in resolved ?? [] {
+                #expect(specifiers(in: sentence) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments: \(sentence)")
             }
         }
     }
@@ -639,7 +692,9 @@ struct HistoryStringTests {
     ///
     /// Three are left, and none is History's or — since the redesign's stage 4 — Settings': all
     /// three are the widget's, kept in the app's table because the two must agree (`sharedKeys`).
-    /// They go when their own screens are redrawn, and this set shrinks with them.
+    /// Since roadmap item 1.2.6 they are grouped too, formatted through
+    /// ``Bundle/localized(_:_:locale:)``; they are `%d` keys only because their screens have not been
+    /// redrawn. This set shrinks when they are.
     @Test func theOnlyRawVolumesLeftToDrawAreOtherScreens() throws {
         let english = try #require(table(appBundle, "en"), "the app ships no en table")
 
@@ -667,11 +722,11 @@ struct WelcomeStringTests {
     @Test(arguments: ["en"] + translated)
     func everyWelcomeStringExistsAndKeepsItsArguments(language: String) {
         for key in welcomeKeys {
-            let resolved = value(appBundle, language, key)
+            let resolved = sentences(appBundle, language, key)
             #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
-            if let resolved {
-                #expect(specifiers(in: resolved) == specifiers(in: key),
-                        "\"\(key)\" in \(language) does not carry the same format arguments")
+            for sentence in resolved ?? [] {
+                #expect(specifiers(in: sentence) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments: \(sentence)")
             }
         }
     }
@@ -723,5 +778,222 @@ struct GroupedFigureTests {
         #expect(english.figure("%1$@ of %2$@", 6, 7, locale: Locale(identifier: "en_US")) == "6 of 7")
         #expect(russian.figure("%1$@ of %2$@", 6, 7, locale: Locale(identifier: "ru_RU")) == "6 из 7")
         #expect(uzbek.figure("%1$@ of %2$@", 6, 7, locale: Locale(identifier: "uz_UZ")) == "7 dan 6")
+    }
+}
+
+// MARK: - Plural forms (spec 2026-10-16 §6.1)
+
+/// Russian's whole-number forms by CLDR's rule, written out here so these tests do not ask Foundation
+/// the question they check it answers. A fraction would take *other*; this app formats none.
+private func russian(_ count: Int, _ one: String, _ few: String, _ many: String) -> String {
+    let last = count % 10, lastTwo = count % 100
+    if last == 1 && lastTwo != 11 { return one }
+    if (2...4).contains(last) && !(12...14).contains(lastTwo) { return few }
+    return many
+}
+
+private func english(_ count: Int, _ one: String, _ other: String) -> String {
+    count == 1 ? one : other
+}
+
+/// The counts spec §1 names: every Russian form, the teens that end in 1–4 and still take *many*, and a
+/// figure that groups.
+private let pluralCounts = [0, 1, 2, 5, 11, 12, 21, 22, 25, 101, 111, 1_001]
+
+/// A key with a counted noun: how many arguments it takes, which of them count (from zero), and which
+/// bundles hold it.
+private struct CountedKey: Sendable {
+    let key: String
+    let arity: Int
+    let counted: [Int]
+    let bundles: [String]
+}
+
+private let averageKey = "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days."
+
+private let countedKeys = [
+    CountedKey(key: "%1$d millilitres", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "%1$@, add %2$d millilitres", arity: 2, counted: [1], bundles: ["app"]),
+    CountedKey(key: "%1$d millilitres to go", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "%1$d of %2$d millilitres", arity: 2, counted: [1], bundles: ["app"]),
+    CountedKey(key: "%1$d percent. %2$d of %3$d millilitres.", arity: 3, counted: [0, 2],
+               bundles: ["app", "widget", "watch"]),
+    CountedKey(key: "Add %1$d millilitres", arity: 1, counted: [0], bundles: ["app", "widget"]),
+    CountedKey(key: "Use %1$d millilitres", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: averageKey, arity: 4, counted: [0, 1, 3], bundles: ["app"]),
+    CountedKey(key: "Last %1$d days", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Logs %1$d millilitres", arity: 1, counted: [0], bundles: ["watch"]),
+    CountedKey(key: "%1$d days", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "%1$d servings", arity: 1, counted: [0], bundles: ["app"]),
+]
+
+private func shipped(_ name: String) -> Bundle? {
+    switch name {
+    case "widget": widgetBundle
+    case "watch": watchBundle
+    default: appBundle
+    }
+}
+
+/// A key's arguments: its counts, except a leading `%1$@`, which takes a vessel's name.
+private func arguments(for key: String, counts: [Int]) -> [any CVarArg] {
+    var values: [any CVarArg] = counts
+    if key.hasPrefix("%1$@") { values[0] = "Glass" }
+    return values
+}
+
+/// `localized` with a list of arguments: it is variadic, and a list cannot be spread into it.
+private func format(_ strings: Bundle, _ key: String, _ arguments: [any CVarArg], _ locale: Locale) -> String {
+    switch arguments.count {
+    case 1: strings.localized(key, arguments[0], locale: locale)
+    case 2: strings.localized(key, arguments[0], arguments[1], locale: locale)
+    case 3: strings.localized(key, arguments[0], arguments[1], arguments[2], locale: locale)
+    case 4: strings.localized(key, arguments[0], arguments[1], arguments[2], arguments[3], locale: locale)
+    default: "no case for \(arguments.count) arguments"
+    }
+}
+
+/// Spec §3.3's sentence for `key` in `language`, each figure formatted by `locale` the way the screens
+/// format theirs, or `nil` for a pair this table does not know.
+private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: Locale) -> String? {
+    let f = n.map { $0.formatted(.number.locale(locale)) }
+    let ml = { (i: Int) in english(n[i], "millilitre", "millilitres") }
+    let mlRu = { (i: Int) in russian(n[i], "миллилитр", "миллилитра", "миллилитров") }
+    switch (key, language) {
+    case ("%1$d millilitres", "en"): return "\(f[0]) \(ml(0))"
+    case ("%1$d millilitres", "ru"): return "\(f[0]) \(mlRu(0))"
+    case ("%1$d millilitres", "uz"): return "\(f[0]) millilitr"
+
+    case ("%1$@, add %2$d millilitres", "en"): return "Glass, add \(f[1]) \(ml(1))"
+    case ("%1$@, add %2$d millilitres", "ru"): return "Glass, добавить \(f[1]) \(mlRu(1))"
+    case ("%1$@, add %2$d millilitres", "uz"): return "Glass, \(f[1]) millilitr qo‘shish"
+
+    case ("%1$d millilitres to go", "en"): return "\(f[0]) \(ml(0)) to go"
+    case ("%1$d millilitres to go", "ru"):
+        return russian(n[0], "Остался \(f[0]) миллилитр", "Осталось \(f[0]) миллилитра", "Осталось \(f[0]) миллилитров")
+    case ("%1$d millilitres to go", "uz"): return "\(f[0]) millilitr qoldi"
+
+    case ("%1$d of %2$d millilitres", "en"): return "\(f[0]) of \(f[1]) \(ml(1))"
+    case ("%1$d of %2$d millilitres", "ru"):
+        return "\(f[0]) из \(f[1]) " + russian(n[1], "миллилитра", "миллилитров", "миллилитров")
+    case ("%1$d of %2$d millilitres", "uz"): return "\(f[1]) millilitrdan \(f[0])"
+
+    case ("%1$d percent. %2$d of %3$d millilitres.", "en"): return "\(f[0]) percent. \(f[1]) of \(f[2]) \(ml(2))."
+    case ("%1$d percent. %2$d of %3$d millilitres.", "ru"):
+        return "\(f[0]) " + russian(n[0], "процент", "процента", "процентов")
+            + ". \(f[1]) из \(f[2]) " + russian(n[2], "миллилитра", "миллилитров", "миллилитров") + "."
+    case ("%1$d percent. %2$d of %3$d millilitres.", "uz"): return "\(f[0]) foiz. \(f[2]) millilitrdan \(f[1])."
+
+    case ("Add %1$d millilitres", "en"): return "Add \(f[0]) \(ml(0))"
+    case ("Add %1$d millilitres", "ru"): return "Добавить \(f[0]) \(mlRu(0))"
+    case ("Add %1$d millilitres", "uz"): return "\(f[0]) millilitr qo‘shish"
+
+    case ("Use %1$d millilitres", "en"): return "Use \(f[0]) \(ml(0))"
+    case ("Use %1$d millilitres", "ru"): return "Выбрать \(f[0]) \(mlRu(0))"
+    case ("Use %1$d millilitres", "uz"): return "Tanlash: \(f[0]) millilitr"
+
+    case (averageKey, "en"):
+        return "Average \(f[0]) \(ml(0)). Best \(f[1]) \(ml(1)). Goal met on \(f[2]) of \(f[3]) "
+            + english(n[3], "day", "days") + "."
+    case (averageKey, "ru"):
+        return "В среднем \(f[0]) \(mlRu(0)). Лучший день \(f[1]) \(mlRu(1)). Цель достигнута в \(f[2]) из \(f[3]) "
+            + russian(n[3], "дня", "дней", "дней") + "."
+    case (averageKey, "uz"):
+        return "O‘rtacha \(f[0]) millilitr. Eng yaxshi kun \(f[1]) millilitr. \(f[3]) kundan \(f[2]) kunida maqsadga erishildi."
+
+    case ("Last %1$d days", "en"): return "Last \(f[0]) " + english(n[0], "day", "days")
+    case ("Last %1$d days", "ru"): return "Последние \(f[0]) " + russian(n[0], "день", "дня", "дней")
+    case ("Last %1$d days", "uz"): return "Oxirgi \(f[0]) kun"
+
+    case ("Logs %1$d millilitres", "en"): return "Logs \(f[0]) \(ml(0))"
+    case ("Logs %1$d millilitres", "ru"): return "Записывает \(f[0]) \(mlRu(0))"
+    case ("Logs %1$d millilitres", "uz"): return "\(f[0]) millilitr qayd etadi"
+
+    case ("%1$d days", "en"): return "\(f[0]) " + english(n[0], "day", "days")
+    case ("%1$d days", "ru"): return "\(f[0]) " + russian(n[0], "день", "дня", "дней")
+    case ("%1$d days", "uz"): return "\(f[0]) kun"
+
+    case ("%1$d servings", "en"): return "\(f[0]) " + english(n[0], "serving", "servings")
+    case ("%1$d servings", "ru"): return "\(f[0]) " + russian(n[0], "порция", "порции", "порций")
+    case ("%1$d servings", "uz"): return "\(f[0]) porsiya"
+
+    default: return nil
+    }
+}
+
+/// ``Bundle/localized(_:_:locale:)`` and the counted keys' forms. Not `@MainActor`: the helper is
+/// `nonisolated`, and the widget's views call it.
+struct PluralFormTests {
+
+    /// Spec §6.1: every counted key, in every bundle that holds it, at every count, in the form §3.3
+    /// gives it — a key with more than one counted argument varied one argument at a time, the
+    /// others held at 5. The locale is the one `AppLanguage.locale` makes for a chosen language.
+    @Test(arguments: ["en", "ru", "uz"])
+    func everyCountedKeyTakesTheFormItsCountNeeds(language: String) throws {
+        let locale = Locale(identifier: language)
+        for counted in countedKeys {
+            for name in counted.bundles {
+                let strings = try #require(localization(shipped(name), language),
+                                           "the \(name) bundle ships no \(language)")
+                for position in counted.counted {
+                    for count in pluralCounts {
+                        var counts = Array(repeating: 5, count: counted.arity)
+                        counts[position] = count
+                        let drawn = format(strings, counted.key, arguments(for: counted.key, counts: counts), locale)
+                        #expect(drawn == expected(counted.key, language, counts, locale),
+                                "\(name), \(language): \"\(counted.key)\" with \(counts)")
+                    }
+                }
+            }
+        }
+    }
+
+    /// Spec §2, finding 2, on the simulator: the Russian table formatted with no locale does not take
+    /// its form from Russian. The probes ran under an English process locale, so this means something
+    /// only under one, and says so rather than passing or failing for another reason.
+    @Test func withNoLocaleTheRussianTableIsNotReadAsRussian() throws {
+        try #require(Locale.current.language.languageCode == .english,
+                     "the test host runs in \(Locale.current.identifier), not English — the probes' finding is not what this run can see")
+        let russian = try #require(localization(appBundle, "ru"), "the app ships no ru table")
+        let key = russian.localizedString(forKey: "Add %1$d millilitres", value: nil, table: nil)
+
+        #expect(String(format: key, 5) == "Добавить 5 миллилитра")
+        #expect(russian.localized("Add %1$d millilitres", 5, locale: Locale(identifier: "ru")) == "Добавить 5 миллилитров")
+    }
+
+    /// Spec §8, as measured: *Follow device* on a phone in a language the app does not ship formats the
+    /// English table with `en_` and the phone's region — `en_DE` on a German phone (iOS 27.0
+    /// simulator, `-testLanguage de -testRegion DE`, 2026-10-17) — so English words, in English's forms,
+    /// with the region's grouping.
+    @Test func aGermanPhoneOnFollowDeviceGetsEnglishWordsAndGermanFigures() throws {
+        let english = try #require(localization(appBundle, "en"), "the app ships no en table")
+        let german = Locale(identifier: "en_DE")
+
+        #expect(english.localized("%1$d millilitres", 1, locale: german) == "1 millilitre")
+        #expect(english.localized("%1$d millilitres", 1_300, locale: german)
+                == "\(1_300.formatted(.number.locale(german))) millilitres")
+    }
+
+    /// A Japanese phone gets `en_JP` (measured as above), so Japanese's single form never reaches the
+    /// English table: *1 millilitre*. The spec expected *1 millilitres* until the final review measured
+    /// the locale; ``theFollowDeviceLocaleSpeaksTheBundlesLanguage()`` pins why.
+    @Test func aJapanesePhoneOnFollowDeviceGetsEnglishForms() throws {
+        let english = try #require(localization(appBundle, "en"), "the app ships no en table")
+
+        #expect(english.localized("%1$d millilitres", 1, locale: Locale(identifier: "en_JP")) == "1 millilitre")
+    }
+
+    /// The rule every form rests on: on *Follow device* the locale `AppLanguage.system` hands the views
+    /// speaks the language of the table it formats, so the plural rule is the words' own. Foundation
+    /// takes `Locale.current`'s language from the bundle's resolved localization — a Japanese phone
+    /// formats the English table with `en_JP` — where a `.system` locale built from the phone's own
+    /// first language would format it by Japanese's one form, *1 millilitres*. Run under
+    /// `-testLanguage ja -testRegion JP` to see a phone in a language the app does not ship.
+    @Test func theFollowDeviceLocaleSpeaksTheBundlesLanguage() {
+        let bundleLanguage = Bundle.main.preferredLocalizations.first
+        let locale = AppLanguage.system.locale
+
+        #expect(locale.language.languageCode?.identifier == bundleLanguage,
+                "Follow device formats the \(bundleLanguage ?? "nil") table with \(locale.identifier)")
     }
 }

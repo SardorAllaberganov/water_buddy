@@ -377,6 +377,7 @@ private struct LanguageCard: View {
 private struct GoalCard: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     @Environment(DataManager.self) private var manager
 
@@ -483,7 +484,7 @@ private struct GoalCard: View {
             // A `Slider`'s stock VoiceOver value is a percentage of its range, which here would
             // announce "50%" for 2,500 ml — a number that appears nowhere in the product.
             .accessibilityLabel(Text("Daily water goal", bundle: strings))
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), goal))
+            .accessibilityValue(strings.localized("%1$d millilitres", goal, locale: locale))
 
             HStack {
                 Text(WelcomeView.goalRange.lowerBound, format: .number)

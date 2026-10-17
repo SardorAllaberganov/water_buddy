@@ -7,6 +7,13 @@
 
 import XCTest
 
+/// A figure as the app speaks it on *Follow device*: grouped by the device's own region
+/// (spec 2026-10-16 §6.3). The capture device is in `en_UZ`, which groups with a space, so a figure
+/// written with a comma here would stop the run at its first figure assertion.
+private func grouped(_ figure: Int) -> String {
+    figure.formatted(.number)
+}
+
 /// The four iPhone screenshots App Store Connect is given, captured by driving the real app.
 ///
 /// **This is not a test.** It asserts almost nothing and proves nothing about the product; it is a
@@ -215,24 +222,24 @@ extension AppStoreScreenshotUITests {
         )
         getStarted.tap()
         XCTAssertTrue(goalSlider.waitForExistence(timeout: 10), "the goal step did not appear")
-        XCTAssertEqual(goalSlider.value as? String, "2000 millilitres")
+        XCTAssertEqual(goalSlider.value as? String, "\(grouped(2_000)) millilitres")
         Thread.sleep(forTimeInterval: settle)
         capture("01-goal-setup-default-2000")
 
         goalSlider.adjust(toNormalizedSliderPosition: 0.0)
-        XCTAssertEqual(goalSlider.value as? String, "1000 millilitres")
+        XCTAssertEqual(goalSlider.value as? String, "\(grouped(1_000)) millilitres")
         Thread.sleep(forTimeInterval: 1)
         capture("02-goal-setup-min-1000")
 
         goalSlider.adjust(toNormalizedSliderPosition: 1.0)
-        XCTAssertEqual(goalSlider.value as? String, "4000 millilitres")
+        XCTAssertEqual(goalSlider.value as? String, "\(grouped(4_000)) millilitres")
         Thread.sleep(forTimeInterval: 1)
         capture("03-goal-setup-max-4000")
 
         // Restore 2,000 before committing. Finishing the welcome saves whatever the slider shows,
         // and every percentage in the other 22 shots is computed against this number.
         goalSlider.adjust(toNormalizedSliderPosition: 0.333)
-        XCTAssertEqual(goalSlider.value as? String, "2000 millilitres")
+        XCTAssertEqual(goalSlider.value as? String, "\(grouped(2_000)) millilitres")
 
         // ── 04–05 · the two empty states, before any water ───────────────────────────────────────
         tapWhenReady(app.buttons["Continue"])
@@ -240,7 +247,7 @@ extension AppStoreScreenshotUITests {
         XCTAssertTrue(app.buttons["Not now"].waitForExistence(timeout: 10), "the welcome's last step did not appear")
         tapWhenReady(app.buttons["Not now"])
         XCTAssertTrue(vessel.waitForExistence(timeout: 10), "the root did not swap to HomeView")
-        XCTAssertEqual(vessel.value as? String, "0 percent. 0 of 2000 millilitres.")
+        XCTAssertEqual(vessel.value as? String, "0 percent. 0 of \(grouped(2_000)) millilitres.")
         Thread.sleep(forTimeInterval: settle)
         capture("04-home-empty-0")
 
@@ -258,7 +265,7 @@ extension AppStoreScreenshotUITests {
         XCTAssertTrue(vessel.waitForExistence(timeout: 5))
         pour("Cup", in: app)
         Thread.sleep(forTimeInterval: settle)
-        XCTAssertEqual(vessel.value as? String, "8 percent. 150 of 2000 millilitres.")
+        XCTAssertEqual(vessel.value as? String, "8 percent. 150 of \(grouped(2_000)) millilitres.")
         capture("06-home-sliver-8")
 
         for (index, name) in ["Bottle", "Glass", "Glass", "Cup"].enumerated() {
@@ -267,7 +274,7 @@ extension AppStoreScreenshotUITests {
             _ = index
         }
         Thread.sleep(forTimeInterval: settle)
-        XCTAssertEqual(vessel.value as? String, "65 percent. 1300 of 2000 millilitres.")
+        XCTAssertEqual(vessel.value as? String, "65 percent. \(grouped(1_300)) of \(grouped(2_000)) millilitres.")
         capture("07-home-partial-65")
 
         // ── 08 · History, five rows, five distinct minutes ───────────────────────────────────────
@@ -328,7 +335,7 @@ extension AppStoreScreenshotUITests {
         XCTAssertTrue(vessel.waitForExistence(timeout: 5))
         for _ in 0..<3 { pour("Cup", in: app); Thread.sleep(forTimeInterval: 1) }
         Thread.sleep(forTimeInterval: settle)
-        XCTAssertEqual(vessel.value as? String, "88 percent. 1750 of 2000 millilitres.")
+        XCTAssertEqual(vessel.value as? String, "88 percent. \(grouped(1_750)) of \(grouped(2_000)) millilitres.")
 
         app.buttons["History"].tap()
         XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 10))
@@ -343,7 +350,7 @@ extension AppStoreScreenshotUITests {
         // ── 14–15 · Settings, at rest and at max scroll ──────────────────────────────────────────
         app.buttons["Settings"].tap()
         XCTAssertTrue(goalSlider.waitForExistence(timeout: 10))
-        XCTAssertEqual(goalSlider.value as? String, "2000 millilitres")
+        XCTAssertEqual(goalSlider.value as? String, "\(grouped(2_000)) millilitres")
         Thread.sleep(forTimeInterval: settle)
         capture("14-settings-top-rest")
 
@@ -362,12 +369,12 @@ extension AppStoreScreenshotUITests {
         capture("16-home-confetti-burst")
 
         Thread.sleep(forTimeInterval: settle)
-        XCTAssertEqual(vessel.value as? String, "100 percent. 2000 of 2000 millilitres.")
+        XCTAssertEqual(vessel.value as? String, "100 percent. \(grouped(2_000)) of \(grouped(2_000)) millilitres.")
         capture("17-home-at-goal-100")
 
         pour("Bottle", in: app)
         Thread.sleep(forTimeInterval: settle)
-        XCTAssertEqual(vessel.value as? String, "125 percent. 2500 of 2000 millilitres.")
+        XCTAssertEqual(vessel.value as? String, "125 percent. \(grouped(2_500)) of \(grouped(2_000)) millilitres.")
         capture("18-home-over-goal-125")
 
         // ── 19 · a quick-add vessel edited — after every Home shot, because it rewrites labels ───

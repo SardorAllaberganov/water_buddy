@@ -121,7 +121,7 @@ private struct LockScreenRing: View {
             .privacySensitive()
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Today's hydration", bundle: strings))
-            .accessibilityValue(snapshot.spokenFigures(in: strings))
+            .accessibilityValue(snapshot.spokenFigures(in: strings, locale: locale))
         }
     }
 }
@@ -134,6 +134,7 @@ private struct LockScreenCard: View {
     let snapshot: WaterSnapshot
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
     @Environment(\.redactionReasons) private var redactionReasons
 
     var body: some View {
@@ -173,11 +174,11 @@ private struct LockScreenCard: View {
                 // The medium Home Screen widget's own two keys, so the two surfaces word today alike.
                 // Each hidden individually, as the medium family hides its own (rule
                 // `65-accessibility`): the column's combined element below speaks them.
-                Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), snapshot.currentWater))
+                Text(strings.localized("%1$d ml", snapshot.currentWater, locale: locale))
                     .font(.headline)
                     .accessibilityHidden(true)
 
-                Text(String(format: strings.localizedString(forKey: "of %1$d ml", value: nil, table: nil), snapshot.dailyGoal))
+                Text(strings.localized("of %1$d ml", snapshot.dailyGoal, locale: locale))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .accessibilityHidden(true)
@@ -200,7 +201,7 @@ private struct LockScreenCard: View {
             // (rule `65-accessibility`).
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Today's hydration", bundle: strings))
-            .accessibilityValue(snapshot.spokenFigures(in: strings))
+            .accessibilityValue(snapshot.spokenFigures(in: strings, locale: locale))
         }
     }
 }
@@ -238,7 +239,7 @@ private struct LockScreenLine: View {
             .privacySensitive()
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Today's hydration", bundle: strings))
-            .accessibilityValue(snapshot.spokenFigures(in: strings))
+            .accessibilityValue(snapshot.spokenFigures(in: strings, locale: locale))
         }
     }
 }
@@ -257,6 +258,7 @@ private struct LockScreenPourButton: View {
     let serving: Int
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
     @Environment(\.redactionReasons) private var redactionReasons
 
     var body: some View {
@@ -287,7 +289,7 @@ private struct LockScreenPourButton: View {
         if redactionReasons.contains(.privacy) {
             strings.localizedString(forKey: "Log Water", value: nil, table: nil)
         } else {
-            String(format: strings.localizedString(forKey: "Add %1$d millilitres", value: nil, table: nil), serving)
+            strings.localized("Add %1$d millilitres", serving, locale: locale)
         }
     }
 }
@@ -297,9 +299,9 @@ private struct LockScreenPourButton: View {
 private extension WaterSnapshot {
 
     /// The Home Screen vessel's own sentence — the percentage and both volumes — so VoiceOver says the
-    /// same thing about today on either screen.
-    func spokenFigures(in strings: Bundle) -> String {
-        String(format: strings.localizedString(forKey: "%1$d percent. %2$d of %3$d millilitres.", value: nil, table: nil), percentage, currentWater, dailyGoal)
+    /// same thing about today on either screen, in the forms and the grouping of `locale`.
+    func spokenFigures(in strings: Bundle, locale: Locale) -> String {
+        strings.localized("%1$d percent. %2$d of %3$d millilitres.", percentage, currentWater, dailyGoal, locale: locale)
     }
 }
 

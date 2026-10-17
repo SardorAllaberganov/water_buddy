@@ -211,6 +211,7 @@ private struct MediumColumn: View {
     let snapshot: WaterSnapshot
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     /// The medium family's hero figure. Scaled, because a widget honours Dynamic Type; bounded
     /// below by the column's own `minimumScaleFactor`.
@@ -218,7 +219,7 @@ private struct MediumColumn: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(String(format: strings.localizedString(forKey: "%1$d ml", value: nil, table: nil), snapshot.currentWater))
+            Text(strings.localized("%1$d ml", snapshot.currentWater, locale: locale))
                 .font(.system(size: totalSize, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white)
@@ -235,7 +236,7 @@ private struct MediumColumn: View {
             // fixed 28pt hero are the same size at default and cross over at the accessibility
             // sizes — the annotation ends up bigger than the number it annotates. A ratio
             // cannot invert.
-            Text(String(format: strings.localizedString(forKey: "of %1$d ml", value: nil, table: nil), snapshot.dailyGoal))
+            Text(strings.localized("of %1$d ml", snapshot.dailyGoal, locale: locale))
                 .font(.system(size: totalSize * 0.46, weight: .medium, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white.opacity(0.85))
@@ -270,6 +271,7 @@ private struct MediumColumn: View {
 private struct MiniVessel: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     /// A phase picked so both waves show a crest and a trough across the vessel's width rather
     /// than crossing zero flat in the middle.
@@ -323,7 +325,7 @@ private struct MiniVessel: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Today's hydration", bundle: strings))
-        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d percent. %2$d of %3$d millilitres.", value: nil, table: nil), snapshot.percentage, snapshot.currentWater, snapshot.dailyGoal))
+        .accessibilityValue(strings.localized("%1$d percent. %2$d of %3$d millilitres.", snapshot.percentage, snapshot.currentWater, snapshot.dailyGoal, locale: locale))
     }
 
     @ViewBuilder
@@ -404,6 +406,7 @@ private struct MiniVessel: View {
 struct PourButton: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     enum Shape {
         case circle, capsule
@@ -432,7 +435,7 @@ struct PourButton: View {
         }
         // Without this the system draws `WidgetBorderedButtonStyle`'s capsule over the glass pane.
         .buttonStyle(.plain)
-        .accessibilityLabel(String(format: strings.localizedString(forKey: "Add %1$d millilitres", value: nil, table: nil), serving))
+        .accessibilityLabel(strings.localized("Add %1$d millilitres", serving, locale: locale))
     }
 
     @ViewBuilder
@@ -447,7 +450,7 @@ struct PourButton: View {
                 .contentShape(Circle())
 
         case .capsule:
-            Text(String(format: strings.localizedString(forKey: "+%1$d ml", value: nil, table: nil), serving))
+            Text(strings.localized("+%1$d ml", serving, locale: locale))
                 .font(.callout.weight(.semibold))
                 .monospacedDigit()
                 .foregroundStyle(.white)

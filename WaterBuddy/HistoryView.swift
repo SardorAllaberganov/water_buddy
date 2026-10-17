@@ -428,7 +428,7 @@ struct HistoryView: View {
     private func heading(_ title: Text) -> some View {
         title
             .accessibilityLabel(spokenDay)
-            .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d of %2$d millilitres", value: nil, table: nil), shownTotal, manager.dailyGoal))
+            .accessibilityValue(strings.localized("%1$d of %2$d millilitres", shownTotal, manager.dailyGoal, locale: locale))
             .accessibilityAddTraits(.isHeader)
     }
 
@@ -687,7 +687,7 @@ private struct HistoryCard: View {
     }
 
     private var title: some View {
-        Text(String(format: strings.localizedString(forKey: "Last %1$d days", value: nil, table: nil), DataManager.historyWindow))
+        Text(strings.localized("Last %1$d days", DataManager.historyWindow, locale: locale))
             .font(.callout.weight(.semibold))
             // Two lines before a word is cut. On one, at the largest text size in Russian, the
             // title read *Последние 7 дн…* — and the card is a row of the list now, with the
@@ -697,13 +697,14 @@ private struct HistoryCard: View {
             .fixedSize(horizontal: false, vertical: true)
             // The card's summary, spoken once: the average, the best and the days the goal was met
             // ride on its title as a value, and the figures that draw them are hidden below.
-            // Spoken as raw numbers, where the figures are drawn grouped.
-            .accessibilityValue(String(
-                format: strings.localizedString(forKey: "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.", value: nil, table: nil),
+            // Spoken grouped, as the figures are drawn (rule `50-views`).
+            .accessibilityValue(strings.localized(
+                "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.",
                 DaySummary.average(of: manager.history),
                 DaySummary.best(of: manager.history),
                 DaySummary.daysMet(in: manager.history, goal: manager.dailyGoal),
-                manager.history.count
+                manager.history.count,
+                locale: locale
             ))
     }
 
@@ -771,7 +772,7 @@ private struct HistoryCard: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(name(of: day))
-        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), day.total))
+        .accessibilityValue(strings.localized("%1$d millilitres", day.total, locale: locale))
         .accessibilityAddTraits(isShown ? [.isSelected] : [])
     }
 
@@ -1035,13 +1036,16 @@ private struct LetterCentres: PreferenceKey {
 /// holds no calendar (rule `30-rollover`) — so a 23- or 25-hour day draws correctly and an hour's
 /// label stands where a serving poured on that hour stands.
 ///
-/// **VoiceOver hears the title, as a heading, and nothing else.** The bars repeat the rows under
-/// this card, each of which speaks its own amount and time; the reminder's mark repeats Home's
-/// line (rule `65-accessibility`).
+/// **VoiceOver hears the title, as a heading, with the count of servings as its value, and nothing
+/// else.** The bars repeat the rows under this card, each of which speaks its own amount and time;
+/// the reminder's mark repeats Home's line; the drawn count repeats the heading's value
+/// (rule `65-accessibility`). That each is silent is the design, unverified with VoiceOver: XCUITest
+/// lists hidden text in this list's rows (`docs/AI_CONTEXT.md` known issue #139).
 private struct DayStrip: View {
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     /// The shown day's servings.
     let logs: [WaterLog]
@@ -1090,15 +1094,54 @@ private struct DayStrip: View {
         return manager.hours(HistoryView.stripHours, onDayOf: anchor)
     }
 
+    /// *When you drank*, and how many times. The count trails the heading, and moves under it where the
+    /// two do not fit on one line at the text size in use (spec 2026-10-16 §3.5).
+    private var heading: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                title
+                    .fixedSize()
+                Spacer(minLength: 0)
+                count
+                    .fixedSize()
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                title
+                count
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var title: some View {
+        Text("When you drank", bundle: strings)
+            .font(.callout.weight(.semibold))
+            // Two lines before a word is cut, as the week card's title has.
+            .lineLimit(2)
+            .minimumScaleFactor(0.7)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityValue(servings)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    /// In the week card's label style, white at 0.9 on this pane — the pair the strip's hour labels
+    /// measure (`docs/DESIGN.md`, *Strip: hour label*). Hidden: the heading speaks it.
+    private var count: some View {
+        Text(servings)
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.white.opacity(0.9))
+            .accessibilityHidden(true)
+    }
+
+    /// *5 servings*, *5 порций*, *5 porsiya*. The rows the bars are drawn from; the card is drawn
+    /// only for a day that has one (`HistoryView`'s `if shownLogs.isEmpty`), so never *0*.
+    private var servings: String {
+        strings.localized("%1$d servings", logs.count, locale: locale)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("When you drank", bundle: strings)
-                .font(.callout.weight(.semibold))
-                // Two lines before a word is cut, as the week card's title has.
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityAddTraits(.isHeader)
+            heading
 
             VStack(spacing: 6) {
                 plot
@@ -1296,7 +1339,7 @@ private struct ServingRow: View {
         // regardless. The wrapper became a second element above it and every serving was
         // announced twice — "250 millilitres, 21:22", then "250 ml, 21:22, button". Only the real
         // accessibility tree shows that; no unit test in this project can see one.
-        .accessibilityLabel(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), log.amount))
+        .accessibilityLabel(strings.localized("%1$d millilitres", log.amount, locale: locale))
         .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
         .accessibilityHint(Text("Edits this serving", bundle: strings))
     }
@@ -1363,6 +1406,7 @@ private struct ServingSheet: View {
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
     @Environment(\.dismiss) private var dismiss
 
     /// The amount under the finger, as an `Int` for the same reason every other volume here is
@@ -1483,7 +1527,7 @@ private struct ServingSheet: View {
         // A `Slider`'s stock VoiceOver value is a percentage of its range, which here would
         // announce "21%" for 250 ml — a number that appears nowhere in the product.
         .accessibilityLabel(Text("Serving amount", bundle: strings))
-        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), amount))
+        .accessibilityValue(strings.localized("%1$d millilitres", amount, locale: locale))
         .padding(.horizontal, 24)
 
         shortcuts
@@ -1596,7 +1640,7 @@ private struct ServingSheet: View {
         // The glyph is what says "cup" on screen; the name is what says it aloud, and the amount
         // is the value.
         .accessibilityLabel(Text(verbatim: serving.name(in: strings)))
-        .accessibilityValue(String(format: strings.localizedString(forKey: "%1$d millilitres", value: nil, table: nil), serving.amount))
+        .accessibilityValue(strings.localized("%1$d millilitres", serving.amount, locale: locale))
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 

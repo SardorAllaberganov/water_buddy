@@ -98,7 +98,7 @@ final class WristModel {
     /// materialises into its own suite for a fresh install (`DataManager.init`), so the two devices
     /// already agree on it before they have ever spoken — and the moment a real mirror lands, this
     /// switches to the phone's own number with no reconciliation needed, because nothing was ever
-    /// *stored* here. `WristView.attribution(mirror:now:strings:)` names which of the two is on
+    /// *stored* here. `WristView.attribution(mirror:now:strings:locale:)` names which of the two is on
     /// screen, so the number is attributed rather than asserted (spec §5's "withheld and
     /// attributed, never a confident zero", read across to the never-synced case).
     ///

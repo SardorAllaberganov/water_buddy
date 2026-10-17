@@ -121,21 +121,15 @@ struct WristVessel: View {
         min(1, max(0, level / scrimFullStrengthLevel))
     }
 
-    /// `1 250 / 2 000 мл` — both figures grouped the way the language being drawn groups them.
-    ///
-    /// **Deliberately not the phone's `%1$d / %2$d ml`.** `%d` never groups, which is why the phone
-    /// draws `1300 / 2000 ml` in every language (spec 2026-10-06 §8.1). The watch grouped this
-    /// readout before it was ever localized, and the owner chose to keep that (§3, ruling 3): the
-    /// figures are formatted first, against the locale `WristRoot` injects beside the bundle, and
-    /// handed to a `%1$@ / %2$@ ml` key only the watch holds.
+    /// `1 250 / 2 000 мл` — both figures grouped the way the language being drawn groups them,
+    /// through ``Bundle/figure(_:_:locale:)`` as the phone's own volumes are, against the locale
+    /// `WristRoot` injects beside the bundle, set into a `%1$@ / %2$@ ml` key only the watch holds.
+    /// The watch grouped this readout before it was ever localized, and the owner chose to keep that
+    /// (spec 2026-10-06 §3, ruling 3).
     ///
     /// `nonisolated static` and free of view state, so `WristViewLogicTests` can pin it.
     nonisolated static func readout(volume: Int, goal: Int, strings: Bundle, locale: Locale) -> String {
-        String(
-            format: strings.localizedString(forKey: "%1$@ / %2$@ ml", value: nil, table: nil),
-            volume.formatted(.number.locale(locale)),
-            goal.formatted(.number.locale(locale))
-        )
+        strings.figure("%1$@ / %2$@ ml", volume, goal, locale: locale)
     }
 }
 

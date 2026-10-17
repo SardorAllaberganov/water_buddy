@@ -49,21 +49,21 @@ struct WristViewLogicTests {
     @Test
     func syncedJustNowReadsAsNow() throws {
         let english = try #require(shipped("en"))
-        let text = WristView.syncedCaption(composedAt: Date(timeIntervalSince1970: 1_000), now: Date(timeIntervalSince1970: 1_030), strings: english)
+        let text = WristView.syncedCaption(composedAt: Date(timeIntervalSince1970: 1_000), now: Date(timeIntervalSince1970: 1_030), strings: english, locale: Locale(identifier: "en"))
         #expect(text == "Synced just now")
     }
 
     @Test
     func syncedMinutesAgoReadsInWholeMinutes() throws {
         let english = try #require(shipped("en"))
-        let text = WristView.syncedCaption(composedAt: Date(timeIntervalSince1970: 1_000), now: Date(timeIntervalSince1970: 1_000 + 245), strings: english)
+        let text = WristView.syncedCaption(composedAt: Date(timeIntervalSince1970: 1_000), now: Date(timeIntervalSince1970: 1_000 + 245), strings: english, locale: Locale(identifier: "en"))
         #expect(text == "Synced 4m ago")
     }
 
     @Test
     func noMirrorYetReadsAsNeverSynced() throws {
         let english = try #require(shipped("en"))
-        #expect(WristView.syncedCaption(composedAt: nil, now: .now, strings: english) == "Not yet synced")
+        #expect(WristView.syncedCaption(composedAt: nil, now: .now, strings: english, locale: Locale(identifier: "en")) == "Not yet synced")
     }
 
     // MARK: - Attribution (the always-present line, spec §8's "never an alert")
@@ -92,7 +92,7 @@ struct WristViewLogicTests {
     @Test
     func beforeTheFirstSyncTheAttributionNamesTheDefaultGoal() throws {
         let english = try #require(shipped("en"))
-        let text = WristView.attribution(mirror: nil, now: Date(timeIntervalSince1970: 1_000), strings: english)
+        let text = WristView.attribution(mirror: nil, now: Date(timeIntervalSince1970: 1_000), strings: english, locale: Locale(identifier: "en"))
         #expect(text == "Not yet synced · default goal")
     }
 
@@ -101,14 +101,14 @@ struct WristViewLogicTests {
     @Test
     func aMirrorWithNoGoalSetAsksForSetupOnTheePhone() throws {
         let english = try #require(shipped("en"))
-        let text = WristView.attribution(mirror: Self.mirror(isGoalSet: false), now: Date(timeIntervalSince1970: 1_030), strings: english)
+        let text = WristView.attribution(mirror: Self.mirror(isGoalSet: false), now: Date(timeIntervalSince1970: 1_030), strings: english, locale: Locale(identifier: "en"))
         #expect(text == "Set your goal in WaterBuddy on iPhone")
     }
 
     @Test
     func aFullySyncedMirrorFallsBackToTheSyncedCaption() throws {
         let english = try #require(shipped("en"))
-        let text = WristView.attribution(mirror: Self.mirror(isGoalSet: true), now: Date(timeIntervalSince1970: 1_000 + 245), strings: english)
+        let text = WristView.attribution(mirror: Self.mirror(isGoalSet: true), now: Date(timeIntervalSince1970: 1_000 + 245), strings: english, locale: Locale(identifier: "en"))
         #expect(text == "Synced 4m ago")
     }
 
@@ -118,11 +118,11 @@ struct WristViewLogicTests {
     func everyCaptionReadsInRussian() throws {
         let russian = try #require(shipped("ru"))
         let start = Date(timeIntervalSince1970: 1_000)
-        let neverSynced = WristView.attribution(mirror: nil, now: start, strings: russian)
-        let noGoal = WristView.attribution(mirror: Self.mirror(isGoalSet: false), now: start, strings: russian)
-        let noDate = WristView.syncedCaption(composedAt: nil, now: start, strings: russian)
-        let justNow = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(30), strings: russian)
-        let minutes = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(245), strings: russian)
+        let neverSynced = WristView.attribution(mirror: nil, now: start, strings: russian, locale: Locale(identifier: "ru"))
+        let noGoal = WristView.attribution(mirror: Self.mirror(isGoalSet: false), now: start, strings: russian, locale: Locale(identifier: "ru"))
+        let noDate = WristView.syncedCaption(composedAt: nil, now: start, strings: russian, locale: Locale(identifier: "ru"))
+        let justNow = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(30), strings: russian, locale: Locale(identifier: "ru"))
+        let minutes = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(245), strings: russian, locale: Locale(identifier: "ru"))
 
         #expect(neverSynced == "Нет синхронизации · цель по умолчанию")
         #expect(noGoal == "Задайте цель в WaterBuddy на iPhone")
@@ -137,11 +137,11 @@ struct WristViewLogicTests {
     func everyCaptionReadsInUzbek() throws {
         let uzbek = try #require(shipped("uz"))
         let start = Date(timeIntervalSince1970: 1_000)
-        let neverSynced = WristView.attribution(mirror: nil, now: start, strings: uzbek)
-        let noGoal = WristView.attribution(mirror: Self.mirror(isGoalSet: false), now: start, strings: uzbek)
-        let noDate = WristView.syncedCaption(composedAt: nil, now: start, strings: uzbek)
-        let justNow = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(30), strings: uzbek)
-        let minutes = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(245), strings: uzbek)
+        let neverSynced = WristView.attribution(mirror: nil, now: start, strings: uzbek, locale: Locale(identifier: "uz"))
+        let noGoal = WristView.attribution(mirror: Self.mirror(isGoalSet: false), now: start, strings: uzbek, locale: Locale(identifier: "uz"))
+        let noDate = WristView.syncedCaption(composedAt: nil, now: start, strings: uzbek, locale: Locale(identifier: "uz"))
+        let justNow = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(30), strings: uzbek, locale: Locale(identifier: "uz"))
+        let minutes = WristView.syncedCaption(composedAt: start, now: start.addingTimeInterval(245), strings: uzbek, locale: Locale(identifier: "uz"))
 
         #expect(neverSynced == "Hali sinxronlanmagan · standart maqsad")
         #expect(noGoal == "Maqsadni iPhone’dagi WaterBuddy’da belgilang")
@@ -157,7 +157,7 @@ struct WristViewLogicTests {
         let strings = try #require(shipped(language))
         let expected = ["en": "Synced just now", "ru": "Синхронизировано только что", "uz": "Hozirgina sinxronlandi"]
         let watchNow = Date(timeIntervalSince1970: 1_000)
-        let text = WristView.syncedCaption(composedAt: watchNow.addingTimeInterval(180), now: watchNow, strings: strings)
+        let text = WristView.syncedCaption(composedAt: watchNow.addingTimeInterval(180), now: watchNow, strings: strings, locale: Locale(identifier: language))
         #expect(text == expected[language])
     }
 

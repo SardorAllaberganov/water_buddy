@@ -44,6 +44,14 @@ func completeWelcomeIfShown(_ app: XCUIApplication) {
     tapWhenReady(notNow)
 }
 
+/// A volume as the welcome speaks it: *2,000 millilitres* — grouped by the device's own region, as
+/// the app groups it on *Follow device*, the language a fresh start has (spec 2026-10-16 §6.3). The
+/// gate devices are in `en_UZ`, which groups with a space: a figure written with a comma here would
+/// be a test of one region, not of the app.
+private func spoken(_ millilitres: Int) -> String {
+    "\(millilitres.formatted(.number)) millilitres"
+}
+
 /// The welcome, from outside the process (spec 2026-10-14 §10).
 ///
 /// **The only class that launches with the fresh start.** A DEBUG build given
@@ -191,12 +199,12 @@ final class WelcomeUITests: XCTestCase {
         let bottle = app.sliders["Bottle"]
         XCTAssertTrue(bottle.waitForExistence(timeout: 5))
         bottle.adjust(toNormalizedSliderPosition: 1)
-        XCTAssertEqual(bottle.value as? String, "1000 millilitres")
+        XCTAssertEqual(bottle.value as? String, spoken(1_000))
 
         tapWhenReady(app.buttons["Continue"])
         tapWhenReady(app.buttons["Not now"])
         XCTAssertTrue(
-            app.buttons["Bottle, add 1000 millilitres"].waitForExistence(timeout: 5),
+            app.buttons["Bottle, add \(spoken(1_000))"].waitForExistence(timeout: 5),
             "Home does not pour the bottle the welcome set"
         )
     }
@@ -215,11 +223,11 @@ final class WelcomeUITests: XCTestCase {
         XCTAssertTrue(bottle.waitForExistence(timeout: 5), "Settings did not appear")
         for _ in 0..<3 where !bottle.isHittable { app.swipeUp() }
         bottle.adjust(toNormalizedSliderPosition: 1)
-        XCTAssertEqual(bottle.value as? String, "1000 millilitres")
+        XCTAssertEqual(bottle.value as? String, spoken(1_000))
 
         app.buttons["Home"].tap()
         XCTAssertTrue(
-            app.buttons["Bottle, add 1000 millilitres"].waitForExistence(timeout: 5),
+            app.buttons["Bottle, add \(spoken(1_000))"].waitForExistence(timeout: 5),
             "a vessel edited in Settings was not saved"
         )
     }
@@ -294,14 +302,14 @@ final class WelcomeUITests: XCTestCase {
     @MainActor
     func testUseSetsTheGoalItSuggests() throws {
         let app = calculatorOpen()
-        let use = app.buttons["Use 2500 millilitres"]
+        let use = app.buttons["Use \(spoken(2_500))"]
         XCTAssertTrue(use.waitForExistence(timeout: 5), "the calculator did not suggest 2,500 at its starting weight")
-        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, "2000 millilitres", "the goal moved before Use was tapped")
+        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, spoken(2_000), "the goal moved before Use was tapped")
 
         use.tap()
 
-        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, "2500 millilitres")
-        XCTAssertFalse(app.buttons["Use 2500 millilitres"].exists, "Use is still offered for the goal it already set")
+        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, spoken(2_500))
+        XCTAssertFalse(app.buttons["Use \(spoken(2_500))"].exists, "Use is still offered for the goal it already set")
     }
 
     /// The activity moves the suggestion, and nothing else (decision W1). Both units' starts agree
@@ -314,12 +322,12 @@ final class WelcomeUITests: XCTestCase {
         XCTAssertTrue(moderate.isSelected, "the calculator does not start at Moderate")
 
         app.buttons["Active, Exercise most days"].tap()
-        XCTAssertTrue(app.buttons["Use 2800 millilitres"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Use \(spoken(2_800))"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Active, Exercise most days"].isSelected)
 
         app.buttons["Light, Mostly sitting"].tap()
-        XCTAssertTrue(app.buttons["Use 2100 millilitres"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, "2000 millilitres", "picking an activity moved the goal")
+        XCTAssertTrue(app.buttons["Use \(spoken(2_100))"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, spoken(2_000), "picking an activity moved the goal")
     }
 
     /// The unit switch converts the weight shown, whichever unit the region started in: kilograms
@@ -336,19 +344,19 @@ final class WelcomeUITests: XCTestCase {
 
         app.buttons["lb"].tap()
         XCTAssertEqual(app.pickerWheels.firstMatch.value as? String, "154 lb")
-        XCTAssertTrue(app.buttons["Use 2400 millilitres"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Use \(spoken(2_400))"].waitForExistence(timeout: 5))
     }
 
     /// Use, then the goal moved away: *Use* comes back with the same figure (Review Focus 1).
     @MainActor
     func testUseComesBackWhenTheGoalIsMovedAway() throws {
         let app = calculatorOpen()
-        app.buttons["Use 2500 millilitres"].tap()
-        XCTAssertFalse(app.buttons["Use 2500 millilitres"].exists)
+        app.buttons["Use \(spoken(2_500))"].tap()
+        XCTAssertFalse(app.buttons["Use \(spoken(2_500))"].exists)
 
         app.sliders["Daily water goal"].adjust(toNormalizedSliderPosition: 1)
-        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, "4000 millilitres")
-        XCTAssertTrue(app.buttons["Use 2500 millilitres"].waitForExistence(timeout: 5), "Use did not come back")
+        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, spoken(4_000))
+        XCTAssertTrue(app.buttons["Use \(spoken(2_500))"].waitForExistence(timeout: 5), "Use did not come back")
     }
 
     /// Continue and Back keep a step as it was left: the panel open, the pick, the goal
@@ -357,14 +365,14 @@ final class WelcomeUITests: XCTestCase {
     func testAStepIsAsItWasLeftWhenBackReturnsToIt() throws {
         let app = calculatorOpen()
         app.buttons["Active, Exercise most days"].tap()
-        app.buttons["Use 2800 millilitres"].tap()
+        app.buttons["Use \(spoken(2_800))"].tap()
 
         tapWhenReady(app.buttons["Continue"])
         XCTAssertTrue(app.sliders["Bottle"].waitForExistence(timeout: 5))
         tapWhenReady(app.buttons["Back"])
 
         XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, "2800 millilitres")
+        XCTAssertEqual(app.sliders["Daily water goal"].value as? String, spoken(2_800))
         XCTAssertTrue(app.buttons["Active, Exercise most days"].isSelected, "the pick was lost")
     }
 }

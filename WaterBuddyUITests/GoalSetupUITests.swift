@@ -514,6 +514,54 @@ final class GoalSetupUITests: XCTestCase {
             app.descendants(matching: .any).matching(identifier: "When you drank").count, 1,
             "the strip's heading must resolve to exactly one element"
         )
+        assertTheStripHeadingSpeaksItsCount(in: app)
+    }
+
+    /// The strip's heading carries the day's count of servings as its value, with the noun in that
+    /// count's form (spec 2026-10-16 §3.5).
+    ///
+    /// Whether the drawn count is also an element of its own is not asked here, because XCUITest
+    /// cannot answer it in History: inside its `List` rows it lists text marked
+    /// `.accessibilityHidden(true)` — the count, the strip's hour labels, the week card's figures —
+    /// where the hidden texts tried on Home were absent. What VoiceOver does with them is a device check
+    /// (`docs/AI_CONTEXT.md` known issue #139).
+    @MainActor
+    private func assertTheStripHeadingSpeaksItsCount(in app: XCUIApplication) {
+        let heading = app.descendants(matching: .any).matching(identifier: "When you drank").firstMatch
+        let value = heading.value as? String ?? ""
+        let count = Int(value.split(separator: " ").first?.filter(\.isNumber) ?? "") ?? 0
+        XCTAssertGreaterThan(count, 0, "the strip's heading carries no count: \"\(value)\"")
+        XCTAssertEqual(value, "\(count.formatted(.number)) \(count == 1 ? "serving" : "servings")",
+                       "the strip's heading does not speak its count with its noun")
+    }
+
+    /// At the largest text size the count may move under the heading; the heading is still one
+    /// element, and still speaks it (rule `65-accessibility`).
+    @MainActor
+    func testTheStripSpeaksItsCountAtTheLargestTextSize() throws {
+        let setup = launchedOnHome()
+        setup.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Glass,")).firstMatch.tap()
+        setup.terminate()
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+        // At this size the header and the week card fill the screen, and a lazy list builds only what
+        // is on it.
+        let heading = app.descendants(matching: .any).matching(identifier: "When you drank").firstMatch
+        var swipes = 0
+        while !heading.exists && swipes < 3 {
+            app.swipeUp()
+            swipes += 1
+        }
+        XCTAssertTrue(heading.waitForExistence(timeout: 5), "a day with a serving draws no strip")
+        XCTAssertEqual(app.descendants(matching: .any).matching(identifier: "When you drank").count, 1,
+                       "the strip's heading must resolve to exactly one element")
+        assertTheStripHeadingSpeaksItsCount(in: app)
     }
 
     /// The sheet's three vessels, from outside the process: each is one button, the one whose
@@ -594,7 +642,8 @@ final class GoalSetupUITests: XCTestCase {
             let figure = shortcut.staticTexts.firstMatch
             XCTAssertTrue(figure.exists, "\(name) draws no figure at all")
 
-            let digits = (shortcut.value as? String ?? "").prefix { $0.isNumber }.count
+            // The figure's digits, its grouping separator aside: *1,000 millilitres* is four.
+            let digits = (shortcut.value as? String ?? "").split(separator: " ").first?.filter(\.isNumber).count ?? 0
             XCTAssertGreaterThan(digits, 0, "\(name)'s value did not carry its amount")
             XCTAssertGreaterThanOrEqual(
                 figure.frame.width, figure.frame.height * 0.4 * CGFloat(digits),
@@ -706,15 +755,16 @@ final class GoalSetupUITests: XCTestCase {
     // MARK: - Home's header and Undo
 
     /// The vessel's value ends "… <total> of <goal> millilitres." — the one place a UI test can
-    /// read today's total, and why that spoken string keeps its `%d` keys.
+    /// read today's total. Its figures are grouped as the screen's are (*1,300*), so the digits are
+    /// read without the separator.
     private static func total(in app: XCUIApplication) -> Int {
         let words = (app.otherElements["Today's hydration"].value as? String ?? "").split(separator: " ")
-        return words.count > 2 ? Int(words[2]) ?? -1 : -1
+        return words.count > 2 ? Int(words[2].filter(\.isNumber)) ?? -1 : -1
     }
 
-    /// Waits until the vessel speaks `total`, and says whether it did.
+    /// Waits until the vessel speaks `total`, grouped as the app groups it, and says whether it did.
     private static func waitForTotal(_ total: Int, in app: XCUIApplication) -> Bool {
-        let spoken = NSPredicate(format: "value CONTAINS %@", " \(total) of ")
+        let spoken = NSPredicate(format: "value CONTAINS %@", " \(total.formatted(.number)) of ")
         let reached = XCTNSPredicateExpectation(predicate: spoken, object: app.otherElements["Today's hydration"])
         return XCTWaiter().wait(for: [reached], timeout: 5) == .completed
     }
@@ -864,6 +914,47 @@ final class GoalSetupUITests: XCTestCase {
             title.frame.height, reached.frame.height * 1.3,
             "the title was drawn smaller than its text style — the chip beside it took its room"
         )
+        assertTheChipSpeaksItsCountWithItsNoun(chip)
+    }
+
+    /// The chip's value is its count with the noun in that count's form — *1 day*, *12 days* — not a
+    /// bare number (spec 2026-10-16 §3.4). Read for whatever streak the device holds: a gate device
+    /// keeps the servings earlier runs poured, so the count is not known here.
+    @MainActor
+    private func assertTheChipSpeaksItsCountWithItsNoun(_ chip: XCUIElement) {
+        let value = chip.value as? String ?? ""
+        let count = Int(value.split(separator: " ").first?.filter(\.isNumber) ?? "") ?? 0
+        XCTAssertGreaterThan(count, 0, "the chip's value carries no count: \"\(value)\"")
+        XCTAssertEqual(value, "\(count.formatted(.number)) \(count == 1 ? "day" : "days")",
+                       "the chip does not speak its count with its noun")
+    }
+
+    /// At the largest text size the chip may draw its count alone beside the title; it still speaks
+    /// the noun, and is still one element (rule `65-accessibility`).
+    @MainActor
+    func testTheChipSpeaksItsNounAtTheLargestTextSize() throws {
+        launchedOnHome().terminate()
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 5), "the app did not open on Home")
+
+        let reached = app.staticTexts["Goal reached"]
+        let bottle = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Bottle,")).firstMatch
+        var pours = 0
+        while !reached.exists && pours < 20 {
+            bottle.tap()
+            pours += 1
+            _ = reached.waitForExistence(timeout: 1)
+        }
+        XCTAssertTrue(reached.exists, "the goal was not reached after \(pours) Bottles")
+
+        let chip = app.descendants(matching: .any).matching(identifier: "Day streak").firstMatch
+        XCTAssertTrue(chip.waitForExistence(timeout: 5), "a day that reached its goal shows no streak")
+        XCTAssertEqual(app.descendants(matching: .any).matching(identifier: "Day streak").count, 1,
+                       "the streak must resolve to exactly one element")
+        assertTheChipSpeaksItsCountWithItsNoun(chip)
     }
 
     /// The whole of Undo, from outside the process: a pour offers it, and taking it removes that
@@ -901,7 +992,7 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertGreaterThan(afterGlass, before)
 
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Cup,")).firstMatch.tap()
-        let moved = NSPredicate(format: "NOT (value CONTAINS %@)", " \(afterGlass) of ")
+        let moved = NSPredicate(format: "NOT (value CONTAINS %@)", " \(afterGlass.formatted(.number)) of ")
         let poured = XCTNSPredicateExpectation(predicate: moved, object: app.otherElements["Today's hydration"])
         XCTAssertEqual(XCTWaiter().wait(for: [poured], timeout: 5), .completed, "the second pour did not land")
 
@@ -1066,10 +1157,11 @@ final class GoalSetupUITests: XCTestCase {
         return ["Today"] + past.map(formatter.string(from:))
     }
 
-    /// A day's total, off its button on the week card: the value reads "<n> millilitres".
+    /// A day's total, off its button on the week card: the value reads "<n> millilitres", the figure
+    /// grouped.
     @MainActor
     private static func millilitres(on day: XCUIElement) -> Int {
-        Int((day.value as? String ?? "").split(separator: " ").first ?? "") ?? -1
+        Int((day.value as? String ?? "").split(separator: " ").first?.filter(\.isNumber) ?? "") ?? -1
     }
 
     /// Brings a serving row clear of the tab bar. With two cards above the servings, a day's
