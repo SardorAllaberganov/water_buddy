@@ -3892,3 +3892,110 @@ the 2026-10-14 lesson on token users predicts.
 apply to its kind — "if a key is added", "if a token changes", "a new … must" — and answer each one in
 place, with a dated note even when the answer is "none". When code starts reading a value the design
 sheet describes, name the new reader in that value's section.
+
+## 2026-10-16 — A plural table is read by the format's locale, not the bundle's language
+
+**What happened.** Designing roadmap item 1.2.6 (#40), the obvious fix was to give the Russian keys
+plural variations in the catalogues and change nothing else. A throwaway probe on macOS (Darwin 27.0)
+compiled a three-key catalogue with `xcstringstool` and resolved it as this app does, but for the
+table's name (`Probe` there, `Localizable` here) — the `.lproj` bundle's `localizedString(forKey:)`,
+then `String(format:)` — and the Russian table came out by the English rule: *Добавить 5
+миллилитра*, *21 миллилитра*. `String(format:)` with no locale, under the two English process locales
+tried, and with `en_US` passed, chooses the form by English; only a Russian locale passed to the
+format chose Russian. And
+every locale that did — `ru`, `ru_RU`, `ru_RU_POSIX`, `ru@numbers=latn`, `ru-u-nu-latn` — also
+grouped the `%d` (*1 240*). Only `en_US_POSIX` printed *1240*, by the English rule. The two cannot be
+had apart, which made "spoken figures stay ungrouped" a cost of the fix rather than a detail.
+
+**Why it matters here.** The app picks its language by choosing a bundle, not by the process's
+locale, so a phone in English with the app in Russian is the ordinary case, and it is exactly the case
+where a locale-less format is wrong. The catalogue would have looked right in Xcode's editor, and
+every test that compares one bundle's raw value with another's would have passed: a key with forms
+resolves to the same format key — `%#@value@` — in the app's English or Russian table and in the
+widget's. (Other tests in this suite would have failed, for a different reason: the key leaves the
+English and Russian `.strings` but not the Uzbek one, and a `%#@…@` value has no `%1$d` for the
+argument checks to find.)
+
+**The rule:** before relying on a localization mechanism, probe it in the call shape the code uses —
+the same bundle construction, the same format call — under a process language that differs from the
+table's. Scratch-compile a catalogue with `xcrun xcstringstool compile`; it costs a minute. And test
+plural forms by formatting sentences, never by comparing resolved values.
+
+## 2026-10-16 — In zsh, `path` is `PATH`
+
+**What happened.** A scratch script that checked this file's line counts read its rows with
+`while read -r path count rest`. In zsh `path` is the array tied to `PATH`, so the first row replaced
+the search path: every `wc` and `tr` after it was "command not found", and every row read as stale.
+
+**The rule:** never name a shell variable `path` (or `cdpath`, `fpath`, `manpath`) in a zsh script;
+`file` will do. A check that reports every row wrong is a broken check before it is a finding.
+
+## 2026-10-17 — A reader's finding was fixed where it pointed, and its copies kept the old claim
+
+**What happened.** The sixty-fourth pass's two readers found 28 problems in 1.2.6's spec and its
+records, and all 28 were taken. The owner's `/doc_sync` the next morning gave the corrected text to
+two more readers, who found 26 (`docsync-65-reader-a.md`, `-b.md`). Among them were copies of claims
+the first round had narrowed in one place only:
+- the spec's §2 said "under both process locales tried … both English", and its proposed `50-views`
+  wording still said Foundation picks a counted noun's English form "in every language";
+- the spec and `docs/ROADMAP.md`'s §8 note said "one of two helpers", and the roadmap's note on
+  1.2.6 still said "one new helper";
+- this file's entry of 2026-10-16 on plural tables still lists five of the seven Russian locales the
+  probe tried, and says the Russian forms and ungrouped figures "cannot be had apart" — what was
+  measured is that none of the seven tried gave them apart.
+
+Reader B found one more error here: the entry on `path` says the script "checked this file's
+line counts". It read the file table in `docs/AI_CONTEXT.md`. Both entries stay as written; this one
+corrects them.
+
+**The rule:** a finding that narrows a claim is fixed only when every file the pass wrote — the
+spec, the sheets, this file, `HISTORY.md` — has been searched for the claim's words, and each copy
+changed or, in an append-only file, corrected in a new entry. The 2026-10-14 lesson says a claim a
+change makes false is written in more than one place. So is a claim a reader makes false.
+
+## 2026-10-17 — A UI test's figure is grouped by the device, and every device here is en_UZ
+
+**What happened.** Roadmap item 1.2.6's plan wrote the welcome's grouped figures as literals with a
+comma — `"1,000 millilitres"`. The welcome's UI tests launch on a fresh start, so the app is on
+*Follow device*, whose locale is `.autoupdatingCurrent`; and every simulator on this Mac — the gates,
+the probes, the screenshot device — has `AppleLocale` `en_UZ`, the host's region, which groups with a
+space. The app spoke *1 000 millilitres*; the test wanted *1,000*. The plan's own `GoalSetup` helpers
+had it right: they format with `.formatted(.number)` in the runner, whose locale is the device's.
+
+**The rule:** in a UI test, never write a grouped figure as a literal. Format it with
+`.formatted(.number)` — the device's own grouping, which is the app's on *Follow device* — and check a
+device's region with `plutil -extract AppleLocale raw` on its `.GlobalPreferences.plist` before
+reasoning about what it should print.
+
+## 2026-10-17 — XCUITest lists hidden text in History's List rows, and a listed child proves nothing
+
+**What happened.** A new UI assertion, "the drawn count is not a second element", failed although the
+count carried `.accessibilityHidden(true)`. A throwaway probe found, with controls:
+- `app.staticTexts[value]` matched the heading itself — the subscript also matches an element's
+  *value*, so the assertion as written could never pass;
+- in History's `List` rows XCUITest listed each hidden text tried — the new count, the strip's hour
+  labels, the week card's figures (the last two at HEAD) — while the two tried on Home (the date under
+  *Today*, the quick-add captions) were absent;
+- children of an `.accessibilityElement(children: .ignore)` element are listed everywhere — Home's
+  vessel included, which is known good — so a listed child is not a VoiceOver leak;
+- neither `ViewThatFits` nor `.fixedSize()` was the cause, though both were suspected first.
+
+The owner chose to drop the assertion and log the gap (#139).
+
+**The rule:** before reading an XCUITest tree as VoiceOver's, run a control — a hidden element and an
+`.ignore` container on a screen that is known good. Query for "a second element" by label, never by
+subscript. What VoiceOver speaks is proved with VoiceOver.
+
+## 2026-10-17 — Another session's `xcrun simctl shutdown all` kills this session's runs
+
+**What happened.** Seven runs were hit: three never launched the test runner ("Mach error -308 —
+(ipc/mig) server died"), and four restarted mid-run ("Restarting after unexpected exit, crash, or test
+timeout"), losing five tests between them. Each was at the moment another project's session began an
+`xcodebuild` run with `xcrun simctl shutdown all`: six lined up within seconds with its
+`gate-times.txt` and `ps`, the seventh — after that log's last entry — with its message. That session
+later messaged to say so, and stopped.
+
+**The rule:** when a run dies with no product reason, read `ps` for other `xcodebuild`s before
+suspecting the code. To shrink the exposure, compile with `build-for-testing` and run with
+`test-without-building`, starting just after the other session's run begins; re-run a lost test by
+name. This session shut its own simulators down by UDID throughout, as the plan says.

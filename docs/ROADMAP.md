@@ -54,6 +54,9 @@ Home (`1ced514`); stage 3, History (`e0762ab`); stage 3b, navigation and motion 
 docs `d58116f` and rule wording `1438122`. **Stage 5, the welcome — item 1.2.3 — is built, gated and
 staged, not committed:** spec `docs/superpowers/specs/2026-10-14-welcome-design.md`, plan
 `docs/superpowers/plans/2026-10-14-premium-redesign-stage-5.md`.)*
+*(2026-10-16: stage 5 — item 1.2.3 — was committed as `d6a3817` (spec and plan), `2af8dbc` (feat),
+`026ef71` (docs) and `6010e25` (rule wording). The redesign's stages 1 to 5 are all committed; this
+file records no release after 1.1.)*
 
 **The App Store product page header** — new on iOS 27, 3840 × 1646 px — is made and staged, not
 committed: `Screenshots/en-US/ProductPageHeader/01-one-tap.png`, *"One tap. Watch it fill."*, from
@@ -105,7 +108,8 @@ registers the category, in its queued reconcile; the action is not `.authenticat
 press is meant to run without unlocking, as the Siri phrase and the control do — proved only on an
 unlocked simulator; and pending reminders still in the plan are filed again when their words differ,
 so ones filed by 1.1 gain the button and ones filed before a change of language are put into the new
-language.)*
+language.)* *(2026-10-16: committed as `2d233e1` (spec and plan), `418fad3` (feat), `fcfbc3c` (docs)
+and `450d76f` (rule wording); the device sweep's steps still stand.)*
 
 **1.2.5 — Rating prompt.** Apple's own review request, asked at a moment of success (say, a goal
 reached on a later day, never in the first session). Apple caps how often it can show. **Needs a
@@ -114,10 +118,26 @@ tree, awaiting `/commit` and the device sweep (#137). Spec `2026-10-15-rating-pr
 about 2.2 s after the user's own pour on Home reaches the goal on the third day in a row, at most
 once per app version; only Home's own pour starts the wait, so a goal reached anywhere else never
 starts a request; a DEBUG build asks only when launched with the `-WaterBuddyReviewPrompt` argument. Whether it should wait for the eight-second *Undo* offer to end
-is open, for the owner (#138).)*
+is open, for the owner (#138).)* *(2026-10-16: committed as `5241030` (spec and plan), `86a44ed`
+(feat), `314d63a` (docs) and `52ee815` (rule wording); #137's device check and #138 still stand.)*
 
 **1.2.6 — Russian plurals (#40).** The shared Russian keys use one plural form. The redesign's
 streak shows a bare number with no noun until this is fixed (decision D3, 2026-10-09).
+*(2026-10-16: the spec is written and staged, for the owner's review —
+`docs/superpowers/specs/2026-10-16-plural-forms-design.md`; no plan or code yet. The owner chose to
+bring back both counted nouns, the streak's *12 days* and the strip's *5 servings*, and Apple's plural
+variations formatted with the app's locale, through a new helper beside `figure`. Built, that locale
+would group the figures too, spoken ones included, and with them the widgets' and the watch's,
+closing #39.
+Open: its D7, whether the three catalogues Xcode rewrote (#50) are committed or discarded first, as
+their own change.)* *(2026-10-17: **built, gated and staged — not committed.** Plan
+`docs/superpowers/plans/2026-10-17-plural-forms.md`, run inline. D7: the owner chose to discard
+Xcode's rewrite. The chip draws *12 days* (*12 дней*, *12 kun*), the count alone where the noun does
+not fit; the strip draws *5 servings*, trailing its heading or under it; every figure, spoken ones
+and both widgets' and the watch's included, is grouped by the app's locale — closing #40 and #39. The
+gate passed on the staged tree, iOS 27.0 and 26.5, before the final review's test-only fix; the unit
+suite passed again after it. One open question became known issue #139, by the
+owner's decision; what only a device shows joins 1.2.7.)*
 
 **1.2.7 — The device-check sweep.** One sitting with the owner's iPhone and Apple Watch, before the
 1.2 submission, working through every check still open: the complication (its spec §8.3), the Siri
@@ -131,7 +151,14 @@ the Russian and Uzbek of its 28 new strings.)* *(2026-10-15: and what 1.2.4 left
 §7.4's eight steps for the reminder's *Log a Glass* — unlocked, locked, on the watch, Double Tap, the
 watch out of reach, before the first unlock (#72), an update over 1.1, VoiceOver — and whether a long
 press and a tap in Notification Center behave on a device as the simulator did not; and #134's
-*Follow device* case.)*
+*Follow device* case.)* *(2026-10-17: and what 1.2.6 left — VoiceOver reading a grouped figure as one
+number, *2 000* in Russian and Uzbek, on Home's vessel and History's rows; the chip (*12 дней*) and
+the strip (*5 порций*) in Russian on the iPhone; History under VoiceOver, where XCUITest lists hidden
+text (#139) — the strip's count, its hour labels and the week card's figures each silent, the
+strip's heading focused on itself; the Lock Screen widget's quiet form with *Allow Access When Locked
+→ Lock Screen Widgets* off, which the simulator cannot reach without a passcode; the inline Lock
+Screen shape, never placed on the simulator; a tinted Home Screen; and the watch's serving rows with a
+vessel of 1,000 ml or more, grouped.)*
 
 **1.2.8 — Store page.** New iPhone screenshots of the redesign (the owner's 2026-10-09 ruling was
 none until the redesign is built), the header, and the pitch in the subtitle or description — not in
@@ -291,6 +318,14 @@ the table did not list, worded in its spec §5 and typed into the rule files uns
 (the claim joins the mutation surface), `25-shared-storage` (its key's absence means never asked),
 `10-architecture` (ten keys) and `85-testing` (the DEBUG opt-in). This time the wording came before
 the code.)*
+*(2026-10-16: 1.2.2's wording was committed as `1438122`, 1.2.3's as `6010e25`, 1.2.4's as
+`450d76f`, and 1.2.5's as `52ee815`. 1.2.6 needs three
+this table does not list, worded in its spec §5 and not yet typed: `50-views` (every sentence with an
+argument through one of two helpers, with the locale; figures grouped, spoken ones too),
+`65-accessibility` (the streak chip's value and the strip heading's) and `70-privacy` (plural forms
+in every catalogue that holds a counted key).)* *(2026-10-17: typed into the three rule files and
+approved by the owner as typed, before any code; staged with 1.2.6's records, for the owner's
+`/commit`.)*
 
 ## 9. Not planned
 

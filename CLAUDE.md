@@ -155,7 +155,8 @@ something to record.
   `-scheme WaterBuddy` build into an empty DerivedData folder emits **31** unique warning lines —
   **29 since 2026-10-15**, when roadmap item 1.2.4's `nonisolated` `ReminderScheduler` removed the
   `removePending` and `removeDelivered` lines in `NotificationManager.swift`, measured on the staged
-  tree, and unchanged by roadmap item 1.2.5 the same day (80
+  tree, unchanged by roadmap item 1.2.5 the same day, and unchanged by roadmap item 1.2.6 on
+  2026-10-17, measured on its staged tree against a clean build of `HEAD` (80
   occurrences as counted then; 44 primary lines on 2026-10-08 — occurrences move with the
   architectures a build compiles, the unique lines do not): the *"main actor-isolated …
   cannot be referenced from a nonisolated context"* family in `DataManager.swift` and

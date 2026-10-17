@@ -7,6 +7,12 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-17 (roadmap item 1.2.6's records, written by the session that built it —
+not a `/doc_sync` pass). **No token changed.** One new measured pair: the strip's count of servings,
+white 0.9 on the strip's pane — 8.17:1 on iOS 27.0, 10.64:1 on 26.5, worst of a minute's sweep — in a
+dated note after the measured-pairs table. The count and the chip's noun reuse existing styles
+(footnote medium, the chip's own font), so no token gains a user.
+
 **Last updated:** 2026-10-16 (the sixty-third pass of `docs/AI_CONTEXT.md`, the owner's `/doc_sync`
 after roadmap item 1.2.5). **No token changed.** One dated note: *The goal-reached burst* gains the
 rating request, which waits on the burst's length (`ReviewPrompt.pause`), so the burst's 1.8 s is no
@@ -1427,6 +1433,15 @@ rectangles; the tab bar's pairs exist only below iOS 26, where the bar is ours):
 day. Its *Settings* rows are of the card stage 4 restyled — *Settings, measured* — and its *First
 run* rows are of `GoalSetupView`, which stage 5 deleted; the welcome's figures are in *Welcome,
 measured*.)*
+
+*(2026-10-17, roadmap item 1.2.6: **Strip: count of servings (0.9)** — the count roadmap item 1.2.6
+drew at the heading's trailing edge, *2 servings*, footnote medium at white 0.9 on the strip's
+`.frosted` + `.raised` pane, the pair the *Strip: hour label* row above measures. Floor 4.5: **8.17**
+on iOS 27.0 (*WaterBuddy Probe 27*, an iPhone 17) and **10.64** on iOS 26.5 (*WaterBuddy Probe
+26.5*, an iPhone 17); iOS 18.6 not measured. Each is the worst of 13 frames five seconds apart, a
+minute of the aurora, at the default text size: the glyphs' 99.5th-percentile luminance in the count's
+box against the 95th percentile of clean ground in a band 3–9 pt around it, WCAG relative luminance.
+Best frames 8.66 and 10.83. A scratch probe, not this table's own run.)*
 
 - **Nothing measured that this stage draws is under its floor, on any of the three systems.** The
   tightest:

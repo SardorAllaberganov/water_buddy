@@ -4,6 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-17 (roadmap item 1.2.6's records, written by the session that built it —
+not a `/doc_sync` pass). **No key and no stored byte changed:** the plural forms live in the
+catalogues, not the store. One passage changed, the language section's *Only sites that format
+against the locale honour this*: every sentence with an argument now formats with the locale, so
+both widgets, the watch's rows and every spoken figure are grouped (#39 closed). No key was added, so
+*What Apple is told about all of this* has nothing to answer.
+
 **Last updated:** 2026-10-16 (thirty-eighth pass — the owner's `/doc_sync` after roadmap item
 1.2.5, on the staged tree). **No key and no stored byte changed.** Checked and standing: twelve keys
 on `DataManager.Key`, ten in the phone's suite, as `CLAUDE.md` says; the new row and its claims
@@ -822,10 +829,16 @@ the redesign's stage 2 — everything Home draws through `Bundle.figure(_:_:loca
 each volume with the locale and hands it to a `%n$@` key: the vessel's `1 300 of 2 000 ml`, the
 status line, the discs' captions, *Undo*; since stage 3, History's header, week card and rows; since
 stage 4, Settings' vessel amounts; since stage 5, the welcome's — its vessel amounts, which are
-Settings' rows (`VesselSliders`), and the calculator's *Your goal is …* and *Use …*. A figure still built with `String(format:)` and `%1$d` — both
-widgets, and the watch's serving rows — groups in no language at all (`AI_CONTEXT.md` known issue
-#39). Spoken strings keep `%d` on purpose. *(Until the thirty-third pass this sentence still listed
-the week card's `Best 8050 ml`, History's rows and Settings — History's stale since stage 3.)*
+Settings' rows (`VesselSliders`), and the calculator's *Your goal is …* and *Use …*. Since roadmap
+item 1.2.6, every other sentence built from a key with an argument goes through
+`Bundle.localized(_:_:locale:)`, which formats the resolved key with the same locale — so a `%1$d` is
+grouped too, and a counted noun takes the plural form the locale's language gives it: both widgets'
+figures (`12 500 мл`, `из 2 000 мл`), the watch's serving rows, and every spoken string
+(*2,000 millilitres*). No site builds a sentence with `String(format:)` over a resolved key any more
+(rule `50-views`). *(Until 1.2.6 this sentence said both widgets and the watch's rows grouped in no
+language at all — known issue #39, closed by it — and that spoken strings kept `%d` on purpose. Until
+the thirty-third pass it still listed the week card's `Best 8050 ml`, History's rows and Settings —
+History's stale since stage 3.)*
 
 ## The day ordinal
 

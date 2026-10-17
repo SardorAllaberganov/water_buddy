@@ -9780,3 +9780,380 @@ Read from the commands at 10:02 on 2026-10-16, after this pass's `git add` of it
 `tasks/lessons.md`, this file) re-staged, and `docs/DESIGN.md` new to the index. **11 unstaged**:
 the five rule files with 1.2.5's wording, for the owner, and the six from before. **1 untracked**:
 `Screenshots/census/`. None in both.
+
+---
+## [2026-10-16] — Roadmap item 1.2.6's spec, and the `/doc_sync` after it
+
+**What changed.** Two things, in one session.
+- **The spec.** `/start_task` with no task named took the roadmap's next item, 1.2.6 — Russian plural
+  forms, known issue #40. The design was classed architectural. Its outline was approved by the owner
+  in three sections, and the spec was written and staged:
+  `docs/superpowers/specs/2026-10-16-plural-forms-design.md`.
+  - Decisions D1–D8. D1, D2 and D6 were asked as questions; D3–D5 came with the sections; D8 was
+    taken in writing the spec. D7 — #50's catalogues — is open, for the owner.
+  - No source, test or rule file changed, and nothing was built or run on a simulator.
+- **The probes behind its approach.** Two throwaway Swift programs, run on macOS (Darwin 27.0) in the
+  session's scratchpad, measured three things:
+  - `String(format:)` with no locale picks a Russian plural table's form by the English rule;
+  - the rule follows the locale passed to the format;
+  - every locale tried that gives the Russian rule also groups `%d`.
+
+  This is why the spec formats every sentence with the app's locale, and why its figures group,
+  spoken ones included.
+- **The `/doc_sync`** — the sixty-fourth pass of `docs/AI_CONTEXT.md` — run by the owner straight
+  after.
+
+**Drift found and fixed.** Most of it is 1.2.5's commits, which the docs had not yet seen.
+- **`docs/AI_CONTEXT.md`.**
+  - *Current state* opened on 1.2.5 as staged at `450d76f`, its rule wording "typed in and unstaged".
+    A new block above it gives the four commits — `5241030`, `86a44ed`, `314d63a`, `52ee815` — and
+    1.2.6's spec.
+  - #39 gains a note: the spec's D6 takes its last sites, both widgets and the watch's rows.
+  - #40 gains a note: the spec, its ten keys, and why a locale.
+  - #50 gains a note: its three catalogues are still rewritten, and D7.
+  - The *Last updated* line gains the pass's paragraph.
+- **`docs/ROADMAP.md`.**
+  - 1.2.4's and 1.2.5's notes still said "awaiting `/commit`"; dated notes give their commits.
+  - §2 still called stage 5 staged; a dated note gives `d6a3817`, `2af8dbc`, `026ef71`, `6010e25`.
+  - 1.2.6 gains a note for its spec.
+  - §8 gains a note: 1.2.4's and 1.2.5's wording committed, and the three rule files 1.2.6 needs.
+- **The spec, §4.** It described #50's rewrite as a re-spacing only; #50 records empty extracted
+  entries too, and §4 now says so (and more, after the readers — below).
+
+**Two fresh readers** then read this pass's records against the code, git, the catalogues, the rule
+files and the probes' saved output. Reader A covered `docs/AI_CONTEXT.md`'s and `docs/ROADMAP.md`'s new
+notes, and found 10. Reader B covered the spec, this checkpoint and the two lessons, and found 18: 4
+errors, 14 doubts. Both reports are saved verbatim in the session's scratchpad (`readers/`), outside
+the repository. Each finding was checked against its source before an edit — B's errors 2 to 4
+against the code and the catalogues (the type round each site, `spokenFigures`, the three catalogues'
+key counts at HEAD and in the tree) — and every one of the 28 was taken, B's three on Russian grammar
+included. What they changed:
+- **D3's two helpers.** 31 of the 32 sites go to the new helper; `WristVessel.readout` goes to
+  `figure`. The spec's status line, §3.1 and §9, *Current state*'s block and #39's note had said one
+  helper for all.
+- **Which types read the locale.** The spec named files where it meant types. Mapped site by site,
+  eleven types gain `@Environment(\.locale)` — among them `WelcomeView` and the Lock Screen widget's
+  card and button, though the spec had listed `WelcomeView` and `LockScreenWidget` as reading it
+  already, and `ServingSheet` and `DayStrip` in `HistoryView.swift`.
+- **A helper outside a view.** The spec said nothing outside a view formats a count;
+  `WaterSnapshot.spokenFigures(in:)` in `LockScreenWidget.swift` does, and gains `locale:`.
+- **#50's three catalogues.** §4 said all three gained entries. `AppShortcuts.xcstrings` gains none —
+  two phrases are marked stale — and the watch widget's goes from 2 keys to 6.
+- **The probes' reach.** In the spec, *Current state*, #40 and a lesson:
+  - the table's `.stringsdict`, not `Localizable.stringsdict` — the probe's table was `Probe`;
+  - "under an English process locale", since no Russian one was tried;
+  - "every locale tried", not "any locale".
+- **The spec's tests.** English and Uzbek are tested at every count, as its *done when* says. The red
+  run spares the *few* counts of `%1$d of %2$d millilitres`, whose genitive is already right. The
+  readers' tests would be broken as well as blinded.
+- **Russian.**
+  - §2's "a noun in the nominative" is now "where no preposition governs the count";
+  - *other* takes the genitive singular, not *few*'s words — the spec, and its proposed `70-privacy`
+    wording;
+  - `Last %1$d days`' *one* form is *Последние 21 день*, not *Последний*.
+- **Smaller:**
+  - *Current state* puts the grouped figures under D2 rather than D6;
+  - "nothing in the repository built or run";
+  - D7's "committed or discarded";
+  - the roots named as types (`RootView`, `LockScreenView`);
+  - this pass's *Its finds* list gains the roadmap's §2 and §8 notes.
+
+**Checked and already accurate.**
+- The documented file list: 87 tracked `.swift` files, each row's count equal to `wc -l`, by a
+  script. That is 84 in the seven target folders and three in `Tools/`; one row,
+  `WaterBuddyWatchWidgetBundle.swift`'s, has no description, and the script's first pattern missed it.
+- Test counts: 616 `@Test`, 57 on the watch, 54 UI `func test`.
+- The three exception sets: 18 entries, `project.pbxproj` unchanged since `314d63a`.
+- Twelve keys on `DataManager.Key`, ten in the phone's suite.
+- Every `` rule `nn-name` `` resolves.
+- `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: they describe code that has not
+  changed since the sixty-third pass, and keep their *Last updated*.
+
+**Files touched:** `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` (two lessons: *A
+plural table is read by the format's locale, not the bundle's language*; *In zsh, `path` is `PATH`*),
+this file, and the staged spec. Nothing under a target, and no `.claude/` file.
+
+**Gate:** not run in this session. The last gate is 1.2.5's, on 2026-10-15.
+
+Read from the commands at 12:34 on 2026-10-16, after this pass's `git add` of its five files by name.
+**No `git commit` was run.** HEAD `52ee815`, 126 commits, `## main...origin/main`. **5 staged**: the
+spec (added), `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file. **6
+unstaged**: the six from before. **1 untracked**: `Screenshots/census/`. None in both.
+
+---
+## [2026-10-17] — `/doc_sync` the morning after: the sixty-fourth pass's text, read again
+
+**What changed.** The owner's `/doc_sync` — the sixty-fifth pass of `docs/AI_CONTEXT.md` — on the
+tree the sixty-fourth left. No source or test file changed, nothing was built or run, and nothing was
+committed between the two passes. With no code to sync, the pass checked what the sixty-fourth had
+written: 1.2.6's spec and the records beside it, all staged.
+
+**Two fresh readers** read that text against the code, git, the catalogues and the probes' saved
+output.
+- Reader A read `docs/AI_CONTEXT.md`'s and `docs/ROADMAP.md`'s new text, and found 7: 1 error, 6
+  doubts.
+- Reader B read the spec, the checkpoint above and the two lessons, and found 19: 3 errors, 16 doubts.
+
+Both reports are saved verbatim in the session's scratchpad (`readers/docsync-65-reader-a.md`,
+`-b.md`), outside the repository. Each finding was checked against its source before an edit — the
+probe's output, `LocalizationTests.swift`, the two comments, the streak's UI test, git — and all 26
+were taken.
+
+**A third fresh reader** then read only this pass's own edits — the new records and the spec's
+changed passages — and found 8: 1 error, 7 doubts (`readers/docsync-65-reader-c.md`). Each was
+checked against its source and taken:
+- the new lesson said `docs/AI_CONTEXT.md` had "one of two helpers"; it was the roadmap's §8 note.
+  The lesson also gave both readers B's find;
+- §2's trade of errors held only where no preposition governs the count (folded into the bullet
+  below);
+- §6.1's red prediction: English *percent* does not change, and the test of finding 2 fails red too;
+- *Provenance* said §6's first test is the one that runs on a simulator, beside the fixes saying
+  only its run with forms shows the rule. It also dated every claim 2026-10-16;
+- §3.1's "a sentence is built from a key in one of two ways" was wider than D3; it now says a key
+  with an argument;
+- `WristVessel.readout`'s comment is half false already (#103(f)) (folded into the bullet below);
+- this checkpoint's "read only in this file" under the `docs/AI_CONTEXT.md` bullet, and the *Git*
+  block's "its records";
+- `docs/AI_CONTEXT.md` said the script checked all 87 rows. It checked 86, and one was checked by hand.
+
+**Drift found and fixed.**
+- **The spec**, corrected in place; its *Provenance* now says so.
+  - §2 said plural variations alone "would fix nothing". The probe's own output says they would
+    trade errors. Where no preposition governs the count, *1 миллилитр* and the *few* counts come
+    right, *5*, *11* and *111 миллилитров* go wrong, and *21* and *101* stay wrong. After *из* it runs
+    the other way: *из 2001 миллилитра* comes right, and *из 2000* and *из 2002 миллилитров* go wrong.
+  - §2 said the second probe ran "under `en_US`". Its output records no process locale.
+  - §8 and *Current state* said the red run would show which locale chooses the form. With the
+    catalogues untouched no key has forms to choose between, so only the tests passing once the
+    forms exist can show it.
+  - §6.1's red prediction left out the two new keys, which fail at every count in Russian and
+    Uzbek. It now says a count fails wherever §3.3's form differs from today's single value. It also
+    says how a key with more than one counted argument is fed: each argument in turn, the others at 5.
+  - §6.1's test of the probes' finding holds only under an English process locale, as they ran, and
+    now checks that first.
+  - §6.2 now names `noTranslationAnywhereLosesAFormatArgument`, `noWatchTranslationLosesAFormatArgument`
+    and `everyWidgetStringIsTranslatedUnlessDeliberatelyNot`.
+  - §5's list of DocC to rewrite gains `WelcomeView.spokenMillilitres` and `WristVessel.readout`.
+    The change makes the first comment false, and "`%d` never groups" in the second. The rest of the
+    second, "which is why the phone draws `1300 / 2000 ml`", is false already (#103(f)).
+  - §6.4's UI test reads the chip's count and its noun's form, not *1 day*: a gate device keeps
+    earlier runs' servings, so its streak can be longer than a day.
+  - §5's proposed `50-views` wording said Foundation picks "a counted noun's English form in every
+    language", which was never measured. It now says Foundation does not take the form from the
+    app's language.
+  - §3.2 adds `WristVessel` to the types that read the locale already.
+  - §3.4 and §5 now say the chip's value is the count with its noun — what the chip draws where the
+    noun fits.
+  - Smaller:
+    - the widgets' and the watch's `ml` sites among §3.1's "rest";
+    - "under §5's rule" for a counted noun added later;
+    - `WaterSnapshot`'s fields under *What does not change*;
+    - "stays plural before a compound numeral" in §3.3;
+    - the plan "dated the day it is written", which can no longer be 2026-10-16.
+  - One change was not a reader's. The red run read "with only the helper's signature on disk". A
+    signature cannot format anything, so every count would fail, not the ones the prediction names.
+    It is now "with §3.1's helper on disk".
+- **`docs/AI_CONTEXT.md`.**
+  - #50's note said the spec edits the watch catalogue; the change would.
+  - *Files on disk* gains a note: its "staged" notes for stage 5 and 1.2.5 name commits now.
+  - The sixty-fourth pass's *Git* block calls the blocks under it 1.2.5's staging. They are 1.2.4's,
+    at `6010e25`, and 1.2.4's records were committed as `2d233e1` to `450d76f`. 1.2.5's staging was
+    read only in `HISTORY.md`.
+    That block is kept as written, and the new block above it corrects it.
+  - The sixty-fourth pass's *Last updated* paragraph is kept as written. The new paragraph names its
+    two slips.
+- **`docs/ROADMAP.md`.**
+  - 1.2.6's note said the change "closes #39", though nothing is built, and named "one new helper".
+  - §8's note gains the commits of 1.2.2's and 1.2.3's rule wording, `1438122` and `6010e25`.
+- **The checkpoint above.** It sums up the probes with "`String(format:)` with no locale picks a
+  Russian plural table's form by the English rule". It leaves out what the spec says: that was
+  measured under an English process locale, the only kind tried. It stays as written.
+- **`tasks/lessons.md`.** The 2026-10-16 entries say the zsh script "checked this file's line counts";
+  it read `docs/AI_CONTEXT.md`'s. They also list five of the seven Russian locales tried and say the
+  two "cannot be had apart". A new entry corrects both and records the pattern: a finding fixed
+  where the reader pointed, with its copies left.
+
+**Checked and already accurate.**
+- The documented file list: 87 tracked `.swift` files, by the same script — 86 rows its pattern
+  reads, each count equal to `wc -l`, and `WaterBuddyWatchWidgetBundle.swift`'s row (9) read
+  separately.
+- Test counts: 616 `@Test`, 57 on the watch, 54 UI `func test`.
+- The three exception sets: 18 entries. `project.pbxproj` last changed in `eba1b1e`, on 2026-10-09.
+  The checkpoint above says it is unchanged since `314d63a`, which is true, and the file is older
+  than that.
+- Twelve keys on `DataManager.Key`, ten in the phone's suite.
+- Every `` rule `nn-name` `` resolves.
+- The six unstaged files: `git diff --stat` reads 479, 62 and 70 lines for the three catalogues and
+  2 for each scheme, as #50's note says.
+- `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: nothing they describe changed,
+  and they keep their *Last updated*.
+
+**Files touched:** the spec, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` (one entry:
+*A reader's finding was fixed where it pointed, and its copies kept the old claim*), this file.
+Nothing under a target, and no `.claude/` file.
+
+**Gate:** not run in this pass. The last gate is 1.2.5's, on 2026-10-15.
+
+Read from the commands at 12:03 on 2026-10-17, after this pass's last `git add` of its five files by
+name.
+**No `git commit` was run.** HEAD `52ee815`, 126 commits, `## main...origin/main`. **5 staged**: the
+spec (added), `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file. **6
+unstaged**: the six from before. **1 untracked**: `Screenshots/census/`. None in both.
+
+---
+## [2026-10-17] — Roadmap item 1.2.6: Russian plural forms
+
+**What changed.** `/start_task` took the staged plan, `docs/superpowers/plans/2026-10-17-plural-forms.md`.
+The owner approved the three rule files' wording as typed and answered D7 with "discard"; the plan
+was then run inline in the main loop, tests first, task by task, nothing committed.
+- **The helper.** `Bundle.localized(_:_:locale:)`, `nonisolated`, beside `figure` in
+  `DataManager.swift`, formats a resolved key with the injected locale. All 32 `String(format:)` sites
+  over a resolved key moved — 31 to it, `WristVessel.readout` to `figure`: 18 in the app, 9 in the
+  widget extension, 5 on the watch. Eleven types read `\.locale` for the first time.
+- **The catalogues.** Ten counted keys carry plural variations wherever they live — English
+  *one*/*other*, Russian *one*/*few*/*many*/*other* (*other* the genitive singular), Uzbek one value —
+  and the app's gains `%1$d days` and `%1$d servings`. App 105 keys, widget 19, watch 16.
+- **The two canvas details back.** Home's streak chip draws *12 days* — *12 дней*, *12 kun* — and the
+  count alone where the noun does not fit beside the title. History's strip draws *5 servings*
+  trailing its heading, or under it at the accessibility sizes; the heading speaks it as its value.
+- **Every figure grouped** by the app's locale: spoken ones, both widgets', the watch's rows. Known
+  issues #40 and #39 retired.
+- **Tests.** `PluralFormTests` (five): every counted key, every bundle, twelve counts, three
+  languages; the no-locale finding; a German and a Japanese phone on *Follow device*; the rule under
+  them. `LocalizationTests`' readers read `Localizable.stringsdict` too. UI tests read grouped figures,
+  and two new ones run at `UICTContentSizeCategoryAccessibilityXXXL`.
+
+**Rulings** (ledgered, each with its cost):
+- The plan's comma literals in `WelcomeUITests` (18) and `AppStoreScreenshotUITests` (11) became
+  `.formatted(.number)` through a private helper in each — every simulator here, and the host, is
+  `en_UZ`, which groups with a space, and the app on *Follow device* spoke *1 000 millilitres*.
+- Two `GoalSetupUITests` sites the plan missed read spoken figures: the second pour's
+  `NOT CONTAINS " \(afterGlass) of "`, which would have passed blind at four digits, and the sheet's
+  digit count, which stopped at the separator. The first grouped the same way, the second made to count
+  digits past the separator; both keep the assertion's strength.
+- Tasks 4 and 5 ran ahead of Task 3's last red while the simulator was being shut down from outside
+  (below). The watch's `syncedCaption(composedAt: nil, …)` mention kept its ellipsis. The strip's
+  contrast went into `docs/DESIGN.md` as a dated note after stage 3c's table, not a row inside it.
+- Probe 27 is left with its Home Screen and Lock Screen widgets placed and 12,500 ml logged today; the
+  app's language is back on English and the appearance on light.
+
+**The owner's decision on the strip.** The plan's "the drawn count is not a second element" failed.
+A throwaway probe, with controls, found that `app.staticTexts[value]` matches the heading by its
+value, and that XCUITest lists `.accessibilityHidden(true)` text inside History's `List` rows — the new
+count, the hour labels and the week card's figures, the last two at HEAD — while the two hidden texts
+tried on Home, the date and the quick-add captions, were absent; neither `ViewThatFits` nor
+`.fixedSize()` was the cause. Per `CLAUDE.md` the work stopped and asked. The owner
+chose to drop that one check and log the gap: known issue #139, with a VoiceOver pass in roadmap item
+1.2.7.
+
+**The final review.** A fresh reviewer (opus) on the staged diff: 0 Critical, 1 Important, 6 Minor.
+The Important was the spec's: §8 said a Japanese phone on *Follow device* draws *1 millilitres*.
+Measured on the iOS 27.0 simulator under `-testLanguage`/`-testRegion`, the app's locale is English
+with the phone's region — `en_JP`, `en_DE`, `en_FR`, `en_UA` — so *1 millilitre*.
+`theFollowDeviceLocaleSpeaksTheBundlesLanguage` was seen red in a scratch copy whose `.system` locale
+was built from the phone's language, and green on the real code; the German and Japanese tests were
+re-aimed at `en_DE` and `en_JP`; spec §8 and the plan's Review Focus 1 carry dated corrections. Five of
+the six Minors are deferred in the ledger: renders of the watch's rows and the quiet Lock Screen form,
+a 100+-day streak at XXXL, UI checks that read a count from the value they check, no UI test through a
+chosen language, the no-locale test failing rather than skipping off an English host. The sixth, the
+records and rule wording still unstaged, was this task's own staging.
+
+**Verification actually run.**
+- **The gate**, on a copy of the staged tree (`git checkout-index`, 14:25): unit
+  `✔ Test run with 621 tests in 78 suites passed`; UI on *WaterBuddy Gate 27* (iOS 27.0) and *Gate
+  26.5*, `GoalSetupUITests` 38 executed in four chunks with 1 skipped by design and the other classes
+  31, 0 failures on each system; watch `✔ 57 tests in 6 suites`; both widget schemes built. After the
+  review's fix: unit 622 passed, and the three Follow-device tests again under
+  `-testLanguage ja -testRegion JP`.
+- **Warnings**, HEAD and the index each built clean, compared by file and message: none new on the
+  app, widget or watch schemes; a plain clean `build` of the app scheme has the 29 unique lines
+  `CLAUDE.md` names.
+- **Red before green** in every task with tests — Task 4 is build-only — each red read against the
+  plan's prediction: Task 1's 165 issues grouped by key matched exactly; Task 2's 13, one more than
+  the plan named (the widget's line of the same reader, ruled the same cause); the welcome's 7 of 13;
+  the watch's 17 compile errors; the chip's and the strip's value checks.
+- **Renders**, from a scratch copy whose fresh start seeds a streak (Probe 27, Small 26.5): every chip
+  and strip case in English, Russian and Uzbek at the default size and XXXL; the live switch to
+  Русский; both Home Screen widgets in English at 1,500 and 12,500 ml, light and dark; both Home Screen
+  widgets and the Lock Screen rectangle and circle at 12,500 ml in English, Russian and Uzbek, in one
+  appearance — nothing cut.
+- **The strip count's contrast**, worst of a minute's sweep: 8.17:1 on iOS 27.0, 10.64:1 on 26.5.
+- **Not run:** a tinted Home Screen; the Lock Screen's quiet form, which needs a passcode; the inline
+  Lock Screen shape; the watch's rows with a vessel of 1,000 ml or more; anything on a device — all in
+  roadmap 1.2.7.
+
+**What got in the way.** Another project's session ran `xcrun simctl shutdown all` before each of its
+runs — about 30 times between 12:20 and 13:42, by its message; its gate log shows 27 runs from 12:46:39
+to 13:41:22. Seven of this session's runs were hit — three never launched the test runner ("Mach error
+-308 … server died"), four restarted mid-run and lost five tests between them. Six lined up within
+seconds with that session's log; the seventh, at about 13:42, after its log's last entry, with its
+message. It messaged at about 13:48 to say so, and stopped; every lost test was re-run by name. Xcode.app also rewrote the three catalogues once more (#50), and they were put
+back to their staged versions.
+
+**Files touched.** Code: `WaterBuddy/DataManager.swift`, `HomeView.swift`, `HistoryView.swift`,
+`WelcomeView.swift`, `SettingsView.swift`, `VesselSliders.swift`, `Localizable.xcstrings`;
+`WaterBuddyWidget/WaterBuddyWidget.swift`, `LockScreenWidget.swift`, `Localizable.xcstrings`;
+`WaterBuddyWatch/WristView.swift`, `WristVessel.swift`, `WristModel.swift`, `Localizable.xcstrings`.
+Tests: `WaterBuddyTests/LocalizationTests.swift`, `WaterBuddyUITests/WelcomeUITests.swift`,
+`GoalSetupUITests.swift`, `AppStoreScreenshotUITests.swift`,
+`WaterBuddyWatchTests/WristViewLogicTests.swift`. Rules (the owner's approved wording):
+`.claude/rules/50-views.md`, `65-accessibility.md`, `70-privacy.md`. Records: `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, the spec's §8, the plan's
+Review Focus 1, `tasks/lessons.md` (three entries), this file. No `project.pbxproj`, entitlement,
+Info.plist, privacy manifest or `DataManager.Key` change.
+
+**The records, read.** Two fresh readers checked these records against the code, git, the ledger and
+the logs: 2 errors and 7 doubts in the sheets, 1 error and 9 doubts in this checkpoint, the lessons,
+the spec's and the plan's notes and the new DocC. Each was checked against its source and taken; four
+of them were comments in code, changed with `///` lines only and compiled again (`build-for-testing`
+succeeded). Before the readers, this checkpoint's own draft said four runs were hit; the logs show
+seven.
+
+Read from the commands at 16:39 on 2026-10-17, after this session's last `git add` of its files by
+name. **No `git commit` was run.** HEAD `52ee815`, 126 commits, `## main...origin/main`. **31
+staged**: the 19 code, test and catalogue files above; the three rule files; `docs/AI_CONTEXT.md`,
+`docs/DESIGN.md`, `docs/ROADMAP.md`, `docs/STATE.md`, `docs/WIDGET.md`; the spec and the plan (both
+added); `tasks/lessons.md` and this file. **3 unstaged**: `.claude/settings.json` (the owner's) and
+the two schemes' `BlueprintName` lines (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-17] — `/doc_sync` after 1.2.6: the warning baseline's dated trail
+
+**What changed.** The owner ran `/doc_sync` straight after roadmap item 1.2.6's records, in the
+session that built it — the sixty-sixth pass of `docs/AI_CONTEXT.md`. No source or test file changed
+between those records and this pass, and nothing was built or run for it.
+
+**Drift found and fixed.** One. `CLAUDE.md`'s warning baseline listed its re-measurements up to
+roadmap item 1.2.5; it now gives 1.2.6's as well — the 29 unique lines of a plain clean `build` of the
+app scheme, on the staged tree, against a clean build of `HEAD` (the ledger's Task 8 Step 2). 1.2.6's
+records read `CLAUDE.md` and found nothing in it made false; that stands, as the line was true, only
+one measurement short. `docs/AI_CONTEXT.md` gains the pass's *Last updated* block.
+
+**Checked and already accurate.**
+- 87 tracked `.swift` files, each file-table row's count equal to its file's lines — all 87 by one
+  script;
+- 622 `@Test`, 57 on the watch, 56 UI `func test`, as *Current state* gives them;
+- 18 exception-set entries, `project.pbxproj` unchanged since `eba1b1e`;
+- every `` rule `nn-name` `` cited in `CLAUDE.md`, `docs/`, `tasks/` and the seven target folders
+  resolves — 18 rule names, 18 files;
+- twelve keys on `DataManager.Key`, ten in the phone's suite — 1.2.6 added none;
+- *Current state*'s 1.2.6 block, the file and catalogue rows' notes, known issues #39, #40, #41,
+  #109(g) and #139, and the 1.2.6 notes in `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and
+  `docs/ROADMAP.md`, read against the code. The first three sheets' *Last updated* are 2026-10-17
+  already; `docs/ROADMAP.md` carries none;
+- no doc names a surface 1.2.6 replaced — `String(format:)` over a resolved key,
+  `onlyTheSpokenHomeStringTakesARawNumber`, `syncedCaption`, `attribution` and `spokenFigures`
+  without a locale — except as history;
+- `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and `docs/dependencies.md` still do not exist.
+
+**No lesson.** One line short of one measurement is not a pattern; `tasks/lessons.md` is unchanged.
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md`, this file.
+
+**Gate.** Not run for this pass. The gate *Current state* reports ran earlier in this session, on a
+copy of the staged tree, and nothing it covered has changed since.
+
+Read from the commands at 23:17 on 2026-10-17, after this pass's `git add` of `CLAUDE.md` and
+`docs/AI_CONTEXT.md` by name; this file is added again once this block is written. **No `git commit`
+was run.** HEAD `52ee815`, 126 commits, `## main...origin/main`. **32 staged**: 1.2.6's 31 and
+`CLAUDE.md`. **3 unstaged**: `.claude/settings.json` (the owner's) and the two schemes'
+`BlueprintName` lines (#50). **1 untracked**: `Screenshots/census/`. None in both.

@@ -3,6 +3,11 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-17 (roadmap item 1.2.6's records, written by the session that built it —
+not a `/doc_sync` pass). **No widget contract changed** — no family, timeline, intent or kind. What
+the widgets draw changed: every figure is formatted with the snapshot's locale and grouped, and two
+shared keys carry plural forms; a dated note under the strings table says so.
+
 **Last updated:** 2026-10-15 (twenty-seventh pass — roadmap item 1.2.4's records, checked by the
 owner's `/doc_sync`). **No widget contract changed:** `AddWaterIntent.perform()`'s code is the same.
 One bullet, in *The intent also reschedules reminders*, says what it now files:
@@ -492,6 +497,17 @@ Formats are positional (`%1$d`) rather than bare `%d` so a translator may reorde
 "X of Y" into "Y dan X". `LocalizationTests` asserts the extension actually ships both languages,
 that its table agrees with the app's value for value, and that every translation carries the same
 format arguments as its key.
+
+*(2026-10-17, roadmap item 1.2.6:)* every figure the widgets draw or speak is formatted with the
+snapshot's locale, through `Bundle.localized(_:_:locale:)` in `DataManager.swift` — so the readout,
+the goal line, the button's face and both spoken sentences are grouped (`12 500 мл`, `из 2 000 мл`,
+`12,500 ml`), where they grouped in no language before (#39, closed). Two of the ten keys carry
+**plural forms**: `%1$d percent. %2$d of %3$d millilitres.` (its last volume; in Russian its percentage too) and
+`Add %1$d millilitres` — English *one*/*other*, Russian *one*/*few*/*many*/*other*, Uzbek one value —
+value for value the app's. A key with forms leaves `Localizable.strings` for `Localizable.stringsdict`
+in the built `.appex`; `LocalizationTests` reads both and compares the two bundles form by form. The
+Lock Screen rectangle's `spokenFigures(in:locale:)` takes the locale too. Rendered on the simulator at
+12,500 ml in English, Russian and Uzbek, on the Home Screen and the Lock Screen: nothing cut.
 
 ### `AddWaterIntent`'s Shortcuts vocabulary is translated
 
