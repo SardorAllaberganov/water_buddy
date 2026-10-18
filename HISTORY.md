@@ -10645,3 +10645,142 @@ its files by name; this file is added again once this block is written. **No `gi
 HEAD `93d23df`, `## main...origin/main`. **15 staged** — the 14 above and `docs/STATE.md`. **6
 unstaged**: `.claude/settings.json` (the owner's) and the five files the open Xcode app rewrites
 (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — Roadmap item 1.3.4: Siri answers "how much water today"
+
+**What changed.** A second App Shortcut. "How much water today in WaterBuddy" — and *How much water
+have I had in*, *Check my water in*; in Russian *Сколько воды сегодня в*, *Сколько осталось выпить
+в*, *Проверь воду в* — runs `TodaysWaterIntent`, app-only, which reads `DataManager.snapshot()`, the
+widget's own read, writes nothing, and answers with one of three lines: *1,450 millilitres so far
+today — 1,050 millilitres to go.*, *2,600 millilitres so far today — you've reached your goal.*, or
+*Nothing logged yet today — 2,000 millilitres to go.* — in en, ru and uz, plural forms and grouped
+figures, resolved by the system. A *Today's Water* tile (`drop.fill`, blue) follows *Log a Glass*.
+`WaterSnapshot` gains `remaining` and `hasReachedGoal`, `nonisolated`. No key, entitlement, exception
+set, privacy manifest or `project.pbxproj` change.
+
+**The rulings it rests on.** The owner's, in the brainstorm: a locked iPhone asks for authentication
+before it answers (`.requiresAuthentication` — recommended as the reversible choice); the answer
+carries today's total and what is left, never the goal alone, the percentage or the streak; it reads
+the widget's snapshot (approach A). After the rulings, Apple's documentation was read: the stricter
+`.requiresLocalDeviceAuthentication` unlocks the phone "even if the request originated from an
+already authenticated Apple Watch or remote device", so `.requiresAuthentication` is *inferred* to
+accept those — the spec says so. The dialog has one line, the unit spelled out, because a shorter
+`supporting` line is promised only beside a snippet (reported from search summaries). The spec, the
+rule wording (`70-privacy`, `15-project`, `20-state`, `43-concurrency`, `85-testing`) and the plan
+were each approved before any code. D1: the open Xcode had rewritten three catalogues; the owner
+chose to restore them, and when it rewrote all four again mid-task, closed the project and chose to
+restore them again before the strings were added (lessons).
+
+**How it was built.** Plan `docs/superpowers/plans/2026-10-18-todays-water.md`, run inline, task by
+task; each test seen red on its expectation, then green. Probes before the plan, throwaway, in the
+scratchpad: a `LocalizedStringResource` with an explicit key and its figures in `defaultValue`,
+resolved from a catalogue compiled by `xcstringstool`, gave the forms and grouping the tests now pin.
+Deviations, each in the session's ledger: `nonisolated` on the two snapshot properties (the GREEN
+build warned at `TodaysWaterIntent.swift:62`, `:69`); the warning script's path strip widened, since
+`xcodebuild` prints `/tmp/…` for a `/private/tmp/…` folder.
+
+**Verification, as run.**
+- Unit, on a copy of the index: `✔ Test run with 654 tests in 84 suites passed` (638 before, 16 new,
+  by the attribute grep). Watch: `✔ Test run with 57 tests in 6 suites passed`. Both widget schemes:
+  `** BUILD SUCCEEDED **`.
+- UI on *WaterBuddy Gate 27*: `GoalSetupUITests` in four chunks, 38 executed, 1 skipped by design,
+  0 failures; the other classes, 31 executed, **1 failure** —
+  `WelcomeUITests.testAStepIsAsItWasLeftWhenBackReturnsToIt`, the tap on *Active* not taken. Run five
+  times alone: the change 4 of 5, `HEAD` 4 of 5, the identical error, 1-minute loads 20–111.
+- UI on *WaterBuddy Gate 26.5*: `GoalSetupUITests` 38 executed, 1 skipped, **1 failure** —
+  `testUndoAfterTwoPoursTakesBackOnlyTheLast`, *Undo* never shown after the first pour, at a load
+  rising to 134; then five runs each, the change 5 of 5 and `HEAD` 5 of 5, loads 40–73. The other
+  classes, 31 executed, 0 failures. Both failures are recorded on #140; this change touches no welcome
+  or Home code. **A comparison on a quiet machine was not run**: the load stayed high (the owner's
+  Xcode build service, another project's simulator) for the whole session.
+- Warnings: clean builds of a `HEAD` export and of the index, compared per file and message: the app
+  scheme 19 and 19, the phone widget 17 and 17, the watch app 2 and 2, the watch widget 19 and 19 —
+  none new, none gone. The counter was checked first: on `HEAD`, 35 unique lines with line numbers, 29
+  with the six in two test files set aside — `CLAUDE.md`'s figure.
+- Simulator, *WaterBuddy Probe 27*, a throwaway XCUITest probe in the copy only: Shortcuts' WaterBuddy
+  page shows *Log a Glass* then *Today's Water*, and *Записать стакан* then *Вода за сегодня* in
+  Russian — looked at; `linkd` interpolated the six Russian phrases and the English ones;
+  `siriactionsd` wrote two contextual actions to Spotlight's index. A tap on the tile showed nothing
+  within four seconds; whether it ran or was refused was not established (#63's note).
+  `perform()` has not run anywhere.
+
+**The final review** — one fresh reviewer, read-only, on the whole change: no Critical. Important,
+all taken: (1) the index held an older test DocC and none of the rules or records — everything is
+now staged as reviewed; (2) no checkpoint — this one; (3) the suites the approved rules call canaries
+could not be shown to catch the two properties' isolation. Measured in the real target with the
+keyword off and back: a synchronous read, and an `async` read inside `#expect`, print nothing; an
+`async` read into a local warns. `TodaysWaterSnapshotTests` is that shape now — seen to warn, then not
+— and the unit target passed again, 654. No shape warned for `answer(for:)`, so
+`TodaysWaterAnswerTests` stays synchronous and says it is not a proven canary (#147, for the owner).
+**Deferred minors**: a cold launch's own reminder re-plan is not awaited before `perform()` returns
+(the spec says the answer waits for none of the launch's work); the intent's DocC states Siri's
+language resolution as fact (#146 gains the device check); `15-project.md:116` runs past its wrap;
+`MovableClock` never moves in the new tests; one test's DocC promises an order swift-testing does not
+keep. Taken into the records: #145's `en_JP` note, `AppShortcuts.xcstrings`' row, rule `43`'s "every
+target" (#147).
+
+**Known issues.** Opened: #145, #146, #147. Notes: #63, #140.
+
+**Files touched.** `WaterBuddy/TodaysWaterIntent.swift` (new), `WaterBuddy/DataManager.swift`,
+`WaterBuddy/WaterBuddyShortcuts.swift`, `WaterBuddy/Localizable.xcstrings`,
+`WaterBuddy/AppShortcuts.xcstrings`, `WaterBuddyTests/TodaysWaterTests.swift` (new),
+`WaterBuddyTests/LocalizationTests.swift`, `WaterBuddyTests/SiriPhraseTests.swift`;
+`.claude/rules/70-privacy.md`, `15-project.md`, `20-state.md`, `43-concurrency.md`, `85-testing.md`
+(the approved wording); `docs/superpowers/specs/2026-10-18-todays-water-design.md`,
+`docs/superpowers/plans/2026-10-18-todays-water.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`,
+`docs/WIDGET.md`, `tasks/lessons.md`, this file. `CLAUDE.md`'s *Two front doors* passage, where Siri
+now answers as well as logs, is left to `/doc_sync`.
+
+**Staging.** Read from the commands at 23:27 on 2026-10-18, after one `git add` of the twenty paths
+above by name; this file is added again once this block is written. **No `git commit` was run.**
+HEAD `88d694f`, `## main...origin/main`. **20 staged** — 4 added (`TodaysWaterIntent.swift`,
+`TodaysWaterTests.swift`, the plan, the spec) and 16 modified. **3 unstaged**: `.claude/settings.json` (the owner's) and the two watch schemes Xcode rewrote (#50).
+**1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — `/doc_sync` after 1.3.4: the baseline's trail, the snapshot's second reader, 1.2.8's commits
+
+**What changed.** The seventy-second pass of `docs/AI_CONTEXT.md`, run by the owner straight after
+roadmap item 1.3.4's records, in the session that built it. No source or test file was written.
+
+**The command's checks.** 91 tracked `.swift` files, 91 rows, each row's count equal to its file's
+lines by one script, before and after the pass. 654 `@Test` (638 before 1.3.4), 57 on the watch, 56
+UI `func test`. `project.pbxproj` last changed in `eba1b1e`, nothing staged in it; the three
+`membershipExceptions` sets as `CLAUDE.md` gives them. 12 `static let`s on `DataManager.Key` — no key
+added. 18 rule names cited, 18 files. `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and
+`docs/dependencies.md` do not exist.
+
+**Drift found and fixed.**
+- `CLAUDE.md`: the warning baseline's dated trail stopped at the lag fix — it now names 1.3.4, as
+  measured in this session (29 unique lines outside the tests on both sides; 35 on `HEAD` with the
+  six in two test files). The snapshot bullet said only the widget reads through `WaterSnapshot`; it
+  now names Siri's *Today's Water* as the second reader, write-free, answering a locked iPhone only
+  after authentication.
+- `docs/STATE.md`: the `currentWater` row called it "the key the widget actually reads"; Siri's
+  answer reads it too. A dated note, and a `Last updated`.
+- `docs/WIDGET.md`: a `Last updated` for the note 1.3.4's records added under the snapshot table.
+- 1.2.8 was committed at 20:33 (`eecb6a7`, `efa9ed3`, `4f21510`, `88d694f`), after its records said
+  "not committed": dated notes on its *Current state* block and its roadmap entry.
+- #50: the open Xcode rewrote `AppShortcuts.xcstrings` and both watch catalogues again by 23:34 —
+  unstaged, the staged copies intact, four phrases marked `stale`. Recorded, not restored: the
+  owner's to decide.
+
+**Checked and left.** `docs/DESIGN.md` — no token or measurement moved. `docs/ROADMAP.md`'s 1.3.4
+entry and §8 note, written by the build, hold. `tasks/lessons.md` — the build's three entries cover
+what this pass met; none added.
+
+**Gate.** Not run for this pass. The build's own runs, earlier in the session, are in the checkpoint
+above.
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
+`docs/ROADMAP.md`, this file.
+
+**Staging.** Read from the commands at 23:36 on 2026-10-18, after this pass's `git add` of its six
+files by name; `docs/AI_CONTEXT.md` and this file are added again once their blocks are written.
+**No `git commit` was run.** HEAD `88d694f`, 138 commits, `## main...origin/main`. **22 staged** — 4
+added, 18 modified: 1.3.4's twenty and this pass's `CLAUDE.md` and `docs/STATE.md`. **6 unstaged**:
+`.claude/settings.json` (the owner's), the two watch schemes, and `WaterBuddy/AppShortcuts.xcstrings`,
+`WaterBuddyWatch/Localizable.xcstrings`, `WaterBuddyWatchWidget/Localizable.xcstrings` — the open
+Xcode's rewrite (#50). **1 untracked**: `Screenshots/census/`. **In both:
+`WaterBuddy/AppShortcuts.xcstrings`** — staged, 1.3.4's reviewed phrases; unstaged, Xcode's rewrite.
+Before `/commit`, the owner decides whether to restore the working-tree copy (rule `90-git`: compare
+`git diff --cached --name-status` with `git diff --name-status`).

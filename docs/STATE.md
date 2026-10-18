@@ -4,6 +4,12 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-18 (seventy-second pass — `/doc_sync` after roadmap item 1.3.4, Siri's
+*Today's Water*, staged). **No key, no stored byte and no writer changed**; 12 `static let`s on
+`DataManager.Key`, as before. What changed is a reader: `TodaysWaterIntent`, in the app's process,
+answers from `DataManager.snapshot()` — `currentWater` with the rollover applied in memory,
+`dailyGoal` — and writes nothing. A dated note on the `currentWater` row says so.
+
 **Last updated:** 2026-10-18 (seventy-first pass — `/doc_sync` after known issue #144's fix).
 **No key and no stored byte changed.** The test-isolation paragraph named `WelcomeUITests` as the one
 UI suite launched on the fresh start; since roadmap item 1.2.8 the store capture is the second, and a
@@ -332,7 +338,7 @@ more, all documented" there until the twenty-sixth pass; the table has had nine 
 
 | Stored key | Type | Range / clamp | Written by | Why it exists |
 |---|---|---|---|---|
-| `sardor.WaterBuddy.currentWater` | `Int` | `0...100_000` | app + extension | Today's total in ml — **derived**, the sum of today's `WaterLog` rows. The key the widget actually reads. |
+| `sardor.WaterBuddy.currentWater` | `Int` | `0...100_000` | app + extension | Today's total in ml — **derived**, the sum of today's `WaterLog` rows. The key the widget actually reads. *(2026-10-18, roadmap item 1.3.4, staged: and the one Siri's *Today's Water* reads, through the same `DataManager.snapshot()`, in the app's process — no new writer.)* |
 | `sardor.WaterBuddy.dailyGoal` | `Int` | `1...100_000` | **app only** | The target. Clamped to ≥ 1 so `progress` cannot divide by zero. Materialised at app launch so a widget never reads a missing key as `0` and shows the first sip as 100%. |
 | `sardor.WaterBuddy.lastActiveDay` | `Int` | `yyyyMMdd` ordinal | app + extension — **the fresh-install stamp is the app's alone**; the rollover's is unguarded, so a widget tap that is the first act of a new day writes it, in the same call that zeroes `currentWater` | The day `currentWater` belongs to. An ordinal, not a `Date`, so travel cannot re-interpret it (see below). |
 | `sardor.WaterBuddy.isGoalSet` | `Bool` | — | app only | Whether the user has *chosen* a goal, so setup is shown once. **Deliberately never materialised — its absence carries meaning.** |

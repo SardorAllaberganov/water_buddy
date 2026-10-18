@@ -4103,3 +4103,44 @@ downscaled whole screenshot showed the bar at once.
 **The rule:** look at a crop before reading anything off it. When several crops of screens that
 should differ come out the same size, compare their hashes; identical bytes mean the crop missed
 what changed.
+
+## 2026-10-18 — A suite off the main actor compiled clean while the member it read was main-actor
+
+**What happened.** Roadmap item 1.3.4 added two computed properties to `WaterSnapshot` in
+`DataManager.swift` and a suite that is not `@MainActor`, whose DocC called it the canary for their
+isolation. It compiled and passed, red then green, with no warning. The first build of
+`TodaysWaterIntent.answer(for:)` — a `nonisolated static` in the **app** target — warned that both
+properties were main-actor-isolated: the app target's `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` had
+inferred them so, and the test target, reading them across the module boundary, said nothing. The
+plan had not given them `nonisolated`; `AppLanguage.code` had shown the need a month before.
+
+**The rule:** a member added in the app target that anything nonisolated will read gets `nonisolated`
+when it is written, as `AppLanguage.code` does. Read the warnings the **app** target prints for new
+code on every run — a quiet test target is not evidence. Do not call a suite a canary for an
+isolation it has never been seen to catch.
+
+## 2026-10-18 — An open Xcode rewrote the catalogues the moment new Swift files appeared
+
+**What happened.** The catalogues were clean before 1.3.4's work began. Minutes after
+`TodaysWaterIntent.swift` and its test file were written, the open Xcode rewrote all four
+`.xcstrings` (#50): its spacing, the new intent's title and description extracted with no values,
+two of *Log a Glass*'s phrases marked `stale`. None held an edit yet, so nothing was lost; an Xcode
+holding a catalogue in memory could have written over entries added by hand. The owner closed the
+project and chose to restore the four files.
+
+**The rule:** before editing a `.xcstrings` by hand, check that Xcode does not have the project open
+(`pgrep -lf Xcode.app` says only whether Xcode runs — ask the owner), and run the `git diff --stat`
+over the catalogues again just before the edit, not only at the start of the task.
+
+## 2026-10-18 — A read inside `#expect` hides an isolation warning, and a reviewer's model was not the target
+
+**What happened.** The final review of 1.3.4 modelled the app and test modules in a probe and found
+an `async` test warns where a synchronous one does not, and proposed making the suite `async`. In the
+real target, with `nonisolated` taken off `remaining`, the `async` tests still printed nothing: they
+read the property inside `#expect`, whose closures swallow the diagnostic, and the probe had not used
+`#expect`. Read into a local first, in an `async` test, it warned. For a `nonisolated static func` on
+the intent, no shape warned at all.
+
+**The rule:** a canary is proved in the real target, both ways — the keyword off, the warning seen;
+the keyword back, the warning gone — before any rule or DocC calls it one. Read the value into a
+local outside `#expect`, in an `async` test. Treat a reviewer's probe as a lead to test, not a result.

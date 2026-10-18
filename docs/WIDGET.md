@@ -3,6 +3,12 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-18 (roadmap item 1.3.4's records, then the seventy-second pass's
+`/doc_sync`). **No widget contract changed** — no family, timeline, intent, kind or view tree.
+`WaterSnapshot` computes two more values, `remaining` and `hasReachedGoal`, which no widget reads:
+they are for Siri's *Today's Water*, in the app. A dated note under the snapshot's field table says
+so; both widget schemes built with no new warning.
+
 **Last updated:** 2026-10-17 (roadmap item 1.2.6's records, written by the session that built it —
 not a `/doc_sync` pass). **No widget contract changed** — no family, timeline, intent or kind. What
 the widgets draw changed: every figure is formatted with the snapshot's locale and grouped, and two
@@ -215,6 +221,14 @@ open SwiftData (rule `40-widget`).
 than resolving it live in the extension is deliberate — the face is rendered into an archive ahead
 of time, so a live read could disagree with the number already drawn beside it. From one snapshot
 they can be stale together but never inconsistent with each other.
+
+*(2026-10-18, roadmap item 1.3.4, staged: `WaterSnapshot` also computes `remaining` and
+`hasReachedGoal` — no new field, nothing new crosses, and **no widget reads them**. They are for
+Siri's *Today's Water* (`TodaysWaterIntent`, app-only), which reads the same
+`DataManager.snapshot()` the timeline does, so what Siri says is what the widget draws. Both are
+`nonisolated`, twins of `DataManager.remaining` and `hasReachedGoal`, held together by
+`theSnapshotAgreesWithTheManager`. The read path, the timeline and the widgets' view trees are
+unchanged; both widget schemes built with no new warning.)*
 
 | Method | Returns |
 |---|---|

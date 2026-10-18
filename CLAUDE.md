@@ -159,8 +159,11 @@ something to record.
   **29 since 2026-10-15**, when roadmap item 1.2.4's `nonisolated` `ReminderScheduler` removed the
   `removePending` and `removeDelivered` lines in `NotificationManager.swift`, measured on the staged
   tree, unchanged by roadmap item 1.2.5 the same day, unchanged by roadmap item 1.2.6 on
-  2026-10-17, measured on its staged tree against a clean build of `HEAD`, and unchanged by the lag
-  fix on 2026-10-18, measured on its working tree against a clean build of a `HEAD` export (80
+  2026-10-17, measured on its staged tree against a clean build of `HEAD`, unchanged by the lag
+  fix on 2026-10-18, measured on its working tree against a clean build of a `HEAD` export, and
+  unchanged by roadmap item 1.3.4 the same day, measured on a copy of its index against a clean build
+  of a `HEAD` export — 29 outside the tests on both, 35 on `HEAD` with the six in two
+  `WaterBuddyTests` files (80
   occurrences as counted then; 44 primary lines on 2026-10-08 — occurrences move with the
   architectures a build compiles, the unique lines do not): the *"main actor-isolated …
   cannot be referenced from a nonisolated context"* family in `DataManager.swift` and
@@ -245,7 +248,12 @@ something to record.
   provider is `nonisolated` and cannot touch a `@MainActor` singleton — and *constructing* a
   `DataManager` there could still roll the day over (zero the total, stamp the day, ring the
   widget doorbell) and recompute today from the rows, none of which is guarded: writes from a
-  process whose job is to draw (rule `40-widget`)
+  process whose job is to draw (rule `40-widget`). **Siri's question reads the same snapshot:**
+  "How much water today in WaterBuddy" runs `TodaysWaterIntent`, app-only, which answers from
+  `DataManager.snapshot()` — today's total and what is left, through `WaterSnapshot.remaining` and
+  `hasReachedGoal` — writes nothing, and answers a locked iPhone only after authentication
+  (`docs/superpowers/specs/2026-10-18-todays-water-design.md`, rule `70-privacy`). It is the one Siri
+  reply that carries figures; *Log a Glass*'s stays fixed and digit-free
 - **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
   fresh install, the one-shot migration, the seed from a cached total, drawing the history and
   the streak, and filing reminders are all guarded by `DataManager.role` — seven sites, the

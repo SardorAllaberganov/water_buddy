@@ -175,7 +175,8 @@ The four iPhone shots are retaken of the redesign over a lived-in week — 65 % 
 earlier days met, a *5 days* chip — in `en_US`, with a 24-hour status-bar clock by the owner's ruling,
 since the capture device's own region draws it. The header was already done. Not done: the pitch in
 the listing copy — the owner chose screenshots only for this task on 2026-10-17 — and the watch shot,
-which waits for 1.3.2.)*
+which waits for 1.3.2.)* *(2026-10-18, evening: committed at 20:33 as `eecb6a7` (the plan), `efa9ed3`
+(feat), `4f21510` (docs) and `88d694f` (the rule wording).)*
 
 ## 4. Release 1.3 — every surface
 
@@ -207,7 +208,14 @@ carries none.
 
 **1.3.4 — Siri: "how much today?"** A second Siri phrase that answers with today's total and
 what is left. **Needs a rule change** (§8): today every Siri reply is one fixed, digit-free line.
-Its design must decide whether it answers on a locked phone.
+Its design must decide whether it answers on a locked phone. *(2026-10-18: **built, gated and staged
+— not committed.** Spec `docs/superpowers/specs/2026-10-18-todays-water-design.md`, plan
+`docs/superpowers/plans/2026-10-18-todays-water.md`. The owner ruled that a locked iPhone asks for
+authentication before it answers (`.requiresAuthentication`), and that the answer carries today's
+total and what is left: *1,450 millilitres so far today — 1,050 millilitres to go.* It reads the
+widget's snapshot and writes nothing; a *Today's Water* tile follows *Log a Glass*. What only a
+device shows — the unlock prompt, with the watch, AirPods and the car, the three lines spoken, and
+Russian — joins 1.2.7's sweep as known issue #146.)*
 
 ## 5. Release 1.4 — Premium
 
@@ -338,6 +346,12 @@ argument through one of two helpers, with the locale; figures grouped, spoken on
 in every catalogue that holds a counted key).)* *(2026-10-17: typed into the three rule files and
 approved by the owner as typed, before any code; staged with 1.2.6's records, for the owner's
 `/commit`.)*
+*(2026-10-18: 1.3.4's `70-privacy` row — Siri's answer to *Today's Water* may say the user's own
+figures, only to someone the system has authenticated, never the streak — and four the table did not
+list: `15-project` (the intent is app-only), `20-state` (the streak never reaches Siri; the snapshot
+carries `remaining` and `hasReachedGoal`), `43-concurrency` and `85-testing` (the new suite that is
+not `@MainActor`). Worded in its spec §5, typed into the rule files unstaged and approved by the owner
+before any code, as 1.2.5's were. Known issue #147 asks the owner to reword the last two.)*
 
 ## 9. Not planned
 
