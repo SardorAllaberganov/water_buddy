@@ -93,8 +93,9 @@ final class DataManager {
     ///
     /// The first window answers nearly everyone: a run of under a month ends inside it. The count
     /// reads the next one only while the run reaches the window's oldest day, so a long run costs
-    /// its owner one wider fetch and nobody else anything. A run longer than the last window is
-    /// reported as that window's length.
+    /// its owner wider fetches and nobody else anything. A run longer than the last window is
+    /// reported as that window's length. Read only when the kept run of closed days no longer
+    /// answers (``closedRun``) — until 2026-10-18 every pour and every tab read them, twice a pour.
     nonisolated static let streakWindows = [30, 120, 480, 1_920]
 
     /// UserDefaults keys, namespaced because an App Group domain is shared by every
@@ -198,6 +199,18 @@ final class DataManager {
     @ObservationIgnored private var storedHistory: [DaySummary] = []
     @ObservationIgnored private var storedHistoryLogs: [Int: [WaterLog]] = [:]
     @ObservationIgnored private var storedStreak = 0
+
+    /// The run of closed days — every day before today — as last counted, with what it was counted
+    /// under: the day it was today, the goal and the calendar's zone (``readClosedRun(at:)``).
+    ///
+    /// **In memory, never in a store**, so ``streak`` stays derived. Today's water cannot change
+    /// the days before it, so a pour, an *Undo* and every tab's ``refresh()`` add today's share to
+    /// this instead of reading back 30, 120, 480 days a time: that read cost a pour 6 ms at 45 days
+    /// of history in a Debug build and 75 ms at 500, twice, inside the tap
+    /// (spec `2026-10-18-the-streaks-cost-design.md`). Forgotten wherever the app changes an earlier
+    /// day — ``addLog(amount:at:)``, ``deleteLog(_:)``, ``updateLog(_:newAmount:timestamp:)``,
+    /// ``ingest(_:)`` — and on every ``dayDidTurn()``; a new day, goal or zone finds the key stale.
+    @ObservationIgnored private var closedRun: (day: Int, goal: Int, zone: String, count: Int)?
     @ObservationIgnored private var storedRemindersEnabled: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
     @ObservationIgnored private var storedServings: [Int]
@@ -381,7 +394,9 @@ final class DataManager {
     /// Derived, never stored: ``DaySummary/streak(of:goal:)`` over the rows, republished with the
     /// history and whenever the goal moves — every day is judged against the **current** goal,
     /// because no past goal is recorded. Days are bucketed from each serving's instant on this
-    /// model's calendar, so a change of time zone can regroup them, as it does the week card.
+    /// model's calendar, so a change of time zone can regroup them, as it does the week card. The
+    /// days before today are counted once and kept in memory until one of them changes
+    /// (``closedRun``); today's share is read afresh each time.
     ///
     /// **Equality-guarded**, like ``history``: an `Int` that did not move redraws nothing, and
     /// ``refresh()`` runs on every foreground. **A failed read leaves it as it stands** — an
@@ -646,6 +661,7 @@ final class DataManager {
 
         let log = WaterLog(amount: amount, timestamp: date ?? now())
         modelContext.insert(log)
+        forgetClosedRunIfNotToday(log.timestamp)
         saveAndRecompute()
         return log.id
     }
@@ -700,6 +716,9 @@ final class DataManager {
         }
 
         guard foldedCount > 0 else { return 0 }
+
+        // A watch that was out of reach overnight delivers yesterday's pours today.
+        if foldedDaysThisPass.contains(where: { $0 != dayOrdinal(for: now()) }) { closedRun = nil }
 
         // The ledger is written only **after** a successful save, never before. A crash or a save
         // failure between the two previously left ids marked applied with no `WaterLog` row behind
@@ -816,6 +835,7 @@ final class DataManager {
 
     /// Removes a serving and recomputes today's total.
     func deleteLog(_ log: WaterLog) {
+        forgetClosedRunIfNotToday(log.timestamp)
         modelContext.delete(log)
         saveAndRecompute()
     }
@@ -855,6 +875,8 @@ final class DataManager {
     func updateLog(_ log: WaterLog, newAmount: Int, timestamp: Date? = nil) {
         let newTimestamp = timestamp ?? log.timestamp
         guard newAmount > 0, newAmount != log.amount || newTimestamp != log.timestamp else { return }
+        // The day it leaves and the day it lands on.
+        forgetClosedRunIfNotToday(log.timestamp, newTimestamp)
         log.amount = newAmount
         log.timestamp = newTimestamp
         saveAndRecompute()
@@ -1017,24 +1039,54 @@ final class DataManager {
 
     /// The run as the store holds it now, or `nil` when the store could not be read.
     ///
-    /// Reads ``streakWindows`` in turn and stops at the first window the run ends inside. Each
-    /// window is one fetch and one roll-up through ``DaySummary/series(from:days:endingOn:in:)``,
-    /// the same bucketing the week card uses, so the two cannot count a day differently.
+    /// The kept run of closed days (``closedRun``), plus today once today has reached the goal —
+    /// which is what ``DaySummary/streak(of:goal:)`` counts: from today if it has arrived, else
+    /// from yesterday. Today's share is read from today's rows alone, through the same bucketing
+    /// the week card uses.
     private func readStreak() -> Int? {
         let instant = now()
-        let end = Self.nextDayBoundary(after: instant, calendar: calendar)
-        var counted = 0
+        guard let closed = readClosedRun(at: instant),
+              let todays = readTodaysLogs()
+        else { return nil }
 
+        let today = DaySummary.series(from: todays, days: 1, endingOn: instant, in: calendar).last
+        return closed + (today?.reached(storedDailyGoal) == true ? 1 : 0)
+    }
+
+    /// The run of closed days, from ``closedRun`` while it answers for today, the goal and the
+    /// zone, or counted from the store again; `nil` when the store could not be read.
+    ///
+    /// Counted as the whole streak always was — ``streakWindows`` in turn, stopping at the first
+    /// window the run ends inside, each one fetch and one roll-up through
+    /// ``DaySummary/series(from:days:endingOn:in:)`` — and today's share taken off again.
+    private func readClosedRun(at instant: Date) -> Int? {
+        let day = dayOrdinal(for: instant)
+        let zone = calendar.timeZone.identifier
+        if let kept = closedRun, kept.day == day, kept.goal == storedDailyGoal, kept.zone == zone {
+            return kept.count
+        }
+
+        let end = Self.nextDayBoundary(after: instant, calendar: calendar)
+        var closed = 0
         for days in Self.streakWindows {
             guard let start = Self.windowStart(days: days, endingOn: instant, calendar: calendar),
                   let logs = readLogs(from: start, to: end)
             else { return nil }
 
             let series = DaySummary.series(from: logs, days: days, endingOn: instant, in: calendar)
-            counted = DaySummary.streak(of: series, goal: storedDailyGoal)
+            let counted = DaySummary.streak(of: series, goal: storedDailyGoal)
+            closed = counted - (series.last?.reached(storedDailyGoal) == true ? 1 : 0)
             guard DaySummary.streakFillsWindow(series, goal: storedDailyGoal) else { break }
         }
-        return counted
+        closedRun = (day: day, goal: storedDailyGoal, zone: zone, count: closed)
+        return closed
+    }
+
+    /// Forgets ``closedRun`` when any of `instants` falls on a day other than today: a serving
+    /// changed there can move the run of closed days, and the next read counts it again.
+    private func forgetClosedRunIfNotToday(_ instants: Date...) {
+        let today = dayOrdinal(for: now())
+        if instants.contains(where: { dayOrdinal(for: $0) != today }) { closedRun = nil }
     }
 
     /// - Returns: whether the save actually succeeded. `ingest(_:)` is the one caller that acts on
@@ -1195,6 +1247,9 @@ final class DataManager {
     /// The rows are republished and the total is **not** recomputed from them, for the reason on
     /// ``republishTodaysLogs()``.
     func dayDidTurn() {
+        // Either observer: a new day closes today, and a new zone can regroup every day the run
+        // counts. Forgotten even when the day did not change, so the next read counts again.
+        closedRun = nil
         guard resetIfNeeded() else { return }
         republishTodaysLogs()
         republishHistory()

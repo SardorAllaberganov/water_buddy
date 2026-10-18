@@ -308,3 +308,184 @@ struct StreakPublishingTests {
         #expect(!String(describing: snapshot).lowercased().contains("streak"))
     }
 }
+
+// MARK: - Recounting
+
+/// Like ``withStreakStore(clock:_:)``, and hands back the container too, so a test can change the
+/// store behind the manager's back through a context of its own.
+@MainActor
+private func withOpenStreakStore<T>(
+    clock: MovableClock,
+    _ body: (DataManager, ModelContainer) throws -> T
+) throws -> T {
+    let name = "test.waterbuddy.streak.open.\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: name)!
+    let container = try ModelContainer(
+        for: WaterLog.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    defer {
+        defaults.removePersistentDomain(forName: name)
+        UserDefaults.standard.removeSuite(named: name)
+    }
+    let manager = DataManager(
+        defaults: defaults,
+        modelContainer: container,
+        calendar: utcDay,
+        now: { clock.now },
+        reloadWidgets: {},
+        rescheduleReminders: { _ in },
+        publishWrist: { _ in }
+    )
+    return try body(manager, container)
+}
+
+/// Takes every serving off the day `daysAgo` before the clock, through a context of the test's own —
+/// a change the manager is not told about.
+@MainActor
+private func emptyBehindTheManagersBack(_ container: ModelContainer, daysAgo: Int, clock: MovableClock) throws {
+    let context = ModelContext(container)
+    let day = utcDay.startOfDay(for: utcDay.date(byAdding: .day, value: -daysAgo, to: clock.now)!)
+    let next = utcDay.date(byAdding: .day, value: 1, to: day)!
+    for log in try context.fetch(FetchDescriptor<WaterLog>(predicate: #Predicate { $0.timestamp >= day && $0.timestamp < next })) {
+        context.delete(log)
+    }
+    try context.save()
+}
+
+/// The run of days before today is counted once and kept, and counted again only when the app
+/// changes one of them, the goal moves or the day turns (spec `2026-10-18-the-streaks-cost-design.md`).
+///
+/// A pour used to recount it from the store — twice, and on every tab's `refresh()` — reading
+/// back 30, then 120, 480 and 1,920 days as the run grew: 6 ms a pour at 45 days of history in a
+/// Debug build, 75 ms at 500, on the main actor, inside the tap. The first two tests prove the
+/// pour and the tab no longer read the past: the past is changed behind the manager's back, which
+/// no process can do in the product — the app is the only one that writes an earlier day — and the
+/// count does not see it. Every test after them holds a path that must recount.
+@MainActor
+struct StreakRecountTests {
+
+    @Test func aPourDoesNotRecountThePastFromTheStore() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, container in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            #expect(manager.streak == 45)
+
+            try emptyBehindTheManagersBack(container, daysAgo: 10, clock: clock)
+            manager.addLog(amount: 250)
+
+            #expect(manager.streak == 45)
+        }
+    }
+
+    @Test func aTabsRefreshDoesNotRecountThePastFromTheStore() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, container in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            #expect(manager.streak == 45)
+
+            try emptyBehindTheManagersBack(container, daysAgo: 10, clock: clock)
+            manager.refresh()
+
+            #expect(manager.streak == 45)
+        }
+    }
+
+    @Test func todaysPourStillJoinsTheRun() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, _ in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            manager.addLog(amount: 1_000)
+            #expect(manager.streak == 45)
+
+            manager.addLog(amount: 1_000)
+            #expect(manager.streak == 46)
+        }
+    }
+
+    @Test func aServingAddedToAnEarlierDayRecountsTheRun() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, _ in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            let eleven = utcDay.date(byAdding: .day, value: -11, to: clock.now)!
+            let short = try #require(manager.allLogs().first { utcDay.isDate($0.timestamp, inSameDayAs: eleven) })
+            manager.updateLog(short, newAmount: 1_500)
+            #expect(manager.streak == 10)
+
+            manager.addLog(amount: 500, at: eleven)
+            #expect(manager.streak == 45)
+        }
+    }
+
+    @Test func aServingDeletedFromAnEarlierDayRecountsTheRun() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, _ in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            let ten = utcDay.date(byAdding: .day, value: -10, to: clock.now)!
+            let row = try #require(manager.allLogs().first { utcDay.isDate($0.timestamp, inSameDayAs: ten) })
+
+            manager.deleteLog(row)
+            #expect(manager.streak == 9)
+        }
+    }
+
+    @Test func aServingMovedOffAnEarlierDayRecountsTheRun() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, _ in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            let ten = utcDay.date(byAdding: .day, value: -10, to: clock.now)!
+            let row = try #require(manager.allLogs().first { utcDay.isDate($0.timestamp, inSameDayAs: ten) })
+
+            // Into today: the earlier day loses its water and today reaches the goal.
+            manager.updateLog(row, newAmount: 2_000, timestamp: clock.now)
+            #expect(manager.streak == 10)
+        }
+    }
+
+    @Test func aWatchPourOnAnEarlierDayRecountsTheRun() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, _ in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            let eleven = utcDay.date(byAdding: .day, value: -11, to: clock.now)!
+            let row = try #require(manager.allLogs().first { utcDay.isDate($0.timestamp, inSameDayAs: eleven) })
+            manager.updateLog(row, newAmount: 1_500)
+            #expect(manager.streak == 10)
+
+            manager.ingest([WristPour(id: UUID(), amount: 500, at: eleven)])
+            #expect(manager.streak == 45)
+        }
+    }
+
+    /// The observer's hop on `NSCalendarDayChanged` and `NSSystemTimeZoneDidChange`: a new zone can
+    /// regroup every day the run counts, so the next read counts it again. The hop itself still
+    /// republishes nothing on a day that did not change (`aTurnThatIsNotANewDayRepublishesNothing`,
+    /// rule `30-rollover`); the recount waits for the next refresh.
+    @Test func theTurnOfTheDayMakesTheNextReadRecountTheRun() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, container in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            try emptyBehindTheManagersBack(container, daysAgo: 10, clock: clock)
+
+            manager.dayDidTurn()
+            manager.refresh()
+            #expect(manager.streak == 9)
+        }
+    }
+
+    @Test func aRunCarriesOverMidnight() throws {
+        let clock = MovableClock(utc(2026, 10, 10, 14))
+        try withOpenStreakStore(clock: clock) { manager, _ in
+            fill(manager, days: 45, endingDaysAgo: 1, amount: 2_000, clock: clock)
+            manager.addLog(amount: 2_000)
+            #expect(manager.streak == 46)
+
+            clock.now = utc(2026, 10, 11, 9)
+            manager.refresh()
+            #expect(manager.streak == 46, "yesterday closed at the goal; today is still open")
+
+            clock.now = utc(2026, 10, 12, 9)
+            manager.refresh()
+            #expect(manager.streak == 0, "a whole day missed")
+        }
+    }
+}
