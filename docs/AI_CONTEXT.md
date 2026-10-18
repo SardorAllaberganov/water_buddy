@@ -4,6 +4,61 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-18 (seventy-first pass — `/doc_sync` after known issue #144's fix, in the
+session that made it). **Nothing was committed:** HEAD `93d23df`; 1.2.8 and the fix staged together,
+as the owner chose — #144 fixed inside the change before `/commit`. Two files' DocC and the capture
+script changed: `Tools/CaptureScreenshots.sh` now reads the clock once at the top, refuses a run
+outside 1:45–11:45 PM before the boot and the build, and freezes the time it checked;
+`AppStoreScreenshotUITests.swift` and `WaterBuddyApp.swift` changed only in `///` lines. The
+command's checks: 89 tracked `.swift` files, the two rows that moved re-counted
+(`AppStoreScreenshotUITests.swift` 714 → 717, `WaterBuddyApp.swift` 176 → 178) and every row compared
+with its file by script; 638 `@Test`, 57 on the watch, 56 UI `func test` — unchanged;
+`project.pbxproj` last changed in `eba1b1e`; no key added; every `` rule `nn-name` `` resolves.
+Changed: this block; *Current state*'s 1.2.8 entry gains a dated note; three rows; **#144 retired**.
+`docs/STATE.md` gains a dated note — its test-isolation paragraph named `WelcomeUITests` as the one
+UI suite on the fresh start, and since 1.2.8 the store capture is the second. The plan gains a note
+on its step 2. `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md` were checked and left: the gate
+line's window is the harness's and still true, and no key, token or widget contract moved. Gate: a
+`build-for-testing` only, this session; the five invocations were not run (`HISTORY.md`).
+
+**Last updated:** 2026-10-18 (seventieth pass — `/doc_sync` run by the owner again, straight after
+the sixty-ninth, on the same tree). **No source or test file changed and nothing was committed:**
+HEAD `93d23df`, 1.2.8 and its records staged. The checks re-run and unchanged: 89 rows equal to their
+files, 638 `@Test`, 57 on the watch, 56 UI, `project.pbxproj` at `eba1b1e`, every rule name
+resolving. With nothing new to sync, two fresh readers read the staged text — one against the code
+and git, one against this session's logs and the earlier session's transcript — and each finding was
+checked at its source. Taken: *Current state* said five earlier days were "over the goal" (two are
+exactly at it — met); the wheel's failure was written as observed ("turned through 3 PM") where the
+log shows only the request and the read-back — now said to be inferred, here, in #142 and in the
+plan; #142's retirement note said the entry "implied" the failed order, which came from this
+session's proposal, and its older text dates the approval 2026-10-18 where the transcript gives
+23:59 on 2026-10-17; `CLAUDE.md`'s gate line said the method writes into `Screenshots/`, which the
+script does, and now names the window; the stage-5 record's "No other UI test passes it" gains a
+note; the plan's `--time` "takes only `HH:mm`" (`2:53` was accepted), its typing date, the watch
+shot as the design's assumption rather than the owner's answer, `tapSpacing`'s DocC, and its first
+capture finishing in the background. **#144 opened**: four sentences in 1.2.8's own harness, script
+and `WaterBuddyApp`'s DocC that overstate, which a sync may not edit. Not taken: the harness's row
+still opening with "both deliberately non-idempotent" — the row's notes are dated in front of it, as
+every row's are. `HISTORY.md`'s two checkpoints and `tasks/lessons.md`'s entry are superseded in new
+ones, with a lesson.
+
+**Last updated:** 2026-10-18 (sixty-ninth pass — `/doc_sync` run straight after roadmap item 1.2.8's
+records, in the session that built it). **Nothing was committed:** HEAD is `93d23df` — the lag fix
+and the sixty-eighth pass were committed at 13:50–13:51 (`b1bbbc3`, `90eb5e4`, `258a67d`, `93d23df`),
+which that pass, written before, could not say. 1.2.8 is staged: the store method of
+`AppStoreScreenshotUITests` rewritten to start clean and build a lived-in week through History's
+sheet, `Tools/CaptureScreenshots.sh` reworked, the four iPhone PNGs retaken, rule `85-testing`'s
+approved wording. The gate passed on the working tree — 638 unit, UI on iOS 27.0 and 26.5 (38 with 1
+skipped, and 31, on each), 57 on the watch, both widgets built. The command's checks: 89 tracked
+`.swift` files, the one row that moved re-counted (`AppStoreScreenshotUITests.swift`, 559 → 714);
+638 `@Test`, 57 on the watch, 56 UI `func test` — unchanged, the store method still one test;
+`project.pbxproj` last changed in `eba1b1e`; no key added; every `` rule `nn-name` `` resolves.
+Changed: *Current state* opens on 1.2.8 and dates the lag fix's commits; #142 retired; #45, #82 and
+#88 gain dated notes; three rows (the harness, the capture script, the iPhone set); `CLAUDE.md`'s
+gate line 2 now says what rule `85-testing` says — the store method starts clean, the census does
+not; `docs/ROADMAP.md`'s 1.2.8 entry. `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md` were
+checked and left: they say nothing of the store set, and no key, token or widget contract moved.
+
 **Last updated:** 2026-10-18 (sixty-eighth pass — `/doc_sync` run by the owner again, straight after
 the sixty-seventh, on the same tree). **No source or test file changed and nothing was committed:**
 HEAD `9999979`, 16 paths staged. The checks re-run and unchanged: 89 rows equal to their files, 638
@@ -1483,7 +1538,7 @@ WaterBuddy/ScreenHeader.swift                     99   app only — (2026-10-13,
 WaterBuddy/ScrollDepth.swift                     167   app only — unstaged 2026-10-12, stage 3b's second pass: ScrollDepth (phase(of:within:) by what is left showing, span(from:to:), scale to 0.92, anchor — pure; it shrinks and does not fade), EnvironmentValues.scrollDepthSpan, View.scrollDepth() (a visualEffect off the section's global frame) and View.scrollDepthContainer(). On History and Settings, not Home
 WaterBuddy/SettingsView.swift                    818   app only — (2026-10-17, 1.2.6: GoalCard reads the locale; the goal's spoken value through localized.) (stage 5: the vessel rows moved out to VesselSliders, the card committing from its own onChange while no drag is in flight; the switch asks through ReminderPermission; the goal's range and step read off WelcomeView; 951 lines before) (the redesign's stage 4, staged 2026-10-14: the canvas's Settings — SettingsStyle, one title and one note style for the four cards, cardTitle()/cardNote()/settingsCard(), Hairline; the goal at 36 pt bold, its range labels white 0.88 (the 0.75 further on is from before — noted in the fifty-eighth pass); vessel amounts grouped and full white, the row a ViewThatFits measured at its widest; the note "The Glass is the one your widget, Siri and Control Center log."; .onAppear refresh with the two cards re-seeded by onChange unless a drag is in flight; step ticks (Haptics.select) from `steps` counters, the language pick on select; one point of top padding, #108; 774 lines before) (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; SavedTick and CheckShape, drawn over the title of the goal's and the vessels' cards by savedTick(_:) when a change is saved; the figure under a held slider at 1.06; the language's checkmark bounces; the cards re-lay out together when the reminders card's text changes; every section recedes with scrollDepth()) unstaged 2026-10-12, stage 3b: its title is ScreenHeader and its four cards arrive; the goal editor (range labels at white 0.75, 2026-10-10, `c9ef45d`), the vessel editor, reminders, the language picker
 WaterBuddy/VesselSliders.swift                   179   app only — (2026-10-17, 1.2.6: a row's spoken amount through localized; the count did not move.) stage 5: the three vessel rows, lifted out of Settings' card so the welcome draws the same rows — a binding to the three amounts, an onDrag hook, a tick per step while held, the row a ViewThatFits measured at its widest
-WaterBuddy/WaterBuddyApp.swift                   176   app only — (2026-10-15, 1.2.5: freshStartManager's DocC names the rating request as the one Debug/Release difference; 175 lines before) RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch, then ReminderResponder.install() (2026-10-15; 170 lines before) (stage 5: the gate shows WelcomeView; every return to the foreground reads the system's answer back through ReminderPermission.reconcile; in DEBUG, -WaterBuddyFreshStart opens on a throwaway suite and an in-memory store — freshStartManager(arguments:); 108 lines before)
+WaterBuddy/WaterBuddyApp.swift                   178   app only — (2026-10-18, #144, staged with 1.2.8, DocC only: freshStartArgument no longer names who passes it — rule 85-testing does; freshStartManager says init() resolves the App Group suite before it; 176 lines before) (2026-10-15, 1.2.5: freshStartManager's DocC names the rating request as the one Debug/Release difference; 175 lines before) RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch, then ReminderResponder.install() (2026-10-15; 170 lines before) (stage 5: the gate shows WelcomeView; every return to the foreground reads the system's answer back through ReminderPermission.reconcile; in DEBUG, -WaterBuddyFreshStart opens on a throwaway suite and an in-memory store — freshStartManager(arguments:); 108 lines before)
 WaterBuddy/WaterBuddyShortcuts.swift              38   app only — the one AppShortcutsProvider: three phrases (en + ru, AppShortcuts.xcstrings), the "Log a Glass" tile
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
 WaterBuddy/WaterMotion.swift                      64   app only — new 2026-10-18, the lag fix, change A: how the water moves after a pour and then rests — the phase eases from 1.1 rad/s to a standstill over settling (2.5 s), carries on across pours, and remaining(at:since:) runs Home's clock (the welcome's waits out settling itself); pure and nonisolated
@@ -1522,7 +1577,7 @@ WaterBuddyTests/WaterMotionTests.swift            85   new 2026-10-18, the lag f
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WelcomeTests.swift               379   (2026-10-15: PermissionSpy's scheduler takes pending and setCategories; 378 lines before) stage 5 — ReminderPermissionTests (7: a grant stored, a refusal and a failed request stored as off, a phone already allowed or already refused not asked again, a re-read that turns reminders off on a refusal and leaves the switch alone otherwise) + WelcomeStepTests (not @MainActor, 8: the order, no Back first and no Continue last, Continue and Back as a pair, the dots from one, where the next and previous steps wait, a slid step seen all the way out, under Reduce Motion nothing travels, the bells at the reminder hours) + WelcomeFinishTests (6: vessels left alone store nothing, vessels set are stored, the goal saved closes the welcome, reminders asked for before it closes, a refusal still opens the app with reminders off, Not now asks nothing) + FreshStartTests (DEBUG only, 2: no argument, no fresh start; a fresh start is a throwaway cleared at each launch) — the first and third against PermissionSpy, a ReminderScheduler built from a spy's closures
 WaterBuddyTests/WristSyncTests.swift             882   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests; staged 2026-10-11: WristIngestTests' failed-read test makes its store unreadable with UnreadableStore, no longer by overwriting the file (known issue #92)
-WaterBuddyUITests/AppStoreScreenshotUITests.swift  559   (2026-10-17, 1.2.6: its spoken figures through a private grouped(_:), the capture device's own grouping — it is en_UZ; not run.) (stage 5, compiled and not run: both methods tap Get Started, shoot the goal step, and walk on with Continue, Continue and Not now through tapWhenReady; 540 lines before) NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
+WaterBuddyUITests/AppStoreScreenshotUITests.swift  717   (2026-10-18, #144, DocC only, staged with 1.2.8: *Why it starts clean* says the launch still resolves the App Group suite and runs the migration, and the run's figures live only in the throwaway; setTime's afternoon failure is the request and the read-back, the snap-back inferred; 714 lines before) (2026-10-18, roadmap item 1.2.8, staged: the store method rewritten — launched with -WaterBuddyFreshStart and en_US, refuses to start outside 1:45–11:45 PM, builds a lived-in week through History's + and wheel (today's five at set times, six earlier days from the sheet's shortcuts), asserts Home at 65 % with a 5 days chip; run three times, the last two passing — the store method is no longer non-idempotent, the census still is, still not run; 559 lines before) (2026-10-17, 1.2.6: its spoken figures through a private grouped(_:), the capture device's own grouping — it is en_UZ; not run.) (stage 5, compiled and not run: both methods tap Get Started, shoot the goal step, and walk on with Continue, Continue and Not now through tapWhenReady; 540 lines before) NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
 WaterBuddyUITests/GoalSetupUITests.swift        1296   (2026-10-17, 1.2.6: 38 tests — total(in:), waitForTotal and millilitres(on:) read grouped figures, as do the Undo and the sheet's-shortcut sites; the chip's and the strip's spoken values checked, and testTheChipSpeaksItsNounAtTheLargestTextSize and testTheStripSpeaksItsCountAtTheLargestTextSize added; the strip's "second element" check dropped by the owner's decision, #139.) (stage 5: eleven Get Started preambles are now completeWelcomeIfShown(app), the class's DocC says the welcome; still 36 tests; 1236 lines before) (stage 4, staged 2026-10-13, 36 tests: testSettingsSaysWhichVesselTheOneTapDoorsLog — the new note drawn, the old one not; testEverySettingsControlIsOneElement — the goal slider, three vessel sliders, the switch and four language rows one element each, a guard green before and after; 1196 lines before) (2026-10-13, stage 3c, staged, 34 tests: testEveryDayOnTheWeekCardIsATapTarget — every day button at least 44 × 44, which bites on a 375-pt phone) (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
@@ -1603,7 +1658,7 @@ omitting it:
 Tools/GenerateAppIcon.swift                      267   generates the three iOS icon variants at 1024². Run: swift Tools/GenerateAppIcon.swift. Does NOT own the watch icon — see known issue #34
 Tools/FlattenPNG.swift                            99   re-encodes a PNG to colour type 2, RGB untouched. Required for every watch capture: simctl writes RGBA on watchOS even with --mask=ignored
 Tools/ComposeStoreScreenshot.swift               161   composites an unaltered iPhone screen onto the product's own aurora at a target slot size — how the iPad 13" set was made (see below)
-Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5. Its default device is gone — known issue #45. It no longer overrides the status bar's clock (2026-10-09, committed in `12ddfc4`)
+Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5. Its default device is gone — known issue #45. It no longer overrides the status bar's clock (2026-10-09, committed in `12ddfc4`). *(2026-10-18, 1.2.8, staged: it finds the phone by name and runtime — iPhone 18 Pro Max, iOS 27.0, the first of two; WATERBUDDY_SCREENSHOT_PHONE still takes a UDID — so its half of #45 is fixed; no dirty-device gate, since the harness starts clean; the clock frozen again, at the run's start, in 24-hour form, the owner's ruling; DerivedData kept between runs. Run end to end twice.)* *(2026-10-18, #144, staged with 1.2.8: the clock is read once at the top and a run outside 1:45–11:45 PM is refused there, before the boot and the build — the harness keeps its own check — and the time checked is the time frozen; its header and `--time` comment say what the code and the 1.2.8 transcript show. Proved by fake-clock runs against a device name nothing matches; not run end to end since.)*
 Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position. Its default device is gone — #45
 Tools/CaptureWatchScreenshot.sh                    —   the watch capture. WATERBUDDY_SCREENSHOT_NOWAIT=1 shoots the empty state unattended. Its default device is gone, and it repeats two claims since found false — #45
 Tools/VerifyScreenshots.sh                         —   proves each capture's size/alpha/format against the slot it will be uploaded to
@@ -1621,7 +1676,7 @@ WaterBuddy/PrivacyInfo.xcprivacy                  —   \
 WaterBuddyWidget/PrivacyInfo.xcprivacy            —    | four byte-identical manifests, one per shipping
 WaterBuddyWatch/PrivacyInfo.xcprivacy             —    | bundle. Each target's synchronized root group
 WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with NO project.pbxproj edit
-Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88)
+Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)*
 Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
 Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states, from 2026-09-02; untracked
@@ -1847,6 +1902,43 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Roadmap item 1.2.8, the iPhone store set, is built, captured, gated and staged — not committed**
+(2026-10-18; the session that built it, then this sixty-ninth pass). HEAD is `93d23df`. The design
+was approved in chat on 2026-10-17 and parked for the lag fix (#142, now retired); the owner resumed
+it, and it is written down for the first time in `docs/superpowers/plans/2026-10-18-store-screenshots.md`.
+*(2026-10-18, the seventy-first pass: #144 is fixed inside this staged change, as the owner chose,
+and retired. The script refuses a run outside the window before it boots and builds, and freezes the
+time it checked, so the status bar can no longer read earlier than the 1:30 PM row; the harness's,
+the script's and `WaterBuddyApp`'s DocC say what the code and the logs show. Checked by fake-clock
+runs before and after, and a `build-for-testing`; the five invocations were not run again, and no
+PNG changed. `WaterBuddyApp.swift` joins 1.2.8's staged paths.)*
+
+- **What changed.** `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots` launches with
+  `-WaterBuddyFreshStart` and `en_US`, refuses to start outside 1:45–11:45 PM, and builds a lived-in
+  week through History's `+`: today's five servings at set times on the wheel (1,300 ml, 65 %), and
+  six earlier days from the sheet's shortcuts, five of them meeting the goal — a *5 days* chip. Nothing
+  is poured on Home. `Tools/CaptureScreenshots.sh` finds the iPhone 18 Pro Max on iOS 27.0 by name,
+  drops the dirty-device gate, freezes the clock in 24-hour form and keeps its DerivedData. Rule
+  `85-testing`'s wording, approved before any code, is staged with it; `CLAUDE.md`'s gate line 2
+  follows it.
+- **The four PNGs** in `Screenshots/en-US/iPhone-6.9/` are retaken, 1320 × 2868, at 15:06, and each
+  was read. `VerifyScreenshots.sh` passed.
+- **What the runs found.** The plan's wheel order — the half of the day first — failed: at 2:42 PM
+  the hour wheel, asked for 12, read back 2. The log shows only the request and the read-back; that
+  it snapped back from a time later than now is inferred, and the fix that rests on it — the wheel
+  spun in the morning, its half of the day set last — passed twice. And `simctl status_bar --time` draws in the device's own hour cycle: `en_UZ` is 24-hour, so
+  the owner chose a frozen 24-hour clock over changing the device.
+- **The gate**, on the working tree: unit `✔ Test run with 638 tests in 80 suites passed`; UI on iOS
+  27.0 — `GoalSetupUITests` 38 in four chunks, 1 skipped by design, the others 31, 0 failures; UI on
+  iOS 26.5 the same, 0 failures; watch `✔ Test run with 57 tests in 6 suites passed`; both widget
+  schemes built. The one Swift file changed, in the UI test target, prints no warning; no product
+  source changed, so no clean-build comparison was run.
+- **Left.** The census method and its script (#82, #45), the watch capture script (#45), and the
+  watch shots (#88), which wait for the watch's redesign, 1.3.2.
+
+*(2026-10-18, the sixty-ninth pass: the lag fix below was committed at 13:50–13:51 the same day —
+`b1bbbc3` (specs and plan), `90eb5e4` (the streak), `258a67d` (the water) and `93d23df` (its sync).)*
 
 **The lag fix is built, gated and staged — not committed** (2026-10-18; its records were written by
 the session that built it, and the sixty-seventh pass read them). HEAD is `9999979`. The owner
@@ -2187,6 +2279,8 @@ the gate's logs it holds live only on this Mac; what a reader elsewhere needs is
 - **`-WaterBuddyFreshStart`, DEBUG only:** the app opens on a throwaway suite,
   `uitest.waterbuddy.freshstart`, cleared at each launch, and an in-memory store — so
   `WelcomeUITests` sees the welcome on any simulator without erasing it. No other UI test passes it.
+  *(2026-10-18, roadmap item 1.2.8: the store capture, `testCaptureAppStoreScreenshots`, passes it
+  too, as rule `85-testing` now says — staged.)*
 - **Strings:** 28 new keys in English, Russian and Uzbek, the Russian and Uzbek drafted by this
   session, for the owner to read.
 - **The owner's rulings mid-stage (2026-10-14, R1–R5),** after the first sweep found eight things
@@ -4118,6 +4212,22 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
+**Read at 20:12 on 2026-10-18, in the seventieth pass, after its `git add` of its five files by
+name: `93d23df`, 134 commits, level with `origin/main`; 13 staged, 6 unstaged, 1 untracked entry,
+none in both** — the same 13, 6 and 1 as the block below; the pass's five (`CLAUDE.md`, this file,
+the plan, `tasks/lessons.md`, `HISTORY.md`) were already among the 13 and are re-staged. No
+`git commit`.
+
+**Read at 15:53 on 2026-10-18, in the sixty-ninth pass, after its `git add` of its four files by
+name: `93d23df`, 134 commits, level with `origin/main`; 13 staged, 6 unstaged, 1 untracked entry,
+none in both.** Staged: roadmap item 1.2.8 — `WaterBuddyUITests/AppStoreScreenshotUITests.swift`,
+`Tools/CaptureScreenshots.sh`, `.claude/rules/85-testing.md`, the four PNGs in
+`Screenshots/en-US/iPhone-6.9/`, `docs/superpowers/plans/2026-10-18-store-screenshots.md` (added),
+`tasks/lessons.md` — and `HISTORY.md`, `CLAUDE.md`, this file, `docs/ROADMAP.md`. Unstaged:
+`.claude/settings.json` (the owner's) and the five files the open Xcode app rewrites (#50). Untracked:
+`Screenshots/census/`. The lag fix and the sixty-seventh and sixty-eighth passes, staged at the blocks
+below, were committed at 13:50–13:51 (`b1bbbc3`..`93d23df`). No `git commit` in this pass.
+
 **Read at 12:03 on 2026-10-17, in the sixty-fifth pass, after its last `git add` of its five files by
 name: `52ee815`, 126 commits, level with `origin/main`; 5 staged, 6 unstaged, 1 untracked entry, none
 in both** — the same five, six and one as the block below. No `git commit` between the two passes, and
@@ -5512,6 +5622,11 @@ rather than fixed — the review's own explicit call, not an oversight:**
     11:15 over History rows reading 23:14. Both iPhone scripts now leave the clock alone (unstaged).
     The dead defaults and the watch script's two false comments stand.
     *(2026-10-11: that fix was committed on 2026-10-10, in `12ddfc4`.)*
+    *(2026-10-18, roadmap item 1.2.8, staged: `Tools/CaptureScreenshots.sh` now finds its phone by
+    name and runtime — iPhone 18 Pro Max, iOS 27.0 — and ran end to end; it freezes the clock again,
+    at the run's start, in 24-hour form, because the device draws `--time` in its own hour cycle and
+    this Mac's are `en_UZ`. `Tools/CaptureFullCensus.sh` and `Tools/CaptureWatchScreenshot.sh` still
+    default to dead devices, and the watch script's two false comments stand.)*
 
 **Opened by the 2026-10-06 smart-reminders change** — each a limit the change records rather than
 fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
@@ -6097,6 +6212,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     stage 3c, which did not touch the harness. Still not run.
     **2026-10-14, the redesign's stage 5:** both methods walk the welcome now — *Get Started*, the
     goal step's shots, then *Continue*, *Continue* and *Not now* through `tapWhenReady(_:)`. Compiled in every gate run; still not run (#130(i)).
+    **2026-10-18, roadmap item 1.2.8 — the store method is rewritten and was run; the census was
+    not.** The store method launches with the fresh start, so it no longer needs an erased device,
+    and builds its week through History's sheet rather than pouring on Home; it passed twice of three
+    runs, the first failing on its own wheel order (`tasks/lessons.md`). The census method is
+    untouched but for one sentence: it still needs an erased device, its shots 10 and 11 are still
+    named for two detents, and its `allowsFullSwipe` citation is still `HistoryView.swift:159`.
 83. **History's header gave a UI test no value.** In stage 1's probe `app.staticTexts["Today"].value`
     did not carry "N of M millilitres" (it parsed as −1). The header is
     `.accessibilityElement(children: .ignore)` with a label and a value. **Whether VoiceOver speaks the
@@ -6223,6 +6344,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `Screenshots/en-US/`. **`Screenshots/census/` has never been tracked** — `git status` still
     shows it untracked — so the nine watch captures kept there are in no commit, and the census's
     iPhone captures were deleted from the working tree only.)*
+    *(2026-10-18, roadmap item 1.2.8: **the iPhone half is retaken, of the redesign**, staged and not
+    committed — the four shots over a lived-in week, at 15:06, figures and times in `en_US` (*1,300*,
+    *1:30 PM*), the status bar's clock *15:01*. The watch shots are still from 2026-09-02: the watch's
+    redesign is 1.3.2.)*
 89. **At the largest text size the first-run screen scrolls under the status bar.** Seen on iOS 18.6
     and 27.0 in stage 1's probe: scrolled up, the question's first line runs beneath the clock. The
     screen is the old one, replaced in stage 5; recorded so the new one is checked for it.
@@ -7403,8 +7528,19 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     moving the waves rather than redrawing them (Home idle only 12 %, and a pour heavier, 43 %), and
     sampling the wave every 4 pt (no saving — the cost is the redraw, not the arithmetic).
 
-142. **Roadmap item 1.2.8 is parked half-way, and rule `85-testing` describes a harness that does
-    not exist yet.** Its wording was approved and typed on 2026-10-18 — the store capture launches with
+142. ~~**Roadmap item 1.2.8 is parked half-way, and rule `85-testing` describes a harness that does
+    not exist yet.**~~ **Retired 2026-10-18 — the harness is on disk, staged, and was run** (the
+    sixty-ninth pass): the store method launches with the fresh start and builds the week through
+    History's sheet; `Tools/CaptureScreenshots.sh` drives it; the four PNGs are retaken; the rule's
+    wording is staged with them. The plan is `docs/superpowers/plans/2026-10-18-store-screenshots.md`.
+    The wheel's order this session's proposal and plan gave — the half of the day first — failed: at
+    2:42 PM the hour, asked for 12, read back 2, inferred to have snapped back from a time later than
+    now (`tasks/lessons.md`, 2026-10-18). *(Corrected by the seventieth pass: the sixty-ninth said
+    "this entry implied" the order, and the text below implies none. And by the earlier session's
+    transcript the owner approved the design and this wording at 23:59 on 2026-10-17; it was typed
+    seconds after midnight, so "approved and typed on 2026-10-18" below is true of the typing only,
+    and "the design approved in chat on 2026-10-18" is 2026-10-17.)*
+    Its wording was approved and typed on 2026-10-18 — the store capture launches with
     `-WaterBuddyFreshStart` and starts clean on its own — and is in the tree, unstaged; the harness
     and `Tools/CaptureScreenshots.sh` are unchanged. A throwaway probe proved the History sheet's
     wheel can be set from XCUITest in `en_US` (hour, minute and AM/PM take `"7"`, `"40"`, `"AM"`; the
@@ -7425,6 +7561,35 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     "the hop … republishes nothing on a day that did not change"; that test observes `todaysLogs`, the
     widget doorbell and `currentWater`, not `streak` or `history` — rule `30-rollover` and
     `dayDidTurn()` itself are what say it.
+
+144. ~~**Four sentences in 1.2.8's own code and script overstate, staged — a doc sync may not edit
+    them.**~~ **Retired 2026-10-18 — fixed inside 1.2.8's staged change, before `/commit`** (the
+    seventy-first pass). (a) The harness's and the script's header say the launch still resolves the
+    App Group suite and runs the migration, and that the run's servings, goal and total live only in
+    the throwaway. (b) `setTime` gives the request and the read-back and calls the snap-back
+    inferred. (c) The `--time` comment gives what the 1.2.8 transcript shows — `14:53` accepted;
+    `2:53 PM`, `2:53 ` and three ISO dates refused, against `simctl`'s own help — and the script now
+    reads the clock once at the top, refuses a run outside 1:45–11:45 PM there, before the boot and
+    the build, and freezes the time it checked: fake-clock runs proved the refusal missing before
+    and present after. (d) `freshStartArgument` names no users; rule `85-testing` does — and
+    `freshStartManager`'s "never opened by it" gains that `init()` resolves the suite first. Every
+    Swift change is `///`; a `build-for-testing` succeeded with no warning in either file.
+    Found by the seventieth pass's two readers, 2026-10-18; each checked at its source.
+    (a) The harness's DocC (*Why it starts clean on its own*) and `Tools/CaptureScreenshots.sh`'s
+    header say the device's own WaterBuddy data "is never opened". `WaterBuddyApp.init()` calls
+    `DataManager.prepareSharedStorage()` before the fresh-start branch, as its own comment says ("It
+    runs on a fresh start too"), and that resolves the App Group suite and runs the one-shot
+    migration. What holds: the run's manager is built on a throwaway suite and an in-memory store, so
+    no serving, goal or total of the device's is read into the shots or written. (b) The harness's
+    DocC on `setTime` says the hour "went from 2 towards 12 by way of 3 PM, snapped back". The log
+    shows only the request for 12 and the read-back *2 o’clock*; the path is inferred. (c) The script
+    says `--time` "takes only an `HH:mm`", but its own first passing run gave it `2:53`, which was
+    accepted and drawn *02:53*; refused were `2:53 PM`, `2:53 ` and full ISO dates. And it says a run
+    outside the window "fails at once" — after the build and the boot — while the clock it freezes is
+    read at the script's start, which the window does not guard: a build slow enough could freeze a
+    time before 1:30 PM. (d) `WaterBuddyApp.freshStartArgument`'s DocC — "The argument the welcome's
+    UI tests launch with" — no longer names every user; rule `85-testing` does. 1.2.8 is not
+    committed, so (a)–(c) can be fixed in the change itself before `/commit`, if the owner wants.
 
 ## Where the rest is written down
 

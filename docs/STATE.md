@@ -4,6 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-18 (seventy-first pass — `/doc_sync` after known issue #144's fix).
+**No key and no stored byte changed.** The test-isolation paragraph named `WelcomeUITests` as the one
+UI suite launched on the fresh start; since roadmap item 1.2.8 the store capture is the second, and a
+dated note says so. Its account of the launch — `prepareSharedStorage()` still runs first, against
+the simulator's group container — was checked against `WaterBuddyApp.init()` and stands; it is what
+#144 corrected the harness's DocC to say.
+
 **Last updated:** 2026-10-18 (sixty-eighth pass — the owner's `/doc_sync` again). **No key and
 no stored byte changed.** The streak paragraph forgot the kept run for "an earlier date"; the code
 forgets it for any day other than today, and for `updateLog` when the serving was or becomes another
@@ -1195,7 +1202,9 @@ in is another matter.** The unit target is hosted in the app (`TEST_HOST` is `Wa
 before any test runs the host's own launch has called `prepareSharedStorage()` and built
 `DataManager.shared` against the group container of the simulator it runs in — as a launch of the
 app does. The UI suites launch that same real app, with no store override — except
-`WelcomeUITests`, which since stage 5 launches it with `-WaterBuddyFreshStart`: in a DEBUG build the
+`WelcomeUITests`, which since stage 5 launches it with `-WaterBuddyFreshStart` *(2026-10-18: and,
+since roadmap item 1.2.8, the store capture, `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`
+— rule `85-testing` names both)*: in a DEBUG build the
 app then runs on that throwaway suite, cleared at launch, and an in-memory store. The launch's own
 `prepareSharedStorage()` still runs first, against the simulator's group container, as on every
 launch — the app's bookkeeping on its own group, as `WaterBuddyApp.init()`'s comment says, not

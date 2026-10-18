@@ -136,8 +136,11 @@ something to record.
   1. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyTests` — phone unit tests
   2. `xcodebuild test -scheme WaterBuddy -only-testing:WaterBuddyUITests
      -skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` — phone UI tests. The skip is
-     **mandatory**: `AppStoreScreenshotUITests` is the App Store capture harness, deliberately
-     non-idempotent, and fails on any device where setup has already been completed
+     **mandatory**: `AppStoreScreenshotUITests` is the App Store capture harness. Its store method
+     starts clean on its own through the fresh start, but runs for minutes, fails as it starts
+     outside 1:45–11:45 PM, and is driven only by `Tools/CaptureScreenshots.sh`, which writes the
+     PNGs into `Screenshots/`; its census method is still deliberately non-idempotent, and fails on
+     any device where setup has already been completed
   3. `xcodebuild test -scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests` — watch unit tests
   4. `xcodebuild build -scheme WaterBuddyWidgetExtension` — the phone widget, its own scheme
   5. `xcodebuild build -scheme WaterBuddyWatchWidget` — the watch widget, its own scheme (no

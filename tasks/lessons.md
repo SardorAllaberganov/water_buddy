@@ -4047,3 +4047,59 @@ measured at about 2 %" was an inference from the screens that carry it, never a 
 overwrite it — a timestamp, not a round number — and writes the load into that log. Check a counting
 script against a count already known before trusting what it prints. Say "measured" only of what was
 switched off and measured; a ceiling inferred from other screens is called a ceiling.
+
+## 2026-10-18 — A wheel bounded by now snaps back from every stop past it, not only from where it lands
+
+**What happened.** Roadmap item 1.2.8's store capture sets today's servings on History's wheel, which
+offers nothing later than now. The approved plan set *AM/PM* first, then the hour, then the minute,
+reasoning that only the half of the day could carry a time past now. The run started at 2:42 PM; the
+fourth serving, 12:25 PM, asked the hour wheel to go from 2 to 12 — and XCUITest turned it the long
+way, through 3 PM, where it snapped back to now and stayed at 2. Three morning servings had passed
+first, so the order looked proven. The read-back after each wheel caught it on the first run.
+
+The same capture found that `simctl status_bar --time` takes only an `HH:mm` (*2:53 PM* and full ISO
+dates are refused) and draws it in the device's own hour cycle: on this Mac's `en_UZ` devices `2:53`
+came out as *02:53*, night, over rows saying *1:30 PM*. The probe a day earlier had set a wheel and
+never looked at the status bar.
+
+**The rule:** move a bounded wheel only where every value it can pass through is inside the bound —
+here, in the morning, with the half of the day set last — and read every wheel back before saving.
+Before relying on a simulator override, try it and look at the pixels on the device the run uses.
+
+## 2026-10-18 — I wrote what I expected a tool had done, beside what it printed
+
+**What happened.** The seventieth pass's two readers checked 1.2.8's records against the session's
+own tool results and logs. Several sentences said more than any of them showed:
+- "The capture, three times in the foreground." The first call came back at the ten-minute limit
+  while `xcodebuild` sat out #101's exit, and finished in the background. The tool result said so.
+- "`--time` takes only an `HH:mm`." The run before had passed it `2:53`, which it accepted and drew
+  as *02:53*. That was the very finding the sentence explained.
+- "The hour … turned through 3 PM … snapped back." The log shows the request for 12 and the
+  read-back *2 o’clock*. The path is an inference, which the fix built on it happened to bear out.
+- "Another project's UI runs came and went between them." No record shows a run during the gate.
+- Smaller ones: the entry above says the run "started at 2:42 PM", where the script started at
+  14:41:14 and the failing serving was at 14:42:57. Its "probe a day earlier" ran about fourteen
+  hours before, after midnight on the same date. "With the load at start and end" holds for some of
+  the logs and not others.
+
+None of these changes what was built, and every one was written from memory of the step rather than
+from its output.
+
+**The rule:** a sentence in the records that says what a tool did — ran in the foreground, accepted,
+refused, turned, started at — is written with that tool's result open, and says "inferred" of
+anything the result does not print. Read the claim against the output, not against the plan it
+was meant to carry out.
+
+## 2026-10-18 — A crop of the status bar showed the middle of the screen
+
+**What happened.** Checking #144, I cropped a store shot's status bar with
+`sips -c 180 1320 --cropOffset 0 0` and got the vessel, from the middle of the screen. The 1.2.8
+session's `--time` probe had cropped its four screenshots the same way, `sips -c 200 700
+--cropOffset 0 0`: the four crops are byte-identical (one MD5), though the full screenshots behind
+the last two differ. So the probe's crops never showed a status bar. Nothing recorded rests on them:
+what `--time` accepted came from `simctl`'s exit, and *02:53* from the capture's own shot. A
+downscaled whole screenshot showed the bar at once.
+
+**The rule:** look at a crop before reading anything off it. When several crops of screens that
+should differ come out the same size, compare their hashes; identical bytes mean the crop missed
+what changed.

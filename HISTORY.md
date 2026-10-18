@@ -10345,3 +10345,303 @@ this file is added again once this block is written. **No `git commit` was run.*
 `.claude/rules/85-testing.md` (#142), `.claude/settings.json` (the owner's), and the five files the open
 Xcode app rewrites (#50) — the two schemes and the three catalogues, back since 11:18. **1 untracked**:
 `Screenshots/census/`. None in both.
+
+## [2026-10-18] — Roadmap item 1.2.8: the iPhone store set, over a lived-in week
+
+**What the owner asked.** `/start_task` with no task named; the owner picked 1.2.8, parked half-way
+for the lag fix (known issue #142), and approved the proposal to resume it — the design approved in
+chat on 2026-10-17, recovered from that session's transcript and written down for the first time in
+`docs/superpowers/plans/2026-10-18-store-screenshots.md`. Its answers from 2026-10-17: a lived-in
+week; raw screens; English only; screenshots only, no listing copy. The watch shot stays.
+
+**What changed.**
+- **`WaterBuddyUITests/AppStoreScreenshotUITests.swift`** — `testCaptureAppStoreScreenshots`
+  rewritten. It launches with `-WaterBuddyFreshStart YES -AppleLanguages (en) -AppleLocale en_US`, so
+  every run is a new install on any simulator, never the device's own data, and figures and times
+  read as an en-US listing does. It refuses to start outside 1:45–11:45 PM. It shoots the welcome's
+  goal step, walks the welcome with *Not now*, then builds the week through History: today's five
+  servings through the `+` at set times on the wheel — 7:40 AM Glass, 9:15 Cup, 10:50 Bottle,
+  12:25 PM Glass, 1:30 PM Cup, 1,300 ml — then the six days before, 27 saves from the sheet's
+  shortcuts: 1,650 (short), 2,000, 2,250, 2,150, 2,500, 2,000. Every wheel and every day's total is
+  read back. Home is asserted at *65 percent. 1,300 of 2,000 millilitres.* with a *5 days* chip, and
+  nothing is poured on Home, so no *Undo*, no slosh, no confetti and no rating request is in shot.
+  Its DocC gives the new reasons. The census method is untouched but for one sentence that said its
+  sibling "stays exactly as it is".
+- **`Tools/CaptureScreenshots.sh`** — the phone is found by name and runtime, *iPhone 18 Pro Max* on
+  iOS 27.0, the first of the two installed (#45's dead-UDID shape, on this script); the dirty-device
+  gate is gone; the status-bar clock is frozen at the run's start in 24-hour form; the DerivedData is
+  kept between runs, so a re-run does not rebuild the app, its widget and its watch app from nothing;
+  stale comments ("iOS 26.5", "iPhone 17 Pro Max", the 5-minute estimate) corrected.
+- **`.claude/rules/85-testing.md`** — the wording the owner approved on 2026-10-17, typed then and
+  unstaged since (#142): the store capture launches with the fresh start; the gate's skip stays
+  mandatory because the store method runs for minutes and writes into `Screenshots/`, and the census
+  method is still non-idempotent.
+- **`Screenshots/en-US/iPhone-6.9/`** — the four PNGs, retaken: `01-home`, `02-history`,
+  `03-settings`, `04-goal-setup`, 1320 × 2868, at 15:06.
+
+**The owner's rulings, in chat.** Resume 1.2.8 on the approved design; carry on after a denied call
+(below); and the status bar's clock, which the design said would be 12-hour: **24-hour, frozen** —
+over switching the capture device to 12-hour time, and over a live clock.
+
+**What the runs found.**
+- **The wheel's order was wrong in the plan.** The first capture (14:41) failed on the fourth
+  serving: the hour wheel, asked to go from 2 PM to 12, turned through 3 PM — later than now — snapped
+  back, and stayed at 2. The harness now spins every wheel in the morning, where all of it is earlier
+  than now, and sets the serving's own half of the day last. The read-back caught it; the plan carries
+  a dated correction; `tasks/lessons.md` has the lesson. The failed run wrote no PNG.
+- **The clock.** The second capture (14:53) passed, and its status bar read *02:53*. `--time` takes
+  only an `HH:mm` — `2:53 PM` and full ISO dates were refused when tried — and draws it in the
+  device's own hour cycle, `en_UZ` here, 24-hour. The owner's ruling above; the third capture (15:01)
+  reads *15:01*.
+
+**One denied call.** A compound command that read the unit gate's log and edited this session's own
+scratch gate runner with `sed -i` was refused. The edit was not made by any other means; the work
+stopped and was reported, and the owner said to go on with the runner as it was, reading each log
+with a separate `grep`.
+
+**Verification actually run.** Logs under this session's scratchpad, each named by its start time,
+with the load at start and end.
+- `build-for-testing` of the `WaterBuddy` scheme: `** TEST BUILD SUCCEEDED **`.
+- The capture, three times in the foreground: 14:41 failed as above (exit 65 after #101's ten-minute
+  exit); 14:53 and 15:01 passed, `Executed 1 test, with 0 failures` in 296 s and 298 s. Each of the
+  four PNGs of the last run was read: the figures, the chip, the week's bars (Monday white and short,
+  Tuesday to Saturday cyan, today selected; *1,978 ml* average, *2,500 ml* best day, *5 of 7*), the
+  strip's five bars and *5 servings*, the rows' times, the clock later than every row, and no
+  transient UI. `VerifyScreenshots.sh`: 15 files checked, all acceptable.
+- **The gate**, on the working tree, each invocation alone with no other `xcodebuild` running at its
+  start (another project's UI runs came and went between them):
+  unit `✔ Test run with 638 tests in 80 suites passed`; UI on iOS 27.0 (`iPhone 17`) —
+  `GoalSetupUITests` 38 in four chunks, 1 skipped by design, 0 failures, and the other classes 31, 0
+  failures; UI on iOS 26.5 — the same, 38 with 1 skipped and 31, 0 failures; watch `✔ Test run with
+  57 tests in 6 suites passed`; `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`
+  `** BUILD SUCCEEDED **`.
+- **Warnings.** The one Swift file changed is in the UI test target; the two builds that compiled its
+  final text (the 14:53 capture and the unit gate) print no warning from it. No product source
+  changed, so no clean-build comparison was run.
+- **Not run:** a capture on any other device size; anything on a device.
+
+**Files.** `WaterBuddyUITests/AppStoreScreenshotUITests.swift`, `Tools/CaptureScreenshots.sh`,
+`.claude/rules/85-testing.md`, the four PNGs, `docs/superpowers/plans/2026-10-18-store-screenshots.md`
+(new), `tasks/lessons.md`, this file. `docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and `CLAUDE.md` are left
+for the `/doc_sync` pass that follows.
+
+**Staging.** Read from the commands at 15:50 on 2026-10-18, after this change's one `git add` by
+explicit path; this file is added straight after this block. **No `git commit` was run.** HEAD
+`93d23df` (the lag fix and its sync, committed since the pass above), `## main...origin/main`.
+**9 staged** before this file: the harness, the script, rule `85-testing`, the four PNGs, the plan
+(added) and `tasks/lessons.md`; **10 with this file**. **6 unstaged**: `.claude/settings.json` (the
+owner's) and the five files the open Xcode app rewrites (#50) — the two schemes and the three
+catalogues. **Untracked**: `Screenshots/census/`, nine watch PNGs. None in both.
+
+## [2026-10-18] — `/doc_sync` after 1.2.8: the store set's records, and the lag fix's commits
+
+**What changed.** `/doc_sync` run straight after roadmap item 1.2.8's records, by the session that
+built it, as its plan said — the sixty-ninth pass of `docs/AI_CONTEXT.md`. No source or test file was
+touched by the pass.
+
+**Drift found and fixed.**
+- `docs/AI_CONTEXT.md`'s *Current state* opened on the lag fix as staged and HEAD as `9999979`; it was
+  committed at 13:50–13:51 (`b1bbbc3`, `90eb5e4`, `258a67d`, `93d23df`). It gains a dated note, and
+  *Current state* now opens on 1.2.8.
+- Known issue #142 — 1.2.8 parked — retired: the harness, the script, the shots and the rule's wording
+  are on disk and staged. #45 gains a note: the store script finds its phone by name now; the census
+  and watch scripts still name dead devices. #82: the store method is rewritten and was run; the
+  census method was not, and is still stale. #88: the iPhone half of the store set is retaken.
+- Three file rows: the harness (559 → 714 lines, with what changed), the capture script, the iPhone
+  set.
+- `CLAUDE.md`'s gate line 2 said the harness is "deliberately non-idempotent, and fails on any device
+  where setup has already been completed" — now true of the census method only, as rule `85-testing`'s
+  approved wording says. It says so.
+- `docs/ROADMAP.md`'s 1.2.8 entry gains a dated note: built, captured, gated, staged; the listing copy
+  and the watch shot not done.
+
+**Checked and already accurate.** 89 tracked `.swift` files, every row's count equal to its file's
+lines, by one script, which was checked against `HEAD`'s stale 559 for the harness; 638 `@Test`, 57 on
+the watch, 56 UI `func test`; `project.pbxproj` last changed in `eba1b1e`; no key added, so
+`docs/STATE.md`'s *If a key is added* question has nothing to answer; `docs/STATE.md`,
+`docs/WIDGET.md` and `docs/DESIGN.md` say nothing of the store set and were left; every
+`` rule `nn-name` `` resolves; `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and
+`docs/dependencies.md` still do not exist.
+
+**Superseded here** (append-only, so kept as written): 1.2.8's checkpoint above says rule `85-testing`'s
+wording was approved on 2026-10-17 and "typed then". By the earlier session's transcript, the owner
+approved the design and its wording at 23:59 on 2026-10-17 and it was typed seconds after midnight, on
+2026-10-18 — which is the date #142 gives.
+
+**Lesson.** The wheel's bound and the status bar's hour cycle, already in `tasks/lessons.md` from
+1.2.8's records; none new from the pass.
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, this file.
+
+**Gate.** Not run for this pass; 1.2.8's checkpoint above reports the gate on the same tree, run in this
+session, and nothing it covered has changed since.
+
+**Staging.** Read from the commands at 15:53 on 2026-10-18, after this pass's `git add` of
+`CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and this file by name; this file and
+`docs/AI_CONTEXT.md` are added again once their staging blocks are written. **No `git commit` was
+run.** HEAD `93d23df`, `## main...origin/main`. **13 staged**: 1.2.8's ten and `CLAUDE.md`,
+`docs/AI_CONTEXT.md`, `docs/ROADMAP.md`. **6 unstaged**: `.claude/settings.json` (the owner's) and the
+five files the open Xcode app rewrites (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — `/doc_sync` again: two fresh readers check 1.2.8's records against the code and the logs
+
+**What changed.** The owner ran `/doc_sync` again, straight after the sixty-ninth pass — the
+seventieth pass of `docs/AI_CONTEXT.md`. No source or test file changed between the two, nothing was
+built or run, and the command's checks were unchanged: 89 rows equal to their files, 638 `@Test`, 57
+on the watch, 56 UI `func test`, `project.pbxproj` at `eba1b1e`, every rule name resolving. With
+nothing new to sync, two fresh readers read the staged text, read-only: one against the code and git
+(ten findings), one against this session's logs, its tool results and the earlier session's
+transcript (seven, and four nits). Each was checked at its source before it was taken.
+
+**Taken, and fixed where the text is live** (`CLAUDE.md`, `docs/AI_CONTEXT.md`, the plan):
+- *Current state* said five earlier days were "over the goal"; two are exactly 2,000 against 2,000 —
+  met, as `DaySummary.reached` counts it.
+- The wheel's failure was written as observed — "turned through 3 PM … snapped back". The log shows
+  only the request for 12 and the read-back *2 o’clock*; the path is inferred. Restated in *Current
+  state*, #142 and the plan.
+- #142's retirement note said the entry "implied" the failed order; the order came from this
+  session's proposal. And #142's older text dates the approval 2026-10-18: by the earlier session's
+  transcript the owner approved the design and wording at 23:59:55 on 2026-10-17, and the rule was
+  typed at 00:00:18–22 on 2026-10-18.
+- `CLAUDE.md`'s gate line said the store method "writes into `Screenshots/`"; the script does. It
+  now says so, and names the window the method fails outside.
+- The stage-5 record's "No other UI test passes it" gains a dated note: the store capture does too.
+- The plan: `--time` "takes only `HH:mm`" — the first passing run gave it `2:53`, accepted and drawn
+  *02:53*; refused were `2:53 PM`, `2:53 ` and full ISO dates; the wording's typing date; the watch
+  shot is the design's own assumption, approved with it, not one of the owner's answers; the census's
+  `tapSpacing` DocC was reworded too; the first capture finished in the background.
+- **#144 opened** for what a sync may not edit: the harness's and the script's "the device's own
+  WaterBuddy data is never opened" (`prepareSharedStorage()` runs before the fresh-start branch); the
+  harness's "by way of 3 PM"; the script's "takes only an `HH:mm`", and its "fails at once" with a
+  clock frozen before the window is checked; `WaterBuddyApp.freshStartArgument`'s DocC naming only
+  the welcome's tests.
+
+**Not taken.** The harness's row still opens with "both deliberately non-idempotent": every row in
+that table carries its dated notes in front of its older text, and the newest says otherwise.
+
+**Superseded here, in this file and in `tasks/lessons.md`** (append-only, so kept as written):
+- 1.2.8's checkpoint: "The watch shot stays" among the owner's answers (the design's assumption);
+  "turned through 3 PM — later than now — snapped back" (inferred); "`--time` takes only an `HH:mm`"
+  (`2:53` was accepted); "with the load at start and end" (the `build-for-testing` log has no end line
+  and the warm-up's end line no load); its `** TEST BUILD SUCCEEDED **`, which compiled the harness
+  before its last edit at 14:51; "the capture, three times in the foreground" (the 14:41 run's call
+  came back at the limit during #101's exit and the run ended in the background at 14:53:00; the
+  harness was edited at 14:51:43, while that `xcodebuild` was still waiting); "another project's UI
+  runs came and went between them" — unsupported: the gate runner refuses to start while any
+  `xcodebuild` runs, and none was refused, but nothing records what ran during an invocation. The
+  only sightings were AvtoLog's runs started at 2:01 and 2:07 PM, during the `build-for-testing` and
+  the warm-up build, which use no simulator. And it did not say that every capture and gate run's
+  `simctl shutdown all` also shut down a StackAndShip iOS 18.6 simulator, booted with no build running
+  on it; the owner was told. "Approved on 2026-10-17, typed then" was already superseded above.
+- The sixty-ninth pass: "which is the date #142 gives" — true of the typing only.
+- `tasks/lessons.md`'s entry on the bounded wheel: "the run started at 2:42 PM" (the script at
+  14:41:14, the failing serving at 14:42:57); "turned it the long way, through 3 PM" (inferred);
+  "takes only an `HH:mm`"; "the probe a day earlier" (about fourteen hours earlier, after midnight on
+  the same date).
+
+**One lesson.** I wrote what I expected a tool had done, beside what it printed (`tasks/lessons.md`).
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md` (the pass's block, *Current state*, #142, #144
+opened, the stage-5 note), the plan, `tasks/lessons.md`, this file.
+
+**Gate.** Not run for this pass; 1.2.8's checkpoint reports the gate on the same tree, run in this
+session.
+
+**Staging.** Read from the commands at 20:12 on 2026-10-18, after this pass's `git add` of its five
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their staging blocks are
+written. **No `git commit` was run.** HEAD `93d23df`, `## main...origin/main`. **13 staged**, the same
+13 paths as after the sixty-ninth pass. **6 unstaged**: `.claude/settings.json` (the owner's) and the
+five files the open Xcode app rewrites (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — Known issue #144: 1.2.8's overstated sentences, and the capture's clock checked before it is frozen
+
+**What changed.** After `/start_task`, the owner chose #144, to be fixed inside 1.2.8's own staged
+change before `/commit`. Each sentence was first checked at its source: `DataManager.prepareSharedStorage()`,
+which resolves `sharedDefaults` — and with it `migrateIfNeeded(from:into:)` — while the SwiftData
+store is a separate lazy static the fresh-start path never touches; the 1.2.8 session's transcript,
+for the `status_bar --time` probes; and the staged `02-history.png`, whose status bar reads *15:01*.
+
+- **`Tools/CaptureScreenshots.sh`** — the one change in behaviour. The clock is read once, at the
+  top, checked against 1:45–11:45 PM before the device is resolved or booted, and that same value is
+  frozen into the status bar at step 3. Before, step 3 read `date` itself, after the boot, and only
+  the harness checked the window, after the build: a run begun at 1:20 PM with a slow enough build
+  could pass the harness and draw *13:2x* over the 1:30 PM row. The header's "fails at once" is now
+  true; the harness keeps its own check, for a build that carries the run past 11:45 PM and for a
+  run started without the script. The header no longer says the device's data "is never opened":
+  the launch resolves the App Group suite and runs the migration, and the run's figures live only
+  in the throwaway. The `--time` comment now says what was tried: the transcript shows `14:53`
+  accepted and `2:53 PM`, `2:53 ` and three ISO dates (`2026-10-18T14:53:00+05:00`,
+  `…T09:53:00Z`, `…T14:53:00`) refused, though `simctl`'s help says an ISO date is taken; that the
+  14:53 capture passed `2:53` and drew *02:53* is from 1.2.8's records.
+- **`WaterBuddyUITests/AppStoreScreenshotUITests.swift`** — DocC only. The class's *Why it starts
+  clean* says what the script's header now says; `setTime`'s afternoon failure is stated as the log
+  has it — asked for 12, read back 2, at 2:42 PM — with the snap-back called inferred.
+- **`WaterBuddy/WaterBuddyApp.swift`** — DocC only. `freshStartArgument` no longer names who passes
+  it; rule `85-testing` does. `freshStartManager`'s "never opened by it" gains a clause saying
+  `init()` resolves the suite before it — beyond #144, proposed with it and approved.
+
+**Verification actually run.**
+- RED, on the script before the change, under a fake `date` (an exported shell function) and a
+  device name nothing matches: 13:44, 13:45, 23:44, 23:45, 09:05 and 00:00 all reached device
+  resolution — none was refused for the time.
+- GREEN, after: 13:44, 23:45, 09:05, 08:59, 00:00 and 12:00 refused with the window message; 13:45
+  and 23:44 reached device resolution, as did the real clock at 20:21. `bash -n` clean. None of
+  these booted or wrote to a simulator.
+- `git diff` of the two Swift files against the index: every changed line is `///`.
+- `xcodebuild build-for-testing -scheme WaterBuddy`, iOS 27.0, iPhone 17, in the foreground from
+  20:21:56: `** TEST BUILD SUCCEEDED **`, both files recompiled, no warning or error naming either.
+- **Not run:** the five-invocation gate — the owner's call, with no product line changed; 1.2.8's
+  checkpoint reports it on the tree before these comments. No recapture: the PNGs are unchanged.
+
+**Files touched.** `Tools/CaptureScreenshots.sh`, `WaterBuddyUITests/AppStoreScreenshotUITests.swift`,
+`WaterBuddy/WaterBuddyApp.swift`, this file. #144 in `docs/AI_CONTEXT.md` is left for `/doc_sync`.
+
+**Staging.** Read from the commands at 20:22 on 2026-10-18, after `git add` of the three files by
+name; this file is added after this block is written. **No `git commit` was run.** HEAD `93d23df`,
+`## main...origin/main`. **14 staged** — 1.2.8's 13 and `WaterBuddy/WaterBuddyApp.swift`. **6
+unstaged**: `.claude/settings.json` (the owner's) and the five files the open Xcode app rewrites
+(#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — `/doc_sync` after #144's fix: #144 retired, and `docs/STATE.md`'s second fresh-start suite
+
+**What changed.** The seventy-first pass of `docs/AI_CONTEXT.md`, run in the session that fixed
+#144, straight after the checkpoint above. No source or test file changed for the pass.
+
+**The command's checks.** 89 tracked `.swift` files, 89 rows, each row's count equal to its file's
+lines by one script (`WaterBuddyWatchWidgetBundle.swift`'s row, which ends at its count, read by hand:
+9 and 9). 638 `@Test`, 57 on the watch, 56 UI `func test` — unchanged. `project.pbxproj` last changed
+in `eba1b1e`, nothing staged or unstaged in it. No key added. 18 rule names cited, 18 files.
+`docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and `docs/dependencies.md` do not exist.
+
+**Changed.**
+- `docs/AI_CONTEXT.md`: the pass's block; a dated note on *Current state*'s 1.2.8 entry; three rows
+  — `WaterBuddyApp.swift` 176 → 178, `AppStoreScreenshotUITests.swift` 714 → 717, and
+  `Tools/CaptureScreenshots.sh`'s note; **#144 retired**, saying what fixed each of (a)–(d).
+- `docs/STATE.md`, **drift from 1.2.8 that no earlier pass caught**: its test-isolation paragraph
+  named `WelcomeUITests` as the one UI suite launched on the fresh start, and the store capture has
+  been the second since 1.2.8. A dated note says so; the paragraph's account of the launch —
+  `prepareSharedStorage()` running first, against the simulator's group container — was checked
+  against `WaterBuddyApp.init()` and stands.
+- The 1.2.8 plan: a dated note on step 2, on the clock now checked by the script.
+- `tasks/lessons.md`: one entry, below.
+
+**Checked and left.** `CLAUDE.md` — its gate line 2's 1:45–11:45 PM window is the harness's, which
+is unchanged, and no target, key or shared file moved. `docs/WIDGET.md` and `docs/DESIGN.md` say
+nothing of the store capture or the fresh start's launch, and no token or widget contract moved.
+`docs/ROADMAP.md`'s 1.2.8 entry still holds: built, captured, gated and staged, not committed.
+
+**One lesson.** A crop of the status bar showed the middle of the screen: `sips -c … --cropOffset 0 0`
+gave the centre here, and the 1.2.8 probe's four crops made that way are byte-identical, one MD5,
+while the full screenshots behind the last two differ. Nothing recorded rested on them.
+
+**Gate.** Not run for this pass. The checkpoint above reports the `build-for-testing` run this
+session; the five invocations were not run in it.
+
+**Files touched.** `docs/AI_CONTEXT.md`, `docs/STATE.md`,
+`docs/superpowers/plans/2026-10-18-store-screenshots.md`, `tasks/lessons.md`, this file.
+
+**Staging.** Read from the commands at 20:25 on 2026-10-18, after this pass's `git add` of four of
+its files by name; this file is added again once this block is written. **No `git commit` was run.**
+HEAD `93d23df`, `## main...origin/main`. **15 staged** — the 14 above and `docs/STATE.md`. **6
+unstaged**: `.claude/settings.json` (the owner's) and the five files the open Xcode app rewrites
+(#50). **1 untracked**: `Screenshots/census/`. None in both.

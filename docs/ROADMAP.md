@@ -169,7 +169,13 @@ the art, where Apple's asset guidance discourages pricing claims. A Russian head
 store listing has a Russian localization. *(2026-10-18: begun and parked for the owner's lag report.
 Designed and approved in chat — the same four screens over a lived-in week built through History's
 `+`, raw, English only, no listing copy — with rule `85-testing`'s wording typed and unstaged and no
-code changed; known issue #142 says where to resume.)*
+code changed; known issue #142 says where to resume.)* *(2026-10-18, later: **resumed, built,
+captured, gated and staged — not committed.** Plan `docs/superpowers/plans/2026-10-18-store-screenshots.md`.
+The four iPhone shots are retaken of the redesign over a lived-in week — 65 % today, five of six
+earlier days met, a *5 days* chip — in `en_US`, with a 24-hour status-bar clock by the owner's ruling,
+since the capture device's own region draws it. The header was already done. Not done: the pitch in
+the listing copy — the owner chose screenshots only for this task on 2026-10-17 — and the watch shot,
+which waits for 1.3.2.)*
 
 ## 4. Release 1.3 — every surface
 
