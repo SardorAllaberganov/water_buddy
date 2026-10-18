@@ -15,22 +15,54 @@
 #  Nothing else may hold a simulator while this runs — CLAUDE.md's hard limits allow one at a time,
 #  and a cloned parallel run writes into a container that cannot be read back.
 #
-#  THIS SCRIPT NEVER ERASES ANYTHING. It *requires* a device with no WaterBuddy state — the run
-#  captures the welcome, reachable only while `Key.isGoalSet` is absent, and the totals in the
-#  other three shots are only correct from an empty store — but erasing is destructive and
-#  `Bash(xcrun simctl erase:*)` is on this project's permission deny list. So the check below is a
-#  *gate*, not a fix: if the device is dirty it prints the exact command and stops, and a human
-#  decides whether to destroy that container.
+#  Run it between 1:45 PM and 11:45 PM. The harness sets today's servings on History's wheel, which
+#  offers nothing later than now, and the last is at 1:30 PM; outside that window it fails at once,
+#  saying so.
+#
+#  THIS SCRIPT NEVER ERASES ANYTHING, and since 2026-10-18 it no longer needs to. The harness
+#  launches the app with `-WaterBuddyFreshStart`: a throwaway suite cleared at launch and an
+#  in-memory store, so every run is a new install whatever the device holds. The launch still
+#  resolves the device's App Group suite and runs the one-shot migration, as every launch does; the
+#  run's servings, goal and total live only in the throwaway (rule `85-testing`).
 #
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-# iPhone 17 Pro Max on iOS 26.5. Its device-type profile reads mainScreenWidth 1320,
-# mainScreenHeight 2868, mainScreenScale 3 — exactly App Store Connect's 6.9" slot. iPhone Air
-# (1260x2736) is the only other installed device that lands in that slot.
-PHONE="${WATERBUDDY_SCREENSHOT_PHONE:-EDF19A71-1CA8-4D79-A5B6-06340C4560E8}"
+# The clock, read once: checked against the window here, before the boot and the build, and frozen
+# into the status bar at step 3 — so the frozen time is always later than the last row. Read after
+# the build instead, a run begun at 1:20 PM could pass the harness's own check and draw 13:20 over a
+# serving at 1:30 PM. The harness keeps its check, for a build that carries the run past 11:45 PM.
+NOW="$(date '+%H:%M')"
+CLOCK=$((10#${NOW/:/}))
+if (( CLOCK < 1345 || CLOCK >= 2345 )); then
+  echo "it is $NOW: the store capture runs between 1:45 PM and 11:45 PM — today's last serving is at 1:30 PM, the wheel offers nothing later than now, and a run across midnight would split the week" >&2
+  exit 1
+fi
+
+# An iPhone 18 Pro Max on iOS 27.0, found by name and runtime rather than by a UDID that dies with
+# the simulator set (it did on 2026-10-08). Its device-type profile reads 1320x2868 at scale 3 —
+# exactly App Store Connect's 6.9" slot, as 1.1's set was. When two devices share the name, the
+# first listed is used and named below; its state does not matter, because the run starts clean.
+# WATERBUDDY_SCREENSHOT_PHONE takes a UDID; the other two take a name and a runtime as
+# `simctl list` prints them.
+NAME="${WATERBUDDY_SCREENSHOT_NAME:-iPhone 18 Pro Max}"
+RUNTIME="${WATERBUDDY_SCREENSHOT_RUNTIME:-iOS 27.0}"
+if [ -n "${WATERBUDDY_SCREENSHOT_PHONE:-}" ]; then
+  PHONE="$WATERBUDDY_SCREENSHOT_PHONE"
+else
+  MATCHES="$(xcrun simctl list devices available | awk -v rt="-- $RUNTIME --" -v name="$NAME" '
+    /^-- / { inrt = ($0 == rt); next }
+    inrt { line = $0; sub(/^ +/, "", line)
+           if (index(line, name " (") == 1 && match(line, /\([0-9A-F-]+\)/)) print substr(line, RSTART + 1, RLENGTH - 2) }')"
+  PHONE="$(printf '%s\n' "$MATCHES" | head -n 1)"
+  if [ -z "$PHONE" ]; then
+    echo "no available simulator named \"$NAME\" on $RUNTIME — set WATERBUDDY_SCREENSHOT_PHONE to a UDID" >&2
+    exit 1
+  fi
+  echo "   $NAME, $RUNTIME: $PHONE ($(printf '%s\n' "$MATCHES" | grep -c .) installed, the first used)"
+fi
 
 # Which App Store slot this run fills. App Store Connect validates the pixel size against the slot
 # it is uploaded to and rejects a mismatch outright — a 6.9" capture in the 6.5" well is refused with
@@ -48,48 +80,13 @@ WORK="$ROOT/build/screenshots"          # build/ is already gitignored
 RESULT="$WORK/iPhone.xcresult"
 DD="$WORK/DerivedData"
 
-rm -rf "$WORK"
+# The result bundle is this run's alone (step 5 clears the attachments); the DerivedData is kept,
+# so a second run builds only what changed rather than the app, its widget and its watch app.
+rm -rf "$RESULT"
 mkdir -p "$WORK" "$OUT"
 
-echo "── 1. a device with no state at all ─────────────────────────────────────────"
+echo "── 1. one simulator, booted ─────────────────────────────────────────────────"
 xcrun simctl shutdown all 2>/dev/null || true
-
-# Read the container metadata off disk rather than booting to ask. An app container whose
-# MCMMetadataIdentifier carries the bundle id, or an App Group container mentioning it, means the
-# app has run here before — so `Key.isGoalSet` may be set and today's SwiftData rows may be
-# non-empty, which silently invalidates every figure in the captures.
-DEVDIR="$HOME/Library/Developer/CoreSimulator/Devices/$PHONE"
-dirty=0
-if find "$DEVDIR/data/Containers/Data/Application" -maxdepth 2 \
-     -name '.com.apple.mobile_container_manager.metadata.plist' 2>/dev/null \
-   | xargs -I{} plutil -extract MCMMetadataIdentifier raw -o - {} 2>/dev/null \
-   | grep -q 'sardor.WaterBuddy'; then dirty=1; fi
-if find "$DEVDIR/data/Containers/Shared/AppGroup" -maxdepth 2 -name '*.plist' 2>/dev/null \
-   | xargs grep -l 'sardor.WaterBuddy' 2>/dev/null | grep -q .; then dirty=1; fi
-
-if [ "$dirty" -ne 0 ]; then
-  cat <<EOF
-
-  STOP — this simulator already carries WaterBuddy state.
-
-  The welcome is unreachable once a goal has been committed, and the totals in the Home and
-  History shots would be whatever a previous run left behind. The capture needs a clean container.
-
-  This script will not erase it for you: that destroys everything on the device, and
-  \`Bash(xcrun simctl erase:*)\` is denied in .claude/settings.json. Run it yourself if you are
-  content to lose what is there:
-
-      xcrun simctl erase $PHONE
-
-  Or point the run at a device that has never had the app, e.g.:
-
-      WATERBUDDY_SCREENSHOT_PHONE=<udid> bash Tools/CaptureScreenshots.sh
-
-EOF
-  exit 1
-fi
-echo "   clean: no WaterBuddy app or App Group container on this device"
-
 xcrun simctl bootstatus "$PHONE" -b
 
 echo "── 2. pin the environment ───────────────────────────────────────────────────"
@@ -100,17 +97,24 @@ xcrun simctl ui "$PHONE" appearance dark
 xcrun simctl ui "$PHONE" content_size large
 
 echo "── 3. freeze the status bar ─────────────────────────────────────────────────"
-# The clock is deliberately NOT overridden. `HistoryView` prints each serving's time directly beneath
-# the status bar, in the device's own 12/24-hour setting, so the only clock that cannot contradict
-# those rows is the real one. A frozen 9:41 would; and so did the `date '+%-l:%M'` this line used
-# until 2026-10-09, which is 12-hour whatever the device is — on a 24-hour simulator at night it
-# printed 11:15 over rows reading 23:14. The cost is that the four shots are a few minutes apart.
+# The clock is frozen at the time read and checked at the top, so the four shots read one time, and
+# every row under it — the last is at 1:30 PM, and the run starts after 1:45 — is earlier. From
+# 2026-10-09 to 2026-10-18 it was left live, after a 12-hour string drawn over 24-hour rows had
+# contradicted them.
+#
+# It is given in 24-hour form, and it is drawn in the device's own hour cycle. Tried on 2026-10-18,
+# `--time` took `14:53`, and took `2:53` and drew it as 02:53 on a capture device in `en_UZ` —
+# night, over rows saying 1:30 PM. It refused `2:53 PM`, `2:53 ` and the three ISO dates tried,
+# though `simctl`'s own help says an ISO date is taken. The app's rows are 12-hour, because the
+# harness launches it in `en_US`; the owner chose the 24-hour clock over changing the device's own
+# hour cycle (2026-10-18).
 xcrun simctl status_bar "$PHONE" override \
+  --time "$NOW" \
   --dataNetwork wifi --wifiMode active --wifiBars 3 \
   --cellularMode active --cellularBars 4 --operatorName "" \
   --batteryState charged --batteryLevel 100
 
-echo "── 4. drive it (about 5 minutes — the pours are spaced deliberately) ────────"
+echo "── 4. drive it (a few minutes — 32 servings through History's sheet) ─────────"
 # `id=` rather than a platform/OS/name triple: the device is already booted with the overrides on it,
 # and naming it by identity is what stops xcodebuild resolving a sibling instead. The private
 # -derivedDataPath keeps this out of the DerivedData the gate uses.
@@ -124,8 +128,8 @@ xcodebuild test \
   -resultBundlePath "$RESULT"
 
 echo "── 5. extract ───────────────────────────────────────────────────────────────"
-# `export attachments` is the current subcommand on Xcode 26.6 (xcresulttool 24757). Do NOT use
-# `export object` — it is deprecated on this toolchain and slated for removal.
+# `export attachments` is the current subcommand, as it was on Xcode 26.6 (xcresulttool 24757).
+# Do NOT use `export object` — it was deprecated there and slated for removal.
 rm -rf "$WORK/attachments"
 xcrun xcresulttool export attachments \
   --path "$RESULT" \

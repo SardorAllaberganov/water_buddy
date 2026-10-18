@@ -63,7 +63,8 @@ struct WaterBuddyApp: App {
     }
 
     #if DEBUG
-    /// The argument the welcome's UI tests launch with.
+    /// The argument a UI test launches with to open on a new install; rule `85-testing` names the
+    /// tests that pass it.
     static let freshStartArgument = "-WaterBuddyFreshStart"
 
     /// The fresh start's one suite, in the app's own preferences — never the App Group. Its name is
@@ -77,7 +78,8 @@ struct WaterBuddyApp: App {
     /// in-memory store. Every side effect a test fixture turns off is turned off — the widget
     /// doorbell, the reminder reschedule, the wrist publish — the fixture discipline rule
     /// `85-testing` sets, applied to a run of the real app. The App Group's suite and store are
-    /// never opened by it. Without the argument this is `nil`, and a Debug build runs what a Release
+    /// never opened by it; `init()` resolves the suite before this, for the launch's own
+    /// bookkeeping. Without the argument this is `nil`, and a Debug build runs what a Release
     /// one does — save the rating request, which a Debug build asks only when launched with
     /// `ReviewPrompt.launchArgument`; a Release build does not contain it.
     ///
