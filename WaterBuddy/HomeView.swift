@@ -1008,6 +1008,16 @@ private struct WaterVessel: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// When the water's latest movement began, and where the surface stood then. Changed together,
+    /// in one `onChange`, and read by the clock instead of `lastPour`: a frame drawn between the pour
+    /// and the change still has the old pair, which stands the surface in the same place.
+    @State private var motionStart = Date.distantPast
+    @State private var restingPhase = 0.0
+
+    /// Whether the water is moving, and so whether the clock runs at all.
+    @State private var moving = false
 
     var body: some View {
         ZStack {
@@ -1033,13 +1043,31 @@ private struct WaterVessel: View {
     @ViewBuilder
     private var water: some View {
         if reduceMotion {
-            // Reduce Motion is aimed squarely at exactly this: a loop that never stops. The
-            // level still animates when it changes; only the perpetual travel is dropped.
+            // Reduce Motion drops the travel altogether. The level still animates when it changes.
             waves(phase: 0, slosh: 0)
         } else {
-            TimelineView(.animation) { context in
-                let seconds = context.date.timeIntervalSinceReferenceDate
-                waves(phase: seconds * 1.1, slosh: slosh(at: context.date))
+            // The clock runs only while the water moves after a pour, and never while the app is
+            // not active — behind Control Center, the app switcher, a system alert. Between pours
+            // the water is still and costs nothing per frame (``WaterMotion``).
+            TimelineView(.animation(minimumInterval: nil, paused: !moving || scenePhase != .active)) { context in
+                waves(
+                    phase: WaterMotion.phase(at: context.date, since: motionStart, base: restingPhase),
+                    slosh: slosh(at: context.date)
+                )
+            }
+            .onChange(of: lastPour) { _, pour in
+                restingPhase = WaterMotion.base(after: restingPhase, from: motionStart, to: pour)
+                motionStart = pour
+            }
+            .task(id: lastPour) {
+                // Runs the clock for what is left of the movement, then stops it. A newer pour
+                // cancels this one and starts its own, so only the latest pour's settling stops it.
+                let left = WaterMotion.remaining(at: .now, since: lastPour)
+                moving = left > 0
+                guard left > 0 else { return }
+                try? await Task.sleep(for: .seconds(left))
+                guard !Task.isCancelled else { return }
+                moving = false
             }
         }
     }
@@ -1058,10 +1086,10 @@ private struct WaterVessel: View {
         .animation(Motion.water, value: level)
     }
 
-    /// How agitated the surface is, decaying after a pour.
+    /// How agitated the surface is, decaying after a pour — over the same window the water moves.
     private func slosh(at date: Date) -> Double {
         let elapsed = date.timeIntervalSince(lastPour)
-        guard elapsed >= 0, elapsed < 5 else { return 0 }
+        guard elapsed >= 0, elapsed < WaterMotion.settling else { return 0 }
         return exp(-elapsed * 1.5)
     }
 

@@ -823,6 +823,15 @@ private struct HelloVessel: View {
     let isShown: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// When the water last began to move, and where the surface stood then — set together, as on
+    /// Home's vessel.
+    @State private var motionStart = Date.distantPast
+    @State private var restingPhase = 0.0
+
+    /// Whether the water is moving, and so whether the clock runs at all.
+    @State private var moving = false
 
     /// Half full: the app's promise, drawn.
     private static let level = 0.5
@@ -832,8 +841,23 @@ private struct HelloVessel: View {
             if reduceMotion {
                 waves(phase: 0)
             } else {
-                TimelineView(.animation(minimumInterval: nil, paused: !isShown)) { context in
-                    waves(phase: context.date.timeIntervalSinceReferenceDate * 1.1)
+                // Moves as Home's water does after a pour — here, each time the step is shown — and
+                // then rests (``WaterMotion``); stopped off its step and while the app is not active.
+                TimelineView(.animation(minimumInterval: nil, paused: !moving || !isShown || scenePhase != .active)) { context in
+                    waves(phase: WaterMotion.phase(at: context.date, since: motionStart, base: restingPhase))
+                }
+                .task(id: isShown) {
+                    guard isShown else {
+                        moving = false
+                        return
+                    }
+                    let shown = Date.now
+                    restingPhase = WaterMotion.base(after: restingPhase, from: motionStart, to: shown)
+                    motionStart = shown
+                    moving = true
+                    try? await Task.sleep(for: .seconds(WaterMotion.settling))
+                    guard !Task.isCancelled else { return }
+                    moving = false
                 }
             }
         }
