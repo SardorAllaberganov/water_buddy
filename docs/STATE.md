@@ -4,6 +4,19 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-18 (sixty-eighth pass — the owner's `/doc_sync` again). **No key and
+no stored byte changed.** The streak paragraph forgot the kept run for "an earlier date"; the code
+forgets it for any day other than today, and for `updateLog` when the serving was or becomes another
+day's. Its claim that the tests pin both halves now says what they pin and what they do not
+(`docs/AI_CONTEXT.md` #143).
+
+**Last updated:** 2026-10-18 (sixty-seventh pass of `docs/AI_CONTEXT.md` — the owner's `/doc_sync`
+after the lag fix). **No key and no stored byte changed.** One passage changed, *`streak` is observed
+state with no key*: the run of days before today is now counted once and kept in memory
+(`closedRun`) until the app changes one of them, the goal moves, the zone changes or the day turns.
+It is not stored, so no key was added and *What Apple is told about all of this* has nothing to
+answer.
+
 **Last updated:** 2026-10-17 (roadmap item 1.2.6's records, written by the session that built it —
 not a `/doc_sync` pass). **No key and no stored byte changed:** the plural forms live in the
 catalogues, not the store. One passage changed, the language section's *Only sites that format
@@ -1082,10 +1095,21 @@ crosses a process or the wire.**
 
 **`streak` is observed state with no key.** `republishStreak()` runs first in `republishHistory()`
 and at the end of the `dailyGoal` setter, behind `role.drawsHistory` — so only the phone app
-computes one — with an equality guard. `readStreak()` reads a window of 30 days ending today, and
-while the run fills the whole window reads a wider one: 120, 480, then 1,920 (`streakWindows`). It
-returns `nil` if any read fails, and a `nil` publishes nothing: **a failed read leaves the streak as
-it stands, never zero** (the same ruling as the total's). Every day is judged against **the goal as
+computes one — with an equality guard. `readStreak()` is the run of days before today plus today,
+once today has reached the goal, read from today's rows alone. The run of days before today is
+counted by `readClosedRun(at:)` — a window of 30 days ending today, and while the run fills the whole
+window a wider one: 120, 480, then 1,920 (`streakWindows`) — and **kept in memory**, `closedRun`,
+keyed by today's ordinal, the goal and the calendar's zone. Not a key and not stored: it is forgotten
+wherever the app changes a day other than today — `addLog(amount:at:)` with a date on another day,
+`deleteLog(_:)` of another day's serving, `updateLog(_:newAmount:timestamp:)` when the serving was or
+becomes another day's, `ingest(_:)` folding a pour onto another day — and on every `dayDidTurn()`, and
+a new day, goal or zone finds its key stale. So a pour, an *Undo* and a tab's `refresh()` no longer
+read the past; with it, a whole pour cost 6 ms at 45 days of history and 75 ms at 500 (2026-10-18,
+spec `2026-10-18-the-streaks-cost-design.md`). `StreakRecountTests` pins that a pour and a refresh
+read no further back, and that the add, the delete, the move into today, a watch pour, the day's turn
+and midnight recount; the goal is pinned by `changingTheGoalReJudgesTheStreak`; a change of zone and a
+serving moved off today are not tested (`docs/AI_CONTEXT.md` #143). It returns `nil` if any read fails, and a `nil` publishes nothing: **a failed read
+leaves the streak as it stands, never zero** (the same ruling as the total's). Every day is judged against **the goal as
 it is now**; today counts once it reaches the goal and does not break the run before it does. The
 arithmetic is `DaySummary.streak(of:goal:)`, pure. `theStreakStaysOutOfTheSnapshotAndTheWristMirror`
 pins that it reaches neither `WaterSnapshot` nor `WristMirror`. That no notification carries it is

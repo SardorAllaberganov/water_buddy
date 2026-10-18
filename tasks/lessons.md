@@ -3999,3 +3999,51 @@ later messaged to say so, and stopped.
 suspecting the code. To shrink the exposure, compile with `build-for-testing` and run with
 `test-without-building`, starting just after the other session's run begins; re-run a lost test by
 name. This session shut its own simulators down by UDID throughout, as the plan says.
+
+## 2026-10-18 — Three readers ranked the lag's causes, and the probe ranked them differently
+
+**What happened.** Four read-only agents read the code for the owner's lag. Three put the aurora's
+never-ending drift first — three blurred lights redrawn every frame under every pane. Measured with
+`XCTCPUMetric`, five idle seconds a screen, the aurora was at most 2 % of the app's CPU: History and
+Settings, which carry it, idled at 2–3 %. Home and the welcome, which also carry a water clock, idled
+at 17 % and 22 %; pausing that clock by hand took them to 5 % and 3 %. Then the first fix — moving a
+wider wave instead of redrawing it — passed its unit tests and made the pour *heavier* (36 % → 43 %),
+and a 4 pt path step saved nothing: the cost was SwiftUI and Core Animation redrawing moving water
+under glass, not the arithmetic that built it.
+
+**The rule:** rank a performance cause by measurement, never by reading. Read to find candidates,
+then switch each off by hand — one variable, reverted — and measure the moment the user complains
+about, not only the idle screen. A cheaper way to draw a frame is not a cheaper frame; measure the
+fix the same way before keeping it.
+
+## 2026-10-18 — A UI failure under another project's load is compared on a quiet machine
+
+**What happened.** The gate's first iOS 26.5 pass failed three UI tests, each a tap that never took
+effect, while another project's simulators held the Mac at a load of 60–200. One of them, run alone at
+those loads: `HEAD` 10 of 10, the change 6 of 13 — which looked like a regression, and was treated as
+one. Interleaved on a quiet machine, both were 10 of 10, and the whole 26.5 target passed. Earlier in
+the same session, to dodge known issue #101's ten-minute exit after a red run, one test run was
+started in the background with `&` — against `CLAUDE.md`'s rule that `xcodebuild` runs in the
+foreground.
+
+**The rule:** before calling a UI failure a regression, run `HEAD` and the change interleaved, the
+same test, the same simulator, the same few minutes, with the load beside each batch — and again on a
+quiet machine. Record a gap that only load shows (#140); do not delete it. Run `xcodebuild` in the
+foreground even when a red run will take ten minutes to exit; read its log while it does.
+
+## 2026-10-18 — A figure in the records needs a log that survives, and a counter checked against a known count
+
+**What happened.** A fresh reader checked the lag fix's records against the session's logs and found
+figures with nothing behind them. The interleaving script named every batch `round 1`, so its second
+run overwrote the first — `HEAD` 10 of 10 and the change 10 of 10 survive as 5 and 5 in the logs, the
+rest only in the chat. A `-run-tests-until-failure` run reused the log name of the 3-of-3 batch before
+it. No log recorded a load, so "a load of 60–200" was a recollection of `uptime` readings that, read
+back, ran 30–140 during the pass and reached 204 only afterwards. And the warning script's second
+`grep` added every message again as "(no file)", so a build of 17 messages was reported as 34 lines
+beside the 29 unique lines `CLAUDE.md` counts — the comparison held, the unit did not. "The aurora
+measured at about 2 %" was an inference from the screens that carry it, never a switch-off.
+
+**The rule:** every run whose figure goes into a doc writes its own log, named so no later run can
+overwrite it — a timestamp, not a round number — and writes the load into that log. Check a counting
+script against a count already known before trusting what it prints. Say "measured" only of what was
+switched off and measured; a ceiling inferred from other screens is called a ceiling.

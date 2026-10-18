@@ -7,6 +7,18 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-18 (sixty-eighth pass, the owner's `/doc_sync` again). **No token
+changed.** *The water*'s table gives the welcome after the fix as 0.176 s, the figure its 3.5 % is
+computed from, where it said 0.18.
+
+**Last updated:** 2026-10-18 (sixty-seventh pass of `docs/AI_CONTEXT.md`, the owner's `/doc_sync`
+after the lag fix). **No token changed.** *The water*'s older sentence still gave the slosh a
+5-second window; it now gives 2.5 seconds, `WaterMotion.settling`, and when it changed.
+
+**Last updated:** 2026-10-18 (the lag fix's records, written by the session that built it — not a
+`/doc_sync` pass). **No token changed.** *The water* gains how the water now rests between pours,
+with the measurements that chose its 2.5-second window and the two approaches dropped.
+
 **Last updated:** 2026-10-17 (roadmap item 1.2.6's records, written by the session that built it —
 not a `/doc_sync` pass). **No token changed.** One new measured pair: the strip's count of servings,
 white 0.9 on the strip's pane — 8.17:1 on iOS 27.0, 10.64:1 on 26.5, worst of a minute's sweep — in a
@@ -436,16 +448,37 @@ fresh every frame by a `TimelineView`, so letting it interpolate would fight the
 
 | | resting amplitude | phase |
 |---|---|---|
-| app | `diameter × 0.018` `+ diameter × 0.05 × slosh` | `seconds × 1.1` from `TimelineView(.animation)` |
+| app | `diameter × 0.018` `+ diameter × 0.05 × slosh` | `WaterMotion.phase`, from `TimelineView(.animation)` while the water moves *(2026-10-18; `seconds × 1.1` until then)* |
 | widget | `diameter × 0.035` | frozen at **`0.6`** |
 
 The widget's is roughly double because the app's 1.8% is 5.4pt of surface at 300pt and only 1.7pt at
 92pt — flat. *(5pt at 280pt until the redesign's stage 2 made the vessel 300.)* The frozen phase `0.6` is picked so both waves show a crest and a trough across the
 vessel's width rather than crossing zero flat in the middle.
 
-App slosh decays as `exp(-elapsed × 1.5)` over a 5-second window after a pour. Water is inset —
+App slosh decays as `exp(-elapsed × 1.5)` over a 2.5-second window after a pour — `WaterMotion.settling`,
+5 seconds until 2026-10-18 (below). Water is inset —
 `padding(10)` in the app, `padding(diameter × 0.04)` in the widget — so it sits in a well and can
 never cover the vessel's lit rim.
+
+**The water rests between pours, since 2026-10-18** (`WaterMotion`, spec
+`2026-10-18-the-waters-cost-design.md`). The app's phase is no longer `seconds × 1.1`: after a pour
+it sets off at 1.1 rad/s and eases evenly to a standstill — `settling × (u − u²/2)` seconds of
+travel, `u` the share of the window gone — then stands, and the next pour carries on from where it
+stood. The window, `WaterMotion.settling`, is **2.5 s**, and the slosh shares it: at 2.5 s
+`exp(−1.5 t)` has the slosh at 2 % of its height. Home's vessel runs its `TimelineView` only while the
+water moves and the app is active; the welcome's hello vessel moves for the same window each time
+its step is shown. **Measured, not chosen** (simulator, Debug, the app's own CPU over five seconds):
+
+| | before | after |
+|---|---|---|
+| Home, idle | 0.83 s (17 % of a core) | 0.20 s (4 %) |
+| The welcome's first step, idle | 1.10 s (22 %) | 0.176 s (3.5 %) |
+| A pour and the five seconds after it | 1.78 s (36 %) | 1.15 s (23 %) |
+
+Of a pour, the water moving under glass was the cost — 1.65 s with it, 0.73 s without; the drop,
+the swell, *Undo* and the level's spring each fell within the noise. A 4 pt path step saved nothing,
+and moving a wider wave instead of redrawing it made the pour heavier (spec §4). The level still
+animates as before, and under Reduce Motion nothing travels at all.
 
 **Home's vessel has depth, since stage 3c** — the canvas's, as ratios of the diameter (`HomeView`'s
 private `Depth`), in the app only:
@@ -2084,7 +2117,8 @@ is the same.)*
 ## Reduce Motion / Reduce Transparency
 
 - **Reduce Motion** — `WaterVessel` swaps the `TimelineView` for a still frame (`phase: 0,
-  slosh: 0`). The level still animates when it changes; only the perpetual travel is dropped.
+  slosh: 0`). The level still animates when it changes; only the travel is dropped — perpetual
+  until 2026-10-18, since then only the 2.5 s after a pour (`WaterMotion`).
   Since stage 3b's second pass three more things read it, each travel across the screen: a
   change of page is a cross-fade, a pour throws no drop, and no section shrinks as it scrolls
   (*Motion*, above — run and recorded with the setting on). The vessel does not swell either,

@@ -4,6 +4,57 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-18 (sixty-eighth pass — `/doc_sync` run by the owner again, straight after
+the sixty-seventh, on the same tree). **No source or test file changed and nothing was committed:**
+HEAD `9999979`, 16 paths staged. The checks re-run and unchanged: 89 rows equal to their files, 638
+`@Test`, 57 on the watch, 56 UI. With nothing new to sync, two fresh readers read the staged text —
+one against the code and git, one against this session's logs — and found 24; each was checked
+against its source. Taken: #99 said "unstaged" — staged since 11:09; the block below says "built
+test-first and unstaged", which was true when it was written and is kept as written. "An earlier
+date" for `addLog` is "a date on another day" in `docs/STATE.md` and the streaks spec, and
+`updateLog` forgets the run when a serving was *or becomes* another day's. "Pins both halves" and
+"every path that must recount does" overstated the tests — #143 lists what they do not reach,
+with two code comments a sync may not edit. `WaterMotionTests` is 7 `@Test` and 8 cases. The welcome
+after the fix is 0.176 s per 5 s, the source of "3.5 %". The aurora's "about 2 %" was never a
+switch-off: History and Settings, which carry it, idled at 2.1 % and 2.6 % — a ceiling, now called
+one. #140's load range, run counts and evidence are restated from the `uptime` readings and the
+logs, with what survives only in the session's output said so. The waters spec's table now follows
+its logs run by run, the streaks spec gives five runs for a goal change, and the plan says A and B
+were staged in one `git add`. Not taken: one reader's "the per-size after-figures are unsupported" —
+`pourprobe-after.log` gives 1.4 ms at 45 days and 1.7 at 500, a refresh 0.4 and 0.6, exactly. A
+lesson was added. `HISTORY.md`'s checkpoint gives the superseded figures.
+
+**Last updated:** 2026-10-18 (sixty-seventh pass — `/doc_sync` run by the owner straight after the
+lag fix's records, in the session that built it). **No source or test file changed for this pass,
+and nothing was committed:** HEAD is `9999979`, the lag fix's 13 paths staged. The command's checks:
+- 89 tracked `.swift` files — the two new ones staged — each row's count equal to its file's lines,
+  all 89 by one script;
+- 638 `@Test`, 57 on the watch, 56 UI `func test`, as the records give them;
+- the shared-file contract — `project.pbxproj` last changed in `eba1b1e`, 2026-10-09;
+- twelve keys on `DataManager.Key`, ten in the phone's suite — the fix added none;
+- every `` rule `nn-name` `` resolves — 18 names, 18 files; `docs/ARCHITECTURE.md`,
+  `docs/CAPABILITIES.md` and `docs/dependencies.md` still do not exist.
+
+Drift found and fixed, four: *Current state* opened on 1.2.6 as staged — it was committed on
+2026-10-17 (`5bc7a0a`, `419868a`, `2451143`, `9999979`), and *Current state* now opens on the lag fix;
+`docs/STATE.md` still described `readStreak()` walking its windows on every read; `docs/DESIGN.md`'s
+older water sentence gave the slosh a 5-second window; `docs/ROADMAP.md` gave 1.2.6 no commits and
+1.2.8 no word of its parking. `CLAUDE.md`'s warning baseline gains the lag fix's measurement — the
+29 unique lines on both sides, from this session's clean builds of the tree and of a `HEAD` export.
+
+**Last updated:** 2026-10-18 (the lag fix's records, written by the session that built it — not a
+`/doc_sync` pass). The owner reported lag on their iPhone, Debug build from Xcode, on Home, History,
+Settings and the welcome, worse over time. Two changes, built test-first and unstaged, HEAD still
+`9999979`: **A** — the water moves for 2.5 s after a pour and then rests (`WaterMotion`, new, app
+only; `HomeView`, `WelcomeView`); **B** — the run of days before today is kept and counted again only
+when one of them changes (`DataManager.closedRun`). Known issue #99 retired; #140–#142 opened. File
+rows: four changed, two new — 89 `.swift` files once the two are added. 638 `@Test` (622 + 7 + 9),
+57 on the watch, 56 UI `func test`. The gate passed, the iOS 26.5 UI target on its second, quiet
+run (#140); no new warning on the app, watch or watch-widget schemes against clean builds of
+`HEAD`. Roadmap item 1.2.8 is parked (#142). *Current state*, `docs/STATE.md` and `docs/WIDGET.md`
+were not edited — neither change moves stored shape or the widget contract; a `/doc_sync` pass is
+the place to read them against the change.
+
 **Last updated:** 2026-10-17, night (sixty-sixth pass — `/doc_sync` run by the owner straight after
 roadmap item 1.2.6's records, in the session that built it). **No source or test file has changed
 since those records, nothing was built or run for this pass, and nothing was committed:** HEAD is
@@ -1411,11 +1462,11 @@ re-checked against their files, 86 by script and one by hand: none stale.)*
 WaterBuddy/Arrival.swift                         154   app only — unstaged 2026-10-12, stage 3b; rewritten by its second pass: Arrival (rise 14, stagger 0.05, hiddenOpacity never zero, and the pure opacity(arrived:settles:) and lift(arrived:settles:reduceMotion:)), EnvironmentValues.pageSettlesIn — true for the page the app opens on, false for every page a turn brings in, whose sections are whole as it slides (History's bars read the flag and not this, and grow on every page) — View.arrives(_:order:) and View.tracksArrival(_:), a task that sets the flag 50 ms after the page is built. isShownTab is gone
 WaterBuddy/AuroraBackground.swift                235   app only — the moving backdrop: RootTabView's one for the three tabs since stage 3b's second pass, and the first-run screen's and the serving sheet's own (stage 5: a comment names WelcomeView for the first-run screen); unstaged 2026-10-12, stage 3b: AuroraClock and AuroraDrift, a CustomAnimation that places a light by one clock every copy reads; staged 2026-10-11, the redesign's stage 3: legibleOnBackdrop(), the two shadows for text that sits straight on it, moved in from HomeView now that History draws on it too
 WaterBuddy/Celebration.swift                     213   app only — ConfettiPiece, the seeded burst, the overlay
-WaterBuddy/DataManager.swift                    2950   shared — (2026-10-17, 1.2.6: Bundle.localized(_:_:locale:), nonisolated, beside figure — every sentence with an argument that figure does not take now goes through it; figure's DocC no longer says spoken strings keep %d.) (2026-10-15, 1.2.5: Key.reviewRequestedVersion, in Key.all; reviewStreak = 3, the pure mayRequestReview(reachedToday:streak:askedVersion:version:) and claimReviewRequest(version:), which writes the version before it answers true — no new import; 2866 lines before) (2026-10-15, 1.2.4: the language setter re-plans the reminders; requestReminderReschedule's queued operation reads the bundle once and registers the reminder's category before it reconciles; AppLanguage.bundle is nonisolated; 2846 lines before) (stage 5: comments only — the first-run screen named as WelcomeView where it was GoalSetupView; 2845 lines before) (2026-10-11, `1ced514`: addLog returns the row's id and undoLog(id:) takes it back; remaining, hasReachedGoal, lastDrink and nextReminder, derived on read; the published streak and its growing windows; dayDidTurn(), which the two day-change observers call; Bundle.figure for grouped volumes. Staged 2026-10-11, the redesign's stage 3: DaySummary.reached(_:) and daysMet(in:goal:); dayFraction(of:) and hours(_:onDayOf:) — where an instant falls in its day, by that day's real length — each a nonisolated static over a calendar with an instance wrapper) the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's, the control's and, since 2026-10-15, the reminder button's one definition) at usualSlot (its index — one of three spellings, known issue #104), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
+WaterBuddy/DataManager.swift                    3005   shared — (2026-10-18, the lag fix, change B: closedRun keeps the run of days before today; readStreak adds today's share; readClosedRun counts it by the old walk; forgetClosedRunIfNotToday in addLog, deleteLog and updateLog, ingest forgets it for another day's pour, dayDidTurn always.) (2026-10-17, 1.2.6: Bundle.localized(_:_:locale:), nonisolated, beside figure — every sentence with an argument that figure does not take now goes through it; figure's DocC no longer says spoken strings keep %d.) (2026-10-15, 1.2.5: Key.reviewRequestedVersion, in Key.all; reviewStreak = 3, the pure mayRequestReview(reachedToday:streak:askedVersion:version:) and claimReviewRequest(version:), which writes the version before it answers true — no new import; 2866 lines before) (2026-10-15, 1.2.4: the language setter re-plans the reminders; requestReminderReschedule's queued operation reads the bundle once and registers the reminder's category before it reconciles; AppLanguage.bundle is nonisolated; 2846 lines before) (stage 5: comments only — the first-run screen named as WelcomeView where it was GoalSetupView; 2845 lines before) (2026-10-11, `1ced514`: addLog returns the row's id and undoLog(id:) takes it back; remaining, hasReachedGoal, lastDrink and nextReminder, derived on read; the published streak and its growing windows; dayDidTurn(), which the two day-change observers call; Bundle.figure for grouped volumes. Staged 2026-10-11, the redesign's stage 3: DaySummary.reached(_:) and daysMet(in:goal:); dayFraction(of:) and hours(_:onDayOf:) — where an instant falls in its day, by that day's real length — each a nonisolated static over a calendar with an instance wrapper) the model, the log CRUD (updateLog takes a time), the window's published rows (historyLogs) and where the window starts (historyWindowStart), the cache, WaterSnapshot, DaySummary, AppLanguage, the four-state Role, usualServing(in:) (the Glass — the widget's, Siri's, the control's and, since 2026-10-15, the reminder button's one definition) at usualSlot (its index — one of three spellings, known issue #104), requestWidgetReload() (timelines and, on iOS 18, controls), remindersSettled() (not on watchOS), the Wrist wire structs and WristMirror.isNews(since:), WristLink (behind #if canImport(WatchConnectivity)) — its push to the face and waitUntilActivated() on iOS, its wait for delivery on watchOS, poll on both
 WaterBuddy/GoalSuggestion.swift                  123   app only — stage 5: the calculator's arithmetic, pure and in whole millilitres — Unit (kilograms 30...200 from 70, pounds 66...440 from 155; starting(for:) is pounds only where the locale measures in US units; convert(_:to:)), Activity (adds 0 / 350 / 700), goal(weight:unit:activity:) rounded half up to WelcomeView.goalStep and held to goalRange
 WaterBuddy/Haptics.swift                          66   app only — the feedback ladder: three rungs, and unstaged 2026-10-12, stage 3b, two more — select (the system's selection tick) and remove (a light impact at confirm's intensity)
 WaterBuddy/HistoryView.swift                    1782   app only — (2026-10-17, 1.2.6: seven sentences through localized; ServingSheet and DayStrip read the locale; DayStrip's heading speaks *5 servings* as its value and draws the count trailing it, or under it where both do not fit; its DocC cites #139.) (stage 5: comments only, naming WelcomeView where they named GoalSetupView) (2026-10-13, stage 3c, staged: the week card's rounded tracks and bars on LiquidGlass.innerCornerRadius, the dashed goal line (GoalLine), a ring on the shown day's track and a white disc behind its letter placed from LetterCentres anchors in place of the gliding capsule, letters white and the shown one Aurora.top heavy, the disclosure 0.88; DayRow lays the days out inside dayRowInset(across:count:) — 16, or 9.5 on a 375-pt phone — with daySlot(across:count:) and dayTapFloor; a serving's glyph white on an Aurora.cyan 0.16 wash) (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; markerOffset(ofDay:among:across:) and one capsule that glides to the shown day; DayStrip grows its bars again when the day changes (not under Reduce Motion); every row recedes through historyRow's scrollDepth(); the sheet's shortcut lozenge lands; the onDisappear reset is gone — a page is rebuilt) unstaged 2026-10-12, stage 3b: the header is ScreenHeader, everything under it arrives, the bars grow as it does, a tick for a day picked and a light tap for a serving swiped away, back to today in onDisappear; staged 2026-10-11, the redesign's stage 3: one List whose rows are the header (the day at .largeTitle, its total against the goal, the +; a past day on two lines at an accessibility text size), the week card that picks the day (cyan for a day that reached the goal, white for one that did not; Average, Best day, Goal met), DayStrip (When you drank: a bar per serving by time of day, hour labels at 6, 12 and 18, a bell at the next reminder) and the servings (ServingRow: the vessel's glyph in a dark well, the amount, the vessel's name, the time; two layouts); swipe-to-delete; the + and one add/edit sheet with three vessel shortcuts under the slider and a day · hour · minute wheel; StripBar at file scope and the statics stripBars(for:vessels:), vessel(forAmount:amounts:), sliderBounds(forAmount:vessels:) (2026-10-10, `c9ef45d`: Save on the primary surface; the shown day reads LiquidGlass.Selection; the goal line at white 0.55)
-WaterBuddy/HomeView.swift                       1206   app only — (2026-10-17, 1.2.6: five sentences through localized; the streak chip draws *12 days* — a ViewThatFits of two streakCapsules, the count alone where the noun does not fit — and speaks the noun at every size.) (2026-10-15, 1.2.5: import StoreKit — the only file that does; requestReview and pageIsShown read; goalPours and ratingWait; pour(_:) counts a crossing it made; askForARating(after:) waits ReviewPrompt.pause, re-checks, claims, asks; 1138 lines before) (stage 5: a comment only, naming WelcomeView) (2026-10-13, stage 3c, staged: WaterVessel's glow, halo and highlight — the Depth ratios from the canvas — none of them under Reduce Transparency) (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; a drop from the pressed disc to the vessel — anchors gathered by PourPlaces, flights, land(_:) — and the vessel's swell; the level on Motion.water; the Undo capsule and the streak chip land, each animation scoped to its own view; the onDisappear reset is gone) unstaged 2026-10-12, stage 3b: the header is ScreenHeader with the date under the title (dateFormat, dateScaleFloor 0.45), the vessel, status and row arrive, a disc's glyph bounces when poured, Undo ends in onDisappear; 2026-10-11, `1ced514`, the redesign's stage 2: the date, the title and the streak chip; the vessel, sized by HomeColumn (a Layout) between vesselFloor and a ceiling that scales with text; the status line; the quiet line (next reminder, last drink) that Undo replaces for eight seconds, in three forms chosen by fit; the ranked quick-add row — the Glass on the primary surface, Cup and Bottle on glass in one glassGroup; UndoOffer; the goal burst (vesselSlots moved out, Task 14; legibleOnBackdrop moved out to AuroraBackground.swift, staged 2026-10-11)
+WaterBuddy/HomeView.swift                       1234   app only — (2026-10-18, the lag fix, change A: the vessel's clock runs only while WaterMotion says the water moves, and never while the app is not active; motionStart and restingPhase change together in one onChange; the slosh shares WaterMotion.settling.) (2026-10-17, 1.2.6: five sentences through localized; the streak chip draws *12 days* — a ViewThatFits of two streakCapsules, the count alone where the noun does not fit — and speaks the noun at every size.) (2026-10-15, 1.2.5: import StoreKit — the only file that does; requestReview and pageIsShown read; goalPours and ratingWait; pour(_:) counts a crossing it made; askForARating(after:) waits ReviewPrompt.pause, re-checks, claims, asks; 1138 lines before) (stage 5: a comment only, naming WelcomeView) (2026-10-13, stage 3c, staged: WaterVessel's glow, halo and highlight — the Depth ratios from the canvas — none of them under Reduce Transparency) (second pass of stage 3b, unstaged 2026-10-12: no backdrop of its own; a drop from the pressed disc to the vessel — anchors gathered by PourPlaces, flights, land(_:) — and the vessel's swell; the level on Motion.water; the Undo capsule and the streak chip land, each animation scoped to its own view; the onDisappear reset is gone) unstaged 2026-10-12, stage 3b: the header is ScreenHeader with the date under the title (dateFormat, dateScaleFloor 0.45), the vessel, status and row arrive, a disc's glyph bounces when poured, Undo ends in onDisappear; 2026-10-11, `1ced514`, the redesign's stage 2: the date, the title and the streak chip; the vessel, sized by HomeColumn (a Layout) between vesselFloor and a ceiling that scales with text; the status line; the quiet line (next reminder, last drink) that Undo replaces for eight seconds, in three forms chosen by fit; the ranked quick-add row — the Glass on the primary surface, Cup and Bottle on glass in one glassGroup; UndoOffer; the goal burst (vesselSlots moved out, Task 14; legibleOnBackdrop moved out to AuroraBackground.swift, staged 2026-10-11)
 WaterBuddy/LiquidGlassModifier.swift             904   shared — design tokens + the glass modifier; 2026-10-13, stage 3c, staged: Apple's glass tinted with systemTintColor (Aurora.top) at systemTintOpacity 0.64, the hand-made sheen and lit rim laid over it (litSurface), scrim(density:scheme:base:onPhone:) in place of Density.scrimOpacity(for:) — Aurora.top 0.30 / 0.70 / 0.80 for the phone's own panes, black 0.16 / 0.28 / 0.40 for the widget's .archived base and the watch — runsOnPhone, Selection.ringOpacity / ringWidth / discFill, innerCornerRadius; 2026-10-11, `1ced514`: routed branches on the pane's base only, and a .material pane on iOS 26+ always carries glassEffect — .identity when it is not Apple's — so a setting never moves a pane's content (#91a); .glassGroup(), Apple's GlassEffectContainer on iOS 26+ and nothing elsewhere; committed 2026-10-10 in c9ef45d: the routing (rendering, systemGlassAvailable, systemVariant), Apple's glass on iOS 26+ behind #if os(iOS) + #available, darkened by systemTintOpacity(for:) (0.52 regular, 0 clear) and given its hit region by .contentShape(shape), LiquidGlass.Primary and primarySurface(in:ring:), LiquidGlass.Selection
 WaterBuddy/LogServingIntent.swift                 90   app only — the Siri phrase's intent ("Log a Glass"): logTheGlassInTheBackground() — wait for the watch link, logTheGlass, wait for the reminder queue — then reply "Water logged." (2026-10-15: the three steps moved into logTheGlassInTheBackground(), which the reminder's button runs too; 78 lines before)
 WaterBuddy/Motion.swift                           93   app only — unstaged 2026-10-12, stage 3b's second pass: Motion, the curves by name — page (.smooth 0.45), pageFade (0.25, under Reduce Motion), settle (0.3), land (spring 0.5 / 0.68) and landSpring, water (spring 0.8 / 0.62), drop (easeIn 0.42) — and the plain numbers behind them. Fifteen older call sites still write .smooth themselves (sixteen until stage 5 deleted GoalSetupView's)
@@ -1435,8 +1486,9 @@ WaterBuddy/VesselSliders.swift                   179   app only — (2026-10-17,
 WaterBuddy/WaterBuddyApp.swift                   176   app only — (2026-10-15, 1.2.5: freshStartManager's DocC names the rating request as the one Debug/Release difference; 175 lines before) RootView, the setup gate, the strings/locale injection, WristInbox.shared + WristLink.live.activate() at launch, then ReminderResponder.install() (2026-10-15; 170 lines before) (stage 5: the gate shows WelcomeView; every return to the foreground reads the system's answer back through ReminderPermission.reconcile; in DEBUG, -WaterBuddyFreshStart opens on a throwaway suite and an in-memory store — freshStartManager(arguments:); 108 lines before)
 WaterBuddy/WaterBuddyShortcuts.swift              38   app only — the one AppShortcutsProvider: three phrases (en + ru, AppShortcuts.xcstrings), the "Log a Glass" tile
 WaterBuddy/WaterLog.swift                         57   shared — the SwiftData @Model, source of truth
+WaterBuddy/WaterMotion.swift                      64   app only — new 2026-10-18, the lag fix, change A: how the water moves after a pour and then rests — the phase eases from 1.1 rad/s to a standstill over settling (2.5 s), carries on across pours, and remaining(at:since:) runs Home's clock (the welcome's waits out settling itself); pure and nonisolated
 WaterBuddy/WaterSurface.swift                    194   shared — waves, scrim, Aurora palette, vesselSlots (moved in from HomeView, Task 14 — a second, non-view consumer: WristView)
-WaterBuddy/WelcomeView.swift                    1314   app only — (2026-10-17, 1.2.6: four sentences through localized; WelcomeView reads the locale; spokenMillilitres' DocC rewritten.) stage 5, replacing GoalSetupView: four steps — hello, the goal (with the calculator under "Work it out for me"), the vessels, reminders — mounted side by side and slid by the step (Motion.page, a fade under Reduce Motion; one turn at a time, the bar disabled while one slides); WelcomeStep (nonisolated: next, previous, number, offset, opacity); the goal's menu, goalRange and goalStep, read by Settings; bellTimes(in:) from ReminderPlan.hours; finish(goal:amounts:asksForReminders:on:using:) — the vessels, then the question, then the goal, which ends the welcome; CalculatorPanel; ReminderBells on frosted discs; WelcomeStyle's measured opacities
+WaterBuddy/WelcomeView.swift                    1338   app only — (2026-10-18, the lag fix, change A: the hello vessel moves for WaterMotion.settling each time its step is shown, then rests; paused while the app is not active.) (2026-10-17, 1.2.6: four sentences through localized; WelcomeView reads the locale; spokenMillilitres' DocC rewritten.) stage 5, replacing GoalSetupView: four steps — hello, the goal (with the calculator under "Work it out for me"), the vessels, reminders — mounted side by side and slid by the step (Motion.page, a fade under Reduce Motion; one turn at a time, the bar disabled while one slides); WelcomeStep (nonisolated: next, previous, number, offset, opacity); the goal's menu, goalRange and goalStep, read by Settings; bellTimes(in:) from ReminderPlan.hours; finish(goal:amounts:asksForReminders:on:using:) — the vessels, then the question, then the goal, which ends the welcome; CalculatorPanel; ReminderBells on frosted discs; WelcomeStyle's measured opacities
 WaterBuddy/WristInbox.swift                       90   app only, NOT shared — reassembles chunked WristBatch payloads (wrist → phone), calls DataManager.ingest(_:)
 WaterBuddy/WristPlan.swift                        80   shared (in both watch exception sets, not the phone widget's) — ReminderPlan's pure twin: buckets the outbox by the watch's day, counts the phone's total until the phone's day ends, names the complication's turnover instants (spec §17)
 WaterBuddyTests/AppLanguageTests.swift           112   AppLanguageTests — the menu and each bundle
@@ -1463,9 +1515,10 @@ WaterBuddyTests/ScreenHeaderTests.swift           43   (2026-10-13, stage 3c, st
 WaterBuddyTests/ScrollDepthTests.swift           134   unstaged 2026-10-12, stage 3b's second pass — ScrollDepthTests (not @MainActor, 16): a section at rest is whole and at the edge at its floor, the top and the foot alike; a section inside what is shown has not moved at all, half out is half gone, wholly out no further; a card taller than the screen is whole while it fills it and nothing jumps as its top crosses the edge; a span of nonsense is no span
 WaterBuddyTests/ServingSeamTests.swift           297   ServingResolutionTests (pure, not @MainActor; usualSlot is the Glass, and usualServing reads it) + ServingSeamTests
 WaterBuddyTests/SiriPhraseTests.swift            277   UsualServingTests + ReconcileQueueSettledTests (both not @MainActor) + LogServingIntentTests + LogTheGlassTests + AppShortcutPhraseTests
-WaterBuddyTests/StreakTests.swift                310   2026-10-11, `1ced514` — StreakCountTests (pure, not @MainActor: DaySummary.streak and streakFillsWindow, and three on windowStart, historyWindowStart and streakWindows) + StreakPublishingTests (the published streak: the window walk, a goal change, a failed read, and that it reaches neither the snapshot nor the wrist's mirror)
+WaterBuddyTests/StreakTests.swift                491   (2026-10-18, the lag fix, change B: StreakRecountTests, nine — a pour and a tab's refresh do not reread the past, shown by changing it behind the manager's back; an earlier day's add, delete and move into today, a watch pour onto an earlier day, a turn of the day and midnight each recount it. A change of zone and a serving moved off today onto another day are not tested (#143).) 2026-10-11, `1ced514` — StreakCountTests (pure, not @MainActor: DaySummary.streak and streakFillsWindow, and three on windowStart, historyWindowStart and streakWindows) + StreakPublishingTests (the published streak: the window walk, a goal change, a failed read, and that it reaches neither the snapshot nor the wrist's mirror)
 WaterBuddyTests/UnreadableStore.swift             87   2026-10-11, `1ced514` — NOT a suite: a file-backed store whose reads fail on demand (the servings' table renamed away through a second SQLite connection, and put back), for the tests that pin what the model does when it cannot read; three tests use it since WristIngestTests' joined (staged 2026-10-11, known issue #92)
 WaterBuddyTests/WaterLogTests.swift              505   WaterLogStoreTests — one makeManager factory is the file's only DataManager( site
+WaterBuddyTests/WaterMotionTests.swift            85   new 2026-10-18, the lag fix, change A — WaterMotionTests (not @MainActor, 7 @Test, 8 cases — one takes two arguments): sets off at its own speed, slows to a standstill, stands still once settled, carries on across a pour, the first pour of a launch, a pour still ahead, settles in 2.5 s
 WaterBuddyTests/WaterSnapshotTests.swift         565   WaterSnapshotTests + WidgetLanguageTests + ProcessRoleTests
 WaterBuddyTests/WelcomeTests.swift               379   (2026-10-15: PermissionSpy's scheduler takes pending and setCategories; 378 lines before) stage 5 — ReminderPermissionTests (7: a grant stored, a refusal and a failed request stored as off, a phone already allowed or already refused not asked again, a re-read that turns reminders off on a refusal and leaves the switch alone otherwise) + WelcomeStepTests (not @MainActor, 8: the order, no Back first and no Continue last, Continue and Back as a pair, the dots from one, where the next and previous steps wait, a slid step seen all the way out, under Reduce Motion nothing travels, the bells at the reminder hours) + WelcomeFinishTests (6: vessels left alone store nothing, vessels set are stored, the goal saved closes the welcome, reminders asked for before it closes, a refusal still opens the app with reminders off, Not now asks nothing) + FreshStartTests (DEBUG only, 2: no argument, no fresh start; a fresh start is a throwaway cleared at each launch) — the first and third against PermissionSpy, a ReminderScheduler built from a spy's closures
 WaterBuddyTests/WristSyncTests.swift             882   WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests; staged 2026-10-11: WristIngestTests' failed-read test makes its store unreadable with UnreadableStore, no longer by overwriting the file (known issue #92)
@@ -1795,7 +1848,41 @@ issue #15.
 
 ## Current state
 
+**The lag fix is built, gated and staged — not committed** (2026-10-18; its records were written by
+the session that built it, and the sixty-seventh pass read them). HEAD is `9999979`. The owner
+reported lag on their iPhone — a Debug build run from Xcode — on Home when pouring, in History, in
+Settings and the welcome: stutter, slow taps, slow screens, worse over time. Two changes, each with
+its own spec and each test-first:
+
+- **A — the water rests** (`docs/superpowers/specs/2026-10-18-the-waters-cost-design.md`, plan
+  `docs/superpowers/plans/2026-10-18-the-waters-cost.md`). `WaterMotion` (new, app only, pure): after a
+  pour the phase sets off at 1.1 rad/s and eases to a standstill over `settling`, 2.5 s, then stands,
+  and carries on from where it stood at the next pour. Home's vessel runs its clock only while the
+  water moves and the app is active; the slosh shares the window; the welcome's hello vessel moves for
+  the window each time its step is shown. `WaterMotionTests`, 7 `@Test` — 8 cases, one taking two
+  arguments.
+- **B — the streak stops rereading the past** (`docs/superpowers/specs/2026-10-18-the-streaks-cost-design.md`).
+  `DataManager.closedRun` keeps the run of days before today; it is forgotten wherever the app changes
+  another day and on every `dayDidTurn()`. `StreakRecountTests`, 9. Known issue #99 retired.
+- **Measured** (simulator, Debug): Home idle 17 % → 4 % of a core, the welcome 22 % → 3.5 % (0.176 s per
+  5 s), a pour and its five seconds 36 % → 23 %; a pour's model work 6 → 1.4 ms at 45 days of history and
+  75 → 1.7 ms at 500, a tab's refresh 3 → 0.4 and 37 → 0.6 ms. The aurora, ranked first by reading, was
+  never switched off: History and Settings, which carry it and no water clock, idled at 2.1 % and
+  2.6 % of a core — its ceiling, not a measurement of it. Moving the waves instead of redrawing them
+  made the pour heavier and was reverted.
+- **The gate**, on the working tree: unit `✔ Test run with 638 tests in 80 suites passed`; UI on iOS
+  27.0 — `GoalSetupUITests` 38 in four chunks, 1 skipped by design, the others 31, 0 failures; UI on
+  iOS 26.5 the same on its second run, on a quiet machine — the first, under another project's load,
+  stopped after three of its four chunks with one failure in each (#140); watch `✔ 57 tests in 6 suites`; both widget schemes built. Warnings:
+  identical by file and message to clean builds of a `HEAD` export on the app, watch and watch-widget
+  schemes, and the app scheme's 29 unique lines.
+- **Left** (#141): nothing in Release or on a device — the owner was asked to try *Edit Scheme → Run →
+  Release*; the pour is still the costliest moment; the welcome's resting water was not rendered.
+  Roadmap item 1.2.8 is parked (#142).
+
 **Roadmap item 1.2.6, Russian plural forms, is built, gated and staged — not committed** (2026-10-17;
+*(2026-10-18: committed on 2026-10-17 at 23:47 — `5bc7a0a` (spec and plan), `419868a` (feat),
+`2451143` (docs), `9999979` (rule wording).)*
 written by the session that built it, not a `/doc_sync` pass). HEAD is still `52ee815`. Spec
 `docs/superpowers/specs/2026-10-16-plural-forms-design.md`, plan
 `docs/superpowers/plans/2026-10-17-plural-forms.md` — both approved by the owner on 2026-10-17 and run
@@ -6333,10 +6420,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `aTurnThatIsNotANewDayRepublishesNothing` pins. `history.last?.date` is then the old zone's
     midnight, and flying west with the app open it formats as yesterday under *Today*, until the
     next foreground or tab change. By reading; the reviewer's finding.
-99. **The streak is re-read from its first window on every republish.** `republishHistory()` runs
+99. ~~**The streak is re-read from its first window on every republish.**~~ **Retired 2026-10-18 —
+    the fix is on disk, staged** (unstaged when its records were written; the lag fix's change B, spec
+    `2026-10-18-the-streaks-cost-design.md`). `republishHistory()` runs
     twice in a pour, and `readStreak()` walks 30, then 120, 480 and 1,920 days until the run ends
     inside a window — so a run of four months costs 630 days of rows, twice, on the main actor,
     inside the tap. Nothing today; it grows with exactly the thing the feature rewards.
+    *(2026-10-18: measured before the fix, Debug, simulator, in-memory store — a pour 1.7, 6.0, 20.8
+    and 74.7 ms at 7, 45, 150 and 500 days of history, a `refresh()` 0.6, 3.0, 10.3 and 37.0 ms; after
+    it, a pour 1.4–1.7 ms and a refresh 0.4–0.6 ms at every size. The run of days before today is
+    kept in memory, `closedRun`, and counted again only when the app changes one of them, the goal
+    moves, the zone changes or the day turns. A goal change and a launch still count it in full.)*
 100. **Small things stage 2's review and renders turned up, none fixed** *(until stage 5, which
     fixed (d) on disk — its note below)*:
     (a) *Undo* plays its confirm haptic even when there was nothing left to undo.
@@ -7269,6 +7363,68 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     1.2.7's sweep: the strip's count, its hour labels and the week card's figures should each be silent,
     and the heading's focus should be the heading, not the whole card. The two strip tests keep their
     value and one-element checks (`assertTheStripHeadingSpeaksItsCount`, whose DocC says why).
+
+**Opened 2026-10-18 by the lag fix** (specs `2026-10-18-the-waters-cost-design.md` and
+`2026-10-18-the-streaks-cost-design.md`; the owner reported lag on an iPhone, Debug build from Xcode):
+
+140. **On iOS 26.5, under another project's load, taps were dropped more often on the fix than on
+    `HEAD`.** The gate's first 26.5 pass, with another project's simulators running beside it — a
+    1-minute load of 30–140 by the `uptime` readings taken (5-minute 63–83), up to 204 while the
+    failures were chased — stopped after three of its four `GoalSetupUITests` chunks, one failure in
+    each, every one on a 5-second wait after a tap: `testAScreenAnswersATapWhenItIsShownAgain`
+    (*Home*'s tab), `testAServingRowDrawsItsAmountWhole…` (the Glass, the first tap after launch —
+    #67's shape) and `testSettingsSaysWhichVesselTheOneTapDoorsLog` (*Settings*' tab). The first two
+    passed every re-run (4 of 4 and 3 of 3). The last, at those loads: `HEAD` 10 of 10, change A alone
+    10 of 10, change B alone 9 of 10, and the fix 6 of 13 — 6 of 12 run alone, and the gate chunk's
+    one. Only the Settings failure was opened: its hierarchy and screen recording show the tap
+    synthesized on the system `UITabBar`'s *Settings*, the app idle again within a second, and Home
+    still selected four seconds later — that tap lost, not late; the other two are inferred to be the
+    same. **On a quiet machine there was no difference**: no other project's `xcodebuild` running, a
+    1-minute load of 7 before the runs and 25–30 while they ran, interleaved, `HEAD` 10 of 10 and the fix 10 of 10, and the
+    whole 26.5 UI target passed (38 with 1 skipped, and 31). Not understood; the owner's ruling was to
+    dig only if the gap survived a quiet machine. **Some of this lives only in the session's output**:
+    one 3-of-3 batch of the fix and the first interleaved round (`HEAD` 5 of 5, the fix 5 of 5) were
+    overwritten by the next run's log of the same name, and no log records a load. Recorded so that a
+    dropped tap on iOS 26 on a device starts here, beside #67 and #115.
+
+141. **What the lag fix measured and left.** Simulator, Debug, `XCTCPUMetric`, throwaway probes not
+    in the tree. Fixed: Home idle 17 % → 4 % of a core, the welcome 22 % → 3.5 % (0.176 s per 5 s), a pour and its five
+    seconds 36 % → 23 %, a pour's model work and every tab's refresh flat at any history (#99). Left:
+    (a) the pour is still the costliest moment — what is left of it is the water moving under glass
+    for 2.5 s; the drop, the swell, *Undo* and the level's spring each measured within the noise;
+    (b) the aurora was never switched off: History and Settings, which carry it and no water clock,
+    idled at 2.1 % and 2.6 % of a core — its ceiling on the main thread, not a measurement — and its
+    GPU cost and its heat over a session are not measured; (c) the welcome's weight wheel formats its 171–375 rows twice a tick, and the watch
+    publish runs twice a pour with no watch paired — both read, neither measured; (d) a goal change
+    and a launch still count the whole streak (10.5 ms and 12.6 ms at 150 days); (e) nothing was run in Release or
+    on a device, and the owner's phone runs a Debug build under the debugger — the check the owner
+    was asked for (*Edit Scheme → Run → Release*) is outstanding; (f) the welcome's resting water was
+    not rendered — Home's was, at rest, moving and settled. Two approaches were measured and dropped:
+    moving the waves rather than redrawing them (Home idle only 12 %, and a pour heavier, 43 %), and
+    sampling the wave every 4 pt (no saving — the cost is the redraw, not the arithmetic).
+
+142. **Roadmap item 1.2.8 is parked half-way, and rule `85-testing` describes a harness that does
+    not exist yet.** Its wording was approved and typed on 2026-10-18 — the store capture launches with
+    `-WaterBuddyFreshStart` and starts clean on its own — and is in the tree, unstaged; the harness
+    and `Tools/CaptureScreenshots.sh` are unchanged. A throwaway probe proved the History sheet's
+    wheel can be set from XCUITest in `en_US` (hour, minute and AM/PM take `"7"`, `"40"`, `"AM"`; the
+    date column takes `"Oct 16"`, not `"Fri, Oct 16"`). The capture must run between 1:45 PM and
+    midnight. Resume from the design approved in chat on 2026-10-18, or take the wording back out.
+
+143. **What the lag fix's tests do not reach, and two comments in its code that overstate.** Found by
+    the sixty-eighth pass's readers; a doc sync may not edit code, so they wait for the next change
+    to those files. (a) `closedRun`'s key has three parts, and only two are tested on their own: the
+    day (`aRunCarriesOverMidnight`, and `theTurnOfTheDayMakesTheNextReadRecountTheRun`) and the goal
+    (`StreakPublishingTests.changingTheGoalReJudgesTheStreak`, not in `StreakRecountTests`); no test
+    changes the zone, which a fixed test calendar cannot. (b) `updateLog` forgets the run when a serving
+    moves *onto* another day as well as off one; only the move off an earlier day into today is tested
+    (`aServingMovedOffAnEarlierDayRecountsTheRun`). (c) `DataManager.swift`'s DocC on `closedRun` says
+    the read "cost a pour 6 ms at 45 days of history in a Debug build and 75 ms at 500, twice" — the 6
+    and 75 ms are the whole pour, both reads in them; "twice" reads as double. (d) The DocC on
+    `theTurnOfTheDayMakesTheNextReadRecountTheRun` cites `aTurnThatIsNotANewDayRepublishesNothing` for
+    "the hop … republishes nothing on a day that did not change"; that test observes `todaysLogs`, the
+    widget doorbell and `currentWater`, not `streak` or `history` — rule `30-rollover` and
+    `dayDidTurn()` itself are what say it.
 
 ## Where the rest is written down
 

@@ -137,7 +137,8 @@ not fit; the strip draws *5 servings*, trailing its heading or under it; every f
 and both widgets' and the watch's included, is grouped by the app's locale — closing #40 and #39. The
 gate passed on the staged tree, iOS 27.0 and 26.5, before the final review's test-only fix; the unit
 suite passed again after it. One open question became known issue #139, by the
-owner's decision; what only a device shows joins 1.2.7.)*
+owner's decision; what only a device shows joins 1.2.7.)* *(2026-10-18: committed on 2026-10-17 as
+`5bc7a0a` (spec and plan), `419868a` (feat), `2451143` (docs) and `9999979` (rule wording).)*
 
 **1.2.7 — The device-check sweep.** One sitting with the owner's iPhone and Apple Watch, before the
 1.2 submission, working through every check still open: the complication (its spec §8.3), the Siri
@@ -158,12 +159,17 @@ text (#139) — the strip's count, its hour labels and the week card's figures e
 strip's heading focused on itself; the Lock Screen widget's quiet form with *Allow Access When Locked
 → Lock Screen Widgets* off, which the simulator cannot reach without a passcode; the inline Lock
 Screen shape, never placed on the simulator; a tinted Home Screen; and the watch's serving rows with a
-vessel of 1,000 ml or more, grouped.)*
+vessel of 1,000 ml or more, grouped.)* *(2026-10-18: and what the lag fix left — #141(e): the owner
+runs the app on the iPhone in Release (*Edit Scheme → Run → Release*) and in Debug, and says whether
+the lag is gone; #140: whether a tap on iOS 26 is ever lost on a device.)*
 
 **1.2.8 — Store page.** New iPhone screenshots of the redesign (the owner's 2026-10-09 ruling was
 none until the redesign is built), the header, and the pitch in the subtitle or description — not in
 the art, where Apple's asset guidance discourages pricing claims. A Russian header too, if the
-store listing has a Russian localization.
+store listing has a Russian localization. *(2026-10-18: begun and parked for the owner's lag report.
+Designed and approved in chat — the same four screens over a lived-in week built through History's
+`+`, raw, English only, no listing copy — with rule `85-testing`'s wording typed and unstaged and no
+code changed; known issue #142 says where to resume.)*
 
 ## 4. Release 1.3 — every surface
 

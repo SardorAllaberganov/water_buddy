@@ -10157,3 +10157,191 @@ Read from the commands at 23:17 on 2026-10-17, after this pass's `git add` of `C
 was run.** HEAD `52ee815`, 126 commits, `## main...origin/main`. **32 staged**: 1.2.6's 31 and
 `CLAUDE.md`. **3 unstaged**: `.claude/settings.json` (the owner's) and the two schemes'
 `BlueprintName` lines (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — The lag fix: the water rests between pours, and the streak stops rereading the past
+
+**What the owner asked.** "There are some lag in the application in different places when working,
+review, test and fix." Their answers: on Home when pouring, in History, in Settings and the welcome;
+stutter, slow taps, slow screens, worse over time; seen on their iPhone in a Debug build run from
+Xcode. Roadmap item 1.2.8 (the store screenshots), begun the same session, was parked for it
+(known issue #142).
+
+**What was found.** Four read-only agents read the code; the simulator measured it (Debug, the
+app's own CPU, `XCTCPUMetric`; a unit probe timing the model on the main actor). Two causes:
+- **The water's clock** — Home's waves were rebuilt every frame, under glass, for ever: Home idled
+  at 17 % of a core and the welcome at 22 %, against 5 % and 3 % with the clock paused by hand.
+- **The streak's re-count** (#99) — every pour, twice, and every tab's `refresh()` read the run back
+  30, 120, 480 days: a pour cost 6 ms at 45 days of history and 75 ms at 500.
+The aurora, which the reading ranked first, measured at about 2 % (`tasks/lessons.md`, 2026-10-18).
+
+**What changed.**
+- **A — the water rests** (spec `docs/superpowers/specs/2026-10-18-the-waters-cost-design.md`, plan
+  `docs/superpowers/plans/2026-10-18-the-waters-cost.md`). New `WaterBuddy/WaterMotion.swift`: after a
+  pour the phase sets off at 1.1 rad/s and eases to a standstill over `settling`, 2.5 s, then stands;
+  each pour carries on from where it stood. `HomeView`'s vessel runs its clock only while the water
+  moves and the app is active, and its slosh shares the window; `WelcomeView`'s hello vessel moves for
+  the window each time its step is shown.
+- **B — the streak** (spec `docs/superpowers/specs/2026-10-18-the-streaks-cost-design.md`).
+  `DataManager.closedRun` keeps the run of days before today, keyed by the day, the goal and the
+  zone; `readStreak()` adds today's share from today's rows. Forgotten where the app changes an earlier
+  day — `addLog` with an earlier date, `deleteLog`, `updateLog`, `ingest` — and on every `dayDidTurn()`.
+
+**The owner's rulings, in chat.** Measure with XCTest metrics only (a background CPU logger was
+denied); calmer motion is acceptable; A first, then B; after the first approach failed its
+measurement, *still water between pours, then find the pour's cost*; *settle in 2.5 s*; on the 26.5
+failures, *re-test when quiet, then dig*.
+
+**Tried and dropped.** Moving a wave a wavelength wider instead of redrawing it: Home idle 12 %, and a
+pour heavier, 43 % against 36 % — reverted in full, its four tests with it. A 4 pt path step: no
+saving. Switching the pour's parts off one at a time found the water's motion was its cost (1.65 s
+of CPU per 5 s with it, 0.73 s without); the drop, the swell, *Undo* and the level's spring were each
+within the noise.
+
+**Verification actually run.**
+- Red before green, each read: `WaterMotionTests` failed to build, then failed all five against a stub
+  modelling today's water; `theWaterSlowsToAStandstill` red against a constant speed;
+  `theWaterSettlesInTwoAndAHalfSeconds` red at 5. `StreakRecountTests`: the two "does not reread"
+  tests red at `HEAD`; a third, which assumed `dayDidTurn()` republishes, was wrong against rule
+  `30-rollover` and `aTurnThatIsNotANewDayRepublishesNothing`, and was rewritten to ask the next read
+  instead.
+- Measured after, same simulator: Home idle 0.83 → 0.20 s per 5 s; the welcome 1.10 → 0.18; a pour
+  1.78 → 1.15; a pour's model work 1.4–1.7 ms and a refresh 0.4–0.6 ms at 7, 45, 150 and 500 days.
+  Home's water looked at, at rest, moving and settled again; the welcome's not rendered.
+- **The gate** on the working tree, the Xcode-rewritten catalogues and schemes discarded first:
+  unit `✔ Test run with 638 tests in 80 suites passed`; UI on iOS 27.0 (`iPhone 17`) —
+  `GoalSetupUITests` 38 executed in four named chunks with 1 skipped by design, the other classes 31,
+  0 failures; watch `✔ 57 tests in 6 suites`; both widget schemes built. **UI on iOS 26.5, first
+  pass, at a load of 60–200 from another project's simulators: one failure in each of three chunks**,
+  each a tap that never took effect (#140); re-run on a quiet machine, all four chunks and the other
+  classes passed — 38 with 1 skipped, and 31, 0 failures. Interleaved on the quiet machine, the
+  failing Settings test: `HEAD` 10 of 10, the change 10 of 10.
+- **Warnings**, clean builds into empty DerivedData of `HEAD` (a `git archive` export) and the tree,
+  compared by file and message: identical on the app scheme (34 lines), the watch scheme (4) and the
+  watch-widget scheme (34).
+- **Not run:** anything in Release or on a device; the welcome's resting water rendered.
+
+**One slip.** One test run was started in the background with `&` to dodge #101's ten-minute exit,
+against `CLAUDE.md`'s foreground rule; its log was read, and it is in `tasks/lessons.md`.
+
+**Files.** `WaterBuddy/WaterMotion.swift` (new), `WaterBuddy/HomeView.swift`,
+`WaterBuddy/WelcomeView.swift`, `WaterBuddy/DataManager.swift`, `WaterBuddyTests/WaterMotionTests.swift`
+(new), `WaterBuddyTests/StreakTests.swift`; the two specs and the plan; `docs/AI_CONTEXT.md` (#99
+retired; #140–#142; six file rows), `docs/DESIGN.md` (*The water*), `tasks/lessons.md` (two), this
+file. Not part of this change and not staged: `.claude/rules/85-testing.md` (1.2.8's approved wording,
+parked — #142), `.claude/settings.json` (the owner's), `Screenshots/census/`.
+
+**Staging.** Written last, from the commands at 11:09 on 2026-10-18, after this change's one `git add`
+by explicit path. **No `git commit` was run.** HEAD `9999979`, `## main...origin/main`. **12 staged**
+before this file: change A's six (`WaterMotion.swift`, `WaterMotionTests.swift`, its spec and its plan
+added; `HomeView.swift`, `WelcomeView.swift` modified), change B's three (`DataManager.swift`,
+`StreakTests.swift` modified, its spec added), and `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`tasks/lessons.md`; **13 with this file**, added straight after this block. A and B touch disjoint
+source files, so `/commit` can take them as two changes. **4 unstaged**: `.claude/rules/85-testing.md`
+(#142), `.claude/settings.json` (the owner's), and the two schemes' `BlueprintName` lines, which the
+open Xcode app rewrites within seconds of each discard (#50) — discarded three times this session,
+left as they are, not staged. **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-18] — `/doc_sync` after the lag fix: four passages the change and the commits left behind
+
+**What changed.** The owner ran `/doc_sync` straight after the lag fix's records, in the session that
+built it — the sixty-seventh pass of `docs/AI_CONTEXT.md`. No source or test file changed for it, and
+nothing was built or run for it beyond reading this session's own clean-build logs.
+
+**Drift found and fixed.** Four, and one addition:
+- `docs/AI_CONTEXT.md`'s *Current state* opened on roadmap item 1.2.6 as staged and not committed; it
+  was committed on 2026-10-17 at 23:47 (`5bc7a0a`, `419868a`, `2451143`, `9999979`), which the
+  sixty-sixth pass, written before the commit, could not say. It gains a dated note, and *Current
+  state* now opens on the lag fix — the records had deliberately left it for this pass.
+- `docs/STATE.md` described `readStreak()` walking 30, 120, 480 and 1,920 days on every read; it now
+  describes `closedRun`, what keys it and what forgets it.
+- `docs/DESIGN.md`'s older sentence on the water gave the slosh a 5-second window; it is 2.5 seconds.
+- `docs/ROADMAP.md` gave 1.2.6 no commits and 1.2.8 no word of its parking; both gain dated notes, and
+  1.2.7's sweep gains the lag fix's device check (#141(e), #140).
+- `CLAUDE.md`'s warning baseline gains the lag fix's measurement: 29 unique lines on a clean build of
+  the tree and 29 on a clean build of a `HEAD` export, read from this session's logs.
+
+**Checked and already accurate.** 89 tracked `.swift` files, each row's count equal to its file's
+lines, all 89 by one script; 638 `@Test`, 57 on the watch, 56 UI `func test`; the shared-file
+contract in `project.pbxproj`, unchanged since `eba1b1e`; twelve keys on `DataManager.Key`, ten in
+the phone's suite; every `` rule `nn-name` `` resolves, 18 of 18; `docs/WIDGET.md`, which neither
+change touches; no doc names the water's old perpetual travel or the streak's per-read walk except as
+history; `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and `docs/dependencies.md` still do not exist.
+
+**No lesson.** The lag fix's two are already in `tasks/lessons.md`; a pass written before a commit
+not knowing the commit is not a pattern.
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/DESIGN.md`,
+`docs/ROADMAP.md`, this file.
+
+**Gate.** Not run for this pass. The gate the lag fix's checkpoint above reports ran earlier in this
+session on the same tree, and nothing it covered has changed since.
+
+**Staging.** Read from the commands at 11:18 on 2026-10-18, after this pass's `git add` of
+`CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/DESIGN.md` and `docs/ROADMAP.md` by name;
+this file is added again once this block is written. **No `git commit` was run.** HEAD `9999979`.
+**16 staged**: the lag fix's 13 and `CLAUDE.md`, `docs/STATE.md`, `docs/ROADMAP.md`. **4 unstaged**:
+`.claude/rules/85-testing.md` (#142), `.claude/settings.json` (the owner's), and the two schemes'
+`BlueprintName` lines the open Xcode app rewrites (#50). **1 untracked**: `Screenshots/census/`. None in
+both.
+
+## [2026-10-18] — `/doc_sync` again: two fresh readers find 24 in the lag fix's text, 23 taken
+
+**What changed.** The owner ran `/doc_sync` again, straight after the sixty-seventh pass — the
+sixty-eighth pass of `docs/AI_CONTEXT.md`. No source or test file changed between the two passes;
+nothing was built or run beyond re-reading this session's logs. The command's checks, re-run, were
+unchanged: 89 rows equal to their files, 638 `@Test`, 57 on the watch, 56 UI `func test`,
+`project.pbxproj` last changed in `eba1b1e`, 18 rule names resolving.
+
+**What the readers found.** With nothing new to sync, two fresh readers read the staged text: one
+against the code and git (11 findings), one against the session's logs (13). Each was checked against
+its source. Taken, and fixed where the text is live:
+- **Staged, not unstaged.** #99 said the fix was unstaged; it has been staged since 11:09.
+- **Another day, not an earlier one.** `docs/STATE.md` and the streaks spec said the kept run is
+  forgotten for `addLog` "with an earlier date"; the code forgets it for any day other than today,
+  and for `updateLog` when the serving was *or becomes* another day's.
+- **What the tests pin.** "Pins both halves" and "every path that must recount does" overstated them:
+  no test changes the zone, and a serving moved off today onto another day is untested. Opened as
+  #143, with two code comments that overstate — `closedRun`'s "twice", and a test's DocC citing
+  `aTurnThatIsNotANewDayRepublishesNothing` for something that test does not observe — which a doc
+  sync may not edit.
+- **Counts.** `WaterMotionTests` is 7 `@Test` and 8 cases. The welcome after the fix is 0.176 s per
+  5 s, the source of its 3.5 %; written 0.18. A goal change and a launch at 150 days are 10.5 and 12.6
+  ms; written "10 ms" for both. The streaks probe took a median of five runs for a goal change, not
+  seven. The waters spec's table mixed two `HEAD` runs and gave the welcome's resting value without
+  its first run; it now follows the logs run by run.
+- **The aurora.** "Measured at about 2 %" was never a switch-off: History and Settings, which carry
+  the aurora and no water clock, idled at 2.1 % and 2.6 % of a core. Restated as a ceiling in
+  `docs/AI_CONTEXT.md`, the spec, and #141.
+- **#140's evidence.** The load is from `uptime` readings, never logged: a 1-minute load of 30–140
+  during the first 26.5 pass (5-minute 63–83), 204 afterwards — not "60–200". The pass stopped after
+  three of its four chunks. Only the Settings failure was opened; the other two lost taps are
+  inferred. The fix's 6 of 13 is 6 of 12 run alone plus the gate chunk's one. One 3-of-3 batch and
+  the first interleaved round survive only in the session's output: the next run's log overwrote
+  each.
+- **The plan** said A was staged apart from B; one `git add` staged both.
+
+Not taken: the code reader's "the per-size after-figures are unsupported" — `pourprobe-after.log`
+gives a pour 1.4 ms at 45 days and 1.7 at 500, a refresh 0.4 and 0.6, exactly as written.
+
+**Superseded here, in this file and in `tasks/lessons.md`** (append-only, so kept as written): the lag
+fix's checkpoint above — "a load of 60–200", "each a tap that never took effect", "the aurora …
+measured at about 2 %", "`addLog` with an earlier date", and its warning counts "34 lines", "4" and
+"34", which are 17, 2 and 17 messages each listed twice by the comparison script; the comparison
+itself, identical on every scheme, stands, as do the 29 unique lines. The lag fix's two lessons —
+"6 of 13", "60–200", "2 % of the app's CPU" — read with the figures above.
+
+**One lesson.** A figure in the records needs a log that survives, and a counter checked against a
+known count (`tasks/lessons.md`).
+
+**Files touched.** `docs/AI_CONTEXT.md` (#99, #140, #141, #143 opened, three file rows, *Current
+state*, the pass's block), `docs/STATE.md`, `docs/DESIGN.md`, both specs, the plan,
+`tasks/lessons.md`, this file.
+
+**Gate.** Not run for this pass; the lag fix's checkpoint above reports the gate on the same tree.
+
+**Staging.** Read from the commands at 12:40 on 2026-10-18, after this pass's `git add` by name;
+this file is added again once this block is written. **No `git commit` was run.** HEAD `9999979`.
+**16 staged**, the same 16 paths as after the sixty-seventh pass. **7 unstaged**:
+`.claude/rules/85-testing.md` (#142), `.claude/settings.json` (the owner's), and the five files the open
+Xcode app rewrites (#50) — the two schemes and the three catalogues, back since 11:18. **1 untracked**:
+`Screenshots/census/`. None in both.
