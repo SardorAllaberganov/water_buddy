@@ -31,7 +31,9 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   is not recoverable from inside the app (rule `25-shared-storage`)
 - The welcome's UI tests launch with `-WaterBuddyFreshStart`, which only a DEBUG build reads, in
   `WaterBuddyApp.init()`: the manager is built on a throwaway suite, cleared at launch, and an
-  in-memory store, with no widget, reminder or watch side effects. No other UI test passes it.
+  in-memory store, with no widget, reminder or watch side effects. So does the store capture,
+  `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run.
+  No other UI test passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
   test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not
@@ -117,10 +119,12 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
 ```
 
 - **`-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` on the UI-test invocation is
-  mandatory, not an optimisation.** `AppStoreScreenshotUITests` is a capture harness, not a test:
-  it is **deliberately non-idempotent** — it asserts *Get Started* exists, so it fails on any device
-  where setup has already been completed, which is every ordinary run. It is driven only by
-  `bash Tools/CaptureScreenshots.sh`, which erases the device first. Dropping the skip turns a green
+  mandatory, not an optimisation.** `AppStoreScreenshotUITests` is a capture harness, not a test.
+  Its store method, `testCaptureAppStoreScreenshots`, starts clean on its own through the fresh
+  start, but it runs for minutes and is driven only by `bash Tools/CaptureScreenshots.sh`, which
+  writes into `Screenshots/`. Its census method, `testCaptureFullScreenCensus`, is still
+  **deliberately non-idempotent** — it asserts *Get Started* exists, so it fails on any device where
+  setup has already been completed, which is every ordinary run. Dropping the skip turns a green
   gate red for a reason that has nothing to do with the product
 - **`OS=27.0` is load-bearing on both platforms — do not simplify it away.** The pin moved from
   `26.5` on 2026-10-10, on the owner's ruling: the simulator set lost its data on 2026-10-08, the
