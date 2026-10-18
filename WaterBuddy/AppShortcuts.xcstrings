@@ -17,6 +17,54 @@
         }
       }
     },
+    "Check my water in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check my water in ${applicationName}"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверь воду в ${applicationName}"
+          }
+        }
+      }
+    },
+    "How much water have I had in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How much water have I had in ${applicationName}"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сколько осталось выпить в ${applicationName}"
+          }
+        }
+      }
+    },
+    "How much water today in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How much water today in ${applicationName}"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сколько воды сегодня в ${applicationName}"
+          }
+        }
+      }
+    },
     "Log a glass in ${applicationName}": {
       "localizations": {
         "en": {

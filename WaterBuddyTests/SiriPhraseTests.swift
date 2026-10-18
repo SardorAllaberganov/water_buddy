@@ -257,7 +257,8 @@ struct LogTheGlassTests {
 // MARK: - The phrases
 
 /// Siri's phrases ship in English and Russian — Siri has no Uzbek — and every one names the app,
-/// without which Siri cannot tell whose shortcut it is (spec 2026-10-07-siri-phrase §3.2).
+/// without which Siri cannot tell whose shortcut it is (spec 2026-10-07-siri-phrase §3.2). Three for
+/// *Log a Glass*, three for *Today's Water* (spec 2026-10-18-todays-water §3.2).
 struct AppShortcutPhraseTests {
 
     @Test func everyPhraseNamesTheAppInEnglishAndRussian() throws {
@@ -268,7 +269,7 @@ struct AppShortcutPhraseTests {
                 "the app ships no \(language) phrase table"
             )
             let table = try #require(NSDictionary(contentsOfFile: path) as? [String: String])
-            #expect(table.count == 3, "\(language) has \(table.count) phrases")
+            #expect(table.count == 6, "\(language) has \(table.count) phrases")
             for phrase in table.values {
                 #expect(phrase.contains("${applicationName}"), "a \(language) phrase does not name the app: \(phrase)")
             }

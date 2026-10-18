@@ -2382,6 +2382,27 @@ struct WaterSnapshot: Sendable, Equatable {
         Int((progressUnclamped * 100).rounded())
     }
 
+    /// Millilitres still to drink today — zero once the goal is met, never negative.
+    ///
+    /// The snapshot's twin of ``DataManager/remaining``, for Siri's answer, which reads what the widget
+    /// draws rather than the app's observable state (spec 2026-10-18-todays-water §3.5).
+    /// `theSnapshotAgreesWithTheManager` keeps the two in step.
+    ///
+    /// `nonisolated`, as ``AppLanguage/code`` is, because `TodaysWaterIntent.answer(for:)` reads it
+    /// from a `nonisolated static`: without it the app target's `SWIFT_DEFAULT_ACTOR_ISOLATION =
+    /// MainActor` infers this property `@MainActor`, and that read warns (rule `43-concurrency`). The
+    /// widget and watch targets set no default isolation, so there it changes nothing.
+    nonisolated var remaining: Int {
+        max(0, dailyGoal - currentWater)
+    }
+
+    /// Whether today's water has reached the goal — the snapshot's twin of
+    /// ``DataManager/hasReachedGoal``, held to it by the same test. `nonisolated` for the same reader
+    /// as ``remaining``.
+    nonisolated var hasReachedGoal: Bool {
+        currentWater >= dailyGoal
+    }
+
     /// The same snapshot with today's water zeroed and **every other field left exactly as it is**.
     ///
     /// This is the widget's midnight timeline entry — the future-dated one `getTimeline` emits so a

@@ -825,6 +825,12 @@ private let countedKeys = [
     CountedKey(key: "Logs %1$d millilitres", arity: 1, counted: [0], bundles: ["watch"]),
     CountedKey(key: "%1$d days", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d servings", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "%1$lld millilitres so far today — %2$lld millilitres to go.", arity: 2,
+               counted: [0, 1], bundles: ["app"]),
+    CountedKey(key: "%1$lld millilitres so far today — you've reached your goal.", arity: 1,
+               counted: [0], bundles: ["app"]),
+    CountedKey(key: "Nothing logged yet today — %1$lld millilitres to go.", arity: 1,
+               counted: [0], bundles: ["app"]),
 ]
 
 private func shipped(_ name: String) -> Bundle? {
@@ -916,6 +922,29 @@ private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: L
     case ("%1$d servings", "en"): return "\(f[0]) " + english(n[0], "serving", "servings")
     case ("%1$d servings", "ru"): return "\(f[0]) " + russian(n[0], "порция", "порции", "порций")
     case ("%1$d servings", "uz"): return "\(f[0]) porsiya"
+
+    case ("%1$lld millilitres so far today — %2$lld millilitres to go.", "en"):
+        return "\(f[0]) \(ml(0)) so far today — \(f[1]) \(ml(1)) to go."
+    case ("%1$lld millilitres so far today — %2$lld millilitres to go.", "ru"):
+        return "Сегодня уже \(f[0]) \(mlRu(0)) — "
+            + russian(n[1], "остался \(f[1]) миллилитр", "осталось \(f[1]) миллилитра", "осталось \(f[1]) миллилитров") + "."
+    case ("%1$lld millilitres so far today — %2$lld millilitres to go.", "uz"):
+        return "Bugun \(f[0]) millilitr — \(f[1]) millilitr qoldi."
+
+    case ("%1$lld millilitres so far today — you've reached your goal.", "en"):
+        return "\(f[0]) \(ml(0)) so far today — you've reached your goal."
+    case ("%1$lld millilitres so far today — you've reached your goal.", "ru"):
+        return "Сегодня уже \(f[0]) \(mlRu(0)) — цель достигнута."
+    case ("%1$lld millilitres so far today — you've reached your goal.", "uz"):
+        return "Bugun \(f[0]) millilitr — maqsadga erishildi."
+
+    case ("Nothing logged yet today — %1$lld millilitres to go.", "en"):
+        return "Nothing logged yet today — \(f[0]) \(ml(0)) to go."
+    case ("Nothing logged yet today — %1$lld millilitres to go.", "ru"):
+        return "Сегодня ещё ничего не записано — "
+            + russian(n[0], "остался \(f[0]) миллилитр", "осталось \(f[0]) миллилитра", "осталось \(f[0]) миллилитров") + "."
+    case ("Nothing logged yet today — %1$lld millilitres to go.", "uz"):
+        return "Bugun hali hech narsa qayd etilmagan — \(f[0]) millilitr qoldi."
 
     default: return nil
     }

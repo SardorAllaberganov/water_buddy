@@ -7,12 +7,14 @@
 
 import AppIntents
 
-/// The product's one App Shortcut: "Log water in WaterBuddy" logs the user's Glass by voice, with no
-/// setup, and the same action shows as a tile in Spotlight and the Shortcuts app.
+/// The product's two App Shortcuts: "Log water in WaterBuddy" logs the user's Glass by voice, and "How
+/// much water today in WaterBuddy" answers with today's total and what is left — both with no setup,
+/// and each shows as a tile in Spotlight and the Shortcuts app. *Log a Glass* is listed first, so its
+/// tile keeps the place it had before the second arrived.
 ///
-/// **One provider per app, in the target of the intent it names** — Apple's rule; the build reports an
-/// intent that is not. So it lives in the app beside ``LogServingIntent``, never in the widget
-/// extension.
+/// **One provider per app, in the target of the intents it names** — Apple's rule; the build reports
+/// an intent that is not. So it lives in the app beside ``LogServingIntent`` and
+/// ``TodaysWaterIntent``, never in the widget extension.
 ///
 /// **Phrases are English and Russian only.** Siri has no Uzbek, so `AppShortcuts.xcstrings` ships no
 /// `uz` — the one catalogue exempt from shipping all three languages. Every phrase names the app: Siri
@@ -31,6 +33,16 @@ struct WaterBuddyShortcuts: AppShortcutsProvider {
             ],
             shortTitle: "Log a Glass",
             systemImageName: "mug.fill"
+        )
+        AppShortcut(
+            intent: TodaysWaterIntent(),
+            phrases: [
+                "How much water today in \(.applicationName)",
+                "How much water have I had in \(.applicationName)",
+                "Check my water in \(.applicationName)",
+            ],
+            shortTitle: "Today's Water",
+            systemImageName: "drop.fill"
         )
     }
 
