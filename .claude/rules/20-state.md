@@ -85,10 +85,12 @@ after the body above had already conceded it.
 - `streak` is published from `republishHistory()` and from the `dailyGoal` setter, behind
   `role.drawsHistory`, with an equality guard. A failed read leaves it as it stands, never zero.
   Every day is judged against the current goal. It never leaves the app: not the snapshot, not a
-  notification, not the wrist's mirror
+  notification, not the wrist's mirror, not Siri
 - `remaining`, `hasReachedGoal`, `lastDrink` and `nextReminder` are computed on read from the
   observable state and stored nowhere. `nextReminder` is the first slot of the plan
-  `currentReminderSlots()` files, cut to today
+  `currentReminderSlots()` files, cut to today. `WaterSnapshot` carries `remaining` and
+  `hasReachedGoal` too, for Siri's answer; `theSnapshotAgreesWithTheManager` pins the two pairs
+  together
 - Do **not** add an equality guard to the `todaysLogs` or `historyLogs` republish. `WaterLog` is a
   `@Model` class hashed by `persistentModelID`, so the array after an amount edit compares equal to
   the array before it — a guard would swallow exactly the change it is meant to publish

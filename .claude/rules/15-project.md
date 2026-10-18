@@ -112,8 +112,8 @@ from before this design was read, kept deliberately rather than renamed for its 
   a file already on the relevant list (rule `40-widget`, rule `25-shared-storage`)
 - `AddWaterIntent` is compiled into the phone widget extension **only**; a second copy in the app
   binary registers the same Shortcuts action twice
-- `LogServingIntent` and `WaterBuddyShortcuts` are app-only and stay out of every exception set: a
-  provider and its intents share a target. `AddWaterIntent` stays the widget extension's own,
+- `LogServingIntent`, `TodaysWaterIntent` and `WaterBuddyShortcuts` are app-only and stay out of
+  every exception set: a provider and its intents share a target. `AddWaterIntent` stays the widget extension's own,
   differently named action
 - A file importing a framework unavailable to iOS or watchOS must live outside all seven
   synchronized folders — `Tools/` at the repository root belongs to no target, which is why

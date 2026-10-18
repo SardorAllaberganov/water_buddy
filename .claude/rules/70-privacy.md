@@ -101,6 +101,12 @@ Three limits are conditions of the permission:
   `IntentDialog`, no user value, in every shipped language — `theSiriReplyCarriesNoUserValues` asserts
   it as `theReminderCopyCarriesNoUserValues` does. `LogServingIntent.authenticationPolicy` is
   `.alwaysAllowed` on purpose: logging water on a locked phone is harmless, and the reply says nothing
+- **Siri's answer to *Today's Water* may say the user's own figures** — today's total and what is
+  left — because the user asked for them, and only to someone the system has authenticated:
+  `TodaysWaterIntent.authenticationPolicy` is `.requiresAuthentication`, so a locked iPhone asks for
+  authentication before it answers. `theAnswerWaitsForAnUnlock` pins it. Never the streak. A figure
+  in any other Siri reply, or this answer given without authentication, needs its own ruling here
+  first
 - **The phone's Lock Screen widget may show the user's own figures** — the percentage, today's
   total, the goal — because the user put it there, as the watch's complication may on the watch
   face; a notification may not, because it arrives unasked. In return, every view that draws a

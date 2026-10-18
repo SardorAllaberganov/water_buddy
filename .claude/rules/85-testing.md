@@ -74,7 +74,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
 - Some suites are deliberately **not** `@MainActor` — `WaterSnapshotTests`, `WidgetLanguageTests`,
   `AppLanguageTests`, `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
-  `WelcomeStepTests`, `GoalSuggestionTests`. They are
+  `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
