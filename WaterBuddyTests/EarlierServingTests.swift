@@ -269,15 +269,17 @@ struct RetimingTests {
         }
     }
 
-    /// Adding to a past day changes no figure the widget draws, so it must not be woken for it.
-    @Test func aServingBackdatedIntoYesterdayRingsNoWidgetDoorbell() throws {
+    /// Adding to a past day moves a bar the week widget draws, so the widget is woken for it — once,
+    /// by the week, since today's total did not move (spec 2026-10-19-the-widget-stage §3.4 W6). It
+    /// asserted no ring until the week widget existed, when no figure the widget drew had a past day.
+    @Test func aServingBackdatedIntoYesterdayRingsTheWidgetOnce() throws {
         try withEarlierStore(now: { utc(2026, 8, 30, 12) }) { manager, taps, _ in
             manager.addLog(amount: 400, at: utc(2026, 8, 30, 9))
             let reloads = taps.reloads
 
             manager.addLog(amount: 250, at: utc(2026, 8, 29, 20))
 
-            #expect(taps.reloads == reloads)
+            #expect(taps.reloads - reloads == 1)
             #expect(manager.currentWater == 400)
             let bars = Dictionary(uniqueKeysWithValues: manager.history.map { ($0.dayOrdinal, $0.total) })
             #expect(bars[20260829] == 250)

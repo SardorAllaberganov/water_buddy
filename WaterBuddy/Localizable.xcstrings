@@ -2413,6 +2413,29 @@
         }
       }
     },
+    "Open WaterBuddy to see your week.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open WaterBuddy to see your week."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откройте WaterBuddy, чтобы увидеть свою неделю."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haftangizni ko‘rish uchun WaterBuddy’ni oching."
+          }
+        }
+      }
+    },
     "Open iOS Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -3011,6 +3034,29 @@
         }
       }
     },
+    "Week": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неделя"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafta"
+          }
+        }
+      }
+    },
     "Welcome to": {
       "extractionState": "manual",
       "localizations": {
@@ -3168,6 +3214,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maqsadingiz — %1$@ ml"
+          }
+        }
+      }
+    },
+    "Your last seven days against your goal.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your last seven days against your goal."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Последние семь дней в сравнении с вашей целью."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oxirgi yetti kun — maqsadingizga nisbatan."
           }
         }
       }

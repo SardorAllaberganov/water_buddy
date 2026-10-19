@@ -133,6 +133,19 @@ final class DataManager {
         /// ``remindersEnabled`` and ``language``. Written only by
         /// ``DataManager/claimReviewRequest(version:)``; no snapshot, mirror or notification reads it.
         static let reviewRequestedVersion = prefix + "reviewRequestedVersion"
+        /// The last ``DataManager/historyWindow`` days' totals, JSON-encoded `[Int: Int]` — day
+        /// ordinal → millilitres, every day of the window present and zeros included — for the week
+        /// widget, which may never open SwiftData (rule `40-widget`).
+        ///
+        /// **Absent means not yet known, never "nothing drunk"**, so nothing materialises it: the
+        /// widget says to open the app rather than drawing a week of zeros (rule `25-shared-storage`).
+        /// Derived, like ``currentWater``: rewritten from the rows wherever today's total is
+        /// recomputed (``DataManager/recomputeTodayAndTheWeek()``), read through
+        /// ``DataManager/readWeekTotals(from:)``.
+        ///
+        /// `nonisolated`, as ``wristApplied`` is: `readWeekTotals(from:)`, on the widget's read path,
+        /// names it.
+        nonisolated static let weekTotals = prefix + "weekTotals"
         /// The watch's own pending pours, JSON-encoded `[WristPour]`. Written only by `WristModel`, in
         /// the watch's local App Group suite — never read or written from the phone.
         static let wristOutbox = prefix + "wristOutbox"
@@ -164,7 +177,7 @@ final class DataManager {
         /// disagree. Production code never reads this — it names the constants directly.
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
-            didMigrateFromStandard, remindersEnabled, language, servings, reviewRequestedVersion,
+            didMigrateFromStandard, remindersEnabled, language, servings, reviewRequestedVersion, weekTotals,
             wristOutbox, wristMirror, wristApplied,
         ]
     }
@@ -582,8 +595,7 @@ final class DataManager {
 
         resetIfNeeded()
         seedFromCachedTotalIfNeeded()
-        recomputeToday()
-        republishHistory()
+        recomputeTodayAndTheWeek()
         startObservingDayChanges()
         rescheduleRemindersNow()
     }
@@ -980,17 +992,40 @@ final class DataManager {
         return logs
     }
 
+    /// Recomputes today's total, then the week, from the rows — what `init` and
+    /// ``saveAndRecompute()`` run, and nothing else does.
+    ///
+    /// **The week is cached exactly where today's total is recomputed** (rule `20-state`), in every
+    /// process that builds a `DataManager` — the widget extension too. A tap the morning after rolls
+    /// the day over in that process before it logs, and the cached total for yesterday goes with
+    /// it; the week, rewritten here from the rows, keeps it (spec 2026-10-19-the-widget-stage §2,
+    /// §3.4). ``refresh()`` and ``dayDidTurn()`` republish the week card and write nothing, for the
+    /// reason ``refresh()`` never recomputes the total: a read across processes can miss the other
+    /// process's newest row.
+    ///
+    /// **One doorbell a pass.** The ``currentWater`` setter rings when today's total moved. The week
+    /// rings only when it has news and the total did not, so a serving moved from today to yesterday
+    /// — both moved — still rings once.
+    private func recomputeTodayAndTheWeek() {
+        let totalBefore = storedCurrentWater
+        recomputeToday()
+        let weekHasNews = republishHistory(cachingTheWeek: true)
+        if weekHasNews, storedCurrentWater == totalBefore {
+            reloadWidgets()
+        }
+    }
+
     /// Republishes the window's rows to ``historyLogs``, then recomputes ``history`` from the same
     /// rows and publishes it if it moved.
     ///
     /// **Guarded on `role.drawsHistory`, and the guard is about cost rather than correctness.** The
     /// other role guards in this file stop a non-owner writing group state; this one stops a process
     /// doing work it can never draw. `recomputeToday()` is deliberately *not* guarded, so
-    /// `AddWaterIntent` reaches ``saveAndRecompute()`` on every widget tap — and without this
-    /// early return that tap would run a seven-day fetch and a full Swift-side roll-up inside a
-    /// process whose entire job is to draw one number. The widget has no history surface: a
-    /// per-day series is derivable from none of the cache keys, and `WaterSnapshot` may only
-    /// carry what the cache alone can answer (rule `40-widget`).
+    /// `AddWaterIntent` reaches ``saveAndRecompute()`` on every widget tap. The guard covers what
+    /// the app draws — the rows, the series, the streak. **The week's cache is not behind it**:
+    /// with `cachingTheWeek` the window is read in any process, the extension included, because the
+    /// week widget reads the cache and the extension's own taps change the rows
+    /// (``recomputeTodayAndTheWeek()``).
     ///
     /// **One fetch feeds both**, so a bar and the list under it are one reading of the store. The
     /// rows are published first and unguarded (see ``historyLogs``): a time-only edit inside a past
@@ -1000,37 +1035,70 @@ final class DataManager {
     /// Returns early on a failed read rather than publishing an empty window. An empty chart is
     /// indistinguishable from a user who never drank, which is the same mistake as writing a
     /// failed read back as a total of zero — one step further out (see ``fetch(_:)``).
-    private func republishHistory() {
-        guard Self.role.drawsHistory else { return }
+    ///
+    /// Returns whether the cached week has news for the widget (``cacheWeek(_:today:)``).
+    @discardableResult
+    private func republishHistory(cachingTheWeek: Bool = false) -> Bool {
+        let draws = Self.role.drawsHistory
+        guard draws || cachingTheWeek else { return false }
 
         // Before the window below, and not inside it: the bars can return early — a failed read,
         // or a series that did not move — while a run further back still did.
-        republishStreak()
+        if draws {
+            republishStreak()
+        }
 
         let instant = now()
         guard let start = Self.historyWindowStart(endingOn: instant, calendar: calendar),
               let logs = readLogs(from: start, to: Self.nextDayBoundary(after: instant, calendar: calendar))
-        else { return }
+        else { return false }
 
-        // `Dictionary(grouping:by:)` keeps each day's rows in the fetch's newest-first order.
-        withMutation(keyPath: \.historyLogs) {
-            storedHistoryLogs = Dictionary(grouping: logs) { dayOrdinal(for: $0.timestamp) }
-        }
-
+        // One roll-up for the card and the cache, so the widget's week and the card are one reading.
         let series = DaySummary.series(
             from: logs,
             days: Self.historyWindow,
             endingOn: instant,
             in: calendar
         )
-        guard series != storedHistory else { return }
+        let weekHasNews = cachingTheWeek && cacheWeek(series, today: dayOrdinal(for: instant))
+
+        guard draws else { return weekHasNews }
+
+        // `Dictionary(grouping:by:)` keeps each day's rows in the fetch's newest-first order.
+        withMutation(keyPath: \.historyLogs) {
+            storedHistoryLogs = Dictionary(grouping: logs) { dayOrdinal(for: $0.timestamp) }
+        }
+
+        guard series != storedHistory else { return weekHasNews }
         withMutation(keyPath: \.history) { storedHistory = series }
+        return weekHasNews
+    }
+
+    /// Writes `series` to ``Key/weekTotals`` if it differs from the cache, and answers whether the
+    /// widget has news: the cache was missing or unreadable, or a day before `today` moved. Today's
+    /// own change is not news here — the ``currentWater`` setter announces it.
+    ///
+    /// **Each day is clamped on the way in**, to the range ``readWeekTotals(from:)`` accepts on the
+    /// way out, as the ``currentWater`` setter clamps today's. The series saturates upward only, so a
+    /// corrupt negative row would otherwise write a week its own reader discards — the widget saying
+    /// to open the app forever, and every pass rewriting the key and ringing.
+    private func cacheWeek(_ series: [DaySummary], today: Int) -> Bool {
+        let week = Dictionary(
+            series.map { ($0.dayOrdinal, $0.total.clamped(to: 0...Self.maximumDailyIntake)) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let cached = Self.readWeekTotals(from: defaults)
+        guard week != cached, let data = try? JSONEncoder().encode(week) else { return false }
+        defaults.set(data, forKey: Key.weekTotals)
+
+        guard let cached else { return true }
+        return week.contains { day, total in day != today && cached[day] != total }
     }
 
     /// Recounts ``streak`` and publishes it if it moved.
     ///
     /// Behind `role.drawsHistory` for ``republishHistory()``'s reason: a widget tap must not run
-    /// a month's fetch in a process that draws one number.
+    /// a month's fetch in a process that draws no streak.
     private func republishStreak() {
         guard Self.role.drawsHistory else { return }
         guard let counted = readStreak(), counted != storedStreak else { return }
@@ -1109,8 +1177,7 @@ final class DataManager {
             #endif
             saved = false
         }
-        recomputeToday()
-        republishHistory()
+        recomputeTodayAndTheWeek()
         return saved
     }
 
@@ -1610,6 +1677,24 @@ final class DataManager {
     /// Control Center control (`LogWaterControl`) draws its glyph — a tile with no figure, which could
     /// never show that the two had come from different slots.
     nonisolated static let usualSlot = 1
+
+    /// The cached week (``Key/weekTotals``), or `nil` when there is none this build wrote.
+    ///
+    /// **Validated on the way out, and discarded whole rather than repaired** — undecodable data, a
+    /// count other than ``historyWindow``, or any day outside `0...maximumDailyIntake` — as
+    /// ``resolveServings(in:)`` discards its triple: a partly-repaired week is a set of bars nobody's
+    /// rows produced. `nil` is *unknown*, which the week widget says in words; it is never read as
+    /// a week of zeros.
+    ///
+    /// `nonisolated static` for ``snapshot(defaults:calendar:now:)``, on the widget's read path.
+    nonisolated static func readWeekTotals(from defaults: UserDefaults) -> [Int: Int]? {
+        guard let data = defaults.data(forKey: Key.weekTotals),
+              let week = try? JSONDecoder().decode([Int: Int].self, from: data),
+              week.count == historyWindow,
+              week.values.allSatisfy({ (0...maximumDailyIntake).contains($0) })
+        else { return nil }
+        return week
+    }
 
     nonisolated private static func resolveDailyGoal(in defaults: UserDefaults) -> Int {
         guard let stored = defaults.object(forKey: Key.dailyGoal) as? Int, stored >= 1 else {
@@ -2210,6 +2295,25 @@ struct DaySummary: Sendable, Equatable {
 
 extension DaySummary {
 
+    /// The `days` local days ending on the day containing `now`, oldest first, each as its ordinal
+    /// and its start — the one walk ``series(from:days:endingOn:in:)`` and
+    /// ``WaterSnapshot/week(endingOn:calendar:)`` both take, so History's card and the week widget
+    /// cannot name different days. Non-positive `days` yields `[]`.
+    nonisolated static func window(days: Int, endingOn now: Date, in calendar: Calendar) -> [(ordinal: Int, date: Date)] {
+        guard days > 0 else { return [] }
+
+        let today = calendar.startOfDay(for: now)
+
+        // Walked with `date(byAdding: .day,)`, never by subtracting 86,400 seconds — a DST day is
+        // 23 or 25 hours long and a seconds-based walk silently drops or repeats one
+        // (rule `30-rollover`).
+        return (0..<days).reversed().compactMap { offset in
+            calendar.date(byAdding: .day, value: -offset, to: today).map {
+                (DataManager.dayOrdinal(for: $0, in: calendar), $0)
+            }
+        }
+    }
+
     /// The last `days` local days ending on the day containing `now`, oldest first.
     ///
     /// Always returns exactly `days` entries, zero-filling a day nobody drank on: a window that
@@ -2239,18 +2343,7 @@ extension DaySummary {
         endingOn now: Date,
         in calendar: Calendar
     ) -> [DaySummary] {
-        guard days > 0 else { return [] }
-
-        let today = calendar.startOfDay(for: now)
-
-        // Walked with `date(byAdding: .day,)`, never by subtracting 86,400 seconds — a DST day is
-        // 23 or 25 hours long and a seconds-based walk silently drops or repeats one
-        // (rule `30-rollover`).
-        let window: [(ordinal: Int, date: Date)] = (0..<days).reversed().compactMap { offset in
-            calendar.date(byAdding: .day, value: -offset, to: today).map {
-                (DataManager.dayOrdinal(for: $0, in: calendar), $0)
-            }
-        }
+        let window = Self.window(days: days, endingOn: now, in: calendar)
 
         var totals: [Int: Int] = [:]
         for log in logs {
@@ -2330,8 +2423,8 @@ extension DaySummary {
 
 // MARK: - Read-only snapshot
 
-/// Today's hydration as a plain value, for a process that must read the store but must never
-/// write to it.
+/// Today's hydration, and the week the week widget draws, as a plain value, for a process that must
+/// read the store but must never write to it.
 ///
 /// A widget's timeline provider is such a process: it is not on the main actor, so it cannot
 /// touch ``DataManager/shared`` at all, and merely *constructing* a `DataManager` would
@@ -2365,6 +2458,18 @@ struct WaterSnapshot: Sendable, Equatable {
     /// compiles. Without the default this field would break all seven at once, and only the
     /// separate extension build would say so.
     var serving: Int = DataManager.defaultServing
+
+    /// The last ``DataManager/historyWindow`` days' totals by day ordinal, as `DataManager` last
+    /// cached them (``DataManager/Key/weekTotals``), or `nil` when none is cached — which the week
+    /// widget says in words. Read through ``week(endingOn:calendar:)``, never by a view directly.
+    ///
+    /// **Defaulted**, like ``serving``, so the memberwise calls elsewhere — most of them in the
+    /// widget target, which the app scheme's tests never compile — build unchanged.
+    ///
+    /// `nonisolated`, as ``remaining`` is: the app target's default isolation infers a stored
+    /// property `@MainActor` too, and a non-`@MainActor` suite reading it from the test module warned
+    /// (rule `43-concurrency`, #147).
+    nonisolated var weekTotals: [Int: Int]? = nil
 
     /// Fraction of the goal reached today, clamped to `0...1`.
     var progress: Double {
@@ -2403,6 +2508,30 @@ struct WaterSnapshot: Sendable, Equatable {
         currentWater >= dailyGoal
     }
 
+    /// The week the widget draws: ``DataManager/historyWindow`` days ending on the day of `instant`,
+    /// oldest first — or `nil` when no week is cached.
+    ///
+    /// **The day of `instant` takes ``currentWater``**, so the bar for today and the vessel beside
+    /// it are one figure, and the midnight entry — this snapshot ``rolledOver()``, asked at midnight
+    /// — shifts the week by itself: yesterday from the cache, today the zero (rule `30-rollover`). A
+    /// day the cache does not hold had nothing logged since its last write, and is zero.
+    ///
+    /// Walked by ``DaySummary/window(days:endingOn:in:)``, the walk History's card is summed over,
+    /// so the two can never name different days. `nonisolated`, because the widget's view and a
+    /// non-`@MainActor` suite read it and the app target would otherwise infer it main-actor
+    /// (rule `43-concurrency`, #147).
+    nonisolated func week(endingOn instant: Date, calendar: Calendar) -> [DaySummary]? {
+        guard let weekTotals else { return nil }
+        let today = DataManager.dayOrdinal(for: instant, in: calendar)
+        return DaySummary.window(days: DataManager.historyWindow, endingOn: instant, in: calendar).map { day in
+            DaySummary(
+                dayOrdinal: day.ordinal,
+                total: day.ordinal == today ? currentWater : weekTotals[day.ordinal] ?? 0,
+                date: day.date
+            )
+        }
+    }
+
     /// The same snapshot with today's water zeroed and **every other field left exactly as it is**.
     ///
     /// This is the widget's midnight timeline entry — the future-dated one `getTimeline` emits so a
@@ -2426,6 +2555,23 @@ struct WaterSnapshot: Sendable, Equatable {
         next.currentWater = 0
         return next
     }
+}
+
+// MARK: - Links from a widget
+
+/// The links a widget opens the app with — one spelling, read by the widget that sets it and by
+/// the app that answers it (rule `50-views`). In this file because both processes compile it and
+/// the shared set does not grow (rule `15-project`).
+///
+/// **No URL scheme is registered with iOS for it.** A widget's link reaches its own app without one
+/// — proved on the simulator before this shipped (spec 2026-10-19-the-widget-stage §3.6) — and a
+/// registered scheme would be an entrance any app or web page could open.
+///
+/// `URL?`, built without a force-unwrap: this codebase never traps (rule `75-diagnostics`).
+nonisolated enum WidgetLink {
+
+    /// The week widget's: History, which shows the same week in full.
+    static let history = URL(string: "waterbuddy://history")
 }
 
 // MARK: - WatchConnectivity wire protocol
@@ -2931,7 +3077,10 @@ extension DataManager {
             language: resolveLanguage(in: defaults),
             // The middle vessel — the one the widget's single button logs and draws, and the one the
             // Siri shortcut logs.
-            serving: usualServing(in: defaults)
+            serving: usualServing(in: defaults),
+            // The week widget's bars; the day of `now` is laid over them from `water`
+            // (``WaterSnapshot/week(endingOn:calendar:)``).
+            weekTotals: readWeekTotals(from: defaults)
         )
     }
 

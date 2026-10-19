@@ -13,6 +13,7 @@ struct WaterBuddyWidgetBundle: WidgetBundle {
 
     var body: some Widget {
         WaterBuddyWidget()
+        WeekWidget()
         LockScreenWidget()
         // The codebase's first version check: controls arrived in iOS 18, and the app still deploys
         // to 17.0. An iPhone on 17 simply never offers this one.

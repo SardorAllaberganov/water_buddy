@@ -66,14 +66,15 @@ struct HydrationEntry: TimelineEntry {
 struct HydrationProvider: TimelineProvider {
 
     func placeholder(in context: Context) -> HydrationEntry {
-        HydrationEntry(date: Date(), snapshot: .sample)
+        let now = Date()
+        return HydrationEntry(date: now, snapshot: .sample(at: now))
     }
 
     func getSnapshot(in context: Context, completion: @escaping (HydrationEntry) -> Void) {
         let now = Date()
         // In the gallery there is no user data worth showing — a brand-new install would offer an
         // empty vessel as its advertisement.
-        let snapshot = context.isPreview ? .sample : DataManager.snapshot(now: now)
+        let snapshot = context.isPreview ? .sample(at: now) : DataManager.snapshot(now: now)
         completion(HydrationEntry(date: now, snapshot: snapshot))
     }
 
@@ -94,11 +95,21 @@ struct HydrationProvider: TimelineProvider {
     }
 }
 
-private extension WaterSnapshot {
+extension WaterSnapshot {
 
-    /// What the widget gallery and the redacted placeholder show. Past halfway, so the water has
-    /// a visible surface and the readout has two digits.
-    static let sample = WaterSnapshot(currentWater: 1_150, dailyGoal: DataManager.defaultDailyGoal)
+    /// What the widget gallery and the redacted placeholder show: past halfway today, so the water
+    /// has a visible surface and the readout has two digits — and a week of four days met, so the
+    /// week widget advertises itself with bars rather than with its empty state. Built for the days
+    /// ending on `date`, because a cached week is keyed by day.
+    static func sample(at date: Date) -> WaterSnapshot {
+        let days = DaySummary.window(days: DataManager.historyWindow, endingOn: date, in: .waterBuddyDay)
+        let totals = [2_100, 1_600, 2_000, 2_300, 1_200, 2_050, 1_150]   // oldest first; today last
+        return WaterSnapshot(
+            currentWater: 1_150,
+            dailyGoal: DataManager.defaultDailyGoal,
+            weekTotals: Dictionary(zip(days.map { $0.ordinal }, totals), uniquingKeysWith: { first, _ in first })
+        )
+    }
 }
 
 // MARK: - Entry view
@@ -114,10 +125,10 @@ struct HydrationView: View {
     /// How far the card floats inside the widget. Small enough that the card is still the widget,
     /// wide enough that the aurora reads as a surface the card is resting *on* rather than a
     /// hairline.
-    private static let cardInset: CGFloat = 10
+    static let cardInset: CGFloat = 10
 
     /// Breathing room inside the card.
-    private static let cardPadding: CGFloat = 12
+    static let cardPadding: CGFloat = 12
 
     /// How far the vessel and the button stand in from the edge when iOS has removed the background
     /// (StandBy). Less than the card's inset and padding together, because no card is drawn round
@@ -168,17 +179,9 @@ struct HydrationView: View {
         }
     }
 
-    @ViewBuilder
     private var card: some View {
         content
-            .padding(Self.cardPadding)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .widgetPane(in: ContainerRelativeShape(), density: .frosted, elevation: .raised)
-            // Under the pane, not over it: `.background` applied *after* `.widgetPane` lands
-            // beneath the glass, which is where a backdrop belongs.
-            .background {
-                WidgetCardBackdrop().clipShape(ContainerRelativeShape())
-            }
+            .widgetCard()
             .accessibilityElement(children: .contain)
     }
 
@@ -495,7 +498,7 @@ struct PourButton: View {
         Button(intent: AddWaterIntent(amount: serving)) {
             label
         }
-        // Without this the system draws `WidgetBorderedButtonStyle`'s capsule over the glass pane.
+        // Without this the system draws `WidgetBorderedButtonStyle`'s capsule over the primary surface.
         .buttonStyle(.plain)
         .accessibilityLabel(strings.localized("Add %1$d millilitres", serving, locale: locale))
     }
@@ -573,6 +576,26 @@ private struct WidgetPane<S: Shape & InsettableShape>: ViewModifier {
                 shape.strokeBorder(.white.opacity(0.45), lineWidth: 1)
             }
         }
+    }
+}
+
+// MARK: - The card
+
+extension View {
+
+    /// The Home Screen widgets' card: padded, on `.frosted`/`.raised` glass over its own blurred
+    /// aurora (``WidgetCardBackdrop``) — one definition, so the Hydration widget and the week widget
+    /// sit side by side as one family. The inset from the widget's edge is the caller's
+    /// (``HydrationView/cardInset``).
+    func widgetCard() -> some View {
+        padding(HydrationView.cardPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .widgetPane(in: ContainerRelativeShape(), density: .frosted, elevation: .raised)
+            // Under the pane, not over it: `.background` applied *after* `.widgetPane` lands
+            // beneath the glass, which is where a backdrop belongs.
+            .background {
+                WidgetCardBackdrop().clipShape(ContainerRelativeShape())
+            }
     }
 }
 

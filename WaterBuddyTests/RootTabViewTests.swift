@@ -69,6 +69,19 @@ struct AppTabTests {
         #expect(Set(titles).count == titles.count, "two tabs reading the same name to VoiceOver")
         #expect(Set(symbols).count == symbols.count, "two tabs drawing the same glyph")
     }
+
+    /// The week widget's link opens History (spec 2026-10-19-the-widget-stage §3.6, rule `50-views`).
+    @Test func theWeekWidgetsLinkOpensHistory() throws {
+        let link = try #require(WidgetLink.history, "the week widget has no link to set")
+        #expect(AppTab(link: link) == .history)
+    }
+
+    /// Only the link a widget sets turns a page — a whole-URL match.
+    @Test(arguments: ["waterbuddy://home", "waterbuddy://", "waterbuddy://history/today", "https://history", "history"])
+    func anyOtherLinkOpensNothing(_ link: String) throws {
+        let url = try #require(URL(string: link))
+        #expect(AppTab(link: url) == nil)
+    }
 }
 
 // MARK: - The shade under Apple's bar

@@ -507,6 +507,119 @@ struct WidgetLanguageTests {
     }
 }
 
+// MARK: - The cached week
+
+/// The ways a stored week can be one this build did not write. Internal, not `private`: it is the
+/// parameter of an internal `@Test` method, which may not take a private type.
+enum WeekCorruption: CaseIterable, Sendable {
+    case absent, notJSON, notData, sixDays, eightDays, aNegativeDay, aDayOverTheCap
+}
+
+/// ``WaterSnapshot/weekTotals`` and ``WaterSnapshot/week(endingOn:calendar:)`` — what the week widget
+/// draws (spec 2026-10-19-the-widget-stage §3.4). **Not `@MainActor`**, as the widget's read is not.
+struct WeekSnapshotTests {
+
+    /// Seven days, the 13th to the 19th of October 2026, oldest first.
+    private static let aWeek: [Int: Int] = [
+        20261013: 0, 20261014: 300, 20261015: 2_000, 20261016: 0,
+        20261017: 1_200, 20261018: 2_400, 20261019: 900,
+    ]
+
+    private static func store(_ corruption: WeekCorruption, in defaults: UserDefaults) throws {
+        let key = DataManager.Key.weekTotals
+        let days = Array(aWeek.keys.sorted())
+        switch corruption {
+        case .absent: break
+        case .notJSON: defaults.set(Data("not a week".utf8), forKey: key)
+        case .notData: defaults.set("a week", forKey: key)
+        case .sixDays: defaults.set(try JSONEncoder().encode(aWeek.filter { $0.key != days[0] }), forKey: key)
+        case .eightDays: defaults.set(try JSONEncoder().encode(aWeek.merging([20261012: 0]) { first, _ in first }), forKey: key)
+        case .aNegativeDay: defaults.set(try JSONEncoder().encode(aWeek.merging([days[1]: -1]) { _, new in new }), forKey: key)
+        case .aDayOverTheCap: defaults.set(try JSONEncoder().encode(aWeek.merging([days[1]: DataManager.maximumDailyIntake + 1]) { _, new in new }), forKey: key)
+        }
+    }
+
+    @Test func theSnapshotCarriesTheCachedWeek() throws {
+        try withTempDefaults { defaults in
+            defaults.set(try JSONEncoder().encode(Self.aWeek), forKey: DataManager.Key.weekTotals)
+
+            let snapshot = DataManager.snapshot(defaults: defaults, calendar: utcDay, now: utc(2026, 10, 19))
+
+            #expect(snapshot.weekTotals == Self.aWeek)
+        }
+    }
+
+    /// Discarded whole, never repaired — as `resolveServings(in:)` treats its triple.
+    @Test(arguments: WeekCorruption.allCases)
+    func aWeekThisBuildDidNotWriteIsUnknown(_ corruption: WeekCorruption) throws {
+        try withTempDefaults { defaults in
+            try Self.store(corruption, in: defaults)
+
+            let snapshot = DataManager.snapshot(defaults: defaults, calendar: utcDay, now: utc(2026, 10, 19))
+
+            #expect(snapshot.weekTotals == nil)
+            #expect(snapshot.week(endingOn: utc(2026, 10, 19), calendar: utcDay) == nil)
+        }
+    }
+
+    /// `async`, with each read into a local before `#expect`: the one shape seen to warn when a
+    /// member read off the main actor is main-actor (#147). Step 6 takes `nonisolated` off
+    /// `week(endingOn:calendar:)` to see it warn.
+    @Test func theWeekEndsOnItsDayAndTakesThatDayFromTheTotal() async throws {
+        let snapshot = WaterSnapshot(currentWater: 1_100, dailyGoal: 2_000, weekTotals: Self.aWeek)
+
+        let cached = snapshot.weekTotals
+        let week = snapshot.week(endingOn: utc(2026, 10, 19, 14), calendar: utcDay)
+
+        #expect(cached == Self.aWeek)
+        let days = try #require(week)
+        #expect(days.map(\.dayOrdinal) == [20261013, 20261014, 20261015, 20261016, 20261017, 20261018, 20261019])
+        #expect(days.map(\.total) == [0, 300, 2_000, 0, 1_200, 2_400, 1_100], "today is the vessel's figure, not the cache's")
+    }
+
+    @Test func theMidnightEntryShiftsTheWeekByADay() throws {
+        let evening = WaterSnapshot(currentWater: 900, dailyGoal: 2_000, weekTotals: Self.aWeek)
+
+        let days = try #require(evening.rolledOver().week(endingOn: utc(2026, 10, 20, 0), calendar: utcDay))
+
+        #expect(days.map(\.dayOrdinal) == [20261014, 20261015, 20261016, 20261017, 20261018, 20261019, 20261020])
+        #expect(days.map(\.total) == [300, 2_000, 0, 1_200, 2_400, 900, 0])
+    }
+
+    /// Review Focus 2: nothing opened or tapped for three days.
+    @Test func aDayNewerThanTheCacheIsEmpty() throws {
+        let stale = WaterSnapshot(currentWater: 0, dailyGoal: 2_000, weekTotals: Self.aWeek)
+
+        let days = try #require(stale.week(endingOn: utc(2026, 10, 22, 9), calendar: utcDay))
+
+        #expect(days.map(\.total) == [0, 1_200, 2_400, 900, 0, 0, 0])
+    }
+
+    /// Review Focus 3: read in Los Angeles, written in UTC.
+    @Test func aWeekReadInAnotherZoneStillHasSevenDays() throws {
+        let losAngeles = gregorian(in: "America/Los_Angeles")
+        let snapshot = WaterSnapshot(currentWater: 500, dailyGoal: 2_000, weekTotals: Self.aWeek)
+
+        // 02:00 UTC on the 19th is 19:00 on the 18th in Los Angeles.
+        let days = try #require(snapshot.week(endingOn: utc(2026, 10, 19, 2), calendar: losAngeles))
+
+        #expect(days.map(\.dayOrdinal) == [20261012, 20261013, 20261014, 20261015, 20261016, 20261017, 20261018])
+        #expect(days.map(\.total) == [0, 0, 300, 2_000, 0, 1_200, 500])
+    }
+
+    @Test func readingACachedWeekLeavesTheStoreUntouched() throws {
+        try withTempDefaults { defaults in
+            seed(defaults, water: 750, goal: 2_500, day: 20_261_018)   // deliberately yesterday
+            defaults.set(try JSONEncoder().encode(Self.aWeek), forKey: DataManager.Key.weekTotals)
+            let before = waterBuddyKeys(in: defaults)
+
+            _ = DataManager.snapshot(defaults: defaults, calendar: utcDay, now: utc(2026, 10, 19))
+
+            #expect(waterBuddyKeys(in: defaults) == before)
+        }
+    }
+}
+
 // MARK: - The process role
 
 /// ``DataManager/Role`` — the four-state answer that replaced a two-state `isAppExtension`.

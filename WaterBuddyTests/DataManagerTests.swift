@@ -422,12 +422,16 @@ struct DataManagerTests {
         withTempDefaults { defaults in
             var reloads = 0
             let manager = makeManager(defaults, onReload: { reloads += 1 }) { utc(2026, 8, 28) }
+            // Construction on an empty suite rings once, for the first week the week widget can draw
+            // (spec 2026-10-19-the-widget-stage §3.4 W6, `WeekCacheTests`); this test is about what
+            // comes after it.
+            let constructed = reloads
 
             manager.addWater(amount: 250)
-            #expect(reloads == 1)
+            #expect(reloads - constructed == 1)
 
             manager.refresh()
-            #expect(reloads == 1)
+            #expect(reloads - constructed == 1)
         }
     }
 
@@ -1010,12 +1014,16 @@ struct LanguageSeamTests {
         withTempDefaults { defaults in
             var reloads = 0
             let manager = makeManager(defaults, onReload: { reloads += 1 }) { utc(2026, 8, 28) }
+            // Construction on an empty suite rings once, for the first week the week widget can draw
+            // (spec 2026-10-19-the-widget-stage §3.4 W6, `WeekCacheTests`); this test is about what
+            // comes after it.
+            let constructed = reloads
 
             manager.language = .russian
-            #expect(reloads == 1, "the widget would keep drawing the old language")
+            #expect(reloads - constructed == 1, "the widget would keep drawing the old language")
 
             manager.language = .russian
-            #expect(reloads == 1, "a no-op write must not churn the widget")
+            #expect(reloads - constructed == 1, "a no-op write must not churn the widget")
         }
     }
 
@@ -1324,12 +1332,16 @@ struct DailyGoalSetupTests {
         withTempDefaults { defaults in
             var reloads = 0
             let manager = makeManager(defaults, onReload: { reloads += 1 }) { utc(2026, 8, 28) }
+            // Construction on an empty suite rings once, for the first week the week widget can draw
+            // (spec 2026-10-19-the-widget-stage §3.4 W6, `WeekCacheTests`); this test is about what
+            // comes after it.
+            let constructed = reloads
 
             manager.saveDailyGoal(ml: 3000)
-            #expect(reloads == 1, "the widget still says 'of 2,000 ml'")
+            #expect(reloads - constructed == 1, "the widget still says 'of 2,000 ml'")
 
             manager.saveDailyGoal(ml: 3000)
-            #expect(reloads == 1)
+            #expect(reloads - constructed == 1)
         }
     }
 

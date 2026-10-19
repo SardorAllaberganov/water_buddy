@@ -37,6 +37,14 @@ nonisolated enum AppTab: String, CaseIterable, Identifiable {
     /// to look for.
     static let opening = AppTab.home
 
+    /// The tab a widget's link names, or `nil` for any other URL — the app's one answer to
+    /// ``WidgetLink`` (rule `50-views`). A whole-URL match, so nothing but the link a widget sets
+    /// turns a page.
+    init?(link: URL) {
+        guard link == WidgetLink.history else { return nil }
+        self = .history
+    }
+
     /// Drawn under the glyph **and** read by VoiceOver.
     ///
     /// One string for both, rather than a visible label plus a separate accessibility label: two
@@ -114,6 +122,9 @@ nonisolated enum AppTab: String, CaseIterable, Identifiable {
 /// Apple's: the glass, the lens that follows a finger dragged along it, and whatever iOS makes
 /// of it next. Below iOS 26 Apple's bar is the flat one, so the app keeps its own. The branch
 /// cannot change while the app runs, and the floor stays iOS 17.
+///
+/// **A widget opens a page.** The week widget's tap arrives as ``WidgetLink/history``, and
+/// ``AppTab/init(link:)`` names the tab it turns to, as the bar would.
 struct RootTabView: View {
 
     /// Which page is showing, which is still leaving, and which way the shown one came.
@@ -195,6 +206,14 @@ struct RootTabView: View {
         // deliberately uses the environment form instead, for the opposite reason — it has no
         // status bar and no hosting controller to hear a preference (rule `50-views`).
         .preferredColorScheme(.dark)
+        // A widget's link turns to its tab as the bar would — an entrance from outside, not a second
+        // route (rule `50-views`). Only once setup is done: before it this view does not exist, and
+        // the welcome stays. The bar's tick plays for it, as for a tap (plan P2).
+        .onOpenURL { url in
+            if let tab = AppTab(link: url) {
+                turn.turn(to: tab)
+            }
+        }
     }
 
     /// One tab's page. Built when its tab is shown and gone when its slide out has ended, so a

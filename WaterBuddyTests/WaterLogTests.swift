@@ -268,11 +268,16 @@ struct WaterLogStoreTests {
     @Test func loggingRingsTheWidgetDoorbellExactlyOnce() throws {
         var reloads = 0
         try withTempStore(onReload: { reloads += 1 }) { manager, _ in
+            // Construction on an empty suite rings once, for the first week the week widget can draw
+            // (spec 2026-10-19-the-widget-stage §3.4 W6, `WeekCacheTests`); this test is about what
+            // comes after it.
+            let constructed = reloads
+
             manager.addLog(amount: 250)
-            #expect(reloads == 1)
+            #expect(reloads - constructed == 1)
 
             manager.addLog(amount: 0)
-            #expect(reloads == 1, "a rejected serving changes nothing and must not ring")
+            #expect(reloads - constructed == 1, "a rejected serving changes nothing and must not ring")
         }
     }
 

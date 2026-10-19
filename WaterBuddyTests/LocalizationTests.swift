@@ -86,6 +86,13 @@ private let sharedKeys = [
     "Add %1$d millilitres",
     "Time for water",
     "A glass now keeps you on track for the day.",
+    "Week",
+    "Your last seven days against your goal.",
+    "Open WaterBuddy to see your week.",
+    "Last %1$d days",
+    "Goal met",
+    "%1$@ of %2$@",
+    "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.",
 ]
 
 /// Home's strings. Listed by name because each is resolved with `localizedString(forKey:)` or
@@ -287,6 +294,26 @@ private func specifiers(in text: String) -> Set<String> {
         for key in sharedKeys {
             #expect(sentences(appBundle, language, key) == sentences(widgetBundle, language, key),
                     "\"\(key)\" differs between the app and the widget in \(language)")
+        }
+    }
+
+    /// The week widget's three new strings, exactly, in both bundles and every shipped language
+    /// (spec 2026-10-19-the-widget-stage §3.7).
+    @Test(arguments: [
+        ("en", "Week", "Week"),
+        ("ru", "Week", "Неделя"),
+        ("uz", "Week", "Hafta"),
+        ("en", "Your last seven days against your goal.", "Your last seven days against your goal."),
+        ("ru", "Your last seven days against your goal.", "Последние семь дней в сравнении с вашей целью."),
+        ("uz", "Your last seven days against your goal.", "Oxirgi yetti kun — maqsadingizga nisbatan."),
+        ("en", "Open WaterBuddy to see your week.", "Open WaterBuddy to see your week."),
+        ("ru", "Open WaterBuddy to see your week.", "Откройте WaterBuddy, чтобы увидеть свою неделю."),
+        ("uz", "Open WaterBuddy to see your week.", "Haftangizni ko‘rish uchun WaterBuddy’ni oching."),
+    ])
+    func theWeekWidgetSaysWhatTheSpecSays(language: String, key: String, expected: String) {
+        for (name, bundle) in [("app", appBundle), ("widget", widgetBundle)] as [(String, Bundle?)] {
+            #expect(value(bundle, language, key) == expected,
+                    "\(name): \"\(key)\" in \(language) is not the spec's wording")
         }
     }
 
