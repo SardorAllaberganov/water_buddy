@@ -119,13 +119,22 @@ struct HydrationView: View {
     /// Breathing room inside the card.
     private static let cardPadding: CGFloat = 12
 
+    /// How far the vessel and the button stand in from the edge when iOS has removed the background
+    /// (StandBy). Less than the card's inset and padding together, because no card is drawn round
+    /// them; on a 158-pt widget it leaves the vessel about 105 pt across, where the card leaves 84.
+    private static let bareInset: CGFloat = 8
+
     let entry: HydrationEntry
 
     @Environment(\.widgetFamily) private var family
 
+    /// `false` when iOS has removed the container background — on iPhone, StandBy. **Read here and
+    /// only here**, and handed down as ``SmallLayout``'s flag: it is get-only, so no preview could set
+    /// it (rule `40-widget`).
+    @Environment(\.showsWidgetContainerBackground) private var showsBackground
+
     var body: some View {
-        card
-            .padding(Self.cardInset)
+        layout
             .containerBackground(for: .widget) { WidgetAurora() }
             // The app sets `.preferredColorScheme(.dark)` deliberately, because a preference
             // travels *up* and turns the status bar white too. A widget has no status bar and no
@@ -139,6 +148,24 @@ struct HydrationView: View {
             // carries both across via `rolledOver()`.
             .environment(\.strings, entry.snapshot.language.bundle)
             .environment(\.locale, entry.snapshot.language.locale)
+    }
+
+    /// The card, or — for the small family once iOS has removed the background — the bare layout.
+    /// Small only: iPhone's StandBy shows small widgets alone (inferred from Apple's documentation,
+    /// spec 2026-10-19-the-widget-stage §3.3), so the medium family never meets a removed background
+    /// there.
+    @ViewBuilder
+    private var layout: some View {
+        if family == .systemSmall && !showsBackground {
+            SmallLayout(snapshot: entry.snapshot, bare: true)
+                .padding(Self.bareInset)
+                // As the card does, so VoiceOver meets the vessel and the button as one group in
+                // both layouts.
+                .accessibilityElement(children: .contain)
+        } else {
+            card
+                .padding(Self.cardInset)
+        }
     }
 
     @ViewBuilder
@@ -159,28 +186,7 @@ struct HydrationView: View {
     private var content: some View {
         switch family {
         case .systemMedium: medium
-        default: small
-        }
-    }
-
-    // MARK: Small
-
-    /// The vessel and the pour button on a diagonal. They cannot stack — a 138pt card will not
-    /// hold a legible vessel *and* a 44pt target beneath it — and they must not overlap, because
-    /// two glass discs sharing an edge read as one dented shape rather than two controls.
-    private var small: some View {
-        GeometryReader { proxy in
-            let side = min(proxy.size.width, proxy.size.height)
-            let vessel = 2 * MiniVessel.radius(fitting: side, besides: PourButton.minimumTarget)
-
-            ZStack {
-                MiniVessel(snapshot: entry.snapshot)
-                    .frame(width: vessel, height: vessel)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-
-                PourButton(shape: .circle, serving: entry.snapshot.serving)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-            }
+        default: SmallLayout(snapshot: entry.snapshot, bare: false)
         }
     }
 
@@ -195,6 +201,39 @@ struct HydrationView: View {
                 .aspectRatio(1, contentMode: .fit)
 
             MediumColumn(snapshot: entry.snapshot)
+        }
+    }
+}
+
+// MARK: - Small
+
+/// The vessel and the pour button on a diagonal. They cannot stack — a 138pt card will not hold a
+/// legible vessel *and* a 44pt target beneath it — and they must not overlap, because two glass discs
+/// sharing an edge read as one dented shape rather than two controls.
+///
+/// **Bare in StandBy.** With `bare`, iOS has removed the background and there is no card: the two
+/// stand on the system's black, the vessel sized by the same clearance formula over the larger square
+/// and drawing its rim rather than its glass (rule `60-design-system`). The flag is a parameter
+/// because `showsWidgetContainerBackground` is get-only: ``HydrationView`` reads it once, and a
+/// `#Preview` builds this directly (rule `40-widget`).
+private struct SmallLayout: View {
+
+    let snapshot: WaterSnapshot
+    let bare: Bool
+
+    var body: some View {
+        GeometryReader { proxy in
+            let side = min(proxy.size.width, proxy.size.height)
+            let vessel = 2 * MiniVessel.radius(fitting: side, besides: PourButton.minimumTarget)
+
+            ZStack {
+                MiniVessel(snapshot: snapshot, bare: bare)
+                    .frame(width: vessel, height: vessel)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+                PourButton(shape: .circle, serving: snapshot.serving)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            }
         }
     }
 }
@@ -268,6 +307,11 @@ private struct MediumColumn: View {
 /// drive it and the travelling phase the app uses is simply not available. A single fixed phase
 /// still reads as water, because what makes the surface legible is the *interference* between the
 /// two waves, not their motion.
+///
+/// **Quiet when iOS asks.** Its figures carry `.privacySensitive()`, and under `.privacy` it draws an
+/// empty vessel and speaks its label alone, as the Lock Screen widget does — so a locked phone in
+/// StandBy shows no figure whenever iOS's own settings say so. On an unlocked Home Screen nothing is
+/// redacted.
 private struct MiniVessel: View {
 
     @Environment(\.strings) private var strings
@@ -301,7 +345,16 @@ private struct MiniVessel: View {
 
     let snapshot: WaterSnapshot
 
+    /// Stands on the system's black, in StandBy: the rim and the water, never the glass
+    /// (rule `60-design-system`, spec 2026-10-19-the-widget-stage §3.3).
+    var bare = false
+
     @Environment(\.widgetRenderingMode) private var renderingMode
+    @Environment(\.redactionReasons) private var redactionReasons
+
+    /// Whether iOS has asked for the figure to be hidden — a locked phone in StandBy, when its own
+    /// lock settings say so (rule `70-privacy`).
+    private var isQuiet: Bool { redactionReasons.contains(.privacy) }
 
     /// The percentage's type size at default Dynamic Type.
     ///
@@ -316,16 +369,24 @@ private struct MiniVessel: View {
             let diameter = min(proxy.size.width, proxy.size.height)
 
             ZStack {
-                water(diameter: diameter)
-                readout(diameter: diameter)
+                // The quiet form is the Lock Screen widget's: an empty vessel, no water and no
+                // figure, still recognisably WaterBuddy to the person it belongs to.
+                if !isQuiet {
+                    ZStack {
+                        water(diameter: diameter)
+                        readout(diameter: diameter)
+                    }
+                    .privacySensitive()
+                }
             }
             .frame(width: diameter, height: diameter)
-            .widgetPane(in: Circle(), density: .sheer, elevation: .resting)
+            .widgetPane(in: Circle(), density: .sheer, elevation: .resting, glass: !bare)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Today's hydration", bundle: strings))
-        .accessibilityValue(strings.localized("%1$d percent. %2$d of %3$d millilitres.", snapshot.percentage, snapshot.currentWater, snapshot.dailyGoal, locale: locale))
+        // A figure hidden from sight is hidden from speech (rule `65-accessibility`).
+        .accessibilityValue(isQuiet ? "" : strings.localized("%1$d percent. %2$d of %3$d millilitres.", snapshot.percentage, snapshot.currentWater, snapshot.dailyGoal, locale: locale))
     }
 
     @ViewBuilder
@@ -467,12 +528,16 @@ struct PourButton: View {
 private extension View {
 
     /// ``LiquidGlassModifier``, with the two things a widget has to do differently.
+    ///
+    /// `glass: false` draws the rim alone, for a pane that stands on the system's black (StandBy):
+    /// glass never goes over a flat background (rule `60-design-system`).
     func widgetPane<S: SwiftUI.Shape & InsettableShape>(
         in shape: S,
         density: LiquidGlass.Density,
-        elevation: LiquidGlass.Elevation
+        elevation: LiquidGlass.Elevation,
+        glass: Bool = true
     ) -> some View {
-        modifier(WidgetPane(shape: shape, density: density, elevation: elevation))
+        modifier(WidgetPane(shape: shape, density: density, elevation: elevation, glass: glass))
     }
 }
 
@@ -487,17 +552,21 @@ private extension View {
 /// black scrim, which would brighten the pane instead of darkening it, and the shadows, which
 /// would ring it in haze. What is left of glass under that treatment is its lit rim, so that is
 /// all this draws.
+///
+/// With `glass` off it draws the rim in every mode — the bare layout in StandBy, where an empty sheer
+/// pane over black reads as a grey disc.
 private struct WidgetPane<S: Shape & InsettableShape>: ViewModifier {
 
     let shape: S
     let density: LiquidGlass.Density
     let elevation: LiquidGlass.Elevation
+    let glass: Bool
 
     @Environment(\.widgetRenderingMode) private var renderingMode
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if renderingMode == .fullColor {
+        if glass && renderingMode == .fullColor {
             content.liquidGlass(in: shape, base: .archived, density: density, elevation: elevation)
         } else {
             content.background {
@@ -559,8 +628,8 @@ private struct PourSurface<S: Shape & InsettableShape>: ViewModifier {
 /// grey rectangle painted on top, whereas a version that is softer and slightly displaced reads
 /// immediately as something seen *through* glass.
 ///
-/// It is opaque, so it also covers the case where the system has stripped the container background
-/// — in StandBy the card brings its own light rather than floating on bare black.
+/// It is opaque. Where the system strips the container background — StandBy, small family only — no
+/// card is drawn, and so no backdrop: the vessel and the button stand on the black (``SmallLayout``).
 private struct WidgetCardBackdrop: View {
 
     @Environment(\.widgetRenderingMode) private var renderingMode
@@ -656,4 +725,32 @@ struct WidgetAurora: View {
 } timeline: {
     HydrationEntry(date: .now, snapshot: WaterSnapshot(currentWater: 250, dailyGoal: 2_000))
     HydrationEntry(date: .now, snapshot: WaterSnapshot(currentWater: 1_150, dailyGoal: 2_000))
+}
+
+// StandBy is not on the simulator, and `showsWidgetContainerBackground` cannot be set, so the bare
+// layout is drawn directly, on the black iOS draws behind it (spec 2026-10-19-the-widget-stage §3.3).
+#Preview("Small · StandBy") {
+    SmallLayout(snapshot: WaterSnapshot(currentWater: 1_150, dailyGoal: 2_000), bare: true)
+        .padding(8)
+        .frame(width: 158, height: 158)
+        .background(Color.black)
+        .environment(\.colorScheme, .dark)
+}
+
+#Preview("Small · StandBy at night") {
+    SmallLayout(snapshot: WaterSnapshot(currentWater: 1_150, dailyGoal: 2_000), bare: true)
+        .padding(8)
+        .frame(width: 158, height: 158)
+        .background(Color.black)
+        .environment(\.colorScheme, .dark)
+        .environment(\.widgetRenderingMode, .vibrant)
+}
+
+#Preview("Small · locked") {
+    SmallLayout(snapshot: WaterSnapshot(currentWater: 1_150, dailyGoal: 2_000), bare: true)
+        .padding(8)
+        .frame(width: 158, height: 158)
+        .background(Color.black)
+        .environment(\.colorScheme, .dark)
+        .redacted(reason: .privacy)
 }
