@@ -4,6 +4,28 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-19 (seventy-third pass — `/doc_sync` after roadmap item 1.3.1's stages 6a
+and 6b, run by the owner in the session that built 6b, before its `/commit`). HEAD `5a46609`: 1.3.4
+and its records were committed at 23:40 on 2026-10-18 (`4a7ece7`..`41309e3`), and 1.3.1's spec and
+plan (`1899aba`) and stage 6a (`5a46609`) at 20:22 today, with nothing in `docs/`; 6b is staged.
+The command's checks: 91 tracked `.swift` files, 91 rows, every count compared with the staged file
+by one script — one stale, `WaterBuddyWidget.swift`, 618 → 756 (659 after 6a);
+654 `@Test`, 57 on the watch, 56 UI `func test`, unchanged; `project.pbxproj` last changed in
+`eba1b1e`; the three exception sets as `CLAUDE.md` gives them; 12 `static let`s on `DataManager.Key`,
+10 on the phone and 2 on the watch, as `CLAUDE.md` and `docs/STATE.md` say — the staged rule
+`10-architecture` already says 11, its approved wording being 6c's; 18 rule names cited, 18 files.
+Changed: this block; *Current state* gains 1.3.1's block, and 1.3.4's its commits; the row; #50 and
+#140 gain notes; **#148 opened** (what only a device shows of StandBy). `docs/WIDGET.md`: the
+button's two forms, the bare layout and the quiet form, and a dated note where *The two rendering
+modes* said stage 6 was not built and filed StandBy under templated. `docs/DESIGN.md`: the primary
+surface's fourth place, and dated notes in the density and elevation lists and on the backdrop's
+StandBy sentence. `docs/ROADMAP.md`: 1.3.1's status, 1.3.4's commits, the ten rule files 1.3.1's
+wording touches. `CLAUDE.md`: the warning baseline's trail gains 1.3.1 and how the lines are now
+counted; the device checks name StandBy. `docs/STATE.md` checked and left: no key or stored byte
+moved. Found and left for the code: `WaterBuddyWidget.swift:498`'s comment still says the bordered
+capsule would draw "over the glass pane" — a doc sync does not edit a source file. Gate: not re-run
+for this pass — 6b's runs, this session, are in `HISTORY.md`.
+
 **Last updated:** 2026-10-18 (seventy-second pass — `/doc_sync` after roadmap item 1.3.4, Siri's
 *Today's Water*, in the session that built it). **Nothing was committed:** HEAD `88d694f`, where 1.2.8
 and its records were committed at 20:33 (`eecb6a7`..`88d694f`); 1.3.4 is staged, its records written
@@ -1603,7 +1625,7 @@ WaterBuddyUITests/WelcomeUITests.swift           378   (2026-10-17, 1.2.6: its 1
 WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
 WaterBuddyWidget/LockScreenWidget.swift          346   (2026-10-17, 1.2.6: four sentences through localized — the .privacy branch's Log Water untouched; spokenFigures(in:locale:); LockScreenCard and LockScreenPourButton read the locale.) the Lock Screen widget (kind "WaterBuddyLockScreen"): circle, rectangle with the + (AddWaterIntent(amount: serving), the serving handed down from entry.snapshot), line — over the same HydrationProvider; every figure privacySensitive, a quiet form under .privacy; strings read only in child views
 WaterBuddyWidget/LogWaterControl.swift            83   the Control Center control (kind "WaterBuddyLogWater", iOS 18): ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving)), titled Log Water in the snapshot's language, the glyph at DataManager.usualSlot, no figure; LogWaterControlProvider reads DataManager.snapshot(now:)
-WaterBuddyWidget/WaterBuddyWidget.swift          618   (2026-10-17, 1.2.6: five sentences through localized; MediumColumn, MiniVessel and PourButton read the locale.) reads the cache only, never SwiftData — the Home Screen widget; HydrationView reads no string itself, MediumColumn does; PourButton internal (its minimumTarget is the Lock Screen button's too)
+WaterBuddyWidget/WaterBuddyWidget.swift          756   (2026-10-19, 1.3.1: 6a — 659, committed in 5a46609 — PourSurface, the pour button on the primary surface in full colour and white in the lit rim on a template; 6b, staged — SmallLayout(snapshot:bare:), the bare layout HydrationView picks when showsWidgetContainerBackground is false, widgetPane(glass:), MiniVessel's bare flag and quiet form under .privacy, three previews.) (2026-10-17, 1.2.6: five sentences through localized; MediumColumn, MiniVessel and PourButton read the locale.) reads the cache only, never SwiftData — the Home Screen widget; HydrationView reads no string itself, MediumColumn does; PourButton internal (its minimumTarget is the Lock Screen button's too)
 WaterBuddyWidget/WaterBuddyWidgetBundle.swift     23   two widgets, WaterBuddyWidget and LockScreenWidget, and inside if #available(iOS 18.0, *) the control, LogWaterControl
 WaterBuddyWatch/WaterBuddyWatchApp.swift          77   watch app only — activates WristLink.live, .backgroundTask(.watchConnectivity) (which now awaits WristLink.waitForPendingDelivery() rather than returning at once), and WristRoot: \.strings + \.locale from WristModel.language, above WristView
 WaterBuddyWatch/WristAurora.swift                 48   watch app only — WidgetAurora's proportional-geometry shape, mirrored for the watch canvas
@@ -1922,8 +1944,44 @@ issue #15.
 
 ## Current state
 
+**Roadmap item 1.3.1, the widget's stage, is under way: 6a committed, 6b built, gated and staged —
+not committed** (2026-10-19; HEAD `5a46609`). Spec `docs/superpowers/specs/2026-10-19-the-widget-stage-design.md`
+and plan `docs/superpowers/plans/2026-10-19-the-widget-stage.md`, approved by the owner with D1–D4,
+P1 and P2, committed in `1899aba`; the plan run inline, task by task. It is the premium redesign's
+stage 6 plus a StandBy layout and a week widget, in three stages. §5's rule wording for ten rule
+files, approved before any code, is staged and not yet committed.
+
+- **6a, the white pour button — committed, `5a46609`.** In full colour the Home Screen widget's pour
+  button is the redesign's primary surface — `PourSurface`, `.primarySurface(in:ring: false)`, so it
+  stays exactly 44 pt and the vessel's clearance holds; on a template, white content in the lit rim.
+  Its gate, as its commit records it: 654 unit; UI 69 on iOS 27.0 and on 26.5, one skipped by design;
+  57 watch; both widget builds; no new warning; placed in light, dark and tinted.
+- **6b, StandBy — staged.** When iOS removes the container background (on iPhone, StandBy) the small
+  family draws no card: `SmallLayout(snapshot:bare:)` at an 8-pt inset, the vessel by the same
+  clearance formula over the larger square, drawing its rim and its water but never its glass
+  (`widgetPane(…, glass: false)`, D4). Its figures carry `.privacySensitive()`, and under `.privacy`
+  it draws the Lock Screen widget's quiet form (D3). Medium unchanged. One file,
+  `WaterBuddyWidget/WaterBuddyWidget.swift`; no key, test, target or catalogue change — no unit test
+  reaches widget-only code (spec §7).
+- **6b's gate, on a copy of the index.** Unit `✔ Test run with 654 tests in 84 suites passed`; UI on
+  iOS 27.0, 69 with 1 skipped by design and 0 failures; on iOS 26.5, 38 with 1 skipped, then 31 with
+  one failure — `testUseComesBackWhenTheGoalIsMovedAway`, at a low load, not seen again in 3 + 3
+  interleaved runs or in the three classes rerun, 31 with 0 failures (#140's note); watch
+  `✔ 57 tests in 6 suites passed`; both widgets built. **No new warning**: the app scheme 35 = 35
+  primary lines (29 outside the tests), the widget scheme 29 = 29, clean builds of `HEAD` and the
+  index, by line and by file and message.
+- **On the simulator.** A throwaway build forced the bare layout on *WaterBuddy Probe 27*: in full
+  colour the rim, the water and the white disc on black — the vessel 109.7 pt across on the
+  simulator's 164.3-pt widget, the formula's own figure, the button 44.0 pt, 24 pt between them; in
+  `.vibrant`, the silhouette and the rimmed button; under `.redacted(reason: .privacy)`, an empty rim.
+  The ordinary card from `HEAD` and from the index, pixel-identical. Real StandBy is #148.
+- **Next: 6c**, the week in the cache and the *Week* widget (plan Tasks 3–7). D1 — the five files
+  Xcode rewrote go back to `HEAD`, with Xcode closed — is done before it (#50's note).
+
 **Roadmap item 1.3.4, Siri's "how much water today", is built, gated and staged — not committed**
-(2026-10-18; HEAD `88d694f`, where 1.2.8 and its records are committed). Spec
+(2026-10-18; HEAD `88d694f`, where 1.2.8 and its records are committed). *(Seventy-third pass:
+committed at 23:40 the same night — `4a7ece7` (spec and plan), `c2f1972` (feat), `7db34a2` (docs),
+`41309e3` (rule wording) — so the block below is history.)* Spec
 `docs/superpowers/specs/2026-10-18-todays-water-design.md` and plan
 `docs/superpowers/plans/2026-10-18-todays-water.md`, both approved by the owner, the plan run inline.
 
@@ -4269,6 +4327,17 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
+**Read at 21:43 on 2026-10-19, in the seventy-third pass, after its `git add` of its six files by
+name: `5a46609`, 144 commits, level with `origin/main`; 18 staged, all modified, 6 unstaged, 1
+untracked entry, none in both.** Staged: roadmap item 1.3.1's approved rule wording in ten
+`.claude/rules/` files; stage 6b — `WaterBuddyWidget/WaterBuddyWidget.swift`, `tasks/lessons.md` —
+and this pass's `CLAUDE.md`, this file, `docs/WIDGET.md`, `docs/DESIGN.md`, `docs/ROADMAP.md` and
+`HISTORY.md`, which carries 6b's checkpoint and this pass's. Unstaged: `.claude/settings.json` (the
+owner's), the two watch schemes, and the three catalogues Xcode rewrote (#50; D1 restores all five
+before 6c). Untracked: `Screenshots/census/`. 1.3.4 and its records, staged at the block below, were
+committed at 23:40 on 2026-10-18 (`4a7ece7`..`41309e3`); 1.3.1's spec and plan and its stage 6a at
+20:22 today (`1899aba`, `5a46609`). No `git commit` in this pass.
+
 **Read at 23:36 on 2026-10-18, in the seventy-second pass, after its `git add` of its six files by
 name: `88d694f`, 138 commits, level with `origin/main`; 22 staged, 6 unstaged, 1 untracked entry, and
 one path in both.** Staged: roadmap item 1.3.4 — `WaterBuddy/TodaysWaterIntent.swift` and
@@ -5788,7 +5857,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `AppShortcuts.xcstrings` and both watch catalogues again — unstaged; in the shortcuts file the
     second and third phrase of each shortcut are marked `stale`, and nothing else changed but the
     spacing. The staged copies are the reviewed ones. A doc sync does not restore them; the owner
-    decides, as in 1.2.6's D7.)*
+    decides, as in 1.2.6's D7.)* *(2026-10-19, the seventy-third pass: 1.3.4 was committed at 23:40
+    with the reviewed copies, so the five unstaged files are now Xcode's rewrite against `HEAD` —
+    `git diff --stat` reads 132 lines in `AppShortcuts.xcstrings`, 637 and 62 in the two watch
+    catalogues, 2 in each scheme. The owner ruled on 2026-10-19, as roadmap item 1.3.1's D1, that all
+    five go back to `HEAD` with Xcode closed first; it is left for stage 6c, which edits two
+    catalogues, because Xcode was open through 6b (pid 2965).)*
 
 **Opened by the 2026-10-07 `/doc_sync` re-run:**
 
@@ -7605,6 +7679,14 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     after the first Glass (`:990`), a load of 83 rising to 134; then five runs each, the change 5 of 5
     and `HEAD` 5 of 5, loads 40–73. So the first is now seen on iOS 27 too, and on `HEAD`. A comparison
     on a quiet machine was not run: the load did not fall far enough in the session.)*
+    *(2026-10-19, roadmap item 1.3.1's stage 6b gate, on a copy of the index: on iOS 26.5,
+    `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway` failed once — `XCTAssertFalse failed` at
+    `WelcomeUITests.swift:355`, *Use 2 500* still there when `.exists` read it 0.7 s after its tap,
+    with no wait — and, unlike every entry above, **at a low load**, 4 to 9. Alone on the same
+    simulator, interleaved, `HEAD` 3 of 3 and the change 3 of 3 at loads 12–219 (another project's
+    simulator beside it); the three classes again, 31 with 0 failures. The change held no file the
+    welcome runs. A lost tap and a button still leaving cannot be told apart: diagnostics were off. If
+    it comes back, a `waitForNonExistence` on that line would separate the two.)*
 
 141. **What the lag fix measured and left.** Simulator, Debug, `XCTCPUMetric`, throwaway probes not
     in the tree. Fixed: Home idle 17 % → 4 % of a core, the welcome 22 % → 3.5 % (0.176 s per 5 s), a pour and its five
@@ -7729,6 +7811,24 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     default main-actor isolation is set on every native target, and `project.pbxproj` sets it on the
     app target alone (`:938`, `:976` — the final review's reading), which the DocC on the two
     properties follows.
+
+**Opened by roadmap item 1.3.1, stages 6a and 6b (2026-10-19):**
+
+148. **What only a device shows of the widget's StandBy layout** (spec
+    `2026-10-19-the-widget-stage-design.md` §8.3, for the 1.2.7 sweep). The simulator has no StandBy,
+    and `showsWidgetContainerBackground` cannot be set, so the bare layout has been seen only through
+    a throwaway build that forced it (`HISTORY.md`, 2026-10-19). On the owner's iPhone: StandBy by
+    day — the vessel's rim and water and the white disc on black — and at night, where the rendering
+    mode is **inferred** to be `.vibrant` and the red is iOS's own; a tap there that logs; and, locked
+    with *Allow Access When Locked → Lock Screen Widgets* off, whether iOS hides the figure — whether
+    it redacts a Home Screen widget in StandBy at all is inferred. That iPhone's StandBy shows small
+    widgets only is inferred from Apple's documentation too, and is why the medium family has no
+    bare layout. **One thing seen on the simulator, for the owner:** under a forced
+    `.redacted(reason: .privacy)` the medium widget's vessel went quiet too, because `MiniVessel` is
+    shared, while the medium's *700 ml* and *of 2,000 ml* stayed drawn. D3 scopes the marking to the
+    small family; if a device ever redacts a medium Home Screen widget, its two lines need
+    `.privacySensitive()` as well. Not placed for 6b: a tinted Home Screen (6a's commit records one
+    for the button).
 
 ## Where the rest is written down
 

@@ -3,6 +3,14 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-19 (the seventy-third pass's `/doc_sync`, after roadmap item 1.3.1's stages
+6a, committed in `5a46609`, and 6b, staged). **The Home Screen widget's view tree changed; no family,
+timeline, intent, kind or key did.** 6a: the pour button is the redesign's primary surface in full
+colour and white in the lit rim on a template. 6b: when iOS removes the container background —
+StandBy — the small family draws the bare layout, and its vessel has a quiet form under `.privacy`.
+*The two rendering modes*, *Layout* and *Accessibility* carry both, with dated notes where they said
+otherwise.
+
 **Last updated:** 2026-10-18 (roadmap item 1.3.4's records, then the seventy-second pass's
 `/doc_sync`). **No widget contract changed** — no family, timeline, intent, kind or view tree.
 `WaterSnapshot` computes two more values, `remaining` and `hasReachedGoal`, which no widget reads:
@@ -190,7 +198,8 @@ exists and any figure written there would be wrong for every user who changed th
 face draws `entry.snapshot.serving`.
 
 `.contentMarginsDisabled()` because the system's ~16pt margin is a fifth of a 158pt canvas; the
-card supplies its own inset (`cardInset = 10`, `cardPadding = 12`).
+card supplies its own inset (`cardInset = 10`, `cardPadding = 12`) — or, when there is no card
+(StandBy, *Layout* below), the bare layout its own (`bareInset = 8`).
 
 ## The read path
 
@@ -291,17 +300,22 @@ the availability flag both ways; `reduceTransparencyAlwaysDrawsTheOpaquePane` pi
 `.archived` as well as for a material; and both branches were rendered in stage 2 (the header
 above). So nothing in this extension reaches `glassEffect`. *(Read "answers `.handMade` for a
 `.flat` base on every OS" until the twentieth pass, which left Reduce Transparency out.)* The widget's
-own pass of the redesign is stage 6 and is not built.
+own pass of the redesign is stage 6 — roadmap item 1.3.1 — *(seventy-third pass: 6a, the pour
+button, committed in `5a46609`; 6b, StandBy, staged; 6c, the week, not built. This sentence read
+"is stage 6 and is not built" until then.)*
 
-**Anything else** — a tinted Home Screen, StandBy. The system treats the whole widget as a
-template: **colour is discarded and only alpha survives**, so every layer `LiquidGlass` stacks
-becomes additive — including the black scrim, which would *brighten* the pane, and the shadows,
-which would ring it in haze.
+**Anything else** — a tinted Home Screen, and StandBy at night, where the mode is **inferred** to be
+`.vibrant` (spec 2026-10-19 §3.3; the SDK says nothing of StandBy). The system treats the whole
+widget as a template: **colour is discarded and only alpha survives**, so every layer `LiquidGlass`
+stacks becomes additive — including the black scrim, which would *brighten* the pane, and the
+shadows, which would ring it in haze. *(Read "a tinted Home Screen, StandBy" until the seventy-third
+pass. StandBy by day is `.fullColor` with the container background removed — *Layout*, below.)*
 
 | Element | `.fullColor` | templated |
 |---|---|---|
-| Pane | full `liquidGlass(base: .archived, …)` | `shape.strokeBorder(.white.opacity(0.45), lineWidth: 1)` only |
+| Pane | full `liquidGlass(base: .archived, …)` — or, with `widgetPane(…, glass: false)`, the rim alone | `shape.strokeBorder(.white.opacity(0.45), lineWidth: 1)` only |
 | Water | `WaterSurface` (two gradient waves) + `WaterReadabilityScrim` | one opaque `WaveShape` at `.white.opacity(0.55)` |
+| Pour button (6a) | `PourSurface`: `.primarySurface(in:ring: false)` — solid white, `Aurora.top` content, no ring, so exactly 44 pt | white content in the rim above — a white shape with dark content would come back as one blank disc |
 | Card backdrop | `WidgetAurora` scaled `1.22`, blurred `12`, saturated `1.1` | `Color.clear` |
 | Container background | `WidgetAurora` (gradient + three lights) | `Color.black` |
 
@@ -315,6 +329,20 @@ legible vessel *and* a 44pt target beneath it) and they must not overlap (two gl
 an edge read as one dented shape, not two controls).
 
 Medium — vessel beside the numbers: hero volume, `of N ml` under it, full-width quick-add capsule.
+
+**Small, bare — StandBy (6b, staged 2026-10-19).** `HydrationView` reads
+`showsWidgetContainerBackground` once; when it is `false` — iOS removed the container background,
+on iPhone StandBy — the small family draws `SmallLayout(snapshot:bare: true)` at `bareInset = 8`
+instead of the card: no card pane, no `WidgetCardBackdrop`, the vessel and the button on the
+system's black, on the same diagonal. The vessel is sized by the same formula below over the larger
+square and draws its rim and its water, never its glass (`widgetPane(…, glass: false)`: glass never
+goes over a flat background). The flag is a parameter because the environment value is get-only, so
+three `#Preview`s draw the bare layout directly — by day, at night (`.vibrant`) and locked. Medium
+has no bare layout: iPhone's StandBy shows small widgets only (**inferred** from Apple's
+documentation). Rendered only through a throwaway build that forced the branch — the simulator has
+no StandBy — where, on the simulator's 164.3-pt small widget, the vessel measured 109.7 pt across
+(the formula's figure; about 105 on a 158-pt widget, where the card leaves 84), the button 44.0 pt,
+24 pt between them (`HISTORY.md`, 2026-10-19). Real StandBy is known issue #148.
 
 ### The vessel radius is derived from the button, not from the canvas
 
@@ -343,7 +371,8 @@ exactly the label's frame.
 
 `Button(intent:)` is the **only** kind of button a widget can have: the archive carries the intent
 and the system runs it on tap. `.buttonStyle(.plain)`, or the system draws
-`WidgetBorderedButtonStyle`'s capsule over the glass. (A control is not a widget: its button is a
+`WidgetBorderedButtonStyle`'s capsule over the button's own surface — glass until 6a, the primary
+surface since. (A control is not a widget: its button is a
 `ControlWidgetButton` — *The Control Center control*, below.)
 
 ### `AddWaterIntent`, as Shortcuts sees it
@@ -429,6 +458,11 @@ list for exactly this reason — six shared files now, not four.
 
 - The vessel is one element: `.accessibilityElement(children: .ignore)`, label
   `"Today's hydration"`, value `"\(percentage) percent. \(currentWater) of \(dailyGoal) millilitres."`
+- **Its quiet form (6b).** The vessel's water and percentage carry `.privacySensitive()`; when
+  `redactionReasons` contains `.privacy` it draws an empty rim — no water, no figure — and speaks its
+  label alone, as the Lock Screen widget does (rule `70-privacy`: StandBy is a locked-phone
+  surface). `MiniVessel` is shared, so the medium vessel has the form too; the medium's two figure
+  lines do not (#148). The bare layout carries the card's `.accessibilityElement(children: .contain)`.
 - In the medium family the visible hero figure and the `of N ml` line are hidden
   **individually** — both numbers are already in the vessel's value, and left visible they become
   two more stops, the second of which is a fragment. Never hide the enclosing stack: it also holds

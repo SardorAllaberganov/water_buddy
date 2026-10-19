@@ -10784,3 +10784,151 @@ Xcode's rewrite (#50). **1 untracked**: `Screenshots/census/`. **In both:
 `WaterBuddy/AppShortcuts.xcstrings`** — staged, 1.3.4's reviewed phrases; unstaged, Xcode's rewrite.
 Before `/commit`, the owner decides whether to restore the working-tree copy (rule `90-git`: compare
 `git diff --cached --name-status` with `git diff --name-status`).
+
+## [2026-10-19] — Roadmap item 1.3.1, stages 6a and 6b: the white pour button, and the small widget in StandBy
+
+**What changed.**
+- **6a** — committed by the owner as `5a46609`, after `1899aba` added the spec and the plan. The Home
+  Screen widget's pour button is the redesign's primary surface in full colour — `PourSurface`,
+  `.primarySurface(in:ring: false)`, so it stays exactly 44 pt — and white content in the lit rim on
+  a template. Its verification, as its commit message records it and not re-run here: 654 unit tests;
+  UI 69 on iOS 27.0 and on 26.5, one skipped by design; 57 watch; both widget builds; no new warning
+  against a clean build of `HEAD`; placed on the simulator in light, dark and tinted. It had no
+  checkpoint; this is it.
+- **6b** — when iOS removes the container background (`showsWidgetContainerBackground` false: on
+  iPhone, StandBy), the small family draws no card, no card pane and no backdrop. `SmallLayout(snapshot:bare:)`
+  replaces `HydrationView.small`; `HydrationView` reads the flag once, in `layout`, and puts the bare
+  layout at an 8-pt inset (`bareInset`). The vessel is sized by the same
+  `MiniVessel.radius(fitting:besides:gap:)` over the larger square and draws its rim and its water,
+  never its glass (`widgetPane(…, glass: false)`). Its figures carry `.privacySensitive()`, and under
+  `.privacy` it draws the Lock Screen widget's quiet form: an empty rim, and VoiceOver its label
+  alone. Three previews draw the bare layout, at night (`.vibrant`) and locked. The medium family is
+  unchanged.
+- Two things beyond the plan's Task 2, both in the proposal the owner approved:
+  `WidgetCardBackdrop`'s DocC no longer says the card brings its own light in StandBy, which stopped
+  being true; and the bare branch carries the card's `.accessibilityElement(children: .contain)`.
+
+**Rulings.** Spec `2026-10-19-the-widget-stage-design.md` §3.2 and §3.3, with the owner's D3 (mark the
+figures, with the quiet form) and D4 (the rim and the water only); the plan as approved on
+2026-10-19 with P1 and P2; §5's rule wording, approved and staged before this session. In this
+session the owner approved the 6b proposal. D1's restore of the five files Xcode rewrote was left for
+6c, which edits the catalogues: Xcode was open (pid 2965), and 6b adds no file and touches no
+catalogue.
+
+**Files touched.** `WaterBuddyWidget/WaterBuddyWidget.swift`; `tasks/lessons.md`, this file.
+
+**Verification.** Gated on a copy of the index (`git checkout-index`); every log is in the session's
+scratchpad, with `uptime` at its start and end; loads below are 1-minute averages.
+- The widget scheme on the tree: `** BUILD SUCCEEDED **`, no warning from `WaterBuddyWidget/`.
+- Unit, *iPhone 17* (27.0): `✔ Test run with 654 tests in 84 suites passed`; the attribute grep says
+  654. Load 3 to 106.
+- UI, *WaterBuddy Gate 27* (27.0), by class: `GoalSetupUITests` 38 with 1 skipped by design, 809 s —
+  past the ten-minute foreground limit, so the harness moved it to the background and its log was
+  read when it ended; `WelcomeUITests` 13; the other two classes 18. **69, 0 failures.**
+- UI, *WaterBuddy Gate 26.5* (26.5): `GoalSetupUITests` 38 with 1 skipped by design. The other three
+  classes failed once in 31: `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway`,
+  `XCTAssertFalse failed` at `WelcomeUITests.swift:355` — *Use 2 500* still existed when `.exists`
+  read it 0.7 s after its tap, with no wait — at loads of 4 to 9. Then, alone on Gate 26.5 and
+  interleaved, `HEAD` 3 of 3 and the change 3 of 3, at loads of 12 to 219 (another project's
+  simulator was running beside it); then the three classes again, **31, 0 failures**, load 68 to 15.
+  The staged diff holds no file the welcome runs. Whether the tap was lost, as in #140, or the button
+  was still leaving is not known — diagnostics were off. For #140's notes; unlike its entries, this
+  one failed at low load.
+- Watch, *WaterBuddy Watch 27*: `✔ Test run with 57 tests in 6 suites passed`.
+- `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`, no warning from
+  either widget folder.
+- Warnings: a clean `build-for-testing` of a `HEAD` (`5a46609`) export and of the index copy, each
+  into an empty folder — **35 = 35** primary lines with line numbers (29 outside the tests, as
+  `CLAUDE.md` records), 19 = 19 by file and message, none new, none gone. The widget scheme, clean on
+  both: 29 = 29 and 17 = 17, none new. The plan's counter first read 80 (see `tasks/lessons.md`).
+- **Render**, *WaterBuddy Probe 27* (27.0; appearance light, content size large), where the two
+  medium and one small Hydration widgets were already placed. A placed widget redraws when its app is
+  installed again, so each render was `simctl install` and screenshots until two came out identical.
+  A throwaway copy took the bare branch for every small widget, with a black container background; a
+  throwaway UI test in it poured one Glass (700 ml, 35%) and paged back to the widgets.
+  - Full colour: the rim and the water, no glass; *35%* in white over the water; the white disc on
+    the diagonal. Measured off the screenshot: the widget 164.3 pt, the vessel 109.7 pt across — the
+    formula's figure for that widget; the spec's "about 105" is for 158 pt — the button 44.0 pt, and
+    24 pt between their edges.
+  - `.vibrant` set at the root: the wave as a white silhouette, the rim, the readout, and the button
+    as white content in its rim.
+  - `.redacted(reason: .privacy)` at the root: an empty rim and the button; no water, no figure.
+  - The ordinary card: `HEAD`'s build and the index's, installed alternately twice after the redacted
+    render — all four renders of the three widgets **pixel-identical**, and the card back, so the
+    redraw is proved. The throwaway copy was deleted.
+- **Not run**: real StandBy, by day and at night, and whether iOS hides the small widget's figure
+  there while locked — the owner's device (spec §8.3). A tinted Home Screen for 6b.
+
+**Seen and left, for the owner.** In the redacted render the medium widget's vessel went quiet too —
+`MiniVessel` is shared — while the medium's *700 ml* and *of 2,000 ml* stayed drawn. Spec §3.3 scopes
+D3 to the small family, on the inference that iPhone redacts no medium Home Screen widget. If a device
+shows otherwise, the medium's two lines need the same marking.
+
+**Staging.** Read from the commands at 21:35 on 2026-10-19, after one `git add` of
+`WaterBuddyWidget/WaterBuddyWidget.swift`, `HISTORY.md` and `tasks/lessons.md` by name; this file is
+added again once this block is written. **No `git commit` was run.** HEAD `5a46609`, 144 commits,
+`## main...origin/main`. **13 staged**, all modified: the ten `.claude/rules/` files carrying §5's
+approved wording, staged before this session, and this change's three. The widget's file is staged
+as gated — it has no unstaged change. **6 unstaged**: `.claude/settings.json` (the owner's), the two
+watch schemes, and `WaterBuddy/AppShortcuts.xcstrings`, `WaterBuddyWatch/Localizable.xcstrings`,
+`WaterBuddyWatchWidget/Localizable.xcstrings` — Xcode's rewrite (#50), D1's restore left for 6c.
+**1 untracked**: `Screenshots/census/`. None in both. `/doc_sync` is for after the owner's
+`/commit` (spec §11.8).
+
+## [2026-10-19] — `/doc_sync` after 1.3.1's stages 6a and 6b: the button and StandBy reach the docs
+
+**What changed.** The seventy-third pass of `docs/AI_CONTEXT.md`, run by the owner in the session
+that built 6b, before its `/commit` — so it describes the staged tree. No source or test file was
+written.
+
+**The command's checks.** 91 tracked `.swift` files, 91 rows, each row's count compared with the
+staged file by one script: one stale. 654 `@Test`, 57 on the watch, 56 UI `func test` — unchanged.
+`project.pbxproj` last changed in `eba1b1e`; the three exception sets, read this pass, as `CLAUDE.md`
+gives them. 12 `static let`s on `DataManager.Key`, 10 on the phone and 2 on the watch, in agreement
+with `CLAUDE.md` and `docs/STATE.md`. 18 rule names cited, 18 files. `docs/ARCHITECTURE.md`,
+`docs/CAPABILITIES.md` and `docs/dependencies.md` do not exist.
+
+**Drift found and fixed.**
+- 1.3.1's spec, plan and 6a were committed (`1899aba`, `5a46609`) with nothing in `docs/`, and 1.3.4's
+  records still said "staged" after its commits at 23:40 on 2026-10-18 (`4a7ece7`..`41309e3`).
+  `docs/AI_CONTEXT.md`: *Current state* gains 1.3.1's block and a dated note on 1.3.4's; the pass log
+  at the top. `docs/ROADMAP.md`: 1.3.1's status, 1.3.4's commits, and §8's note on the ten rule files
+  1.3.1's approved wording touches — checked against the staged diff, which also carries 6a's
+  pour-button wording.
+- `WaterBuddyWidget.swift`'s row: 618 → 756 lines, with 6a's and 6b's notes.
+- `docs/WIDGET.md` said the widget's pass of the redesign "is stage 6 and is not built", and filed
+  StandBy with the tinted Home Screen as templated — StandBy by day is full colour with its
+  background removed, and at night the mode is inferred to be `.vibrant`. Both carry dated notes; the
+  rendering table gains the pour button's two forms and `glass: false`; *Layout* gains the bare
+  layout with its measured geometry; *Accessibility* the quiet form; *Configuration* `bareInset`.
+- `docs/DESIGN.md` counted the widget's two pour buttons as `.frosted`, `.resting` glass, gave the
+  primary surface three places, and said the card brings its own light in StandBy. Dated notes on
+  all three; no token moved.
+- `CLAUDE.md`: the warning baseline's trail gains 1.3.1, and says the lines are counted from primary
+  `file:line:col: warning:` lines only — the counter lesson of the same day; the device checks name
+  StandBy, which a simulator does not have.
+- Known issues: **#148 opened** — what only a device shows of the StandBy layout, with the medium
+  vessel's quiet form beside its two drawn lines, for the owner. #140 gains 6b's welcome failure,
+  the one at a low load; #50 gains the state of the five files and D1's timing.
+
+**Checked and left.** `docs/STATE.md` — no key or stored byte moved; the staged rule
+`10-architecture`'s "11 keys" is 6c's approved wording, ahead of the code by design.
+`tasks/lessons.md` — the build's two entries of today cover what this pass met; none added.
+
+**Found and left for the code.** `WaterBuddyWidget.swift:498` still says the bordered capsule would
+draw "over the glass pane"; since 6a it would draw over the primary surface. A doc sync does not edit
+a source file; it is for the next change to that file, 6c.
+
+**Gate.** Not run for this pass. 6b's runs, earlier in this session, are in the checkpoint above.
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/WIDGET.md`, `docs/DESIGN.md`,
+`docs/ROADMAP.md`, this file.
+
+**Staging.** Read from the commands at 21:43 on 2026-10-19, after this pass's `git add` of its six
+files by name; `docs/AI_CONTEXT.md` and this file are added again once their blocks are written.
+**No `git commit` was run.** HEAD `5a46609`, 144 commits, `## main...origin/main`. **18 staged**, all
+modified: the ten rule files with 1.3.1's approved wording, 6b's widget file and `tasks/lessons.md`,
+and this pass's six. **6 unstaged**: `.claude/settings.json` (the owner's), the two watch schemes,
+and `WaterBuddy/AppShortcuts.xcstrings`, `WaterBuddyWatch/Localizable.xcstrings`,
+`WaterBuddyWatchWidget/Localizable.xcstrings` — Xcode's rewrite (#50). **1 untracked**:
+`Screenshots/census/`. None in both.

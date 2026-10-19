@@ -160,9 +160,12 @@ something to record.
   `removePending` and `removeDelivered` lines in `NotificationManager.swift`, measured on the staged
   tree, unchanged by roadmap item 1.2.5 the same day, unchanged by roadmap item 1.2.6 on
   2026-10-17, measured on its staged tree against a clean build of `HEAD`, unchanged by the lag
-  fix on 2026-10-18, measured on its working tree against a clean build of a `HEAD` export, and
+  fix on 2026-10-18, measured on its working tree against a clean build of a `HEAD` export,
   unchanged by roadmap item 1.3.4 the same day, measured on a copy of its index against a clean build
-  of a `HEAD` export — 29 outside the tests on both, 35 on `HEAD` with the six in two
+  of a `HEAD` export, and unchanged by roadmap item 1.3.1's stages 6a and 6b on 2026-10-19, 6b
+  measured the same way — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
+  prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
+  tests on both, 35 on `HEAD` with the six in two
   `WaterBuddyTests` files (80
   occurrences as counted then; 44 primary lines on 2026-10-08 — occurrences move with the
   architectures a build compiles, the unique lines do not): the *"main actor-isolated …
@@ -182,7 +185,9 @@ something to record.
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
   widget on the Home Screen after any change to storage, entitlements, target membership or the
   widget's view tree — the Lock Screen widget on the Lock Screen too, the control in Control
-  Center, and the same for the watch face's complication, which no part of the automated gate renders
+  Center, and the same for the watch face's complication, which no part of the automated gate renders.
+  The small widget's StandBy layout cannot be placed at all on a simulator, which has no StandBy:
+  draw it through its `#Preview`, and take it into StandBy on a device, by day and at night
 - Ask yourself: "Would a staff engineer approve this?"
 
 ## Demand Elegance (Balanced)

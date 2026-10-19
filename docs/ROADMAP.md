@@ -194,7 +194,13 @@ sits here beside the other surfaces that answer without opening the app.
 
 **1.3.1 — The week widget** cannot read SwiftData (rule `40-widget`: the draw path never opens
 it), so a week of daily totals must enter the App Group cache as a new key — a change to the stored
-shape, cascading to `docs/STATE.md` and the snapshot's read-only tests.
+shape, cascading to `docs/STATE.md` and the snapshot's read-only tests. *(2026-10-19: **under way, in
+three stages.** Spec `docs/superpowers/specs/2026-10-19-the-widget-stage-design.md` and plan
+`docs/superpowers/plans/2026-10-19-the-widget-stage.md`, approved with D1–D4, committed in `1899aba`.
+**6a**, the pour button on the primary surface, is committed (`5a46609`). **6b**, the small widget
+on StandBy's black — the vessel's rim and water, the white disc, and the figure hidden when iOS
+asks — is built, gated and staged, not committed. **6c**, the week as `Key.weekTotals` and a medium
+*Week* widget that opens History, is next. StandBy itself is for 1.2.7's sweep, known issue #148.)*
 
 **1.3.2 — The watch** needs a watchOS 26 or later runtime to render the redesign's watch stage
 (decision D6); watchOS 27.0 is installed. The new complication families read the watch's own suite,
@@ -215,7 +221,8 @@ authentication before it answers (`.requiresAuthentication`), and that the answe
 total and what is left: *1,450 millilitres so far today — 1,050 millilitres to go.* It reads the
 widget's snapshot and writes nothing; a *Today's Water* tile follows *Log a Glass*. What only a
 device shows — the unlock prompt, with the watch, AirPods and the car, the three lines spoken, and
-Russian — joins 1.2.7's sweep as known issue #146.)*
+Russian — joins 1.2.7's sweep as known issue #146.)* *(2026-10-19: committed at 23:40 on 2026-10-18,
+`4a7ece7`..`41309e3`.)*
 
 ## 5. Release 1.4 — Premium
 
@@ -352,6 +359,12 @@ list: `15-project` (the intent is app-only), `20-state` (the streak never reache
 carries `remaining` and `hasReachedGoal`), `43-concurrency` and `85-testing` (the new suite that is
 not `@MainActor`). Worded in its spec §5, typed into the rule files unstaged and approved by the owner
 before any code, as 1.2.5's were. Known issue #147 asks the owner to reword the last two.)*
+*(2026-10-19: 1.3.4's wording was committed as `41309e3`. 1.3.1 needed ten this table does not list,
+worded in its spec §5 — the week's key in `10-architecture`, `20-state`, `25-shared-storage` and
+`30-rollover`, and its snapshot in `40-widget`; the pour button, the StandBy layout, the week widget
+and its link across `40-widget`, `50-views`, `60-design-system`, `65-accessibility` and
+`70-privacy`; StandBy and the week in `85-testing`'s device list. Approved by the owner before any
+code and staged; not yet committed — 6a was committed ahead of its wording.)*
 
 ## 9. Not planned
 

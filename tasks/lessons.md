@@ -4144,3 +4144,30 @@ the intent, no shape warned at all.
 **The rule:** a canary is proved in the real target, both ways — the keyword off, the warning seen;
 the keyword back, the warning gone — before any rule or DocC calls it one. Read the value into a
 local outside `#expect`, in an `async` test. Treat a reviewer's probe as a lead to test, not a result.
+
+## 2026-10-19 — Xcode 27's snippet lines more than doubled the warning counter
+
+**What happened.** The widget stage's plan collects warnings with `grep 'warning:'`. Xcode 27 prints
+each diagnostic twice: the primary `file:line:col: warning:` line, and a `` `- warning: `` line under
+the source snippet it quotes. The clean build of `HEAD` counted 80 where `CLAUDE.md` records 35. The
+plan's `sed` also left the build root in every path, because the compiler prints `/tmp/…` while the
+scratchpad's own name is `/private/tmp/…`. The primary lines alone, with the root stripped, gave 35 —
+29 outside the tests, the recorded figures — with line numbers kept, and 19 by file and message.
+
+**The rule:** count only lines matching `^/…\.swift:[0-9]+:[0-9]+: warning:`, strip the root with a
+pattern that matches both `/tmp` and `/private/tmp`, and check `HEAD`'s count against the recorded
+figure before comparing anything. Compare by file and message as well as by line, because a change
+that moves lines in a file with warnings shifts every line number below it.
+
+## 2026-10-19 — A placed widget redraws when its app is installed again
+
+**What happened.** 6b's render needed the bare layout on a Home Screen. *WaterBuddy Probe 27* still
+held 6a's Hydration widgets — `Library/SpringBoard/IconState.plist` in the device's folder listed
+them — and `xcrun simctl install` of a new build redrew every placed widget from the new extension
+within seconds. A build that drew a black background turned the cards black, and the next install
+turned them back, so the redraw was proved rather than assumed. No SpringBoard placement was needed.
+Leaving the app from a UI test landed on the icon's page, as on 2026-10-08.
+
+**The rule:** before driving SpringBoard to place a widget, read the probe device's `IconState.plist`.
+If the widget is placed, install and take screenshots until two agree. Before trusting a diff that
+says two renders are identical, show a render between them that differs visibly.

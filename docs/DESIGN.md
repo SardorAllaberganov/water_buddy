@@ -7,6 +7,12 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-19 (the seventy-third pass's `/doc_sync`, after roadmap item 1.3.1's
+stages 6a, committed in `5a46609`, and 6b, staged). **No token changed.** Since 6a the widget's two
+pour buttons are the primary surface, not `.frosted` glass: *The primary surface* gains a fourth
+place, and the density and elevation lists say so in dated notes. Since 6b `WidgetCardBackdrop`'s
+StandBy sentence is history — in StandBy the small widget draws no card, so no backdrop.
+
 **Last updated:** 2026-10-18 (sixty-eighth pass, the owner's `/doc_sync` again). **No token
 changed.** *The water*'s table gives the welcome after the fix as 0.176 s, the figure its 3.5 % is
 computed from, where it said 0.18.
@@ -265,7 +271,9 @@ Settings*, and the watch's two capsules, which pass no elevation and take the de
 *(2026-10-14, the redesign's stage 5: there is no first-run card. The welcome's panes are
 `.raised` — its three cards, the calculator, the reminder's preview and *Back* — except Hello's
 vessel, `.floating` as Home's is, and *Use* and the bells' discs, `.resting`. Its main action is
-the primary surface.)*
+the primary surface.)* *(2026-10-19, roadmap item 1.3.1's stage 6a, `5a46609`: the widget's buttons
+are no longer glass. In full colour they are the primary surface, which casts `Elevation.raised`'s
+two shadows; on a template, the rim alone, with no shadow, as every widget pane there.)*
 
 ## `LiquidGlass.Density`
 
@@ -300,7 +308,8 @@ app's first pane at that density, because it carries a line of text (*Home, meas
 small capsules `.sheer` — the sheet's *Cancel*, *Open iOS Settings* and the watch's two. *(Read
 "vessels `.sheer`, cards and buttons `.frosted`" until the forty-seventh pass, whose rewrite
 counted the four capsules as three and left the widget's buttons out; corrected in the
-forty-eighth.)*
+forty-eighth.)* *(2026-10-19, stage 6a, `5a46609`: the widget's two pour buttons are the primary
+surface now, not `.frosted` panes — *The primary surface*, below.)*
 
 ## Specular and edge
 
@@ -414,7 +423,10 @@ backdrop shared pixel-for-pixel with the surround gives the eye nothing to tell 
 grey rectangle painted on top.
 
 It is opaque, so it also covers the case where the system has stripped the container background: in
-StandBy the card brings its own light rather than floating on bare black.
+StandBy the card brings its own light rather than floating on bare black. *(2026-10-19, roadmap item
+1.3.1's stage 6b, staged: no longer — when iOS strips the background, the small family draws no
+card and so no backdrop; the vessel's rim and water and the white button stand on the black
+(`docs/WIDGET.md`, *Layout*). The medium family is not shown in StandBy, which is inferred.)*
 
 ## The water
 
@@ -795,7 +807,11 @@ glow — and, since the redesign's stage 2, **Home's Glass disc**, the only one 
 slot every one-tap door logs, between two glass discs. *(2026-10-14, the redesign's stage 5: the
 first is now the welcome's main action, in its bar — *Get Started*, then *Continue*, then *Turn on
 reminders* — on a rounded rectangle at `LiquidGlass.cornerRadius` (`WelcomeView.swift:677`).
-Still three places.)*
+Still three places.)* *(2026-10-19, roadmap item 1.3.1's stage 6a, `5a46609`: **four** — the Home
+Screen widget's pour button, a `Circle` in the small family and a `Capsule` in the medium, through
+`PourSurface`: `ring: false`, so the button stays exactly 44 pt and the vessel's clearance holds,
+and in `.fullColor` only — on a template it is white content in the lit rim. The pair is the same,
+`Aurora.top` on the shaded white, so the figures below cover it.)*
 
 | Token (`LiquidGlass.Primary`) | Value | |
 |---|---|---|
