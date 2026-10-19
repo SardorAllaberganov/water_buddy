@@ -399,7 +399,8 @@ private struct MiniVessel: View {
 // MARK: - Pour button
 
 /// The interactive half. `Button(intent:)` is the only kind of button a widget can have: the
-/// archive carries the intent, and the system runs it when the user taps.
+/// archive carries the intent, and the system runs it when the user taps. Drawn on the redesign's
+/// primary surface in full colour, and as white in the lit rim on a template (``PourSurface``).
 ///
 /// Not `private`, for one reason: the Lock Screen widget's button reads ``minimumTarget``, so the 44pt
 /// floor both widgets' buttons honour has one definition rather than two.
@@ -444,20 +445,18 @@ struct PourButton: View {
         case .circle:
             Image(systemName: "plus")
                 .font(.system(size: 19, weight: .semibold))
-                .foregroundStyle(.white)
                 .frame(width: Self.minimumTarget, height: Self.minimumTarget)
-                .widgetPane(in: Circle(), density: .frosted, elevation: .resting)
+                .pourSurface(in: Circle())
                 .contentShape(Circle())
 
         case .capsule:
             Text(strings.localized("+%1$d ml", serving, locale: locale))
                 .font(.callout.weight(.semibold))
                 .monospacedDigit()
-                .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity, minHeight: Self.minimumTarget)
-                .widgetPane(in: Capsule(), density: .frosted, elevation: .resting)
+                .pourSurface(in: Capsule())
                 .contentShape(Capsule())
         }
     }
@@ -504,6 +503,48 @@ private struct WidgetPane<S: Shape & InsettableShape>: ViewModifier {
             content.background {
                 shape.strokeBorder(.white.opacity(0.45), lineWidth: 1)
             }
+        }
+    }
+}
+
+// MARK: - The pour button's surface
+
+private extension View {
+
+    /// The pour button's surface — the one place in a widget the redesign's primary surface is
+    /// drawn.
+    func pourSurface<S: SwiftUI.Shape & InsettableShape>(in shape: S) -> some View {
+        modifier(PourSurface(shape: shape))
+    }
+}
+
+/// The widget's one action as the redesign's primary surface: solid white, `Aurora.top` content
+/// (rule `60-design-system`).
+///
+/// **No ring.** ``PrimarySurfaceModifier``'s ring reaches six points outside the shape, and the
+/// button is exactly ``PourButton/minimumTarget`` — the target `MiniVessel.radius(fitting:besides:gap:)`
+/// derives the vessel's clearance from (rule `40-widget`). A ring would eat the 4-pt gap.
+///
+/// **Outside `.fullColor` it keeps the white content in the lit rim.** On a template only alpha
+/// survives, and a white shape with dark content comes back as one blank disc. That is the fallback
+/// every pane in a templated widget takes (``WidgetPane``).
+private struct PourSurface<S: Shape & InsettableShape>: ViewModifier {
+
+    let shape: S
+
+    @Environment(\.widgetRenderingMode) private var renderingMode
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if renderingMode == .fullColor {
+            // The surface sets its content's colour; the label sets none of its own.
+            content.primarySurface(in: shape, ring: false)
+        } else {
+            content
+                .foregroundStyle(.white)
+                .background {
+                    shape.strokeBorder(.white.opacity(0.45), lineWidth: 1)
+                }
         }
     }
 }
