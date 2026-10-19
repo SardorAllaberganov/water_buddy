@@ -48,6 +48,13 @@ after the body above had already conceded it.
   no-op write rings it
 - Sum with `addingReportingOverflow` and saturate at `maximumDailyIntake`. Plain `+` or
   `reduce(0, +)` traps on a corrupt `Int.max` row and crashes the app instead of degrading
+- The week is derived the same way. `Key.weekTotals` — the last `historyWindow` days' totals by day
+  ordinal — is rewritten from the rows by exactly the two paths that recompute today's total, `init`
+  and `saveAndRecompute()`, in every process that builds a `DataManager`; in the app from the same
+  fetch as the week card. Never by `refresh()` or `dayDidTurn()`, for `refresh()`'s reason. A failed
+  read writes nothing and an unchanged week writes nothing. It rings the widget doorbell when it was
+  missing or a day before today moved; today's own change is the `currentWater` setter's ring, so a
+  real change still rings once
 - `removeWater(amount:)` takes water off the `WaterLog` rows — delete each serving it swallows
   whole, shrink the one it partly covers. Never subtract from `currentWater` or the cached key; the
   next `recomputeToday()` silently undoes it

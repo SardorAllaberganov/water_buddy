@@ -51,7 +51,9 @@ Three limits are conditions of the permission:
   The phone's Lock Screen widget joined it in
   `docs/superpowers/specs/2026-10-08-lock-screen-widget-design.md`: `currentWater` counts pours the
   watch authored, so the total it draws is wire-derived too, and it is held to the marking *The lock
-  screen is a public surface* sets out
+  screen is a public surface* sets out. The week widget is a Home Screen widget, as the Hydration
+  widget is: its totals count the watch's pours, as `currentWater` does, and it takes no carve-out
+  of its own
 - **No third framework rides in behind it.** `HealthKit`, `CoreLocation` and `CloudKit` remain
   banned by name, and a watch app is exactly where someone will propose all three.
 
@@ -115,6 +117,11 @@ Three limits are conditions of the permission:
   *Allow Access When Locked → Lock Screen Widgets* sees no figure until the phone unlocks, as iOS
   hides a notification's preview. The quiet form speaks no figure either: its elements carry their
   label alone, and its button says *Log Water*
+- **StandBy is a locked-phone surface too.** The small Home Screen widget's figures — the vessel's
+  percentage and its water — carry `.privacySensitive()`, and the vessel draws the Lock Screen
+  widget's quiet form — an empty rim, no water, no figure — whenever `redactionReasons` contains
+  `.privacy`, so iOS's own lock settings decide what a phone on a nightstand shows. On an unlocked
+  Home Screen nothing is redacted
 - Never add an entitlement to hide the Lock Screen widget harder. The Data Protection entitlement
   would hide every widget in the extension while locked and give it no runtime — the Home Screen
   widget would go blank in StandBy — and *Nothing leaves the device* already forbids a second

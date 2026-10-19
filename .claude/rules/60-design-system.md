@@ -68,6 +68,10 @@ measured.
 ## The primary surface
 - A screen's one main action is drawn with `.primarySurface(in:)`: solid white, `Aurora.top` content.
   It is the only surface that is not glass, and a screen carries at most one
+- In the Home Screen widget the pour button is the primary surface in `.fullColor` —
+  `.primarySurface(in:ring: false)`, so it stays exactly its 44-pt target and the vessel's clearance
+  holds (rule `40-widget`). Outside `.fullColor` it is white content in the lit rim, as every pane
+  there is
 - Its shade, its pressed wash, its ring and its shadows come from `LiquidGlass.Primary` and
   `Elevation.raised`. Never hand-roll one from `.background(.white)`
 - The surface sets its content's colour. Never give a primary label a `.foregroundStyle` of its own
@@ -154,6 +158,14 @@ measured.
   rather than as a second edge
 - Two glass discs may never share an edge in the small family; the vessel cap is derived from the
   button's 44pt target and a 4pt gap
+- When the system removes the container background — `showsWidgetContainerBackground` is `false`,
+  on iPhone StandBy — the small family draws no card, no card pane and no backdrop: the vessel and
+  the pour button stand on the system's black. The vessel draws its lit rim and its water, never its
+  glass, because glass never goes over a flat background
+- The week widget draws History's week card from History's values — `Aurora.cyan` for a met day,
+  white for the rest, white 0.10 tracks, the dashed goal line at white 0.62 — each pair measured on
+  the widget's own rendered pane (`docs/DESIGN.md`), never carried over from History's figures.
+  Outside `.fullColor` a met bar is `.widgetAccentable()`
 - Every glyph or annotation inside a capped container is sized as a **ratio** of that container,
   never with its own text style — a capped container and an uncapped text style cross over at the
   accessibility sizes (rule `65-accessibility`)

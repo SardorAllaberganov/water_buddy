@@ -95,6 +95,9 @@ changed.
   report the cached total, not zero
 - The widget also emits a second, midnight-dated timeline entry with a zeroed total, so it turns
   over on its own even if nothing wakes it (rule `40-widget`)
+- The week widget turns over from the same midnight entry: `week(endingOn:)` at the entry's date
+  takes yesterday from `Key.weekTotals` and today from the rolled-over total. `rolledOver()` still
+  changes only the total
 - Keep `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys` green for any
   change to the read path. If you add a key, extend the helper those tests compare against — it
   enumerates keys explicitly and will not notice a new one on its own

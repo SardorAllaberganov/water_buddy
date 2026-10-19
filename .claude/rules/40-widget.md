@@ -63,6 +63,10 @@ target the file joins.
   existing six; `WaterSnapshot` and `AppLanguage` live in `DataManager.swift` for exactly this reason
 - Any change here keeps `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys`
   green — a snapshot read may not create or alter a single key
+- `WaterSnapshot.weekTotals` is the cached week, validated on the way out — a failed decode, the
+  wrong count or a value outside `0...maximumDailyIntake` discards the whole map to `nil`, never
+  repairs it — and `week(endingOn:calendar:)` is the one place the bars are computed. Both are
+  `nonisolated`
 
 ## The timeline
 - `getTimeline` always emits the second, midnight-dated entry with a zeroed total alongside the
@@ -143,6 +147,8 @@ target the file joins.
 - `MiniVessel.radius(fitting:besides:gap:)` stays the derived clearance formula, not a flat
   proportion
 - Keep `.invalidatableContent()` on the figures an intent changes
+- The small family reads `showsWidgetContainerBackground` once, in `HydrationView`, and hands its
+  layout a flag, so a `#Preview` can draw the bare layout the environment cannot be set to
 
 ## The control
 - The only control in a widget's view tree is `Button(intent:)` with `.buttonStyle(.plain)` and a
@@ -194,6 +200,21 @@ target the file joins.
   press made after an edit logs the previous Glass (measured on the simulator). Never remove it as
   redundant beside the timeline reload
 
+## The week widget
+- `WeekWidget` is a fourth widget in the same extension, in its own file: its own kind
+  (`"WaterBuddyWeek"`, permanent once shipped), its own `StaticConfiguration`, `.systemMedium` only,
+  listed after `WaterBuddyWidget`
+- It reads through the same `HydrationProvider` and `HydrationEntry` — never a second provider —
+  and draws `entry.snapshot.week(endingOn: entry.date, calendar: .waterBuddyDay)`, so the midnight
+  entry shifts its week from the same snapshot that zeroes the total
+- It keeps the Home Screen widget's `.contentMarginsDisabled()`, card, backdrop and aurora, and
+  injects `entry.snapshot.language.bundle` and `.locale` at its root
+- It carries no button. A tap opens History through `.widgetURL(WidgetLink.history)`, the one
+  spelling of the link, which the app reads too
+- When the snapshot's week is `nil` it says so — *Open WaterBuddy to see your week* — and never
+  draws a week of zeros
+- Its gallery strings are static literals that name no figure
+
 ## Proving it
 - The app scheme does not compile the widget's sources. Build the extension separately after any
   change here, and after any change to one of the six shared files (rule `15-project`)
@@ -204,3 +225,6 @@ target the file joins.
   Screen slot and on the Action Button. Its press does run on a simulator — `chronod` performs it,
   where `linkd` refuses the widgets' buttons — so prove there that it logs the stored Glass; a locked
   phone, the Lock Screen slot, the Action Button and VoiceOver need a device
+- The simulator has no StandBy: draw the bare layout through its `#Preview`, and take the small
+  widget into StandBy on a device, by day and at night. Place the week widget, tap it, and see
+  History open

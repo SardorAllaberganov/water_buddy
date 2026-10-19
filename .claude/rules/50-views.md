@@ -97,6 +97,9 @@ persist anything.
   `TabView`, `NavigationStack` or `NavigationLink` — there are none in the project
 - Every destination has exactly one route to it. No header button, gear or shortcut that duplicates
   a tab
+- A widget's link from outside the app is an entrance, not a second route: `RootTabView` answers
+  `WidgetLink.history` in `.onOpenURL`, through `AppTab(link:)`, by turning to History as its tab
+  would. Before setup the link is ignored
 - Present a sheet with `.sheet(item:)` bound to an optional `@State`, handing the thing being edited
   to the sheet as an `init` parameter — not a `Bool` plus a separately-stored selection
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen

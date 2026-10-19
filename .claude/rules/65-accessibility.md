@@ -125,7 +125,11 @@ rather than re-deriving it.
   tab and leaving the app each end it
 - The Lock Screen widget's figures are one element per shape — label *Today's hydration*, value the
   vessel's own percent-and-millilitres string — and its quiet form speaks no figure: the label alone,
-  and *Log Water* on the button. A figure hidden from sight is hidden from speech
+  and *Log Water* on the button. A figure hidden from sight is hidden from speech. The small Home
+  Screen widget's quiet form is the same: its vessel keeps its label and speaks no figure
+- The week widget is one element: label *Last 7 days*, value the sentence History's card speaks —
+  the average, the best day and the days met. Its bars, letters and figure are hidden. With no
+  week, its value is the line it draws
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1
