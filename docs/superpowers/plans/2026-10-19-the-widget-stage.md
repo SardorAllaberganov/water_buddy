@@ -112,6 +112,14 @@ task that owns it:
 
   *(2026-10-19: the owner approved the plan and ruled both in one reply — P1, rebase the four tests;
   P2, keep the tick.)*
+
+  *(2026-10-20, 6c executed: P1 missed a fifth — `EarlierServingTests.aServingBackdatedIntoYesterdayRingsNoWidgetDoorbell`,
+  whose premise the week widget ends. The run stopped on it, and the owner ruled it rewritten as
+  `aServingBackdatedIntoYesterdayRingsTheWidgetOnce`. Corrected in the build, each recorded in
+  `HISTORY.md`: `WeekCorruption` must be internal; the stored `weekTotals` is `nonisolated` too (spec
+  R5); `widgetPane` and `WidgetCardBackdrop` stay private. Step 4 of Task 6 could not place the week
+  widget before the app had run — the simulator's gallery offers no widget of an app that has not
+  run.)*
 - [ ] **The catalogues are clean and Xcode is closed.** This must print nothing, and `lsof -p` on any
   running Xcode must show no WaterBuddy project file:
 

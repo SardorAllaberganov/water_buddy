@@ -7,6 +7,11 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-20 (the seventy-fourth pass's `/doc_sync`, after roadmap item 1.3.1's stage
+6c, staged). **No token changed.** The week widget draws History's week-card values, measured again
+on its own pane: *The week widget, measured* holds the eleven pairs and the method — none under its
+floor, the nearest the goal line over a track at 3.06:1 and the title at 4.95:1.
+
 **Last updated:** 2026-10-19 (the seventy-third pass's `/doc_sync`, after roadmap item 1.3.1's
 stages 6a, committed in `5a46609`, and 6b, staged). **No token changed.** Since 6a the widget's two
 pour buttons are the primary surface, not `.frosted` glass: *The primary surface* gains a fourth
@@ -1222,6 +1227,40 @@ identical digests with Reduce Transparency off, identical with it on, and the tw
 from each other — so both branches ran. Both sizes placed on a Home Screen from each build (iOS
 27.0, light): the medium widget's cell, 573,408 pixels, differs in none; the small one's in 34, by
 one level, all outside the widget's own rectangle.
+
+### The week widget, measured
+
+*2026-10-20, roadmap item 1.3.1's stage 6c, built and staged, not committed.* The week widget draws
+History's values — `Aurora.cyan` for a met day, white for the rest, white 0.10 tracks, the goal line
+1.5 pt at white 0.62 — and rule `60-design-system` asks for each pair measured on the widget's own
+pane, because History's figures were read on History's. **No token changed.**
+
+Measured off a screenshot of the placed widget on *WaterBuddy Probe 27* (iPhone 17, iOS 27.0, light,
+the device's real week, 3× pixels, WCAG relative luminance). The foreground is the element's core —
+a bar's interior median, a glyph's brightest tenth. The ground is the **lightest** 8-px patch beside
+it — the gaps between tracks, the track above a bar, the pane around a glyph — so each figure is the
+worst on that frame. A widget does not move, so one frame is the whole of it; light and dark rendered
+identically, as the card sets its own dark scheme.
+
+| Pair | Ratio | Floor |
+|---|---|---|
+| Met bar at the goal line (cyan) vs the gaps beside it and its track above | **3.66:1** | 3:1 |
+| Met bar, full height (cyan) vs the gaps beside it | 5.34:1 | 3:1 |
+| Unmet bar (white) vs its track and the gaps | 7.10:1, 7.26:1 | 3:1 |
+| An empty day's 2-pt sliver (white) vs its track | 5.32:1 | 3:1 |
+| Goal line over a track vs the track | **3.06:1** | 3:1 |
+| Goal line over a gap vs the gap | 4.31:1 | 3:1 |
+| Weekday letters (white) vs the pane | 7.20:1 | 4.5:1 |
+| Title *Last 7 days* (white) vs the pane | **4.95:1** | 4.5:1 |
+| Figure *2 of 7* (white) vs the pane | 8.82:1 | 4.5:1 |
+| *Goal met* (white 0.85) vs the pane | 6.99:1 | 4.5:1 |
+| Track (white 0.10) vs the gap between tracks | 1.79:1 | — |
+
+**Nothing is under its floor.** The nearest are the goal line over a track, 3.06 (History's reads 3.67
+on its own pane), and the title, 4.95, where the card is lightest, top left. The track claims no
+floor, as History's does not: it is the faint slot a short bar stands in, and a met bar is told by
+its colour **and** by standing at or above the line (rule `65-accessibility`). Not measured: a tinted
+Home Screen, where a met bar takes iOS's accent (#149).
 
 ## History, measured
 

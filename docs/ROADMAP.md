@@ -201,6 +201,12 @@ three stages.** Spec `docs/superpowers/specs/2026-10-19-the-widget-stage-design.
 on StandBy's black — the vessel's rim and water, the white disc, and the figure hidden when iOS
 asks — is built, gated and staged, not committed. **6c**, the week as `Key.weekTotals` and a medium
 *Week* widget that opens History, is next. StandBy itself is for 1.2.7's sweep, known issue #148.)*
+*(2026-10-20: 6b committed as `ed77d9f`, its doc sync as `4c796a9`. **6c — `Key.weekTotals`, the *Week*
+widget and its link to History — is built, gated and staged, not committed**, the plan's Tasks 3–7.
+The owner ruled one test the plan missed, rewritten. The link needs no URL scheme. The week adds a
+median 0.42 ms to a widget tap. What only a device shows of it — VoiceOver, a narrow iPhone, a
+tinted Home Screen, the morning after, and whether a phone offers the new widget before the updated
+app is opened — joins 1.2.7's sweep as known issue #149; the week's two designed edges are #150.)*
 
 **1.3.2 — The watch** needs a watchOS 26 or later runtime to render the redesign's watch stage
 (decision D6); watchOS 27.0 is installed. The new complication families read the watch's own suite,

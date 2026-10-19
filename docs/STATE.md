@@ -4,6 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-20 (seventy-fourth pass — `/doc_sync` after roadmap item 1.3.1's stage 6c,
+staged). **One key joins the phone's suite: `weekTotals`**, the last seven days' totals by day
+ordinal, derived like `currentWater` and written where it is recomputed, by the app and the
+extension; 13 `static let`s on `DataManager.Key`, 11 on the phone. Its row, the notes on the
+doorbell paragraph, `history`'s guard and `Key.all` were written by the build; this pass moved the
+counts that still said ten and re-derived the guard sites' lines and `role`'s by their words.
+
 **Last updated:** 2026-10-18 (seventy-second pass — `/doc_sync` after roadmap item 1.3.4, Siri's
 *Today's Water*, staged). **No key, no stored byte and no writer changed**; 12 `static let`s on
 `DataManager.Key`, as before. What changed is a reader: `TodaysWaterIntent`, in the app's process,
@@ -269,7 +276,7 @@ and which is authoritative matters more than either on its own:
 
 | | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
 |---|---|---|
-| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | ten keys (below) |
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | eleven keys (below; ten until 2026-10-20, `weekTotals` the eleventh) |
 | Status | **source of truth** | **derived cache** |
 | Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
 | Read by | the app — and the extension's own `DataManager`, inside `AddWaterIntent.perform()` and nowhere else | the app **and the widget** |
@@ -334,7 +341,9 @@ the next extension. `Key.all` — the roster the widget tripwires read — now l
 total: the ten in this table — the eight, `wristApplied` and `reviewRequestedVersion` — and the
 watch's two, documented in *The watch's own suite* further down. *(Read "the eight below plus three
 more, all documented" there until the twenty-sixth pass; the table has had nine rows since
-`wristApplied` joined it, and ten since 2026-10-15, roadmap item 1.2.5.)*
+`wristApplied` joined it, and ten since 2026-10-15, roadmap item 1.2.5.)* *(2026-10-20, roadmap item
+1.3.1's stage 6c, staged: **thirteen** in `Key.all` — the eleven in this table, `weekTotals` the
+eleventh, and the watch's two.)*
 
 | Stored key | Type | Range / clamp | Written by | Why it exists |
 |---|---|---|---|---|
@@ -348,6 +357,7 @@ more, all documented" there until the twenty-sixth pass; the table has had nine 
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
 | `sardor.WaterBuddy.wristApplied` | `Data` (JSON `[Int: [UUID]]`) | **unbounded per day, until the 90-day trim** — see note below | **app only, via `ingest(_:)`** | The phone's per-day applied ledger for wrist-authored pours — day ordinal → the `WaterLog.id`s already folded in. `nonisolated`, unlike the eight keys above it (and the watch's two), because `readAppliedLedger(from:)`/`writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` and a nested type's members otherwise infer the enclosing `@MainActor` class's isolation. Trimmed to the last `appliedLedgerRetentionDays` (90) real calendar days on every write — never by subtracting a raw integer from the `yyyyMMdd` ordinal, which borrows across the month/day radix incorrectly (a real bug this plan introduced and fixed in its own Task 4, before it shipped). A write also protects any day it just folded into, even one already older than the 90-day cutoff, so the same write that adds an entry can never be the write that trims it (final review, `ingest(_:)`'s cutoff is `min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)`). |
 | `sardor.WaterBuddy.reviewRequestedVersion` | `String` | — (read with `object(forKey:) as? String`; anything else reads as never asked) | **app only, via `claimReviewRequest(version:)`** | The app's version (`CFBundleShortVersionString`, e.g. `"1.2"`) the last time it asked iOS for a rating (roadmap 1.2.5, `docs/superpowers/specs/2026-10-15-rating-prompt-design.md`). **Absent means never asked**, so it is never materialised. The claim writes it **before** answering `true`, so nothing asks without recording it, and Home asks at most once per version. It writes nothing else: no row, no widget doorbell, no reschedule — no widget, snapshot, mirror or notification reads it. Not `string(forKey:)`, which hands back a stored number as a string: a stored `1.2` would read as version 1.2 asked (`aStoredNumberCountsAsNeverAsked`, seen to fail against that read). No role guard: `streak` is zero in every process but the phone app, so the claim refuses there by construction. |
+| `sardor.WaterBuddy.weekTotals` | `Data` (JSON `[Int: Int]`) | exactly 7 days, each `0...100_000` — each day clamped on the way **in** by `cacheWeek` (a corrupt negative row would otherwise write a week its own reader rejects: `aCorruptNegativeServingIsClampedInTheCachedDay`, from the final review), and validated on the way **out** by `readWeekTotals(from:)`, which discards the whole week on a failed decode, the wrong count or one day out of range, never repairing it | app + extension, via `recomputeTodayAndTheWeek()` — `init` and `saveAndRecompute()` only | The last `historyWindow` days' totals by day ordinal, zeros included, for the week widget, which may never open SwiftData (roadmap 1.3.1, `docs/superpowers/specs/2026-10-19-the-widget-stage-design.md` §3.4). **Derived**, like `currentWater`: rewritten from the rows wherever today's total is recomputed, in every process that builds a `DataManager`, so the extension's tap the morning after keeps yesterday after its `init` rolled the cached total over. **Absent means not yet known** — the widget says *Open WaterBuddy to see your week.* — so it is never materialised. Never written by `refresh()` or `dayDidTurn()` (a read across processes can miss the other's newest row), never from a failed read, never when unchanged. Rings the widget when it was missing or unreadable, or a day **before** today moved; today's change is the `currentWater` setter's ring, so one pass rings once. `nonisolated`, for the reader on the widget's path. The snapshot carries it as `WaterSnapshot.weekTotals`, and `week(endingOn:calendar:)` lays today's total over it. |
 
 > **The `wristApplied` ledger is not capped at `maximumAckedIds` (256).** That cap belongs to a different, related
 > but distinct thing: `WristMirror.acked`, the wire mirror's own array, sent phone → wrist on every
@@ -367,7 +377,7 @@ more, all documented" there until the twenty-sixth pass; the table has had nine 
 `WaterBuddyWatch` and `WaterBuddyWatchWidget` resolve the identical App Group *identifier string*,
 `group.sardor.WaterBuddy`, through the same `DataManager.sharedDefaults` accessor the phone uses —
 but the watch is a **different physical device**, so this is a different container on disk, holding
-none of the phone's ten keys above and read by none of the phone-side code. Never confuse "same
+none of the phone's eleven keys above and read by none of the phone-side code. Never confuse "same
 identifier" with "same storage": nothing written on one device is visible on the other except
 through an explicit `WatchConnectivity` transfer (rule `70-privacy`).
 
@@ -380,13 +390,14 @@ Both are written **only** by `WristModel`, never by `DataManager` — the one ho
 `20-state` now states plainly: one writer per store, not one writer full stop. `WristModel` never
 opens SwiftData and never touches the phone's own App Group container.
 
-**Of the phone's ten keys, four are carried by the migration** — `currentWater`, `dailyGoal`,
+**Of the phone's eleven keys, four are carried by the migration** — `currentWater`, `dailyGoal`,
 `lastActiveDay`, `isGoalSet` (`migrateIfNeeded(from:into:)` names exactly those).
 `didMigrateFromStandardDefaults` is not, because it *is* the bookkeeping; and `language` is not,
 because it did not exist before the App Group did, so there is nothing in a pre-capability
 `UserDefaults.standard` to carry. `remindersEnabled`, `servings` and `wristApplied` are not in
 the list either; this sheet has never recorded a reason for those three. `reviewRequestedVersion`
-is not, for `language`'s reason: it was born in the App Group, in 1.2.5. *(This paragraph is
+is not, for `language`'s reason: it was born in the App Group, in 1.2.5 — and `weekTotals` is not,
+for the same reason, born in 1.3.1's 6c (2026-10-20). *(This paragraph is
 about the phone's suite and sits under the watch's table; the twenty-seventh pass left it where
 it stood and said so.)*
 
@@ -421,6 +432,9 @@ adopting a new store looks exactly like data loss.
 
 `DataManager.Key.all` lists all twelve keys — the phone's own ten plus the watch's two
 (`wristOutbox`, `wristMirror`) — directly under the declarations it mirrors, below its own DocC.
+*(2026-10-20, 1.3.1's 6c, staged: thirteen — the phone's eleven with `weekTotals`. Every
+`DataManager` writes it in `init`, so `everyKeyTheProductWritesIsOnTheRoster` reads it back and
+requires it, and `readingACachedWeekLeavesTheStoreUntouched` compares it as one of the roster.)*
 Production code never reads it; it exists so the widget's two read-path tripwires —
 `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys` — can prove a snapshot
 read created and altered *nothing*.
@@ -436,8 +450,9 @@ Keeping the roster beside the declarations is what makes the omission hard rathe
 `DataManager`'s real writers and the migration, reads back every `sardor.WaterBuddy.` key that
 landed in the suite, and requires the roster to hold it — and, since 1.2.5, requires the claim's
 own key among them, because its count guard (`>= 8`) cannot see the claim: the other writers meet
-it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's ten keys and
-not the watch's two**: `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
+it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's eleven keys and
+not the watch's two** (ten until 2026-10-20; `weekTotals` is written by every `init`, so the test reads
+it back without a change of its own): `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
 target the phone's tests cannot reach, and no watch test reads `Key.all` — so nothing would catch
 either of those two going missing from the roster. `theTripwireHelperEnumeratesEveryStoredKey` does not — the helper
 it checks *is* `Key.all`, so it compares the roster with itself and pins only that the helper is
@@ -605,7 +620,11 @@ It differs from `todaysLogs` in three ways, each for a stated reason:
   `recomputeToday()` is deliberately unguarded, so `AddWaterIntent` reaches `saveAndRecompute()` on
   every widget tap — without the guard, that tap runs a seven-day fetch and a full roll-up inside
   the `.appex`. Nothing about history crosses to the widget: a per-day series is derivable from
-  none of the phone's ten keys.
+  none of the phone's ten keys. *(2026-10-20, roadmap item 1.3.1's 6c, staged: no longer — the
+  week crosses as `weekTotals`. The guard now covers what the app draws — the rows, the series, the
+  streak — and `republishHistory(cachingTheWeek: true)`, from `init` and `saveAndRecompute()` only,
+  runs the seven-day fetch and roll-up in the extension too, to keep the cache. Measured: a median
+  0.42 ms a tap on the simulator, against 0.14 ms for today's rows.)*
 - **It is republished from four sites**, not one — `init`, `refresh()`, `saveAndRecompute()` and,
   since the redesign's stage 2, `dayDidTurn()` — because a mutation must show up on the card
   immediately, `addLog` calls `refresh()` *before* it inserts, and a day that turns under an open
@@ -677,6 +696,8 @@ rows and total from one fetch.
   moves no total — `history` compares equal and stays put — while that day's rows reorder. Pinned by
   `retimingAServingWithinAPastDayRepublishesItsRows`.
 - **App-only**, under the same `role.drawsHistory` guard; the widget extension never builds it.
+  *(2026-10-20: still true — since 6c the extension reads the same window to cache the week, and
+  publishes none of its rows.)*
 - **Stores nothing.** Like `history`, it is derived on every republish.
 
 The window's start has one definition: `DataManager.windowStart(days:endingOn:calendar:)` — which
@@ -695,7 +716,12 @@ keeps the time. Moving a serving across midnight moves its water between two day
 `saveAndRecompute()` follows it: today's total is re-derived through the `currentWater` setter, so the
 cache key, the widget doorbell and the wrist publish move **only if today's total did** — a serving
 added to or re-timed inside a past day wakes nothing (`aServingBackdatedIntoYesterdayRingsNoWidgetDoorbell`,
-`aMoveAcrossMidnightRingsTheWidgetDoorbellOnce`). A watch pour can be re-timed safely: the applied
+`aMoveAcrossMidnightRingsTheWidgetDoorbellOnce`). *(2026-10-20, roadmap item 1.3.1's 6c, staged: the
+widget doorbell no longer — a past day is a bar the week widget draws, so a serving added to or
+re-timed inside one rings it **once**, through `weekTotals` (`aServingBackdatedIntoYesterdayRingsTheWidgetOnce`,
+the test renamed and inverted on the owner's ruling; `anEditToAnEarlierDayRingsTheWidgetOnce`); a move
+across midnight still rings once (`aServingMovedToYesterdayRingsOnce`). The `currentWater` key and the
+wrist publish still move only with today's total.)* A watch pour can be re-timed safely: the applied
 ledger is keyed by the pour's own `at`, which a resend repeats, and the existence check finds the row
 by `id` wherever its time moved (`aRetimedWatchPourStaysDeletedWhenTheWatchResendsIt`).
 
@@ -955,7 +981,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1647 (read :1565, a line of its DocC, until 1.2.5)
+nonisolated static let role: Role = {          // DataManager.swift:1787 (read :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -981,19 +1007,24 @@ for #73 moved all six, by four lines or by thirteen; and 2026-10-08: all six had
 2026-09-01 check that followed the watchOS plan's ~500-line addition. *This sentence said "by three
 different questions" until the twenty-sixth pass; the four writes have only ever asked two.*):
 
-1. **Materialising `dailyGoal` in `init`** (`:551`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:592`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1162`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:1083`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1709`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1294`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:1215`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:1931`, `mayHaveLegacyStandardDefaults`).
 
 Three further sites are guarded by the same enum but are not group bookkeeping:
-`republishHistory` (`:969`, `drawsHistory`, cost rather than correctness); `republishStreak`
-(`:1000`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
+`republishHistory` (`:1042`, `drawsHistory`, cost rather than correctness); `republishStreak`
+(`:1103`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
 because the `dailyGoal` setter calls it outside `republishHistory`); and
-`requestReminderReschedule` (`:1329`, `mayFileReminders`, the one whose wrong answer is immediately
+`requestReminderReschedule` (`:1531`, `mayFileReminders`, the one whose wrong answer is immediately
 user-visible). Rule `25-shared-storage` still counts six (`docs/AI_CONTEXT.md` known issue #103).
+*(Lines re-derived by their words on 2026-10-20, the seventy-fourth pass, on the staged tree — they
+read `:551`, `:1162`, `:1083`, `:1709`, `:969`, `:1000` and `:1329`, several passes old. Since 1.3.1's
+6c, `republishHistory`'s guard is `draws || cachingTheWeek`: the week's cache runs in any process
+that recomputes today, and only what the app draws stays behind `drawsHistory` — no new role
+question, spec §3.4 W7.)*
 
 Only `.phoneApp` answers `true` to any of the four questions today. Each is an exhaustive `switch`
 with **no `default`**, so a fifth binary fails to compile until somebody answers all four for it.

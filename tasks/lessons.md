@@ -4171,3 +4171,79 @@ Leaving the app from a UI test landed on the icon's page, as on 2026-10-08.
 **The rule:** before driving SpringBoard to place a widget, read the probe device's `IconState.plist`.
 If the widget is placed, install and take screenshots until two agree. Before trusting a diff that
 says two renders are identical, show a render between them that differs visibly.
+
+## 2026-10-20 — The gallery offers a widget only after its app has run
+
+**What happened.** 6c's plan had the week widget placed before the new build was ever launched, to
+see its empty state. On *Probe 27* the gallery, searched for WaterBuddy, offered only the two
+Hydration pages — the build was installed, its extension carried `WaterBuddyWeek`, the version was
+unchanged — and the probe, swiping a counted two pages, added a third Hydration medium instead. After
+the app had launched once, the gallery offered *Week*. On a simulator created for the purpose, the
+index build installed and never launched, the search found **no** WaterBuddy widget at all. And the
+launch is what writes the first week, so the empty state cannot be reached by placing first.
+
+**The rule:** a placement probe launches the app once before it opens the gallery, and finds a widget
+by its gallery title, never by counting pages. A state that exists only before the first launch is
+checked in a throwaway build that forces it.
+
+## 2026-10-20 — A failing unit run waits ten minutes for diagnostics
+
+**What happened.** Two of 6c's mutation runs — each failing on purpose — passed the ten-minute
+foreground limit, though their tests finished in a second. The tail of each log showed
+`simctl diagnose … --timeout=600`, which `xcodebuild` starts after a failing run unless told not to.
+The plan passed `-collect-test-diagnostics never` to UI runs only.
+
+**The rule:** pass `-collect-test-diagnostics never` on every `xcodebuild test`, unit runs included.
+And name a swift-testing function in `-only-testing:` with its `()` — without it the run executed 0
+tests and still printed `** TEST SUCCEEDED **`.
+
+## 2026-10-20 — An edit by a list's last lines landed in the wrong list
+
+**What happened.** 6c added seven keys "at the end of `sharedKeys`" with an Edit whose old text was the
+list's last two entries and its `]`. The text matched the end of `welcomeKeys` instead, a few
+screens further down. RED caught it: the shared-key tests stayed green where the plan said they would
+fail, and only the new test failed.
+
+**The rule:** when an edit appends to a named list, the old text includes the declaration line or is
+checked in the diff's hunk header before the run. A RED greener than the plan says is a finding about
+the change, read before going on.
+
+## 2026-10-20 — A stored property is inferred main-actor too, and a probe's `isSelected` lied
+
+**What happened.** 6c's plan made the week's method, key and reader `nonisolated` and left the stored
+`WaterSnapshot.weekTotals` alone. The RED run warned at the off-actor suite's read of it — the app
+target's default isolation infers a struct's stored property main-actor, and the test module reading
+it warns, as #147 found for computed ones. Spec R5 had named it. Separately, a language probe read
+`isSelected` as true on all four of Settings' language rows, restored a frame recorded before the
+screen scrolled, and left the device in Uzbek.
+
+**The rule:** every member of a snapshot type that a nonisolated reader names — stored or computed —
+gets `nonisolated` when written. A probe that changes a setting records what it was from the screen
+or the records, not from `isSelected`, and restores by a label that reads the same in every
+language.
+
+## 2026-10-20 — A known issue's shape came back in new code, and only `simctl install` redrew the widget
+
+**What happened.** The final review of 6c found the week card's `.dynamicTypeSize(...accessibility1)`
+inside the card's body, below the card's own `@ScaledMetric` — known issue #76's exact shape, carried
+into new code by the plan. Rendered at AX5 it pressed the bars to slivers. With the cap moved above
+the card, the first "after" renders came out pixel-identical to "before". A throwaway build that
+turned the title red showed no red through `xcodebuild test`'s install, and showed it within seconds
+of `xcrun simctl install`. Those identical renders had been stale.
+
+**The rule:** before writing a modifier that caps or overrides an environment value, check the open
+known issues for the same mechanism, and put a cap above any view whose own dynamic property should
+obey it. To redraw a placed widget from a new build, use `xcrun simctl install` and shoot until two
+agree. An "after" render that matches "before" is checked with a visible marker first.
+
+## 2026-10-20 — Line citations in a current section went stale across passes nobody re-derived
+
+**What happened.** The seventy-fourth pass found `AI_CONTEXT.md`'s *The process role* still citing
+`DataManager.swift` lines from the redesign's stage 5 — `role` at `:1647`, standing at `:1787`, and all
+seven guard sites — and `STATE.md`'s copy the same. Every pass since had checked the file rows' line
+counts, which a script compares, and none had checked the line numbers quoted in prose, which nothing
+compares. 6c's own records cited the file without noticing the old numbers beside them.
+
+**The rule:** when a change moves lines in a file whose lines the docs quote, the sync finds every
+`file.swift:NNNN` and `` `:NNNN` `` in a *current* section (not a dated note) and re-derives each one by
+its words with `grep -n`. Historical notes keep the numbers they had.

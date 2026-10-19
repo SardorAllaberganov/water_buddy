@@ -10932,3 +10932,200 @@ and this pass's six. **6 unstaged**: `.claude/settings.json` (the owner's), the 
 and `WaterBuddy/AppShortcuts.xcstrings`, `WaterBuddyWatch/Localizable.xcstrings`,
 `WaterBuddyWatchWidget/Localizable.xcstrings` — Xcode's rewrite (#50). **1 untracked**:
 `Screenshots/census/`. None in both.
+
+## [2026-10-20] — Roadmap item 1.3.1, stage 6c: the week in the cache, the Week widget, and its link to History
+
+**What changed.** Built across the evening of 2026-10-19 and past midnight, after the owner had
+committed 6b (`ed77d9f`) and its doc sync (`4c796a9`). The plan's Tasks 3–7, run inline.
+- **The week in the cache.** `Key.weekTotals` holds the last seven days' totals by day ordinal, as
+  JSON. `recomputeTodayAndTheWeek()` runs where today's total is recomputed — `init` and
+  `saveAndRecompute()` — in the app and in the widget extension, through
+  `republishHistory(cachingTheWeek:)` and `cacheWeek(_:today:)`. One roll-up feeds History's card and
+  the cache. Never written by `refresh()` or `dayDidTurn()`, from a failed read, or when unchanged.
+  One doorbell a pass: the `currentWater` setter rings for today; the week rings when it was missing
+  or a past day moved, and today's total did not. `readWeekTotals(from:)` discards a week this build
+  did not write, whole. `WaterSnapshot.weekTotals` carries it; `week(endingOn:calendar:)` draws it,
+  today from the total, walked by `DaySummary.window` — the walk `series` now takes too.
+- **The link.** `WidgetLink.history` (`waterbuddy://history`), answered in `RootTabView` by
+  `AppTab(link:)` and `.onOpenURL`, a whole-URL match. No URL scheme registered — proved first, on
+  *Probe 27* with a throwaway build: a tap on the small Hydration widget's vessel opened History
+  warm and cold.
+- **The widget.** `WeekWidget.swift`: kind `WaterBuddyWeek`, medium only, `HydrationProvider`; History's
+  week card at widget size — title, days met, seven bars on tracks against the dashed goal line, the
+  narrow weekday letters — one VoiceOver element; *Open WaterBuddy to see your week.* with no week;
+  `.widgetURL(WidgetLink.history)`, no button. `widgetCard()` is the card both Home Screen widgets
+  draw; `WaterSnapshot.sample(at:)` gives the gallery a week. Seven keys join the widget's catalogue
+  and `sharedKeys`; three are new in both catalogues.
+- **Before the code**, D1: the five files Xcode had rewritten (`AppShortcuts.xcstrings`, both watch
+  catalogues, both watch schemes) were restored to `HEAD` by name, with the project closed in Xcode.
+
+**Rulings.** Spec §3.4–§3.7 and §5; the plan with P1 (rebase the four doorbell tests) and P2 (keep the
+tick). **The owner, in this session:** `EarlierServingTests.aServingBackdatedIntoYesterdayRingsNoWidgetDoorbell`,
+a fifth doorbell test the plan's P1 missed, failed once the week rang for a past day — the session
+stopped and asked; it is rewritten as `aServingBackdatedIntoYesterdayRingsTheWidgetOnce`. **Made in the
+build, each in the ledger:** `WeekCorruption` internal (an internal `@Test` cannot take a private
+type — the plan's version did not compile); the stored `WaterSnapshot.weekTotals` `nonisolated` too,
+as spec R5 says and the plan dropped — RED warned without it; only `cardInset` and `cardPadding` lose
+`private`, as `widgetCard()` sits beside `widgetPane` and `WidgetCardBackdrop`; the link proved before
+Task 3, as spec §11.7 orders; the warning counter the corrected one (`tasks/lessons.md`, 2026-10-19).
+The pour button's stale "over the glass pane" comment fixed, as proposed beforehand. After the gate,
+one word of the sample's DocC: "five days met" was four.
+
+**Files touched.** `WaterBuddy/DataManager.swift`, `WaterBuddy/RootTabView.swift`,
+`WaterBuddy/Localizable.xcstrings`; `WaterBuddyWidget/WeekWidget.swift` (new),
+`WaterBuddyWidget/WaterBuddyWidget.swift`, `WaterBuddyWidget/WaterBuddyWidgetBundle.swift`,
+`WaterBuddyWidget/Localizable.xcstrings`; `WaterBuddyTests/WeekCacheTests.swift` (new),
+`WaterSnapshotTests.swift`, `DataManagerTests.swift`, `WaterLogTests.swift`, `EarlierServingTests.swift`,
+`LocalizationTests.swift`, `RootTabViewTests.swift`; `docs/AI_CONTEXT.md`, `docs/STATE.md`,
+`docs/WIDGET.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, `tasks/lessons.md`, this file.
+
+**Verification.** Every log is in the session's scratchpad, with `uptime`; loads are 1-minute averages.
+- **RED, then GREEN.** `WeekCacheTests` and `WeekSnapshotTests`: 19 tests, 17 failing on their own
+  expectations, the two the plan named green at RED; then 19 of 19. Seen to fail, then put back: the
+  reader without its count guard and range guard (four corruption cases), `snapshot` removing the key
+  (`readingACachedWeekLeavesTheStoreUntouched`), and the isolation keywords — `week(endingOn:calendar:)`
+  and the stored `weekTotals` warn at the off-actor suite's reads, `Key.weekTotals` in the reader, and
+  `readWeekTotals(from:)` is a compile **error** in `snapshot`. The whole target then read the four P1
+  tests and the fifth failing, nothing else; rebased and rewritten, 673 of 673. `AppTabTests` RED (the
+  `nil` link; every other URL opened History), then 8 of 8. `LocalizationTests` RED — the first RED
+  stayed green on the shared keys because the seven had landed in `welcomeKeys`; moved, 46 issues as
+  expected — then 24 of 24 with the catalogues in.
+- **The gate**, on a copy of the index (`git checkout-index`). Unit, *iPhone 17* (27.0):
+  `✔ Test run with 676 tests in 86 suites passed`; the attribute grep says 676. UI, *Gate 27*, by
+  chunk: `GoalSetupUITests` 19 with 1 skipped and 19, the other three classes 31 — **69, 0 failures**,
+  loads 4 to 72. UI, *Gate 26.5*: 19 with 1 skipped and **1 failure**,
+  `testAScreenComesBackWholeAfterItsTabIsLeft` — *Undo* never appeared after the first Glass,
+  `GoalSetupUITests.swift:162`, loads 4 to 15 — then 19 and 31 with none. Alone on *Gate 26.5*,
+  interleaved with a `HEAD` export: the change 3 of 3, `HEAD` 2 of 3, its failure the same line and
+  message, loads 7 to 58 (#140's note). Watch, *Watch 27*: `✔ Test run with 57 tests in 6 suites
+  passed`. `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`.
+- **Warnings**, clean builds of a `HEAD` export and of the index copy into empty folders, primary
+  lines only: the app scheme 35 = 35 (29 outside the tests, 19 = 19 by file and message — `HEAD` first
+  checked against `CLAUDE.md`'s figures), the widget scheme 29 = 29 (17 = 17), the watch scheme
+  2 = 2, the watch widget scheme 29 = 29 (17 = 17). None new, none gone.
+- **Measured** (a throwaway test in a copy, Debug, *iPhone 17*, loads 20 to 78): on disk, 90 days of
+  ten servings; 200 reads each through a fresh `ModelContext`, alternated — today's rows, median
+  0.14 ms (p90 0.36); the week's rows with the roll-up and the cache's encode and decode, median
+  **0.42 ms** (p90 0.82). What the week adds to one widget tap is under a millisecond.
+- **On the simulator**, *Probe 27* (27.0), a throwaway probe in a copy; every shot looked at.
+  - Before the new build had run, the gallery offered only Hydration, and the probe — counting pages
+    — added a third Hydration medium, later removed through its own menu. After a launch the
+    gallery offered *Week*, its sample at four of seven met.
+  - Placed: *Last 7 days*, *2 of 7*. With a Glass poured and a serving added to Sunday, History's
+    card read *Average 2,607 millilitres. Best 12,500 millilitres. Goal met on 2 of 7 days.* and the
+    widget's element the same; Sunday's bar grew from a sliver. At midnight, with nothing tapped,
+    the week turned to Wednesday–Tuesday, matching History's card day by day.
+  - The link: warm (the app on Home) and cold, History selected both times.
+  - Russian (*Последние 7 дней*, *2 из 7*, *Цель достигнута*) and Uzbek (*Oxirgi 7 kun*, *7 dan 2*,
+    *Maqsadga erishildi*) through the in-app picker, then English — what the device was left on, after
+    a first probe's restore had left it in Uzbek.
+  - Light and dark identical. The colour pairs, measured off the light shot at 3× against the lightest
+    patch beside each: none under its floor — the nearest the goal line over a track, 3.06:1, and the
+    title, 4.95:1 (`docs/DESIGN.md`, *The week widget, measured*).
+  - The empty state: on a simulator created for it and deleted after, the build installed and never
+    launched, the gallery found no WaterBuddy widget at all. So a throwaway build passing no week,
+    installed over the probe build: one line in English and Uzbek, two in Russian, uncut. The real
+    build reinstalled, the bars back.
+- **Not run**: VoiceOver, a narrow iPhone, a tinted Home Screen, the morning after on a phone, and
+  whether a phone offers the new widget before the updated app is opened (#149).
+
+**The final review, and its fixes.** A fresh read-only reviewer (opus) read the staged code against the
+spec, the plan's Review Focus and the ledger's rulings: nothing critical; the five focus cases held.
+Each finding was checked at its source and graded by what a person would get:
+- **Fixed — the type cap capped nothing** (Important). `WeekCard` had `.dynamicTypeSize(...accessibility1)`
+  inside its body, below its own `@ScaledMetric`, and every font is a ratio of that metric — known
+  issue #76's shape, from the plan's code; its comment said the type held still. RED by render on
+  *Probe 27*: AX1 and AX5 differed, and at AX5 the title more than doubled and pressed the bars to
+  slivers. The cap moved to `WeekView`, above the card. The first renders after the move were
+  pixel-identical to before — stale: a marker build with a red title did not show through
+  `xcodebuild test`'s install and did through `simctl install`. GREEN that way: AX5 pixel-identical to
+  AX1, the default size as before. The probe put back on `large`.
+- **Fixed — a week the reader rejects** (Minor, re-graded Important by effect). The series saturates
+  upward only, so a corrupt negative row reached the cache as a negative day, which
+  `readWeekTotals(from:)` discards: the widget saying to open the app forever, each pass rewriting
+  and ringing. `aCorruptNegativeServingIsClampedInTheCachedDay` RED (the reader's `nil`), then
+  `cacheWeek` clamps each day to `0...maximumDailyIntake`, as the `currentWater` setter does; GREEN, 20
+  of 20 in the two suites.
+- **Left, for the owner** — four minor findings. A day missing from the cache counts as news while
+  the reader draws it as zero, so a launch after two idle days reloads twice, with nothing drawn
+  changed (`(cached[day] ?? 0) != total` would close it). The extension's cache-only branch has
+  never run (#149). The setter's ring comes before `cacheWeek`'s write for a serving moved to
+  yesterday, which is safe because the reload is asynchronous. Two DocC lists of what constructing a
+  `DataManager` writes omit the week.
+- **The gate again**, on a fresh copy of the index after the fixes. Unit `✔ Test run with 677 tests in
+  86 suites passed`, the attribute grep 677. UI on *Gate 27*: 19 with 1 skipped, 19, 31 — **69,
+  0 failures**. On *Gate 26.5*: 19 with 1 skipped, 19, 31 — **69, 0 failures**. Loads 4 to 146,
+  another project's tests at the start. Watch `✔ Test run with 57 tests in 6 suites passed`. Both
+  widget schemes `** BUILD SUCCEEDED **`. Warnings, clean builds of the index against the `HEAD`
+  lists above: app 35 (29 outside the tests, 19 by file and message), phone widget 29 (17), watch 2,
+  watch widget 29 (17). None new, none gone.
+
+**Seen and left.** #149 opened (what only a device shows of the week widget, and the extension's
+write path), #150 (the week's two designed edges, spec §3.4), and a note on #76 (the shape, rendered
+for the first time). The gallery on the simulator offers no widget of an app that has not run, and
+`xcodebuild test`'s install does not redraw a placed widget (`tasks/lessons.md`).
+
+**Staging.** Read from the commands at 01:27 on 2026-10-20, after the session's last `git add`; this file
+is added again once this block is written. **No `git commit` was run.** HEAD `4c796a9`, 146 commits,
+`## main...origin/main`. **32 staged** — 30 modified, 2 added (`WaterBuddyTests/WeekCacheTests.swift`,
+`WaterBuddyWidget/WeekWidget.swift`): the ten `.claude/rules/` files with 1.3.1's approved wording,
+staged before this session; 6c's fourteen source, test and catalogue files; `docs/AI_CONTEXT.md`,
+`docs/DESIGN.md`, `docs/ROADMAP.md`, `docs/STATE.md`, `docs/WIDGET.md`, the plan,
+`tasks/lessons.md` and this file. **1 unstaged**: `.claude/settings.json` (the owner's). **1
+untracked**: `Screenshots/census/`. None in both. `/doc_sync` and `/commit` are the owner's.
+
+## [2026-10-20] — `/doc_sync` after 1.3.1's stage 6c: the counts move to eleven, and nine stale line citations
+
+**What changed.** The seventy-fourth pass of `docs/AI_CONTEXT.md`, run by the owner in the session that
+built 6c, before its `/commit`, so it describes the staged tree. No source or test file was written.
+6c's own records — *Current state*, the rows, #149 and #150, the widget and design sections, the
+checkpoint above — were written by the build and read again here against the staged code.
+
+**The command's checks.** 93 tracked and staged `.swift` files, 93 rows, every count compared with the
+staged file by one script: none stale. The script's pattern misses `WaterBuddyWatchWidgetBundle.swift`'s
+row, which ends at its count, as the seventy-third pass found; read by hand, 9 = 9. 677 `@Test`, 57 on
+the watch, 56 UI `func test`; every current statement of the phone figure says 677, the 654s all in
+dated blocks. `project.pbxproj` last changed in `eba1b1e`; its three exception sets, read this pass, are
+`CLAUDE.md`'s. 13 `static let`s on `DataManager.Key`, 11 on the phone with `weekTotals` and 2 on the
+watch. 18 rule names cited, 18 files. `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and
+`docs/dependencies.md` do not exist.
+
+**Drift found and fixed.**
+- **The key count.** `CLAUDE.md`'s storage table said ten keys; `docs/STATE.md` said ten in its stores
+  table, the watch's suite section, the migration paragraph and the roster test's paragraph. Each now
+  says eleven, with `weekTotals` named where it matters; the migration paragraph says why it is not
+  carried — born in the App Group, as `reviewRequestedVersion` was.
+- **The widget's configurations.** `CLAUDE.md`'s target table and `AI_CONTEXT.md`'s *Targets* row said
+  two `StaticConfiguration`s; three, with the week widget.
+- **`CLAUDE.md`** also gains: the extension's read of the rows in the storage table (it recomputes today
+  and the week in the same pass); 6c in the warning baseline's trail; the week in the snapshot bullet,
+  with the link; a bullet of its own — the week is cached, never authored; and the week widget among
+  the things placed by hand, with the two simulator facts this stage learned.
+- **Nine line citations stale since stage 5.** *The process role* in `AI_CONTEXT.md` — `role`, `Role` and
+  the seven guard sites — and `STATE.md`'s guard list and `role` comment still had stage 5's numbers;
+  re-derived by their words (`role` `:1647` → `:1787`; the sites now `:592`, `:1294`, `:1215`, `:1931`,
+  `:1042`, `:1103`, `:1531`). `ProcessRoleTests` `:519` → `:632`. Both sections note that
+  `republishHistory`'s guard is `draws || cachingTheWeek` since 6c.
+- **Known issues.** #50 gains its close: D1 done at the start of 6c, the tree now clean of Xcode's
+  rewrite. #149 and #150 get an *Opened by* line of their own, where they had sat under 6a's and 6b's.
+- **Headers.** `docs/AI_CONTEXT.md`'s pass log, and *Last updated* in `docs/STATE.md`, `docs/WIDGET.md`
+  and `docs/DESIGN.md`. `docs/ROADMAP.md` keeps no such line; 6c's status there was written by the
+  build.
+
+**Checked and left.** `docs/ROADMAP.md` — 1.3.1's entry carries 6c. `.claude/` — not derived; the staged
+rules already carry 6c's approved wording (rule `40-widget` names `WaterSnapshot.sample` where the code
+now has `sample(at:)` — the final review set it aside as doc drift; the rule is the owner's).
+
+**Lessons.** One added: line citations in a current section went stale across passes nobody
+re-derived.
+
+**Gate.** Not run for this pass. 6c's two gates, this session, are in the checkpoint above.
+
+**Files touched.** `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`,
+`docs/DESIGN.md`, `tasks/lessons.md`, this file.
+
+**Staging.** Read from the commands at 01:36 on 2026-10-20, after this pass's `git add` of its files
+by name; this file is added again once this block is written. **No `git commit` was run.** HEAD
+`4c796a9`, 146 commits, `## main...origin/main`. **33 staged** — 31 modified, 2 added: 6c's 32 and
+`CLAUDE.md`. **1 unstaged**: `.claude/settings.json` (the owner's). **1 untracked**:
+`Screenshots/census/`. None in both.

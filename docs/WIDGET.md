@@ -3,13 +3,21 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-20 (the seventy-fourth pass's `/doc_sync`, after roadmap item 1.3.1's stage
+6c, staged). **A fourth widget, `WeekWidget` (kind `WaterBuddyWeek`, medium), and a fifth snapshot
+field, `weekTotals`.** *The week widget* has its own section; the read path, the provider's sample and
+the bundle carry dated notes. Written by the build and read again in this pass against the staged
+code: the cap on the week's type sits in `WeekView` since the final review, and the section says so.
+
 **Last updated:** 2026-10-19 (the seventy-third pass's `/doc_sync`, after roadmap item 1.3.1's stages
 6a, committed in `5a46609`, and 6b, staged). **The Home Screen widget's view tree changed; no family,
 timeline, intent, kind or key did.** 6a: the pour button is the redesign's primary surface in full
 colour and white in the lit rim on a template. 6b: when iOS removes the container background —
 StandBy — the small family draws the bare layout, and its vessel has a quiet form under `.privacy`.
 *The two rendering modes*, *Layout* and *Accessibility* carry both, with dated notes where they said
-otherwise.
+otherwise. *(2026-10-20, written by the session that built 6c, staged: a fourth widget and a fifth
+snapshot field — *The week widget*, the read path's `weekTotals`, the bundle note under
+*Configuration*.)*
 
 **Last updated:** 2026-10-18 (roadmap item 1.3.4's records, then the seventy-second pass's
 `/doc_sync`). **No widget contract changed** — no family, timeline, intent, kind or view tree.
@@ -186,6 +194,10 @@ the Lock Screen button's floor too. Previously: twelfth pass — `/doc_sync` aft
 | Gallery name | `.configurationDisplayName("Hydration")`, the row above — the gallery reads no plist key for it. The extension's own bundle name is `CFBundleDisplayName = WaterBuddy Widget`, written by hand in `WaterBuddyWidget-Info.plist`. *(This row read `INFOPLIST_KEY_CFBundleDisplayName = Hydration` until the twentieth pass: no such build setting exists on this target — it has `GENERATE_INFOPLIST_FILE = NO` — and the only two in the project are the watch app's, `"Water Buddy"`.)* |
 | Info.plist | `WaterBuddyWidget-Info.plist` → `NSExtensionPointIdentifier = com.apple.widgetkit-extension` |
 
+*(2026-10-20, roadmap item 1.3.1's 6c, staged: the bundle lists **three** widgets and a control — this
+one, `WeekWidget` (*The week widget*, below) right after it, `LockScreenWidget` and `LogWaterControl`.
+This table is the Hydration widget's; the week widget's own is in its section.)*
+
 **Both gallery strings must stay static literals.** They are read by the system, not rendered by
 us, so WidgetKit cannot carry format arguments across that boundary: interpolating either — by the
 `LocalizedStringKey` or the `Text` overload, both were tried — traps the moment `body` is
@@ -225,6 +237,15 @@ open SwiftData (rule `40-widget`).
 | `language` | `resolveLanguage(in:)` | the widget has its own strings table and its own process; without this it draws the *device* language while the app draws the chosen one |
 | `serving` | `DataManager.usualServing(in:)` — `resolveServings(in:)[1]` with a name: the **middle** quick-add vessel, and the one definition the Siri shortcut (`LogServingIntent`, app-only) logs too | the vessels are user-editable, so the button's face and the amount it logs are no longer a constant both processes compile. They agree by reading one key instead |
 
+*(2026-10-20, roadmap item 1.3.1's 6c, staged: a fifth field, `weekTotals: [Int: Int]?`, resolved by
+`readWeekTotals(from:)` from `Key.weekTotals` — the last seven days by day ordinal, `nil` when absent or
+not a week this build wrote (a failed decode, a count other than seven, a day outside
+`0...maximumDailyIntake` — discarded whole). It crosses because the week widget may never open
+SwiftData. Defaulted, like `serving`, so every memberwise call builds unchanged; `nonisolated`. Drawn
+only through `week(endingOn:calendar:)`, which walks `DaySummary.window` — History's own walk — and
+takes the day of `instant` from `currentWater`, so the midnight entry, `rolledOver()`, shifts the week
+by itself. The snapshot still writes nothing: `readingACachedWeekLeavesTheStoreUntouched`.)*
+
 `serving` is the newest and the one to reason about carefully: it is why `PourButton` takes an
 `Int` and builds `AddWaterIntent(amount:)` rather than `init()`. Taking it from the snapshot rather
 than resolving it live in the extension is deliberate — the face is rendered into an archive ahead
@@ -247,7 +268,10 @@ unchanged; both widget schemes built with no new warning.)*
 
 `WaterSnapshot.sample` is **1,150 of 2,000** — past halfway, so the water has a visible surface and
 the readout has two digits. A brand-new install would otherwise advertise itself with an empty
-vessel.
+vessel. *(2026-10-20, 1.3.1's 6c, staged: now `WaterSnapshot.sample(at:)`, the same 1,150 of 2,000 and
+a week — 2,100 · 1,600 · 2,000 · 2,300 · 1,200 · 2,050 · 1,150, four days met — keyed by the days
+ending on the date it is asked for, so the week widget's gallery shows bars rather than its empty
+state. `placeholder(in:)` and `getSnapshot(in:)`'s preview both take it at `Date()`.)*
 
 ### The timeline
 
@@ -302,7 +326,9 @@ above). So nothing in this extension reaches `glassEffect`. *(Read "answers `.ha
 `.flat` base on every OS" until the twentieth pass, which left Reduce Transparency out.)* The widget's
 own pass of the redesign is stage 6 — roadmap item 1.3.1 — *(seventy-third pass: 6a, the pour
 button, committed in `5a46609`; 6b, StandBy, staged; 6c, the week, not built. This sentence read
-"is stage 6 and is not built" until then.)*
+"is stage 6 and is not built" until then.)* *(2026-10-20: 6b committed in `ed77d9f`; 6c, the week
+widget, built and staged — its card goes through the same `WidgetPane`, `.archived`, never
+`glassEffect`.)*
 
 **Anything else** — a tinted Home Screen, and StandBy at night, where the mode is **inferred** to be
 `.vibrant` (spec 2026-10-19 §3.3; the SDK says nothing of StandBy). The system treats the whole
@@ -633,6 +659,56 @@ three languages and at three digits. **Not proved:** the **+** (`linkd` refuses 
 extension, #63), the quiet form, and what VoiceOver says — SpringBoard's XCUITest tree lists the drawn
 texts beneath each combined element whatever the flags (#70). The owner's device check (spec §7.5) is
 the proof.
+
+## The week widget
+
+*Added 2026-10-20 — roadmap item 1.3.1's stage 6c, built and staged, not committed.* History's week
+card at widget size, on the Home Screen
+(`docs/superpowers/specs/2026-10-19-the-widget-stage-design.md` §3.4–§3.6).
+
+| | |
+|---|---|
+| Type | `StaticConfiguration`, in `WeekWidget.swift` |
+| `kind` | `"WaterBuddyWeek"` (`WeekWidget.kind`) — permanent once shipped |
+| Families | `.systemMedium` only |
+| Provider | `HydrationProvider` — the Hydration widget's, never a second one: one snapshot, one midnight, one reload |
+| Entry view | `WeekView` → `WeekCard`, drawn with `widgetCard()`, the card the Hydration widget draws |
+| `configurationDisplayName` | `"Week"` — **static literal** |
+| `description` | `"Your last seven days against your goal."` — **static literal**, no figure |
+| Content margins | `.contentMarginsDisabled()`, `HydrationView.cardInset` around the card |
+| Link | `.widgetURL(WidgetLink.history)` — `waterbuddy://history`, answered in `RootTabView` by `AppTab(link:)`; **no URL scheme is registered**, and none is needed for a widget's own app (proved warm and cold on the simulator before any code) |
+
+**What it draws.** `entry.snapshot.week(endingOn: entry.date, calendar: .waterBuddyDay)`: the title
+*Last 7 days*, the days met over *Goal met* (*2 of 7*, through `%1$@ of %2$@` as History draws it), seven
+bars on white 0.10 tracks — cyan for a met day, white for the rest, a 2-pt sliver for an empty day and
+4 pt at least for any water — against a 1.5-pt dashed goal line at white 0.62, and the narrow weekday
+letters, today's heavier. The scale is the goal or the best day, whichever is larger, so a met bar
+always stands at or above the line. **No button.** When the snapshot's week is `nil` it says *Open
+WaterBuddy to see your week.* — two lines allowed — and draws no bars, never a week of zeros.
+
+**Rendering modes.** The card is the same `WidgetPane` over `.archived` as the Hydration widget's; on a
+template a met bar is `.widgetAccentable()`. Not placed on a tinted Home Screen yet (#149).
+
+**Accessibility.** One element: label *Last 7 days*, value History's sentence — *Average 2,607
+millilitres. Best 12,500 millilitres. Goal met on 2 of 7 days.* — or, with no week, the line it
+draws. Type is capped at `.accessibility1` — **in `WeekView`, above the card**, because the card's own
+`@ScaledMetric` reads the environment from above it, and every font in it is a ratio of that metric.
+Written first inside the card's body, as the medium column's still is (#76), it capped nothing: at AX5
+the title more than doubled and pressed the bars to slivers. Moved after the final review, and rendered
+before and after; at AX5 the widget is now pixel-identical to AX1. With `.lineLimit(1)` and
+`.minimumScaleFactor(0.6)` beside it.
+
+**Measured on the simulator** (2026-10-20, *Probe 27*, iOS 27.0): the gallery shows the sample, four
+days met; the placed widget agreed with History's card day by day, took a serving added to Sunday,
+turned over at midnight with nothing tapped, opened History warm and cold, and drew Russian and
+Uzbek. The colour pairs are in `docs/DESIGN.md`. **On the simulator the gallery offered none of an
+app's widgets until the app had run once**, and that run writes the week, so the empty state was
+seen only in a throwaway build (#149).
+
+**Localisation.** Seven keys in the widget's catalogue, all in `sharedKeys`: *Week*, *Your last seven
+days against your goal.* and *Open WaterBuddy to see your week.* (new in both catalogues), and *Last
+%1$d days*, *Goal met*, *%1$@ of %2$@* and History's spoken sentence, copied from the app's with their
+plural forms.
 
 ## The Control Center control
 

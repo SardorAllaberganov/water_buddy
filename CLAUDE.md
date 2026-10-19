@@ -7,7 +7,7 @@
 > | Target | Status |
 > |---|---|
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
-> | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: two `StaticConfiguration`s over one provider — the Home Screen widget and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
+> | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: three `StaticConfiguration`s over one provider — the Home Screen widget, the week widget (`WeekWidget`, medium, a tap opens History) and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
 > | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
@@ -56,8 +56,8 @@ design:**
 
 | Store | Holds | Read by |
 |---|---|---|
-| SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared`; never the widget's draw path |
-| `UserDefaults` — ten keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in — a **derived cache** | the app *and* the widget |
+| SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared` (which recomputes today and the week from the rows in the same pass); never the widget's draw path |
+| `UserDefaults` — eleven keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget's draw path never opens
@@ -163,7 +163,9 @@ something to record.
   fix on 2026-10-18, measured on its working tree against a clean build of a `HEAD` export,
   unchanged by roadmap item 1.3.4 the same day, measured on a copy of its index against a clean build
   of a `HEAD` export, and unchanged by roadmap item 1.3.1's stages 6a and 6b on 2026-10-19, 6b
-  measured the same way — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
+  measured the same way, and by 6c on 2026-10-20, measured on two copies of its index — before and
+  after its final review's fixes — against a clean build of a `HEAD` export, on all four schemes
+  — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
   `WaterBuddyTests` files (80
@@ -185,7 +187,10 @@ something to record.
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
   widget on the Home Screen after any change to storage, entitlements, target membership or the
   widget's view tree — the Lock Screen widget on the Lock Screen too, the control in Control
-  Center, and the same for the watch face's complication, which no part of the automated gate renders.
+  Center, the week widget on the Home Screen and tapped into History, and the same for the watch
+  face's complication, which no part of the automated gate renders. On the simulator the gallery
+  offers no widget of an app that has not run, and a placed widget redraws from a new build after
+  `xcrun simctl install`, not after `xcodebuild test`'s own install (`tasks/lessons.md`, 2026-10-20).
   The small widget's StandBy layout cannot be placed at all on a simulator, which has no StandBy:
   draw it through its `#Preview`, and take it into StandBy on a device, by day and at night
 - Ask yourself: "Would a staff engineer approve this?"
@@ -258,7 +263,18 @@ something to record.
   `DataManager.snapshot()` — today's total and what is left, through `WaterSnapshot.remaining` and
   `hasReachedGoal` — writes nothing, and answers a locked iPhone only after authentication
   (`docs/superpowers/specs/2026-10-18-todays-water-design.md`, rule `70-privacy`). It is the one Siri
-  reply that carries figures; *Log a Glass*'s stays fixed and digit-free
+  reply that carries figures; *Log a Glass*'s stays fixed and digit-free. **The week widget reads it
+  too:** `WaterSnapshot.weekTotals`, the cached `Key.weekTotals`, drawn through
+  `week(endingOn:calendar:)` with today taken from the total; its tap opens History through
+  `WidgetLink.history`, answered by `AppTab(link:)` — no URL scheme registered
+  (`docs/superpowers/specs/2026-10-19-the-widget-stage-design.md`)
+- **The week is cached, never authored.** `Key.weekTotals` is rewritten from the rows exactly where
+  today's total is recomputed — `init` and `saveAndRecompute()`, through `recomputeTodayAndTheWeek()`,
+  in the app and the widget extension alike, so the extension's tap the morning after keeps
+  yesterday. Never by `refresh()` or `dayDidTurn()`, never from a failed read, never when unchanged;
+  each day clamped on the way in and the whole week validated on the way out. One widget doorbell a
+  pass: the `currentWater` setter rings for today, the week only when it was missing or a past day
+  moved (rule `20-state`)
 - **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
   fresh install, the one-shot migration, the seed from a cached total, drawing the history and
   the streak, and filing reminders are all guarded by `DataManager.role` — seven sites, the
