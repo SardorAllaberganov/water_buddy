@@ -4,6 +4,22 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-20 (seventy-fifth pass — `/doc_sync` run by the owner in the session that
+opened roadmap item 1.3.2, during its plan's preconditions, before any of its code). HEAD `06229be`:
+1.3.1 is committed whole — 6c as `fb1af96`, its doc sync as `cdc53da`, the ten rule files' wording as
+`06229be` — so the block below it in *Current state* is history. 1.3.2's spec and plan are written and
+approved, and untracked until this pass stages them. The command's checks: 93 tracked `.swift` files
+(90 in the seven target folders, 3 in `Tools/`), each with its row, no source file changed since the
+seventy-fourth pass; 677 `@Test`, 57 on the watch, 56 UI `func test`; `project.pbxproj` last changed
+in `eba1b1e`, its three exception sets six files each as `CLAUDE.md` gives them; 13 keys on
+`DataManager.Key` (11 phone, 2 watch — `prefix` and `all` are not keys); every cited rule resolves; no
+`docs/ARCHITECTURE.md`, `CAPABILITIES.md` or `dependencies.md`. Changed: this block; *Current state*
+gains 1.3.2's block and 6c's its commits; #77 and #90 gain notes; *Git* gains this pass's block.
+`docs/ROADMAP.md`: 1.3.1 committed, 1.3.2 begun. The redesign spec's status line gains a dated note.
+`CLAUDE.md`: the warning trail gains this session's measurement of `HEAD`. `docs/STATE.md`,
+`docs/WIDGET.md` and `docs/DESIGN.md` were checked and left — no key, widget contract or token moved.
+Gate: not run in this pass; the one clean build it read is in `HISTORY.md`.
+
 **Last updated:** 2026-10-20 (seventy-fourth pass — `/doc_sync` after roadmap item 1.3.1's stage 6c,
 run by the owner in the session that built it, before its `/commit`). HEAD `4c796a9`: 6b and its doc
 sync were committed (`ed77d9f`, `4c796a9`); 6c is staged, its records written by the build itself —
@@ -1969,9 +1985,36 @@ issue #15.
 
 ## Current state
 
+**Roadmap item 1.3.2, the watch's stage, is begun: spec and plan approved, preconditions under way, no
+code yet** (2026-10-20; HEAD `06229be`). Written by the seventy-fifth `/doc_sync`, not by a build.
+
+- **What it is.** The premium redesign's stage 7 plus two complication families, in three sub-stages,
+  each gated and committed on its own: **7a**, Apple's glass on the watch; **7b**, the canvas's screen
+  — the vessel a display showing the percentage, *1,300 of 2,000 ml* under it, a row of Cup, Glass
+  and Bottle with the Glass as the primary surface, the *More* sheet gone; **7c**, rectangular and
+  corner faces beside the circular one, display-only, all reading one `WristPlan.Face` with the
+  screen, every figure `.privacySensitive()` with a quiet form. Spec
+  `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md`; plan
+  `docs/superpowers/plans/2026-10-20-the-watch-stage.md`; both approved by the owner today.
+- **Rulings.** D6 kept as approved on 2026-10-09: a watchOS 26 runtime is installed before the stage
+  is measured, and the watch tests run on 26.x as well as 27.0 — the roadmap's "26 or later" reading
+  is retired. Three families (no inline); display-only (no second writer to the watch's suite);
+  redaction on all three, the circular face included; approach A. No key, wire field, entitlement or
+  exception set moves.
+- **Done.** The plan's P2 (the five catalogues clean; WaterBuddy not open in the running Xcode) and P3.
+  P1 in part: five probe watches made (#90). P4 in part: a clean `build-for-testing` of a `HEAD`
+  export, `-scheme WaterBuddy`, gives 35 unique primary warning lines — 29 outside the tests, 6 in two
+  test files — `CLAUDE.md`'s figure; the three other schemes are not measured yet.
+- **Waiting.** The watchOS 26.x runtime is not on this Mac — `xcrun simctl runtime list` shows
+  watchOS 27.0 and 11.5 only (#77). The gate's watch device on it and the 26.x probe watch are not
+  made. The rule wording of the spec's §5 (the plan's Task 0) is not typed. A command that bundled
+  `chmod`, which `.claude/settings.json` denies, was refused, and the session stopped on it, as
+  `CLAUDE.md` says; resuming needs the owner's word.
+
 **Roadmap item 1.3.1, the widget's stage: 6c — the week in the cache, the *Week* widget and its link
 to History — is built, gated and staged, not committed** (2026-10-19/20; HEAD `4c796a9`, where 6b and
-its doc sync are committed, `ed77d9f` and `4c796a9`). Written by the session that built it, not a
+its doc sync are committed, `ed77d9f` and `4c796a9`). *(Seventy-fifth pass: committed — 6c as
+`fb1af96`, its doc sync as `cdc53da`, the rule wording as `06229be` — so the block below is history.)* Written by the session that built it, not a
 `/doc_sync` pass. The plan's Tasks 3–7, run inline; the ten rule files with §5's approved wording
 are still staged from before.
 
@@ -4402,6 +4445,14 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
+**Read at 12:39 on 2026-10-20, in the seventy-fifth pass, after its `git add` of its eight files by
+name: `06229be`, 149 commits, level with `origin/main`; 8 staged — 6 modified, 2 added — 1 unstaged, 1
+untracked entry, none in both.** Staged: this pass's `CLAUDE.md`, this file, `docs/ROADMAP.md`, the
+redesign spec's status note, `tasks/lessons.md` and `HISTORY.md`, and roadmap item 1.3.2's spec and
+plan (added). Unstaged: `.claude/settings.json` (the owner's). Untracked: `Screenshots/census/`. 1.3.1
+and its records were committed after the seventy-fourth pass: `fb1af96`, `cdc53da`, `06229be`. This
+file and `HISTORY.md` are added again once their blocks are written. No `git commit` in this pass.
+
 **Read at 21:43 on 2026-10-19, in the seventy-third pass, after its `git add` of its six files by
 name: `5a46609`, 144 commits, level with `origin/main`; 18 staged, all modified, 6 unstaged, 1
 untracked entry, none in both.** Staged: roadmap item 1.3.1's approved rule wording in ten
@@ -6304,6 +6355,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
       instead. The two `simctl erase` lines were given to the owner twice and had not run when this
       was written. No watchOS 26 runtime is installed either, so the redesign's watch stage cannot be
       rendered or tested here.
+    - **2026-10-20, the seventy-fifth pass.** Roadmap item 1.3.2 keeps D6 as approved — a watchOS 26
+      runtime before the watch's stage is measured (its spec §3.2). The owner reported the runtime
+      installed; `xcrun simctl list runtimes` and `xcrun simctl runtime list`, read after, show
+      watchOS 27.0 and 11.5 only, so it is not on this Mac yet — perhaps still downloading. 7a's code
+      and failing tests may start on 27.0 without it; its measurements and the gate's watch run on
+      26.x may not.
 
 **Opened by the owner's device report of 2026-10-09 (the forty-first pass):**
 
@@ -6638,6 +6695,14 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     the delete-path probe and hold one each; the *Gate* devices hold the servings each UI run
     pours. The session's scratch folder is 4.4 GB, most of it result bundles and two build
     folders; the data volume read 87 % used, 59 GiB free, at the end.
+    **2026-10-20, the seventy-fifth pass: five more, for roadmap item 1.3.2's renders** (its plan's
+    P1), all on watchOS 27.0, unpaired, each booted once and shut down by its id — *WaterBuddy Probe
+    Watch 40* (SE 3 40mm, `C60FBB91-334A-45EC-AB3A-82FDA4991970`), *… 42* (Series 12 42mm,
+    `DC08267C-81BF-491A-9A4B-309694EAF9AF`), *… 44* (SE 3 44mm, `08E01774-734C-4ED1-9BA1-E54F80041CD7`),
+    *… 46* (Series 12 46mm, `EA3FF10C-2EC4-4377-A055-8D20D2AD64D9`) and *… 49* (Ultra 4 49mm,
+    `EDFA3558-DF3C-42B6-8CCA-2EEC46D1B20A`). Nothing installed on them yet. *WaterBuddy Watch 26* and
+    *WaterBuddy Probe Watch 26* wait for the runtime (#77). *WaterBuddy Probe 27*, found booted, was
+    shut down by its id; *WareStack 18.6*, another project's, was left as it was.
 91. **What the final review of stage 1 found and nothing was done about** — smaller things, each the
     owner's or a later stage's:
     **2026-10-11: (a) is retired — fixed on disk, staged in stage 2 — and two of (d)'s three

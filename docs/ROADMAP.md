@@ -207,10 +207,19 @@ The owner ruled one test the plan missed, rewritten. The link needs no URL schem
 median 0.42 ms to a widget tap. What only a device shows of it — VoiceOver, a narrow iPhone, a
 tinted Home Screen, the morning after, and whether a phone offers the new widget before the updated
 app is opened — joins 1.2.7's sweep as known issue #149; the week's two designed edges are #150.)*
+*(2026-10-20, later: **1.3.1 is committed whole** — 6c as `fb1af96`, its doc sync as `cdc53da`, the ten
+rule files' wording as `06229be`.)*
 
 **1.3.2 — The watch** needs a watchOS 26 or later runtime to render the redesign's watch stage
 (decision D6); watchOS 27.0 is installed. The new complication families read the watch's own suite,
-as the circular one does.
+as the circular one does. *(2026-10-20: **begun.** Spec
+`docs/superpowers/specs/2026-10-20-the-watch-stage-design.md` and plan
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md`, approved by the owner: three sub-stages — 7a,
+Apple's glass on the watch; 7b, the canvas's screen with a row of three pour buttons; 7c, rectangular
+and corner faces beside the circular one, display-only, redacted when watchOS asks. The owner kept D6
+as first approved — a watchOS **26** runtime before the stage is measured, so "26 or later" above is
+superseded — and that runtime is not yet on this Mac (known issue #77). No code yet; the rule wording
+for six files is the plan's first step.)*
 
 **1.3.3 — Apple Health.** Each serving written as dietary water, and removed when the serving is
 deleted or edited. Whether it also *reads* water other apps logged is the design's first question.

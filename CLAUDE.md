@@ -164,7 +164,9 @@ something to record.
   unchanged by roadmap item 1.3.4 the same day, measured on a copy of its index against a clean build
   of a `HEAD` export, and unchanged by roadmap item 1.3.1's stages 6a and 6b on 2026-10-19, 6b
   measured the same way, and by 6c on 2026-10-20, measured on two copies of its index — before and
-  after its final review's fixes — against a clean build of a `HEAD` export, on all four schemes
+  after its final review's fixes — against a clean build of a `HEAD` export, on all four schemes,
+  and read again from a clean build of a `HEAD` `06229be` export later that day, before roadmap item
+  1.3.2, `-scheme WaterBuddy` alone: 35 = 29 + 6
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two

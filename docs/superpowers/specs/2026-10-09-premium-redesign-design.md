@@ -2,7 +2,11 @@
 
 **Status:** the look was approved by the owner in conversation on 2026-10-09, on a canvas of twelve
 boards ("ok"), and **this document was approved by the owner the same day ("ok, approve all")**, with
-all seven decisions of §13 taken as recommended. Nothing is implemented yet. Stage 1's plan is
+all seven decisions of §13 taken as recommended. Nothing is implemented yet. *(2026-10-20, the
+seventy-fifth `/doc_sync`: that sentence is long stale — stages 1 to 6 are built and committed, the
+last as roadmap item 1.3.1 (`docs/ROADMAP.md` §2–§4), and stage 7, the watch, is begun as roadmap item
+1.3.2 under its own spec, `2026-10-20-the-watch-stage-design.md`, which keeps D6 as written here.)*
+Stage 1's plan is
 `docs/superpowers/plans/2026-10-09-premium-redesign-stage-1.md`; writing it moved three items between
 stages, recorded in §3.2 and §14.
 

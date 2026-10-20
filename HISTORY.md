@@ -11129,3 +11129,80 @@ by name; this file is added again once this block is written. **No `git commit` 
 `4c796a9`, 146 commits, `## main...origin/main`. **33 staged** — 31 modified, 2 added: 6c's 32 and
 `CLAUDE.md`. **1 unstaged**: `.claude/settings.json` (the owner's). **1 untracked**:
 `Screenshots/census/`. None in both.
+
+## [2026-10-20] — `/doc_sync` during 1.3.2's preconditions: 1.3.1 committed, the watch's stage begun
+
+### What
+
+The seventy-fifth pass, run by the owner in the session that opened roadmap item 1.3.2 — after its
+spec and plan were approved and part of the plan's preconditions run, before any of its code. No source
+or test file changed since the seventy-fourth pass; the pass records where the work stands.
+
+- **1.3.1 is committed whole**: 6c as `fb1af96`, its doc sync as `cdc53da`, the ten rule files' wording
+  as `06229be` — the seventy-fourth pass recorded 6c as staged. `docs/AI_CONTEXT.md`'s 6c block and
+  `docs/ROADMAP.md`'s 1.3.1 entry gain the commits.
+- **1.3.2 is begun.** The spec, `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md`, and
+  the plan, `docs/superpowers/plans/2026-10-20-the-watch-stage.md`, were approved by the owner today.
+  Three sub-stages: 7a, Apple's glass on the watch; 7b, the canvas's screen — the vessel a display, the
+  millilitre line under it, a row of Cup, Glass and Bottle with the Glass as the primary surface;
+  7c, rectangular and corner faces beside the circular one, display-only, all reading one
+  `WristPlan.Face`, every figure redacted when watchOS asks. `docs/AI_CONTEXT.md` gains a block for it
+  at the head of *Current state*; `docs/ROADMAP.md` an entry.
+- **The redesign spec's status line** still read "Nothing is implemented yet" with six stages built;
+  it gains a dated note (`tasks/lessons.md`, 2026-10-06: a spec's status line is a claim).
+- **#77** gains a note: the owner reported the watchOS 26 runtime installed, and `simctl` shows
+  watchOS 27.0 and 11.5 only. **#90** gains the five probe watches made today, with their ids.
+- **`CLAUDE.md`'s warning trail** gains this session's read of `HEAD`: 35 = 29 + 6.
+- **Two lessons**: one denied word refused a whole compound command; a build log names `/tmp` where
+  the scratchpad resolves `/private/tmp`. The plan's warning-comparison block had the second flaw and is
+  corrected to strip by each export folder's own name; its preconditions gain a dated note.
+
+### The rulings this rests on
+
+- The owner, today: D6 kept as approved on 2026-10-09 — a watchOS 26 runtime before the watch's stage
+  is measured; three families, no inline; every face display-only; redaction on all three; approach A
+  in three sub-stages; the rectangle's header, line and bar; the spec and the plan approved.
+- `CLAUDE.md`'s hard limit: a denied tool call is a stop. The session stopped on the refused `chmod`
+  and asked; the owner's next word was this `/doc_sync`.
+
+### What was run in the session, and what it showed
+
+- **P2:** `git diff --stat` over the five catalogues printed nothing; Xcode was running with
+  *AvtoLog* and *WareStack* open, not WaterBuddy (asked of Xcode through `osascript`).
+- **P1, in part:** `xcrun simctl create` made *WaterBuddy Probe Watch 40, 42, 44, 46, 49* on watchOS
+  27.0; each booted (`bootstatus -b` exit 0) and was shut down by its id. *WaterBuddy Probe 27* was
+  shut down by its id; *WareStack 18.6*, another project's, was left booted.
+- **P4, in part:** a clean `build-for-testing` of a `git archive HEAD` export at `06229be`,
+  `-scheme WaterBuddy`, iOS 27.0 *iPhone 17*, empty DerivedData: `** TEST BUILD SUCCEEDED **`, 35
+  unique primary warning lines with line numbers — 21 in `DataManager.swift`, 6 in
+  `NotificationManager.swift`, 2 in `WristView.swift`, 4 in `ReminderPlanTests.swift`, 2 in
+  `NotificationManagerTests.swift`; 19 by file and message. The watch, watch widget and phone widget
+  schemes were not measured.
+
+### What the pass checked and left
+
+- 93 tracked `.swift` files (90 in the seven target folders, 3 in `Tools/`), none changed since the
+  last pass, so no row's count moved; 677 `@Test`, 57 on the watch, 56 UI `func test`;
+  `project.pbxproj` last changed in `eba1b1e`, the three exception sets six files each; 13 keys on
+  `DataManager.Key`, 11 phone and 2 watch, as `CLAUDE.md` and `docs/STATE.md` say; every cited rule
+  resolves; no `docs/ARCHITECTURE.md`, `CAPABILITIES.md` or `dependencies.md`.
+- `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: no key, widget contract or token moved.
+  `docs/DESIGN.md` dates watchOS 27.0's install to 2026-10-09 where #77 records it under 2026-10-10;
+  which is right is not established here, so neither was changed.
+
+### Files touched
+
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/ROADMAP.md` ·
+`docs/superpowers/specs/2026-10-09-premium-redesign-design.md` ·
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md` · `tasks/lessons.md` · `HISTORY.md`. Staged with
+them, unchanged by this pass: `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md`.
+
+### Gate
+
+Not run in this pass, and no gate was run in the session.
+
+**Staging.** Read from the commands at 12:39 on 2026-10-20, after this pass's `git add` of its files
+by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No
+`git commit` was run.** HEAD `06229be`, 149 commits, `## main...origin/main`. **8 staged** — 6
+modified, 2 added (1.3.2's spec and plan). **1 unstaged**: `.claude/settings.json` (the owner's).
+**1 untracked**: `Screenshots/census/`. None in both.

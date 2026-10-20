@@ -4247,3 +4247,28 @@ compares. 6c's own records cited the file without noticing the old numbers besid
 **The rule:** when a change moves lines in a file whose lines the docs quote, the sync finds every
 `file.swift:NNNN` and `` `:NNNN` `` in a *current* section (not a dated note) and re-derives each one by
 its words with `grep -n`. Historical notes keep the numbers they had.
+
+## 2026-10-20 — One denied word refused a whole compound command
+
+**What happened.** Measuring roadmap item 1.3.2's warning baseline, one `Bash` call wrote a small
+log-filtering script into the scratchpad, `chmod +x`-ed it, ran it, and then started a clean build.
+`.claude/settings.json` denies `Bash(chmod:*)`, so the whole call was refused — the build with it — and
+the session stopped, as `CLAUDE.md`'s hard limit requires. Nothing about the work needed `chmod`: a
+scratch script runs as `zsh file.sh` or `python3 -I file.py`. The same plan had first written
+`xcrun simctl spawn … defaults write` for a probe simulator's settings, which `Bash(defaults write:*)`
+denies too; that line was rewritten before the plan was approved, for another reason.
+
+**The rule:** read the deny list in `.claude/settings.json` before writing a plan's commands or a
+compound call, and never put a denied verb in one — not even in a step that does not need it. A refused
+call is a stop, not a puzzle to work around.
+
+## 2026-10-20 — A build log names `/tmp`, where the scratchpad resolves `/private/tmp`
+
+**What happened.** The warning comparison strips each export's root from the compiler's paths before
+it compares HEAD with the index. With the export at `$S/head` and `$S` spelled `/private/tmp/…`, the
+log printed every path as `/tmp/…/head/…`, so `s|$H/||` and `s|/private$H/||` both matched nothing and
+the list kept absolute paths. Two such lists, from two export folders, would differ on every line, and
+the comparison would report every warning as new — or, cut differently, hide a real one.
+
+**The rule:** strip by the export folder's own name (`s|^.*/head/||`), and look at three lines of the
+stripped list before trusting a comparison built on it.
