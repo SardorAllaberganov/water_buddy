@@ -166,7 +166,9 @@ something to record.
   measured the same way, and by 6c on 2026-10-20, measured on two copies of its index — before and
   after its final review's fixes — against a clean build of a `HEAD` export, on all four schemes,
   and read again from a clean build of a `HEAD` `06229be` export later that day, before roadmap item
-  1.3.2, `-scheme WaterBuddy` alone: 35 = 29 + 6
+  1.3.2, `-scheme WaterBuddy` alone: 35 = 29 + 6, and unchanged by 1.3.2's stage 7a the same day,
+  measured on a copy of its index against a clean build of a `HEAD` `ff7305b` export, on all four
+  schemes — the watch's 2 and both widget schemes' 29 included
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two

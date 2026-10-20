@@ -11206,3 +11206,170 @@ by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks ar
 `git commit` was run.** HEAD `06229be`, 149 commits, `## main...origin/main`. **8 staged** — 6
 modified, 2 added (1.3.2's spec and plan). **1 unstaged**: `.claude/settings.json` (the owner's).
 **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-20] — Roadmap item 1.3.2, stage 7a: Apple's glass on the watch
+
+### What
+
+The watch draws Apple's glass. Built in the main loop from the plan
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md`, its P4 and Tasks 0–3, tests first, on HEAD
+`ff7305b`.
+
+- **`WaterBuddy/LiquidGlassModifier.swift`** (shared): `LiquidGlass.systemGlassAvailable`,
+  `sampling(_:)` with the `systemGlass` property behind it, and `GlassGroupModifier` check
+  `#available(iOS 26.0, watchOS 26.0, *)`; every `#if os(iOS)` round them is gone. On the watch,
+  whose floor is 26.0, the flag is always true. Six DocC passages that put the watch on the
+  hand-made stack, or the glass on iOS alone, now say what is true — the type's `Interaction` note,
+  `systemGlassAvailable`, the scrim's watch clause (its `onPhone: false` answer is reached by no
+  production pane, kept for the test that asks), the modifier's own list, `sampling(_:)` (which now
+  names `theWatchDrawsAppleGlass`), `GlassGroupModifier`. On iOS every branch answers as
+  before.
+- **`WaterBuddyWatch/WristView.swift`**: the *More* capsule and the serving sheet's rows pass
+  `interactive: true`, so on Apple's glass they take the regular, tinted variant, not the clear one
+  under a label — known issue #91(b), retired.
+- **`WaterBuddyWatchTests/WristGlassTests.swift`**, new: `theWatchDrawsAppleGlass`, the watch's
+  half of `theAvailabilityFlagMatchesTheRunningSystem`.
+- **`WaterBuddyTests/LiquidGlassTests.swift`**: two DocC comments that said the watch draws the
+  hand-made stack corrected. No assertion moved.
+- **The rule wording of spec §5**, typed into six rule files (`00-workspace`, `15-project`,
+  `60-design-system`, `65-accessibility`, `70-privacy`, `85-testing`), approved by the owner, then
+  amended to the runtime ruling below. **Unstaged**, for its own `chore(claude)` commit.
+
+### The rulings this rests on
+
+- The owner, "ok": §5's wording as typed. The two count sentences of `85-testing` that the plan
+  leaves alone ("these five invocations", "the test half is three invocations") were raised and left.
+- The owner, "maybe you will change the runtime for different one that is exists": **the watchOS
+  26.x half is withdrawn.** The runtime never arrived (`simctl` showed watchOS 27.0 and 11.5, read
+  twice), and 11.5 is below the watch's 26.0 floor. Every measurement and run is on watchOS 27.0
+  alone; the gate stays five invocations; what 26.x would show is known issue #151. The typed
+  wording of `15-project` (the watch run-verified on 27.0 only), `60-design-system` (no "both watch
+  runtimes") and `85-testing` (no sixth invocation) was amended, and the spec (§3.2) and the plan
+  (P1) carry dated notes.
+- The owner, "go", on the recommendation: **the tint stays `0.64`** — the plan's Task 2 Step 4,
+  second branch. The only pairs 7a moved under their floor are the sheet's `.secondary` amounts, and
+  7b deletes the sheet.
+
+### What was run, and what it showed
+
+- **P4, the warning baseline** — clean builds of a `HEAD` `ff7305b` export (code identical to
+  `06229be`), each into an empty folder: `WaterBuddyWatch` 2 primary lines (2 by file and message,
+  `WristView.swift`'s *'Combine' was not imported*); `WaterBuddyWatchWidget` 29 (17);
+  `WaterBuddyWidgetExtension` 29 (17), the same list — both build all four targets. No `actool`
+  line this time (#36).
+- **RED**, *WaterBuddy Watch 27* (27.0), 13:10: `✘ … WristGlassTests.swift:21:9: Expectation failed:
+  LiquidGlass.systemGlassAvailable`, the floor expectation passing — a wrong value, not a compile
+  error. **GREEN**, 13:12: `✔ Test run with 1 test in 1 suite passed`. The phone's five glass suites
+  (`LiquidGlassInteractionTests`, `…BaseTests`, `…RoutingTests`, `…ScrimTests`, `PrimarySurfaceTests`):
+  `✔ Test run with 25 tests in 5 suites passed`, no warning naming the glass file. Both widget
+  schemes built.
+- **The renders** — a probe copy of the working tree, and of the `HEAD` export, each with the plan's
+  `WristProbe` seed and switches; *WaterBuddy Probe Watch 46* (Series 12 46mm, 27.0). Eight captures
+  of 7a — the vessel at 0% and 62%, the capsule, the sheet, each again under the probe's forced
+  Reduce Transparency — and three of `HEAD`; each settled within three shots and each was looked at.
+  The vessel on clear glass, the capsule and rows on blue-tinted regular glass with the lit rim,
+  the opaque fill and plain aurora under Reduce Transparency.
+- **The table** (`docs/DESIGN.md`, *The watch's glass, measured*), the label's full-strength ink
+  against the lightest clean-ground pixel — `HEAD` / 7a / 7a under Reduce Transparency: *More*
+  12.28 / 8.68 / 12.03; *Cup* 9.44 / 6.92 / 12.03; *Bottle* 9.41 / 6.87 / 12.03; *150 ml* 4.87 /
+  **2.83** / 4.74; *500 ml* 4.88 / **2.84** / 4.74; *62%* 4.94 / 4.90 / 4.94 (floor 3); the
+  millilitre line 2.39 in all three (#44, removed in 7b). The plan's column sampler was run too; its
+  worst column is a glyph's anti-aliased edge (1.41 on the white *Cup*), so it was not ruled on
+  (`tasks/lessons.md`).
+- **The gate**, on a copy of the index (`git checkout-index`, 13:37), one simulator at a time,
+  `-parallel-testing-enabled NO`, `-collect-test-diagnostics never`:
+  - unit, *iPhone 17* (27.0), 13:37–13:39: `✔ Test run with 677 tests in 86 suites passed`; the
+    attribute grep says 677. Another project's `xcodebuild test` ran beside it (load 159).
+  - watch, *WaterBuddy Watch 27*, 13:39: `✔ Test run with 58 tests in 7 suites passed`; the grep
+    says 58.
+  - `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`, no error.
+  - UI, *WaterBuddy Gate 27*, after the other project's run had ended, 13:43–14:04, three chunks:
+    `GoalSetupUITests` 19 with 1 skipped and 0 failures, 19 with 0, the other three classes 31 with
+    0 — **69, 0 failures**; one-minute loads at each chunk's start and end 5.6 to 19.9.
+  - UI, *WaterBuddy Gate 26.5*, 14:04–14:20, the same chunks: **69, 1 skipped by design, 0
+    failures**; loads 4.0 to 8.9.
+- **The warning comparison**, clean builds of the `HEAD` export and of the index copy:
+  `-scheme WaterBuddy` 35 and 35 (19 by file and message), `WaterBuddyWatch` 2 and 2,
+  `WaterBuddyWatchWidget` 29 and 29, `WaterBuddyWidgetExtension` 29 and 29 — **`comm -13` empty on
+  all four**, by line and by message. `HEAD`'s 35 is `CLAUDE.md`'s figure.
+
+### Not done
+
+- Anything on watchOS 26.x (#151). The other four watch sizes, Russian and Uzbek, and the press of
+  Apple's interactive glass on the watch — 7b re-renders the screen on all five sizes.
+- The watch face's complication: 7a does not touch its view tree, which draws no glass.
+
+### Files touched
+
+`WaterBuddy/LiquidGlassModifier.swift` · `WaterBuddyWatch/WristView.swift` ·
+`WaterBuddyWatchTests/WristGlassTests.swift` (new) · `WaterBuddyTests/LiquidGlassTests.swift` ·
+`docs/DESIGN.md` · `docs/AI_CONTEXT.md` · `docs/ROADMAP.md` ·
+`docs/superpowers/specs/2026-10-20-the-watch-stage-design.md` ·
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md` · `tasks/lessons.md` · `HISTORY.md`. Unstaged:
+the six rule files.
+
+### Gate
+
+Run in this session, on a copy of the index, as *What was run* gives it: unit 677, UI 69 and 69 with
+1 skipped by design each and 0 failures, watch 58, both widgets built, no new warning on any scheme.
+watchOS 26.x not run (#151).
+
+**Staging.** Read from the commands at 14:26 on 2026-10-20, after this session's `git add` of its
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `ff7305b`, 151 commits, `## main...origin/main`. **11 staged** —
+10 modified, 1 added (`WaterBuddyWatchTests/WristGlassTests.swift`). **7 unstaged**: the six rule
+files with §5's wording, and `.claude/settings.json` (the owner's). **1 untracked**:
+`Screenshots/census/`. None in both.
+
+## [2026-10-20] — `/doc_sync` after 1.3.2's stage 7a, before its `/commit`
+
+### What
+
+The seventy-sixth pass, run by the owner in the session that built 7a, after 7a's own records were
+written and staged and before `/commit`. No source or test file changed in the pass.
+
+- **`docs/AI_CONTEXT.md`, *Targets*.** The phone tests' row still gave **616 `@Test` in 77 suites,
+  run 2026-10-15** — 1.2.5's figure, left by every pass since, while the head blocks gave the current
+  count. It now leads with **677 in 86, run 2026-10-20**, the old figures kept behind "Before that".
+  The watch tests' row: 57 in 6 → **58 in 7**, `WristGlassTests` added.
+- **`CLAUDE.md`'s warning trail** gains 7a: unchanged on all four schemes, a copy of its index
+  against a clean build of a `HEAD` `ff7305b` export.
+- **`docs/WIDGET.md`** gains a dated block, as stage 3c's pass wrote one: a shared file changed
+  (`LiquidGlassModifier.swift`), the extension's contract did not — `.archived` panes never meet
+  `glassEffect`, and the extension built from the staged copy with no new warning.
+- **`docs/AI_CONTEXT.md`**'s head gains this pass's block and *Git* its staging block.
+
+### What the pass checked and left
+
+- 94 tracked `.swift` files, each with its row in *Files on disk*, every count equal to `wc -l` — 93
+  by script; the script's pattern wanted text after the count and skipped
+  `WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift`, whose row has none, so it was read by
+  hand: 9 = 9. `WaterBuddy/GoalSetupView.swift`, matched by the path grep, is in two historical
+  `git status` blocks, not a row.
+- 677 `@Test`, 58 on the watch, 56 UI `func test`, by the attribute grep — the gate's counts.
+- The three exception sets, six files each, as `CLAUDE.md` gives them; `project.pbxproj` last changed
+  in `eba1b1e`. 13 keys on `DataManager.Key`, 11 phone and 2 watch; `DataManager.swift` unchanged
+  since `HEAD`. Every cited rule resolves. No `docs/ARCHITECTURE.md`, `CAPABILITIES.md` or
+  `dependencies.md`.
+- `docs/STATE.md`: no key, writer or rollover moved — left. `docs/DESIGN.md`, `docs/ROADMAP.md`, the
+  spec, the plan and `tasks/lessons.md`: written by 7a's records in this session, read again, left.
+- No current sentence in `CLAUDE.md`, `docs/STATE.md` or `docs/AI_CONTEXT.md`'s sections above
+  *Current state* still puts the watch on the hand-made glass.
+- `CLAUDE.md`'s gate: still five invocations, matching rule `85-testing` as amended (unstaged) and
+  the runtime ruling.
+
+### Files touched
+
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/WIDGET.md` · `HISTORY.md`.
+
+### Gate
+
+Not re-run in this pass. 7a's gate ran earlier in this session, on a copy of the index; its results
+are 7a's checkpoint above.
+
+**Staging.** Read from the commands at 14:39 on 2026-10-20, after this pass's `git add` of its four
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `ff7305b`, 151 commits, `## main...origin/main`. **13 staged** —
+12 modified, 1 added: 7a's eleven and this pass's `CLAUDE.md` and `docs/WIDGET.md`. **7 unstaged**:
+the six rule files with spec §5's wording, and `.claude/settings.json` (the owner's). **1
+untracked**: `Screenshots/census/`. None in both.

@@ -4272,3 +4272,29 @@ the comparison would report every warning as new — or, cut differently, hide a
 
 **The rule:** strip by the export folder's own name (`s|^.*/head/||`), and look at three lines of the
 stripped list before trusting a comparison built on it.
+
+## 2026-10-20 — A column sampler's worst column is a glyph's edge, not the ground
+
+**What happened.** 7a's plan measured each watch label with a per-column sampler — ink the brightest
+pixel in a column, ground the median of the clean rows — and named its *worst* column against the
+floor. On the watch's renders the worst column read 1.41 for a full-white *Cup* whose median column
+read 8.07: at a glyph's edge a column's brightest pixel is anti-aliased coverage, not the ink. Ruled
+on that figure, every label fails. The *Cup* box also first ran its clean rows through the *p*'s
+descender, and read 1.00.
+
+**The rule:** rule on the label's full-strength ink against the lightest clean-ground pixel — the
+method `docs/DESIGN.md` records — and keep the column sampler's median as a cross-check. Before
+trusting a box, check that its clean rows hold no ink: a ground of 1.0 under white text is a
+descender, not a pane.
+
+## 2026-10-20 — A probe built from the index builds `HEAD` when the change is unstaged
+
+**What happened.** 7a's plan builds every probe from `git checkout-index` — a copy of the index —
+and stages the code only in its last task, after the renders. Followed in that order, the renders
+would have shown `HEAD`'s hand-made glass, labelled as the change. The session copied the working
+tree instead (`git ls-files` through `tar`, with the new untracked test added by hand) and diffed the
+copy against the tree before building.
+
+**The rule:** a probe of unstaged work copies the working tree, and the copy is diffed against the
+tree before it is built. `git checkout-index` is for the gate, after the staging it is meant to
+prove.

@@ -3,6 +3,16 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-20 (the seventy-sixth pass's `/doc_sync`, after roadmap item 1.3.2's stage
+7a, staged). **No file under `WaterBuddyWidget/` changed, and no contract here did.** One of the six
+shared files did: `LiquidGlassModifier.swift` draws Apple's glass on the watch too —
+`#available(iOS 26.0, watchOS 26.0, *)` where it said `#if os(iOS)` and iOS alone. On iOS every
+branch answers as before, and this extension's panes are `.archived`, so they take the hand-made
+stack and never meet `glassEffect`. The extension was built from a copy of the stage's index,
+`** BUILD SUCCEEDED **`, and a clean build of it against one of `HEAD` gave the same 29 warning
+lines, none new. Nothing was placed or rendered. The watch's face draws no glass, and 7a did not
+touch it.
+
 **Last updated:** 2026-10-20 (the seventy-fourth pass's `/doc_sync`, after roadmap item 1.3.1's stage
 6c, staged). **A fourth widget, `WeekWidget` (kind `WaterBuddyWeek`, medium), and a fifth snapshot
 field, `weekTotals`.** *The week widget* has its own section; the read path, the provider's sample and

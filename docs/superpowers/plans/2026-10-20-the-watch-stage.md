@@ -110,7 +110,7 @@ task that owns it:
 
 ## Preconditions — before any code
 
-- [ ] **P1 — the runtime and the simulators (spec D1).** The owner installs the newest watchOS 26.x
+- [x] **P1 — the runtime and the simulators (spec D1).** The owner installs the newest watchOS 26.x
   simulator runtime Xcode 27.0 offers. Then read its version and identifier, and create the devices:
 
 ```bash
@@ -129,7 +129,7 @@ xcrun simctl create "WaterBuddy Probe Watch 49" com.apple.CoreSimulator.SimDevic
   `-10-46mm`; `simctl create` refuses a type the runtime does not support. Record every UDID in the
   session log. Boot each once and shut it down by UDID, so a listed device is proved to have data
   (`tasks/lessons.md`, 2026-10-08).
-- [ ] **P2 — the catalogues are clean and Xcode is closed.** This must print nothing, and no running
+- [x] **P2 — the catalogues are clean and Xcode is closed.** This must print nothing, and no running
   Xcode may hold a WaterBuddy file:
 
 ```bash
@@ -137,12 +137,12 @@ git diff --stat -- WaterBuddy/Localizable.xcstrings WaterBuddyWidget/Localizable
 pgrep -l Xcode && lsof -c Xcode 2>/dev/null | grep -c WaterBuddy
 ```
 
-- [ ] **P3 — read the DocC** on `WristView`, `WristServing`, `WristVessel`, `WristModel`
+- [x] **P3 — read the DocC** on `WristView`, `WristServing`, `WristVessel`, `WristModel`
   (`displayGoal`, `todaysTotal`, `pour`, `apply`), `WristPlan`, `WristWidgetProvider`,
   `LiquidGlass.systemGlassAvailable`, `systemVariant`, `systemTintOpacity`, `sampling(_:)`,
   `PrimarySurfaceModifier`, `GlassGroupModifier` — rule `00-workspace`, and `CLAUDE.md`'s required
   reading for `LiquidGlassModifier.swift`.
-- [ ] **P4 — the warning baseline**, before 7a's first edit: **The warning comparison** (below) on
+- [x] **P4 — the warning baseline**, before 7a's first edit: **The warning comparison** (below) on
   HEAD alone, every scheme. Expected: 29 unique primary lines for `-scheme WaterBuddy`; the watch's 2
   (`WristView.swift`, *'Combine' was not imported*); the watch widget scheme's lines as its log
   shows them. Write the four counts into the session log; these are what "no new warning" compares
@@ -154,6 +154,15 @@ pgrep -l Xcode && lsof -c Xcode 2>/dev/null | grep -c WaterBuddy
   `-scheme WaterBuddy` gives 35 primary lines on `HEAD` `06229be`. The next call, which bundled a
   `chmod` the settings deny, was refused and the session stopped (`tasks/lessons.md`, 2026-10-20);
   the other three schemes wait for the owner's word.)*
+
+  *(2026-10-20, later: P4 done — clean builds of a `HEAD` `ff7305b` export: `WaterBuddyWatch` 2
+  primary lines, `WaterBuddyWatchWidget` 29 and `WaterBuddyWidgetExtension` 29, the two widget lists
+  identical. **P1's 26.x half is withdrawn by the owner's ruling** ("maybe you will change the
+  runtime for different one that is exists"): the 26.x runtime never arrived, and the one other
+  watchOS runtime here, 11.5, is below the watch's 26.0 floor and cannot run it. Everything this plan
+  measures or runs on "both runtimes" is measured and run on watchOS 27.0 alone; the gate stays five
+  invocations; the 26.x half goes to the owner's device as a known issue. The rule wording of Task 0
+  was amended to match.)*
 
 ## Files
 
@@ -354,7 +363,7 @@ text 4.5:1, a glyph 3:1, the vessel's percentage (large, bold) 3:1.
 **Files:** the six rule files named in the table. Each edit replaces the sentence quoted (found by
 reading the file first) with the text given; nothing else in the file moves.
 
-- [ ] **Step 1: `15-project`**, *Targets and schemes*, the bullet beginning "**The second version
+- [x] **Step 1: `15-project`**, *Targets and schemes*, the bullet beginning "**The second version
   check is the glass's.**" becomes:
 
   > **The second version check is the glass's.** `LiquidGlassModifier` draws Apple's glass inside
@@ -365,7 +374,7 @@ reading the file first) with the text given; nothing else in the file moves.
   > iOS 26 the path is run-verified on iOS 18.6 and compile-verified only at 17.0; the watch's is
   > run-verified on watchOS 26.x and 27.0 (the redesign's stage 7)
 
-- [ ] **Step 2: `60-design-system`.**
+- [x] **Step 2: `60-design-system`.**
   - *Glass*, second bullet: "the hand-made stack everywhere else — a `.flat` base, iOS 17 to 25, and
     the watch until its own stage." → "the hand-made stack everywhere else — a `.flat` base, and iOS 17
     to 25. The watch draws Apple's glass from its floor, watchOS 26.0."
@@ -396,7 +405,7 @@ reading the file first) with the text given; nothing else in the file moves.
     > - The rectangle draws the app screen's own line, `WristPlan.Face.millilitreLine(in:locale:)`;
     >   the faces and the screen read one `WristPlan.Face`
 
-- [ ] **Step 3: `65-accessibility`**, *VoiceOver*:
+- [x] **Step 3: `65-accessibility`**, *VoiceOver*:
   - "The vessel is exactly **one** element in both processes" → "The vessel is exactly **one**
     element in all three processes that draw it — the app, the widget and the watch".
   - After the Lock Screen widget's bullet, two new bullets: "Each pour button on the watch is one
@@ -405,7 +414,7 @@ reading the file first) with the text given; nothing else in the file moves.
     sentence through `WristPlan.Face.spokenFigures(in:locale:)` — and its quiet form speaks its label
     alone".
 
-- [ ] **Step 4: `70-privacy`.**
+- [x] **Step 4: `70-privacy`.**
   - *WatchConnectivity*, the carve-out: "renders a percentage derived from the stored `WristMirror` as
     an `.accessoryCircular` complication" → "renders today's figures, derived from the stored
     `WristMirror`, in three faces — circular, rectangular and corner —". At the end of that bullet:
@@ -415,7 +424,7 @@ reading the file first) with the text given; nothing else in the file moves.
     system language" → "The faces draw in `WristMirror.languageCode`'s language, resolved by their
     provider; their `.description` is resolved by WidgetKit and follows the watch's system language".
 
-- [ ] **Step 5: `85-testing`**, *The gate*: "**Five invocations, not three**" → "**Six invocations**";
+- [x] **Step 5: `85-testing`**, *The gate*: "**Five invocations, not three**" → "**Six invocations**";
   the watch invocation is followed by its twin on `OS=26.x,name=WaterBuddy Watch 26`; a new bullet
   after the iOS 26 one: "**While watchOS 26 is supported, the watch unit tests also run on a watchOS
   26 runtime** — the floor, where Apple's glass on the watch began." *A green suite is not proof*:
@@ -423,10 +432,10 @@ reading the file first) with the text given; nothing else in the file moves.
   watch face by hand" → "add each of its three faces to a watch face by hand, a tinted face among
   them, on both watch runtimes".
 
-- [ ] **Step 6: `00-workspace`**, *Layout*: "the watch WidgetKit extension — .accessoryCircular
+- [x] **Step 6: `00-workspace`**, *Layout*: "the watch WidgetKit extension — .accessoryCircular
   percentage ring" → "the watch WidgetKit extension — circular, rectangular and corner faces".
 
-- [ ] **Step 7: Show and stop.** `git diff -- .claude/rules/` to the owner. **Stop until the owner
+- [x] **Step 7: Show and stop.** `git diff -- .claude/rules/` to the owner. **Stop until the owner
   approves the wording.** It stays unstaged; the owner commits it when they choose, as
   `chore(claude): …` after the stage (precedent `06229be`).
 
@@ -442,7 +451,7 @@ reading the file first) with the text given; nothing else in the file moves.
 **Interfaces:**
 - Produces: `LiquidGlass.systemGlassAvailable == true` on watchOS. Unchanged signatures.
 
-- [ ] **Step 1: Write the failing test**, `WaterBuddyWatchTests/WristGlassTests.swift`:
+- [x] **Step 1: Write the failing test**, `WaterBuddyWatchTests/WristGlassTests.swift`:
 
 ```swift
 //
@@ -470,11 +479,11 @@ struct WristGlassTests {
 }
 ```
 
-- [ ] **Step 2: Run it and verify RED** — a watch unit run, `-only-testing:WaterBuddyWatchTests/WristGlassTests`,
+- [x] **Step 2: Run it and verify RED** — a watch unit run, `-only-testing:WaterBuddyWatchTests/WristGlassTests`,
   with `-collect-test-diagnostics never`. Expected: `✘` on `#expect(LiquidGlass.systemGlassAvailable)`
   — the flag is `false` by `#if os(iOS)`, a wrong value, not a compile error.
 
-- [ ] **Step 3: Widen the three sites.** In `LiquidGlassModifier.swift`:
+- [x] **Step 3: Widen the three sites.** In `LiquidGlassModifier.swift`:
 
   `systemGlassAvailable` (`:248`–`:261`) becomes:
 
@@ -523,15 +532,15 @@ struct WristGlassTests {
   no production pane and is kept for the test that asks the watch's question. No code in `scrim(…)`
   changes.
 
-- [ ] **Step 4: The watch's two labelled panes become controls.** In `WristView.swift`, the *More*
+- [x] **Step 4: The watch's two labelled panes become controls.** In `WristView.swift`, the *More*
   capsule (`:287`) and the sheet's rows (`:456`): `.liquidGlass(in: Capsule(), density: .sheer)` →
   `.liquidGlass(in: Capsule(), density: .sheer, interactive: true)`, each with the comment "Interactive:
   the glass is what is pressed, and on Apple's glass a sheer control takes the regular, tinted
   variant — the clear one would leave its label on untinted glass (#91(b))."
 
-- [ ] **Step 5: Run it GREEN**, on **both** watch runtimes (`WristGlassTests`). Expected:
+- [x] **Step 5: Run it GREEN**, on **both** watch runtimes (`WristGlassTests`). Expected:
   `✔ Test run with 1 test in 1 suite passed` on each.
-- [ ] **Step 6: The phone's glass suites still hold** — a phone unit run,
+- [x] **Step 6: The phone's glass suites still hold** — a phone unit run,
   `-only-testing:WaterBuddyTests/LiquidGlassInteractionTests -only-testing:WaterBuddyTests/LiquidGlassScrimTests`.
   Expected: all pass. Then **a watch widget build** and the phone widget build
   (`-scheme WaterBuddyWidgetExtension`): both `** BUILD SUCCEEDED **`, no warning naming
@@ -543,7 +552,7 @@ struct WristGlassTests {
 
 **Files:** none in the tree unless Step 4 rules a watch rung.
 
-- [ ] **Step 1: Shoot the panes** with **the screen probe**, on *WaterBuddy Probe Watch 46* (27.0)
+- [x] **Step 1: Shoot the panes** with **the screen probe**, on *WaterBuddy Probe Watch 46* (27.0)
   and *WaterBuddy Probe Watch 26*, each with:
   - `-WristProbeTotal 0` — the vessel empty on clear glass;
   - `-WristProbeTotal 1240` — the vessel at 62%;
@@ -551,10 +560,10 @@ struct WristGlassTests {
   - `-WristProbeTotal 1240 -WristProbeMenu` — the sheet's two rows;
   - each again with `-WristProbeReduceTransparency` (the probe's own switch, above).
   Look at all twenty.
-- [ ] **Step 2: Measure** with **the contrast sampler**: the *More* label; each row's name; each row's
+- [x] **Step 2: Measure** with **the contrast sampler**: the *More* label; each row's name; each row's
   amount (`.secondary`); on each runtime. And the 62% vessel's percentage over the water.
-- [ ] **Step 3: Write the table** into the session log: pair, runtime, worst, median, best, floor.
-- [ ] **Step 4: The tint ruling.**
+- [x] **Step 3: Write the table** into the session log: pair, runtime, worst, median, best, floor.
+- [x] **Step 4: The tint ruling.**
   - **Every pair clears its floor on both runtimes** → `systemTintOpacity` stays one value, 0.64. Go
     to Task 3.
   - **The only pair under its floor is a row's `.secondary` amount** → **stop and show the owner the
@@ -589,11 +598,21 @@ struct WristGlassTests {
 
 ---
 
+*(2026-10-20, as run: on watchOS 27.0 only (P1's note) — eight shots, not twenty, plus three from a
+`HEAD` probe for the hand-made column. Three departures from the text above. **The probe copied the
+working tree**, not the index: 7a's code was unstaged when Task 2 ran, and `git checkout-index` would
+have built `HEAD`. **The floor figure is the clean-ground one**: the sampler's worst column is a
+glyph's anti-aliased edge — the white *Cup* read 1.41 there — so each pair is also read as the
+label's full-strength ink against the lightest clean-ground pixel, `docs/DESIGN.md`'s method, and
+that figure is the one ruled on. **The ruling was Step 4's second branch**: the sheet's `.secondary`
+amounts, 2.83:1, were the only pairs 7a moved under a floor; the owner kept `0.64`. The table is
+*The watch's glass, measured*, `docs/DESIGN.md`.)*
+
 ### Task 3: 7a — verification, records, staging
 
-- [ ] **Step 1: The gate** (above), on the staged tree. Expected as written there.
-- [ ] **Step 2: The warning comparison** (above), every scheme — a shared file changed.
-- [ ] **Step 3: Records.** `HISTORY.md`, a checkpoint `## [2026-10-20] — Roadmap item 1.3.2, stage 7a:
+- [x] **Step 1: The gate** (above), on the staged tree. Expected as written there.
+- [x] **Step 2: The warning comparison** (above), every scheme — a shared file changed.
+- [x] **Step 3: Records.** `HISTORY.md`, a checkpoint `## [2026-10-20] — Roadmap item 1.3.2, stage 7a:
   Apple's glass on the watch` (or the date it runs): what changed, the rulings, the RED run, the gate
   and warning comparison as their logs show them, the twenty shots looked at, the tint table.
   `docs/DESIGN.md`: the watch's measured pairs beside *The look, measured*; the rendering table's

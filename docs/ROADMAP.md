@@ -219,7 +219,10 @@ Apple's glass on the watch; 7b, the canvas's screen with a row of three pour but
 and corner faces beside the circular one, display-only, redacted when watchOS asks. The owner kept D6
 as first approved — a watchOS **26** runtime before the stage is measured, so "26 or later" above is
 superseded — and that runtime is not yet on this Mac (known issue #77). No code yet; the rule wording
-for six files is the plan's first step.)*
+for six files is the plan's first step.)* *(2026-10-20, later: **7a is built, gated and staged** —
+Apple's glass on the watch. The runtime never arrived, and the owner withdrew the 26.x half: the stage
+is measured and gated on watchOS 27.0 alone, and what 26.x would show is known issue #151. The tint
+stays `0.64`; the serving sheet's `.secondary` amounts read 2.83:1 until 7b deletes the sheet.)*
 
 **1.3.3 — Apple Health.** Each serving written as dietary water, and removed when the serving is
 deleted or edited. Whether it also *reads* water other apps logged is the design's first question.

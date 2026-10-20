@@ -12,6 +12,10 @@ owner's review; **no plan, no rule text and no code yet.** Roadmap item **1.3.2*
 rectangular and corner complications. The rule wording in §5 is a proposal — rules change only when
 the owner decides (rule `99-docs-cascade`) — typed for approval **before** 7a's code, as for 1.3.1.
 
+*(2026-10-20, later: §5's wording is typed and approved, unstaged; **7a is built, gated and staged**,
+measured on watchOS 27.0 alone by the owner's ruling (§3.2's note), the tint kept at `0.64` by the
+plan's own branch. 7b and 7c are not begun.)*
+
 **Authority.** Subordinate to the DocC on the type being changed, then `.claude/rules/`, then
 `CLAUDE.md` (rule `99-docs-cascade`). Where it contradicts the code, the code wins and this document
 changes.
@@ -95,6 +99,14 @@ newest watchOS 26.x simulator runtime Xcode 27.0 offers, and creates one watch o
 measurement in this stage is taken on that runtime **and** on 27.0, because the phone's glass
 rendered and hit-tested differently on iOS 26.5 and 27.0 (rule `85-testing`). The installed version
 is pinned by number in the gate once it is known (§8.1).
+
+*(2026-10-20, later the same day: **superseded by the owner's ruling** — "maybe you will change the
+runtime for different one that is exists". The 26.x runtime did not arrive on this Mac, and the one
+other watchOS runtime installed, 11.5, is below the watch's 26.0 floor. Every measurement and run this
+spec places on "both runtimes" is taken on watchOS 27.0 alone; the gate stays at rule `85-testing`'s
+five invocations; how the watch's glass renders and hit-tests on 26.x goes to the owner's device, in
+1.2.7's sweep, as a known issue. §5's wording for `15-project`, `60-design-system` and `85-testing`
+was amended to match.)*
 
 ### 3.3 Stage 7a — Apple's glass on the watch
 

@@ -7,6 +7,13 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-20 (roadmap item 1.3.2's stage 7a, written by the session that built it —
+not a `/doc_sync` pass). **No token changed.** The watch draws Apple's glass: *Three ways to draw a
+pane*, the density and elevation lists, *Interactive glass* and the container's note say so in dated
+notes, and *The watch's glass, measured* holds its pairs on watchOS 27.0 — the tint stays `0.64`, on
+the owner's ruling, though the serving sheet's `.secondary` amounts read 2.83:1 until 7b removes the
+sheet.
+
 **Last updated:** 2026-10-20 (the seventy-fourth pass's `/doc_sync`, after roadmap item 1.3.1's stage
 6c, staged). **No token changed.** The week widget draws History's week-card values, measured again
 on its own pane: *The week widget, measured* holds the eleven pairs and the method — none under its
@@ -279,6 +286,9 @@ vessel, `.floating` as Home's is, and *Use* and the bells' discs, `.resting`. It
 the primary surface.)* *(2026-10-19, roadmap item 1.3.1's stage 6a, `5a46609`: the widget's buttons
 are no longer glass. In full colour they are the primary surface, which casts `Elevation.raised`'s
 two shadows; on a template, the rim alone, with no shadow, as every widget pane there.)*
+*(2026-10-20, the redesign's stage 7a: the watch's vessel and its two capsules are Apple's glass,
+which draws no shadow of this file's, so their elevations are drawn only under Reduce
+Transparency's opaque pane. The capsules are `interactive: true` now.)*
 
 ## `LiquidGlass.Density`
 
@@ -295,7 +305,9 @@ glass.
 
 The two scrim columns since stage 3c: the phone's own panes are a `.material` base on iOS, which
 draws the hand-made stack from iOS 17 to 25 only; the widget's `.archived` base and the watch kept
-black at the old values. The blue figures are measured, in *The look, measured*; opaque is not the
+black at the old values. *(2026-10-20, the redesign's stage 7a: the watch draws Apple's glass, or
+the opaque fill under Reduce Transparency, so no watch pane draws a scrim now; the black column's
+watch answer is kept, and `theWatchKeepsItsBlackScrim` still holds it.)* The blue figures are measured, in *The look, measured*; opaque is not the
 lightest rung that passed, so the three stay in density order. (One column, black at
 `0.16`/`0.28`/`0.40`, until the fifty-seventh pass; the values lived on `Density.scrimOpacity(for:)`,
 which stage 3c removed.)
@@ -766,15 +778,20 @@ Since the redesign's stage 1 (2026-10-09; committed 2026-10-10 in `c9ef45d`), `l
 |---|---|
 | Reduce Transparency is on | the opaque fill and lit rim, on every OS (`.opaque`) |
 | the base is `.flat` — the widget's `.archived` | the hand-made stack (`.handMade`) |
-| the base is `.material`, iOS 26 or later | Apple's glass, `glassEffect(_:in:)` (`.system`) |
-| the base is `.material`, below iOS 26 — and the watch, for now | the hand-made stack |
+| the base is `.material`, iOS 26 or later, or the watch | Apple's glass, `glassEffect(_:in:)` (`.system`) |
+| the base is `.material`, below iOS 26 | the hand-made stack |
 
-- `LiquidGlass.systemGlassAvailable` is `true` on iOS 26 and later and **`false` on watchOS**, by
-  `#if os(iOS)`. When that was written no watchOS 26 runtime was installed and a watch pane could
-  not be rendered; watchOS 27.0 has been installed since 2026-10-09, the watch app ran on it on the
-  hand-made stack, and no watch pane has been drawn on Apple's glass yet. The redesign's watch stage
-  turns it on, and measures it there. (The flag's own DocC gave the missing runtime as its reason
-  until the redesign's stage 2 corrected it to this one — known issue #91d.)
+*(The table's last two rows read "iOS 26 or later" and "below iOS 26 — and the watch, for now" until
+the redesign's stage 7a, 2026-10-20.)*
+
+- `LiquidGlass.systemGlassAvailable` is `true` on iOS 26 and later and, **since the redesign's stage
+  7a (2026-10-20), on the watch** — `#available(iOS 26.0, watchOS 26.0, *)`, which on the watch,
+  whose floor is 26.0, is always true; `theWatchDrawsAppleGlass` holds it. The watch's panes were
+  rendered and measured on watchOS 27.0 only (*The watch's glass, measured*): no watchOS 26.x
+  runtime reached this Mac, and on the owner's ruling the stage went ahead without one, so the
+  watch's floor runs Apple's glass compile-verified. *(Until 7a: **`false` on watchOS**, by
+  `#if os(iOS)` — no watch pane had been drawn on Apple's glass. The flag's own DocC gave the missing
+  runtime as its reason until the redesign's stage 2 corrected it — known issue #91d.)*
 - **Everything above this section describes the hand-made stack.** On Apple's glass the scrim, the
   tint and the two shadows are not drawn, and `tint`, `tintOpacity` and `elevation` are ignored.
   The specular and the lit rim **are** drawn, over the glass and under the content, since stage 3c
@@ -1562,6 +1579,52 @@ status and quiet lines and every other text on the aurora (no pane under them, s
 not change them), Russian and Uzbek, iOS 17, a device. The probe's captures and scripts lived in
 the session's scratchpad and are not kept; this section is the record.
 
+## The watch's glass, measured
+
+**2026-10-20, the redesign's stage 7a** (spec `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md`
+§3.3). The watch's panes moved from the hand-made stack to Apple's glass: the vessel to the clear
+variant, untinted; the *More* capsule and the serving sheet's two rows, now `interactive: true`, to the
+regular variant, tinted `Aurora.top` at `0.64`, the phone's value.
+
+**Method.** A throwaway probe in a copy of the working tree, seeded through `WristModel.apply(_:)` from
+launch arguments — 1,240 of 2,000 ml, and 0 — with switches that draw the sheet open, scroll the
+capsule into view and force Reduce Transparency (`simctl` cannot set it); and the same probe in a
+`HEAD` export, which draws the hand-made stack, for the column beside it. *WaterBuddy Probe Watch 46*
+(Series 12 46mm), **watchOS 27.0 only**: the spec asked for a 26.x runtime too, none reached this
+Mac, and the owner ruled the stage go on without it. One capture a state, taken when two in a row
+agreed — `WristAurora` does not move, so one frame is the whole of it (the plan's correction (2)).
+Eleven captures, each looked at. **The figure** is the label's own full-strength ink — the 98th
+percentile of luminance between the clean rows — against the **lightest** pixel of the clean rows
+above and below the label across its width: clean ground is the floor (#95). The plan's column
+sampler was run as well; its worst column is a glyph's anti-aliased edge, not a floor figure, and its
+median agrees with the figure at the median ground.
+
+| Pair | Floor | `HEAD`, hand-made | 7a, Apple's glass | 7a, Reduce Transparency |
+|---|---|---|---|---|
+| *More*, white, on the capsule | 4.5 | 12.28 | **8.68** | 12.03 |
+| *Cup*, white, on its row | 4.5 | 9.44 | **6.92** | 12.03 |
+| *Bottle*, white, on its row | 4.5 | 9.41 | **6.87** | 12.03 |
+| *150 ml*, `.secondary`, on its row | 4.5 | 4.87 | **2.83** | 4.74 |
+| *500 ml*, `.secondary`, on its row | 4.5 | 4.88 | **2.84** | 4.74 |
+| *62%*, white, over the water at 62% | 3 | 4.94 | **4.90** | 4.94 |
+| *1 240 / 2 000 ml*, white 0.8, over the water (#44) | 4.5 | 2.39 | **2.39** | 2.39 |
+
+- **The tint stays `0.64`, one value for both devices — the owner's ruling**, the plan's own branch
+  for this table: the only pairs under their floor that 7a moved are the sheet's `.secondary` amounts,
+  and the redesign's stage 7b deletes the sheet. On Apple's tinted glass the secondary style renders
+  dimmer (ink 0.28 against 0.35) over lighter ground (0.067 against 0.032). Climbing the watch's tint
+  for a pane about to go would have set 7b's discs by a label they do not carry. Between 7a's commit
+  and 7b's the amounts read 2.83:1; nothing ships in between.
+- **The vessel is unchanged by 7a**, to the figure: its clear glass takes no tint, and its readout
+  stands on `WaterReadabilityScrim`. The millilitre line's 2.39 is #44's failure read by this
+  method — the ground under the line's foot, where the water is lightest, against the 3.34 worst
+  column recorded in *Contrast figures that were measured, not eyeballed* — and 7b removes the line.
+- **Reduce Transparency** draws the opaque fill and the plain aurora, as on the phone; every pair
+  passes there.
+- **Not measured:** watchOS 26.x (no runtime); the other four watch sizes; the press, which on Apple's
+  glass is the system's own response and was not captured; Russian and Uzbek. 7b re-renders the
+  screen on all five sizes.
+
 ## Settings, measured
 
 **2026-10-13, the redesign's stage 4** (spec `docs/superpowers/specs/2026-10-09-premium-redesign-design.md`
@@ -2006,7 +2069,9 @@ as glass that "reacts to touch and pointer interactions in real time".
 **Apple's API is reachable, since the toolchain moved to Xcode 27.0.** `glassEffect(_:in:)`, `Glass`,
 `GlassEffectContainer` and the `.glass` button styles are declared for iOS 26.0 and watchOS 26.0 in
 the installed SDK. On iOS 26 and later an interactive pane is therefore Apple's `Glass.interactive()`
-(*Three ways to draw a pane*), and what follows is what the **hand-made stack** does instead. *(This
+(*Three ways to draw a pane*), and what follows is what the **hand-made stack** does instead.
+*(2026-10-20, the redesign's stage 7a: on the watch too. Its two capsules take `Glass.interactive()`;
+nothing on the watch sets `glassIsPressed`, so no boost below applies there.)* *(This
 paragraph said the API "is not reachable from this project" until 2026-10-09: true on Xcode 16.4 with
 only `iphoneos18.5`, where the symbols were undeclared rather than unavailable.)* **Since stage 3c
 the edge and specular rows apply on Apple's glass too**: the sheen and lit rim laid over it
@@ -2076,7 +2141,8 @@ stage 2 adds the container with the new quick-add row (spec `2026-10-09-premium-
 row, which is no longer three glass circles: two glass discs flank the primary surface, and the
 container has those two to sample together. `glassEffectID` is still not used; nothing morphs.
 *(2026-10-14, the sixtieth pass: a second container since stage 5, round the welcome's seven
-bell discs on its reminders step.)*
+bell discs on its reminders step.)* *(2026-10-20, the redesign's stage 7a: `.glassGroup()` is
+`GlassEffectContainer` on the watch too. No watch view calls it yet; 7b's pour row will.)*
 
 Apple also warns to "limit the use of Liquid Glass effects onscreen at the same time". Home
 drew **five** panes (the vessel, three vessels, the tab bar); since stage 2 it draws four — the
