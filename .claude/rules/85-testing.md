@@ -171,7 +171,7 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
 The suite injects its own `UserDefaults`, `Calendar` and clock, so it structurally **cannot** see an
 entitlement that was not added, a file missing from a target, or a widget that renders blank.
 **No widget's rendering has any automated coverage, on either platform** — the phone's Home Screen
-and Lock Screen widgets, its Control Center control, and the watch's `.accessoryCircular` face are all
+and Lock Screen widgets, its Control Center control, and the watch's three faces are all
 proved only by placing them and looking.
 
 After any change to storage, entitlements, target membership or the widget's view tree: run the app
@@ -180,8 +180,8 @@ control in Control Center, put the week widget on the Home Screen and tap it int
 small widget into StandBy on a device, by day and at night, since the simulator has none, and, after
 a change to reminders, press a reminder's *Log a Glass* with the
 app not running. The same
-applies to the watch face: install `WaterBuddyWatch` and add the widget to a watch face by hand: no
-part of the automated gate renders it.
+applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face
+by hand, a tinted face among them: no part of the automated gate renders them.
 
 ## Counting
 Count the attribute in the only position it can be one; `@Test` also appears inside DocC comments:

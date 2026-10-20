@@ -15,11 +15,11 @@ measured.
 - `.liquidGlass(…)` draws one of three panes, chosen by
   `LiquidGlass.rendering(base:reduceTransparency:systemGlassAvailable:)`: the opaque fill under
   Reduce Transparency; Apple's glass (`glassEffect`) for a `.material` base on iOS 26 and later; the
-  hand-made stack everywhere else — a `.flat` base, iOS 17 to 25, and the watch until its own stage.
-  Never call `glassEffect` at a call site
+  hand-made stack everywhere else — a `.flat` base, and iOS 17 to 25. The watch draws Apple's glass
+  from its floor, watchOS 26.0. Never call `glassEffect` at a call site
 - Sibling panes that sit close together — a row of discs — are wrapped with `.glassGroup()`:
-  Apple's `GlassEffectContainer` on iOS 26 and later, the content untouched elsewhere. Never write
-  `GlassEffectContainer` at a call site
+  Apple's `GlassEffectContainer` on iOS 26 and later and on the watch, the content untouched
+  elsewhere. Never write `GlassEffectContainer` at a call site
 - A pane's content is never moved between branches by a setting. `LiquidGlassModifier` changes the
   background and the glass handed to `glassEffect` — `.identity` when the pane is not Apple's — so
   a Reduce Transparency flip rebuilds nothing inside a pane
@@ -32,7 +32,8 @@ measured.
   the lightest rung that passed when every pair was rendered on iOS 27.0 and followed through the
   aurora's swing (`docs/DESIGN.md`, *The look, measured*), and
   `theTintIsNoLighterThanTheLightestRungThatPassed` holds it. Never retune it by eye, and never
-  estimate one value from another
+  estimate one value from another. The watch is measured on its own renders, never estimated from
+  the phone's
 - A pane answers a tap anywhere inside its shape, on both paths. The hand-made stack gets that from
   its fills; on Apple's glass the modifier says it with `.contentShape(shape)`. Never remove it: on
   iOS 26.5 a serving row stopped answering on its bare glass without it
@@ -78,16 +79,15 @@ measured.
 - It carries no glow. The cyan glow *Get Started* and *Save* once had is retired
 - Its contrast is derived, not measured, because its fill is solid:
   `thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`
+- On the watch the Glass pour button is the primary surface — a capsule carrying its amount where
+  the row has room, a disc where it has not — `ring: false`, as the widget's: the ring is the phone's
 
 ## Interaction
-- **Currently unreachable on the watch.** This glob widened to `WaterBuddyWatch/**/*.swift`, but
-  `PressStyle.swift` and `Haptics.swift` (below) are neither of them in the watch's own
-  `PBXFileSystemSynchronizedBuildFileExceptionSet` (confirmed by a `project.pbxproj` grep — zero
-  hits for either filename outside the phone app's own synchronized root group), so `WristView`'s
-  pour buttons compile against `.buttonStyle(.plain)` and fire no press animation and no haptic at
-  all. Known and, for v1, deliberate — haptics were not in the approved watch scope — not a defect
-  to fix under this rule; a future task that wants either on the watch adds the file to that
-  exception set first
+- **No press response of the app's own on the watch.** `PressStyle.swift` and `Haptics.swift` are in
+  none of the watch's exception sets, so its buttons take `.buttonStyle(.plain)` and play no haptic —
+  deliberate: haptics were not in the approved watch scope. Its glass controls take
+  `Glass.interactive()`, whose press response is the system's; the white Glass has none. A task that
+  wants either on the watch adds the file to that exception set first
 - Every app `Button` whose label is a glass pane carries `.buttonStyle(PressStyle())`, and
   `PressStyle` stays the only writer of `EnvironmentValues.glassIsPressed`
 - Keep `interactive` opt-in (`false` by default). Pass `interactive: true` only where the glass
@@ -133,7 +133,8 @@ measured.
   vessel. Do not remove it or tune it away in favour of a heavier text shadow
 - Leave `intensity` at its default 1 in the app; scale it with the level only on a small canvas: the
   widget's small vessel (`min(1, level * 1.6)`) and the watch's vessel
-  (`WristVessel.scrimIntensity(at:)`, full strength by 20%). Each ramp is calibrated to where its
+  (`WristVessel.scrimIntensity(at:)`, full strength by the level at which water reaches the
+  percentage's ink, its lowest readout). Each ramp is calibrated to where its
   **own** smallest readout sits and reaches full strength before water can reach it. Never copy one
   canvas's ramp to another
 - Volumes stay `Int` everywhere, including a view's `@State`. A `Double` may exist only as a drawing
@@ -176,3 +177,12 @@ measured.
   with no branch on `widgetRenderingMode` and no `colorScheme` override
 - The Control Center control draws nothing of its own — iOS draws its glyph and title in Control
   Center's own style — so it takes no glass, no `Aurora` colour and no tint
+
+## On the watch face
+- A face draws no glass and no aurora. Its gauges are tinted `Aurora.blue`, and on a tinted face the
+  header and the gauges are `.widgetAccentable()`
+- Every figure on a face carries `.privacySensitive()`, and every shape draws its quiet form — the
+  drop and an empty gauge, and on the rectangle *Hydration* over an empty bar — whenever
+  `redactionReasons` contains `.privacy`
+- The rectangle draws the app screen's own line, `WristPlan.Face.millilitreLine(in:locale:)`; the
+  faces and the screen read one `WristPlan.Face`

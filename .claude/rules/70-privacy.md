@@ -38,10 +38,10 @@ Three limits are conditions of the permission:
 - **No wire field may reach a notification, a Live Activity, or any surface outside the two
   apps' own screens — with two named carve-outs: the watch's own complication, on the watch's own
   face, and the phone's own Lock Screen widget, on the phone's own Lock Screen.**
-  `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` renders a percentage derived from the
-  stored `WristMirror` as an `.accessoryCircular` complication, which is a wire-derived value
-  reaching a surface other than `WristView`'s own screen — but it is the exact precedent the phone
-  side already permits for its own Home Screen widget (`WaterBuddyWidget`, drawing from
+  `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` renders today's figures, derived from the
+  stored `WristMirror`, in three faces — circular, rectangular and corner — which are wire-derived
+  values reaching a surface other than `WristView`'s own screen — but it is the exact precedent the
+  phone side already permits for its own Home Screen widget (`WaterBuddyWidget`, drawing from
   `WaterSnapshot`, which is itself the phone's own non-screen surface for the identical class of
   state). The underlying protection is unchanged and still absolute: a notification and a Live
   Activity remain forbidden on both devices, in both directions, with no carve-out of any kind — this
@@ -53,7 +53,9 @@ Three limits are conditions of the permission:
   watch authored, so the total it draws is wire-derived too, and it is held to the marking *The lock
   screen is a public surface* sets out. The week widget is a Home Screen widget, as the Hydration
   widget is: its totals count the watch's pours, as `currentWater` does, and it takes no carve-out
-  of its own
+  of its own. Since the redesign's stage 7 the watch's faces carry the Lock Screen widget's marking:
+  every figure `.privacySensitive()`, and a quiet form whenever `redactionReasons` contains
+  `.privacy`
 - **No third framework rides in behind it.** `HealthKit`, `CoreLocation` and `CloudKit` remain
   banned by name, and a watch app is exactly where someone will propose all three.
 
@@ -166,8 +168,9 @@ Three limits are conditions of the permission:
   locale
 - The watch takes its language from `WristMirror.languageCode`, through `WristModel.language`,
   injected at `WristRoot`. `nil` — the phone set to *Follow device* — and the time before the first
-  mirror both resolve the watch's own `Bundle.main`. The complication's `.description` is resolved by
-  WidgetKit and follows the watch's system language
+  mirror both resolve the watch's own `Bundle.main`. The faces draw in `WristMirror.languageCode`'s
+  language, resolved by their provider; their `.description` is resolved by WidgetKit and follows the
+  watch's system language
 - The product ships exactly `en`, `ru` and `uz`. Never add a case to `AppLanguage.selectable` without
   shipping the matching translations in **all four** `Localizable.xcstrings` files, and keep
   `knownRegions` in step

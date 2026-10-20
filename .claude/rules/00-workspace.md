@@ -33,7 +33,7 @@ WaterBuddyWidget/        the phone WidgetKit extension — StaticConfiguration +
 WaterBuddyTests/         swift-testing (@Test / #expect), own suite per test, phone side
 WaterBuddyUITests/       XCTest — the setup gate, the accessibility tree, the tab swap
 WaterBuddyWatch/         the watch app — WristView, @Observable WristModel over its own local suite
-WaterBuddyWatchWidget/   the watch WidgetKit extension — .accessoryCircular percentage ring
+WaterBuddyWatchWidget/   the watch WidgetKit extension — circular, rectangular and corner faces
 WaterBuddyWatchTests/    swift-testing, watch side
 Entitlements/            one App Group entitlement file per signed target (four signed targets)
 Tools/                   standalone scripts, in no target

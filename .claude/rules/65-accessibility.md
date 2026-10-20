@@ -80,8 +80,9 @@ rather than re-deriving it.
   floor, and `theBarHoldsThreeTabs` is the tripwire
 
 ## VoiceOver
-- The vessel is exactly **one** element in both processes: `.accessibilityElement(children: .ignore)`
-  + a label + an `.accessibilityValue` carrying percent and millilitres
+- The vessel is exactly **one** element in all three processes that draw it — the app, the widget
+  and the watch: `.accessibilityElement(children: .ignore)` + a label + an `.accessibilityValue`
+  carrying percent and millilitres
 - The week card's summary is one element; each day is exactly one button, with `.isSelected` on the
   shown day
 - The week card's summary speaks the average, the best day and the days the goal was met. A met
@@ -127,6 +128,10 @@ rather than re-deriving it.
   vessel's own percent-and-millilitres string — and its quiet form speaks no figure: the label alone,
   and *Log Water* on the button. A figure hidden from sight is hidden from speech. The small Home
   Screen widget's quiet form is the same: its vessel keeps its label and speaks no figure
+- Each pour button on the watch is one button whose label is the phone's `%1$@, add %2$d
+  millilitres`; the amounts drawn under its discs are hidden
+- Each watch face is one element — label *Today's hydration*, value the vessel's own sentence
+  through `WristPlan.Face.spokenFigures(in:locale:)` — and its quiet form speaks its label alone
 - The week widget is one element: label *Last 7 days*, value the sentence History's card speaks —
   the average, the best day and the days met. Its bars, letters and figure are hidden. With no
   week, its value is the line it draws
