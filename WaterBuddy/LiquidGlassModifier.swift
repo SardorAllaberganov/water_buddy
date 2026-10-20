@@ -23,12 +23,12 @@ enum LiquidGlass {
     ///
     /// Adopted from Apple's *Applying Liquid Glass to custom views*, which describes
     /// `Glass.interactive()` as glass that "reacts to touch and pointer interactions in real time".
-    /// On iOS 26 and later an interactive pane **is** that glass
+    /// On iOS 26 and later, and on the watch, an interactive pane **is** that glass
     /// (``LiquidGlass/systemVariant(density:interactive:)``). These multipliers are what the
     /// hand-made stack does instead, wherever ``LiquidGlass/rendering(base:reduceTransparency:systemGlassAvailable:)``
-    /// answers `.handMade`: below iOS 26, in the widget, and on the watch until its own stage. The
-    /// edge and specular boosts also brighten the sheen and lit rim laid over Apple's glass (stage
-    /// 3c), so a pressed pane's rim answers on both paths.
+    /// answers `.handMade`: below iOS 26, and in the widget. The edge and specular boosts also
+    /// brighten the sheen and lit rim laid over Apple's glass (stage 3c), so a pressed pane's rim
+    /// answers on both paths.
     ///
     /// Three multipliers rather than one, because the three layers carry the press in different
     /// schemes. In **light** mode the tint does the work: frosted goes 0.45 → 0.61, clamped to the
@@ -247,16 +247,13 @@ enum LiquidGlass {
 
     /// Whether this process can draw Apple's glass.
     ///
-    /// **iOS only, for now.** watchOS 26 has the API and the watch's floor is 26.0, so the watch
-    /// could take this path today — but the watch's panes have not been rendered on Apple's
-    /// glass, and a pane nobody has rendered is not one to ship. The watch stage of the
-    /// redesign turns it on (spec §9, §14).
+    /// On the phone, from iOS 26. On the watch, always: its floor is watchOS 26.0, where the API
+    /// begins, and the redesign's watch stage rendered and measured its panes on it (spec
+    /// `2026-10-20-the-watch-stage-design.md` §3.3).
     ///
     /// A `static let`, resolved once: the answer cannot change while the process lives.
     nonisolated static let systemGlassAvailable: Bool = {
-        #if os(iOS)
-        if #available(iOS 26.0, *) { return true }
-        #endif
+        if #available(iOS 26.0, watchOS 26.0, *) { return true }
         return false
     }()
 
@@ -337,8 +334,11 @@ enum LiquidGlass {
     ///   (`docs/DESIGN.md`, *The look, measured*). The three stay in density order — opaque is the
     ///   lightest measured rung above frosted, though a lighter one passed — and opaque stays under
     ///   1, or the pane is a slab.
-    /// - **The widget's `.archived` base and the watch** keep black at today's values: the archive's
-    ///   fills were derived for it (``Base/archived``), and the watch's look is its own stage's.
+    /// - **The widget's `.archived` base** keeps black at today's values: the archive's fills were
+    ///   derived for it (``Base/archived``). The watch's answer is black too, and no watch pane asks
+    ///   it: since the redesign's stage 7 the watch draws Apple's glass, or the opaque fill under
+    ///   Reduce Transparency, never this stack. It is kept for the test that asks the watch's
+    ///   question, so a watch that ever fell back would draw what it drew before.
     nonisolated static func scrim(
         density: Density,
         scheme: ColorScheme,
@@ -396,10 +396,10 @@ extension EnvironmentValues {
 /// A glass surface, drawn one of three ways. ``LiquidGlass/rendering(base:reduceTransparency:systemGlassAvailable:)``
 /// decides which, and no call site is told.
 ///
-/// - **Apple's glass**, on iOS 26 and later, for a base that can sample its backdrop. The system
-///   draws the pane and its depth; this file lays the stack's sheen and lit rim over it, under the
-///   content (``litSurface``). `tint`, `elevation` and the scrim describe the hand-made stack, and
-///   Apple's glass takes none of them.
+/// - **Apple's glass**, on iOS 26 and later and on the watch, for a base that can sample its
+///   backdrop. The system draws the pane and its depth; this file lays the stack's sheen and lit
+///   rim over it, under the content (``litSurface``). `tint`, `elevation` and the scrim describe
+///   the hand-made stack, and Apple's glass takes none of them.
 /// - **The opaque pane**, under Reduce Transparency, on every OS.
 /// - **The hand-made stack**, everywhere else. Its six layers, bottom to top, are what make it
 ///   read as a physical pane rather than a translucent rectangle:
@@ -493,13 +493,12 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
     /// what the API is: it anchors its shape behind the view and applies the glass's foreground
     /// effects over it.
     ///
-    /// The `else` and the `#else` draw this file's own pane. They are also reached, as
-    /// `.handMade`, if ``rendering`` and this check ever disagreed, which
-    /// `theAvailabilityFlagMatchesTheRunningSystem` exists to prevent.
+    /// The `else` draws this file's own pane. It is also reached, as `.handMade`, if ``rendering``
+    /// and this check ever disagreed, which `theAvailabilityFlagMatchesTheRunningSystem` and
+    /// `theWatchDrawsAppleGlass` exist to prevent.
     @ViewBuilder
     private func sampling(_ content: Content) -> some View {
-        #if os(iOS)
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, watchOS 26.0, *) {
             content
                 .background(ownPane(systemGlassDrawn: true))
                 .glassEffect(rendering == .system ? systemGlass : .identity, in: shape)
@@ -512,9 +511,6 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
         } else {
             content.background(ownPane(systemGlassDrawn: false))
         }
-        #else
-        content.background(ownPane(systemGlassDrawn: false))
-        #endif
     }
 
     /// What this file draws behind the content: the opaque pane, the hand-made stack, or — where
@@ -541,8 +537,7 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
             .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
     }
 
-    #if os(iOS)
-    @available(iOS 26.0, *)
+    @available(iOS 26.0, watchOS 26.0, *)
     private var systemGlass: Glass {
         let variant = LiquidGlass.systemVariant(density: density, interactive: interactive)
         let darkening = LiquidGlass.systemTintOpacity(for: variant)
@@ -556,7 +551,6 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
         let tinted = glass.tint(darkening > 0 ? LiquidGlass.systemTintColor.opacity(darkening) : nil)
         return interactive ? tinted.interactive() : tinted
     }
-    #endif
 
     // MARK: Layers
 
@@ -730,25 +724,20 @@ struct PrimarySurfaceModifier<S: Shape & InsettableShape>: ViewModifier {
 
 /// Groups sibling glass panes that sit close together.
 ///
-/// On iOS 26 and later this is Apple's `GlassEffectContainer`: the system samples the backdrop
-/// once for the panes inside it and draws them as one layer of glass. Everywhere else it is the
-/// content, untouched — the hand-made stack needs no container.
+/// On iOS 26 and later, and on the watch, this is Apple's `GlassEffectContainer`: the system
+/// samples the backdrop once for the panes inside it and draws them as one layer of glass.
+/// Everywhere else it is the content, untouched — the hand-made stack needs no container.
 ///
 /// The branch is on the system and nothing else, so it cannot change while the app runs and
-/// nothing inside is rebuilt. `#if os(iOS)` keeps the watch on the pass-through until its own
-/// stage, as ``LiquidGlass/systemGlassAvailable`` does for the panes.
+/// nothing inside is rebuilt.
 private struct GlassGroupModifier: ViewModifier {
 
     func body(content: Content) -> some View {
-        #if os(iOS)
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, watchOS 26.0, *) {
             GlassEffectContainer { content }
         } else {
             content
         }
-        #else
-        content
-        #endif
     }
 }
 

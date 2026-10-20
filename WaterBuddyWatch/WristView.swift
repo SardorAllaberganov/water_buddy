@@ -284,7 +284,10 @@ struct WristView: View {
                 .frame(maxWidth: .infinity, minHeight: wristMinimumTarget)
                 // `.sheer`: a short label and a control, not sentence-length text — the density the
                 // rows this replaces already used (rule `60-design-system`).
-                .liquidGlass(in: Capsule(), density: .sheer)
+                // Interactive: the glass is what is pressed, and on Apple's glass a sheer control
+                // takes the regular, tinted variant — the clear one would leave its label on
+                // untinted glass (#91(b)).
+                .liquidGlass(in: Capsule(), density: .sheer, interactive: true)
                 .contentShape(Capsule())
             }
             .buttonStyle(.plain)
@@ -453,7 +456,10 @@ private struct WristServingMenu: View {
                         .padding(.horizontal, wristCapsuleInset)
                         .padding(.vertical, wristCapsuleVerticalInset)
                         .frame(minHeight: wristMinimumTarget)
-                        .liquidGlass(in: Capsule(), density: .sheer)
+                        // Interactive: the glass is what is pressed, and on Apple's glass a sheer
+                        // control takes the regular, tinted variant — the clear one would leave its
+                        // label on untinted glass (#91(b)).
+                        .liquidGlass(in: Capsule(), density: .sheer, interactive: true)
                         .contentShape(Capsule())
                     }
                     .buttonStyle(.plain)

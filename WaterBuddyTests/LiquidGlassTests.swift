@@ -164,7 +164,7 @@ struct LiquidGlassRoutingTests {
         #expect(LiquidGlass.rendering(base: material, reduceTransparency: false, systemGlassAvailable: true) == .system)
     }
 
-    /// iOS 17 to 25, and for now the watch: exactly the stack every pane drew before this existed.
+    /// iOS 17 to 25: exactly the stack every pane drew before this existed.
     @Test func aMaterialBaseFallsBackToTheHandMadeStackWhereItHasNot() {
         #expect(LiquidGlass.rendering(base: material, reduceTransparency: false, systemGlassAvailable: false) == .handMade)
     }
@@ -268,7 +268,9 @@ struct LiquidGlassScrimTests {
         }
     }
 
-    /// The watch draws the hand-made stack on a `.material` base, and its look is its own stage's.
+    /// The watch's answer stays black. No watch pane asks it since the redesign's stage 7 — the
+    /// watch draws Apple's glass, or the opaque fill under Reduce Transparency — so a watch that
+    /// ever fell back to the hand-made stack would draw what it drew before.
     @Test func theWatchKeepsItsBlackScrim() {
         for density in densities {
             let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: false)
