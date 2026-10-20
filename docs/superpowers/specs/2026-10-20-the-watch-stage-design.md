@@ -16,6 +16,15 @@ the owner decides (rule `99-docs-cascade`) — typed for approval **before** 7a'
 measured on watchOS 27.0 alone by the owner's ruling (§3.2's note), the tint kept at `0.64` by the
 plan's own branch. 7b and 7c are not begun.)*
 
+*(2026-10-20, later still: 7a is committed (`90fef5d`). **7b is built, gated and staged**, on
+watchOS 27.0. Four of its figures moved from this text, each by the owner's word or a ruling recorded
+in the plan's note before its Task 4: the column fills the safe area and the bottom inset down to
+22 pt, so the 46 mm vessel is 77 pt, not the canvas's 100 — the canvas does not fit below the real
+clock; the caption gives way to the vessel and is a turn of the crown away on 46 mm; the `%` is never
+under 14 pt bold; below the accessibility sizes a disc gives way to the 44 pt floor where three do not
+fit (§3.4's "where the screen allows"). Each button, pressed on the simulator, pours its own serving.
+7c is not begun.)*
+
 **Authority.** Subordinate to the DocC on the type being changed, then `.claude/rules/`, then
 `CLAUDE.md` (rule `99-docs-cascade`). Where it contradicts the code, the code wins and this document
 changes.

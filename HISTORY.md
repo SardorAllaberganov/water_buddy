@@ -11373,3 +11373,231 @@ files by name; this file and `docs/AI_CONTEXT.md` are added again once their blo
 12 modified, 1 added: 7a's eleven and this pass's `CLAUDE.md` and `docs/WIDGET.md`. **7 unstaged**:
 the six rule files with spec §5's wording, and `.claude/settings.json` (the owner's). **1
 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-20] — Roadmap item 1.3.2, stage 7b: the watch's screen
+
+### What
+
+The watch's screen becomes the canvas's board *Watch*. Built in the main loop from the plan
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md`, its Tasks 4–8, tests first, on HEAD
+`ca43a60` (7a committed as `90fef5d`, its doc sync `63f8a46`, the rule wording `ca43a60`).
+
+- **`WaterBuddy/WristPlan.swift`** (shared with both watch targets): `WristPlan.Face` — `total`,
+  `goal`, `progress` held to `0...1`, `percentage` held to `0...999` and rounded as the complication
+  always rounded it, `spokenFigures(in:locale:)` and `millilitreLine(in:locale:)` in the app's own
+  keys, `sample` — and `WristPlan.face(mirror:outbox:now:calendar:)`. Foundation only, `nonisolated`.
+- **`WaterBuddyWatch/WristModel.swift`**: `face`; `displayGoal` and `todaysTotal` read through it.
+- **`WaterBuddyWatch/WristVessel.swift`**: a display again — takes a `Face` and a diameter, one
+  VoiceOver element (*Today's hydration*, the vessel's sentence); the percentage only, the figure at
+  0.32 of the diameter and the `%` at `signSize(diameter:)`, `max(14, 0.14 × D)`, bold; the scrim full
+  by 32%; `readout(…)` and `diameter(fitting:reserving:)` removed.
+- **`WaterBuddyWatch/WristColumn.swift`**, new: a `Layout` — the vessel takes what the line and the
+  row leave, between its floor and ceiling, and the caption, the last child, gives way to it.
+- **`WaterBuddyWatch/WristView.swift`**: the screen — the vessel, the line under it, `WristPourRow`,
+  the caption. The row: Cup and Bottle as `.liquidGlass(in: Circle(), density: .sheer,
+  interactive: true)` discs, the Glass the primary surface (`ring: false`), a capsule carrying its
+  amount where the row has room, three discs where not, a sideways scroll past that, inside
+  `.glassGroup()`; each button labelled with the phone's `%1$@, add %2$d millilitres`, the drawn
+  amounts hidden. Pure statics: `pourRow(from:)`, `pourLabel`, `amountLabel`, `vesselRange`,
+  `columnHeight`, `columnShare`, `discDiameter`. Gone: the *More* button and its sheet,
+  `vesselHeightFraction`, `primaryIndex` (now `DataManager.usualSlot`), `wristCapsuleInset` and
+  `wristCapsuleVerticalInset`.
+- **`WaterBuddyWatch/Localizable.xcstrings`**: +`%1$@ of %2$@ ml`, +`%1$@, add %2$d millilitres`
+  (with its plural variations), copied from the app's catalogue value for value; −`%1$@ / %2$@ ml`,
+  −`Logs %1$d millilitres`, −`More`, −`Shows the other serving sizes`. 14 keys. Edited by hand with
+  Xcode holding no WaterBuddy file; round-trips byte for byte.
+- **Tests**: `WristPlanTests` +6; `WristModelTests` +1; `WristViewLogicTests` +5, the readout test
+  rewritten for the line, the scrim's line test replaced by two for the percentage;
+  `WristVesselLayoutTests` −2, +7; `LocalizationTests`' watch lists, `countedKeys` and `expected`.
+
+### The rulings this rests on
+
+- The owner, "go", on the recommendation: **the caption is `WristColumn`'s last child and gives way
+  to the vessel** — spec §3.4 ("static wherever it fits") and §9 over the plan, which put it below a
+  full-height column on every watch.
+- The owner, asked under `CLAUDE.md`'s hard limit when the test and the code disagreed: **2,050 of
+  2,000 reads 102%**. The plan's 103 was hand arithmetic; `2050 / 2000 * 100` is 102.49999999999999
+  in `Double`, and the complication, `WaterSnapshot` and `HomeView` all round it to 102. The literal
+  changed, with a comment; the code did not.
+- The owner, from three 46mm renders at the plan's Step 8 stop: **the column fills the safe area and
+  the bottom inset down to the canvas's 22pt margin** (`WristView.columnHeight`). The 46mm safe area
+  is 204×159 under insets of 53 and 36; the plan had assumed ~210, and the vessel came out 63pt.
+  Chosen: 77pt there, the row on screen, the caption a turn of the crown away.
+- Mine, logged in the ledger: on the 40mm watch the disc row did not fit at the default size — its
+  three amounts are 45–47pt wide against 44pt shares of a 142pt row — and fell to the sideways
+  scroll, cutting *500 m*. **Below the accessibility sizes a disc gives way to its column's share,
+  down to the 44pt floor, and an amount may scale inside that share; at the accessibility sizes both
+  keep their size and the row scrolls sideways.** Spec §3.4's "at least 44pt, the canvas's 46pt where
+  the screen allows". The first cut kept any disc grown by type; the final review (below) showed the
+  40mm row would then scroll from xLarge, and it was widened, test first.
+- The owner, at the contrast pass's stop: **the `%` is never under 14pt bold** — the canvas's own
+  size and weight, large text. At 0.14 of a 77pt vessel it was 11pt, small text, 3.99:1 over a full
+  vessel against 4.5; the widget's two readout shadows reached 4.34.
+
+### What was run, and what it showed
+
+- **RED, then GREEN, each task**: Task 4 — *no member 'Face'* on the phone and *'face'* on the watch;
+  then 15 and 27 (after the 102 ruling). Task 5 — *no member 'pourRow'/'pourLabel'/'amountLabel'*, and
+  value failures in `theWatchAgreesWithThePhoneOnEverySharedString` and
+  `everyCountedKeyTakesTheFormItsCountNeeds` in three languages; then 27 and 29. Task 6 — *cannot find
+  'WristColumn'*, *no member 'vesselRange'*; then 65, 29 and the watch widget built; then
+  `columnHeight`'s RED and 66. Task 7 — `belowWhereWaterReachesThePercentageTheScrimIsStillRamping`
+  failing at the old 0.2; then 67. Task 8 — `columnShare`/`discDiameter` RED, 69; `signSize` RED, 70.
+- **The ink**, an `ImageRenderer` probe in a copy of the tree, the empty vessel on black at 2×,
+  redrawn into a known RGBA layout before any byte was read: the percentage's lowest ink 0.108,
+  0.110, 0.106, 0.115 and 0.114 of the diameter below the centre at 60, 77, 80, 100 and 123pt — `ink`
+  0.12; water reaches it at 0.325 to 0.345; the scrim is full by 0.32.
+- **The renders**, a probe copy of the working tree seeded through `WristModel.apply(_:)`, on all
+  five *WaterBuddy Probe Watch* sizes (27.0) at 0, 1,300 and 2,600 ml and with 150/1,000/1,500 ml
+  vessels; on 46 and 40mm in Russian and Uzbek, under forced Reduce Transparency, and at a forced
+  `.accessibility5` — `simctl ui content_size` answers *"Runtime does not support dynamic text"* on
+  a watch. Every capture was looked at: the capsule row on 46 and 49mm, three discs on 40–44mm and
+  for a litre, the 40mm row scrolling sideways at the largest size, the opaque panes under Reduce
+  Transparency. The pairs, by `docs/DESIGN.md`'s method with each box found from its ink, are in
+  *The watch's screen, measured*: the line 6.72 / 6.87 (46 / 40mm), the glyphs 7.31–7.94, the
+  amounts 7.05–7.22, the figure 3.21–4.99, the `%` 3.54–4.66 — none under its floor.
+- **The gate**, on a copy of the index (`git checkout-index`, 16:19), one simulator at a time,
+  `-parallel-testing-enabled NO`, `-collect-test-diagnostics never`:
+  - unit, *iPhone 17* (27.0): `✔ Test run with 683 tests in 86 suites passed`; the attribute grep
+    says 683.
+  - UI, *WaterBuddy Gate 27*: `GoalSetupUITests` 19 with 1 skipped and 0 failures, 19 with 0; the
+    other three classes 31 with **1 failure** — `WelcomeUITests.testAStepIsAsItWasLeftWhenBackReturnsToIt`,
+    *Failed to tap "Use 2 800 millilitres"* at `:368`, #140's lost tap. Alone five times: the change
+    3 of 5 (one `:368`, one launch-time wait at `:19`), `HEAD` 4 of 5 (one `:368`), one-minute loads
+    127 to 361 while another project's iOS 18.6 simulator tests and crash reporting ran. Re-run at a
+    load of 8: 31, 0 failures. This change touches no phone view.
+  - UI, *WaterBuddy Gate 26.5*: 19 with 1 skipped, 19, 31 — **69, 0 failures**.
+  - watch, *WaterBuddy Watch 27*: `✔ Test run with 70 tests in 7 suites passed`; the grep says 70.
+  - `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`.
+- **The warning comparison**, clean builds of a `HEAD` `ca43a60` export and of the index copy:
+  `-scheme WaterBuddy` 35 and 35 (19 by file and message), `WaterBuddyWatch` 2 and 2,
+  `WaterBuddyWatchWidget` 29 and 29 (17), `WaterBuddyWidgetExtension` 29 and 29 (17) — **`comm -13`
+  empty on all four**.
+
+### Not done
+
+- Anything on watchOS 26.x (#151). A press on a device, by the crown or VoiceOver (#152, new). The
+  faces — 7c.
+
+### The press, and how it was first misread
+
+The plan's Task 8, Step 3: the owner clicked Cup, the Glass and Bottle in `DeviceHub.app` on *Probe
+Watch 46* while a background capture saved a frame at each change. The session looked first — one
+frame, a screenshot at 16:17:24 reading *1 240*, and *"Received an unexpected HID event of type 1.
+Ignoring."* in every process's log — and recorded the press as impossible on a watch simulator. The
+clicks came from 16:17:43 to 16:18:13. The capture saved 75 frames: *1 240* → 1 490 (+250) → 1 990
+(+500) → 2 240 → 2 740 → 3 240 → 3 740, then the screen scrolled under the owner's drag; the watch's
+own outbox held twelve pours, 150 twice, 250 four times and 500 six times. **Each button pours its own
+serving and the screen follows.** The final review's question — where is the evidence a button
+pours? — is what sent the session back to the outbox. The HID lines are noise (`tasks/lessons.md`).
+
+### The final review
+
+A fresh reviewer read the staged diff against the plan, the spec and the rules: **0 critical, 2
+important, 6 minor.** Important: (1) the disc ruling above, fixed — `discDiameter(…,
+accessibilitySize:)`, `aDiscGivesWayToTheFloorBelowTheAccessibilitySizes` RED (the call took no such
+argument) then GREEN, 70 on the watch, and the 40, 44 and 46mm screens rendered at a forced xxxLarge
+(every row fits, the discs at 44 on 40 and 44mm) and at `.accessibility5` (40 and 44mm scroll
+sideways); (2) no evidence a button pours — answered above. Deferred for the owner, as minor: the
+60pt vessel floor spelled twice; `WristColumn`'s give-way and row roles assume four children, with no
+test for fewer or for the width clamp; the sideways `ScrollView` clipping the glass discs (rule
+`60-design-system` asks for `.scrollClipDisabled()`); tap-to-pour-era test names, a MARK and the
+suite's DocC, `wristCapsuleSideInset`'s "192 pt" (188) and `wristRowMinimumGap`'s "8 pt" (~6),
+`Face`'s DocC saying the complication reads it (7c), `wristAmountSpacing` reused inside the capsule;
+`theLineAndTheLabelsFollowThePhonesLanguage`'s prefix check, which a missing Russian key would pass;
+and one test's "schoolbook rounding of the exact share", which is a `Double` share. It also asked
+whether 14pt bold is large text by strict WCAG — 14pt there is 18.7 CSS px — which goes to the owner
+with the `%` ruling.
+
+### Files touched
+
+`WaterBuddy/WristPlan.swift` · `WaterBuddyWatch/WristColumn.swift` (new) ·
+`WaterBuddyWatch/WristModel.swift` · `WaterBuddyWatch/WristVessel.swift` ·
+`WaterBuddyWatch/WristView.swift` · `WaterBuddyWatch/Localizable.xcstrings` ·
+`WaterBuddyTests/WristSyncTests.swift` · `WaterBuddyTests/LocalizationTests.swift` ·
+`WaterBuddyWatchTests/WristModelTests.swift` · `WaterBuddyWatchTests/WristViewLogicTests.swift` ·
+`WaterBuddyWatchTests/WristVesselLayoutTests.swift` · `docs/AI_CONTEXT.md` · `docs/DESIGN.md` ·
+`docs/ROADMAP.md` · `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md` ·
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md` · `tasks/lessons.md` · `HISTORY.md`.
+
+### Gate
+
+Run in this session, on a copy of the index, as *What was run* gives it: unit 683; UI 69 on each
+system with 1 skipped by design — on 27.0 after #140's lost tap was re-run; watch 70; both widgets
+built; no new warning on any scheme. watchOS 26.x not run (#151).
+
+After the final review's fix, on a second copy of the index (18:02): watch `✔ Test run with 70
+tests in 7 suites passed`; unit `✔ Test run with 683 tests in 86 suites passed`; both widget schemes
+`** BUILD SUCCEEDED **`; clean builds against the `HEAD` export, `-scheme WaterBuddy` 35 and 35,
+`WaterBuddyWatch` 2 and 2, `WaterBuddyWatchWidget` 29 and 29 — nothing new. The UI suites were not
+run again: the fix is the watch's row alone, which no phone UI test reaches.
+
+**Staging.** Read from the commands at 18:07 on 2026-10-20, after this session's last `git add` of
+its files by name — the review's fix and the corrected records; first read at 17:42, the same counts;
+this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `ca43a60`, 154 commits, `## main...origin/main`. **18 staged** —
+17 modified, 1 added (`WaterBuddyWatch/WristColumn.swift`). **1 unstaged**: `.claude/settings.json`
+(the owner's). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-20] — `/doc_sync` after 1.3.2's stage 7b, before its `/commit`
+
+### What
+
+The seventy-seventh pass, run by the owner in the session that built 7b, after 7b's records were
+written and staged and before `/commit`. No source or test file changed in the pass.
+
+- **Two file rows were stale**, both left by the final review's fix, which came after the rows were
+  written: `WaterBuddyWatch/WristView.swift` 495 → **498**, and
+  `WaterBuddyWatchTests/WristVesselLayoutTests.swift` 116 → **120**, whose words still described a
+  disc grown by type as never giving way.
+- **Three current sentences still named the watch's `primaryIndex`**, which 7b deletes — the
+  *Targets* table's `usualSlot` note and #136 in `docs/AI_CONTEXT.md`, and the servings row of
+  `docs/STATE.md` — each gains a dated note. #100(b) and #103's citations of `WristVessel.swift:126`
+  and `:127` already carry 1.2.6's "gone".
+- **`CLAUDE.md`'s warning trail** gains 7b: unchanged on all four schemes against a clean build of a
+  `HEAD` `ca43a60` export, and again on three after the review's fix.
+- **`docs/STATE.md`** gains a *Last updated* line: no key moved.
+- **Known issue #50** gains a note. During the pass the owner opened WaterBuddy in Xcode, and the
+  working tree gained unstaged rewrites of five files — the watch's and the watch widget's catalogues
+  (Xcode's style, three or four extracted keys with no values, every staged key unchanged),
+  `WaterBuddy/AppShortcuts.xcstrings` (four entries), and the `WaterBuddyWatch` and
+  `WaterBuddyWatchWidget` schemes (one `BlueprintName` line each). The index holds 7b as gated. The
+  pass touched none of them.
+- **`tasks/lessons.md`**: one entry — rows written before the review's fix.
+- **`docs/AI_CONTEXT.md`**'s head gains this pass's block and *Git* its staging block.
+
+### What the pass checked and left
+
+- 95 tracked `.swift` files, each with its row, every count equal to `wc -l` by script, after the
+  two fixes.
+- 683 `@Test`, 70 on the watch, 56 UI `func test`, by the attribute grep — the gate's counts.
+- The three exception sets, six files each, as `CLAUDE.md` gives them; `project.pbxproj` last changed
+  in `eba1b1e`. 13 keys on `DataManager.Key`, 11 phone and 2 watch, as `CLAUDE.md` and
+  `docs/STATE.md` give them. Every cited rule resolves. No `docs/ARCHITECTURE.md`, `CAPABILITIES.md`
+  or `dependencies.md`.
+- `docs/WIDGET.md`: 7b changes none of the phone widget's six shared files, and the watch face's
+  provider reads `WristPlan.Face` only from 7c — left. `docs/DESIGN.md`: the scrim's levels
+  (0.325 … 0.345) and the ceilings (98.08 on the 46mm) recomputed, and the 40mm vessel read off a
+  render at the 60pt floor — left. `docs/ROADMAP.md`, the spec and the plan: written by 7b's records
+  in this session, read again, left.
+- `CLAUDE.md`'s target table and its shared-file, storage and architecture lists: no sentence moved by
+  7b; the watch row names `WristView` and `WristModel`, both still true.
+
+### Files touched
+
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/STATE.md` · `tasks/lessons.md` · `HISTORY.md`.
+
+### Gate
+
+Not re-run in this pass. 7b's gate ran earlier in this session, on copies of the index; its results
+are 7b's checkpoint above.
+
+**Staging.** Read from the commands at 18:13 on 2026-10-20, after this pass's `git add` of its five
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `ca43a60`, 154 commits, `## main...origin/main`. **20 staged** —
+19 modified, 1 added: 7b's eighteen and this pass's `CLAUDE.md` and `docs/STATE.md`. **6 unstaged**:
+`.claude/settings.json` (the owner's) and Xcode's five rewrites (#50) — the two shared schemes
+`WaterBuddyWatch.xcscheme` and `WaterBuddyWatchWidget.xcscheme`, `WaterBuddy/AppShortcuts.xcstrings`,
+`WaterBuddyWatch/Localizable.xcstrings` and `WaterBuddyWatchWidget/Localizable.xcstrings`. **1
+untracked**: `Screenshots/census/`. **1 in both**: `WaterBuddyWatch/Localizable.xcstrings`, staged as
+7b gated it, rewritten by Xcode in the tree.

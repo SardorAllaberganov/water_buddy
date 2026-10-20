@@ -633,6 +633,23 @@ git diff --name-status
 
 ---
 
+*(2026-10-20, later: **Tasks 4–8 are done, gated and staged** — 7b, by the session that built it,
+on watchOS 27.0 alone. Where it left this text, each by a ruling in the session's ledger: Task 4's
+`face.percentage == 103` reads **102** — 2,050 / 2,000 × 100 is 102.49999999999999 in `Double`, as the
+phone rounds it (the owner's word). Task 6's caption is `WristColumn`'s **last child, giving way to
+the vessel**, not below a full-height column (spec §3.4). Its Step 8 stopped: the 46 mm safe area is
+159 pt under a 53 pt clock, not ~210, and the vessel came out 63 pt; the owner chose
+`WristView.columnHeight` — the safe area and the bottom inset to the canvas's 22 pt margin — 77 pt.
+Task 8's renders found the 40 mm row in its sideways scroll at the default size: below the
+accessibility sizes a disc now gives way to the 44 pt floor and an amount may scale inside its
+column's share (`discDiameter`, `columnShare`) — widened after the final review, which found the
+first cut would still scroll from xLarge. Its contrast pass stopped on the `%`, small text in the
+smaller vessel at 3.99:1; the owner chose a 14 pt bold floor (`WristVessel.signSize`). Task 7's ink
+measured 0.106–0.115, so `ink` = 0.12 and the scrim is full by 0.32. The owner pressed each button in
+`DeviceHub.app` and the line moved by each serving (`docs/AI_CONTEXT.md` #152, first misrecorded as
+failed). `simctl ui content_size` is unsupported on a watch runtime; the sizes were forced in the probe.
+The boxes below are left as written; `HISTORY.md` has the record.)*
+
 ### Task 4: 7b — `WristPlan.Face`, and the model reading it
 
 **Files:**

@@ -7,6 +7,12 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-20 (roadmap item 1.3.2's stage 7b, written by the session that built it —
+not a `/doc_sync` pass). **No shared token changed**; the watch's screen gains its own, in
+*The watch's screen, measured* — the column, the row's discs and capsule, the vessel's figure and
+sign, and the scrim's ramp re-derived from the percentage — with every pair measured on watchOS 27.0,
+none under its floor. The serving sheet whose amounts read 2.83:1 is gone.
+
 **Last updated:** 2026-10-20 (roadmap item 1.3.2's stage 7a, written by the session that built it —
 not a `/doc_sync` pass). **No token changed.** The watch draws Apple's glass: *Three ways to draw a
 pane*, the density and elevation lists, *Interactive glass* and the container's note say so in dated
@@ -1624,6 +1630,64 @@ median agrees with the figure at the median ground.
 - **Not measured:** watchOS 26.x (no runtime); the other four watch sizes; the press, which on Apple's
   glass is the system's own response and was not captured; Russian and Uzbek. 7b re-renders the
   screen on all five sizes.
+
+## The watch's screen, measured
+
+**2026-10-20, the redesign's stage 7b** (spec `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md`
+§3.4). The screen is the canvas's board *Watch*: the vessel a display, the millilitre line under it,
+a row of three pour buttons, the sync caption. **It supersedes the vessel and millilitre-line rows of
+*The watch's glass, measured*** above; those stay as the record of their day.
+
+**What is drawn**, and where each figure comes from:
+
+| Token | Value | Source |
+|---|---|---|
+| Column gap | 6 pt | the canvas (`WristColumn.gap`) |
+| Column height | the safe area + the bottom inset less 22 pt | the owner's ruling, from three 46 mm renders: the canvas laid out from y = 28 to 226 of 248, which does not fit below the real 53 pt clock inset (`WristView.columnHeight`) |
+| Vessel | 60 pt floor; ceiling 100/208 of the screen's width | the canvas's 100 pt on the 46 mm's 208 (`vesselRange`); 77 pt on the 46 mm as built, 60 on the 40 mm |
+| Figure | 0.32 × diameter, bold rounded | the canvas's 32 in 100 |
+| `%` | 0.14 × diameter, **never under 14 pt**, bold rounded | the canvas's 14 pt bold — large text; at the share alone it was 11 pt in the 77 pt vessel and read 3.99:1 (the owner's ruling) |
+| Scrim full at | **32%** (was 20%) | water first reaches the figure's ink at `(0.36·D − 6)/(D − 12)`: the ink ends 0.106–0.115 of D below the centre on `ImageRenderer` renders at 60, 77, 80, 100 and 123 pt, rounded up to 0.12; 0.325 at the floor, rounded down |
+| Line | `.footnote` semibold, full white, `minimumScaleFactor(0.7)` | out of the water (#44 retired) |
+| Disc | 46 pt (`@ScaledMetric`), held to 44…56; below the accessibility sizes it gives way to its column's share, down to 44, where three do not fit; at the accessibility sizes it keeps its size and the row scrolls sideways | the canvas's 46; rule `65-accessibility`; the 40 mm row would otherwise scroll from the default size (and, as first built, from xLarge — the final review's finding) |
+| Least gap between panes | 4 pt, the spare spread between them | rule `60-design-system`; the canvas's 8 on the 46 mm |
+| Glyph | 0.46 × disc | the canvas's 22 in 46, rounded down |
+| Capsule | glyph + 3 pt + amount, `.footnote` heavy rounded, 8 pt either side | the canvas's 84 pt capsule |
+| Amount under a disc | `.caption2` semibold, full white, 3 pt below; below the accessibility sizes it may scale to 0.5 inside its column's even share | the 40 mm row: amounts 45–47 pt wide against 44 pt shares |
+
+**Method.** *The watch's glass, measured*'s — a throwaway probe in a copy of the working tree, seeded
+through `WristModel.apply(_:)` from launch arguments, with switches for Reduce Transparency and
+`.accessibility5` (`simctl` sets neither on a watch); one capture a state once two agree, each looked
+at; the label's full-strength ink against the lightest pixel of the clean rows above and below it,
+the box the label's own ink found from the render. Boxes placed by hand with their clean rows 6 to
+13 px off the ink read the 100% figure at 2.89 and 2.65 — brighter water further out — and were
+superseded. *WaterBuddy Probe Watch 46* and *40*, **watchOS 27.0 only** (#151).
+
+| Pair | Floor | 46 mm | 40 mm | Reduce Transparency, 46 / 40 |
+|---|---|---|---|---|
+| The line, white, on the aurora | 4.5 | 6.72 | 6.87 | 11.56 / 11.50 |
+| Cup's glyph, white, on its disc | 3 | 7.53 | 7.50 | 12.03 / 12.03 |
+| Bottle's glyph, white, on its disc | 3 | 7.94 | 7.31 | 12.03 / 12.03 |
+| *150 ml* under its disc | 4.5 | 7.22 | 7.07 | 9.64 / 9.18 |
+| *500 ml* under its disc | 4.5 | 7.22 | 7.11 | 9.77 / 9.54 |
+| The figure at 0% (glass, no scrim) | 3 | 4.42 | 4.48 | — |
+| The figure at 62% | 3 | 4.86 | 4.77 | 4.99 / 4.86 |
+| The figure at 100% | 3 | 3.31 | 3.21 | — |
+| The `%` at 0% | 3 | 4.64 | 4.66 | — |
+| The `%` at 62% | 3 | 4.20 | 3.79 | 4.22 / 3.85 |
+| The `%` at 100% | 3 | 3.73 | 3.54 | — |
+
+- **The `%` before the floor**, at 0.14 × diameter semibold: 4.58 / 3.99 on the 46 mm (62% / 100%),
+  4.42 / 4.00 on the 40 mm, against 4.5 as small text. The widget's two readout shadows raised the
+  46 mm's 100% to 4.34; the old 0.28 figure with the shadows to 4.43. Neither reached 4.5.
+- **The Glass, white with `Aurora.top` content, is not measured** — its contrast is derived
+  (`thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`).
+- **Rendered and looked at, not measured:** all five sizes at 0, 1,300 and 2,600 ml and with
+  150/1,000/1,500 ml vessels (the capsule row on 46 and 49 mm; three discs on 40–44 mm and for a
+  litre), Russian and Uzbek, a forced xxxLarge on 40, 44 and 46 mm (every row fits, the discs at 44
+  on 40 and 44 mm), and `.accessibility5` (on 40 and 44 mm the row scrolls sideways).
+- **Not measured:** watchOS 26.x; the press, which the owner made in `DeviceHub.app` and which
+  poured each button's serving (#152), but whose glass response was not captured.
 
 ## Settings, measured
 

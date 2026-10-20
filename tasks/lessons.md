@@ -4298,3 +4298,89 @@ copy against the tree before building.
 **The rule:** a probe of unstaged work copies the working tree, and the copy is diffed against the
 tree before it is built. `git checkout-index` is for the gate, after the staging it is meant to
 prove.
+
+## 2026-10-20 — A watch plan sized its screen from the canvas, not from the safe area
+
+**What happened.** 7b's plan gave `WristColumn` the GeometryReader's height and expected the 46mm
+vessel at the canvas's 100pt. The render drew 63pt. A probe-only log of the proxy read 204×159 with
+insets of 53 at the top and 36 at the bottom — the plan had assumed about 210. The canvas laid itself
+out from y = 28 to 226 of the full 248, which does not fit below the real clock. The plan's own stop
+caught it; the owner chose a column that runs into the bottom inset to the canvas's margin, 77pt.
+
+**The rule:** before a plan sizes anything on the watch, log the screen's GeometryReader size and
+safe-area insets on the sizes it names, and derive heights from those. A canvas board is the whole
+screen; the app gets the safe area.
+
+## 2026-10-20 — Two black frames agree, and a warm relaunch on a watch simulator draws black
+
+**What happened.** The settle loop keeps the first shot that matches the one before it. After the
+first launch in a batch, `simctl launch --terminate-running-process` left the watch drawing black,
+two black frames agreed at once, and three renders were black. It looked like a layout failure at
+larger column heights until the first launch of every batch was seen to render whatever the height.
+`simctl terminate` and then `simctl launch` drew every time.
+
+**The rule:** a settle loop waits for a lit frame before it compares two; on a watch simulator a
+probe terminates and then launches. A failure that follows launch order, not input, is the harness.
+
+## 2026-10-20 — A press checked before it was made, and a log line read as its cause
+
+**What happened.** The plan's last step had the owner click each pour button in `DeviceHub.app` —
+Xcode 27 ships no `Simulator.app` — while a background capture saved a frame at each change. The
+owner answered "done"; the session listed one frame, took a screenshot reading *1 240*, found
+*"Received an unexpected HID event of type 1. Ignoring."* in every process's log, and recorded the
+press as impossible on a watch simulator. The clicks came 19 seconds after that screenshot: the
+capture then saved 75 frames, the line moving by each serving, and the watch's outbox held twelve
+pours. The HID lines are printed around every touch and mean nothing here. The final review asked
+for evidence that a button pours, which is what sent the session back to the outbox. Separately,
+`xcrun simctl ui <watch> content_size …` does answer *"Runtime does not support dynamic text"*.
+
+**The rule:** when a check needs someone's hands, let the capture run until they confirm, and read
+the device's own state — the store, the frames' timestamps — before the log. Compare every capture's
+time with the event it is meant to show. A warning a system prints for every process is not a cause
+until it is shown to differ between a press that works and one that does not. A watch probe sets the
+text size in its own copy, with `.transformEnvironment(\.dynamicTypeSize)` behind a launch argument.
+
+## 2026-10-20 — A frame with a `maxWidth` grows to it, and squeezed the Glass
+
+**What happened.** To let an amount under a disc shrink on the narrow 40mm row, it was given
+`.frame(maxWidth: share)`. Offered more on the 46mm row, each side amount took its whole 60pt share,
+and the Glass's capsule between them was squeezed until its glyph covered its amount. The 40mm
+renders had looked right; the 46mm ones showed it.
+
+**The rule:** a bound that may only give way is `.frame(maxWidth:)` followed by
+`.fixedSize(horizontal: true, vertical: false)`. After any change to a row's sizing, render the
+roomiest size as well as the tightest.
+
+## 2026-10-20 — Loose contrast boxes failed a pair that tight ones passed, and a smaller vessel moved a glyph's floor
+
+**What happened.** The first boxes for the 100% figure were placed by eye with their clean rows 6 to
+13px off the ink, in brighter water, and read 2.89:1 and 2.65:1 against 3. Boxes found from the
+render's own ink, the clean rows 2 to 5px off it — `docs/DESIGN.md`'s method — read 3.31 and 3.21.
+The same pass found the real failure: in a 77pt vessel the `%` at 0.14 of the diameter is 11pt, small
+text held to 4.5:1, where in `HEAD`'s 164pt vessel it was large text held to 3.
+
+**The rule:** find a label's box from its ink, never by eye, and take the clean rows within a few
+pixels of it. When a container shrinks, re-check which floor each text inside it now falls under —
+a share can carry a glyph across the large-text line.
+
+## 2026-10-20 — A probe built in the same call that printed its stale diff, and a hand-computed .5
+
+**What happened.** One probe rebuild printed the diff against the tree and built in the same call;
+the diff named `WristVessel.swift` as stale, and twenty renders were taken of the old scrim before it
+was read. Earlier the plan's test expected 103% for 2,050 of 2,000: by hand 102.5 rounds up, but
+`2050 / 2000 * 100` is 102.49999999999999 in `Double`, and the phone, the complication and the face all
+draw 102.
+
+**The rule:** diff the probe against the tree in one call, read it, and build in the next. A test
+literal at a .5 boundary is computed by the code's own arithmetic, not by hand.
+
+## 2026-10-20 — File rows written before the review's fix were stale by the time the sync read them
+
+**What happened.** 7b's session wrote its *Files on disk* rows, then ran the final review, whose fix
+added three lines to `WristView.swift` and four to `WristVesselLayoutTests.swift`. The records were
+corrected for what the fix changed in meaning, but not the two counts, and one row still described
+the disc as the fix had replaced it. The seventy-seventh pass's row check found both.
+
+**The rule:** a session writes its file rows after its last code change — after the final review's
+fixes — or re-runs the row check before it stages its records. A row's words are re-read beside the
+count whenever the file changed.

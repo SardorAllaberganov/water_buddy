@@ -4,6 +4,11 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-20 (seventy-seventh pass — `/doc_sync` after roadmap item 1.3.2's stage 7b,
+staged, before its `/commit`). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the
+phone and 2 on the watch, and 7b writes nothing new to either suite — `WristPlan.Face` is read, never
+stored. One dated note: `primaryIndex`, the watch's spelling of the Glass's index, is gone.
+
 **Last updated:** 2026-10-20 (seventy-fourth pass — `/doc_sync` after roadmap item 1.3.1's stage 6c,
 staged). **One key joins the phone's suite: `weekTotals`**, the last seven days' totals by day
 ordinal, derived like `currentWater` and written where it is recomputed, by the app and the
@@ -330,7 +335,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours — and a tenth, the rating request's mark

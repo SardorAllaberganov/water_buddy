@@ -223,6 +223,12 @@ for six files is the plan's first step.)* *(2026-10-20, later: **7a is built, ga
 Apple's glass on the watch. The runtime never arrived, and the owner withdrew the 26.x half: the stage
 is measured and gated on watchOS 27.0 alone, and what 26.x would show is known issue #151. The tint
 stays `0.64`; the serving sheet's `.secondary` amounts read 2.83:1 until 7b deletes the sheet.)*
+*(2026-10-20, later still: 7a is committed as `90fef5d`. **7b is built, gated and staged** — the
+canvas's screen: a vessel that shows the percentage, the millilitre line under it, Cup, the Glass and
+Bottle in a row, the sheet gone. On the owner's rulings the 46 mm vessel is 77 pt, not 100 — the
+canvas does not fit below the real clock — and the `%` is never under 14 pt bold. Every pair clears its
+floor on watchOS 27.0, and each button, pressed in `DeviceHub.app`, pours its own serving. A press
+on a device is still owed (known issue #152). 7c, the faces, is next.)*
 
 **1.3.3 — Apple Health.** Each serving written as dietary water, and removed when the serving is
 deleted or edited. Whether it also *reads* water other apps logged is the design's first question.
