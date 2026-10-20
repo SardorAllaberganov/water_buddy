@@ -11,25 +11,104 @@
         }
       }
     },
-    "%1$@ / %2$@ ml": {
+    "%1$@ of %2$@ ml": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ / %2$@ ml"
+            "value": "%1$@ of %2$@ ml"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ / %2$@ мл"
+            "value": "%1$@ из %2$@ мл"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ / %2$@ ml"
+            "value": "%2$@ dan %1$@ ml"
+          }
+        }
+      }
+    },
+    "%1$@, add %2$d millilitres": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, add %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg millilitre"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, добавить %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитра"
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитров"
+                    }
+                  },
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитр"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитра"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$d millilitr qo‘shish"
           }
         }
       }
@@ -237,88 +316,6 @@
         }
       }
     },
-    "Logs %1$d millilitres": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Logs %1$d millilitre"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Logs %1$d millilitres"
-                }
-              }
-            }
-          }
-        },
-        "ru": {
-          "variations": {
-            "plural": {
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Записывает %1$d миллилитра"
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Записывает %1$d миллилитров"
-                }
-              },
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Записывает %1$d миллилитр"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Записывает %1$d миллилитра"
-                }
-              }
-            }
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$d millilitr qayd etadi"
-          }
-        }
-      }
-    },
-    "More": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "More"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ещё"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yana"
-          }
-        }
-      }
-    },
     "Not yet synced": {
       "extractionState": "manual",
       "localizations": {
@@ -384,29 +381,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maqsadni iPhone’dagi WaterBuddy’da belgilang"
-          }
-        }
-      }
-    },
-    "Shows the other serving sizes": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shows the other serving sizes"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Показывает другие порции"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Boshqa porsiyalarni ko‘rsatadi"
           }
         }
       }

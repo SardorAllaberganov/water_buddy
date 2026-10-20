@@ -46,6 +46,25 @@ struct WristModelTests {
         }
     }
 
+    /// Review focus 4, the screen's half: the model draws exactly what the complication computes
+    /// from the same store.
+    @Test
+    func theModelsFaceIsThePlansFace() {
+        withTempDefaults { defaults in
+            let now = Date(timeIntervalSince1970: 1_000)
+            let model = makeModel(defaults, now: { now })
+            model.apply(WristMirror(
+                schemaVersion: WristMirror.currentSchemaVersion, currentWater: 1_000, dailyGoal: 1_600,
+                servings: [150, 250, 500], languageCode: nil, isGoalSet: true,
+                composedAt: now, phoneDayStart: Date(timeIntervalSince1970: 0), phoneDayEnd: Self.endOfFirstDay, acked: []
+            ))
+            model.pour(amount: 250)
+            #expect(model.face == WristPlan.face(mirror: model.mirror, outbox: model.pendingOutbox, now: now, calendar: Self.utc))
+            #expect(model.face == WristPlan.Face(total: 1_250, goal: 1_600))
+            #expect(model.face.percentage == 78)
+        }
+    }
+
     @Test
     func pouringAppendsToTheOutboxAndCallsSend() {
         withTempDefaults { defaults in

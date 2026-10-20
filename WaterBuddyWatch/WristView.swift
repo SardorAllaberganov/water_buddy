@@ -2,50 +2,59 @@
 //  WristView.swift
 //  WaterBuddyWatch
 //
-//  The one screen (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §8):
-//  vessel, the servings, "Synced Nm ago" — always present, never an alert. Deliberately no
-//  settings, goal editor, history or reminders here; each would author state the watch cannot own
-//  (v1 scope, owner-confirmed).
+//  The one screen (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §8): the
+//  vessel, the millilitre line under it, a row of three pour buttons — Cup, Glass, Bottle, the Glass
+//  the screen's primary surface — and "Synced Nm ago", always present, never an alert. Deliberately
+//  no settings, goal editor, history or reminders here; each would author state the watch cannot
+//  own (v1 scope, owner-confirmed).
 //
-//  The three pour rows that used to sit under the vessel are gone. The **vessel itself** is now the
-//  pour button for one serving, and the other two live behind a single button pinned to the bottom
-//  of the viewport (owner-approved, this pass). A watch screen has room for one obvious action, and
-//  stacking three equal-weight rows under a 140pt circle meant the circle — the thing the whole
-//  screen is about — was the one part of it you could not touch.
+//  The redesign's §9 and spec 2026-10-20 §3.4 drew it so. The tap-to-pour vessel with Cup and Bottle
+//  behind a *More* sheet that came before was reversed by decision D5: the vessel is a display again,
+//  and every serving is one tap away.
 //
 
 import SwiftUI
 
 // MARK: - Layout constants
 
-/// Off the bezel. A capsule flush to the edge of a round-rect display reads as clipped rather than
-/// as a button.
+/// Off the bezel. A pane flush to the edge of a round-rect display reads as clipped rather than as a
+/// button.
 ///
-/// File scope rather than a `private static` on `WristView`, because `WristServingMenu` below needs
-/// the identical figures and Swift's `private` does not reach a sibling type even in the same file.
+/// File scope rather than a `private static` on `WristView`, because `WristPourRow` below needs the
+/// figures beside it and Swift's `private` does not reach a sibling type even in the same file.
 /// `nonisolated` for the reason rule `43-concurrency` gives: `SWIFT_DEFAULT_ACTOR_ISOLATION =
 /// MainActor` infers `@MainActor` onto an unmarked declaration, and these are read from
 /// `nonisolated` contexts.
 nonisolated let wristScreenInset: CGFloat = 8
 
-/// Inside the capsule. `HistoryView.ServingRow` uses 22pt, which is 5.6% of a 393pt iPhone; the same
-/// proportion of a 41mm watch's ~176pt is 9.9, so: 10. Derived rather than picked, the way
-/// `MiniVessel`'s own sizing is (rule `60-design-system`), and then confirmed by rendering — a
-/// derivation is where a number starts, not proof that it looks right.
-///
-/// The rows this replaces had **no horizontal padding at all**: the `HStack` filled the row and the
-/// capsule wrapped it exactly, so "Cup" sat flush against the left rim and "150 ml" against the
-/// right. Nothing else in this codebase draws a capsule that way.
-nonisolated let wristCapsuleInset: CGFloat = 10
-
-/// The capsule's vertical inset. Named for the same reason ``wristCapsuleInset`` is, and because it
-/// is used by two types: the "More" button and the sheet's own rows have to be the same lockup, and
-/// two bare `10`s in two files is how they stop being.
-nonisolated let wristCapsuleVerticalInset: CGFloat = 10
-
 /// A `minHeight`, never a fixed `height`, so a target grows with Dynamic Type instead of clipping
 /// (rule `65-accessibility`'s 44pt floor).
 nonisolated let wristMinimumTarget: CGFloat = 44
+
+/// A pour disc's diameter: the canvas's 46 pt, scaled with type and held between the 44 pt floor rule
+/// `65-accessibility` sets and ``wristDiscCeiling``.
+nonisolated let wristDiscDiameter: CGFloat = 46
+
+/// The most a disc grows with type. Past it the row stops fitting and scrolls sideways instead
+/// (rule `65-accessibility`: never shrink a control to make the set fit).
+nonisolated let wristDiscCeiling: CGFloat = 56
+
+/// The least air between two panes in the row — glass discs may never share an edge
+/// (rule `60-design-system`). The spare width is spread between them, so on the 46 mm screen the
+/// gaps come out at the canvas's 8 pt.
+nonisolated let wristRowMinimumGap: CGFloat = 4
+
+/// Between a disc and the amount under it.
+nonisolated let wristAmountSpacing: CGFloat = 3
+
+/// Inside the Glass's capsule, either side of its glyph and amount — the canvas's 84 pt capsule
+/// around a 20 pt glyph, a 4 pt gap and a ~48 pt amount, rounded up. Wider, and the capsule row
+/// would not fit the 46 mm screen's 192 pt with its 4 pt gaps.
+nonisolated let wristCapsuleSideInset: CGFloat = 8
+
+/// A pour glyph as a share of its disc — the canvas's 22 pt in 46 pt, rounded down. A ratio, never a
+/// text style: the disc is a capped container (rule `60-design-system`).
+nonisolated let wristGlyphShare: CGFloat = 0.46
 
 // MARK: - One offered serving
 
@@ -79,62 +88,59 @@ struct WristView: View {
 
     @State private var model = WristModel.shared
     @State private var now = Date()
-    @State private var isMenuPresented = false
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
 
     private let clock = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
-    /// The share of the screen's safe area the vessel's box may take — **a fraction, not a fixed
-    /// height**, and that is the whole point.
-    ///
-    /// Two fixed heights were tried and both were rendered and rejected. At 140 (the figure the
-    /// three-row layout used) the vessel, the caption and the button together overflowed a 46mm and
-    /// the button was cut off by the screen edge; at 120 it still overflowed, by about 23pt. A fixed
-    /// number cannot be right on a range of screens that runs from a 40mm to a 49mm, which is
-    /// exactly the reasoning `WristVessel.diameter(fitting:within:)` already applies one level down.
-    ///
-    /// The furniture below the vessel is a two-line `.caption2` (~32pt), a 44pt button and two 10pt
-    /// gaps — ~96pt of fixed height that does not scale with the screen. Half was where that
-    /// arithmetic landed first, and `diameter(fitting:within:)`'s own 60pt floor guards the bottom
-    /// end of the range.
-    ///
-    /// **0.78125 — the owner asked for 25% bigger twice, and the two steps compound: 0.5 × 1.25 ×
-    /// 1.25.** The vessel is height-bound on every watch (its box is far narrower than the screen),
-    /// so the box's share of the height *is* the diameter, and a 25% ask is a 25% multiplication
-    /// here.
-    ///
-    /// Each step is spent out of the screen's slack, never out of the furniture: the button keeps
-    /// its 44pt floor and the caption keeps both its lines, because rule `65-accessibility` sets the
-    /// first and spec §8 sets the second. What a bigger circle buys in presence it pays for in
-    /// reach — at this fraction the "More" button sits below the fold at rest on every size and is
-    /// found by turning the crown. That is a deliberate, owner-directed trade, recorded here so the
-    /// next reader does not "fix" it back.
-    ///
-    /// **On the two smallest watches (40mm, 42mm) the screen scrolls, and that is deliberate.**
-    /// Verified by rendering on a 40mm: its safe area is ~134pt while the furniture alone is ~95pt,
-    /// so even at the 60pt floor the vessel cannot fit beside it — *no* value of this fraction makes
-    /// that screen static. The choice is therefore between a short crown scroll and a ~6pt
-    /// `volume / goal` readout (`WristVessel` sizes its type as a ratio of the diameter), and the
-    /// scroll is plainly the better one — which is the same judgement
-    /// `diameter(fitting:within:)`'s own floor already records: "a vessel that small is worse than a
-    /// clipped one". `.scrollBounceBehavior(.basedOnSize)` keeps the screen static wherever it does
-    /// fit, so the larger watches pay nothing for this.
-    private static let vesselHeightFraction: CGFloat = 0.78125
+    /// The canvas's vessel against its screen: 100 pt on the 46 mm watch's 208 pt.
+    nonisolated static let canvasVesselShare: CGFloat = 100.0 / 208.0
 
-    /// Index 1 of `vesselSlots` and of `Key.servings` — "Glass". Named once rather than spelled `1`
-    /// at three sites: rule `20-state` calls this position "the vessel the widget follows", and a
-    /// bare literal in three places is exactly how the phone widget and the watch would drift into
-    /// following different ones.
+    /// The diameters the vessel may take on a screen this wide: the 60 pt floor below which its
+    /// readout stops being legible, up to the canvas's share of the screen.
+    nonisolated static func vesselRange(screenWidth: CGFloat) -> ClosedRange<CGFloat> {
+        60...max(60, screenWidth * canvasVesselShare)
+    }
+
+    /// How far above the screen's bottom edge the canvas ended its amounts: 226 of 248 pt.
+    nonisolated static let canvasBottomMargin: CGFloat = 22
+
+    /// The height ``WristColumn`` fills: the safe area, and as much of the bottom inset — the
+    /// rounded corners, where a scroll view still draws — as leaves ``canvasBottomMargin`` below the
+    /// row, so the amounts under the discs stay clear of the corners.
     ///
-    /// `nonisolated` is load-bearing, not decoration. Without it this is inferred `@MainActor`
-    /// (`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` is set on every target) and the three
-    /// `nonisolated static func`s below cannot read it — four *"main actor-isolated static property
-    /// … can not be referenced from a nonisolated context"* warnings, which is a Swift 6 error
-    /// later. Rule `43-concurrency` names `HomeView.servings` and `AuroraBackground.lights` as the
-    /// same case; this is the watch's third.
-    nonisolated private static let primaryIndex = 1
+    /// **Not the safe area alone, by the owner's ruling (2026-10-20).** On the 46 mm watch the safe
+    /// area is 159 pt tall under a 53 pt clock inset, where the plan had assumed about 210; the
+    /// line and the row left the vessel 63 pt of the canvas's 100. The canvas itself does not fit
+    /// below the real clock, so the three renders went to the owner, who chose this middle one —
+    /// 77 pt there, the row on screen, the caption a turn of the crown away.
+    nonisolated static func columnHeight(safeHeight: CGFloat, bottomInset: CGFloat) -> CGFloat {
+        safeHeight + max(0, bottomInset - canvasBottomMargin)
+    }
+
+    /// A column's even share of the pour row: the width less the least gaps, split evenly and
+    /// rounded down to whole points, so the shares and their gaps never sum past the row — the most
+    /// an amount under a disc may take before it gives a little.
+    nonisolated static func columnShare(rowWidth: CGFloat, count: Int) -> CGFloat {
+        guard count > 0 else { return rowWidth }
+        return ((rowWidth - CGFloat(count - 1) * wristRowMinimumGap) / CGFloat(count)).rounded(.down)
+    }
+
+    /// A pour disc's diameter on a row this wide.
+    ///
+    /// **Below the accessibility sizes a disc gives way to its column's share, down to the 44pt
+    /// floor,** where three do not fit — the 40mm watch, whose row is 142pt wide: its renders put the
+    /// last amount off the edge at the default size, and from xLarge on the scaled disc would send the
+    /// row into its sideways scroll (spec 2026-10-20 §3.4: "at least 44pt, the canvas's 46pt where the
+    /// screen allows"). **At the accessibility sizes a disc keeps the size type gave it,** and a row it
+    /// does not fit scrolls sideways — the one place rule `65-accessibility` lets a set overflow
+    /// rather than shrink a control. Held to ``wristDiscCeiling``, and never under the floor.
+    nonisolated static func discDiameter(scaled: CGFloat, rowWidth: CGFloat, count: Int, accessibilitySize: Bool) -> CGFloat {
+        let wanted = min(scaled, wristDiscCeiling)
+        guard !accessibilitySize else { return max(wristMinimumTarget, wanted) }
+        return max(wristMinimumTarget, min(wanted, columnShare(rowWidth: rowWidth, count: count)))
+    }
 
     /// The screen is **never** gated on having heard from the phone.
     ///
@@ -146,101 +152,76 @@ struct WristView: View {
     /// `syncedCaption(composedAt: nil, …)`) unreachable in production while their tests stayed green.
     ///
     /// The number is never presented as more certain than it is: ``WristModel/displayGoal`` names
-    /// the goal actually in use, and ``attribution(mirror:now:strings:locale:)`` — always on screen,
-    /// outside every branch, as spec §8 requires — says whether it came from the phone or is still
-    /// the default.
+    /// the goal actually in use, and ``attribution(mirror:now:strings:locale:)`` — always present,
+    /// outside every branch, as spec §8 requires, and on screen wherever it fits — says whether it
+    /// came from the phone or is still the default.
     ///
-    /// **A `ScrollView`, not a `List`.** With three stacked items there is nothing left for a `List`
-    /// to do, and its own row insets were half of why the capsules were mis-padded — every row
-    /// needed a `.listRowBackground(Color.clear)` to undo a surface the design never wanted.
+    /// **A `ScrollView`, not a `List`.** With four stacked items there is nothing left for a `List`
+    /// to do, and its own row insets would need a `.listRowBackground(Color.clear)` on every row to
+    /// undo a surface the design never wanted.
     ///
-    /// **The button is in the flow, pushed down by a `Spacer`, and deliberately *not* mounted
-    /// through `.safeAreaInset(edge: .bottom)`.** That was the first attempt and it was rendered and
-    /// rejected: `safeAreaInset` reserves the bar's height *for scrolling*, not for the resting
-    /// layout — rule `50-views` says so in as many words — so at rest the capsule drew straight over
-    /// the bottom of the vessel and pushed the attribution line below it, inverting the very order
-    /// the design settled on. The screenshot is in this pass's `HISTORY.md` entry.
-    ///
-    /// `GeometryReader` + `.frame(minHeight:)` + `.scrollBounceBehavior(.basedOnSize)` is rule
-    /// `65-accessibility`'s own prescribed shape for a screen that should fill the viewport at
-    /// ordinary text sizes and scroll at the accessibility ones. The `Spacer(minLength: 0)` is what
-    /// puts the button at the bottom of the viewport when there is room and lets it flow when there
-    /// is not — "at the bottom" without a floating bar that can cover what it sits above.
+    /// **The column, not a fraction of the height.** ``WristColumn`` gives the vessel what the line
+    /// and the row leave of ``columnHeight(safeHeight:bottomInset:)``, between
+    /// ``vesselRange(screenWidth:)``'s floor and ceiling, and lets the sync caption take what is
+    /// spare — so the row is never pushed off the screen by the vessel. `GeometryReader` +
+    /// `ScrollView` + `.scrollBounceBehavior(.basedOnSize)` is rule `65-accessibility`'s own shape for
+    /// a screen that fills the viewport at ordinary sizes and scrolls at the accessibility ones; the
+    /// column itself is at least that height, which is what `.frame(minHeight:)` used to say. Because
+    /// that height runs into the bottom inset, the screen always scrolls a little — far enough to
+    /// bring the caption up, where it did not fit.
     var body: some View {
-        let others = Self.secondary(from: model.mirror)
+        let face = model.face
 
         return ZStack {
             WristAurora()
 
             GeometryReader { proxy in
                 ScrollView {
-                    // 6, not 10: the 25% bigger vessel spends the screen's slack, and the two gaps
-                    // are the only place left to claw any back that doesn't cost the button its
-                    // 44pt floor or the caption its second line.
-                    VStack(spacing: 6) {
-                        vessel(boxedInto: proxy.size.height * Self.vesselHeightFraction)
+                    WristColumn(
+                        height: Self.columnHeight(safeHeight: proxy.size.height, bottomInset: proxy.safeAreaInsets.bottom),
+                        vessel: Self.vesselRange(screenWidth: proxy.size.width)
+                    ) {
+                        vessel(face)
+                        lineUnderTheVessel(face)
+                        WristPourRow(
+                            servings: Self.pourRow(from: model.mirror),
+                            glassID: Self.primary(from: model.mirror).id,
+                            rowWidth: proxy.size.width - 2 * wristScreenInset
+                        ) { model.pour(amount: $0) }
                         attributionLine
-                        Spacer(minLength: 0)
-                        menuButton(offering: others)
                     }
                     .padding(.horizontal, wristScreenInset)
-                    .frame(minHeight: proxy.size.height)
                 }
                 .scrollBounceBehavior(.basedOnSize)
             }
         }
         .onReceive(clock) { now = $0 }
-        // `isPresented:` rather than rule `50-views`' usual `.sheet(item:)`, and the exception is
-        // principled: that rule exists to stop "a `Bool` plus a separately-stored selection", where
-        // the two can disagree. There is no selection here — the sheet is a menu of actions, not an
-        // editor for a thing — so there is no second piece of state to fall out of step.
-        .sheet(isPresented: $isMenuPresented) {
-            WristServingMenu(servings: others) { model.pour(amount: $0) }
+    }
+
+    // MARK: - The vessel and the line under it
+
+    /// The vessel, drawn and spoken; no longer a button (D5). It describes itself — one element,
+    /// the label and the phone vessel's own sentence (``WristVessel``).
+    private func vessel(_ face: WristPlan.Face) -> some View {
+        GeometryReader { proxy in
+            WristVessel(face: face, diameter: WristVessel.diameter(fitting: proxy.size.width, within: proxy.size.height))
+                .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
         }
     }
 
-    // MARK: - The vessel, which is now the pour button
-
-    /// The circle is the control. Its accessibility label, value and hint sit on the **`Button`**,
-    /// not on an `.accessibilityElement(children: .ignore)` wrapper around it — rule
-    /// `65-accessibility`, and `HistoryView.ServingRow` records what the wrapper actually costs:
-    /// every serving announced twice, visible only in a real accessibility tree and in no unit test
-    /// this project can write. ``WristVessel`` gave those three modifiers up for this.
-    ///
-    /// `.contentShape(Circle())` is what keeps the target honest. The label is a square frame with
-    /// the circle inscribed, so without it the dead corners either side of the vessel would pour
-    /// water — a tap that logs a serving because you brushed the edge of the screen.
-    private func vessel(boxedInto height: CGFloat) -> some View {
-        let serving = Self.primary(from: model.mirror)
-        let progress = model.displayGoal > 0 ? Double(model.todaysTotal) / Double(model.displayGoal) : 0
-        let percentage = Int((progress * 100).rounded())
-
-        return GeometryReader { proxy in
-            let diameter = WristVessel.diameter(fitting: proxy.size.width, within: proxy.size.height)
-            Button {
-                model.pour(amount: serving.amount)
-            } label: {
-                WristVessel(
-                    level: min(1, progress),
-                    percentage: percentage,
-                    volume: model.todaysTotal,
-                    goal: model.displayGoal,
-                    diameter: diameter
-                )
-            }
-            .buttonStyle(.plain)
-            .contentShape(Circle())
-            .accessibilityLabel(Text("Today's hydration", bundle: strings))
-            // The phone vessel's own sentence, so VoiceOver reads the same figures the same way on
-            // both devices (spec 2026-10-06 §3, ruling 5).
-            .accessibilityValue(strings.localized("%1$d percent. %2$d of %3$d millilitres.", percentage, model.todaysTotal, model.displayGoal, locale: locale))
-            .accessibilityHint(strings.localized("Logs %1$d millilitres", serving.amount, locale: locale))
-            .position(x: proxy.size.width / 2, y: diameter / 2)
-        }
-        .frame(height: height)
+    /// *1,240 of 2,000 ml*, out of the water and under the vessel (#44). Hidden: the vessel speaks
+    /// the same figures (rule `65-accessibility`).
+    private func lineUnderTheVessel(_ face: WristPlan.Face) -> some View {
+        Text(face.millilitreLine(in: strings, locale: locale))
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .frame(maxWidth: .infinity)
+            .accessibilityHidden(true)
     }
 
-    // MARK: - The attribution line and the menu
+    // MARK: - The attribution line
 
     /// Named `attributionLine`, not `attribution`: a private computed property of that name shadows
     /// the `static func attribution(mirror:now:strings:locale:)` it is trying to call, and
@@ -252,49 +233,6 @@ struct WristView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-    }
-
-    /// Everything the vessel does not pour, behind one button.
-    ///
-    /// **A `Button` presenting a `.sheet`, not a `Menu`.** `Menu` is unavailable on watchOS — the
-    /// compiler is unambiguous about it (*"'Menu' is unavailable in watchOS"*), so the shape the
-    /// design asked for is reached with the platform's own equivalent rather than abandoned.
-    ///
-    /// Hidden outright when there is nothing to offer rather than shown as a button that opens onto
-    /// an empty sheet — which is reachable, not hypothetical: a mirror can carry a servings array
-    /// too short to fill the slots (see ``secondary(from:)``), and a control that does nothing when
-    /// tapped is worse than one that isn't there.
-    @ViewBuilder
-    private func menuButton(offering others: [WristServing]) -> some View {
-        if !others.isEmpty {
-            Button {
-                isMenuPresented = true
-            } label: {
-                Label {
-                    Text("More", bundle: strings)
-                } icon: {
-                    Image(systemName: "ellipsis")
-                }
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .padding(.horizontal, wristCapsuleInset)
-                .padding(.vertical, wristCapsuleVerticalInset)
-                .frame(maxWidth: .infinity, minHeight: wristMinimumTarget)
-                // `.sheer`: a short label and a control, not sentence-length text — the density the
-                // rows this replaces already used (rule `60-design-system`).
-                // Interactive: the glass is what is pressed, and on Apple's glass a sheer control
-                // takes the regular, tinted variant — the clear one would leave its label on
-                // untinted glass (#91(b)).
-                .liquidGlass(in: Capsule(), density: .sheer, interactive: true)
-                .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
-            // No `.accessibilityLabel`: VoiceOver reads the visible "More", then the hint. A
-            // control's visible text and its VoiceOver label are one string (rule `65-accessibility`).
-            .accessibilityHint(Text("Shows the other serving sizes", bundle: strings))
-        }
     }
 
     // MARK: - The pure functions the screen reads from
@@ -311,7 +249,7 @@ struct WristView: View {
     /// **`zip` is the arity guard, and deliberately the only one.** `WristMirror.servings` crosses
     /// the wire as a bare `[Int]`: `DataManager`'s own setter rejects any triple that is not exactly
     /// three long, but nothing re-checks that on this side of the transfer. Truncating to the
-    /// shorter of the two is what keeps a malformed publish a *smaller menu* rather than a crash —
+    /// shorter of the two is what keeps a malformed publish a *smaller row* rather than a crash —
     /// the same discard-rather-than-repair instinct rule `20-state` applies to
     /// `resolveServings(in:)`, one device further out.
     nonisolated static func servings(from mirror: WristMirror?) -> [WristServing] {
@@ -320,27 +258,29 @@ struct WristView: View {
         }
     }
 
-    /// The serving the vessel itself pours: the phone's **middle** quick-add vessel, index 1 — the
-    /// same one `AddWaterIntent` logs from the Home Screen widget (rule `40-widget`), so the two
-    /// ambient front doors on the two devices cannot disagree about what one tap means.
+    /// The serving the Glass button pours: the phone's **middle** quick-add vessel,
+    /// ``DataManager/usualSlot`` — the one name for the slot every one-tap door logs, the same one
+    /// `AddWaterIntent` logs from the Home Screen widget (rule `40-widget`), so the two ambient front
+    /// doors on the two devices cannot disagree about what one tap means.
     ///
     /// **Non-optional by construction, and that is the point.** `vesselSlots` is a compiled-in
     /// constant of exactly three, so the *slot* always exists and only the *amount* can be missing.
     /// A mirror too short to carry one falls back to ``DataManager/defaultServing`` — the identical
-    /// figure `AddWaterIntent.init()` seeds for a caller that has expressed no preference. A vessel
-    /// that cannot be tapped is a worse failure than one that pours the default, because on this
-    /// screen it is the only action there is.
+    /// figure `AddWaterIntent.init()` seeds for a caller that has expressed no preference. A Glass
+    /// that cannot be tapped is a worse failure than one that pours the default, because it is the
+    /// screen's primary action.
     nonisolated static func primary(from mirror: WristMirror?) -> WristServing {
         let amounts = resolveServings(from: mirror)
-        let slot = vesselSlots[primaryIndex]
+        let slot = vesselSlots[DataManager.usualSlot]
         return WristServing(
             nameKey: slot.nameKey,
             symbol: slot.symbol,
-            amount: amounts.indices.contains(primaryIndex) ? amounts[primaryIndex] : DataManager.defaultServing
+            amount: amounts.indices.contains(DataManager.usualSlot) ? amounts[DataManager.usualSlot] : DataManager.defaultServing
         )
     }
 
-    /// Everything the vessel does not pour, in `vesselSlots` order — the menu's whole contents.
+    /// Everything the Glass does not pour, in `vesselSlots` order — Cup and Bottle, the rest of the
+    /// row.
     ///
     /// Filters by **position**, not by comparing amounts: two vessels are allowed to hold the same
     /// figure (rule `20-state` forbids sorting or deduping the triple for exactly this reason), so
@@ -348,8 +288,35 @@ struct WristView: View {
     nonisolated static func secondary(from mirror: WristMirror?) -> [WristServing] {
         servings(from: mirror)
             .enumerated()
-            .filter { $0.offset != primaryIndex }
+            .filter { $0.offset != DataManager.usualSlot }
             .map(\.element)
+    }
+
+    /// The row under the vessel: every serving the screen offers, in `vesselSlots` order, the Glass
+    /// always among them.
+    ///
+    /// **Built from ``primary(from:)`` and ``secondary(from:)``, never from the raw servings** (the
+    /// redesign's §9.2): a mirror too short to name a middle vessel still leaves a Glass that pours
+    /// the default, because on this screen the row is the only action there is. A slot whose amount
+    /// the mirror does not carry is left out, as the menu always left it out.
+    nonisolated static func pourRow(from mirror: WristMirror?) -> [WristServing] {
+        let primary = primary(from: mirror)
+        let others = secondary(from: mirror)
+        return vesselSlots.compactMap { slot in
+            slot.nameKey == primary.nameKey ? primary : others.first { $0.nameKey == slot.nameKey }
+        }
+    }
+
+    /// A pour button's VoiceOver label — the phone's own quick-add sentence (`HomeView`), so a
+    /// serving is spoken alike on both devices, in the form its count takes.
+    nonisolated static func pourLabel(for serving: WristServing, strings: Bundle, locale: Locale) -> String {
+        strings.localized("%1$@, add %2$d millilitres", serving.name(in: strings), serving.amount, locale: locale)
+    }
+
+    /// The amount a button carries — inside the Glass's capsule, under a disc — grouped as `locale`
+    /// groups it.
+    nonisolated static func amountLabel(_ amount: Int, strings: Bundle, locale: Locale) -> String {
+        strings.localized("%1$d ml", amount, locale: locale)
     }
 
     /// The one always-on-screen line that says how much to trust the number above it.
@@ -407,67 +374,121 @@ struct WristView: View {
     }
 }
 
-// MARK: - The sheet behind the button
+// MARK: - The pour row
 
-/// The other servings, one tap each. `Menu` does not exist on watchOS, so this is what "a button
-/// with a menu" resolves to on this platform.
+/// The three pour buttons (spec 2026-10-20 §3.4). Two whole rows, one chosen — the Glass as a capsule
+/// carrying its amount where the row has room, three discs where it has not — and a sideways scroll
+/// past the largest text sizes, where even three discs do not fit (rule `65-accessibility`).
 ///
-/// A `private struct` in the file that uses it, per rule `50-views` — it earns its own file only
-/// when a second screen wants it, and there is only one screen here.
-///
-/// It stands its own ``WristAurora`` because a sheet is a full-screen surface on watchOS, and rule
-/// `60-design-system` is explicit that glass goes over content, imagery or colour and **never** over
-/// a flat background. Without it these capsules would sit on black.
-private struct WristServingMenu: View {
+/// A `private struct` in the file that uses it, per rule `50-views`. `.buttonStyle(.plain)` and no
+/// haptic: `PressStyle` and `Haptics` are in none of the watch's exception sets (rule
+/// `60-design-system`), so the discs' press response is Apple's interactive glass and the white
+/// Glass has none.
+private struct WristPourRow: View {
 
     let servings: [WristServing]
+    let glassID: String
+    /// The width the row is laid across — the screen's, less ``wristScreenInset`` either side.
+    let rowWidth: CGFloat
     let pour: (Int) -> Void
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .body) private var scaledDisc: CGFloat = wristDiscDiameter
+
+    private var disc: CGFloat {
+        WristView.discDiameter(scaled: scaledDisc, rowWidth: rowWidth, count: servings.count,
+                               accessibilitySize: typeSize.isAccessibilitySize)
+    }
 
     var body: some View {
-        ZStack {
-            WristAurora()
+        ViewThatFits(in: .horizontal) {
+            row(glassCarriesItsAmount: true)
+            row(glassCarriesItsAmount: false)
+            ScrollView(.horizontal) { row(glassCarriesItsAmount: false) }
+        }
+        .frame(maxWidth: .infinity)
+        .glassGroup()
+    }
 
-            List {
-                ForEach(servings) { serving in
-                    Button {
-                        pour(serving.amount)
-                        dismiss()
-                    } label: {
-                        HStack(spacing: 8) {
-                            // The phone's own two calls — `HomeView.Serving.name(in:)` and the
-                            // `%1$d ml` caption under each quick-add vessel — so a serving reads the
-                            // same on both devices and `LocalizationTests` can hold the two
-                            // catalogues to it.
-                            Label {
-                                Text(serving.name(in: strings))
-                            } icon: {
-                                Image(systemName: serving.symbol)
-                            }
-                            Spacer(minLength: 8)
-                            Text(strings.localized("%1$d ml", serving.amount, locale: locale))
-                                .foregroundStyle(.secondary)
-                        }
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .padding(.horizontal, wristCapsuleInset)
-                        .padding(.vertical, wristCapsuleVerticalInset)
-                        .frame(minHeight: wristMinimumTarget)
-                        // Interactive: the glass is what is pressed, and on Apple's glass a sheer
-                        // control takes the regular, tinted variant — the clear one would leave its
-                        // label on untinted glass (#91(b)).
-                        .liquidGlass(in: Capsule(), density: .sheer, interactive: true)
-                        .contentShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
-                    // A glass row clears the list's own surfaces (rule `60-design-system`).
-                    .listRowBackground(Color.clear)
-                }
+    private func row(glassCarriesItsAmount: Bool) -> some View {
+        HStack(alignment: .top, spacing: 0) {
+            ForEach(Array(servings.enumerated()), id: \.element.id) { index, serving in
+                if index > 0 { Spacer(minLength: wristRowMinimumGap) }
+                column(serving, glassCarriesItsAmount: glassCarriesItsAmount)
             }
-            .scrollContentBackground(.hidden)
+        }
+    }
+
+    private func column(_ serving: WristServing, glassCarriesItsAmount: Bool) -> some View {
+        let isGlass = serving.id == glassID
+        let inside = isGlass && glassCarriesItsAmount
+        return VStack(spacing: wristAmountSpacing) {
+            Button { pour(serving.amount) } label: { face(of: serving, isGlass: isGlass, carriesAmount: inside) }
+                .buttonStyle(.plain)
+                // The phone's own quick-add sentence, so a serving is spoken alike on both devices.
+                .accessibilityLabel(WristView.pourLabel(for: serving, strings: strings, locale: locale))
+            if !inside {
+                amount(serving)
+                    // The button's label already speaks the amount (rule `65-accessibility`).
+                    .accessibilityHidden(true)
+            }
+        }
+    }
+
+    /// The amount under a disc. **Below the accessibility sizes it gives a little** — down to half
+    /// its size, held to its column's even share of the row — so that on the 40mm watch, where three
+    /// amounts at full size are wider than the row (47pt each against 44pt shares), the row still
+    /// stands still; elsewhere it is drawn at full size. **At the accessibility sizes it keeps its
+    /// size,** and a row it does not fit scrolls sideways instead, so no amount is ever cut short.
+    @ViewBuilder
+    private func amount(_ serving: WristServing) -> some View {
+        let text = Text(WristView.amountLabel(serving.amount, strings: strings, locale: locale))
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(.white)
+            .lineLimit(1)
+        if typeSize.isAccessibilitySize {
+            text.fixedSize()
+        } else {
+            // A frame with a `maxWidth` grows to it when offered more, and squeezed the Glass's
+            // capsule on the 46mm watch; held at its own width, it only ever gives way.
+            text
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: WristView.columnShare(rowWidth: rowWidth, count: servings.count))
+                .fixedSize(horizontal: true, vertical: false)
+        }
+    }
+
+    @ViewBuilder
+    private func face(of serving: WristServing, isGlass: Bool, carriesAmount: Bool) -> some View {
+        if carriesAmount {
+            HStack(spacing: wristAmountSpacing) {
+                Image(systemName: serving.symbol)
+                Text(WristView.amountLabel(serving.amount, strings: strings, locale: locale)).fixedSize()
+            }
+            .font(.footnote.weight(.heavy))
+            .fontDesign(.rounded)
+            .padding(.horizontal, wristCapsuleSideInset)
+            .frame(minWidth: disc, minHeight: disc)
+            // The screen's one primary surface; it sets its label's colour (rule `60-design-system`).
+            .primarySurface(in: Capsule(), ring: false)
+            .contentShape(Capsule())
+        } else if isGlass {
+            Image(systemName: serving.symbol)
+                .font(.system(size: disc * wristGlyphShare, weight: .semibold))
+                .frame(width: disc, height: disc)
+                .primarySurface(in: Circle(), ring: false)
+                .contentShape(Circle())
+        } else {
+            Image(systemName: serving.symbol)
+                .font(.system(size: disc * wristGlyphShare, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: disc, height: disc)
+                // A control: the glass is what is pressed, so Apple's regular, tinted variant — the
+                // clear one would leave its glyph on untinted glass (#91(b)).
+                .liquidGlass(in: Circle(), density: .sheer, interactive: true)
+                .contentShape(Circle())
         }
     }
 }

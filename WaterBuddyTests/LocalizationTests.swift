@@ -51,6 +51,8 @@ private let watchSharedKeys = [
     "Cup",
     "Glass",
     "Bottle",
+    "%1$@ of %2$@ ml",
+    "%1$@, add %2$d millilitres",
 ]
 
 /// The watch's own strings, which have no phone equivalent. Listed by name because the build
@@ -58,10 +60,6 @@ private let watchSharedKeys = [
 /// extracted table, so a coverage check cannot see one go missing — the gap
 /// `theShortcutsVocabularyIsTranslated` exists for.
 private let watchOwnKeys = [
-    "%1$@ / %2$@ ml",
-    "Logs %1$d millilitres",
-    "More",
-    "Shows the other serving sizes",
     "Not yet synced · default goal",
     "Set your goal in WaterBuddy on iPhone",
     "Not yet synced",
@@ -840,7 +838,7 @@ private let averageKey = "Average %1$d millilitres. Best %2$d millilitres. Goal 
 
 private let countedKeys = [
     CountedKey(key: "%1$d millilitres", arity: 1, counted: [0], bundles: ["app"]),
-    CountedKey(key: "%1$@, add %2$d millilitres", arity: 2, counted: [1], bundles: ["app"]),
+    CountedKey(key: "%1$@, add %2$d millilitres", arity: 2, counted: [1], bundles: ["app", "watch"]),
     CountedKey(key: "%1$d millilitres to go", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d of %2$d millilitres", arity: 2, counted: [1], bundles: ["app"]),
     CountedKey(key: "%1$d percent. %2$d of %3$d millilitres.", arity: 3, counted: [0, 2],
@@ -849,7 +847,6 @@ private let countedKeys = [
     CountedKey(key: "Use %1$d millilitres", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: averageKey, arity: 4, counted: [0, 1, 3], bundles: ["app"]),
     CountedKey(key: "Last %1$d days", arity: 1, counted: [0], bundles: ["app"]),
-    CountedKey(key: "Logs %1$d millilitres", arity: 1, counted: [0], bundles: ["watch"]),
     CountedKey(key: "%1$d days", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d servings", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — %2$lld millilitres to go.", arity: 2,
@@ -937,10 +934,6 @@ private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: L
     case ("Last %1$d days", "en"): return "Last \(f[0]) " + english(n[0], "day", "days")
     case ("Last %1$d days", "ru"): return "Последние \(f[0]) " + russian(n[0], "день", "дня", "дней")
     case ("Last %1$d days", "uz"): return "Oxirgi \(f[0]) kun"
-
-    case ("Logs %1$d millilitres", "en"): return "Logs \(f[0]) \(ml(0))"
-    case ("Logs %1$d millilitres", "ru"): return "Записывает \(f[0]) \(mlRu(0))"
-    case ("Logs %1$d millilitres", "uz"): return "\(f[0]) millilitr qayd etadi"
 
     case ("%1$d days", "en"): return "\(f[0]) " + english(n[0], "day", "days")
     case ("%1$d days", "ru"): return "\(f[0]) " + russian(n[0], "день", "дня", "дней")

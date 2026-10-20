@@ -91,8 +91,16 @@ final class WristModel {
         return storedMirror
     }
 
+    /// Today's figures, as the complication computes them from the same store —
+    /// `WristPlan.face(mirror:outbox:now:calendar:)` — so the screen and the face cannot disagree
+    /// (spec 2026-10-20 §3.5). Reads through `mirror` and `pendingOutbox`, so it needs no tracking of
+    /// its own; the phone's day ending is caught by `WristView`'s 30-second clock.
+    var face: WristPlan.Face {
+        WristPlan.face(mirror: mirror, outbox: pendingOutbox, now: now(), calendar: calendar)
+    }
+
     /// The goal the screen draws against: the phone's when a mirror has arrived, and
-    /// ``DataManager/defaultDailyGoal`` before it ever has.
+    /// ``DataManager/defaultDailyGoal`` before it ever has — read through ``face``.
     ///
     /// The fallback is not a guess dressed as a fact. It is the identical figure the phone
     /// materialises into its own suite for a fresh install (`DataManager.init`), so the two devices
@@ -105,7 +113,7 @@ final class WristModel {
     /// Reads through `self.mirror` for the same reason `isMirrorStale` and `todaysTotal` do — it
     /// needs no tracking of its own, because `mirror` is the only tracked state it touches.
     var displayGoal: Int {
-        mirror?.dailyGoal ?? DataManager.defaultDailyGoal
+        face.goal
     }
 
     /// The language the watch draws in: the phone's own in-app choice, carried on the mirror
@@ -150,7 +158,8 @@ final class WristModel {
 
     /// The phone's total until the phone's own day ends, plus whatever's still in the outbox waiting
     /// to be acked — decided by `WristPlan.todaysTotal(mirror:outbox:now:calendar:)`, the same
-    /// function the complication reads, so the screen and the face cannot disagree (spec §17).
+    /// function the complication reads, so the screen and the face cannot disagree (spec §17) — read
+    /// through ``face``.
     ///
     /// Reads through `self.mirror` and `self.pendingOutbox` for the same reason `isMirrorStale` does —
     /// no separate tracking of its own; it changes exactly when either of those does, which is what
@@ -159,7 +168,7 @@ final class WristModel {
     /// ending is not a change Observation can see: `WristView` re-reads this on its 30-second clock,
     /// and the complication schedules a timeline entry for it.
     var todaysTotal: Int {
-        WristPlan.todaysTotal(mirror: mirror, outbox: pendingOutbox, now: now(), calendar: calendar)
+        face.total
     }
 
     /// Records a pour the user just made, and hands the transport the **whole current outbox** —

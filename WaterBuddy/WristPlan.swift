@@ -78,3 +78,61 @@ enum WristPlan {
         mirror.phoneDayEnd ?? DataManager.nextDayBoundary(after: mirror.phoneDayStart, calendar: calendar)
     }
 }
+
+// MARK: - The face
+
+extension WristPlan {
+
+    /// Today's figures as both watch surfaces draw them — the screen through `WristModel.face`, the
+    /// complication through its entry — so the two cannot disagree (spec 2026-10-20 §3.5).
+    ///
+    /// **Nested here, not a file of its own:** a new file would grow two exception sets
+    /// (rule `15-project`); `ReminderPlan.Slot` is the precedent. `nonisolated`, because this file
+    /// compiles into the phone app, whose default isolation is the main actor, and the complication's
+    /// provider reads it off the main actor.
+    nonisolated struct Face: Equatable, Sendable {
+
+        let total: Int
+        let goal: Int
+
+        /// How full the vessel is: the share of the goal, held to `0...1` — the water stops at the
+        /// rim — and 0 for a goal of 0, which a corrupt mirror is the only way to carry.
+        var progress: Double {
+            guard goal > 0 else { return 0 }
+            return min(1, max(0, Double(total) / Double(goal)))
+        }
+
+        /// The readout: the share in whole percent, rounded as the complication always rounded it,
+        /// held to `0...999` so it fits a face in three digits. 0 for a goal of 0.
+        var percentage: Int {
+            guard goal > 0 else { return 0 }
+            return min(999, max(0, Int((Double(total) / Double(goal) * 100).rounded())))
+        }
+
+        /// The vessel's own sentence — `WaterSnapshot.spokenFigures(in:locale:)`'s twin, the same key —
+        /// so the screen and every face speak today alike.
+        func spokenFigures(in strings: Bundle, locale: Locale) -> String {
+            strings.localized("%1$d percent. %2$d of %3$d millilitres.", percentage, total, goal, locale: locale)
+        }
+
+        /// *1,240 of 2,000 ml* — the line under the vessel and the rectangle's middle line, the phone's
+        /// own key, both figures grouped as `locale` groups them.
+        func millilitreLine(in strings: Bundle, locale: Locale) -> String {
+            strings.figure("%1$@ of %2$@ ml", total, goal, locale: locale)
+        }
+
+        /// What a face draws in the gallery and as its placeholder: 62%, the figure the circular face
+        /// has always shown there.
+        static let sample = Face(total: 1_240, goal: 2_000)
+    }
+
+    /// Today's face from the watch's store: ``todaysTotal(mirror:outbox:now:calendar:)`` against the
+    /// phone's goal, or ``DataManager/defaultDailyGoal`` before the first sync — the fallback
+    /// `WristModel.displayGoal` has always used.
+    nonisolated static func face(mirror: WristMirror?, outbox: [WristPour], now: Date, calendar: Calendar) -> Face {
+        Face(
+            total: todaysTotal(mirror: mirror, outbox: outbox, now: now, calendar: calendar),
+            goal: mirror?.dailyGoal ?? DataManager.defaultDailyGoal
+        )
+    }
+}

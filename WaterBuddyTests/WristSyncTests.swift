@@ -540,6 +540,79 @@ struct WristPlanTests {
         #expect(WristPlan.dayBoundaries(after: now, mirror: ended, calendar: Self.utc) == [Date(timeIntervalSince1970: 1_767_312_000)])
         #expect(WristPlan.dayBoundaries(after: now, mirror: nil, calendar: Self.utc) == [Date(timeIntervalSince1970: 1_767_312_000)])
     }
+
+    // MARK: - The face both watch surfaces draw (spec 2026-10-20 §3.5)
+
+    /// The app's own English, from the test host — this suite is hosted by the phone app.
+    private static var english: Bundle? {
+        Bundle.main.url(forResource: "en", withExtension: "lproj").flatMap(Bundle.init(url:))
+    }
+
+    @Test
+    func aFaceBeforeAnySyncDrawsAgainstTheDefaultGoal() {
+        let now = Date(timeIntervalSince1970: 1_767_279_600) // 2026-01-01 15:00 UTC
+        let pour = WristPour(id: UUID(), amount: 500, at: now)
+        let face = WristPlan.face(mirror: nil, outbox: [pour], now: now, calendar: Self.utc)
+        #expect(face == WristPlan.Face(total: 500, goal: DataManager.defaultDailyGoal))
+        #expect(face.percentage == 25)
+        #expect(face.progress == 0.25)
+    }
+
+    @Test
+    func aFaceCountsThePhonesTotalAndTheWatchsOwnPours() {
+        let mirror = Self.mirror(
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_225_600), // 2026-01-01 00:00 UTC
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_312_000)    // 2026-01-02 00:00 UTC
+        )
+        let now = Date(timeIntervalSince1970: 1_767_279_600)
+        let pour = WristPour(id: UUID(), amount: 250, at: now)
+        let face = WristPlan.face(mirror: mirror, outbox: [pour], now: now, calendar: Self.utc)
+        #expect(face == WristPlan.Face(total: 2_050, goal: 2_000))
+        // 102, not 103: 2,050 / 2,000 × 100 is 102.49999999999999 in `Double`, and the phone's own
+        // percentage rounds it the same way — the face keeps the complication's formula unchanged.
+        #expect(face.percentage == 102, "past the goal the readout keeps counting")
+        #expect(face.progress == 1, "the water stops at the rim")
+    }
+
+    /// Review focus 4: the phone slept through midnight and nothing arrived. At the instant its day
+    /// ends, the face falls to the watch's own pours — the same instant `WristModel` does, because
+    /// both read this function.
+    @Test
+    func theFaceTurnsOverWhenThePhonesDayEnds() {
+        let end = Date(timeIntervalSince1970: 1_767_312_000)
+        let mirror = Self.mirror(phoneDayStart: Date(timeIntervalSince1970: 1_767_225_600), phoneDayEnd: end)
+        let newDaysPour = WristPour(id: UUID(), amount: 250, at: end)
+        #expect(WristPlan.face(mirror: mirror, outbox: [], now: end.addingTimeInterval(-1), calendar: Self.utc).total == 1_800)
+        #expect(WristPlan.face(mirror: mirror, outbox: [newDaysPour], now: end, calendar: Self.utc)
+                == WristPlan.Face(total: 250, goal: 2_000))
+    }
+
+    /// The provider's formula, carried over unchanged: schoolbook rounding of the exact share.
+    @Test(arguments: [
+        (1_240, 2_000, 62), (1_245, 2_000, 62), (1_250, 2_000, 63), (333, 1_000, 33), (0, 2_000, 0),
+    ])
+    func theFaceRoundsAsTheComplicationAlwaysHas(total: Int, goal: Int, percentage: Int) {
+        #expect(WristPlan.Face(total: total, goal: goal).percentage == percentage)
+    }
+
+    /// Review focus 3: a corrupt mirror. No division by zero, a full vessel, and a readout that
+    /// still fits in three digits.
+    @Test
+    func aFaceNeverDividesByZeroOrOverflowsItsReadout() {
+        #expect(WristPlan.Face(total: 500, goal: 0).percentage == 0)
+        #expect(WristPlan.Face(total: 500, goal: 0).progress == 0)
+        #expect(WristPlan.Face(total: 100_000, goal: 2_000).percentage == 999)
+        #expect(WristPlan.Face(total: 100_000, goal: 2_000).progress == 1)
+    }
+
+    @Test
+    func aFaceSpeaksAndDrawsItsFiguresInTheAppsSentences() throws {
+        let english = try #require(Self.english)
+        let face = WristPlan.Face(total: 1_240, goal: 2_000)
+        let locale = Locale(identifier: "en")
+        #expect(face.spokenFigures(in: english, locale: locale) == "62 percent. 1,240 of 2,000 millilitres.")
+        #expect(face.millilitreLine(in: english, locale: locale) == "1,240 of 2,000 ml")
+    }
 }
 
 /// `WristInbox`'s only reference to `DataManager` is `.shared`, which cannot be swapped in a test —
