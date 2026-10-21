@@ -116,6 +116,10 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `LogServingIntent`, `TodaysWaterIntent` and `WaterBuddyShortcuts` are app-only and stay out of
   every exception set: a provider and its intents share a target. `AddWaterIntent` stays the widget extension's own,
   differently named action
+- `PremiumAccess`, `PremiumSet`, `PremiumStore` and `PaywallView` are app-only and stay out of every
+  exception set. `WaterBuddyTests/WaterBuddy.storekit` is the local StoreKit configuration: a test
+  resource, in no shipping bundle. The checked-in `WaterBuddy` scheme's Run action names it, so a
+  run from Xcode buys from it and never from the App Store; an archive carries none
 - A file importing a framework unavailable to iOS or watchOS must live outside all seven
   synchronized folders — `Tools/` at the repository root belongs to no target, which is why
   `GenerateAppIcon.swift` sits there and is run with `swift Tools/GenerateAppIcon.swift`

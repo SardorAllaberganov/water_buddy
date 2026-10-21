@@ -88,6 +88,8 @@ rather than re-deriving it.
 - The week card's summary speaks the average, the best day and the days the goal was met. A met
   day's bar is cyan and an unmet day's white, and never by colour alone: a met bar also stands at
   or above the goal line
+- Each of the paywall's plans is one button — label the plan's name, value its price line,
+  `.isSelected` on the chosen one. The renewal terms are spoken in full, never hidden
 - History's heading is one element: label the shown day, value its total against the goal, the
   header trait. At an accessibility text size a past day's heading is drawn on two lines — the
   weekday, which is that element, and the date, hidden — because on one line beside the `+` the

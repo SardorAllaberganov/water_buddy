@@ -173,7 +173,9 @@ something to record.
   four schemes, and again on `WaterBuddy`, `WaterBuddyWatch` and `WaterBuddyWatchWidget` after its
   final review's fix, and unchanged by stage 7c on 2026-10-21, measured on a copy of its index
   against a clean build of a `HEAD` `3d1cda8` export, on all four schemes, and again on those three
-  after its final review's fix
+  after its final review's fix, and read again on 2026-10-21 from a clean build of a `HEAD`
+  `0be24f9` export before roadmap item 1.4.1's code — `-scheme WaterBuddy` 35 = 29 + 6,
+  `WaterBuddyWidgetExtension` 29, `WaterBuddyWatch` 2; 1.4.1's own comparison is not yet run
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
@@ -303,6 +305,9 @@ something to record.
   `UserNotifications`), `NotificationManager` only files and unfiles, and neither ever calls
   `removeAllPendingNotificationRequests()`: from the extension that would clear the app's entire
   set (rule `80-notifications`)
+- **Premium is read, never stored.** `PremiumStore` reads StoreKit for the app alone and writes
+  neither store; StoreKit is imported in `HomeView.swift` and `PremiumStore.swift` only (rule
+  `70-privacy`, rule `10-architecture`)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

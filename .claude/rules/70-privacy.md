@@ -10,7 +10,7 @@ That is a property to defend, not a phase.
 
 ## Nothing leaves the device
 - Import no networking, analytics or sensor framework: `URLSession`, `Network`, `CoreLocation`,
-  `HealthKit`, `CloudKit`, `StoreKit` (one exception, below), `AdSupport`,
+  `HealthKit`, `CloudKit`, `StoreKit` (two uses, below), `AdSupport`,
   `AppTrackingTransparency` — and no third-party SDK (rule `95-dependencies`)
 - Keep `com.apple.security.application-groups` the only entitlement on either signed target. Adding
   any other capability requires a written justification in this file first
@@ -63,24 +63,39 @@ Approved by the owner: `docs/superpowers/specs/2026-08-31-waterbuddy-watchos-des
 the explicit ruling ("§9's `70-privacy` amendment is approved as written") that made this text live
 policy rather than a draft, closing that document's own §9.3.
 
-## The review request is the one use of StoreKit
+## StoreKit, for the review request and for Premium
 
-`StoreKit` stays banned, with one exception: `HomeView.swift`, in the app target, imports it for
-`@Environment(\.requestReview)` and nothing else. iOS draws the request, decides whether to show it,
-and sends any rating or review to Apple itself, under the user's own Apple Account and only on the
-user's own tap. The app hands it nothing — no figure, no identifier, no account — and learns nothing
-back, not even whether it was shown. It needs no entitlement and no usage-description key.
+`StoreKit` stays banned outside two files in the app target. `HomeView.swift` imports it for
+`@Environment(\.requestReview)` and nothing else. `PremiumStore.swift` imports it for Premium's two
+products, `PremiumAccess.productIDs` — a yearly subscription and a lifetime purchase. iOS draws the
+rating request and the purchase sheet; Apple takes the payment and holds the purchase under the
+user's own Apple Account; StoreKit verifies it on the device. The app sends nothing anywhere — no
+figure, no identifier, no account, no receipt — and stores nothing about a purchase: the paid state
+is read from StoreKit each time and kept in memory only. Neither use needs an entitlement or a
+usage-description key.
 
-Three limits are conditions of the permission:
-- **One file.** No widget or watch file imports `StoreKit`, and neither does `DataManager.swift`,
-  which compiles into all four targets
-- **One call.** No product, purchase, transaction or subscription API until roadmap item 1.4.1 writes
-  its own amendment here. A *Rate WaterBuddy* link to the App Store is not part of this permission
-  either
-- **One moment.** Asked only after the user's own pour on Home reaches the goal on the third day in
-  a row, at most once per app version, after the confetti lands — never at launch, never from a
-  button whose answer is the request, never from the widget, Siri, the control, a reminder's button,
-  the watch or History
+Six limits are conditions of the permission:
+- **Two files.** No other file imports `StoreKit` — no view, no widget or watch file, and not
+  `DataManager.swift`, which compiles into all four targets. A view reads `PremiumStore` from the
+  environment and is handed plain values. Only the unit tests may import `StoreKitTest`, and only
+  against `WaterBuddyTests/WaterBuddy.storekit`, never the App Store
+- **Named calls.** For the review request, `requestReview` alone. For Premium, `Product.products(for:)`
+  and its purchase call, `Transaction.updates`, `Transaction.currentEntitlements`, `finish()`,
+  `AppStore.sync()` and `AppStore.showManageSubscriptions(in:)`. No offer codes, promoted purchases,
+  app account tokens or consumables until an amendment here names them. A *Rate WaterBuddy* link to
+  the App Store is not part of this permission
+- **The review request's moment.** Asked only after the user's own pour on Home reaches the goal on
+  the third day in a row, at most once per app version, after the confetti lands — never at launch,
+  never from a button whose answer is the request, never from the widget, Siri, the control, a
+  reminder's button, the watch or History
+- **The paywall's moment.** Shown only when the user opens it — Settings' *See Premium*, or a later
+  item's own locked state — never at launch, never in the welcome, never after a pour, and never
+  from the widget, Siri, the control, a reminder's button or the watch. A Release build offers it
+  only while there is a set to sell (`PaywallView.isOffered(arguments:)`)
+- **Two links, on the user's own tap.** *Terms of Use* (Apple's standard licence) and *Privacy
+  Policy* open in Safari. The app fetches neither
+- **What never moves behind it.** No way of logging, and nothing a free user can do today —
+  *The Premium line*, `docs/ROADMAP.md` §1
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

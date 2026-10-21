@@ -20,6 +20,8 @@ persist anything.
   for a past day
 - A view never writes `UserDefaults`. Every mutation goes through a `DataManager` method, or a
   `Binding` whose setter calls one
+- Premium's state comes from `@Environment(PremiumStore.self)`. A view never imports `StoreKit` and
+  never holds a `Product`; it is handed `PremiumAccess.Plan`s
 
 ## Arithmetic belongs to the model
 - A `body` must not recompute a figure the model already publishes. Take the total and the goal off
@@ -102,6 +104,8 @@ persist anything.
   would. Before setup the link is ignored
 - Present a sheet with `.sheet(item:)` bound to an optional `@State`, handing the thing being edited
   to the sheet as an `init` parameter — not a `Bool` plus a separately-stored selection
+- The paywall is presented with `.sheet(item:)` bound to an optional `PaywallView.Entry` — where it
+  was opened from — never a `Bool`
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen
   whose last card sits under the bar needs its own bottom padding
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the

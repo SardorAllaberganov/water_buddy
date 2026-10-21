@@ -23,6 +23,12 @@ warning here is a Swift 6 error later.
   are read during `sharedDefaults`' own lazy initialiser
 - Give the production default of every injected `DataManager` side-effect closure as a
   `nonisolated static func`, so the parameter stays a plain non-isolated closure
+- `PremiumStore` is `@MainActor @Observable`. Its one `Transaction.updates` listener is a long-lived
+  `Task` started in its `init`, held by the store and cancelled in `deinit`. StoreKit reaches it only
+  through `PremiumStore.Source`, a struct of closures built by `static func live()`, each closure
+  calling StoreKit in its own body — `ReminderScheduler`'s shape — so no StoreKit value sits in a
+  `static let`
+- `PremiumAccess` is `nonisolated` and imports `Foundation` alone, as `ReminderPlan` does
 
 ## Sendable, and what may cross a process
 - `WaterSnapshot` is the only **state** value handed to a widget process: `Sendable`, `Equatable`,
@@ -135,5 +141,6 @@ warning here is a Swift 6 error later.
 - Never add `@MainActor` to `WaterSnapshotTests`, `WidgetLanguageTests`, `AppLanguageTests`,
   `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
-  `WelcomeStepTests`, `GoalSuggestionTests` or `TodaysWaterAnswerTests` to make them
-  compile. They are compile-time canaries: fix the declaration they read instead
+  `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests` or
+  `PaywallOfferTests` to make them compile. They are compile-time canaries: fix the declaration they
+  read instead

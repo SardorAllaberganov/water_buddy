@@ -45,6 +45,14 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   and a UI test whose pour crossed the goal on a long-gated simulator would meet a system alert. No
   UI test passes it. The request itself has no automated coverage: prove it by hand on a simulator
   launched with the argument
+- `-WaterBuddyPremium` is DEBUG's opt-in to the paywall, read through
+  `PaywallView.isOffered(arguments:)`. `PremiumUITests` passes it and no other UI test does, so no
+  other run meets the Premium card. A purchase through the sheet has no automated coverage: prove it
+  by hand on a simulator, with the scheme's local StoreKit configuration
+- StoreKit is reached in a test only through `PremiumStore.Source`'s closures or an `SKTestSession`
+  over `WaterBuddyTests/WaterBuddy.storekit` — never the App Store or its sandbox. A suite that opens
+  an `SKTestSession` is `.serialized` and clears its transactions in a `defer`: a session is the
+  simulator's own state, shared by every test in the run
 - Inject the `Calendar` and the `now: () -> Date` clock rather than waiting for a real day
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process
@@ -74,7 +82,8 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
 - Some suites are deliberately **not** `@MainActor` — `WaterSnapshotTests`, `WidgetLanguageTests`,
   `AppLanguageTests`, `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
-  `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`. They are
+  `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
+  `PaywallOfferTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
@@ -179,7 +188,8 @@ on the simulator and put the widget on the Home Screen — in light, in dark, an
 control in Control Center, put the week widget on the Home Screen and tap it into History, take the
 small widget into StandBy on a device, by day and at night, since the simulator has none, and, after
 a change to reminders, press a reminder's *Log a Glass* with the
-app not running. The same
+app not running; after a change to Premium, buy each plan, restore, refund and approve an Ask to Buy
+through the local StoreKit configuration. The same
 applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face
 by hand, a tinted face among them: no part of the automated gate renders them.
 

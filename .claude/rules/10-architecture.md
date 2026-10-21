@@ -58,6 +58,11 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
   `WaterSnapshot` (rule `50-views`)
 - **Reminders are scheduled from a pure plan.** `ReminderPlan` decides when, `NotificationManager`
   only files and unfiles (rule `80-notifications`)
+- **Premium is read, never stored.** `PremiumStore`, app-only and `@MainActor @Observable`, is
+  injected beside `DataManager`. It reads StoreKit and writes neither store: the paid state lives in
+  memory and is read again at launch, on every return to the foreground and on every transaction
+  update. The widget and the watch never compile it and never ask StoreKit — a later item that needs
+  them to know writes a derived key through `DataManager` (rule `70-privacy`)
 
 ## Import direction
 - The widget may import from the six shared files. **Nothing shared may import from the widget or
@@ -89,3 +94,4 @@ membership* section.
 - A bare `withAnimation`, a bare `print` outside `#if DEBUG`, a bare `Date()` in logic
 - `WristModel` writing to the phone's SwiftData store or `DataManager` writing to the watch's local
   suite — the one-writer-per-store split is exact, not a shared free-for-all
+- `import StoreKit` outside `HomeView.swift` and `PremiumStore.swift`
