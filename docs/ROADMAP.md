@@ -29,6 +29,13 @@ hydration apps ranked complaints by how often they appeared, and paying to log w
 (about 65 mentions, across every competitor read). The scan's figures are from that session's
 record; the scan itself is not in this repository.
 
+**The Premium line** (the owner's, 2026-10-21). Every Premium item below is held to three lines:
+1. **No way of logging is ever Premium** — the app's row, the widget, the watch, Siri, Control
+   Center, the reminder's *Log a Glass*, and every drink type 1.5.1 adds.
+2. **Premium reads only what the free app already stores.** When a subscription lapses the extras
+   go quiet; no serving, setting or figure is lost or hidden.
+3. **Everything is worked out on the device** — no server, no account, no location.
+
 ## 2. Shipped so far
 
 The first list, approved 2026-10-06 and worked in order:
@@ -235,7 +242,8 @@ hiding its figures when watchOS redacts. The owner placed all three on simulated
 the face turned over at midnight with the app closed. With it **1.3.2 is built whole**; what only a
 device shows of the faces — the quiet forms on a locked watch and in Always On, VoiceOver on the
 wrist, the corner on a tinted face, the Smart Stack — joins 1.2.7's sweep as known issue #153, beside
-#151 and #152.)*
+#151 and #152.)* *(2026-10-21, later: 7c is committed as `5194121`, its doc sync as `0be24f9` —
+**1.3.2 is committed whole.**)*
 
 **1.3.3 — Apple Health.** Each serving written as dietary water, and removed when the serving is
 deleted or edited. Whether it also *reads* water other apps logged is the design's first question.
@@ -260,6 +268,11 @@ Russian — joins 1.2.7's sweep as known issue #146.)* *(2026-10-19: committed a
 **Why third.** It comes after the product looks and feels finished everywhere, so the first thing a
 paying user buys is the extras, never the basics. Nothing a free user can do today moves behind it.
 
+**Sold as sets** (the owner's, 2026-10-21). Premium launches as sets, not single features, so the
+paywall sells more than one thing: **to understand** — 1.4.2, 1.4.6, 1.4.7; **to be coached** —
+1.4.3, 1.4.9, 1.4.10, and 1.4.11 once it can be built; **to make it theirs** — 1.4.5, 1.4.8; and
+1.4.4, export. Every item is held to *The Premium line* (§1). Nothing here ships before 1.4.1.
+
 | # | Item | Free / Premium | Size |
 |---|---|---|---|
 | 1.4.1 | **StoreKit subscriptions and the paywall** — yearly and lifetime | — | Medium |
@@ -267,10 +280,25 @@ paying user buys is the extras, never the basics. Nothing a free user can do tod
 | 1.4.3 | **Custom reminder schedule** | Premium | Medium |
 | 1.4.4 | **Export** | Premium | Small |
 | 1.4.5 | **Themes and app icons** | Premium | Medium |
+| 1.4.6 | **Patterns** | Premium | Medium |
+| 1.4.7 | **Monthly recap** | Premium | Small |
+| 1.4.8 | **Vessel library** | Premium | Medium |
+| 1.4.9 | **Pace line** | Premium | Small |
+| 1.4.10 | **Remind only when behind** | Premium | Small |
+| 1.4.11 | **Workout-aware goal** | Premium | Medium |
 
 **1.4.1 — StoreKit.** Purchases are verified on the device by StoreKit itself, so Premium needs no
 server and keeps the product's *no account, no server* shape. **Needs a rule change** (§8), the
 same one as the rating prompt. The streak stays free (the owner's choice, 2026-10-09).
+*(2026-10-21: **begun, ahead of 1.3.3, on the owner's choice — half built, staged, paused.** Spec
+`docs/superpowers/specs/2026-10-21-premium-foundation-design.md` and plan
+`docs/superpowers/plans/2026-10-21-premium-foundation.md`, both approved: the foundation built now and
+hidden until the first set (D1); a free week on the yearly plan (D2); our own paywall in the app's
+glass and language (D3); the paid state read from StoreKit and stored nowhere. Its `StoreKit`
+amendment — two files, named calls, the paywall's moment — is typed into rule `70-privacy`,
+unstaged. Tasks 0–5 are built and staged: the decision, the store, the words, 46 tests. Paused at
+Task 6 for the privacy policy's URL (known issue #159); App Store Connect's steps are #155, a device
+purchase #156.)*
 
 **1.4.2 — Full history.** History beyond the week shown today: a month calendar of goal days, and
 trends. Free users keep today's week. **No serving is ever deleted or hidden from the store because
@@ -287,6 +315,37 @@ phone until the user sends it.
 from `Aurora` today (rule `60-design-system`), so a theme is a second set of those colours, and each
 theme's contrast is measured to the same floors before it ships.
 
+*(Items 1.4.6 to 1.4.11 were added on 2026-10-21, approved by the owner in that session's chat.)*
+
+**1.4.6 — Patterns.** When in the day the user drinks, weekdays against weekends, and their usual
+first and last drink — read from the same rows as 1.4.2's full history, and worked out on the
+device.
+
+**1.4.7 — Monthly recap.** At the turn of each month, a card: the days the goal was met, the best
+streak, the litres drunk, and the change from the month before. It may be shared as an image, which
+leaves the phone only on the user's own tap, as 1.4.4's file does. **Needs a rule change** (§8).
+The streak never leaves the app today (rule `20-state`), so whether the shared image carries it is
+its design's question.
+
+**1.4.8 — Vessel library.** More than three vessels, each with its own name and glyph; Home's row of
+three is picked from them. Every one-tap door still logs the Glass, slot `DataManager.usualSlot`.
+On a lapse, the three on Home stay as they are and still log; only picking from the library is the
+extra. Today `Key.servings` holds exactly three amounts and the names and glyphs are fixed in
+`vesselSlots`, which the watch draws too. **Needs rule changes** (§8).
+
+**1.4.9 — Pace line.** Where the user should be by now across the reminder hours
+(`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.
+Worked out when shown and stored nowhere, as `remaining` is (rule `20-state`).
+
+**1.4.10 — Remind only when behind.** A slot today is dropped when what the user has already drunk
+covers what 1.4.9's pace asks for by that slot's hour — a third reason beside the goal and a drink
+within the hour. The plan still only drops slots and never moves one, so it stays pure (rule
+`80-notifications`). **Needs a rule change** (§8).
+
+**1.4.11 — Workout-aware goal.** A workout recorded in Apple Health raises that day's goal; no
+location and no weather (§9). Only if 1.3.3 also *reads* from Health — otherwise it waits. Whether
+the widget and the watch draw the raised goal is its design's question. **Needs rule changes** (§8).
+
 ## 6. Release 1.5 — more to log, more people
 
 | # | Item | Free / Premium | Size |
@@ -294,12 +353,15 @@ theme's contrast is measured to the same floors before it ships.
 | 1.5.1 | **Other drinks** — tea, coffee, juice, milk | Free | Large |
 | 1.5.2 | **Live Activity** | Free | Medium |
 | 1.5.3 | **New languages** | Free | Medium per language |
+| 1.5.4 | **Caffeine** | Premium | Medium |
 
 **1.5.1 — Other drinks.** A drink type stored on every serving: a change to `WaterLog`, the source
 of truth, and so a SwiftData migration, with consequences for the widget, the watch's wire format,
 Siri, Control Center and Apple Health. Questions for its design: whether every drink counts in full
 toward the goal; whether the one-tap doors (widget, Siri, Control Center, the watch, and since
-2026-10-15 the reminder's *Log a Glass*) keep logging water only.
+2026-10-15 the reminder's *Log a Glass*) keep logging water only. *(2026-10-21: and whether a drink
+counts toward the goal at its own share of water — decided here, for every user, never as a Premium
+extra: a total that changed when a subscription lapsed would break *The Premium line*, §1.)*
 
 **1.5.2 — Live Activity.** Today's progress on the Lock Screen and in the Dynamic Island. **With no
 server, it can only be updated when the app or one of its intents runs** — a pour from the app, a
@@ -310,6 +372,13 @@ forbids a Live Activity today, because the total it would show counts pours the 
 all four string catalogues, the store listing, the header's phrase, and `knownRegions`
 (rule `15-project`). Added here, after the copy has settled, so no feature is translated twice.
 Which languages is a decision for that time.
+
+**1.5.4 — Caffeine.** Milligrams of caffeine counted from coffee and tea servings, a daily limit,
+and a reminder at a cut-off hour the user chooses. After 1.5.1, which stores the drink on each
+serving; how much caffeine a serving carries is its design's first question. The cut-off is a
+second kind of reminder beside the hydration grid — its own identifiers, inside the 64-request cap,
+and no digit in its copy. **Needs rule changes** (§8). *(Added on 2026-10-21, approved by the
+owner in that session's chat.)*
 
 ## 7. Release 2.0 — your data everywhere
 
@@ -343,6 +412,11 @@ Each is written as an amendment for the owner to approve, before its item's code
 | `80-notifications` | A reminder carries an action | 1.2.4 |
 | `60-design-system` | The glass, per stage 3c's chosen approach | 1.2.1 |
 | `60-design-system` | A second set of `Aurora` colours | 1.4.5 |
+| `70-privacy` | What leaves the app on the user's own tap — the export file, the recap's image | 1.4.4, 1.4.7 |
+| `20-state`, `25-shared-storage`, `10-architecture`, `50-views` | A library of vessels beside `Key.servings`' three, named by the user | 1.4.8 |
+| `80-notifications` | A slot dropped when the user is ahead of pace | 1.4.10 |
+| `70-privacy`, `15-project` | Reading workouts from `HealthKit`, beyond 1.3.3's row | 1.4.11 |
+| `80-notifications`, `70-privacy` | A second kind of reminder, the caffeine cut-off, with no digit | 1.5.4 |
 
 *(2026-10-14: 1.2.1's was approved on 2026-10-13 and committed as `c9d1f6b`. 1.2.2 needed three
 this table did not list — rule `50-views` (all three tabs refresh; a mirrored `@State` takes a
@@ -396,6 +470,9 @@ worded in its spec §5 — the week's key in `10-architecture`, `20-state`, `25-
 and its link across `40-widget`, `50-views`, `60-design-system`, `65-accessibility` and
 `70-privacy`; StandBy and the week in `85-testing`'s device list. Approved by the owner before any
 code and staged; not yet committed — 6a was committed ahead of its wording.)*
+*(2026-10-21: the last five rows were added with items 1.4.6 to 1.4.11 and 1.5.4. The first also
+covers 1.4.4, which had no row here before: an export file is the user's data leaving the app. Each
+row is still worded and approved when its item's turn comes, before its code.)*
 
 ## 9. Not planned
 
