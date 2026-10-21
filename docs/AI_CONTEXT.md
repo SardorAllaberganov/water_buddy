@@ -4,6 +4,32 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-21 (seventy-eighth pass — `/doc_sync` run by the owner in the session that
+built roadmap item 1.3.2's stage 7c, after its records and before its `/commit`). HEAD `3d1cda8`; 7c
+staged. The command's checks: 96 tracked `.swift` files, each with its row, every row's count equal
+to `wc -l` by script — none stale; 683 `@Test`, 70 on the watch, 56 UI `func test`; `project.pbxproj`
+last changed in `eba1b1e`, its three exception sets six files each as `CLAUDE.md` gives them; 13 keys
+on `DataManager.Key` (11 phone, 2 watch); the watch widget's catalogue 5 keys, as its row gives;
+every cited rule resolves; no `docs/ARCHITECTURE.md`, `CAPABILITIES.md` or `dependencies.md`.
+Changed here: this block and *Git*. `CLAUDE.md`: the target table's watch widget row names the three
+faces — the sentence 7c's records left for this pass — the warning trail gains 7c, and the line on
+placing widgets by hand names the three faces and a watch face with slots. `docs/STATE.md`: no key
+moved; two dated notes under *The language* — the faces read the mirror's language and format with
+its locale, which 7c's records missed. `docs/DESIGN.md`: no token changed; a block giving
+`Aurora.blue` against a full-colour face's black, 6.21:1, computed from the token. `docs/WIDGET.md`,
+`docs/ROADMAP.md`, the spec and the plan: written by 7c's records in this session, read again, left.
+`tasks/lessons.md`: one entry. Gate: not re-run — no code moved; 7c's ran in this session on its
+staged copy, and *Current state* gives it.
+
+**Last updated:** 2026-10-21 (roadmap item 1.3.2's stage 7c, written by the session that built it —
+not a `/doc_sync` pass). HEAD `3d1cda8`. 7c is staged: *Current state* gains its block; four rows in
+*Files on disk* change or join — 96 tracked `.swift` files with `WristFaceView.swift` — and the watch
+widget catalogue's row; the *Targets* row for the watch widget and the never-placed line under
+*Current state* gain dated notes; 683 `@Test`, 70 on the watch, 56 UI `func test`, all unchanged;
+#50, #140 and #151 gain notes, and #153 and #154 are new; *Git* gains this session's block.
+`CLAUDE.md` is left for `/doc_sync`: its target table still describes the watch widget as the
+circular ring alone.
+
 **Last updated:** 2026-10-20 (seventy-seventh pass — `/doc_sync` run by the owner in the session that
 built roadmap item 1.3.2's stage 7b, after its records and before its `/commit`). HEAD `ca43a60`; 7b
 staged. The command's checks: 95 tracked `.swift` files, each with its row, every row's count equal
@@ -1508,7 +1534,7 @@ it) and the watch's own `primaryIndex = 1`, `WristView.swift:136` — known issu
 | `WaterBuddyTests` | `sardor.WaterBuddyTests` | `WaterBuddyTests/` | **LIVE** — swift-testing, **683 `@Test` functions in 86 suites, all run on 2026-10-20** in 1.3.2's stage 7b gate (the attribute grep says 683; 7b added the face's six to `WristPlanTests`). Before that: **677 in 86, all run on 2026-10-20** in 1.3.2's stage 7a gate (the attribute grep said 677; the seventy-sixth pass found this row still at 1.2.5's figure — roadmap items 1.2.6 to 1.3.1 added the 61 since, and their rows in *Files on disk* name them). Before that: **616 `@Test` functions in 77 suites, all run on 2026-10-15** (roadmap item 1.2.5 added twelve, in two new suites — `ReviewRequestTests` 8 and `ReviewPromptTests` 4; 604 in 75 before it, when 1.2.4 had added eleven; 593 on 2026-10-14) (36 are the redesign's stage 5, staged: six new suites — `ReminderPermissionTests` 7, `WelcomeStepTests` 8, `WelcomeFinishTests` 6 and `FreshStartTests` 2 in the new `WelcomeTests.swift`, `GoalSuggestionTests` 12 in its own file, and `WelcomeStringTests` 1 in `LocalizationTests`; `DailyGoalSetupTests` reads `WelcomeView`'s menu). Before that: **557 `@Test` functions in 69 suites, all run on 2026-10-13** (one is the redesign's stage 4, staged: `theVesselsNoteNamesTheGlassByItsOwnName` in `LocalizationTests`). Before that: 556 `@Test` functions in 69 suites, all run on 2026-10-13 (9 are the redesign's stage 3c, staged: one new suite — `LiquidGlassScrimTests` 4 — one test more in each of `LiquidGlassRoutingTests`, 10, and `PrimarySurfaceTests`, 2, and three more in `HistoryLayoutTests`, 17; recounted per suite by script in the fifty-seventh pass). Before that: 547 `@Test` functions in 68 suites, all run on 2026-10-12 (47 are stage 3b's second pass, unstaged: four new suites — `MotionTests` 6, `PageTurnTests` 13, `PourArcTests` 6, `ScrollDepthTests` 16 — four more in `ArrivalTests`, 10, and two more in `HistoryLayoutTests`, 14). Before that: 500 in 64 suites, all run on 2026-10-12 (21 are the redesign's stage 3b, unstaged: four new suites — `ScreenMetricsTests` 4, `ArrivalTests` 6, `BarShadeTests` 3, `AuroraDriftTests` 6 — and one test more in each of `HapticLadderTests` and `HomeLayoutTests`). Before that: 479 `@Test` functions in 60 suites, all run on 2026-10-11 (35 tests are the redesign's stage 3, staged: four new suites — `DaysMetTests` 8, `DayFractionTests` 9, `HistoryLayoutTests` 12, `HistoryStringTests` 3 — and one test more in each of `HistoryWindowTests`, `HistoryServingTests` and `GroupedFigureTests`. Stage 2's 57 in eight suites were committed in `1ced514`: `UndoTests`, `HomeFiguresTests`, `DayTurnTests`, `StreakCountTests`, `StreakPublishingTests`, `HomeLayoutTests`, `HomeStringTests`, `GroupedFigureTests`; stage 1's `LiquidGlassRoutingTests` and `PrimarySurfaceTests` in `c9ef45d`). *(Read 444 in 56 until the fiftieth pass; 387 in 48 until the forty-seventh — the forty-sixth updated the header and the gate and left this row.)* |
 | `WaterBuddyUITests` | `sardor.WaterBuddyUITests` | `WaterBuddyUITests/` | **LIVE** — **since the redesign's stage 5, staged 2026-10-14: a new class, `WelcomeUITests`, 13 tests on the DEBUG fresh start (the welcome walked forward and back, each control one element, the largest text size, the shared walk, a vessel set in the welcome and one edited in Settings read back on Home, a step's title where a tab's stands, a double tap moving one step, and five for the calculator); `GoalSetupUITests` still has 36, its eleven *Get Started* preambles now `completeWelcomeIfShown(_:)`; 54 declared, 67 executed a system, one of them skipped.** Before that, **since the redesign's stage 4, staged 2026-10-13: `GoalSetupUITests` has 36 tests, 41 declared, 54 executed a system, one of them skipped** — two more, that Settings draws the new vessels note and that each of its controls is one element. Before that, **since the redesign's stage 3c, staged 2026-10-13: `GoalSetupUITests` has 34 tests, 39 declared, 52 executed a system, one of them skipped** — one more, `testEveryDayOnTheWeekCardIsATapTarget`, that each of the week card's days is at least 44 × 44. Before that, **since stage 3b's second pass, unstaged 2026-10-12: `GoalSetupUITests` has 33 tests, 38 declared, 51 executed a system, one of them skipped** — one more, that only the page shown is in the tree once a change of tab has ended. Before that, **since the redesign's stage 3b, unstaged 2026-10-12: `GoalSetupUITests` has 32 tests** — seven more, for the title's place (two), a screen coming back whole, a kept screen answering a tap, the drag along Apple's bar, the app's own bar's captions, and History returning to today — **37 declared, 50 executed a system, one of them skipped** (the caption test where the bar is Apple's, the drag test where it is the app's own), and the class runs in chunks (#110). The text that follows is the fiftieth pass's. — `GoalSetupUITests` (25 real tests; the ninth, committed in `c9ef45d`, taps a serving row on its bare glass; eleven are stage 2's, committed in `1ced514`: Home's heading, the two "never squeezed" checks, and *Undo*; five are stage 3's, staged: the strip's heading, the sheet's shortcuts, and three at the largest text size — the shortcuts' figures, a row's amount, a past day's heading), the Xcode template's 3, and `AppStoreScreenshotUITests`' 2 capture harnesses. **30 declared, 43 executed** — the 2 harnesses are skipped by the gate, and `testLaunch` runs once per launch configuration. Since stage 3 the target runs as two invocations, 25 and 18: one no longer fits a 600-second foreground call (known issue #110). *(Read "20 real tests … 25 declared, 38 executed" until the fiftieth pass; "9 real tests … 14 declared, 27 executed" until the forty-seventh.)* |
 | `WaterBuddyWatch` | `sardor.WaterBuddy.watchkitapp` | `WaterBuddyWatch/` **+ 6 shared files** | **LIVE** — SwiftUI, `@Observable` `WristModel` over its own local App Group suite; no SwiftData |
-| `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly |
+| `WaterBuddyWatchWidget` | `sardor.WaterBuddy.watchkitapp.WaterBuddyWatchWidget` | `WaterBuddyWatchWidget/` **+ 6 shared files** | **LIVE** — `.accessoryCircular` percentage ring, reads the watch's own suite directly *(2026-10-21, 1.3.2's stage 7c, staged: three faces — the circle, `.accessoryRectangular` and `.accessoryCorner` — drawn by `WristFaceView` from `WristPlan.Face`, in the phone's chosen language, every figure `.privacySensitive()` with a quiet form; still display-only)* |
 | `WaterBuddyWatchTests` | `sardor.WaterBuddyWatchTests` | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, **70 `@Test` functions in 7 suites, all run on 2026-10-20** on watchOS 27.0 in 1.3.2's stage 7b gate (7b: +1 in `WristModelTests`, +5 and one rewritten in `WristViewLogicTests` with the scrim's one replaced by two, and in `WristVesselLayoutTests` two removed and seven added). Before that: 58 in 7 (1.3.2's stage 7a added `WristGlassTests`, 1). Before that: 57 in 6 suites |
 
 Every target's sources come from a `PBXFileSystemSynchronizedRootGroup`, so a new `.swift` file
@@ -1676,7 +1702,7 @@ WaterBuddyTests/HistoryViewTests.swift           308   (stage 5: a comment names
 WaterBuddyTests/HomeModelTests.swift             409   2026-10-11, `1ced514` — UndoTests (the id addLog returns, undo by id, after midnight, on a failed read) + HomeFiguresTests (remaining, hasReachedGoal, lastDrink, nextReminder and what each observes) + DayTurnTests (dayDidTurn republishes on a real day change and on nothing else)
 WaterBuddyTests/HomeViewTests.swift              287   (unstaged 2026-10-12, stage 3b: theWidestDateFitsTheNarrowestPhoneAtTheLargestTextSize — every day of a year in three languages, measured in iOS's own font) HomeServingTests — the quick-add row's offered vessels — + HomeLayoutTests (not @MainActor; 2026-10-11, `1ced514`): the Glass ranked, the vessel's floor and ceiling, what the column leaves it, the discs' bounds, an offer's lifetime, Home's glyphs
 WaterBuddyTests/LiquidGlassTests.swift           340   (2026-10-20, 1.3.2 7a, staged: two DocC comments no longer put the watch on the hand-made stack; no assertion moved.) (2026-10-13, stage 3c, staged: the tint floor moved to 0.64, theGlassIsTintedWithTheSkysOwnBlue, LiquidGlassScrimTests — the phone's own panes scrimmed with the sky at 0.30 / 0.70 / 0.80 in density order, the widget and the watch keeping black, Light Mode none — and theShownDaysLetterReadsOnItsDisc in PrimarySurfaceTests) LiquidGlassInteractionTests + LiquidGlassBaseTests — the press response; 2026-10-10, `c9ef45d`: LiquidGlassRoutingTests (which pane, which of Apple's variants, the availability flag, only the regular variant darkened, and no lighter than the lightest rung that passed) + PrimarySurfaceTests (the derived contrast); none @MainActor
-WaterBuddyTests/LocalizationTests.swift         1048   (2026-10-20, 1.3.2 7b, staged: watchSharedKeys gains %1$@ of %2$@ ml and %1$@, add %2$d millilitres; watchOwnKeys loses the readout, Logs %1$d millilitres, More and Shows the other serving sizes; the pour sentence counted in the watch's bundle too, Logs %1$d millilitres no longer; 1055 lines before) (2026-10-19, 1.3.1 6c, staged: `sharedKeys` gains the week widget's seven; `theWeekWidgetSaysWhatTheSpecSays` — its three new strings in en/ru/uz, in both bundles; 1028 lines before) (2026-10-18, 1.3.4, staged: Siri's three answer keys join countedKeys and expected — every form at twelve counts in en/ru/uz; 999 lines before) (2026-10-17, 1.2.6: PluralFormTests, five — every counted key in every bundle at twelve counts in en/ru/uz, the no-locale finding, a German and a Japanese phone on Follow device, theFollowDeviceLocaleSpeaksTheBundlesLanguage; table(_:_:) reads Localizable.stringsdict too and returns every form; theTablesSeeAKeyWithPluralForms; homeKeys and historyKeys gain %1$d days and %1$d servings; theHomeKeysThatTakeARawNumberAreTheCountedOnes replaces onlyTheSpokenHomeStringTakesARawNumber.) (2026-10-15, 1.2.4: theTranslatedReminderCopyStillCarriesNoUserValues reads Log a Glass in ru and uz, required; theAppAndTheWidgetFileRemindersInTheSameWords in en, ru, uz; 699 lines before) (stage 5: welcomeKeys, the welcome's 28 keys, and WelcomeStringTests — each in en/ru/uz with its specifiers matching; 648 lines before) (stage 4, staged 2026-10-13: theVesselsNoteNamesTheGlassByItsOwnName — the note's key in en/ru/uz contains each table's word for Glass, and the old note's key is gone; 628 lines before) (2026-10-11, `1ced514`: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders. Staged 2026-10-11, the redesign's stage 3: HistoryStringTests — History's six keys in en/ru/uz, the four retired keys gone, and the built table's raw-number volume keys exactly the three other screens still draw) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
+WaterBuddyTests/LocalizationTests.swift         1061   (2026-10-21, 1.3.2 7c, staged: watchWidgetSharedKeys — Today's hydration, Hydration, %1$@ of %2$@ ml and the vessel's sentence — compared with the app bundle in every language, replacing the description's single check; the sentence counted in the watch widget's bundle too; 1048 lines before) (2026-10-20, 1.3.2 7b, staged: watchSharedKeys gains %1$@ of %2$@ ml and %1$@, add %2$d millilitres; watchOwnKeys loses the readout, Logs %1$d millilitres, More and Shows the other serving sizes; the pour sentence counted in the watch's bundle too, Logs %1$d millilitres no longer; 1055 lines before) (2026-10-19, 1.3.1 6c, staged: `sharedKeys` gains the week widget's seven; `theWeekWidgetSaysWhatTheSpecSays` — its three new strings in en/ru/uz, in both bundles; 1028 lines before) (2026-10-18, 1.3.4, staged: Siri's three answer keys join countedKeys and expected — every form at twelve counts in en/ru/uz; 999 lines before) (2026-10-17, 1.2.6: PluralFormTests, five — every counted key in every bundle at twelve counts in en/ru/uz, the no-locale finding, a German and a Japanese phone on Follow device, theFollowDeviceLocaleSpeaksTheBundlesLanguage; table(_:_:) reads Localizable.stringsdict too and returns every form; theTablesSeeAKeyWithPluralForms; homeKeys and historyKeys gain %1$d days and %1$d servings; theHomeKeysThatTakeARawNumberAreTheCountedOnes replaces onlyTheSpokenHomeStringTakesARawNumber.) (2026-10-15, 1.2.4: theTranslatedReminderCopyStillCarriesNoUserValues reads Log a Glass in ru and uz, required; theAppAndTheWidgetFileRemindersInTheSameWords in en, ru, uz; 699 lines before) (stage 5: welcomeKeys, the welcome's 28 keys, and WelcomeStringTests — each in en/ru/uz with its specifiers matching; 648 lines before) (stage 4, staged 2026-10-13: theVesselsNoteNamesTheGlassByItsOwnName — the note's key in en/ru/uz contains each table's word for Glass, and the old note's key is gone; 628 lines before) (2026-10-11, `1ced514`: HomeStringTests — Home's ten keys in en/ru/uz with matching specifiers — + GroupedFigureTests — Bundle.figure groups by the locale and Uzbek reorders. Staged 2026-10-11, the redesign's stage 3: HistoryStringTests — History's six keys in en/ru/uz, the four retired keys gone, and the built table's raw-number volume keys exactly the three other screens still draw) the four bundles' string tables, en/ru/uz — the phone's two and, through the built phone app's Watch/ folder, the watch's two; the Shortcuts vocabulary test also pins the control's two strings
 WaterBuddyTests/MotionTests.swift                 64   unstaged 2026-10-12, stage 3b's second pass — MotionTests (not @MainActor, 6): a page changes in under half a second and over a quarter, the fade is shorter than the slide, what lands overshoots and does not ring, neither spring is as quick as the press's, a drop is quicker than the level, a state changes quicker than a page
 WaterBuddyTests/NotificationManagerTests.swift   495   (2026-10-15, 1.2.4: both spies hold PendingReminders and replace a request filed under its identifier, as the centre does; eight new tests — the button's category and action, its title in the bundle passed, PendingReminder read off a request, the re-file in other words, in another language and from 1.1, and ReminderResponder.logsTheGlass(for:); theReminderCopyCarriesNoUserValues reads the button's title; 352 lines before) NotificationManagerTests — applying a plan, against a spy scheduler — + ReconcileQueueTests (not @MainActor), against SharedCentre, a lock-guarded stand-in two reconciles can reach at once
 WaterBuddyTests/PageTurnTests.swift              185   unstaged 2026-10-12, stage 3b's second pass — PageTurnTests (not @MainActor, 13): a tab to the right comes in from the right and the page leaving ends a whole width away; the tab already shown turns nothing; two pages at most, in the bar's order; every turn is counted; an older turn's end does not end a newer one, nor does there-back-and-there-again inside one slide; under Reduce Motion nothing travels and the page leaving fades
@@ -1721,8 +1747,9 @@ WaterBuddyWatchTests/WristModelTests.swift       462   (2026-10-20, 1.3.2 7b, st
 WaterBuddyWatchTests/WristPlanCompileTests.swift  20   compile-time canary — WristPlan stays free of actor isolation
 WaterBuddyWatchTests/WristVesselLayoutTests.swift 120  (2026-10-20, 1.3.2 7b, staged: the two diameter(fitting:reserving:) tests removed (#84(d)); the column — the vessel takes what the line and the row leave, the caption gives way to it, the height runs into the bottom inset to the canvas's margin; the row — an even share per column, a disc giving way to the floor below the accessibility sizes and keeping its size at them; the ceiling as the canvas's share; the "%" kept large text; 49 lines before) diameter(fitting:within:) against five real watch width/height pairs
 WaterBuddyWatchTests/WristViewLogicTests.swift   388   (2026-10-20, 1.3.2 7b, staged: the pour row's five — order and amounts, a short or empty mirror keeping the Glass, a litre grouped, the phone's sentence in en/ru/uz, the phone's language followed; the readout test rewritten for the line under the vessel; the scrim's tests rewritten for the percentage — full before water reaches it, and still ramping below. The sentence after the notes is history; 323 lines before) (2026-10-17, 1.2.6: the 17 calls of syncedCaption and attribution pass locale:; the count did not move.) the pure logic WristView composes — servings resolution, which one the vessel pours, what the menu gets, attribution in en/ru/uz, serving names, the grouped readout, and the vessel's scrim ramp (full before water can reach the millilitre line, on every diameter)
-WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 95   .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight, policy .atEnd (no longer a 15-minute timer); its description is the phone's own "Today's hydration"
+WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift 88   (2026-10-21, 1.3.2 7c, staged: WristWidgetEntry carries a WristPlan.Face and an AppLanguage from the mirror; the provider calls WristPlan.face(…); three families; the view is WristFaceRoot; 95 lines before) .accessoryCircular percentage ring — reads Key.wristMirror + Key.wristOutbox directly, never WristModel.shared; WristPlan's arithmetic; entries at the phone's day end and the watch's midnight, policy .atEnd (no longer a 15-minute timer); its description is the phone's own "Today's hydration"
 WaterBuddyWatchWidget/WaterBuddyWatchWidgetBundle.swift 9
+WaterBuddyWatchWidget/WristFaceView.swift       209   (2026-10-21, 1.3.2 7c, staged, new) the three faces: WristFaceRoot (the background, \.strings and \.locale from the entry's language), WristFaceView(face:family:), the ring, the corner (the percentage on one line, a curved gauge as its widgetLabel, accentable, hidden from VoiceOver) and the card (the drop, Hydration and the percentage; the screen's line; a bar) — each one VoiceOver element, Today's hydration with the vessel's sentence, and a quiet form under .privacy that draws and speaks no figure; three previews
 ```
 
 **81 `.swift` files across the seven target folders**, all listed above — 84 with the three
@@ -1852,7 +1879,7 @@ app's icon set and none for the widget's catalogue or the watch's.)*
 Xcode rewrite of it; what follows is this row's earlier text.)* As committed before 1.3.4; **the working-tree copy is Xcode's unstaged rewrite, which marks two of the three phrases `"extractionState" : "stale"`** (known issue #50) *(2026-10-17: discarded by the owner's choice — 1.2.6's decision D7 — so the tree matches the commit; an IDE build writes it again)* |
 | `WaterBuddyWidget/Localizable.xcstrings` | **19** keys — **15** in en/ru/uz: the 10 hand-written as a strict subset of the app's (a membership exception cannot carry a resource) plus `AddWaterIntent`'s five Shortcuts strings, translated since before the repository's first commit (known issue #1, retired 2026-10-06); and **4 the build extracted** (`%`, `+%lld`, `1,450 ml`, `Today`) with no values at all, which reach no compiled table. *(This row called all nine extracted keys untranslated until the twenty-ninth pass.)* *(2026-10-17, roadmap item 1.2.6: the percentage key and `Add %1$d millilitres` carry plural variations, value for value the app's.)* |
 | `WaterBuddyWatch/Localizable.xcstrings` | **16** keys as committed — **19 in the working tree**, where Xcode's unstaged rewrite appends three it extracted with no values (`+%lld`, `1,450 ml`, `Today`; known issue #50) — 15 in en/ru/uz (six copied value for value from the app's catalogue, nine the watch's own) and `%`, en only. Written by a script that copies the shared keys, and held to the phone's own strings by `LocalizationTests` through the built phone app *(2026-10-17, roadmap item 1.2.6: the percentage key and `Logs %1$d millilitres` carry plural variations, edited by hand in the file's own style; Xcode's rewrite discarded (D7), so the tree holds the 16 again until an IDE build writes it back)* *(2026-10-20, roadmap item 1.3.2's stage 7b, staged: **14** keys — `%1$@ of %2$@ ml` and `%1$@, add %2$d millilitres` copied from the app's catalogue value for value, with the latter's plural variations; `%1$@ / %2$@ ml`, `Logs %1$d millilitres`, `More` and `Shows the other serving sizes` removed. Edited by hand with Xcode holding no WaterBuddy file; the file round-trips through `json.dumps(…, indent=2)` byte for byte)* |
-| `WaterBuddyWatchWidget/Localizable.xcstrings` | **2** keys as committed — **6 in the working tree**, with four Xcode extracted and left empty (`%lld`, `+%lld`, `1,450 ml`, `Today`; #50) — `Today's hydration` (the complication's description, the phone's own string) in en/ru/uz, and `WaterBuddy`, en only and never translated *(2026-10-17: Xcode's rewrite discarded (1.2.6's D7); the tree holds the 2)* |
+| `WaterBuddyWatchWidget/Localizable.xcstrings` | **2** keys as committed — **6 in the working tree**, with four Xcode extracted and left empty (`%lld`, `+%lld`, `1,450 ml`, `Today`; #50) — `Today's hydration` (the complication's description, the phone's own string) in en/ru/uz, and `WaterBuddy`, en only and never translated *(2026-10-17: Xcode's rewrite discarded (1.2.6's D7); the tree holds the 2)* *(2026-10-21, 1.3.2's stage 7c, staged: **5** keys — `%1$@ of %2$@ ml`, `%1$d percent. %2$d of %3$d millilitres.` and `Hydration` join, each the app catalogue's entry value for value, plural forms included; Xcode's rewrite of this file was restored to `HEAD` first, on the owner's word, so the four empty extracted keys are gone from the tree)* |
 | `WaterBuddy/Assets.xcassets` | `AppIcon.appiconset/AppIcon-{light,dark,tinted}.png`, 1024², generated; and `AccentColor.colorset` |
 | `WaterBuddyWidget/Assets.xcassets` | `AccentColor.colorset` and `WidgetBackground.colorset` — no icon |
 | `WaterBuddyWatch/Assets.xcassets` | `AppIcon.appiconset/AppIcon.png`, 1024², the modern `universal` + `"platform" : "watchos"` form (rule `15-project`, *Submission*) — not made by the generator; and `AccentColor.colorset` |
@@ -2030,6 +2057,61 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Roadmap item 1.3.2, stage 7c — the watch's three faces — is built, gated and staged, not
+committed** (2026-10-20 evening to 2026-10-21; HEAD `3d1cda8`: 7b committed as `af388da`, its doc
+sync `3d1cda8`). Written by the session that built it, not a `/doc_sync` pass. The plan's Tasks
+9–11, run inline, tests first. With 7c, roadmap item 1.3.2 is built whole.
+
+- **What changed.** The complication offers `.accessoryRectangular` and `.accessoryCorner` beside
+  the circle, every face display-only. `WristWidgetEntry` carries a `WristPlan.Face` — the function
+  the screen reads — and the phone's `AppLanguage`, from the mirror; `WristFaceRoot` injects
+  `\.strings` and `\.locale` together. The circle is the ring it was; the corner draws the
+  percentage, `.percent` in the chosen locale, with a curved gauge as its `widgetLabel`; the
+  rectangle draws the drop, *Hydration* and the percentage, the screen's own line
+  (*1,300 of 2,000 ml*) and a bar. Each shape is one VoiceOver element — *Today's hydration*, the
+  vessel's sentence — every shown figure `.privacySensitive()`, and each has a quiet form under
+  `.privacy` that draws and speaks no figure. The watch widget's catalogue gains three keys, value
+  for value from the app's (5); `LocalizationTests` compares all four of its shared keys in every
+  language. The kind, the gallery strings, the provider's store read and its `.atEnd` timeline are
+  unchanged.
+- **The owner's rulings this session.** (1) Xcode's unstaged rewrite of the watch widget's
+  catalogue (#50) restored to `HEAD` before the keys went in. (2) watchOS 27.0 alone (#151). (3) The
+  tinted corner on the final build skipped — the owner's swipe to the Infograph face did not reach
+  the probe watch.
+- **My rulings, in the ledger.** The rectangle's line and bar are marked only when shown
+  (`.privacySensitive(!quiet)`): a marked blank line under the privacy reason drew the system's grey
+  placeholder chip, a render showed. The corner's figure gained `.lineLimit(1)` — the probe drew
+  Russian *100 %* on two lines. The corner's two label gauges gained `.widgetAccentable()` — on the
+  tinted Infograph face its gauge stayed white beside a green circle (rule `60-design-system`).
+- **The final review**, a fresh reviewer on the staged diff: 0 critical; 2 important, both
+  verification still to do at the time (the tinted corner; the gate); 4 minor. One minor re-graded
+  and fixed — the corner's label gauges hidden from VoiceOver (rule `65-accessibility`); three
+  deferred for the owner (`HISTORY.md` lists them).
+- **Seen on the simulator** (*WaterBuddy Probe Watch 46*, watchOS 27.0, a probe copy seeding the
+  store through `WristModel.apply`): 110 renders of the three shapes at 62, 100 and 999%, en/ru/uz,
+  shown and quiet — every quiet form without a figure; then **the owner placed all three** —
+  the circle and the rectangle on Modular (multicolour), the corner and the circle on Infograph
+  (tinted green). The faces followed the phone's Russian after the app's own reload. And **the
+  midnight turnover with the app closed**: at 00:00:02 the Modular face fell from *65 % ·
+  1 300 из 2 000 мл* to *0 % · 0 из 2 000 мл*, a second before the system's own date did.
+- **Not seen:** the corner on a tinted face after the accentable fix; the quiet forms where watchOS
+  draws them, VoiceOver on the wrist, the Smart Stack, and 26.x — #153 for the sweep, #151.
+- **The gate**, on a copy of the index: unit `✔ Test run with 683 tests in 86 suites passed` (the
+  grep says 683); watch on *Watch 27* `✔ Test run with 70 tests in 7 suites passed` (the grep says
+  70); both widget schemes `** BUILD SUCCEEDED **`; UI on *Gate 26.5*, quiet: 69, 1 skipped by
+  design, 0 failures; UI on *Gate 27*: 19 with 1 skipped, then — beside another project's iOS 18.6
+  test run, loads up to 329 — a timing guard tripped in the second chunk (6.97 s against 6.5,
+  passed alone) and `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway` failed in the third,
+  as `HEAD` failed it too (#140's 2026-10-21 note); once the other run ended, at loads of 5 to 7,
+  both chunks again: 19 and 31, **0 failures** — 69, 1 skipped.
+- **Warnings.** Clean builds of a `HEAD` `3d1cda8` export and of the index copy: `-scheme
+  WaterBuddy` 35 and 35 (19 by file and message), `WaterBuddyWatch` 2 and 2, `WaterBuddyWatchWidget`
+  and `WaterBuddyWidgetExtension` 29 and 29 each (17) — **nothing new**; after the review's fix, on
+  a second index copy, the three schemes that compile the face again: 35, 2 and 29.
+- **Next:** the owner's `/commit` and `/doc_sync`; 1.2.7's device sweep carries #151–#153.
+
+*(The 7b block below is history: 7b was committed as `af388da`.)*
 
 **Roadmap item 1.3.2, stage 7b — the watch's screen — is built, gated and staged, not committed**
 (2026-10-20; HEAD `ca43a60`: 7a committed as `90fef5d`, its doc sync `63f8a46`, the rule wording
@@ -4565,6 +4647,9 @@ both roots rendering at accessibility text sizes.
   either platform (rule `85-testing`'s standing note) — the phone widget's Home Screen appearance
   was never re-verified against the watchOS plan's changes (none touched it), and the watch's
   `.accessoryCircular` face has never been placed on a real or simulated watch face and looked at.
+  *(2026-10-21, 1.3.2's stage 7c: placed on a simulated one — the circle, the rectangle and the
+  corner, by the owner, on Modular and on a tinted Infograph, watchOS 27.0 — and seen turning over at
+  midnight; a real watch is still #153.)*
 - **Whether a widget extension may reach the notification service at runtime.** This is the one
   thing research could not settle: the *addressing* is proven (an `.appex` resolves through
   `LSPlugInKitProxy.containingBundle`, so its requests land in the app's pending set — established
@@ -4588,6 +4673,25 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 12:19 on 2026-10-21, in the seventy-eighth pass, after its `git add` of its six files by
+name: `3d1cda8`, 156 commits, level with `origin/main`; 14 staged — 13 modified, 1 added — 5
+unstaged, 1 untracked entry, none in both.** Staged: 7c's eleven (below) and this pass's `CLAUDE.md`,
+`docs/STATE.md` and `docs/DESIGN.md`. Unstaged: `.claude/settings.json` (the owner's), and four of
+Xcode's rewrites (#50) — the `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes,
+`WaterBuddy/AppShortcuts.xcstrings` and the watch's catalogue. Untracked: `Screenshots/census/`. This
+file and `HISTORY.md` are added again once their blocks are written. No `git commit` in this pass.
+
+**Read at 01:48 on 2026-10-21, in 1.3.2's stage 7c, after its last `git add` of its files by name:
+`3d1cda8`, 156 commits, level with `origin/main`; 11 staged — 10 modified, 1 added — 5 unstaged, 1
+untracked entry, none in both.** Staged: 7c's four code and test files (`WristFaceView.swift`
+added), and `HISTORY.md`, this file, `docs/ROADMAP.md`, `docs/WIDGET.md`, the spec, the plan and
+`tasks/lessons.md`. Unstaged: `.claude/settings.json` (the owner's), and four of Xcode's rewrites
+(#50) — the `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings`
+and the watch's catalogue; the fifth, the watch widget's catalogue, was restored to `HEAD` before 7c
+edited it. Untracked: `Screenshots/census/`. 7b and its records were committed as `af388da` and
+`3d1cda8`. This file and `HISTORY.md` are added again once their blocks are written. No `git commit`
+was run.
 
 **Read at 18:13 on 2026-10-20, in the seventy-seventh pass, after its `git add` of its five files by
 name: `ca43a60`, 154 commits, level with `origin/main`; 20 staged — 19 modified, 1 added — 6
@@ -6194,6 +6298,11 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `BlueprintName` line fewer. The index holds 7b's catalogue as gated; the watch's file now reads
     `MM`. A doc sync does not touch them: whether the rewrites are discarded, as D7 did, is the
     owner's, and `/commit`'s cached-against-unstaged check will show all five.)*
+    *(2026-10-21, 1.3.2's stage 7c: one of the five discarded, on the owner's word — the watch
+    widget's catalogue was restored to `HEAD` (`git restore`) with Xcode's project closed, because
+    7c adds its three keys to that file and the rewrite would have been staged with them. The other
+    four are left, unstaged. WaterBuddy was still open in Xcode when the session began; the owner
+    closed it before the catalogue was edited.)*
 
 **Opened by the 2026-10-07 `/doc_sync` re-run:**
 
@@ -8063,6 +8172,19 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     shape), at loads of 4 to 15. Alone on *Gate 26.5*, interleaved with a `HEAD` (`4c796a9`) export:
     the change 3 of 3, `HEAD` 2 of 3 — `HEAD`'s one failure the identical line and message — at loads
     of 7 to 58, another project's run beside it. The rest of the 26.5 pass, 19 + 31, had no failure.)*
+    *(2026-10-21, roadmap item 1.3.2's stage 7c gate, on a copy of the index, with another project's
+    iOS 18.6 `xctest` at ~95% CPU beside it — 1-minute loads up to 329: on iOS 27.0,
+    `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway` failed in the class chunk three times on
+    the change — `XCTAssertFalse` at `WelcomeUITests.swift:355` at a starting load of 118 and again at
+    47, and once `XCTAssertEqual` at `:358`, the slider dragged to its end reading *3 700*, *3 200* or
+    *2 600 millilitres* where 4 000 was expected, at 25. Alone, interleaved: the change 2 of 3, `HEAD`
+    1 of 3 — all three failures at `:358`. `HEAD`'s chunk, once: 31, 0 failures, at 20 to 36. Once the
+    other run had ended, at loads of 5 to 7, the change's chunk passed 31 of 31, and the whole 26.5
+    pass 69 with 1 skipped. The change held no file the phone's welcome runs. So the slider's
+    `adjust(toNormalizedSliderPosition:)` falls short under load, on `HEAD` too — a second shape
+    beside the lost tap — and `:355`'s cause is still not established. In the same gate,
+    `GoalSetupUITests.testAnOlderPoursTimerDoesNotEndANewerOffer` tripped its own slow-machine guard
+    once (6.97 s against 6.5) and passed alone and in its quiet chunk.)*
 
 141. **What the lag fix measured and left.** Simulator, Debug, `XCTCPUMetric`, throwaway probes not
     in the tree. Fixed: Home idle 17 % → 4 % of a core, the welcome 22 % → 3.5 % (0.176 s per 5 s), a pour and its five
@@ -8245,6 +8367,8 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     running 26.x, or the runtime if it arrives, settles it.
     *(2026-10-20, stage 7b: the screen too — the row, the column, the renders and *The watch's
     screen, measured* are watchOS 27.0's.)*
+    *(2026-10-21, stage 7c: and the faces — the probe's renders, the placement and the midnight
+    turnover are watchOS 27.0's.)*
 152. **The watch's pour row is proved on the simulator only by clicks in `DeviceHub.app`** (roadmap
     item 1.3.2, stage 7b, 2026-10-20). The owner clicked Cup, the Glass and Bottle on *WaterBuddy
     Probe Watch 46* (watchOS 27.0) in `DeviceHub.app` — Xcode 27 ships no `Simulator.app` — and a
@@ -8257,6 +8381,34 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     are noise (`tasks/lessons.md`, 2026-10-20). Still open: the press of Apple's interactive glass on a
     device, the Digital Crown, VoiceOver's activate, and the row at the accessibility sizes, where it
     scrolls sideways — none was pressed here.
+
+**Opened by roadmap item 1.3.2, stage 7c (2026-10-21):**
+
+153. **What only a device shows of the watch's three faces** (spec `2026-10-20-the-watch-stage-design.md`
+    §8.3, for the 1.2.7 sweep). Seen on the simulator (`HISTORY.md`, 2026-10-21): every shape
+    rendered shown and quiet in en/ru/uz at 62, 100 and 999%; the three placed by the owner — the
+    circle and the rectangle on Modular, the corner and the circle on a green Infograph — on
+    *WaterBuddy Probe Watch 46*, watchOS 27.0; the faces following the phone's Russian; and the
+    midnight turnover with the app closed. Not seen: **the quiet forms where watchOS draws them** —
+    a locked watch, and Always On with the app's complication data turned off; when watchOS redacts
+    at all is inferred, and the quiet forms have been drawn only under a forced
+    `.redacted(reason: .privacy)`. **VoiceOver on the wrist** — one stop per face, the label and the
+    vessel's sentence, the label alone when quiet; nothing reads a face's accessibility tree on a
+    simulator. **The corner on a tinted face after its fix** — before it, its curved gauge stayed
+    white beside a green circle; `.widgetAccentable()` was added and compiles, and the owner skipped
+    the re-shoot. **The Smart Stack**, where watchOS also offers an `.accessoryRectangular` widget,
+    out of the spec's scope and never looked at. And every face on watchOS 26.x (#151).
+
+154. **A corrupt watch store can trap the watch's total, on the screen and on every face**
+    (the 7c final review's declined item, checked at its source). `WristPlan.todaysTotal(from:now:calendar:)`
+    sums the outbox with `reduce(0) { $0 + $1.amount }` (`WristPlan.swift:36`), and
+    `todaysTotal(mirror:outbox:now:calendar:)` adds the mirror's `currentWater` with a plain `+`
+    (`:55`); `Face.percentage` converts `Int(… .rounded())` before its `0...999` clamp. A persisted
+    `WristMirror` or outbox holding an extreme value would overflow there and crash the watch app or
+    its complication, where rule `75-diagnostics` saturates (`addingReportingOverflow`) on the phone.
+    Not reachable from the product: the phone composes `currentWater` from its clamped
+    `0...maximumDailyIntake` total, and a pour's amount is a vessel's, held to the same range.
+    Pre-existing — the provider before 7c had the same arithmetic — and left for its own change.
 
 ## Where the rest is written down
 

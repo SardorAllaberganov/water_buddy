@@ -7,6 +7,14 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-21 (seventy-eighth pass — `/doc_sync` after roadmap item 1.3.2's stage 7c,
+staged, before its `/commit`). **No token changed.** The watch's three faces draw no glass and no
+aurora; the one token they read is `Aurora.blue`, the gauges' tint, as the circle's was before 7c.
+Against a full-colour face's black it is **6.21:1** (luminance 0.2605, from `WaterSurface.swift:153`)
+— computed from the token, not read off a render, which a solid background allows — over the 3:1 a
+non-text glyph is held to. On a tinted face watchOS recolours the gauges, and no pair on a face was
+measured. The text on a face is the system's own colour.
+
 **Last updated:** 2026-10-20 (roadmap item 1.3.2's stage 7b, written by the session that built it —
 not a `/doc_sync` pass). **No shared token changed**; the watch's screen gains its own, in
 *The watch's screen, measured* — the column, the row's discs and capsule, the vessel's figure and

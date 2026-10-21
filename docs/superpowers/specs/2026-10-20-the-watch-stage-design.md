@@ -25,6 +25,14 @@ under 14 pt bold; below the accessibility sizes a disc gives way to the 44 pt fl
 fit (§3.4's "where the screen allows"). Each button, pressed on the simulator, pours its own serving.
 7c is not begun.)*
 
+*(2026-10-21: 7b is committed (`af388da`). **7c is built, gated and staged**, on watchOS 27.0. Three
+details of §3.6 moved, each a ruling in the plan's ledger: the rectangle marks its line and bar only
+when shown, because a marked blank line drew the system's placeholder chip in the quiet form; the
+corner's figure is held to one line, which Russian *100 %* broke without; and the corner's curved
+gauge is accentable and hidden from VoiceOver like every other figure. §8.3's midnight turnover was
+seen on the simulator, with the app closed; the faces' quiet form where watchOS draws it, VoiceOver
+on the wrist and the tinted corner after its fix are known issue #153.)*
+
 **Authority.** Subordinate to the DocC on the type being changed, then `.claude/rules/`, then
 `CLAUDE.md` (rule `99-docs-cascade`). Where it contradicts the code, the code wins and this document
 changes.

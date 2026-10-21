@@ -229,6 +229,13 @@ Bottle in a row, the sheet gone. On the owner's rulings the 46 mm vessel is 77 p
 canvas does not fit below the real clock — and the `%` is never under 14 pt bold. Every pair clears its
 floor on watchOS 27.0, and each button, pressed in `DeviceHub.app`, pours its own serving. A press
 on a device is still owed (known issue #152). 7c, the faces, is next.)*
+*(2026-10-21: 7b is committed as `af388da`. **7c is built, gated and staged** — the circle, a
+rectangle and a corner, all display-only, each drawing `WristPlan.Face` in the phone's language and
+hiding its figures when watchOS redacts. The owner placed all three on simulated watch faces, and
+the face turned over at midnight with the app closed. With it **1.3.2 is built whole**; what only a
+device shows of the faces — the quiet forms on a locked watch and in Always On, VoiceOver on the
+wrist, the corner on a tinted face, the Smart Stack — joins 1.2.7's sweep as known issue #153, beside
+#151 and #152.)*
 
 **1.3.3 — Apple Health.** Each serving written as dietary water, and removed when the serving is
 deleted or edited. Whether it also *reads* water other apps logged is the design's first question.

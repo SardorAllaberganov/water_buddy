@@ -11601,3 +11601,195 @@ files by name; this file and `docs/AI_CONTEXT.md` are added again once their blo
 `WaterBuddyWatch/Localizable.xcstrings` and `WaterBuddyWatchWidget/Localizable.xcstrings`. **1
 untracked**: `Screenshots/census/`. **1 in both**: `WaterBuddyWatch/Localizable.xcstrings`, staged as
 7b gated it, rewritten by Xcode in the tree.
+
+## [2026-10-21] — Roadmap item 1.3.2, stage 7c: three faces
+
+### What
+
+The watch's complication offers a rectangle and a corner beside its circle — every face
+display-only, every face reading the app's own arithmetic, every figure hidden when watchOS
+redacts. Built in the main loop from the plan `docs/superpowers/plans/2026-10-20-the-watch-stage.md`,
+its Tasks 9–11, tests first, on HEAD `3d1cda8` (7b committed as `af388da`, its doc sync `3d1cda8`),
+between the evening of 2026-10-20 and 01:45 on 2026-10-21. With it, roadmap item 1.3.2 is built
+whole.
+
+- **`WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift`**: `WristWidgetEntry(date:face:language:)` —
+  a `WristPlan.Face` from `WristPlan.face(…)`, the function the screen reads, and the phone's
+  `AppLanguage(code: mirror?.languageCode)`, as `WristModel.language` resolves it; the placeholder
+  draws `Face.sample` (62%). `.supportedFamilies` lists `.accessoryCircular`, `.accessoryRectangular`
+  and `.accessoryCorner`. The kind, the two gallery literals, `readStore()`, the boundary entries and
+  `.atEnd` are unchanged.
+- **`WaterBuddyWatchWidget/WristFaceView.swift`**, new: `WristFaceRoot` (the empty container
+  background; `\.strings` and `\.locale` together from the entry), `WristFaceView(face:family:)`, and
+  three private shapes — the ring, as it was, now accentable on a tinted face; the corner, the
+  percentage on one line in the chosen locale with a curved gauge as its `widgetLabel`; the card,
+  the drop, *Hydration* and the percentage over the screen's own line and a bar. Each is one
+  VoiceOver element, *Today's hydration* with the vessel's sentence; each shown figure is
+  `.privacySensitive()`; each has a quiet form under `.privacy` — the drop and an empty gauge,
+  *Hydration* over an empty bar — that draws and speaks no figure.
+- **`WaterBuddyWatchWidget/Localizable.xcstrings`**: `%1$@ of %2$@ ml`, `%1$d percent. %2$d of %3$d
+  millilitres.` and `Hydration`, the app catalogue's entries value for value, plural forms included
+  (5 keys). Xcode's unstaged rewrite of the file was restored to `HEAD` first.
+- **`WaterBuddyTests/LocalizationTests.swift`**: `watchWidgetSharedKeys` — the three and *Today's
+  hydration* — compared with the app bundle sentence by sentence in every language, replacing the
+  description's single check; the vessel's sentence counted in the watch widget's bundle too.
+
+### The rulings this rests on
+
+The owner's: Xcode's rewrite of the watch widget's catalogue (#50) restored before the edit, the
+project closed in Xcode first; watchOS 27.0 alone (#151); the tinted corner's re-shoot skipped.
+
+Mine, each in the session's ledger with what it costs if wrong:
+- The rectangle's line and bar carry `.privacySensitive(!quiet)`. Rendered under
+  `.redacted(reason: .privacy)`, a marked blank line drew the system's grey placeholder chip where the
+  quiet form draws nothing; a marked bar drew as itself.
+- The corner's figure carries `.lineLimit(1)`: the probe drew Russian *100 %* and *999 %* on two
+  lines, because `.minimumScaleFactor` alone does not stop a wrap.
+- The corner's two label gauges carry `.widgetAccentable()`: on the tinted Infograph face its gauge
+  stayed white beside the green circle — rule `60-design-system`'s *On the watch face*.
+- The probe read the faces' strings from the embedded complication's `<lang>.lproj` — the watch
+  app hosting it has no *Hydration* — and rendered in the dark scheme.
+- The midnight turnover, first ruled not claimable on a simulator, was seen (below).
+
+### What was run, and what it showed
+
+- **RED, then GREEN**: the localization tests failed on values — three keys missing from the watch
+  widget's tables in en, ru and uz, and the counted sentence in every language, 29 tests with 58
+  issues — then passed, 29 of 29, after the keys; again after the faces.
+- **The face probe**, in a copy of the working tree on *WaterBuddy Probe Watch 46* (watchOS 27.0):
+  110 `ImageRenderer` images — the three shapes at 62, 100 and 999%, en/ru/uz, shown and quiet. The
+  rectangle's line reads *1,240 of 2,000 ml*, *1 240 из 2 000 мл*, *2 000 dan 1 240 ml*; every quiet
+  form shows no figure and no fill. A first run in the renderer's light scheme drew no text at all;
+  a second showed the Russian corner's wrap. The probe cannot draw a `widgetLabel` or apply a
+  tinted face's accent.
+- **The faces on a face**, a probe copy seeding the watch's own store through `WristModel.apply`:
+  the default face, Numerals Duo, has no complication slots; the owner placed the circle and the
+  rectangle on Modular (multicolour) and the corner and the circle on Infograph (tinted green). The
+  corner read *65%* with its curved gauge — white, which the accentable fix answers; the circle took
+  the green. Relaunched with the phone's Russian and terminated, the faces read *Гидратация 65 %* and
+  *1 300 из 2 000 мл*. The gallery shows the placeholder's 62 under *Water Buddy* (#24).
+- **Midnight, with the app closed since 23:40**: at 23:59:59 the Modular face drew *65* and *65 % ·
+  1 300 из 2 000 мл*; at 00:00:02, *0* and *0 % · 0 из 2 000 мл* with an empty bar, a second before
+  the system's own date turned from TUE 20 to WED 21.
+
+### Not done
+
+The corner on a tinted face after its fix — the owner's swipe did not reach the probe watch, and the
+owner skipped it. The quiet forms where watchOS draws them, VoiceOver on the wrist and the Smart
+Stack (#153); everything on watchOS 26.x (#151).
+
+### The final review
+
+A fresh reviewer read the staged diff against the spec, the plan, the rules and the ledger's
+rulings: **0 critical, 2 important, 4 minor.** Important: (1) the tinted corner unseen after its
+fix, and (2) no gate on the staged tree yet — both the verification still ahead at that time; (2) is
+below, (1) the owner skipped. One minor re-graded to important by its effect and fixed: the corner's
+label gauges `.accessibilityHidden(true)`, as rule `65-accessibility` hides every figure an element
+already speaks — no automated test reaches a widget label's accessibility tree, so it rests on the
+build and the warning comparison. Deferred for the owner: no `#Preview` of the quiet forms or the
+edge figures; the ring's "unchanged to the eye" holds in full colour only, and the card's quiet form
+passes an empty `accessibilityValue` where the others omit it; the rectangle is also offered in the
+Smart Stack, unseen (#153). Its declined item — the watch's total summed with a plain `+` and
+`Face.percentage`'s `Int(Double)` before its clamp, pre-existing — is checked at its source and opened
+as #154.
+
+### Files touched
+
+`WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` · `WaterBuddyWatchWidget/WristFaceView.swift`
+(new) · `WaterBuddyWatchWidget/Localizable.xcstrings` · `WaterBuddyTests/LocalizationTests.swift` ·
+`docs/AI_CONTEXT.md` · `docs/ROADMAP.md` · `docs/WIDGET.md` ·
+`docs/superpowers/specs/2026-10-20-the-watch-stage-design.md` ·
+`docs/superpowers/plans/2026-10-20-the-watch-stage.md` · `tasks/lessons.md` · `HISTORY.md`.
+
+### Gate
+
+Run in this session, after the review's fix, on a copy of the index, `-parallel-testing-enabled NO`,
+`-collect-test-diagnostics never`, `uptime` at each run's start and end:
+- unit, *iPhone 17* (27.0), 00:08–00:10: `✔ Test run with 683 tests in 86 suites passed`; the
+  attribute grep says 683.
+- watch, *WaterBuddy Watch 27*, 00:10: `✔ Test run with 70 tests in 7 suites passed`; the grep says
+  70.
+- `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`: `** BUILD SUCCEEDED **`, no error.
+- UI, *WaterBuddy Gate 27*, first beside another project's iOS 18.6 `xctest` at ~95% CPU, loads up
+  to 329: `GoalSetupUITests` 19 with 1 skipped and 0 failures; 19 with 1 failure —
+  `testAnOlderPoursTimerDoesNotEndANewerOffer` on its own slow-machine guard (6.97 s against 6.5),
+  passed alone; the other three classes, 31 with 1 failure —
+  `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway` (#140's 2026-10-21 note: on the change in
+  the chunk three times, at `:355` twice and `:358` once; alone the change 2 of 3 and `HEAD` 1 of 3,
+  every failure at `:358`; `HEAD`'s chunk once 31 of 31). Once the other run had ended, at loads of
+  5 to 7: 31 with 0 failures, and 19 with 0 — **69, 1 skipped by design, 0 failures**.
+- UI, *WaterBuddy Gate 26.5*, at loads of 3 to 6: 19 with 1 skipped, 19, 31 — **69, 0 failures**.
+- **The warning comparison**, clean builds of a `HEAD` `3d1cda8` export and of the index copy:
+  `-scheme WaterBuddy` 35 and 35 (19 by file and message), `WaterBuddyWatch` 2 and 2,
+  `WaterBuddyWatchWidget` and `WaterBuddyWidgetExtension` 29 and 29 — identical, line and message.
+  After the review's fix, on the re-exported index, the three schemes that compile the face again:
+  35, 2 and 29.
+
+watchOS 26.x not run (#151).
+
+**Staging.** Read from the commands at 01:48 on 2026-10-21, after this session's last `git add` of
+its files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `3d1cda8`, 156 commits, `## main...origin/main`. **11 staged** —
+10 modified, 1 added (`WaterBuddyWatchWidget/WristFaceView.swift`). **5 unstaged**:
+`.claude/settings.json` (the owner's) and four of Xcode's rewrites (#50) — the `WaterBuddyWatch` and
+`WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings` and
+`WaterBuddyWatch/Localizable.xcstrings`. **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-21] — `/doc_sync` after 1.3.2's stage 7c, before its `/commit`
+
+### What
+
+The seventy-eighth pass, run by the owner in the session that built 7c, after 7c's records were
+written and staged and before `/commit`. No source or test file changed in the pass.
+
+- **`CLAUDE.md`'s target table** still gave the watch widget as an `.accessoryCircular`
+  percentage ring — the one sentence 7c's records left for this pass. It now names the three faces,
+  `WristFaceView`, `WristPlan.Face`, the phone's language and the quiet form.
+- **`CLAUDE.md`'s warning trail** gains 7c: unchanged on all four schemes against a clean build of a
+  `HEAD` `3d1cda8` export, and again on three after the review's fix. Its line on placing widgets by
+  hand names the three faces, a tinted face among them, on Modular or Infograph — the default Numerals
+  Duo has no slots.
+- **`docs/STATE.md`**, missed by 7c's records: *The language* named the complication only to say its
+  `.description` cannot follow the in-app choice, and its list of sites formatting against the locale
+  left the faces out. Two dated notes: the faces resolve `AppLanguage(code: mirror?.languageCode)` from
+  the stored mirror, as the screen does — until 7c the circle drew a bare number in no language — and
+  format the percentage and the rectangle's line with that locale. Its *Last updated* says no key
+  moved.
+- **`docs/DESIGN.md`** gains a *Last updated* block: no token changed; the faces read one,
+  `Aurora.blue`, the gauges' tint, as the circle did; against a full-colour face's black it is
+  **6.21:1** (luminance 0.2605), computed from the token by script, over the 3:1 a non-text glyph is
+  held to. A tinted face recolours it, and nothing on a face was measured.
+- **`tasks/lessons.md`**: one entry — "no key moved" did not mean `docs/STATE.md` was untouched.
+- **`docs/AI_CONTEXT.md`**'s head gains this pass's block and *Git* its staging block.
+
+### What the pass checked and left
+
+- 96 tracked `.swift` files, each with its row, every count equal to `wc -l` by script — none stale.
+- 683 `@Test`, 70 on the watch, 56 UI `func test`, by the attribute grep — the gate's counts.
+- The three exception sets, six files each, as `CLAUDE.md` gives them; `project.pbxproj` last changed
+  in `eba1b1e`. 13 keys on `DataManager.Key`, 11 phone and 2 watch, as `CLAUDE.md` and
+  `docs/STATE.md` give them. The watch widget's catalogue holds 5 keys, as its row gives. Every cited
+  rule resolves. No `docs/ARCHITECTURE.md`, `CAPABILITIES.md` or `dependencies.md`.
+- `docs/WIDGET.md`: 7c changes no file under `WaterBuddyWidget/` and none of the six shared files, and
+  its block says the faces' contract is the spec's §3.6 — left. `docs/ROADMAP.md`, the spec and the
+  plan: written by 7c's records in this session, read again, left.
+- `CLAUDE.md`'s shared-file, storage and architecture lists: no sentence moved by 7c; "the watch's
+  complication reads the watch's own suite itself" is still true of all three faces.
+
+### Files touched
+
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/DESIGN.md` · `tasks/lessons.md` ·
+`HISTORY.md`.
+
+### Gate
+
+Not re-run in this pass: no code moved. 7c's gate ran earlier in this session, on copies of the
+index; its results are 7c's checkpoint above.
+
+**Staging.** Read from the commands at 12:19 on 2026-10-21, after this pass's `git add` of its six
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `3d1cda8`, 156 commits, `## main...origin/main`. **14 staged** —
+13 modified, 1 added: 7c's eleven and this pass's `CLAUDE.md`, `docs/STATE.md` and
+`docs/DESIGN.md`. **5 unstaged**: `.claude/settings.json` (the owner's) and four of Xcode's rewrites
+(#50) — the `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings`
+and `WaterBuddyWatch/Localizable.xcstrings`. **1 untracked**: `Screenshots/census/`. None in both.

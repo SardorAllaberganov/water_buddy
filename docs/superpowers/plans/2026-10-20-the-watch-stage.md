@@ -1546,6 +1546,21 @@ struct InkProbe {
 
 ---
 
+*(2026-10-21: **Tasks 9–11 are done, gated and staged** — 7c, by the session that built it, on
+watchOS 27.0 alone. Where it left this text, each by a ruling in the session's ledger: Task 9's
+catalogue was Xcode's rewrite in the tree (#50), restored to `HEAD` on the owner's word before the
+three keys went in. Task 10's rectangle marks its line and bar with `.privacySensitive(!quiet)` — a
+marked blank line drew the system's placeholder chip in the quiet form; the corner's figure gained
+`.lineLimit(1)` — the probe drew Russian *100 %* on two lines; the probe read the faces' strings from
+the embedded complication's own `.lproj` (the watch app's catalogue has no *Hydration*) and rendered
+in the dark scheme (in the light one `.primary` drew black on black). Task 11's placement: the default
+face, Numerals Duo, has no complication slots — the owner placed the faces on Modular and on a
+tinted Infograph instead, where the corner's gauge stayed white, so it gained `.widgetAccentable()`;
+the re-shoot after that fix was skipped by the owner. *WaterBuddy Probe Watch 26* does not exist
+(#151). The midnight turnover was seen with the app closed. The final review's re-graded minor hid
+the corner's label gauges from VoiceOver. The boxes below are left as written; `HISTORY.md` has the
+record.)*
+
 ### Task 9: 7c — the faces' strings
 
 **Files:**

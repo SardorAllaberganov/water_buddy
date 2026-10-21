@@ -4384,3 +4384,42 @@ the disc as the fix had replaced it. The seventy-seventh pass's row check found 
 **The rule:** a session writes its file rows after its last code change — after the final review's
 fixes — or re-runs the row check before it stages its records. A row's words are re-read beside the
 count whenever the file changed.
+
+## 2026-10-21 — A watch face with no slots, and a "done" the capture did not see
+
+**What happened.** 7c's plan had the owner place the three faces "on a watch face". The probe watch's
+face was Numerals Duo, which has no complication slots, and the owner answered "there is no
+complications"; the capture showed the face's edit screen offering only numerals, style and colour.
+Named faces — Infograph for the corner, Modular for the rectangle — worked at once. Later the owner
+answered "done" to a swipe to the Infograph face, and all 235 frames since showed Modular: the swipe
+had not reached the probe watch.
+
+**The rule:** a step that asks for a complication names a face that carries the slot it needs —
+Infograph for a corner, Modular for a rectangle, either for a circle — and how to get to it. A
+"done" for something on a screen is checked against the capture before anything rests on it.
+
+## 2026-10-21 — A renderer's light scheme hid every glyph, and a scale factor without a line limit wrapped
+
+**What happened.** 7c's face probe rendered each shape with `ImageRenderer` on a black ground, as a
+face draws. Only the gauges came out: in the renderer's default light scheme `.primary` text and the
+drop were black on black, and 54 renders held 7 distinct images, the same in every language. With
+`.environment(\.colorScheme, .dark)` they drew, and showed the corner's Russian *100 %* on two
+lines: the plan's figure had `.minimumScaleFactor(0.4)` and no line limit, and a scale factor only
+shrinks text that a limit holds to its lines.
+
+**The rule:** a render of a dark surface sets the colour scheme it is drawn in, and a probe whose
+renders are identical where their inputs differ is broken before it is read. A figure meant to
+shrink to fit carries `.lineLimit(1)` beside its `.minimumScaleFactor`.
+
+## 2026-10-21 — "No key moved" did not mean `docs/STATE.md` was untouched
+
+**What happened.** 7c's records reasoned that the faces add no key and left `docs/STATE.md` alone.
+But the sheet also says who reads each stored field and which sites format against the chosen
+locale. The faces became a second reader of the mirror's `languageCode` — until 7c the circle drew a
+bare number in no language — and a new site formatting with its locale. *The language* named the
+complication only to say its `.description` cannot follow the in-app choice, and its list of
+locale-honouring sites left the faces out, until the seventy-eighth pass.
+
+**The rule:** before a stage's records leave `docs/STATE.md`, search the sheet for every stored field
+the change reads (`languageCode`, `currentWater`, `servings`) and for `locale`, not only for
+`Key.`. A new reader or a new formatting site moves the sheet even when no key does.

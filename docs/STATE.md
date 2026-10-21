@@ -4,6 +4,12 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-21 (seventy-eighth pass — `/doc_sync` after roadmap item 1.3.2's stage 7c,
+staged, before its `/commit`). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the
+phone and 2 on the watch, and 7c writes nothing to either suite. What changed is a reader: the
+watch's faces read `WristMirror.languageCode` as the screen does, and format their figures with its
+locale — two dated notes under *The language*.
+
 **Last updated:** 2026-10-20 (seventy-seventh pass — `/doc_sync` after roadmap item 1.3.2's stage 7b,
 staged, before its `/commit`). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the
 phone and 2 on the watch, and 7b writes nothing new to either suite — `WristPlan.Face` is read, never
@@ -868,7 +874,12 @@ tracks `language` through `mirror`, and `WristRoot` re-injects the bundle and th
 (`docs/superpowers/specs/2026-10-06-watch-localization-design.md` §4.1). The complication's
 `.description` cannot follow the in-app choice: WidgetKit resolves it before any entry exists, so it
 follows the watch's system language, exactly as the phone widget's description and the Shortcuts
-vocabulary follow the phone's.
+vocabulary follow the phone's. *(2026-10-21, 1.3.2's stage 7c, staged: the faces themselves now
+follow the in-app choice. Their provider resolves `AppLanguage(code: mirror?.languageCode)` — the
+table above, read from the same stored mirror — into each entry, and `WristFaceRoot` injects that
+language's bundle and locale from the complication's own `.lproj`; with no mirror, or *Follow
+device*, the complication's own `Bundle.main`. Until 7c the circle drew a bare number in no language.
+Only the `.description` still follows the watch's system language.)*
 
 ### The language is why nothing asks `Bundle.main`
 
@@ -895,7 +906,11 @@ figures (`12 500 мл`, `из 2 000 мл`), the watch's serving rows, and every 
 (rule `50-views`). *(Until 1.2.6 this sentence said both widgets and the watch's rows grouped in no
 language at all — known issue #39, closed by it — and that spoken strings kept `%d` on purpose. Until
 the thirty-third pass it still listed the week card's `Best 8050 ml`, History's rows and Settings —
-History's stale since stage 3.)*
+History's stale since stage 3.)* *(2026-10-21, 1.3.2's stage 7c, staged: the watch's three faces
+join the sites that format against the locale — the percentage through `.number` and `.percent`
+under the entry's locale, and the rectangle's `1 240 из 2 000 мл` through
+`WristPlan.Face.millilitreLine(in:locale:)`, which is `Bundle.figure(_:_:locale:)`, as the screen's
+line under the vessel is.)*
 
 ## The day ordinal
 

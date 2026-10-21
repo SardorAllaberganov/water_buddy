@@ -3,6 +3,14 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-21 (roadmap item 1.3.2's stage 7c, written by the session that built it —
+not a `/doc_sync` pass). **No file under `WaterBuddyWidget/` changed, and no contract here did.** The
+watch's complication gained a rectangle and a corner beside its circle; that contract is the watch
+stage's spec, `docs/superpowers/specs/2026-10-20-the-watch-stage-design.md` §3.6, and this sheet
+covers the phone's widgets. None of the six shared files changed. `WaterBuddyWidgetExtension` built
+from a copy of the stage's index, `** BUILD SUCCEEDED **`, with the same 29 warning lines as a clean
+build of `HEAD`.
+
 **Last updated:** 2026-10-20 (the seventy-sixth pass's `/doc_sync`, after roadmap item 1.3.2's stage
 7a, staged). **No file under `WaterBuddyWidget/` changed, and no contract here did.** One of the six
 shared files did: `LiquidGlassModifier.swift` draws Apple's glass on the watch too —

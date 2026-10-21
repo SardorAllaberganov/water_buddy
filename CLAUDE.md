@@ -11,7 +11,7 @@
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
 > | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
-> | `WaterBuddyWatchWidget/` | **LIVE** — `.accessoryCircular` percentage-ring complication, reads the watch's own suite directly, never `WristModel.shared` |
+> | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
 > | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets) |
 > | `Tools/` | standalone scripts, in **no** build target — the icon generator, and the screenshot harness |
@@ -171,7 +171,9 @@ something to record.
   schemes — the watch's 2 and both widget schemes' 29 included — and unchanged by stage 7b the same
   day, measured on a copy of its index against a clean build of a `HEAD` `ca43a60` export, on all
   four schemes, and again on `WaterBuddy`, `WaterBuddyWatch` and `WaterBuddyWatchWidget` after its
-  final review's fix
+  final review's fix, and unchanged by stage 7c on 2026-10-21, measured on a copy of its index
+  against a clean build of a `HEAD` `3d1cda8` export, on all four schemes, and again on those three
+  after its final review's fix
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
@@ -194,8 +196,10 @@ something to record.
   missing from a target, or a widget that renders blank. Run the app on the simulator and put the
   widget on the Home Screen after any change to storage, entitlements, target membership or the
   widget's view tree — the Lock Screen widget on the Lock Screen too, the control in Control
-  Center, the week widget on the Home Screen and tapped into History, and the same for the watch
-  face's complication, which no part of the automated gate renders. On the simulator the gallery
+  Center, the week widget on the Home Screen and tapped into History, and the same for the watch's
+  three faces, a tinted watch face among them, which no part of the automated gate renders — on
+  Modular or Infograph, since the default Numerals Duo has no complication slots
+  (`tasks/lessons.md`, 2026-10-21). On the simulator the gallery
   offers no widget of an app that has not run, and a placed widget redraws from a new build after
   `xcrun simctl install`, not after `xcodebuild test`'s own install (`tasks/lessons.md`, 2026-10-20).
   The small widget's StandBy layout cannot be placed at all on a simulator, which has no StandBy:
