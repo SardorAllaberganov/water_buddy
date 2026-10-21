@@ -165,6 +165,38 @@ private let welcomeKeys = [
     "A starting point, not medical advice.",
 ]
 
+/// The paywall's and the Premium card's strings (spec 2026-10-21 §3.8). Most are resolved by name in
+/// `PremiumAccess`, where the build's extraction cannot see them.
+private let premiumKeys = [
+    "WaterBuddy Premium",
+    "Logging water is free, always.",
+    "Restore Purchases",
+    "Terms of Use",
+    "Privacy Policy",
+    "The App Store can't be reached right now.",
+    "Try Again",
+    "Waiting for approval.",
+    "The purchase didn't go through.",
+    "Thank you",
+    "You have Premium.",
+    "Premium",
+    "Extras for the way you drink. Logging water stays free.",
+    "See Premium",
+    "Manage Subscription",
+    "Yearly",
+    "Lifetime",
+    "%1$@ free, then %2$@ a year",
+    "%1$@ a year",
+    "%1$@, once",
+    "Start Free Trial",
+    "Subscribe",
+    "Buy Lifetime",
+    "Free trial: %1$@. Then %2$@ is charged each year until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings.",
+    "%1$@ is charged each year until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings.",
+    "One payment. It never renews.",
+    "Yearly, until %1$@",
+]
+
 private let reminderCopy = ["Time for water", "A glass now keeps you on track for the day."]
 
 /// The `.lproj` for one language inside one bundle, or `nil` if that language was not shipped.
@@ -759,6 +791,24 @@ struct WelcomeStringTests {
     @Test(arguments: ["en"] + translated)
     func everyWelcomeStringExistsAndKeepsItsArguments(language: String) {
         for key in welcomeKeys {
+            let resolved = sentences(appBundle, language, key)
+            #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
+            for sentence in resolved ?? [] {
+                #expect(specifiers(in: sentence) == specifiers(in: key),
+                        "\"\(key)\" in \(language) does not carry the same format arguments: \(sentence)")
+            }
+        }
+    }
+}
+
+// MARK: - Premium
+
+/// The paywall's own strings, in every language the app ships.
+struct PremiumStringTests {
+
+    @Test(arguments: ["en"] + translated)
+    func everyPremiumStringExistsAndKeepsItsArguments(language: String) {
+        for key in premiumKeys {
             let resolved = sentences(appBundle, language, key)
             #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
             for sentence in resolved ?? [] {
