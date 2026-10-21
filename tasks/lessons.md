@@ -4423,3 +4423,44 @@ locale-honouring sites left the faces out, until the seventy-eighth pass.
 **The rule:** before a stage's records leave `docs/STATE.md`, search the sheet for every stored field
 the change reads (`languageCode`, `currentWater`, `servings`) and for `locale`, not only for
 `Key.`. A new reader or a new formatting site moves the sheet even when no key does.
+
+## 2026-10-21 — Two lessons this file already held were broken again
+
+**What happened.** Roadmap item 1.4.1's session reviewed the last three entries here at its start.
+It then looped schemes in zsh with `set -- $pair`, which zsh does not split, so three builds asked
+for schemes named *"WaterBuddyWidgetExtension widget iOS"*; and it filtered a swift-testing run with
+`-only-testing:…/eTheYearlyConfirmedInASceneAfterAReset`, without `()`, which ran 0 tests. Both are
+recorded above (the zsh word-split, and the `()` in `-only-testing:`).
+
+**The rule:** before the first command of a kind the session has not yet run — a shell loop, an
+`-only-testing:` filter, a scheme list — grep this file for its tool (`zsh`, `only-testing`,
+`xcstrings`, `simctl`). Reading only the newest entries is not reviewing the lessons.
+
+## 2026-10-21 — StoreKit testing is a system with its own timing, and it once fell through to the sandbox
+
+**What happened.** 1.4.1's probe and its session tests met three behaviours of `SKTestSession` on
+the iOS 27.0 simulator that no plan predicted. (1) The first purchase on a freshly booted simulator,
+during a load spike, went to the real sandbox and waited on a *Sign in to Apple Account* alert; the
+run was stopped at 600 s, and it did not happen again. (2) A refund reaches
+`Transaction.currentEntitlements` between 100 and 300 ms after `refundTransaction` — an immediate read
+still answered it held. (3) `expireSubscription` on a subscription in its free trial left
+`currentEntitlements` answering the trial's transaction with its first expiry for seconds, a second
+purchase answered *bought* and changed nothing, and a second expiry threw `SKServiceErrorDomain` 2.
+A test that passed one run failed the next only because an earlier test had used up the trial.
+
+**The rule:** probe StoreKit testing in the call shape the code uses, with a time limit on every
+purchase, before writing a test against it. Every session suite resets its session, clears its
+transactions, carries `.timeLimit`, and reads a changed entitlement by waiting for it, never
+immediately. A behaviour the environment cannot express is a disabled test with its measured reason,
+for the owner — never an assertion bent to fit.
+
+## 2026-10-21 — A default argument is evaluated off the main actor, and `#expect` would not carry a `try`
+
+**What happened.** `PremiumStore.init(source: Source = .live(), …)` warned *call to main
+actor-isolated static method 'live()' in a synchronous nonisolated context* — a default argument is
+evaluated in the caller's nonisolated context, though the class is `@MainActor`. Separately,
+`#expect(try await source.buy(…) == .bought)` inside a closure passed to a test helper failed to
+compile, *errors thrown from here are not handled*, in the macro's expansion.
+
+**The rule:** give a main-actor default as a `convenience init()` that builds it in the body, not as
+a default argument. Inside a closure, bind a throwing call to a `let` first and `#expect` the value.

@@ -11793,3 +11793,100 @@ files by name; this file and `docs/AI_CONTEXT.md` are added again once their blo
 `docs/DESIGN.md`. **5 unstaged**: `.claude/settings.json` (the owner's) and four of Xcode's rewrites
 (#50) — the `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings`
 and `WaterBuddyWatch/Localizable.xcstrings`. **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-21] — Roadmap item 1.4.1 begun: Premium's foundation, Tasks 0–5, paused; and the seventy-ninth `/doc_sync`
+
+### What
+
+On HEAD `0be24f9` (1.3.2 committed whole: 7c `5194121`, its doc sync `0be24f9`), in one session that
+the owner opened with `/start_task` and no task named.
+
+- **The roadmap amendment.** Asked what to build, the owner chose to make Premium worth paying for,
+  for all four kinds of payer, and the roadmap gained, approved in chat: *The Premium line* in §1 —
+  no way of logging is ever Premium, Premium reads only what the free app stores, everything on the
+  device; items 1.4.6 *Patterns*, 1.4.7 *Monthly recap*, 1.4.8 *Vessel library*, 1.4.9 *Pace line*,
+  1.4.10 *Remind only when behind*, 1.4.11 *Workout-aware goal*, 1.5.4 *Caffeine*; 1.4 sold as sets;
+  1.5.1's question of counting a drink at its own share, for everyone; five rule rows in §8, export's
+  among them, which §8 had lacked.
+- **1.4.1's spec and plan**, approved: `docs/superpowers/specs/2026-10-21-premium-foundation-design.md`
+  — D1 the foundation built now and hidden until a set exists, D2 a free week on the yearly plan, D3
+  our own paywall in the app's glass and language, D4 nothing stored — and
+  `docs/superpowers/plans/2026-10-21-premium-foundation.md`, ten tasks, P1–P13, run inline.
+- **Built, tests first, staged — Tasks 0–5.** `WaterBuddy/PremiumAccess.swift` (the decision and the
+  words, Foundation only), `WaterBuddy/PremiumSet.swift` (no case), `WaterBuddy/PremiumStore.swift`
+  (the second file to import StoreKit; read, never stored), 27 strings in
+  `WaterBuddy/Localizable.xcstrings`, `WaterBuddyTests/WaterBuddy.storekit`, and 46 tests in
+  `PremiumAccessTests.swift`, `PremiumStoreTests.swift` and `LocalizationTests.swift`. The spec's §5
+  wording is typed into seven rule files and `CLAUDE.md`, unstaged. Nothing draws yet.
+- **Paused at Task 6, Step 1:** the owner has no privacy policy URL to hand (#159).
+
+### The rulings this rests on
+
+The owner's: the four payers; all seven items; 1.4.1 first; D1–D3; the spec and the plan "ok"; the
+project closed in Xcode before the catalogue edit; stop before Task 6 without the URL.
+
+Mine, each in the ledger with what it costs if wrong: work in the main tree, staged, never committed;
+the session suite's reset and minute's limit (#158); a purchase bound to a `let` before `#expect`;
+`PremiumStore()` as a convenience init, because `.live()` as a default argument warned; refund and
+expiry reads that wait up to five seconds; `anExpiredYearlyReadsFree` disabled with its measured
+reason, for the owner (#157); the catalogue's own `"key": value` format; Tasks 3–5 and the spec staged
+early, against an Xcode rewrite (#50).
+
+### What was run, and what it showed
+
+- **The warnings baseline**, clean builds of a `HEAD` `0be24f9` export into one folder: `-scheme
+  WaterBuddy` 35 lines (19 by file and message), `WaterBuddyWidgetExtension` 29 (17),
+  `WaterBuddyWatch` 2, `WaterBuddyWatchWidget` 2.
+- **The probe**, three runs in a throwaway copy on *iPhone 17* (27.0): the configuration loads and
+  lands in `WaterBuddyTests.xctest` alone, `project.pbxproj` unchanged; `purchase(confirmIn:)`,
+  `purchase()` and `buyProduct` all complete in the unit-test host, signed `Apple_Xcode_Key`; the
+  trial's length in Foundation's words — en *1 week | 2 weeks | 5 weeks*, ru *1 неделя | 2 недели |
+  5 недель*, uz *1 hafta | 2 hafta | 5 hafta*. The first purchase of the first run went to the real
+  sandbox instead (#158).
+- **RED, then GREEN, per task:** 14 of 14 failed then passed (Task 3); 20 of 26 failed against the
+  stub store, the six on the real `live()` passing, then 40 passed with one skipped (Task 4); 6 of 6
+  failed then 44 passed (Task 5).
+- **The phone unit suite**, 14:48: `✔ Test run with 729 tests in 91 suites passed`, one skipped; the
+  attribute grep says 729.
+
+### Not done
+
+Tasks 6–9: the paywall, the Settings card and `WaterBuddyApp`'s store; the owner's walk in Xcode with
+the local configuration; the final review, the five-invocation gate and the warning comparison; the
+records. The UI and watch suites and both widget builds were not run.
+
+### The seventy-ninth `/doc_sync`
+
+Run by the owner at the pause. Checked: 101 tracked `.swift` files, each with its row, every count
+equal to `wc -l` (100 by script, one by hand) — none stale; 729 `@Test`, 70 on the watch, 56 UI
+`func test`; the exception sets unchanged since `eba1b1e`; 13 keys; every cited rule resolves; no
+forbidden doc. Changed: `docs/AI_CONTEXT.md` (the head, *Targets*, *Files on disk*, *Current state*,
+#155–#159, *Git*), `docs/ROADMAP.md` (7c's commits — missed until now — and 1.4.1 begun),
+`docs/STATE.md` (no key; the paid state stored nowhere; Apple told nothing new), `CLAUDE.md` (the
+warning trail's baseline), `tasks/lessons.md` (three entries). Left: `docs/WIDGET.md` and
+`docs/DESIGN.md` — no widget file, shared file or drawn colour has moved yet.
+
+### Files touched
+
+`docs/ROADMAP.md` · the spec · the plan · `WaterBuddy/PremiumAccess.swift` (new) ·
+`WaterBuddy/PremiumSet.swift` (new) · `WaterBuddy/PremiumStore.swift` (new) ·
+`WaterBuddy/Localizable.xcstrings` · `WaterBuddyTests/WaterBuddy.storekit` (new) ·
+`WaterBuddyTests/PremiumAccessTests.swift` (new) · `WaterBuddyTests/PremiumStoreTests.swift` (new) ·
+`WaterBuddyTests/LocalizationTests.swift` · seven rule files and `CLAUDE.md` (spec §5, unstaged) ·
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/STATE.md` · `tasks/lessons.md` · `HISTORY.md`.
+
+### Gate
+
+The phone unit suite only, on *iPhone 17* (27.0): 729 tests, one skipped by design (#157). The UI
+suites on 27.0 and 26.5, the watch suite, both widget builds and the warning comparison: not run —
+1.4.1's Task 8.
+
+**Staging.** Read from the commands at 14:55 on 2026-10-21, after this pass's `git add` of its six
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `0be24f9`, 158 commits, `## main...origin/main`. **16 staged** — 8
+modified, 8 added: 1.4.1's roadmap amendment, spec, plan and Tasks 3–5's eight files, and this pass's
+`CLAUDE.md` (with the spec's §5 bullet typed in Task 2), `docs/AI_CONTEXT.md`, `docs/STATE.md`,
+`tasks/lessons.md` and this file. **12 unstaged**: the seven rule files with the spec's §5 wording, for
+the owner; `.claude/settings.json` (the owner's); and four of Xcode's rewrites (#50) — the
+`WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings` and
+`WaterBuddyWatch/Localizable.xcstrings`. **1 untracked**: `Screenshots/census/`. None in both.

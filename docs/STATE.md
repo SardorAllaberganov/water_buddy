@@ -4,6 +4,12 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-21 (seventy-ninth pass — `/doc_sync` with roadmap item 1.4.1 half built,
+staged and paused). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the phone and 2 on
+the watch. 1.4.1's paid state is read from StoreKit and stored nowhere, by design — a dated paragraph
+under *Derived on read, and a streak that is published and not stored*, and one under *What Apple is
+told about all of this*. Searched for `StoreKit`, `review`, `keys` and `locale`: nothing else moved.
+
 **Last updated:** 2026-10-21 (seventy-eighth pass — `/doc_sync` after roadmap item 1.3.2's stage 7c,
 staged, before its `/commit`). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the
 phone and 2 on the watch, and 7c writes nothing to either suite. What changed is a reader: the
@@ -1088,6 +1094,12 @@ added — it brings none. It is `UserDefaults` in the App Group, the use `1C8F.1
 StoreKit's review request, the one other thing 1.2.5 brought, is not a required-reason API. The four
 manifests are unchanged, and no networking framework is imported.)*
 
+*(2026-10-21, roadmap item 1.4.1, staged: Premium's purchases add no key and no required-reason API —
+StoreKit's product, transaction and purchase calls are none of Apple's listed categories, and the
+paid state is not written to `UserDefaults`. The four manifests are unchanged. The App Privacy answers
+stay *Data Not Collected*: Apple takes the payment, and nothing about a purchase reaches the owner
+(spec §7.4, known issue #155).)*
+
 Separately and unrelated to privacy: `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` on the app
 target's two configurations only. Extensions and the watch app inherit the containing app's answer;
 duplicating it is wrong. Without it every upload stalls on a manual export-compliance questionnaire.
@@ -1179,6 +1191,17 @@ arithmetic is `DaySummary.streak(of:goal:)`, pure. `theStreakStaysOutOfTheSnapsh
 pins that it reaches neither `WaterSnapshot` nor `WristMirror`. That no notification carries it is
 true by reading — the reminder copy takes no value at all (rule `80-notifications`) — and is not
 what that test asserts.
+
+*(2026-10-21, roadmap item 1.4.1, staged, half built.)* **Premium's paid state is published and not
+stored either — by decision D4 of `docs/superpowers/specs/2026-10-21-premium-foundation-design.md`.**
+`PremiumStore` (app-only, not `DataManager`) reads `Transaction.currentEntitlements` when it is built,
+whenever the app comes forward and after every transaction update, and keeps
+`PremiumAccess.resolve`'s answer — `.free`, `.yearly(until:)` or `.lifetime` — in memory. No key on
+`DataManager.Key`, no App Group write, no `UserDefaults` read: StoreKit keeps purchases on the device
+and answers offline, and a cached flag could still say Premium after a refund. Until the first read
+the state is `.checking`, and nothing Premium draws. The widget and the watch do not learn it; a
+later item that needs them to writes a *derived* key through `DataManager`, and this sheet gains its
+row then.
 
 ## Tests that pin this
 
