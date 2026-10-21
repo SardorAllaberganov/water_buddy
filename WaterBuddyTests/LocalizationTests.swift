@@ -67,6 +67,15 @@ private let watchOwnKeys = [
     "Synced %1$dm ago",
 ]
 
+/// Every phone string a watch face draws or speaks, copied into the complication's own catalogue
+/// value for value (spec 2026-10-20 §3.7). *Today's hydration* is also its gallery description.
+private let watchWidgetSharedKeys = [
+    "Today's hydration",
+    "Hydration",
+    "%1$@ of %2$@ ml",
+    "%1$d percent. %2$d of %3$d millilitres.",
+]
+
 /// Every string the widget draws or files, and therefore every string that has to exist in **both**
 /// bundles.
 ///
@@ -601,9 +610,12 @@ private func specifiers(in text: String) -> Set<String> {
             #expect(sentences(watchBundle, language, key) == phone,
                     "\"\(key)\" differs between the phone and the watch in \(language)")
         }
-        let description = "Today's hydration"
-        #expect(value(watchWidgetBundle, language, description) == value(appBundle, language, description),
-                "the complication's description differs from the phone's in \(language)")
+        for key in watchWidgetSharedKeys {
+            let phone = sentences(appBundle, language, key)
+            #expect(phone != nil, "\"\(key)\" is missing from the phone's \(language) table — nothing to agree with")
+            #expect(sentences(watchWidgetBundle, language, key) == phone,
+                    "\"\(key)\" differs between the phone and the watch's faces in \(language)")
+        }
     }
 
     @Test(arguments: ["en"] + translated)
@@ -842,7 +854,7 @@ private let countedKeys = [
     CountedKey(key: "%1$d millilitres to go", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d of %2$d millilitres", arity: 2, counted: [1], bundles: ["app"]),
     CountedKey(key: "%1$d percent. %2$d of %3$d millilitres.", arity: 3, counted: [0, 2],
-               bundles: ["app", "widget", "watch"]),
+               bundles: ["app", "widget", "watch", "watchWidget"]),
     CountedKey(key: "Add %1$d millilitres", arity: 1, counted: [0], bundles: ["app", "widget"]),
     CountedKey(key: "Use %1$d millilitres", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: averageKey, arity: 4, counted: [0, 1, 3], bundles: ["app"]),
@@ -861,6 +873,7 @@ private func shipped(_ name: String) -> Bundle? {
     switch name {
     case "widget": widgetBundle
     case "watch": watchBundle
+    case "watchWidget": watchWidgetBundle
     default: appBundle
     }
 }

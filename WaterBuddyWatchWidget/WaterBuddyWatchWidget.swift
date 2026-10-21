@@ -2,9 +2,9 @@
 //  WaterBuddyWatchWidget.swift
 //  WaterBuddyWatchWidget
 //
-//  One family: `.accessoryCircular`, a percentage ring — the shape people actually use this
-//  complication family for. No interactivity: the phone widget's `AddWaterIntent` has no watch
-//  equivalent in v1 (spec §12).
+//  Three families — `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` — drawn by
+//  `WristFaceView`, all display-only: a tap opens the watch app, and the phone widget's
+//  `AddWaterIntent` has no watch equivalent (spec 2026-10-20 §3.6).
 //
 
 import WidgetKit
@@ -12,12 +12,16 @@ import SwiftUI
 
 struct WristWidgetEntry: TimelineEntry {
     let date: Date
-    let percentage: Int
+    /// Today's figures, from `WristPlan.face(…)` — the function the screen reads too.
+    let face: WristPlan.Face
+    /// The phone's choice, carried on the mirror, as `WristModel.language` resolves it — so the
+    /// faces draw the screen's language, not the watch's (rule `70-privacy`).
+    let language: AppLanguage
 }
 
 struct WristWidgetProvider: TimelineProvider {
     func placeholder(in context: Context) -> WristWidgetEntry {
-        WristWidgetEntry(date: .now, percentage: 62)
+        WristWidgetEntry(date: .now, face: .sample, language: .system)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (WristWidgetEntry) -> Void) {
@@ -61,35 +65,24 @@ struct WristWidgetProvider: TimelineProvider {
     }
 
     private func entry(at date: Date, mirror: WristMirror?, outbox: [WristPour], calendar: Calendar) -> WristWidgetEntry {
-        // The face has to agree with the app beside it. `WristView` draws a usable screen before the
-        // first sync — against `DataManager.defaultDailyGoal`, counting pours still sitting in the
-        // outbox — and counts the phone's total only until the phone's day ends. A complication that
-        // did either differently would show a different number from the app it belongs to: same two
-        // inputs, same fallback, and `WristPlan.todaysTotal` doing the arithmetic for both.
-        let goal = mirror?.dailyGoal ?? DataManager.defaultDailyGoal
-        guard goal > 0 else { return WristWidgetEntry(date: date, percentage: 0) }
-
-        let total = WristPlan.todaysTotal(mirror: mirror, outbox: outbox, now: date, calendar: calendar)
-        let percentage = Int((Double(total) / Double(goal) * 100).rounded())
-        return WristWidgetEntry(date: date, percentage: min(999, max(0, percentage)))
+        // The face has to agree with the app beside it: same store, same fallback, same arithmetic.
+        WristWidgetEntry(
+            date: date,
+            face: WristPlan.face(mirror: mirror, outbox: outbox, now: date, calendar: calendar),
+            language: AppLanguage(code: mirror?.languageCode)
+        )
     }
 }
 
 struct WaterBuddyWatchWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "WaterBuddyWatchWidget", provider: WristWidgetProvider()) { entry in
-            Gauge(value: Double(entry.percentage), in: 0...100) {
-                Image(systemName: "drop.fill")
-            } currentValueLabel: {
-                Text("\(entry.percentage)")
-            }
-            .gaugeStyle(.accessoryCircular)
-            .tint(Aurora.blue)
+            WristFaceRoot(entry: entry)
         }
         .configurationDisplayName("WaterBuddy")
         // No full stop: this is the phone's own `Today's hydration`, so the complication's catalogue
         // holds it value for value and `LocalizationTests` keeps the two from drifting.
         .description("Today's hydration")
-        .supportedFamilies([.accessoryCircular])
+        .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryCorner])
     }
 }
