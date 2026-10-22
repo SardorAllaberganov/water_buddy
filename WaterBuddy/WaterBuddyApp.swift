@@ -21,6 +21,9 @@ struct WaterBuddyApp: App {
     /// open. ``DataManager`` is the whole persistence layer.
     private let manager: DataManager
 
+    /// Premium's paid state, read from StoreKit and kept in memory only (``PremiumStore``).
+    private let premium: PremiumStore
+
     init() {
         // Resolve the App Group before anything draws, so the container probe and the one-shot
         // migration out of `UserDefaults.standard` both happen here, in the app, at a moment we
@@ -28,6 +31,11 @@ struct WaterBuddyApp: App {
         // also where the DEBUG warning about it fires, instead of somewhere further in. It runs on
         // a fresh start too: it is the app's own bookkeeping on its own group, not test data.
         DataManager.prepareSharedStorage()
+
+        // Built right after the App Group is resolved, before anything draws — fresh start included —
+        // so its listener hears every transaction from launch — a renewal, a refund, an approved Ask
+        // to Buy (spec §3.3). It reads StoreKit and writes nothing.
+        premium = PremiumStore()
 
         #if DEBUG
         if let fresh = Self.freshStartManager(arguments: ProcessInfo.processInfo.arguments) {
@@ -114,6 +122,7 @@ struct WaterBuddyApp: App {
         WindowGroup {
             RootView()
                 .environment(manager)
+                .environment(premium)
         }
         .onChange(of: scenePhase) { _, phase in
             // Another process may have written while we were away — the widget's `AddWaterIntent`
@@ -121,6 +130,9 @@ struct WaterBuddyApp: App {
             // idempotent, so an extra call costs nothing.
             if phase == .active {
                 manager.refresh()
+
+                // A purchase may have been refunded or renewed while the app was away.
+                Task { await premium.refresh() }
 
                 // And notifications may have been turned off in iOS Settings meanwhile. Noticed
                 // here, every screen stops promising a reminder that cannot fire (known issue

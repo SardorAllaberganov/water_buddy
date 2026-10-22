@@ -195,7 +195,7 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     /// Whether Home is the page shown, and not the one sliding out after a change of tab.
     @Environment(\.pageIsShown) private var pageIsShown
-    /// StoreKit's rating request — the one use of StoreKit in the product (rule `70-privacy`).
+    /// StoreKit's rating request — one of StoreKit's two uses in the product (rule `70-privacy`).
     @Environment(\.requestReview) private var requestReview
 
     /// Bumped on every pour. Drives the haptic, so a daily rollover cannot fire one.
@@ -881,8 +881,8 @@ struct HomeView: View {
     // MARK: - Rating
 
     /// Asks iOS for a rating once the confetti of the pour that reached the goal has landed — if the
-    /// model says this is the moment (rule `70-privacy`, *The review request is the one use of
-    /// StoreKit*).
+    /// model says this is the moment (rule `70-privacy`, *StoreKit, for the review request and for
+    /// Premium*).
     ///
     /// Keyed on ``goalPours``, so the next crossing starts the wait again. After the pause it asks
     /// only if the wait still stands — Home stayed the page shown and the app stayed active, either

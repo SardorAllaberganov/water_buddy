@@ -557,5 +557,5 @@ private struct GlassTabBar: View {
     manager.addLog(amount: 250)
     manager.addLog(amount: 500)
 
-    return RootTabView().environment(manager)
+    return RootTabView().environment(manager).environment(PremiumStore(source: .silent()))
 }

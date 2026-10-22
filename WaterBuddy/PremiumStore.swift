@@ -43,13 +43,13 @@ final class PremiumStore {
         }
     }
 
-    /// The two plans, as the paywall offers them.
+    /// The three plans, as the paywall offers them.
     nonisolated enum Plans: Sendable, Equatable {
         case notLoaded
         case loading
         case loaded([PremiumAccess.Plan])
-        /// StoreKit could not be reached, or did not return both products: never an empty or a half
-        /// paywall (plan P7).
+        /// StoreKit could not be reached, or did not return all three products: never an empty or a
+        /// half paywall (plan P7).
         case unavailable
     }
 
@@ -65,6 +65,12 @@ final class PremiumStore {
         case unverified
     }
 
+    /// Where a restore stands — *Restore Purchases* shows its progress, and says so when nothing was
+    /// found (the final review's minor 5).
+    nonisolated enum Restoring: Sendable, Equatable {
+        case idle, restoring, nothingFound
+    }
+
     /// Every way StoreKit reaches the store. Main-actor, unlike `ReminderScheduler`: only the store
     /// calls these, on the main actor, and the purchase, the manage sheet and the scene they need are
     /// main-actor themselves (plan P2).
@@ -73,20 +79,30 @@ final class PremiumStore {
         var entitlements: () async -> [PremiumAccess.Entitlement]
         /// One element for each verified transaction update, after it has been finished.
         var updates: () -> AsyncStream<Void>
-        /// Both plans, the yearly's trial only for the eligible.
+        /// The three plans, the yearly's trial only for the eligible.
         var plans: () async throws -> [PremiumAccess.Plan]
         var buy: (_ productID: String) async throws -> Outcome
         var restore: () async throws -> Void
         var manage: () async -> Void
+        /// Whether Apple's manage sheet works here — not on a Mac ([MS] in the foundation spec).
+        var canManage: () -> Bool
     }
 
     private(set) var state: State = .checking
     private(set) var plans: Plans = .notLoaded
     private(set) var purchase: Purchase = .idle
+    private(set) var restoring: Restoring = .idle
+    /// Whether a subscription stands — beside a lifetime purchase too — so *Manage Subscription*
+    /// has something to manage (the final review's minor 3).
+    private(set) var holdsSubscription = false
 
     @ObservationIgnored private let source: Source
-    @ObservationIgnored private let now: () -> Date
+    /// The store's clock — the one the card and the sheet hand to ``PremiumAccess/Status/line(in:locale:now:)``
+    /// (rule `30-rollover`'s *The clock*).
+    @ObservationIgnored let now: () -> Date
     @ObservationIgnored private var listener: Task<Void, Never>?
+    /// Numbers every read, so a read that a newer one overtook does not publish (minor 4).
+    @ObservationIgnored private var reads = 0
 
     /// Listens at once — so a renewal, a refund or an approved Ask to Buy is never missed while the
     /// app runs — and reads the state for the first time.
@@ -114,26 +130,49 @@ final class PremiumStore {
         listener?.cancel()
     }
 
-    /// Reads what is held, and publishes it only when it changed.
+    /// Reads what is held, and publishes it only when it changed — and only if no newer read began
+    /// while this one waited on StoreKit.
     func refresh() async {
-        let status = PremiumAccess.resolve(await source.entitlements(), now: now())
+        reads += 1
+        let read = reads
+        let entitlements = await source.entitlements()
+        guard read == reads else { return }
+        let status = PremiumAccess.resolve(entitlements)
         if state != .known(status) {
             state = .known(status)
+        }
+        // A purchase landed, by whichever read: a restore that found nothing earlier — or decided
+        // from a read this one overtook — no longer has anything to say (step 1's final review, I1).
+        if status.isPremium, restoring == .nothingFound {
+            restoring = .idle
+        }
+        let subscribed = PremiumAccess.holdsSubscription(entitlements)
+        if holdsSubscription != subscribed {
+            holdsSubscription = subscribed
         }
     }
 
     /// Opens the paywall clean: the last purchase's outcome forgotten, the plans read again.
+    ///
+    /// A purchase still under way is not an outcome, and is kept. *Not now* closes the sheet while
+    /// StoreKit's own is still coming up; were *See Premium*'s fresh sheet to forget it, its button
+    /// would come back enabled and ``buy(_:)``'s guard would let a second purchase start.
     func prepare() async {
-        purchase = .idle
+        if purchase != .buying {
+            purchase = .idle
+        }
+        if restoring != .restoring {
+            restoring = .idle
+        }
         await loadPlans()
     }
 
-    /// Reads both plans; anything less is ``Plans/unavailable`` (plan P7).
+    /// Reads the three plans; anything less is ``Plans/unavailable`` (plan P7).
     func loadPlans() async {
         plans = .loading
         do {
             let loaded = try await source.plans()
-            let complete = loaded.count == 2 && Set(loaded.map(\.kind)) == [.yearly, .lifetime]
+            let complete = loaded.count == 3 && Set(loaded.map(\.kind)) == [.monthly, .yearly, .lifetime]
             plans = complete ? .loaded(loaded) : .unavailable
         } catch {
             plans = .unavailable
@@ -162,8 +201,11 @@ final class PremiumStore {
     }
 
     /// Asks the App Store for the user's purchases again, then reads them — App Review asks every
-    /// app that sells something restorable for this (spec §3.3).
+    /// app that sells something restorable for this (foundation spec §3.3). A second tap while one
+    /// runs asks nothing; what it found is said either way.
     func restore() async {
+        guard restoring != .restoring else { return }
+        restoring = .restoring
         do {
             try await source.restore()
         } catch {
@@ -172,11 +214,17 @@ final class PremiumStore {
             #endif
         }
         await refresh()
+        restoring = state.status?.isPremium == true ? .idle : .nothingFound
     }
 
     /// Apple's own sheet for the subscription, which says whether it renews.
     func manage() async {
         await source.manage()
+    }
+
+    /// Whether *Manage Subscription* is offered here.
+    var canManage: Bool {
+        source.canManage()
     }
 
     /// The scene a purchase is confirmed in and the manage sheet is shown on: the one in the
@@ -260,7 +308,8 @@ extension PremiumStore.Source {
                     print("WaterBuddy: the manage-subscriptions sheet could not be shown.")
                     #endif
                 }
-            }
+            },
+            canManage: { !ProcessInfo.processInfo.isiOSAppOnMac }
         )
     }
 
@@ -272,7 +321,8 @@ extension PremiumStore.Source {
             plans: { [] },
             buy: { _ in .cancelled },
             restore: {},
-            manage: {}
+            manage: {},
+            canManage: { false }
         )
     }
 }
@@ -300,10 +350,16 @@ private extension PremiumAccess.Plan {
            await subscription.isEligibleForIntroOffer {
             trial = Period(offer.period, count: offer.periodCount)
         }
+        let kind: Kind = switch product.id {
+        case PremiumAccess.lifetimeID: .lifetime
+        case PremiumAccess.monthlyID: .monthly
+        default: .yearly
+        }
         self.init(
             id: product.id,
-            kind: product.id == PremiumAccess.lifetimeID ? .lifetime : .yearly,
+            kind: kind,
             price: product.displayPrice,
+            amount: product.price,
             trial: trial
         )
     }

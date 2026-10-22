@@ -16,10 +16,16 @@ private let now = ISO8601DateFormatter().date(from: "2026-10-21T12:00:00Z")!
 private let later = now.addingTimeInterval(3_600)
 
 private let yearlyPlan = PremiumAccess.Plan(
-    id: PremiumAccess.yearlyID, kind: .yearly, price: "$19.99",
+    id: PremiumAccess.yearlyID, kind: .yearly, price: "$19.99", amount: Decimal(string: "19.99")!,
     trial: PremiumAccess.Plan.Period(value: 1, unit: .week)
 )
-private let lifetimePlan = PremiumAccess.Plan(id: PremiumAccess.lifetimeID, kind: .lifetime, price: "$39.99", trial: nil)
+private let lifetimePlan = PremiumAccess.Plan(
+    id: PremiumAccess.lifetimeID, kind: .lifetime, price: "$39.99", amount: Decimal(string: "39.99")!, trial: nil
+)
+private let monthlyPlan = PremiumAccess.Plan(
+    id: PremiumAccess.monthlyID, kind: .monthly, price: "$2.99", amount: Decimal(string: "2.99")!, trial: nil
+)
+private let heldMonthly = PremiumAccess.Entitlement(productID: PremiumAccess.monthlyID, expires: later, revoked: nil)
 
 private let heldLifetime = PremiumAccess.Entitlement(productID: PremiumAccess.lifetimeID, expires: nil, revoked: nil)
 private let heldYearly = PremiumAccess.Entitlement(productID: PremiumAccess.yearlyID, expires: later, revoked: nil)
@@ -32,7 +38,7 @@ private struct Refused: Error {}
 @MainActor
 private final class FakeAppStore {
     var held: [PremiumAccess.Entitlement] = []
-    var plans: Result<[PremiumAccess.Plan], any Error> = .success([yearlyPlan, lifetimePlan])
+    var plans: Result<[PremiumAccess.Plan], any Error> = .success([monthlyPlan, yearlyPlan, lifetimePlan])
     var outcome: Result<PremiumStore.Outcome, any Error> = .success(.bought)
     /// What a successful purchase leaves held, as the real one's finished transaction would.
     var boughtLeaves: [PremiumAccess.Entitlement] = [heldLifetime]
@@ -40,14 +46,37 @@ private final class FakeAppStore {
     /// Set, a purchase waits here until the test resumes it.
     var holdsPurchase = false
     var gate: CheckedContinuation<Void, Never>?
+    /// Set, the next read waits here — holding what it read before the wait — until resumed.
+    var holdsNextRead = false
+    var readGate: CheckedContinuation<Void, Never>?
+    /// Set too, the read after the held one waits here — two reads in flight, either let go first.
+    var holdsSecondRead = false
+    var secondReadGate: CheckedContinuation<Void, Never>?
+    private(set) var reads = 0
+    /// Set, a restore waits here until resumed.
+    var holdsRestore = false
+    var restoreGate: CheckedContinuation<Void, Never>?
+    /// Whether Apple's manage sheet works here.
+    var manages = true
     private(set) var bought: [String] = []
     private(set) var restores = 0
-    private(set) var manages = 0
+    private(set) var manageCalls = 0
     let (updates, update) = AsyncStream<Void>.makeStream()
 
     var source: PremiumStore.Source {
         PremiumStore.Source(
-            entitlements: { self.held },
+            entitlements: {
+                self.reads += 1
+                let held = self.held
+                if self.holdsNextRead {
+                    self.holdsNextRead = false
+                    await withCheckedContinuation { self.readGate = $0 }
+                } else if self.holdsSecondRead {
+                    self.holdsSecondRead = false
+                    await withCheckedContinuation { self.secondReadGate = $0 }
+                }
+                return held
+            },
             updates: { self.updates },
             plans: { try self.plans.get() },
             buy: { productID in
@@ -61,9 +90,13 @@ private final class FakeAppStore {
             },
             restore: {
                 self.restores += 1
+                if self.holdsRestore {
+                    await withCheckedContinuation { self.restoreGate = $0 }
+                }
                 if self.restoreFails { throw Refused() }
             },
-            manage: { self.manages += 1 }
+            manage: { self.manageCalls += 1 },
+            canManage: { self.manages }
         )
     }
 }
@@ -79,6 +112,7 @@ private func settle(_ condition: () -> Bool) async {
 // MARK: - The store
 
 @MainActor
+@Suite(.timeLimit(.minutes(1)))
 struct PremiumStoreTests {
 
     @Test func theStateWaitsForItsFirstRead() async {
@@ -165,6 +199,28 @@ struct PremiumStoreTests {
         #expect(fake.bought.count == 1)
     }
 
+    /// Review Focus 1, by way of the sheet: *Not now*, then *See Premium*, while StoreKit's own sheet
+    /// is still coming up. The new sheet's `prepare()` keeps the purchase under way, so its tap buys
+    /// nothing. The fake stops holding before that tap, so a guard left open would show as a second
+    /// purchase that lands, not as a run that waits forever.
+    @Test func openingTheSheetAgainWhileBuyingKeepsThePurchase() async {
+        let fake = FakeAppStore()
+        fake.holdsPurchase = true
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.refresh()
+        let first = Task { await store.buy(lifetimePlan) }
+        await settle { fake.gate != nil }
+        await store.prepare()
+        #expect(store.purchase == .buying)
+        fake.holdsPurchase = false
+        await store.buy(lifetimePlan)
+        #expect(fake.bought.count == 1)
+        fake.gate?.resume()
+        await first.value
+        #expect(store.purchase == .bought)
+        #expect(fake.bought.count == 1)
+    }
+
     @Test func aRefundArrivingAsAnUpdateReadsFree() async {
         let fake = FakeAppStore()
         fake.held = [heldLifetime]
@@ -191,18 +247,18 @@ struct PremiumStoreTests {
         #expect(store.state == .known(.yearly(until: later)))
     }
 
-    @Test func plansLoadBoth() async {
+    @Test func plansLoadAllThree() async {
         let fake = FakeAppStore()
         let store = PremiumStore(source: fake.source, now: { now })
         #expect(store.plans == .notLoaded)
         await store.loadPlans()
-        #expect(store.plans == .loaded([yearlyPlan, lifetimePlan]))
+        #expect(store.plans == .loaded([monthlyPlan, yearlyPlan, lifetimePlan]))
     }
 
     /// Review Focus 4.
     @Test func oneProductMissingIsUnavailable() async {
         let fake = FakeAppStore()
-        fake.plans = .success([yearlyPlan])
+        fake.plans = .success([yearlyPlan, lifetimePlan])
         let store = PremiumStore(source: fake.source, now: { now })
         await store.loadPlans()
         #expect(store.plans == .unavailable)
@@ -214,9 +270,9 @@ struct PremiumStoreTests {
         let store = PremiumStore(source: fake.source, now: { now })
         await store.loadPlans()
         #expect(store.plans == .unavailable)
-        fake.plans = .success([yearlyPlan, lifetimePlan])
+        fake.plans = .success([monthlyPlan, yearlyPlan, lifetimePlan])
         await store.loadPlans()
-        #expect(store.plans == .loaded([yearlyPlan, lifetimePlan]))
+        #expect(store.plans == .loaded([monthlyPlan, yearlyPlan, lifetimePlan]))
     }
 
     /// Review Focus 3.
@@ -229,7 +285,7 @@ struct PremiumStoreTests {
         #expect(store.purchase == .failed)
         await store.prepare()
         #expect(store.purchase == .idle)
-        #expect(store.plans == .loaded([yearlyPlan, lifetimePlan]))
+        #expect(store.plans == .loaded([monthlyPlan, yearlyPlan, lifetimePlan]))
     }
 
     @Test func restoreAsksTheAppStoreThenReads() async {
@@ -240,6 +296,7 @@ struct PremiumStoreTests {
         await store.restore()
         #expect(fake.restores == 1)
         #expect(store.state == .known(.lifetime))
+        #expect(store.restoring == .idle)
     }
 
     @Test func aFailedRestoreStillReads() async {
@@ -250,25 +307,144 @@ struct PremiumStoreTests {
         await store.restore()
         #expect(fake.restores == 1)
         #expect(store.state == .known(.yearly(until: later)))
+        #expect(store.restoring == .idle)
     }
 
     @Test func manageOpensApplesSheet() async {
         let fake = FakeAppStore()
         let store = PremiumStore(source: fake.source, now: { now })
         await store.manage()
-        #expect(fake.manages == 1)
+        #expect(fake.manageCalls == 1)
     }
 
-    /// Review Focus 5, through the store's own clock. Named apart from `PremiumAccessTests`' case:
-    /// no name is used twice across suites (rule `85-testing`).
+    @Test func aRestoreThatFindsNothingSaysSo() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.restore()
+        #expect(fake.restores == 1)
+        #expect(store.restoring == .nothingFound)
+        #expect(store.state == .known(.free))
+    }
+
+    /// Review Focus 3.
+    @Test func aSecondRestoreWhileOneRunsAsksOnce() async {
+        let fake = FakeAppStore()
+        fake.holdsRestore = true
+        let store = PremiumStore(source: fake.source, now: { now })
+        let first = Task { await store.restore() }
+        await settle { fake.restoreGate != nil }
+        #expect(store.restoring == .restoring)
+        // A guard left open shows as a second restore that lands, not as a run that waits forever.
+        fake.holdsRestore = false
+        await store.restore()
+        #expect(fake.restores == 1)
+        fake.restoreGate?.resume()
+        await first.value
+        #expect(fake.restores == 1)
+    }
+
+    @Test func openingTheSheetAgainForgetsNothingToRestore() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.restore()
+        #expect(store.restoring == .nothingFound)
+        await store.prepare()
+        #expect(store.restoring == .idle)
+    }
+
+    /// Step 1's final review, I1: *Restore Purchases* tapped first, then a purchase — *Thank you*
+    /// must not stand over "No purchases to restore."
+    @Test func aPurchaseAfterNothingToRestoreClearsTheLine() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.restore()
+        #expect(store.restoring == .nothingFound)
+        await store.buy(lifetimePlan)
+        #expect(store.state == .known(.lifetime))
+        #expect(store.restoring == .idle)
+    }
+
+    /// I1, by another door: an Ask to Buy approved, or a purchase on another device, after a restore
+    /// that found nothing.
+    @Test func anApprovalAfterNothingToRestoreClearsTheLine() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.restore()
+        #expect(store.restoring == .nothingFound)
+        fake.held = [heldYearly]
+        fake.update.yield()
+        await settle { store.state == .known(.yearly(until: later)) }
+        #expect(store.state == .known(.yearly(until: later)))
+        #expect(store.restoring == .idle)
+    }
+
+    /// I1's race: restore's own read is overtaken, so it decides from the state before the purchase
+    /// it found — and the newer read lands that purchase a moment later.
+    @Test func aRestoreWhoseReadWasOvertakenDoesNotOutliveThePurchase() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.refresh()
+        await settle { fake.reads >= 2 }
+        fake.holdsNextRead = true
+        fake.holdsSecondRead = true
+        let restoring = Task { await store.restore() }
+        await settle { fake.readGate != nil }
+        fake.held = [heldLifetime]
+        let newer = Task { await store.refresh() }
+        await settle { fake.secondReadGate != nil }
+        fake.readGate?.resume()
+        await restoring.value
+        fake.secondReadGate?.resume()
+        await newer.value
+        #expect(store.state == .known(.lifetime))
+        #expect(store.restoring == .idle)
+    }
+
+    /// The final review's minor 4: two reads in flight, the older finishing last, never publishes.
+    @Test func aReadOvertakenByANewerOneDoesNotPublish() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.refresh()
+        await settle { fake.reads >= 2 }
+        fake.holdsNextRead = true
+        let older = Task { await store.refresh() }
+        await settle { fake.readGate != nil }
+        fake.held = [heldLifetime]
+        await store.refresh()
+        #expect(store.state == .known(.lifetime))
+        fake.readGate?.resume()
+        await older.value
+        #expect(store.state == .known(.lifetime))
+    }
+
+    /// The final review's minor 6.
+    @Test func manageIsOfferedOnlyWhereItWorks() async {
+        let fake = FakeAppStore()
+        let store = PremiumStore(source: fake.source, now: { now })
+        #expect(store.canManage)
+        fake.manages = false
+        #expect(!store.canManage)
+    }
+
+    /// The final review's minor 3.
+    @Test func aLifetimeBesideAMonthlyStillHasASubscriptionToManage() async {
+        let fake = FakeAppStore()
+        fake.held = [heldLifetime, heldMonthly]
+        let store = PremiumStore(source: fake.source, now: { now })
+        await store.refresh()
+        #expect(store.state == .known(.lifetime))
+        #expect(store.holdsSubscription)
+    }
+
+    /// Review Focus 5 of the foundation, under the grace ruling: the store reads free once StoreKit
+    /// stops listing the plan. Named apart from `PremiumAccessTests`' case (rule `85-testing`).
     @Test func anExpiryPassingWhileTheAppRunsReadsFreeOnTheStoresNextRead() async {
         let fake = FakeAppStore()
         fake.held = [heldYearly]
-        var clock = now
-        let store = PremiumStore(source: fake.source, now: { clock })
+        let store = PremiumStore(source: fake.source, now: { now })
         await store.refresh()
         #expect(store.state == .known(.yearly(until: later)))
-        clock = later.addingTimeInterval(1)
+        fake.held = []
         await store.refresh()
         #expect(store.state == .known(.free))
     }
@@ -304,22 +480,65 @@ struct StoreKitSessionTests {
         settlingOn expected: PremiumAccess.Status,
         from source: PremiumStore.Source
     ) async throws -> PremiumAccess.Status {
-        var status = PremiumAccess.resolve(await source.entitlements(), now: .now)
+        var status = PremiumAccess.resolve(await source.entitlements())
         for _ in 0..<50 where status != expected {
             try await Task.sleep(for: .milliseconds(100))
-            status = PremiumAccess.resolve(await source.entitlements(), now: .now)
+            status = PremiumAccess.resolve(await source.entitlements())
         }
         return status
     }
 
-    @Test func bothProductsLoadAndTheYearlyOffersAFreeWeek() async throws {
+    @Test func allThreeProductsLoadAndOnlyTheYearlyOffersAFreeWeek() async throws {
         try await withSession { _ in
             let plans = try await PremiumStore.Source.live().plans()
             #expect(plans.map(\.id) == PremiumAccess.productIDs)
-            #expect(plans.map(\.kind) == [.yearly, .lifetime])
-            #expect(plans.allSatisfy { !$0.price.isEmpty })
-            #expect(plans.first?.trial == PremiumAccess.Plan.Period(value: 1, unit: .week))
-            #expect(plans.last?.trial == nil)
+            #expect(plans.map(\.kind) == [.monthly, .yearly, .lifetime])
+            #expect(plans.allSatisfy { !$0.price.isEmpty && $0.amount > 0 })
+            #expect(plans.first { $0.kind == .yearly }?.trial == PremiumAccess.Plan.Period(value: 1, unit: .week))
+            #expect(plans.first { $0.kind == .monthly }?.trial == nil)
+            #expect(plans.first { $0.kind == .lifetime }?.trial == nil)
+        }
+    }
+
+    /// The configuration's monthly plan is a month.
+    @Test func theConfigurationsMonthlyRenewsEveryMonth() throws {
+        let url = try #require(Bundle(for: TestBundle.self).url(forResource: "WaterBuddy", withExtension: "storekit"))
+        let text = try String(contentsOf: url, encoding: .utf8)
+        #expect(text.contains("\"recurringSubscriptionPeriod\" : \"P1M\""))
+    }
+
+    @Test func aBoughtMonthlyReadsMonthly() async throws {
+        try await withSession { _ in
+            let source = PremiumStore.Source.live()
+            let outcome = try await source.buy(PremiumAccess.monthlyID)
+            #expect(outcome == .bought)
+            let status = PremiumAccess.resolve(await source.entitlements())
+            guard case .monthly(let until) = status else {
+                Issue.record("a bought monthly read \(status)")
+                return
+            }
+            #expect(until > .now)
+        }
+    }
+
+    /// The upgrade in one group (spec §3.1, measured in Task 1's probe).
+    @Test func aMonthlyThenAYearlyReadsTheYearly() async throws {
+        try await withSession { _ in
+            let source = PremiumStore.Source.live()
+            let first = try await source.buy(PremiumAccess.monthlyID)
+            #expect(first == .bought)
+            let second = try await source.buy(PremiumAccess.yearlyID)
+            #expect(second == .bought)
+            var status = PremiumAccess.resolve(await source.entitlements())
+            for _ in 0..<50 {
+                if case .yearly = status { break }
+                try await Task.sleep(for: .milliseconds(100))
+                status = PremiumAccess.resolve(await source.entitlements())
+            }
+            guard case .yearly = status else {
+                Issue.record("a monthly then a yearly read \(status)")
+                return
+            }
         }
     }
 
@@ -335,7 +554,7 @@ struct StoreKitSessionTests {
             let source = PremiumStore.Source.live()
             let outcome = try await source.buy(PremiumAccess.yearlyID)
             #expect(outcome == .bought)
-            let status = PremiumAccess.resolve(await source.entitlements(), now: .now)
+            let status = PremiumAccess.resolve(await source.entitlements())
             guard case .yearly(let until) = status else {
                 Issue.record("a bought yearly read \(status)")
                 return
@@ -349,7 +568,7 @@ struct StoreKitSessionTests {
             let source = PremiumStore.Source.live()
             let outcome = try await source.buy(PremiumAccess.lifetimeID)
             #expect(outcome == .bought)
-            #expect(PremiumAccess.resolve(await source.entitlements(), now: .now) == .lifetime)
+            #expect(PremiumAccess.resolve(await source.entitlements()) == .lifetime)
         }
     }
 
@@ -357,9 +576,10 @@ struct StoreKitSessionTests {
     /// after `expireSubscription`, `Transaction.currentEntitlements` still answered the trial's
     /// transaction with its first expiry for three seconds and more, a second purchase answered
     /// *bought* and changed nothing, and a second expiry threw `SKServiceErrorDomain` 2 (measured on
-    /// iOS 27.0, 2026-10-21). In the App Store a period ends on its own expiry, which
-    /// `PremiumAccess.resolve` reads (`aYearlyEndingAtThisInstantIsOver`, `aYearlyThatEndedIsOver`,
-    /// both `anExpiryPassing…` cases) and the live mapping carries (`aBoughtYearlyReadsPremium`).
+    /// iOS 27.0, 2026-10-21). Under the owner's grace ruling a lapsed plan reads free when StoreKit
+    /// stops listing it (`aSubscriptionStoreKitStopsListingReadsFree`,
+    /// `anExpiryPassingWhileTheAppRunsReadsFreeOnTheStoresNextRead`); this test asks the environment
+    /// to stop listing it, which it does not.
     @Test(.disabled("StoreKit testing does not end a free trial early in current entitlements (2026-10-21)"))
     func anExpiredYearlyReadsFree() async throws {
         try await withSession { session in
@@ -392,8 +612,8 @@ struct StoreKitSessionTests {
             #expect(outcome == .bought)
             try session.expireSubscription(productIdentifier: PremiumAccess.yearlyID)
             let plans = try await source.plans()
-            #expect(plans.first?.kind == .yearly)
-            #expect(plans.first?.trial == nil)
+            let yearly = try #require(plans.first { $0.kind == .yearly })
+            #expect(yearly.trial == nil)
         }
     }
 
@@ -402,7 +622,7 @@ struct StoreKitSessionTests {
             session.askToBuyEnabled = true
             let store = PremiumStore(source: .live())
             await store.refresh()
-            await store.buy(PremiumAccess.Plan(id: PremiumAccess.lifetimeID, kind: .lifetime, price: "", trial: nil))
+            await store.buy(PremiumAccess.Plan(id: PremiumAccess.lifetimeID, kind: .lifetime, price: "", amount: 0, trial: nil))
             #expect(store.purchase == .pending)
             let asked = try #require(session.allTransactions().first { $0.pendingAskToBuyConfirmation })
             try session.approveAskToBuyTransaction(identifier: asked.identifier)

@@ -1,0 +1,71 @@
+//
+//  PremiumUITests.swift
+//  WaterBuddyUITests
+//
+//  Created by Sardor Allaberganov on 21/10/26.
+//
+
+import XCTest
+
+/// Premium's card and sheet (spec `2026-10-21-premium-foundation-design.md` §6). The only class that
+/// launches with `-WaterBuddyPremium` (rule `85-testing`). It asserts nothing that needs a product to
+/// load: a gate run has no StoreKit configuration, so the plans read as unavailable.
+final class PremiumUITests: XCTestCase {
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+    }
+
+    /// One element by its label, whether SwiftUI exposes it as a button or a link.
+    private func count(_ label: String, in app: XCUIApplication) -> Int {
+        app.buttons.matching(identifier: label).count + app.links.matching(identifier: label).count
+    }
+
+    @MainActor
+    func testAnOrdinaryRunHasNoPremiumCard() throws {
+        let app = XCUIApplication()
+        app.launch()
+        completeWelcomeIfShown(app)
+
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5))
+        // The card waits for the first StoreKit read; give it the time it would take to come.
+        XCTAssertFalse(app.buttons["See Premium"].waitForExistence(timeout: 3),
+                       "the card showed in a run not launched to offer it")
+    }
+
+    @MainActor
+    func testTheCardLeadsSettingsAndOpensThePaywall() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-WaterBuddyPremium", "YES"]
+        app.launch()
+        completeWelcomeIfShown(app)
+
+        app.buttons["Settings"].tap()
+        let see = app.buttons["See Premium"]
+        XCTAssertTrue(see.waitForExistence(timeout: 10), "no Premium card")
+        XCTAssertEqual(app.buttons.matching(identifier: "See Premium").count, 1)
+        let goal = app.sliders["Daily water goal"]
+        XCTAssertTrue(goal.waitForExistence(timeout: 5))
+        XCTAssertLessThan(see.frame.minY, goal.frame.minY, "the Premium card is not first")
+        tapWhenReady(see)
+
+        XCTAssertTrue(app.staticTexts["See how you really drink, and what would help."].waitForExistence(timeout: 5),
+                      "no paywall")
+        XCTAssertTrue(app.staticTexts["Logging water is free, always."].exists)
+        // Each row is one element carrying its title and its line. Counted by the whole row's label:
+        // XCUITest also lists the row's own title beneath it, which VoiceOver does not stop on
+        // (`tasks/lessons.md`, 2026-10-17; the owner's ruling, 2026-10-22).
+        for title in ["Month view and full history", "Your patterns", "Personal AI insights", "A monthly recap"] {
+            let row = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", title + ", "))
+            XCTAssertEqual(row.count, 1, "\(title) is not one element")
+        }
+        for label in ["Restore Purchases", "Terms of Use", "Privacy Policy", "Not now"] {
+            XCTAssertEqual(count(label, in: app), 1, "\(label) is not one element")
+        }
+
+        app.buttons["Not now"].tap()
+        XCTAssertTrue(see.waitForExistence(timeout: 5), "Not now did not close the paywall")
+    }
+}

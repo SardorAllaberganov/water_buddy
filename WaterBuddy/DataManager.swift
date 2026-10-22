@@ -1419,7 +1419,7 @@ final class DataManager {
     ///
     /// No ``role`` guard: ``streak`` is zero wherever ``Role/drawsHistory`` is `false`, so the
     /// decision already answers `false` in every process but the phone app. `HomeView` is its one
-    /// caller (rule `70-privacy`, *The review request is the one use of StoreKit*).
+    /// caller (rule `70-privacy`, *StoreKit, for the review request and for Premium*).
     ///
     /// - Parameter version: the app's `CFBundleShortVersionString` (`ReviewPrompt.version`).
     /// - Returns: whether the caller should ask iOS now.

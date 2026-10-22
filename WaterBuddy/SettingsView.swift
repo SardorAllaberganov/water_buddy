@@ -29,6 +29,21 @@ struct SettingsView: View {
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(PremiumStore.self) private var premium
+
+    /// The paywall, while it is open — its `.sheet(item:)` selection (rule `50-views`).
+    @State private var paywall: PaywallView.Entry?
+
+    /// Premium's card shows where the paywall is offered, once the first read has answered — so a
+    /// paying user never sees the free card flash (plan S13).
+    private var showsPremium: Bool {
+        PaywallView.isOfferedHere && premium.state != .checking
+    }
+
+    /// The other cards' arrival order starts after Premium's when it is drawn (``Arrival``).
+    private var lead: Int {
+        showsPremium ? 1 : 0
+    }
 
     /// What iOS currently thinks. Presentation state, re-read whenever the screen comes forward —
     /// permission can be revoked in Settings while this app is in the background, and the toggle
@@ -67,12 +82,20 @@ struct SettingsView: View {
                         // apart; the stack's own spacing is the 16.
                         .padding(.bottom, SettingsStyle.headerGap - SettingsStyle.cardGap)
                         .scrollDepth()
-                    // The goal leads: it is the number the whole product is measured against,
-                    // and reminders are a preference about it.
-                    GoalCard(currentGoal: manager.dailyGoal).arrives(arrived, order: 0).scrollDepth()
-                    ServingsCard(current: manager.servings).arrives(arrived, order: 1).scrollDepth()
-                    remindersCard.arrives(arrived, order: 2).scrollDepth()
-                    LanguageCard().arrives(arrived, order: 3).scrollDepth()
+                    // Premium leads where it is offered — the owner's ruling (spec
+                    // `2026-10-21-premium-paywall-and-monthly-design.md` §3.5), which reverses *the
+                    // goal leads*.
+                    if showsPremium {
+                        PremiumCard { paywall = .settings }
+                            .arrives(arrived, order: 0)
+                            .scrollDepth()
+                    }
+                    // Then the goal: it is the number the whole product is measured against, and
+                    // reminders are a preference about it.
+                    GoalCard(currentGoal: manager.dailyGoal).arrives(arrived, order: lead).scrollDepth()
+                    ServingsCard(current: manager.servings).arrives(arrived, order: lead + 1).scrollDepth()
+                    remindersCard.arrives(arrived, order: lead + 2).scrollDepth()
+                    LanguageCard().arrives(arrived, order: lead + 3).scrollDepth()
                     Spacer(minLength: 0)
                 }
                 // The reminders card changes what it says, and with it its height: when
@@ -114,6 +137,7 @@ struct SettingsView: View {
         .sensoryFeedback(Haptics.confirm, trigger: enables)
         .tracksArrival($arrived)
         .task { await readSystemState() }
+        .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
         .onChange(of: scenePhase) { _, phase in
             // Returning from the Settings app is the whole reason this is here.
             if phase == .active {
@@ -347,6 +371,154 @@ private struct LanguageCard: View {
         .accessibilityLabel(language.name(in: strings))
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
+}
+
+// MARK: - Premium
+
+/// Premium's card, first on the screen where the paywall is offered (spec
+/// `2026-10-21-premium-paywall-and-monthly-design.md` §3.5). While nothing is held: what Premium adds
+/// and the way in, on the screen's one primary surface, with Premium's rim. Once something is: the
+/// plan held, and Apple's manage sheet for a subscription.
+private struct PremiumCard: View {
+
+    @Environment(PremiumStore.self) private var premium
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Opens the paywall.
+    let open: () -> Void
+
+    var body: some View {
+        if let status = premium.state.status, status.isPremium {
+            held(status)
+        } else {
+            offer
+        }
+    }
+
+    private var offer: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                // White: in the card's lit corner cyan read 2.88:1 (step 1's walk, Task 8; the
+                // owner's ruling R4). The rim carries the colour.
+                Image(systemName: "sparkles")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    title
+                    Text("Extras for the way you drink. Logging water stays free.", bundle: strings)
+                        .cardNote()
+                }
+            }
+            previews
+            Button(action: open) {
+                Text("See Premium", bundle: strings)
+                    .font(.body.weight(.bold))
+                    .frame(maxWidth: .infinity, minHeight: PremiumCardStyle.buttonHeight)
+                    .primarySurface(in: Capsule())
+            }
+            .buttonStyle(PressStyle())
+        }
+        // `.frosted` and `.raised`, matching every sibling on this screen, and Premium's rim.
+        .settingsCard()
+        .premiumRim()
+    }
+
+    /// The card's name. At the accessibility sizes it is a lockup of two lines, each kept whole and
+    /// shrunk rather than broken: in one `Text` beside the glyph it was hyphenated "Water-Buddy" (the
+    /// walk, W6; rule `65-accessibility`). Spoken as one name either way.
+    @ViewBuilder
+    private var title: some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("WaterBuddy", bundle: strings).cardTitle()
+                Text("Premium", bundle: strings).cardTitle()
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("WaterBuddy Premium", bundle: strings))
+        } else {
+            Text("WaterBuddy Premium", bundle: strings)
+                .cardTitle()
+        }
+    }
+
+    /// What the sets add, as a glyph over a caption — decoration, with no pane of its own (plan S7);
+    /// the paywall names each in full. At the accessibility sizes a glyph beside a caption, one to a
+    /// row: three abreast, the captions broke mid-word (the walk, W5).
+    private var previews: some View {
+        let column = typeSize.isAccessibilitySize
+        let layout = column
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 10))
+        let item = column
+            ? AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 10))
+            : AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+        return layout {
+            ForEach(PaywallView.shownSets(debug: PaywallView.isDebug).flatMap(\.features), id: \.self) { feature in
+                if let caption = feature.caption(in: strings) {
+                    item {
+                        // Set as text, a glyph has a baseline, and the row aligns on it: the glyphs
+                        // sit on one line and the captions start on one, whatever a glyph's shape —
+                        // `sparkles` stands taller than the rest (the walk, W1).
+                        Text(Image(systemName: feature.symbol))
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(Aurora.cyan)
+                        Text(caption)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
+    private func held(_ status: PremiumAccess.Status) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("You have Premium.", bundle: strings)
+                .cardTitle()
+                .padding(.bottom, 6)
+            if let line = status.line(in: strings, locale: locale, now: premium.now()) {
+                Text(line)
+                    .cardNote()
+            }
+            // Apple's sheet manages a subscription — beside a lifetime purchase too — and is not
+            // offered where it does not work (the final review's minors 3 and 6).
+            if premium.holdsSubscription, premium.canManage {
+                cardButton("Manage Subscription") {
+                    Task { await premium.manage() }
+                }
+            }
+        }
+        // `.frosted` and `.raised`, matching every sibling on this screen.
+        .settingsCard()
+    }
+
+    /// The reminders card's capsule — glass: managing is not the screen's main action.
+    private func cardButton(_ key: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(key, bundle: strings)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+                .liquidGlass(in: Capsule(), density: .sheer, elevation: .resting, interactive: true)
+        }
+        .buttonStyle(PressStyle())
+        .padding(.top, 12)
+    }
+}
+
+/// The card's own measure.
+private enum PremiumCardStyle {
+    /// The primary buttons' 56 (rule `65-accessibility`).
+    static let buttonHeight: CGFloat = 56
 }
 
 // MARK: - The goal editor
@@ -814,5 +986,5 @@ private struct CheckShape: Shape {
     manager.saveDailyGoal(ml: 2_500)
 
     // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
-    return SettingsView().background { AuroraBackground() }.environment(manager)
+    return SettingsView().background { AuroraBackground() }.environment(manager).environment(PremiumStore(source: .silent()))
 }
