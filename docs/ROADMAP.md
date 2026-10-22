@@ -22,7 +22,9 @@ The owner's goal (2026-10-06): **stand out on the App Store and get users**, wit
 in-app subscription later.
 
 The pitch, which every item below must keep true: **"WaterBuddy never charges you to log water."**
-Premium sells extras — never logging. Pricing is yearly plus lifetime; no weekly plans.
+Premium sells extras — never logging. Pricing is monthly, yearly and lifetime — a free week on the
+yearly alone; no weekly plans. *(The owner, 2026-10-21: the monthly plan added, $2.99 beside $19.99
+a year and $39.99 once; until then this line read "yearly plus lifetime".)*
 
 Why that pitch: a read-only scan on 2026-10-06 of about 430 recent US App Store reviews of six
 hydration apps ranked complaints by how often they appeared, and paying to log water was first
@@ -272,10 +274,15 @@ paying user buys is the extras, never the basics. Nothing a free user can do tod
 paywall sells more than one thing: **to understand** — 1.4.2, 1.4.6, 1.4.7; **to be coached** —
 1.4.3, 1.4.9, 1.4.10, and 1.4.11 once it can be built; **to make it theirs** — 1.4.5, 1.4.8; and
 1.4.4, export. Every item is held to *The Premium line* (§1). Nothing here ships before 1.4.1.
+*(2026-10-21, evening, the owner's: **set A, to understand, comes first** and gains **1.4.12,
+personal AI insights**; it is built in five steps — 1 the monthly plan, the paywall and the Settings
+card as designed (1.4.1, amended); 2 1.4.2; 3 1.4.6; 4 1.4.12; 5 1.4.7 — and goes on sale with the
+last, so the paywall never lists a feature that is not built. The design canvas:
+https://claude.ai/artifact/1dyjwFfRVsLYzcvwQ6poGy, private to the owner.)*
 
 | # | Item | Free / Premium | Size |
 |---|---|---|---|
-| 1.4.1 | **StoreKit subscriptions and the paywall** — yearly and lifetime | — | Medium |
+| 1.4.1 | **StoreKit subscriptions and the paywall** — monthly, yearly and lifetime | — | Medium |
 | 1.4.2 | **Full history and a month view** | Premium | Medium |
 | 1.4.3 | **Custom reminder schedule** | Premium | Medium |
 | 1.4.4 | **Export** | Premium | Small |
@@ -286,6 +293,7 @@ paywall sells more than one thing: **to understand** — 1.4.2, 1.4.6, 1.4.7; **
 | 1.4.9 | **Pace line** | Premium | Small |
 | 1.4.10 | **Remind only when behind** | Premium | Small |
 | 1.4.11 | **Workout-aware goal** | Premium | Medium |
+| 1.4.12 | **Personal AI insights** — Apple's on-device model | Premium | Medium |
 
 **1.4.1 — StoreKit.** Purchases are verified on the device by StoreKit itself, so Premium needs no
 server and keeps the product's *no account, no server* shape. **Needs a rule change** (§8), the
@@ -299,6 +307,23 @@ amendment — two files, named calls, the paywall's moment — is typed into rul
 unstaged. Tasks 0–5 are built and staged: the decision, the store, the words, 46 tests. Paused at
 Task 6 for the privacy policy's URL (known issue #159); App Store Connect's steps are #155, a device
 purchase #156.)*
+*(2026-10-21, evening: Task 6 built without the URL, on the owner's word, and gated; the owner then
+judged its paywall "very poor" on their iPhone and approved a redesign. **Set A's step 1 amends
+1.4.1**: a monthly plan, the grace-period ruling, set A declared and not on sale, the paywall and
+the Settings card as designed — spec `docs/superpowers/specs/2026-10-21-premium-paywall-and-monthly-design.md`
+and plan `docs/superpowers/plans/2026-10-21-premium-paywall-and-monthly.md`, both approved, no code
+of them yet. Task 6's paywall and card are superseded and never ship.)*
+*(2026-10-22: step 1 **built through its Task 7, tests first, and staged** — the monthly plan, the
+grace ruling on disk, set A declared and not on sale, three plans in the store, 27 strings, the
+paywall and the Settings card as designed; 764 unit `@Test`. Waiting on Task 8, the owner's walk, then
+the gate and the review. Its rule wording — rules `70-privacy` and `60-design-system`, and two
+canary lists — is typed and unstaged for the owner.)*
+*(2026-10-22, later: step 1 **built, walked, measured, gated and staged** — the final review's two
+fixes, ten findings of the walk fixed and seen fixed, the paywall's colour pairs all at their floors
+after the owner's four rulings (one card for the features, cyan glyphs, BEST VALUE inside the yearly
+tile, white small marks); 768 unit `@Test`, the UI suite on 27.0 and 26.5, the watch, both widgets,
+warnings unchanged. Nobody meets it until step 5 puts set A on sale; the privacy URL (#159) still
+gates a Release build.)*
 
 **1.4.2 — Full history.** History beyond the week shown today: a month calendar of goal days, and
 trends. Free users keep today's week. **No serving is ever deleted or hidden from the store because
@@ -345,6 +370,16 @@ within the hour. The plan still only drops slots and never moves one, so it stay
 **1.4.11 — Workout-aware goal.** A workout recorded in Apple Health raises that day's goal; no
 location and no weather (§9). Only if 1.3.3 also *reads* from Health — otherwise it waits. Whether
 the widget and the watch draw the raised goal is its design's question. **Needs rule changes** (§8).
+
+**1.4.12 — Personal AI insights.** *(Added 2026-10-21, evening, on the owner's choice, into set A.)*
+A short insight each week — what changed, what is working, one concrete suggestion — written by
+Apple's **on-device** model (`FoundationModels`, iOS 26 and later, on an iPhone with Apple
+Intelligence on, in a language the model speaks), from the user's own summarised figures — never the
+raw servings — and never as medical advice. Everywhere else the app writes the same kinds of insight
+from fixed sentences in all three languages, and each says how it was made. Nothing leaves the
+phone: Apple's Private Cloud Compute and a cloud model were set aside by the owner ("a"). The name
+*Apple Intelligence* in the app's copy is checked against Apple's guidelines for it before set A goes
+on sale. **Needs a rule change** (§8).
 
 ## 6. Release 1.5 — more to log, more people
 
@@ -416,6 +451,7 @@ Each is written as an amendment for the owner to approve, before its item's code
 | `20-state`, `25-shared-storage`, `10-architecture`, `50-views` | A library of vessels beside `Key.servings`' three, named by the user | 1.4.8 |
 | `80-notifications` | A slot dropped when the user is ahead of pace | 1.4.10 |
 | `70-privacy`, `15-project` | Reading workouts from `HealthKit`, beyond 1.3.3's row | 1.4.11 |
+| `70-privacy`, `95-dependencies` | `FoundationModels` — Apple's on-device model — may be imported, by the insights' file alone | 1.4.12 |
 | `80-notifications`, `70-privacy` | A second kind of reminder, the caffeine cut-off, with no digit | 1.5.4 |
 
 *(2026-10-14: 1.2.1's was approved on 2026-10-13 and committed as `c9d1f6b`. 1.2.2 needed three

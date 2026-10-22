@@ -175,7 +175,17 @@ something to record.
   against a clean build of a `HEAD` `3d1cda8` export, on all four schemes, and again on those three
   after its final review's fix, and read again on 2026-10-21 from a clean build of a `HEAD`
   `0be24f9` export before roadmap item 1.4.1's code — `-scheme WaterBuddy` 35 = 29 + 6,
-  `WaterBuddyWidgetExtension` 29, `WaterBuddyWatch` 2; 1.4.1's own comparison is not yet run
+  `WaterBuddyWidgetExtension` 29, `WaterBuddyWatch` 2; and 1.4.1's own comparison, on 2026-10-21
+  from a clean build of a copy of its index (Tasks 0–6 and the final review's fix), against that
+  export, by file and message: **one new line** on `-scheme WaterBuddy` — Apple's own
+  `StoreKitTest.framework/Headers/SKTestTransaction.h:34` deprecation, there because the tests import
+  `StoreKitTest` — so 36 = 29 + 6 + 1, the owner's to rule (`docs/AI_CONTEXT.md` #160); the widget
+  29, the watch 2 and the watch widget 2 unchanged; and read again on 2026-10-21 from a clean build of
+  a `HEAD` `b981374` export before set A's step 1's code, by file and message with line numbers
+  stripped — `-scheme WaterBuddy` 20 (the `StoreKitTest` line among them), `WaterBuddyWidgetExtension`
+  17, `WaterBuddyWatch` 2, `WaterBuddyWatchWidget` 2; and step 1's own comparison, on 2026-10-22 from
+  a clean build of a copy of its index (Tasks 3–7, the final review's fixes and the walk's), against
+  that export, the same way: unchanged on all four schemes — 20, 17, 2, 2, no line new or gone
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two

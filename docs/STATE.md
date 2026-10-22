@@ -4,6 +4,27 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-22 (eighty-second pass — step 1's Task 10, after its walk, its fixes and its
+gate). **Still no key moved**: 13 `static let`s on `DataManager.Key`, counted from the source. The
+review's fix to `PremiumStore.refresh()` — a purchase clears *No purchases to restore.* — changes a
+published value held in memory only; the paid state is still read from StoreKit, never stored, and the
+store still holds three products. The walk ran on a throwaway suite (`-WaterBuddyFreshStart`) and wrote
+nothing to the App Group.
+
+**Last updated:** 2026-10-22 (eighty-first pass — `/doc_sync` after set A's step 1, Tasks 0–7, built
+and staged). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the phone and 2 on the
+watch, counted from the source. One dated note under *Derived on read*: the monthly plan and the grace
+ruling are on disk, and the store's two new published values are stored nowhere. Searched for
+`StoreKit`, `Premium`, `keys`, `required-reason` and `locale`: nothing else moved — the privacy
+manifests are untouched and step 1 adds no required-reason API.
+
+**Last updated:** 2026-10-21 (eightieth pass — `/doc_sync` after 1.4.1's Task 6 and the owner's
+redirection to set A). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the phone and 2
+on the watch. One dated note under *Derived on read*: the store is now built at launch and read on
+every `.active`, as the paragraph already said; the monthly plan and the grace ruling are specified
+for step 1 and not on disk. Searched for `StoreKit`, `Premium`, `review`, `keys` and `locale`: nothing
+else moved.
+
 **Last updated:** 2026-10-21 (seventy-ninth pass — `/doc_sync` with roadmap item 1.4.1 half built,
 staged and paused). **No key moved**: 13 `static let`s on `DataManager.Key`, 11 on the phone and 2 on
 the watch. 1.4.1's paid state is read from StoreKit and stored nowhere, by design — a dated paragraph
@@ -756,7 +777,8 @@ reminders off has to *clear* what is already filed with the system, not merely s
 *(2026-10-14, the redesign's stage 5: who sets it, all app-only. Turning reminders **on** — Settings'
 switch, or *Turn on reminders* on the welcome's last step — stores iOS's answer through
 `ReminderPermission.enable(on:using:)`, which asks only when iOS has not been asked. Settings'
-switch turning **off** writes `false` itself (`SettingsView.swift:189`). And
+switch turning **off** writes `false` itself (`SettingsView.swift:213` since set A's step 1; `:189` at
+`HEAD`). And
 `ReminderPermission.reconcile(_:using:)` clears it when iOS reads *denied* and changes nothing
 otherwise; it runs whenever the app comes forward (`WaterBuddyApp`) and whenever Settings appears
 or comes back to the foreground (`SettingsView.readSystemState()`). Every write is the one setter,
@@ -1202,6 +1224,23 @@ and answers offline, and a cached flag could still say Premium after a refund. U
 the state is `.checking`, and nothing Premium draws. The widget and the watch do not learn it; a
 later item that needs them to writes a *derived* key through `DataManager`, and this sheet gains its
 row then.
+
+*(2026-10-21, evening, 1.4.1's Task 6, staged.)* The read now happens where the paragraph above says:
+`WaterBuddyApp.init()` builds the store right after `prepareSharedStorage()` — before the DEBUG fresh
+start returns, so a UI test's run has one too — and reads it again on every `.active`. Still no key.
+**Specified for set A's step 1 and not on disk** (`docs/superpowers/specs/2026-10-21-premium-paywall-and-monthly-design.md`):
+a third product, the monthly plan, and the owner's grace ruling — `PremiumAccess.resolve` will take
+StoreKit's current entitlements as the answer to whether a subscription is held, with no clock of its
+own (`docs/AI_CONTEXT.md` #161). Neither adds a key.
+
+*(2026-10-22, set A's step 1, Tasks 3–7, staged.)* Both are on disk now. The answer in memory is one of
+`.free`, `.monthly(until:)`, `.yearly(until:)` or `.lifetime`, and `PremiumStore` also keeps
+`holdsSubscription` — whether a subscription stands beside whatever `resolve` answers, for *Manage
+Subscription* — and `restoring`; all three published, none stored. `resolve(_:)` takes no clock: a
+subscription is held for as long as StoreKit lists it, so one in its billing grace period stays
+Premium, and the status line names the plan alone once its date has passed. A read that a newer read
+overtook publishes nothing. Still no key on `DataManager.Key`, no App Group write and no `UserDefaults`
+read; `PremiumSet.understand` and its `isOnSale` are compiled constants, not stored state.
 
 ## Tests that pin this
 

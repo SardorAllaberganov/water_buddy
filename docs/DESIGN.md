@@ -7,6 +7,38 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-22 (eighty-second pass — step 1's Task 10, after its walk and its colour
+pairs). **No shared token changed; the paywall and the Premium card were measured** — a new section,
+*The paywall, measured*: 74 readings off a minute at each of three places on iOS 27.0, none under its
+floor, after the owner's four rulings (R1–R4) on what the first measure found. What the eighty-first
+pass transcribed below no longer stands for the paywall: the badge has no pill and no cyan, the feature
+glyphs have no tiles and are all cyan, the trial note and the promise's check are white, the subtitle is
+full white, and the subtitle, the rows and the included line sit on one `.frosted` card. The card's
+header sparkle is white; its rim is unchanged.
+
+**Last updated:** 2026-10-22 (eighty-first pass — `/doc_sync` after set A's step 1, Tasks 0–7, staged).
+**No shared token changed, and nothing was measured.** Step 1 adds Premium's own measures, all
+app-only and transcribed here from the source:
+`PremiumRim.width` 1.5 pt — `Aurora.cyan` → `Aurora.magenta` → `Aurora.blue`, top-leading to
+bottom-trailing, stroked inside `LiquidGlass.cornerRadius` (28) over the Settings card's standard
+`.frosted` + `.raised` pane; `PaywallStyle` — the welcome's text opacities, white **0.92** for lines
+and **0.88** for the terms, 44 pt for the close button and every footer link, 56 pt for the primary
+surface, plan tiles at least 124 pt tall with a 10 pt gap, the *Best value* badge raised 11 pt across
+the yearly tile's edge on `.opaque` glass in `Aurora.cyan`, the preview's dots 14 pt and bars 34 pt
+in `Aurora.cyan` and white 0.22 / 0.6; `PremiumCardStyle.buttonHeight` 56. Every new colour pair — the
+tiles' lines on their `.frosted` panes, the promise and the badge on glass, the terms and the footer
+on the aurora, the card's previews — is **unmeasured**: the step-1 plan's Task 8 measures each off a
+render, and one short of 4.5:1 is raised to the lowest value that passes.
+
+**Last updated:** 2026-10-21 (eightieth pass — `/doc_sync` after roadmap item 1.4.1's Task 6). **No
+token changed and nothing was measured.** The paywall and Settings card staged by 1.4.1's Task 6 draw
+new colour pairs (white 0.92 and 0.88 on glass and on the aurora) that were never measured: the
+owner judged that design on their iPhone and had it redesigned before it shipped. The approved
+design — the canvas https://claude.ai/artifact/1dyjwFfRVsLYzcvwQ6poGy and spec
+`2026-10-21-premium-paywall-and-monthly-design.md` §3.4–3.5 — adds a `.premiumRim()` stroked in
+`Aurora.cyan`, `Aurora.magenta` and `Aurora.blue`, and `Aurora.cyan` text on glass; the step-1 plan's
+Task 8 measures every pair off renders before this sheet records them.
+
 **Last updated:** 2026-10-21 (seventy-eighth pass — `/doc_sync` after roadmap item 1.3.2's stage 7c,
 staged, before its `/commit`). **No token changed.** The watch's three faces draw no glass and no
 aurora; the one token they read is `Aurora.blue`, the gauges' tint, as the circle's was before 7c.
@@ -1972,6 +2004,85 @@ line also named Reduce Motion, "for which the simulator has no switch", until th
 pass of `docs/AI_CONTEXT.md`. Its Settings app has one, and the standalone bar was looked at
 under it on iOS 27.0 — the note of 2026-10-12 above. Apple's bar inside a `TabView` never
 was, and is no longer drawn.)*
+
+## The paywall, measured
+
+**2026-10-22, set A's step 1, Task 8** (spec `docs/superpowers/specs/2026-10-21-premium-paywall-and-monthly-design.md`
+§3.4–3.5; plan `docs/superpowers/plans/2026-10-21-premium-paywall-and-monthly.md`, Task 8 Step 3).
+It supersedes the eighty-first pass's transcription of `PaywallStyle` and the badge.
+
+**What is drawn now.** The sheet on the aurora: the close button (white glyph, `.sheer` disc, a
+control) and the promise — *Logging water is free, always.*, white, its check white — on `.frosted`
+glass, a capsule beside the button and a rounded row of its own at the accessibility sizes; the
+decorative preview on `.frosted`; **the title alone on the aurora**, `.largeTitle` heavy, white, with
+`legibleOnBackdrop()`'s two shadows; **one `.frosted` + `.resting` card** (16 pt padding) holding the
+subtitle (`.body`, **full white**), the four feature rows — each glyph `Aurora.cyan` in a 28-pt box
+that scales to 42, at 0.72 of it (20 pt, the Settings card's previews' size), no tile; the title
+`.subheadline` bold white, the line `.footnote` at white 0.92 — and *New Premium features arrive in
+updates, included.* at 0.92; the three plan tiles on `.frosted` glass, one height, the selected one
+marked with `LiquidGlass.Selection`; on the yearly, **BEST VALUE** as its first line (`.caption2`
+heavy, uppercase, the tile's white), the other two keeping an invisible copy of that line side by
+side so the names and prices stand level; names white, prices `.title2` heavy white, the period, the
+saving (its own line) and the note at 0.92 — the yearly's free week too; the primary surface; the terms
+at 0.88 and the footer at 0.92 on the aurora, both with the two shadows. The Settings card: the rim
+unchanged, its header sparkle **white**, the title white, the note 0.92, the previews' captions white
+and their glyphs `Aurora.cyan`.
+
+**Method.** As *Welcome, measured*, with the bands built from the pixels rather than the tree: a
+throwaway XCUITest method in a scratch copy of the index held each place for a minute, a frame every
+3 s — the card in Settings, the sheet's top, the sheet's end — on *WaterBuddy Probe 27* (iPhone 17,
+iOS 27.0), sRGB frames. Each element's own ink was found in a box drawn round it; its ground read on a
+ring 2–6 pt out (beside its glyphs) and, for text on the aurora, also 10–14 pt out (clean ground, #95);
+every other ink on any frame — text, rims, marks — masked out and dilated 3 px, the aurora's cyan
+light (green ≤ 159 over the frames) kept as ground; white composited at its opacity over each ground
+pixel; a cyan mark at its own rendered colour. Worst frame. Every ring was drawn on a capture and looked
+at before a figure was kept: two earlier sets of boxes were thrown away — hand boxes caught the badge's
+rim and a glyph tile's rim, and a band finder sampling every second column let a stroke through, each
+reading 1.00.
+
+**The first measure found these under their floor**, worst frame: the sheet's text on the aurora,
+which had no shadows — the subtitle 2.77–3.46, the feature rows 2.77–4.03, the included line 4.16
+(the title held its 3, at 3.05); the glyph tiles on `.sheer` — cyan 1.50, blue and magenta 1.00, white
+2.89; the promise on `.sheer` 3.49 and its cyan check 1.76; the *Best value* badge, cyan on its
+`.opaque` pill, **1.74** — the pill's own sheen runs from L 0.29 under its first letters to 0.10 under
+its last, and cyan reaches about 4.1 even there; the trial note, cyan on the selected tile, 4.10; the
+card's cyan sparkle in its lit corner, 2.88. The shadows and `.frosted` went in on precedent (every
+other screen's text on the aurora carries the shadows; the welcome's bells went sheer → frosted) and
+lifted the text on the aurora by only 0.1–0.4: the aurora's cyan light passes behind the top of the
+sheet. **The owner ruled the rest** (R1–R4, the recommended options): R1, one `.frosted` card for the
+subtitle, the rows and the included line, the glyphs without tiles; R2, every feature glyph cyan — blue
+and magenta read 1.5–1.7 even on frosted glass; R3, the badge's pill dropped, BEST VALUE the yearly
+tile's first line in white; R4, the note, the check and the sparkle white. On the card the subtitle then
+read 4.32 by its lit corner at 0.92 — read off the same frames at 0.94 / 0.96 / 0.98 / 1.0: 4.43 / 4.54
+/ 4.65 / 4.77 — and went to full white, not 0.96, which cleared by 0.04 inside the ~0.06 two captures
+of one pair differed by (the welcome's card line, R5, the precedent).
+
+**On the final source, 74 readings, none under its floor** — iOS 27.0 only (#165). Top / end of the
+sheet, where an element is at both; beside the glyphs unless marked clean:
+
+| Pair | Floor | Reading |
+|---|---|---|
+| The title (1.0, large), beside / clean | 3 | 3.20 / 3.20 · 6.52 / 4.07 |
+| The subtitle (1.0), on the card | 4.5 | 4.77 · 4.98 |
+| A feature row's title (1.0), worst of four | 4.5 | 6.28 · 6.35 |
+| A feature row's line (0.92), worst of four | 4.5 | 5.94 · 5.92 |
+| The included line (0.92) | 4.5 | 7.68 · 7.78 |
+| A feature glyph (cyan), calendar / bars / sparkles / recap | 3 | 3.41 / 4.26 / 5.21 / 5.56 · 3.35 / 3.84 / 4.37 / 4.70 |
+| BEST VALUE (1.0), on the selected tile | 4.5 | 4.63 · 4.61 |
+| A tile's name (1.0) — Monthly / Yearly / Lifetime | 4.5 | 6.86 / 5.28 / 6.00 · 6.65 / 5.25 / 6.28 |
+| A price (1.0, large) — $2.99 / $19.99 | 3 | 8.44 / 6.36 · 8.27 / 6.43 |
+| The monthly's lines (0.92) — *a month* / *Cancel any time* | 4.5 | 8.49 / 8.73 · 8.46 / 8.43 |
+| The yearly's lines (0.92) — *a year* / *save 20%* / *1 week free* | 4.5 | 6.53 / 6.89 / 6.94 · 6.51 / 6.63 / 6.51 |
+| The lifetime's lines (0.92) — *once* / *Yours for good* | 4.5 | 7.60 / 7.97 · 7.49 / 7.67 |
+| The close glyph (1.0) / the promise (1.0) / its check (1.0) | 3 / 4.5 / 3 | 7.33 / 5.90 / 4.98 |
+| The terms (0.88), beside / clean | 4.5 | 4.65 / 4.66 |
+| The footer (0.92), beside / clean | 4.5 | 5.15 / 5.05 |
+| The card: title (1.0) / note (0.92) / captions (1.0), worst | 4.5 | 5.80 / 5.45 / 6.43 |
+| The card: header sparkle (1.0) / preview glyphs (cyan), worst | 3 | 5.06 / 3.42 |
+
+**Not measured:** iOS 26.5 and 18.6 (#165); Increase Contrast; the thank-you and held screens' lines
+(the walk saw them, its frames were not held); the sheet's lines in Russian and Uzbek, which wrap
+differently over the same grounds.
 
 ## The header and a screen arriving
 

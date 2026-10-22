@@ -3,6 +3,27 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-22 (eighty-second pass — step 1's Task 10). Checked: **still no file under
+`WaterBuddyWidget/` and none of the six shared files changed in step 1** — its walk's fixes are in
+`PaywallView.swift`, `PremiumAccess.swift`, `PremiumStore.swift` and `SettingsView.swift`, all app-only
+— and no contract here did. `WaterBuddyWidgetExtension` built in step 1's gate, `** BUILD SUCCEEDED **`,
+and a clean build of a copy of its index gives the same 17 warning messages as the `HEAD` export.
+
+**Last updated:** 2026-10-22 (eighty-first pass — `/doc_sync` after set A's step 1, Tasks 0–7). **No
+file under `WaterBuddyWidget/` changed, none of the six shared files did** (`DataManager.swift`'s
+staged diff is still 1.4.1's DocC sentence, untouched by step 1), **and no contract here did.**
+Everything step 1 adds — the monthly plan, set A, the paywall, `PremiumRim` — is app-only and
+compiled into no extension. `WaterBuddyWidgetExtension` was not built after step 1's code in this
+session (Task 0 built it from a `HEAD` export only: 17 messages by file and message); step 1's own
+build is Task 9's.
+
+**Last updated:** 2026-10-21 (eightieth pass — `/doc_sync` after roadmap item 1.4.1's Task 6). **No
+file under `WaterBuddyWidget/` changed, and no contract here did.** One of the six shared files,
+`DataManager.swift`, changed in a DocC sentence only (rule `70-privacy`'s StoreKit section renamed).
+`WaterBuddyWidgetExtension` built in this session's gate, `** BUILD SUCCEEDED **`, and a clean build
+of the staged index printed the same 17 messages by file and message — 29 unique lines — as the
+1.4.1 baseline. Premium reaches no widget: nothing it adds is compiled into the extension.
+
 **Last updated:** 2026-10-21 (roadmap item 1.3.2's stage 7c, written by the session that built it —
 not a `/doc_sync` pass). **No file under `WaterBuddyWidget/` changed, and no contract here did.** The
 watch's complication gained a rectangle and a corner beside its circle; that contract is the watch

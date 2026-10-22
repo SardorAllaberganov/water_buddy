@@ -4464,3 +4464,198 @@ compile, *errors thrown from here are not handled*, in the macro's expansion.
 
 **The rule:** give a main-actor default as a `convenience init()` that builds it in the body, not as
 a default argument. Inside a closure, bind a throwing call to a `let` first and `#expect` the value.
+
+## 2026-10-21 — A screen that sells was built before anyone saw it
+
+**What happened.** 1.4.1's paywall and Settings card were specified in words, planned with full
+code, built, reviewed and gated — and the owner, seeing them on their iPhone, judged them "very poor"
+and noted that Premium had nothing in it to sell. The spec had approved a layout in prose; nobody had
+looked at a picture of it. The redesign was settled in an hour on a design canvas, before any code.
+
+**The rule:** a screen whose job is to persuade — a paywall, an onboarding, a store page — is shown
+to the owner as a drawn design and approved before its spec is written, and what it sells is decided
+before how it looks.
+
+## 2026-10-21 — An unasked screenshot of the owner's phone caught another app
+
+**What happened.** While the owner worked on their connected iPhone, the session took a screenshot
+through `devicectl device capture screenshot` without being asked, to see where the app stood. It
+caught a different app's payment receipt. The file was deleted at once and its contents not used.
+
+**The rule:** a capture of the owner's own device is taken only after the owner says "done" for that
+step — never to look around. Anything captured unasked is deleted unread beyond the glance that found
+it, and the owner is told.
+
+## 2026-10-21 — A device run with the flag in the wrong list, then not relaunched
+
+**What happened.** On the owner's iPhone the paywall never showed. The scheme carried
+`-WaterBuddyPremium YES` as an **environment variable**, which `ProcessInfo.arguments` never sees;
+then, with the flag moved to the launch arguments, the app was not relaunched — `devicectl device
+info processes` showed the same process ID before and after the owner's ⌘R, and Xcode's last build log
+was older than the change. `devicectl device process launch` took the app's arguments only after a
+`--` — without it, it read `-WaterBuddyPremium` as its own option.
+
+**The rule:** to prove a device run picked up a launch argument, read the scheme's
+`CommandLineArguments` (not `EnvironmentVariables`) and compare the process ID before and after.
+Pass an app's arguments to `devicectl … launch` after `--`.
+
+## 2026-10-21 — A warning check by our own file names missed an SDK's line
+
+**What happened.** 1.4.1's Task 4 checked for new warnings by grepping the build for the names of the
+files it touched, found none, and moved on. Task 6's clean-build comparison found a new line anyway:
+Apple's `StoreKitTest` header, `SKTestTransaction.h:34`, emitted because the tests began importing
+`StoreKitTest`. The path was the SDK's, so no grep for our names could see it.
+
+**The rule:** a task that adds an import compares the whole warning set — every
+`file:line:col: warning:` line, SDK paths included — against its baseline, by file and message. A
+grep for our own names is a smell test, not the check.
+
+## 2026-10-21 — A load wait not chained to the run it guarded
+
+**What happened.** A UI RED run was started with `uptime` printed beside it but not waited on; the
+load was 61. Later in the session the wait was an `until` loop in the same command as the
+`xcodebuild`, and runs still started at under 6 and ended at 147, 353 and 875 — other projects and
+macOS's storage service, not this one.
+
+**The rule:** put the load wait and the run in one command, so nothing starts between them, and
+record the load at the start **and** at the end — a run that ended under a spike is not evidence
+either way.
+
+## 2026-10-21 — The deny list stopped the sync again, and a zsh loop misread every row
+
+**What happened.** The eightieth `/doc_sync` wrote a line-count check as a script and ran `chmod +x`
+on it — refused by the deny list, as the 2026-10-07 entry *A read-only check needs no script file*
+records, and the sync stopped until the owner said go on. The pipeline that replaced it, a
+`while read` loop, printed *bad output format specification* on every line under zsh and reported
+every row missing; a `join` of two sorted lists (`wc -l` against the rows) did the check in one
+pass.
+
+**The rule:** before the first command of its kind in a session, grep this file for the tool — here,
+`chmod` and `script` (the 2026-10-21 entry *Two lessons this file already held were broken again*).
+Compare two lists with `join` or `comm`, not a shell loop.
+
+## 2026-10-22 — StoreKit testing read the configuration's prices under the device's region
+
+**What happened.** Step 1's probe printed `Product.price` for the three local products: 2, 19 and 39,
+while `displayPrice` drew $2.99, $19.99 and $39.99. Every simulator on this Mac is `en_UZ`, whose
+decimal separator is a comma, and on the host `Decimal(string: "39.99", locale: en_UZ)` is 39.
+`-testRegion US` changed nothing — it sets the app's locale, not the device's. The plan had expected
+2.99, 19.99 and 39.99, and the yearly's saving, computed from `price`, would have read 20 % in every
+local run instead of 44 %, with every unit test green, because those tests use literal `Decimal`s.
+
+**The rule:** a figure computed from `Product.price` is probed in the local configuration on this
+Mac's own simulators before it is trusted, and its unit tests never stand in for that probe. Read
+`price` beside `displayPrice`; a whole number beside a fractional display is the device's region, not
+the product (`docs/AI_CONTEXT.md` #162).
+
+## 2026-10-22 — A launch argument in the Run action reached the unit tests
+
+**What happened.** `theTestRunItselfIsNotOfferedThePaywall` failed in the working tree although the
+code was right. The owner had added `-WaterBuddyPremium YES` to the `WaterBuddy` scheme's Run action
+for a device walk, and the Test action's `shouldUseLaunchSchemeArgsEnv = "YES"` hands the Run
+action's arguments to the test host. A copy of the index, with `HEAD`'s scheme, ran it green.
+
+**The rule:** when a test about launch arguments fails, read the scheme's `CommandLineArguments` and
+the Test action's `shouldUseLaunchSchemeArgsEnv` before the code, and prove the code on a copy of the
+index (`git checkout-index -a --prefix=…`) whenever the working tree carries an unstaged scheme
+(`docs/AI_CONTEXT.md` #163).
+
+## 2026-10-22 — I changed the code for an XCUITest count this file had already explained
+
+**What happened.** The plan's UI check counted every element whose label began with a paywall
+feature's title and found two per row. I printed the matches, read the second as a leak, and changed
+the row from `.combine` to `.ignore` with a label and a value; the count stayed two. Only then did I
+find the 2026-10-17 entry: XCUITest lists the children of a collapsed element everywhere, Home's
+vessel included, so a listed child proves nothing about VoiceOver. The change was withdrawn; the owner
+ruled the check counts the whole row by its full label, and a run without the row's `.combine` showed
+that check fails (0 ≠ 1).
+
+**The rule:** before changing accessibility code to satisfy an XCUITest count, grep this file for
+`XCUITest lists`. A count over `descendants(matching: .any)` that matches a collapsed row's own text
+counts XCUITest's tree, not VoiceOver's; count the element by what only it carries, and prove the
+rewritten check fails on a mutation.
+
+## 2026-10-22 — A plan's full code still needs a compiler
+
+**What happened.** Step 1's plan, written with full code and approved, passed a `switch` expression as
+a function argument — `kind: switch product.id { … }` — which Swift does not allow: a `switch` or `if`
+expression may stand only as an initializer, an assignment, or a `return` (or a single-expression
+body). It failed at the stub, before any test ran.
+
+**The rule:** an `if` or `switch` expression in a plan's code is bound with `let` before it is
+passed. A plan's code is a draft until it compiles; a line that does not is a ruling in the ledger,
+never a silent rewrite.
+
+## 2026-10-22 — Under another session's load, one UI class overran the foreground limit
+
+**What happened.** `PremiumUITests` — two tests — took 13 minutes at a 1-minute load of 150 to 280
+from other projects' simulators, and the harness moved the `xcodebuild` to the background at 600 s.
+`timeout` does not exist on macOS (exit 127), so it cannot bound a run. Single-test runs took two
+minutes at the same loads.
+
+**The rule:** under a load above 100, run one UI test by its `-only-testing:` path rather than its
+class while diagnosing, and read a backgrounded run's log in full when it lands — never report it as
+a foreground result. `gtimeout` is not installed either; bound nothing, and say what ran where.
+
+## 2026-10-22 — A `sed -i` on a scratch file was refused, mid-walk
+
+**What happened.** During step 1's walk the harness — a throwaway XCUITest file in the session's
+scratch copy, never in the tree — needed one line changed (`.firstMatch` on an ambiguous *Settings*
+tap). The command was a `sed -i` chained to the re-run, and the permission rules refused it. The
+session stopped and said so; the owner said "ok" to the same change made with `Edit`. An earlier
+patch to the same file had gone through a `python3` rewrite, which was allowed but was not `Edit`.
+
+**The rule:** `Edit` and `Write` for every file change, the scratchpad's included; `sed -i`, a
+heredoc or a script that rewrites a file is not an edit tool wherever the file lives. A refusal is
+reported and the work waits — the owner's word, not a different command, is what moves it.
+
+## 2026-10-22 — A run with known reds is a run meant to fail
+
+**What happened.** A GREEN run of eight suites carried two failures already on record (the privacy
+URL, and the scheme argument then still in the working tree). It was started without
+`-collect-test-diagnostics never`, the run before it had the flag, and after the tests had finished in a
+minute `xcodebuild` sat in `simctl diagnose` for nine more, overran the 600-second call and went to the
+background. This file's lesson of 2026-10-07 (*A failing run can cost ten minutes*) says to pass the
+flag on runs *meant to fail* — RED and mutation runs — and this one was not thought of as one.
+
+**The rule:** any run that will name a failure — RED, a mutation, or GREEN with a known red still in
+the tree — passes `-collect-test-diagnostics never`. Every `xcodebuild test` this project runs while a
+known red stands is such a run.
+
+## 2026-10-22 — The paywall's text on the aurora shipped through plan and review without its shadows
+
+**What happened.** Every screen's text straight on the aurora carries `legibleOnBackdrop()`'s two
+shadows — Home, the headers, the welcome — but the paywall, written whole from a canvas in step 1, put
+its title, subtitle, feature rows, terms and footer on the aurora without them, and neither the plan
+nor the final review noticed. Measured, the lines read 2.8 to 4.0:1 where the aurora's cyan light
+passes behind the top of the sheet; with the shadows they gained only 0.1 to 0.4, and the owner moved
+them onto a `.frosted` card. The same measurement found cyan small text and glyphs on glass under
+their floors (the badge 1.74, a note 4.1, glyphs 1.0 to 2.9), which the spec had drawn by eye.
+
+**The rule:** a new screen's text on the aurora is listed in its plan with `legibleOnBackdrop()` and a
+clean-ground reading still to take, and sentence-length text goes on `.frosted` glass from the start
+(rule `60-design-system`). Cyan is for glyphs on dark glass, checked at 3:1; small cyan text on glass is
+assumed to fail until a render says otherwise.
+
+## 2026-10-22 — Contrast read by bands and boxes read the rim, not the ground
+
+**What happened.** The first two passes at the paywall's colour pairs read 1.00 in several places —
+impossible for clean ground. Hand-placed boxes caught the badge's lit rim; a finder of text-free rows
+that sampled every second column let thin strokes and descenders through. A loose cyan test also
+treated the aurora's own cyan light (green up to 159) as ink and would have thrown its brightest ground
+away.
+
+**The rule:** read ground on a ring around each element's own ink, with every other ink on every frame
+masked and dilated, and the ink tests set from the backdrop's measured extremes; any reading near 1.0,
+or any ring not looked at on a capture, is a measuring error until proved otherwise.
+
+## 2026-10-22 — A count check that printed nothing had read 101 rows of 102
+
+**What happened.** The eighty-third `/doc_sync` compared every *Files on disk* count with `wc -l` in a
+loop that printed only the stale ones, and it printed nothing. Counting what it had read gave 101
+rows against 102 files: `WaterBuddyWatchWidgetBundle.swift`'s row ends with its count, and the row
+pattern wanted text after the number. That row was right, but the loop's silence would have read the
+same had it been wrong.
+
+**The rule:** a check that reports only failures also prints how many items it read, compared with how
+many exist; silence counts as a pass only when the two numbers agree, and the gap is read by hand.

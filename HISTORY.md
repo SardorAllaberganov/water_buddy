@@ -11890,3 +11890,295 @@ modified, 8 added: 1.4.1's roadmap amendment, spec, plan and Tasks 3–5's eight
 the owner; `.claude/settings.json` (the owner's); and four of Xcode's rewrites (#50) — the
 `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings` and
 `WaterBuddyWatch/Localizable.xcstrings`. **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-21] — 1.4.1's Task 6 built and gated, Premium redirected to a designed set A, step 1 specified and planned; and the eightieth `/doc_sync`
+
+### What
+
+On HEAD `b981374` (1.4.1's Tasks 0–5 committed as `e7b7f38`, their doc sync `3d577bb`, the rule
+wording `b981374`), in one session the owner opened with `/start_task` and no task named.
+
+- **1.4.1's Task 6, built without the privacy URL** on the owner's word ("go now without privacy
+  policy URL and I will give you later"): `WaterBuddy/PaywallView.swift` (new), `PremiumCard` as
+  Settings' fifth card, the store built in `WaterBuddyApp.init()` and read on every `.active`, the
+  previews' silent store, two DocC sentences, `PaywallOfferTests` (4), `PremiumUITests` (2). The
+  token `OWNER-PRIVACY-URL` stays, and `theLinksAreApplesTermsAndAPageOfOurs` fails until the URL.
+- **The final review** (fresh, read-only, opus): no Critical; Important 1 fixed test-first —
+  `prepare()` keeps a purchase under way (`openingTheSheetAgainWhileBuyingKeepsThePurchase`, RED →
+  GREEN); Important 2 — a subscriber in grace read as free — ruled by the owner and carried into
+  step 1; ten minors, carried into step 1.
+- **The gate** on that code, and the warning comparison (*What was run*).
+- **On the owner's iPhone**: no paywall — the flag was an environment variable, then the app was not
+  relaunched; launched with the argument by `devicectl`. An unasked screenshot of the phone caught
+  another app's receipt; deleted, the owner told.
+- **The redirection**: the owner judged the paywall "very poor", with nothing to sell. On a design
+  canvas (https://claude.ai/artifact/1dyjwFfRVsLYzcvwQ6poGy, private) the owner chose, one answer at
+  a time: set A — Understand — first; a monthly plan ($2.99, no trial; yearly $19.99 with a free
+  week; lifetime $39.99); personal AI insights on Apple's on-device model, named *Personal AI
+  insights* using Apple Intelligence; five steps, set A on sale after the last.
+- **Step 1's spec and plan**, both approved ("ok") and staged:
+  `docs/superpowers/specs/2026-10-21-premium-paywall-and-monthly-design.md` and
+  `docs/superpowers/plans/2026-10-21-premium-paywall-and-monthly.md`. No code of them yet.
+
+### The rulings this rests on
+
+The owner's: build Task 6 without the URL; the four answers above; the step-1 design "ok", with the
+grace ruling inside it; the spec "ok"; the plan "ok".
+
+Mine, each in the ledger (`.superpowers/sdd/2026-10-21-premium-foundation/progress.md`) with what it
+costs if wrong: the URL test left red rather than narrowed or disabled; the gate and the review run
+before the owner's walk; *Not now* left live mid-purchase (a purchase that never answers must not
+trap the user); the grace finding left in code for the owner; the new warning reported, not
+suppressed; the UI failure called #140's flake after an interleaved run against a `HEAD` export.
+
+### What was run, and what it showed
+
+- **RED → GREEN** for Task 6: unit 4 of 4 failed on the stub, then 3 passed and the URL test failed
+  on its `https` alone; UI 1 of 2 failed at *no Premium card*, then 2 of 2 passed. The review's fix:
+  3 issues RED, then `✔ Test run with 41 tests in 3 suites passed`.
+- **The gate**, 19:09–21:18: unit, *iPhone 17* (27.0), `✘ Test run with 734 tests in 92 suites failed
+  … with 1 issue` — 732 passed, 1 skipped (#157), the URL test; UI, *Gate 27*, 19 + 19 + 33 = 71
+  executed, 1 skipped, 1 failure — `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway` at `:355`;
+  UI, *Gate 26.5*, 71, 1 skipped, 0 failures; watch, *WaterBuddy Watch 27*, `✔ Test run with 70 tests
+  in 7 suites passed`; `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` `** BUILD SUCCEEDED **`.
+- **The #140 check**, alone on *Gate 27*, interleaved with a `HEAD` export: the change 1 passed and 2
+  failed at `:358`; `HEAD` 2 passed and 1 failed at `:358`; every failure under a load spike that
+  rose during the run (147, 353; one at 875 not counted).
+- **The warning comparison**, clean builds of the staged index against `0be24f9`'s baseline, by file
+  and message: one new line on `-scheme WaterBuddy`, Apple's `StoreKitTest` header (#160); the other
+  three schemes unchanged. Unique primary lines 36 / 29 / 2 / 2.
+
+### The eightieth `/doc_sync`
+
+Run by the owner twice — the first stopped when its script-and-`chmod` check was refused by the deny
+list (the 2026-10-07 lesson, broken again), the second, after the owner's go, by a `join` pipeline.
+Checked: 103 tracked or staged `.swift` files — two without rows (`PaywallView.swift`,
+`PremiumUITests.swift`), five counts stale (`PremiumStore.swift`, `SettingsView.swift`,
+`WaterBuddyApp.swift`, `PremiumAccessTests.swift`, `PremiumStoreTests.swift`), the rest equal to
+`wc -l`; 734 `@Test`, 70 on the watch, 58 UI `func test`; the exception sets unchanged since
+`eba1b1e`; 13 keys; every cited rule resolves; no forbidden doc. Changed: `docs/AI_CONTEXT.md` (the
+head, *Targets*' two test rows, ten rows in *Files on disk*, *Current state*'s new block, notes on
+#50, #140, #155, #157 and #159, new #160 and #161, *Git*), `docs/STATE.md`, `docs/WIDGET.md` and
+`docs/DESIGN.md` (dated notes; no key or token moved), `docs/ROADMAP.md` (monthly pricing in §1, set
+A first and its five steps, item 1.4.12, 1.4.1's note, a §8 row for `FoundationModels`), `CLAUDE.md`
+(the warning trail), `tasks/lessons.md` (six entries).
+
+### Files touched
+
+`WaterBuddy/PaywallView.swift` (new) · `WaterBuddy/SettingsView.swift` · `WaterBuddy/WaterBuddyApp.swift`
+· `WaterBuddy/RootTabView.swift` · `WaterBuddy/HomeView.swift` · `WaterBuddy/DataManager.swift` ·
+`WaterBuddy/PremiumStore.swift` · `WaterBuddyTests/PremiumAccessTests.swift` ·
+`WaterBuddyTests/PremiumStoreTests.swift` · `WaterBuddyUITests/PremiumUITests.swift` (new) · the
+step-1 spec and plan (new) · `CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/WIDGET.md` ·
+`docs/DESIGN.md` · `docs/ROADMAP.md` · `tasks/lessons.md` · `HISTORY.md`.
+
+### Gate
+
+As above: run in this session on the code as it stands, with one known red (the privacy URL), one
+skip (#157) and one flake (#140) named. The owner's walk on a device: not done — Task 6's design was
+replaced before it.
+
+**Staging.** Read from the commands at 23:08 on 2026-10-21, after this pass's `git add` of its eight
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No
+`git commit` was run.** HEAD `b981374`, 162 commits, `## main...origin/main`. **20 staged** — 16
+modified, 4 added: Task 6's ten files and the review's fix, step 1's spec and plan, and this pass's
+eight. **7 unstaged**: `.claude/settings.json` (the owner's), the `WaterBuddy` scheme the owner edited
+in Xcode, and five of Xcode's rewrites (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-22] — Set A's step 1 built through Task 7 and staged; and the eighty-first `/doc_sync`
+
+### What
+
+On HEAD `b981374`, in one session the owner opened with `/start_task` and no task named; the owner
+said "go" to step 1's plan (`docs/superpowers/plans/2026-10-21-premium-paywall-and-monthly.md`), run
+inline, the ledger at `.superpowers/sdd/2026-10-21-premium-paywall-and-monthly/progress.md`.
+
+- **Task 0:** the warnings baseline — clean builds of a `HEAD` export, by file and message with line
+  numbers stripped: app 20, widget 17, watch 2, watch widget 2.
+- **Task 1, the probe** (a throwaway copy, removed): three products load; a monthly then a yearly in
+  one group leaves the yearly alone in current entitlements; percents *44%*, *44 %*, *44%*.
+  `Product.price` reads 2, 19 and 39 under this Mac's `en_UZ` simulators (#162); the owner kept
+  `Product.price` ("go").
+- **Task 2:** the spec's §5 wording typed into rules `70-privacy`, `60-design-system`,
+  `43-concurrency` and `85-testing`, unstaged for the owner.
+- **Tasks 3–7, each seen RED before its code and GREEN after:** the monthly plan and the owner's
+  grace ruling in `PremiumAccess` (#161 retired); set A, not on sale, and a Release switch that also
+  needs an `https` privacy link; the store's three plans, read number, restore states and manage
+  check; 27 strings; `PremiumRim.swift` (new); the paywall rewritten; Settings' Premium card first.
+- **Paused before Task 8**, the owner's walk on a device or *WaterBuddy Probe 27*.
+
+### The rulings this rests on
+
+The owner's: "go" after `/start_task`; "go" after the probe, keeping `Product.price`; WaterBuddy
+closed in Xcode before the `.storekit` and catalogue edits ("Closed it — go on"); the paywall's
+feature rows counted by their whole label in `PremiumUITests` ("Count the whole row").
+
+Mine, each in the ledger with its cost: `PremiumSetTests` in the two canary lists; the monthly's words
+held to Task 6 so their test failed first; a `switch` expression bound with `let` (the plan's did not
+compile); the owner's unstaged scheme argument left until Task 9 and Task 4 proved on a copy of the
+index (#163). One ruling withdrawn: the feature row moved to `.ignore` on a wrong diagnosis, and back
+to the plan's `.combine` once the 2026-10-17 lesson was found.
+
+### What was run, and what it showed
+
+- RED, then GREEN, per task — the counts in the ledger; Task 6's RED included `theMonthlyReadsAsDesigned`
+  and, in English too, `PremiumStringTests`.
+- **The phone unit suite**, *iPhone 17* (27.0), 2026-10-22 00:31–00:32: `✘ Test run with 764 tests in
+  94 suites failed … with 2 issues` — `theLinksAreApplesTermsAndAPageOfOurs` (#159) and
+  `theTestRunItselfIsNotOfferedThePaywall` (#163, green on a copy of the index in Task 4); one
+  skipped (#157).
+- **`PremiumUITests`** on *WaterBuddy Gate 27*, 00:29–00:30: `Executed 2 tests, with 0 failures`. A
+  mutation run without the feature row's `.combine` failed the whole-row check, 0 ≠ 1.
+- **Not run:** the whole UI suite on 27.0 and 26.5, the watch suite, both widget builds, the warning
+  comparison, the final review — the plan's Task 9.
+- The machine was shared throughout: 1-minute loads of 18 to 445 from other sessions' runs, recorded
+  at each run's start and end in the ledger; one UI class overran 600 s and was moved to the
+  background by the harness — its failure was the one being diagnosed, and it is not counted.
+
+### The eighty-first `/doc_sync`
+
+Run by the owner. Checked: 105 tracked or staged `.swift` files against *Files on disk* by one `join` —
+two without rows (`PremiumRim.swift`, `PremiumSetTests.swift`), nine counts stale (`PaywallView`,
+`PremiumAccess`, `PremiumSet`, `PremiumStore`, `SettingsView`, `LocalizationTests`,
+`PremiumAccessTests`, `PremiumStoreTests`, `PremiumUITests`), `WaterBuddyWatchWidgetBundle.swift`'s
+9 = 9 by hand; 764 `@Test`, 70 on the watch, 58 UI `func test`; `project.pbxproj` last changed in
+`eba1b1e`, its three exception sets six files each; 13 keys on `DataManager.Key`; every cited rule
+resolves (`comm` against `.claude/rules/`); no forbidden doc. **Drift found:** the app catalogue's row
+said 110 keys — 113 at `0be24f9`, 140 at `b981374`, 167 now. Changed: `docs/AI_CONTEXT.md` (the head,
+*Targets*' two test rows, twelve rows — two new, nine counts, one note on an unchanged count — and
+the `.storekit` paragraph in *Files on disk*, the catalogue
+row, *Current state*'s new block, notes on #139, #155, #157 and #159, #161 retired, #162 and #163 new,
+*Git*), `docs/STATE.md` (a dated note, no key), `docs/WIDGET.md` (checked, nothing moved),
+`docs/DESIGN.md` (Premium's measures transcribed, nothing measured), `docs/ROADMAP.md` (1.4.1's
+note), `CLAUDE.md` (the warning trail), `tasks/lessons.md` (five entries).
+
+### Files touched
+
+Code, staged: `WaterBuddy/PremiumAccess.swift` · `WaterBuddy/PremiumSet.swift` ·
+`WaterBuddy/PremiumStore.swift` · `WaterBuddy/PaywallView.swift` · `WaterBuddy/PremiumRim.swift` (new) ·
+`WaterBuddy/SettingsView.swift` · `WaterBuddy/WaterBuddyApp.swift` · `WaterBuddy/Localizable.xcstrings`
+· `WaterBuddyTests/WaterBuddy.storekit` · `WaterBuddyTests/PremiumAccessTests.swift` ·
+`WaterBuddyTests/PremiumSetTests.swift` (new) · `WaterBuddyTests/PremiumStoreTests.swift` ·
+`WaterBuddyTests/LocalizationTests.swift` · `WaterBuddyUITests/PremiumUITests.swift`. Rules, unstaged:
+`.claude/rules/70-privacy.md` · `60-design-system.md` · `43-concurrency.md` · `85-testing.md`. Docs:
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/WIDGET.md` · `docs/DESIGN.md` ·
+`docs/ROADMAP.md` · `tasks/lessons.md` · `HISTORY.md`.
+
+### Gate
+
+Not the full gate: the phone unit suite and `PremiumUITests` only, as above. The rest is Task 9's.
+
+**Staging.** Read from the commands at 00:42 on 2026-10-22, after this pass's `git add` of its eight
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No
+`git commit` was run.** HEAD `b981374`, 162 commits, `## main...origin/main`. **27 staged** — 21
+modified, 6 added: the eightieth pass's twenty, step 1's Tasks 3–7 (two files new among them:
+`PremiumRim.swift`, `PremiumSetTests.swift`), and this pass's docs. **11 unstaged**: the four rule
+files carrying step 1's wording, for the owner; `.claude/settings.json` (the owner's); the
+`WaterBuddy` scheme the owner edited in Xcode (#163); and five of Xcode's rewrites (#50). **1
+untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-22] — Set A's step 1 walked, measured and gated (Tasks 8–10); staged whole
+
+### What
+
+The same session, after the eighty-first `/doc_sync`, on the owner's "go" to Task 8 → 9 → 10.
+
+- **The final review** (a fresh reviewer, read-only, run beside the walk): I1 — *No purchases to
+  restore.* outlived a purchase, by any read, including one a newer read overtook — fixed in
+  `PremiumStore.refresh()`, three tests RED then GREEN; I2 — *Best value* on a yearly that saves
+  nothing — `Plan.showsBestValue(saving:)`, one test RED then GREEN. Six minors deferred (M1, M2,
+  M5–M8).
+- **Task 8, the walk,** on *WaterBuddy Probe 27*: the owner said "test it by yourself all things", so a
+  throwaway XCUITest class in a scratch copy of the index walked every step with an `SKTestSession` —
+  purchases, *Thank you*, the held card, refund, upgrade, Ask to Buy, restore, Russian, Uzbek, the
+  accessibility tree, the largest size, Reduce Transparency. Ten findings (W1–W10), each fixed and seen
+  fixed on a re-walk: the card's captions level (first baseline) and, at the largest size, a column
+  with a whole title; the yearly's saving on its own line (`save %1$@`); the Russian badge whole; the
+  promise on its own row at the largest size; the tiles one height; the feature glyphs inside their
+  boxes at the largest size.
+- **Task 8 Step 3, the colour pairs,** a minute at each of three places, read on rings around each
+  text's own ink. The first measure found the sheet's text on the aurora without the backdrop's shadows
+  (2.8–4.0:1), the `.sheer` glyph tiles and promise (1.0–3.5), the cyan badge on its pill's sheen
+  (1.74), the cyan trial note (4.1) and the card's cyan sparkle (2.88). The shadows and `.frosted` went
+  in on precedent; **the owner ruled the rest, R1–R4**: one `.frosted` card for the subtitle, the rows
+  and the included line; every feature glyph cyan; BEST VALUE the yearly tile's first line, white; the
+  note, the check and the sparkle white. The subtitle went to full white. **74 readings on the final
+  source, none under its floor** (iOS 27.0; `docs/DESIGN.md`, *The paywall, measured*).
+- **Task 9:** the scheme's stray argument and environment variable removed (#163 retired); the gate
+  (below); the warnings unchanged on all four schemes.
+- **Task 10:** the eighty-second pass of the records.
+
+### Rulings
+
+The owner's: "go"; "test it by yourself all things"; "ok" to the harness edit made with `Edit` after a
+`sed -i` was refused; WaterBuddy closed in Xcode before the catalogue and the scheme; R1–R4. The
+session's, each in the ledger with its cost: the walk driven by a scratch XCUITest harness; the
+yearly's saving split onto its own line (plan S1 superseded); `badgeLift` scaled without a ceiling (then
+removed by R3); the subtitle left out of the thank-you and held screens; the subtitle at full white
+rather than the plan's lowest passing 0.96; another project's booted simulator left running.
+
+### Files
+
+Code, staged: `WaterBuddy/PaywallView.swift` · `PremiumAccess.swift` · `PremiumStore.swift` ·
+`SettingsView.swift` · `Localizable.xcstrings`. Tests, staged: `WaterBuddyTests/PremiumStoreTests.swift`
+· `PremiumAccessTests.swift` · `LocalizationTests.swift`. The scheme, staged:
+`WaterBuddy.xcodeproj/xcshareddata/xcschemes/WaterBuddy.xcscheme`. Docs: `CLAUDE.md` ·
+`docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/WIDGET.md` · `docs/DESIGN.md` · `docs/ROADMAP.md` ·
+`tasks/lessons.md` · `HISTORY.md`. The rule files stay unstaged for the owner.
+
+### Gate
+
+Run in this session, `-collect-test-diagnostics never`, under another session's load (7 to 196):
+unit on *iPhone 17* — `✘ Test run with 768 tests in 94 suites failed … with 1 issue`, the privacy URL
+(#159), one skipped (#157); UI on *WaterBuddy Gate 27* — 71 executed, 1 skipped, two failures that
+passed alone (Home's *Undo* timing pair); UI on *WaterBuddy Gate 26.5* — 71 executed, 1 skipped, five
+failures that each passed on re-run (Home's first Glass, one of them interleaved with a `HEAD` export;
+#140's pair; `PremiumUITests` on its first runs there, #166); watch on *WaterBuddy Watch 27* — `✔ Test
+run with 70 tests in 7 suites passed`; `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` —
+`** BUILD SUCCEEDED **`. Warnings, a clean build of a copy of the index against Task 0's `HEAD` export:
+20 / 17 / 2 / 2, none new or gone.
+
+**Staging.** Read from the commands at 12:03 on 2026-10-22, after this pass's `git add` of its records
+by name; this file is added again once this block is written. **No `git commit` was run.** HEAD
+`b981374`, 162 commits. **28 staged** — 22 modified, 6 added: step 1's code and tests, the scheme, the
+spec and the plan, and the records. **10 unstaged**: the four rule files carrying step 1's wording, for
+the owner; `.claude/settings.json` (the owner's); and five of Xcode's rewrites (#50) — the watch's two
+schemes, `AppShortcuts.xcstrings` and the two watch catalogues. **1 untracked**: `Screenshots/census/`.
+None in both.
+
+## [2026-10-22] — The eighty-third `/doc_sync`: one drift in *Targets*, a lesson on silent checks
+
+### What
+
+The owner ran `/doc_sync` straight after step 1's own records (the eighty-second pass, the checkpoint
+above). The command's checks were run by a script in the session's scratchpad.
+
+- **Checked and current:** 102 `.swift` files in the seven target folders, each with a *Files on disk*
+  row whose count equals `wc -l` (101 matched by the row pattern; `WaterBuddyWatchWidgetBundle.swift`,
+  whose row ends with its count, 9 = 9 by hand); 768 phone `@Test`, 70 watch and 58 `func test` by the
+  attribute grep, the same in every current statement — the 764s left are dated history; 13 keys on
+  `DataManager.Key`, as `docs/STATE.md` says and `CLAUDE.md`'s eleven phone keys plus the watch's two;
+  the three `membershipExceptions` sets as `CLAUDE.md` names them; every `` rule `nn-name` `` cited
+  resolves; `StoreKit` imported in `HomeView.swift` and `PremiumStore.swift` alone. The replaced
+  surfaces (`badgeLift`, `tileTop`, the glyph tiles, the joined saving line) are named only where a doc
+  says what replaced them. `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, `docs/ROADMAP.md` and
+  `CLAUDE.md` were read against the code and left as the eighty-second pass wrote them. The unstaged
+  rule wording names nothing step 1 replaced (rule `60-design-system`'s rim stands).
+- **Drift, fixed:** *Targets*' `WaterBuddyWatchTests` row cited its 2026-10-20 run; it now cites
+  step 1's gate (70 of 70, 2026-10-22 11:50, *WaterBuddy Watch 27*).
+- **Lesson:** a count check that printed nothing had read 101 rows of 102 (`tasks/lessons.md`).
+
+### Files
+
+`docs/AI_CONTEXT.md` (the header, the watch-test row) · `tasks/lessons.md` · `HISTORY.md`. Nothing
+under the code or test targets, nothing under `.claude/`.
+
+### Gate
+
+Not run by this sync. The last gate is step 1's, earlier the same day (the checkpoint above).
+
+**Staging.** Read from the commands at 12:08 on 2026-10-22, after this sync's `git add` of
+`docs/AI_CONTEXT.md` and `tasks/lessons.md` by name; this file is added again once this block is
+written. **No `git commit` was run.** HEAD `b981374`, 162 commits. **28 staged** — 22 modified, 6
+added, the same set as above. **10 unstaged**, the same ten. **1 untracked**: `Screenshots/census/`.
+None in both.
