@@ -41,6 +41,9 @@ measured.
   day with `Selection.ringOpacity`'s ring on its track **and** `Selection.discFill` behind its
   letter, the letter heavier than the rest. Each mark is present at zero opacity when nothing is
   selected. Never a fill, a rim, a ring or a disc written as a literal in a view
+- Premium's card is marked with `.premiumRim()` — `Aurora.cyan`, `Aurora.magenta` and
+  `Aurora.blue` stroked around a standard pane — and nowhere else. Never a gradient stroke written
+  in a view
 - Glass goes over content, imagery or colour — never over a flat background
 - Choose density by what the pane carries: `.frosted` or `.opaque` behind sentence-length text,
   `.sheer` only for short labels and controls

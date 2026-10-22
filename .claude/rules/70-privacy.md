@@ -66,13 +66,13 @@ policy rather than a draft, closing that document's own §9.3.
 ## StoreKit, for the review request and for Premium
 
 `StoreKit` stays banned outside two files in the app target. `HomeView.swift` imports it for
-`@Environment(\.requestReview)` and nothing else. `PremiumStore.swift` imports it for Premium's two
-products, `PremiumAccess.productIDs` — a yearly subscription and a lifetime purchase. iOS draws the
-rating request and the purchase sheet; Apple takes the payment and holds the purchase under the
-user's own Apple Account; StoreKit verifies it on the device. The app sends nothing anywhere — no
-figure, no identifier, no account, no receipt — and stores nothing about a purchase: the paid state
-is read from StoreKit each time and kept in memory only. Neither use needs an entitlement or a
-usage-description key.
+`@Environment(\.requestReview)` and nothing else. `PremiumStore.swift` imports it for Premium's
+three products, `PremiumAccess.productIDs` — a monthly and a yearly subscription and a lifetime
+purchase. iOS draws the rating request and the purchase sheet; Apple takes the payment and holds the
+purchase under the user's own Apple Account; StoreKit verifies it on the device. The app sends
+nothing anywhere — no figure, no identifier, no account, no receipt — and stores nothing about a
+purchase: the paid state is read from StoreKit each time and kept in memory only. Neither use needs
+an entitlement or a usage-description key.
 
 Six limits are conditions of the permission:
 - **Two files.** No other file imports `StoreKit` — no view, no widget or watch file, and not
@@ -80,7 +80,8 @@ Six limits are conditions of the permission:
   environment and is handed plain values. Only the unit tests may import `StoreKitTest`, and only
   against `WaterBuddyTests/WaterBuddy.storekit`, never the App Store
 - **Named calls.** For the review request, `requestReview` alone. For Premium, `Product.products(for:)`
-  and its purchase call, `Transaction.updates`, `Transaction.currentEntitlements`, `finish()`,
+  and its purchase call, `Transaction.updates`, `Transaction.currentEntitlements`,
+  `Product.price`, `Product.SubscriptionInfo.isEligibleForIntroOffer`, `finish()`,
   `AppStore.sync()` and `AppStore.showManageSubscriptions(in:)`. No offer codes, promoted purchases,
   app account tokens or consumables until an amendment here names them. A *Rate WaterBuddy* link to
   the App Store is not part of this permission
@@ -91,7 +92,8 @@ Six limits are conditions of the permission:
 - **The paywall's moment.** Shown only when the user opens it — Settings' *See Premium*, or a later
   item's own locked state — never at launch, never in the welcome, never after a pour, and never
   from the widget, Siri, the control, a reminder's button or the watch. A Release build offers it
-  only while there is a set to sell (`PaywallView.isOffered(arguments:)`)
+  only while a set is on sale and the privacy policy link is set
+  (`PaywallView.isOffered(arguments:)`)
 - **Two links, on the user's own tap.** *Terms of Use* (Apple's standard licence) and *Privacy
   Policy* open in Safari. The app fetches neither
 - **What never moves behind it.** No way of logging, and nothing a free user can do today —

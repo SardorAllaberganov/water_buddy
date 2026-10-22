@@ -141,6 +141,6 @@ warning here is a Swift 6 error later.
 - Never add `@MainActor` to `WaterSnapshotTests`, `WidgetLanguageTests`, `AppLanguageTests`,
   `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
-  `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests` or
-  `PaywallOfferTests` to make them compile. They are compile-time canaries: fix the declaration they
-  read instead
+  `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
+  `PremiumSetTests`, `PaywallOfferTests` or `PaywallScreenTests` to make them compile. They are
+  compile-time canaries: fix the declaration they read instead
