@@ -4,6 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` after set A's step 2 was specified and
+planned). **No key and no stored byte moved; nothing was built.** Step 1, recorded below as staged, is
+committed (`d5cf816`). Step 2's plan (`docs/superpowers/plans/2026-10-22-month-view.md`) adds to the
+model two published values, `month` and `monthLogs`, read from the rows only while History asks for a
+month and stored nowhere — no key, no schema change (its spec §3.7). This sheet records them when they
+are built, with the probe's measured cost.
+
 **Last updated:** 2026-10-22 (eighty-second pass — step 1's Task 10, after its walk, its fixes and its
 gate). **Still no key moved**: 13 `static let`s on `DataManager.Key`, counted from the source. The
 review's fix to `PremiumStore.refresh()` — a purchase clears *No purchases to restore.* — changes a

@@ -7,6 +7,13 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` after set A's step 2 was specified and
+planned). **No token changed and nothing was measured; nothing was built.** Step 1 is committed
+(`d5cf816`). Step 2's design is drawn on the canvas (row *Set A, step 2*) and its plan lists the pairs
+its walk measures — the switch's labels, the rings against their track, the day numbers (a quiet day's
+starting at white 0.7), the legend, the opened day's heading on the aurora, the tiles, the average
+line, the locked card and the promise — for a section here once they are read.
+
 **Last updated:** 2026-10-22 (eighty-second pass — step 1's Task 10, after its walk and its colour
 pairs). **No shared token changed; the paywall and the Premium card were measured** — a new section,
 *The paywall, measured*: 74 readings off a minute at each of three places on iOS 27.0, none under its

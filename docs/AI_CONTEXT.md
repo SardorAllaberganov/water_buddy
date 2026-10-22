@@ -4,6 +4,20 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` run by the owner once set A's step 2 was
+designed, drawn on the canvas, specified and planned; no code of it). HEAD `a6e287b`, 166 commits,
+level with `origin/main`: step 1 was committed after the eighty-third pass (`4577d92`, `d5cf816`,
+`fd12b7f`, `a6e287b`). The command's checks, by `comm` over sorted lists: 102 tracked `.swift` files in
+the seven target folders, 102 *Files on disk* rows, every count equal to `wc -l`; 768 phone `@Test`, 70
+watch, 58 UI `func test`; 13 keys on `DataManager.Key`; the three exception sets six files each, as
+`CLAUDE.md` names them; 18 rules cited and 18 rule files; `StoreKit` imported in `HomeView.swift` and
+`PremiumStore.swift` alone; no `docs/ARCHITECTURE.md`, `CAPABILITIES.md` or `dependencies.md`.
+**Drift found:** the sheets' newest notes still read step 1 as staged at `HEAD` `b981374` — superseded
+by dated notes, never rewritten. Changed: this block; *Current state* gains step 2's block; #50 a note;
+*Git*. `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: dated notes, nothing in their subjects
+moved. `docs/ROADMAP.md`: 1.4.1's and 1.4.2's notes. `CLAUDE.md`: read against the code, current.
+`tasks/lessons.md`: two entries. Gate: not run.
+
 **Last updated:** 2026-10-22 (eighty-third pass — `/doc_sync` run by the owner straight after the
 eighty-second). The command's checks, by script: 102 `.swift` files in the seven target folders, every
 one with a *Files on disk* row whose count equals `wc -l` (101 matched by the row pattern,
@@ -2154,6 +2168,43 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Set A's step 2 — roadmap item 1.4.2, the month view and full history — is designed, drawn,
+specified and planned; no code of it exists yet** (2026-10-22, afternoon; HEAD `a6e287b`, the spec and
+the plan staged). Step 1 is committed: its spec and plan `4577d92`, its code `d5cf816`, its records
+`fd12b7f`, its rule wording `a6e287b`. Recorded by the eighty-fourth `/doc_sync`, run by the owner.
+
+- **The owner's rulings, in order:** a day older than the week is **seen, read-only** — adding and
+  correcting stay the week's, for every user, so no way of logging is paid for; the free user's locked
+  month blurs **a drawn month**, never their own; an opened day appears **inline, under the month**;
+  **approach 1** — `DataManager` shows one month at a time, read only while it is asked for; the
+  design's four sections, each "Yes, go on"; three boards drawn on the design canvas
+  (https://claude.ai/artifact/1dyjwFfRVsLYzcvwQ6poGy, row *Set A, step 2*: *Week, with the switch*,
+  *Month, a day open*, *Month, free user*), "Approved"; the spec, "ok"; the plan, "plan is ok now".
+- **The spec**, `docs/superpowers/specs/2026-10-22-month-view-design.md` (435 lines): the switch drawn
+  only once StoreKit has answered, for a holder always and for a free user only where the paywall is
+  offered — so a Release build's History is unchanged until step 5; the switch on its own row under an
+  unchanged header (beside the `+` it would have left a 375-pt phone 121 pt for the day's name); the
+  counting rule — a past month every day, this month the days before today and today once it is met,
+  the first month from the first serving; six figures; `MonthHistory` beside `DaySummary` in
+  `DataManager.swift`; `month` and `monthLogs` mirroring `history` and `historyLogs`; `showMonth(_:)`;
+  no key, no schema change, nothing for the widget or the watch; the change line names no month,
+  because Russian would need the prepositional case. It withdraws the step-1 spec's per-feature
+  shortcut row in Settings' held card (§3.5) as a second route to History (rule `50-views`).
+- **The plan**, `docs/superpowers/plans/2026-10-22-month-view.md` (2,765 lines): Tasks 0–10 — the
+  baseline, a probe (the reads' cost at 7 to 500 days against a 3 ms budget, a DST month, each
+  language's first weekday), the rule wording for six rule files typed unstaged, then `MonthHistory`,
+  the model's publishing, History's statics, 20 strings and the screens, each test-first; then the walk,
+  the review, the gate and the records. Fourteen decisions, M1–M14, among them the UI tests joining
+  `PremiumUITests` (rule `85-testing`'s sentence stays true), plain chevrons for the arrows and the
+  opened day's heading on the aurora above its strip. Expected after it: 812 unit `@Test` (768 + 44),
+  60 UI `func test`, 187 catalogue keys.
+- **Not run in this session:** any gate, build or test — the last gate is step 1's (Task 9, 2026-10-22,
+  ending 11:50; *Targets*).
+- **Next:** the plan's Task 0, inline in this repository's own loop (`CLAUDE.md`: no implementation
+  subagent).
+
+*(The block below is history: step 1 is now committed, above.)*
 
 **Premium's step 1 — the monthly plan, the paywall and the card — is built, walked, measured, gated
 and staged whole; no user meets it until step 5 puts set A on sale** (Tasks 8–10, 2026-10-22 01:09 to
@@ -4956,6 +5007,17 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
+**Read at 13:18 on 2026-10-22, in the eighty-fourth pass, after its `git add` of its seven files by
+name: `a6e287b`, 166 commits, level with `origin/main`; 9 staged — 7 modified, 2 added — 6 unstaged,
+1 untracked entry, none in both.** Staged: step 2's spec and plan, added; and this pass's
+`docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`,
+`tasks/lessons.md` and `HISTORY.md`. Unstaged: `.claude/settings.json` (the owner's) and five of Xcode's
+rewrites (#50) — the `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes,
+`WaterBuddy/AppShortcuts.xcstrings` and the watch's and the watch widget's catalogues. Untracked:
+`Screenshots/census/`. Step 1 — everything the eighty-first pass staged, and its rule wording — was
+committed since that pass, as `4577d92`, `d5cf816`, `fd12b7f` and `a6e287b`. This file and `HISTORY.md`
+are added again once their blocks are written. No `git commit` in this session.
+
 **Read at 00:42 on 2026-10-22, in the eighty-first pass, after its `git add` of its eight files by
 name: `b981374`, 162 commits, level with `origin/main`; 27 staged — 21 modified, 6 added — 11
 unstaged, 1 untracked entry, none in both.** Staged: everything the eightieth pass staged (1.4.1's
@@ -6637,6 +6699,11 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     (`identifier = "../../WaterBuddyTests/WaterBuddy.storekit"`), `-WaterBuddyPremium YES` among its
     launch arguments, and the same flag left by mistake among its environment variables. The step-1
     plan's Task 9 keeps the StoreKit reference and removes the other two before it stages the file.)*
+    *(2026-10-22, the eighty-fourth pass: the scheme was cleaned and committed with step 1
+    (`d5cf816`); the five rewrites are still in the tree against `HEAD` `a6e287b` — `git diff --stat`
+    reads 132 lines in `AppShortcuts.xcstrings`, 605 and 263 in the two watch catalogues, 2 in each
+    scheme — with the Siri phrases' `stale` marks among them. Set A's step 2 plan edits only
+    `WaterBuddy/Localizable.xcstrings`, which none of the five is, with Xcode closed (its Task 6).)*
 
 **Opened by the 2026-10-07 `/doc_sync` re-run:**
 

@@ -325,9 +325,19 @@ tile, white small marks); 768 unit `@Test`, the UI suite on 27.0 and 26.5, the w
 warnings unchanged. Nobody meets it until step 5 puts set A on sale; the privacy URL (#159) still
 gates a Release build.)*
 
+*(2026-10-22, afternoon: step 1 **committed** — its spec and plan `4577d92`, the code `d5cf816`, its
+records `fd12b7f`, its rule wording `a6e287b`.)*
+
 **1.4.2 — Full history.** History beyond the week shown today: a month calendar of goal days, and
 trends. Free users keep today's week. **No serving is ever deleted or hidden from the store because
 a user is not paying** — only the longer view is the extra.
+*(2026-10-22, afternoon: **set A's step 2 — designed, drawn, specified and planned, no code of it
+yet.** The owner's rulings: an older day is seen read-only, so adding and correcting stay the week's
+for everyone; the locked month blurs a drawn month, not the user's; an opened day appears under the
+month; the model shows one month at a time. Boards on the canvas, row *Set A, step 2*; spec
+`docs/superpowers/specs/2026-10-22-month-view-design.md` and plan
+`docs/superpowers/plans/2026-10-22-month-view.md`, both approved. Nobody meets it until step 5 puts
+set A on sale.)*
 
 **1.4.3 — Custom reminder schedule.** The user's own hours and interval, and quiet days, in place of
 the fixed grid of seven hours (`ReminderPlan.hours`). Any schedule must keep the plan within

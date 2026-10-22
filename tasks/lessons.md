@@ -4659,3 +4659,28 @@ same had it been wrong.
 
 **The rule:** a check that reports only failures also prints how many items it read, compared with how
 many exist; silence counts as a pass only when the two numbers agree, and the gap is read by hand.
+
+## 2026-10-22 — A board drawn in one mode put its control where the other mode's button lives
+
+**What happened.** The design canvas's *History — Month* boards, drawn with step 1, set the
+*Week · Month* switch on the title's line, where Week mode's `+` stands — the one route to the serving
+sheet. Nothing was drawn for Week mode with the switch in it. Worked out for the narrowest supported
+phone, the switch and the `+` together would have left the day's name 121 pt, under the title's 0.5
+shrink floor, so *Wednesday, 14 Oct* would have been cut. It was caught while reading `ScreenHeader`
+before the design was presented, and the switch moved to a row of its own under an unchanged header,
+drawn for both modes before the spec.
+
+**The rule:** when a screen gains a mode, draw every mode with the new control in it, and work out
+what anything sharing the title's line leaves the title on a 375-pt phone, before the board is
+approved.
+
+## 2026-10-22 — A sentence that names a month needs a case Foundation cannot give
+
+**What happened.** The canvas's change line read *Up 240 ml on September*. In Russian the month there
+takes the prepositional case — *чем в сентябре* — and Foundation formats a month only in the nominative
+(`LLLL`, *сентябрь*) or the genitive (`MMMM`, *сентября*); either set into that sentence is a grammar
+error a Russian reader sees at once. The line became *Up 240 ml on the month before*, which names no
+month.
+
+**The rule:** never set a formatted month or weekday inside a translated sentence. Word the sentence so
+it names none, or draw the name on its own, as a heading or a label.

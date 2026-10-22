@@ -12182,3 +12182,64 @@ Not run by this sync. The last gate is step 1's, earlier the same day (the check
 written. **No `git commit` was run.** HEAD `b981374`, 162 commits. **28 staged** — 22 modified, 6
 added, the same set as above. **10 unstaged**, the same ten. **1 untracked**: `Screenshots/census/`.
 None in both.
+
+## [2026-10-22] — Set A's step 2 designed, drawn, specified and planned; and the eighty-fourth `/doc_sync`
+
+### What
+
+The owner ran `/start_task` with no task named, after committing step 1 (`4577d92`, `d5cf816`,
+`fd12b7f`, `a6e287b`). `docs/ROADMAP.md` §5 makes set A's step 2 next — roadmap item 1.4.2, the month
+view and full history — and it was taken up on the brainstorming skill's architectural path: questions
+one at a time, three approaches, a design in four sections, boards, a spec, a plan. **No code was
+written.**
+
+- **The context, read-only:** a subagent mapped `HistoryView`, `DataManager`'s history paths and the
+  Premium surface — History reaches seven days and no further, `readLogs(from:to:)` is the store's one
+  range query, and neither `HistoryView` nor `RootTabView` reads `PremiumStore`. The canvas already held
+  two boards for the step, *History — Month, Premium* and *— free user*.
+- **The design**, in the order the owner ruled it (below), then drawn: three boards in a new row, *Set A,
+  step 2* — Week with the switch, Month with a day open, Month for a free user — beside the originals,
+  which are kept. Where they differ from the originals is listed in the session's reply to the owner:
+  the switch on its own row, glass not white for its selected half, a Sunday-first English grid, the
+  week card's marks on the opened day, no date in the drawn month, the Premium rim and a white glyph on
+  the locked card, the change line naming no month.
+- **The spec**, `docs/superpowers/specs/2026-10-22-month-view-design.md`, 435 lines; self-reviewed — a
+  month whose first read failed cannot name itself, so its quiet form carries no title; and the
+  `role.drawsHistory` guard is read, not tested, since the test host is always `.phoneApp`.
+- **The plan**, `docs/superpowers/plans/2026-10-22-month-view.md`, 2,765 lines: Tasks 0–10, decisions
+  M1–M14, five Review Focus inputs with a test each and one by hand; self-reviewed — the two blocks it
+  moves written out whole, two shadowed names in `MonthHistory.make` renamed, and Task 7's per-file
+  warning check made a comparison with Task 0's baseline (the baseline already holds `DataManager.swift`
+  lines).
+- **The eighty-fourth `/doc_sync`.** Checked and current, by `comm` over sorted lists: 102 tracked
+  `.swift` files and 102 *Files on disk* rows, every count equal to `wc -l`; 768 phone `@Test`, 70 watch,
+  58 UI `func test`; 13 keys on `DataManager.Key`; the three exception sets, six files each; 18 rules
+  cited, 18 rule files; `StoreKit` in two files; no ARCHITECTURE, CAPABILITIES or dependencies sheet.
+  `CLAUDE.md` read against the code and left. **Drift, superseded rather than rewritten:** the sheets'
+  newest notes read step 1 as staged at `HEAD` `b981374`; each gains a dated note.
+
+### Rulings it rests on
+
+The owner's, in this session: a day older than the week is **seen, read-only** ("See it, read-only");
+the locked month blurs **a drawn month** ("A drawn month"); an opened day appears **inline, under the
+month**; **approach 1**, the model shows one month at a time; Sections 1 to 4, "Yes, go on" each (the
+fourth "Yes — redraw on canvas"); the three boards, "Approved — write spec"; the spec, "ok"; the plan,
+"plan is ok now".
+
+### Files
+
+`docs/superpowers/specs/2026-10-22-month-view-design.md` and `docs/superpowers/plans/2026-10-22-month-view.md`
+(new) · `docs/AI_CONTEXT.md` (the header, *Current state*, #50, *Git*) · `docs/STATE.md`,
+`docs/WIDGET.md`, `docs/DESIGN.md` (dated notes) · `docs/ROADMAP.md` (1.4.1's and 1.4.2's notes) ·
+`tasks/lessons.md` (two entries) · `HISTORY.md`. Outside the repository: the design canvas's three new
+boards and its index. Nothing under the code or test targets, nothing under `.claude/`.
+
+### Gate
+
+Not run in this session. The last gate is step 1's (2026-10-22, ending 11:50).
+
+**Staging.** Read from the commands at 13:18 on 2026-10-22, after this sync's `git add` of its seven
+records by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `a6e287b`, 166 commits, level with `origin/main`. **9 staged** — 7
+modified, 2 added: the spec and the plan, and the records. **6 unstaged**: `.claude/settings.json` (the
+owner's) and five of Xcode's rewrites (#50). **1 untracked**: `Screenshots/census/`. None in both.

@@ -3,6 +3,12 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` after set A's step 2 was specified and
+planned). **No contract here moved; nothing was built.** Step 1 is committed (`d5cf816`). Step 2's
+plan changes one of the six shared files, `DataManager.swift` — a new value type, `MonthHistory`, and
+the app's month — and nothing on the widget's read path: no key, no field on `WaterSnapshot`, no file
+under `WaterBuddyWidget/`. Both widget builds are in its gate.
+
 **Last updated:** 2026-10-22 (eighty-second pass — step 1's Task 10). Checked: **still no file under
 `WaterBuddyWidget/` and none of the six shared files changed in step 1** — its walk's fixes are in
 `PaywallView.swift`, `PremiumAccess.swift`, `PremiumStore.swift` and `SettingsView.swift`, all app-only
