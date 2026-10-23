@@ -7,6 +7,16 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-23, evening (eighty-sixth pass — `/doc_sync` run by the owner on set A's step
+3's staged tree; this header was the drift: step 3's records added a section and left it). **No shared
+token changed.** A new section, *The patterns, measured*, after *The month, measured*: what the patterns
+draw under a holder's month — the heading on the aurora, *When you drink*, *Weekdays* and *Weekends*, the
+two time tiles, the pending line — and 22 colour pairs off renders on iOS 27.0, by *The month,
+measured*'s tool. **One is under its floor**: the heading's line on the aurora, 4.17 beside its glyphs at
+the worst of forty frames two seconds apart (4.53 and 4.74 in twelve), already white at full opacity —
+known issue #171, for the owner. *Most around 13:00* holds in `Aurora.cyan` at 5.21; a met side's cyan bar
+3.56; the goal's rule 3.84.
+
 **Last updated:** 2026-10-23 (set A's step 2's own Task 10 — not a `/doc_sync` pass). **No shared
 token changed.** A new section, *The month, measured*, after *The paywall, measured*: what the month
 view draws — the switch, the month card, the opened day, the figures, the locked month — and 51 colour
@@ -2166,6 +2176,58 @@ and outside it. *See Premium* is the primary surface, derived rather than measur
 **Not measured:** iOS 26.5 and 18.6; Increase Contrast; the month in Russian and Uzbek, whose names and
 labels are wider over the same grounds; the largest text sizes, where the letters and numbers keep the
 ring's capped size and the labels grow.
+
+## The patterns, measured
+
+**2026-10-23, set A's step 3** (spec `docs/superpowers/specs/2026-10-23-patterns-design.md` §3.2, §3.8).
+**No token moved, and one pair is under its floor** — the heading's line, on the aurora, for the owner
+(`docs/AI_CONTEXT.md`, known issue #171).
+
+**What is drawn.** Under the month's figures, on the aurora: *Patterns* `.title3` bold and *From this
+month's finished days* `.subheadline` semibold, white with the two shadows — `OpenedDayHeading`'s style.
+Then three `.frosted` + `.raised` panes, the week card's pair. *When you drink*: the title `.callout`
+semibold white, *Most around 13:00* `.footnote` semibold in `Aurora.cyan`; 24 bars of 8 pt, one an hour,
+the busiest `Aurora.cyan` and the rest white 0.7, on a white 0.3 ground line; the day strip's axis, its
+labels at 0.9 and 0.18 of the plot. *Weekdays* and *Weekends*: the name `.subheadline` semibold and the
+figure `.subheadline` bold, white; a 10-pt bar on a white 0.10 track, both at
+`LiquidGlass.innerCornerRadius`, `Aurora.cyan` when the average reaches the goal and white when it does
+not, and the goal line's rule at its end, 1.5 pt at white 0.62; *Measured against your current goal*
+`.footnote` at 0.9. Two tiles in the month figures' style: the time `.title3` bold white over a
+`.footnote` label at 0.9. Below seven days of water, one `.frosted` pane: *Patterns need 7 days of
+water*, `.subheadline` white.
+
+**Method.** *The month, measured*'s, with its tool: the walk's throwaway XCUITest in a scratch copy of
+the index, the app seeded from June 26 by a DEBUG-only argument in that copy, a lifetime purchase through
+an `SKTestSession`; *WaterBuddy Probe 27* (iPhone 17, iOS 27.0), sRGB frames; boxes from the
+accessibility tree dumped at the place; the ground on a ring 2–6 pt out of the ink, clipped to its pane;
+the worst pixel of the worst frame. October held twelve frames a second apart, then forty frames two
+seconds apart for the heading; September three frames for its met bar; June four for the pending line.
+
+| Pair | Floor | Reading |
+|---|---|---|
+| *Patterns* (1.0), beside its glyphs | 4.5 | 5.73 |
+| **The heading's line (1.0), beside its glyphs** | 4.5 | **4.17** (p1 4.24), forty frames; 4.53 and 4.74 in twelve |
+| *When you drink* (1.0) | 4.5 | 5.08 |
+| *Most around 13:00* (`Aurora.cyan`) | 4.5 | 5.21 |
+| The axis's labels (0.9) — 06 / 12 | 4.5 | 7.61 / 8.19 |
+| The busiest bar (`Aurora.cyan`) | 3 | 5.18 |
+| An hour's bar (white 0.7) — 10 / 07 / a sip at the floor | 3 | 5.17 / 5.10 / 6.33 |
+| *Weekdays* (1.0) / its figure (1.0) | 4.5 | 5.74 / 9.09 |
+| The weekday bar (white) / the weekend bar against its track | 3 | 5.96 / 6.70 |
+| A met side's bar (`Aurora.cyan`), September | 3 | 3.56 |
+| The goal's rule (0.62) | 3 | 3.84 |
+| *Measured against your current goal* (0.9) | 4.5 | 6.18 |
+| A tile's time (1.0) / label (0.9), worst of two | 4.5 | 5.24 / 5.10 |
+| *Patterns need 7 days of water* (1.0) | 4.5 | 5.66 |
+
+The heading's line fails where the aurora's cyan light passes behind it: the brightest ground beside
+its glyphs reached L 0.20 in frame 18 of the forty (from the reading, 1.05 / 4.17 − 0.05; the first frame
+read 6.96, L 0.10), and white at full opacity cannot be raised. The
+title over it, larger and bolder, holds. The clean-ground ring (8–14 pt) reaches the chart pane's lit
+rim below the line and is not a reading.
+
+**Not measured:** iOS 26.5 and 18.6; Increase Contrast; Russian and Uzbek, whose lines are wider over the
+same grounds; the largest text sizes.
 
 ## The header and a screen arriving
 

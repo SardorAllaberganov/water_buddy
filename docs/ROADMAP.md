@@ -360,6 +360,13 @@ theme's contrast is measured to the same floors before it ships.
 **1.4.6 — Patterns.** When in the day the user drinks, weekdays against weekends, and their usual
 first and last drink — read from the same rows as 1.4.2's full history, and worked out on the
 device.
+*(2026-10-23, evening: **set A's step 3 — designed, specified, built test-first, walked, measured and
+reviewed, staged; not committed.** The owner's rulings: the patterns describe **the month on screen**,
+inline in Month mode under its figures; **finished days only**, so today joins at midnight; **after
+seven days of water**, with one line below that; the model **carried on `MonthHistory`**; then "go to
+implementation… Do not ask". Spec `docs/superpowers/specs/2026-10-23-patterns-design.md`, no plan
+document, no board — the 2026-10-21 concept board is the look. One colour pair is under its floor for
+the owner (#171). Nobody meets it until step 5 puts set A on sale.)*
 
 **1.4.7 — Monthly recap.** At the turn of each month, a card: the days the goal was met, the best
 streak, the litres drunk, and the change from the month before. It may be shared as an image, which

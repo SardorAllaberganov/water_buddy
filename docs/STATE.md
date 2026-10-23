@@ -4,6 +4,16 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-23, evening (eighty-sixth pass — `/doc_sync` run by the owner on set A's step
+3's staged tree; this header was the drift: step 3's records added a section and left it). **No key and
+no stored byte moved**: 13 keys on `DataManager.Key`, counted from the source. A new subsection,
+*`month.patterns`*, under *`month` and `monthLogs`*: the shown month's patterns, carried on `MonthHistory`
+— which days count, what the value holds, the weekend handed in, the wall clock, and the cost measured
+beside a `HEAD` twin (`MonthPatterns.make` 0.51–0.69 ms at 500 days). The `usualSlot` row of
+*Constants both processes agree on*: its pointer to History's literal `servings[1]` re-pointed `HistoryView.swift:363` → `:397`, its old numbers kept. The
+guard sites (*Who may write on behalf of the group*) all sit above the first line step 3 moved in
+`DataManager.swift` (2,633) and are unchanged.
+
 **Last updated:** 2026-10-23 (eighty-fifth pass — `/doc_sync` run by the owner on step 2's staged
 tree). **No key and no stored byte moved**: 13 keys on `DataManager.Key`, counted from the source.
 **Drift, fixed:** *Who may write on behalf of the group*'s guard list still cited `HEAD` `2e2f3a7`'s
@@ -390,7 +400,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:363` (`:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:397` (`:363` until set A's step 3, `:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours — and a tenth, the rating request's mark
@@ -823,6 +833,37 @@ store.
   **+2.77 ms** with a month shown — inside the owner's **6 ms** (the spec's 3 ms, amended on 2026-10-22).
   The month's two-month window is the cost (~4.5 ms for ~490 rows before the read-once ruling); the
   first-serving read is 0.05–0.6 ms from 7 to 500 days.
+
+### `month.patterns` — the shown month's patterns, carried on the month
+
+*Added 2026-10-23, set A's step 3 (roadmap 1.4.6), staged; spec
+`docs/superpowers/specs/2026-10-23-patterns-design.md` §3.1–3.6.*
+
+`MonthHistory` carries `patterns: MonthPatterns?`, built by `MonthHistory.make` from the rows it is
+already handed. **No new property, no new read, no key, no schema change**: the patterns are published,
+equality-guarded, kept through a failed read and let go exactly as `month` is, and reach neither the
+widget nor the watch.
+
+- **Which days:** the shown month's days on or after the first serving's and **before today** — today
+  joins at midnight, through `dayDidTurn()`'s republish. A serving stamped after today counts nowhere.
+  `nil` until **seven** of those days hold water (`MonthPatterns.minimumDays`); seven days with water
+  among consecutive finished days span a week, so both sides of the split always have days.
+- **What it holds:** each hour's water (24 entries, saturated at `Int.max`) and the busiest hour (a tie
+  to the earlier); each weekday's water and count of days, Sunday first, a day's water saturated at
+  `maximumDailyIntake`; the usual first and last drink — the median of the days' wall-clock minutes, the
+  earlier middle for an even count, rounded to five minutes and held at 23:55; the goal it was judged
+  against; and three instants on the month's 1st, for formatting only.
+- **The weekend is handed in** — `split(weekend:)` takes the app's locale's weekend from
+  `HistoryView.weekend(in:)`, so a language change needs no republish. Empty counted days stay in each
+  side's denominator, as the month's average does.
+- **A serving's hour and minute are the wall clock's** on the injected calendar (`minuteOfDay`), never
+  seconds since midnight; the day is `dayOrdinal(for:in:)`'s (rule `30-rollover`).
+- **Measured cost**, on the built code, a probe in a copy of the index beside its twin on a `HEAD`
+  `24b2de4` export, alternated twice (iPhone 17, iOS 27.0), at 500 days: `MonthPatterns.make` alone
+  **0.51–0.69 ms** over the two-month window's 458 rows; with a month shown, `refresh()` added +2.80 /
+  +4.37 ms and a pour +4.30 / +5.97 ms, against `HEAD`'s +2.58 / +3.27 and +2.92 / +6.32 in the same
+  rounds — the difference inside the run-to-run noise, every figure under the owner's 6 ms. Each run
+  started at a load of 7 or under and drove it to 83–136 by its own simulator boot.
 
 ## The sixth key, and the seam that reads it
 

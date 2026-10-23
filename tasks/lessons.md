@@ -4753,3 +4753,61 @@ the bare-citation sweep attributes each `` `:N` `` to the last file named before
 into the files the change touched. A list a doc writes in prose — the classes in a target, the guard
 sites, the callers — is checked by printing the code's own list beside it (`grep` for the class
 declarations, for `role.` guards), never by reading the sentence and agreeing with it.
+
+## 2026-10-23 — The lesson on edit tools was read after three files had gone through scripts
+
+**What happened.** Set A's step 3's `/start_task` read the newest six lessons. The rule that `Edit` and
+`Write` are the only edit tools, the scratchpad included (2026-10-22), sat further back. Before a
+`sed -i` on a scratch file was refused, a `python3` script had rewritten `LocalizationTests.swift` and
+`Localizable.xcstrings` in the tree, and the walk copy's `WaterBuddyApp.swift`; heredocs had written a
+probe file and the ledger's appends. All of it was allowed by the permission rules, and all of it was
+against the lesson. The session stopped at the refusal and told the owner, who said "go".
+
+**The rule:** before a session's first file change, read every lesson about tools and permissions —
+`grep -n 'Edit\|Write\|refused\|heredoc\|sed' tasks/lessons.md` — not the newest few. `Edit` and `Write`
+carry every change, a JSON catalogue's included: one `Edit` per key block is slower than a script and is
+the only way the owner has asked for.
+
+## 2026-10-23 — Twelve frames passed a line on the aurora that forty failed
+
+**What happened.** The patterns' heading line, white text straight on the aurora, read 4.74 over
+twelve frames a second apart, and 4.53 in a second twelve. A reviewer's doubt about another pair sent the
+measurement back for forty frames two seconds apart: 4.17, under the 4.5 floor, where the aurora's cyan
+light drifted behind the line. *The month, measured* had held each place for a minute.
+
+**The rule:** text on the aurora is held for at least a minute and a half of frames before its figure is
+kept — the aurora's light takes that long to cross a line — and the record names how many frames and
+how far apart. A pane's glass moves little and twelve frames hold; the aurora moves and they do not.
+
+## 2026-10-23 — A walk test passed while drawing the screen it was not meant to
+
+**What happened.** A re-run of the patterns walk passed and its stills showed the free user's locked
+month: the `SKTestSession` purchase in `setUp` had not landed when the app read StoreKit (#166's
+timing). The test asserted only that the tab and the switch existed. Its stills were caught only because
+they were looked at.
+
+**The rule:** a walk test asserts the state its stills are for — here, that *Patterns* is on screen
+after Month is chosen — so a run that lands somewhere else fails instead of passing with the wrong
+pictures. Look at every still before a figure is taken from it.
+
+## 2026-10-23 — Two figures went into the records before they were read
+
+**What happened.** Writing step 3's records, *The patterns, measured* gave a ground luminance of 0.25 and
+known issue #176 gave `HistoryView.swift` 3,005 lines. Neither number had been printed. The tool prints
+ground luminance for the first frame only; the worst frame's follows from its ratio, 0.20. `wc -l` read
+3,022. Both were caught when the next command printed something that contradicted them.
+
+**The rule:** rule `90-git`'s "never write a count you did not just print" covers every figure in prose,
+not only staging blocks and test counts. Print the number, then type it — and where a tool does not
+print it, write how it was derived beside it.
+
+## 2026-10-23 — A records pass headed one sheet and left the two others it changed
+
+**What happened.** Set A's step 3's records wrote `docs/AI_CONTEXT.md`'s *Last updated* block, and added
+*`month.patterns`* to `docs/STATE.md` and *The patterns, measured* to `docs/DESIGN.md` without a block
+in either header — both still named step 2's passes. The eighty-sixth `/doc_sync` found it only because
+its script printed every sheet's newest *Last updated* line.
+
+**The rule:** before a records pass stages, print `git diff --name-only -- docs CLAUDE.md` beside each of
+those sheets' newest *Last updated* line; every sheet the pass changed heads itself with that pass.
+`docs/ROADMAP.md` keeps no such header and is the one exception.

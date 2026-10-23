@@ -189,7 +189,10 @@ something to record.
   read again on 2026-10-22 from a clean build of a `HEAD` `2e2f3a7` export before set A's step 2's code
   — 20, 17, 2, 2 — and step 2's own comparison, on 2026-10-23 from a clean build of a copy of its index
   (Tasks 3–7, the walk's fixes and the final review's), against that export, the same way: unchanged on
-  all four schemes — 20, 17, 2, 2, no line new or gone, and the same sites by line
+  all four schemes — 20, 17, 2, 2, no line new or gone, and the same sites by line; and set A's step
+  3's own comparison, on 2026-10-23 from a clean build of a copy of its index against a clean build of
+  a `HEAD` `24b2de4` export, the same way: unchanged on all four schemes — 20, 17, 2, 2 by message,
+  36, 29, 2, 2 sites by line, none inside the new code
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two

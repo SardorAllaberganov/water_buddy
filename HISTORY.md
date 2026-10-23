@@ -12379,3 +12379,124 @@ files by name; this file and `docs/AI_CONTEXT.md` are added again once their blo
 `git commit` was run.** HEAD `2e2f3a7`, 168 commits, level with `origin/main`. **18 staged** — 17
 modified, 1 added, the same set as above. **12 unstaged**, the same twelve. **1 untracked**:
 `Screenshots/census/`. None in both.
+
+## [2026-10-23] — Set A's step 3, Patterns, designed, built, walked, measured, reviewed and gated; staged whole
+
+### What
+
+Roadmap item 1.4.6, set A's step 3 of 5. Under a holder's month in History's Month mode, after the
+figures: *Patterns* and *From this month's finished days* on the aurora; *When you drink* — a bar an hour
+across the whole day on the day strip's axis, the busiest in `Aurora.cyan`, *Most around 13:00*;
+*Weekdays* and *Weekends*, each its average day against the goal's rule, cyan when met; *First drink,
+usually* and *Last drink, usually*. Below seven days of water, *Patterns need 7 days of water*.
+
+- **The model:** `MonthPatterns`, a pure `nonisolated` value beside `MonthHistory` in `DataManager.swift`,
+  carried on `MonthHistory.patterns` and built in `MonthHistory.make` from the rows it is already handed.
+  Finished days only — the shown month's, from the first serving's day, before today; `nil` below seven
+  days with water; each hour's water and the busiest (a tie to the earlier); each weekday's tally, split
+  at the weekend `HistoryView.weekend(in:)` hands in from the app's locale; the usual first and last drink
+  as medians of wall-clock minutes, rounded to five and held at 23:55. No new property, read, key, call
+  site or schema change; nothing for the widget or the watch.
+- **The view:** five private structs in `HistoryView.swift` after `MonthFigures`; `weekend(in:)`,
+  `hourPosition(_:)`, `hourBars(_:)`. Ten new keys in the app's catalogue, in en/ru/uz, two counted.
+
+### The rulings it rests on
+
+The owner's, in order: the month on screen, inline; finished days only; after seven days of water, with
+one line below; approach A, carried on `MonthHistory`; the design's first three sections, the third
+answered "Yes, go to implementation. All sections are ok. Do not ask" — so the spec's §3.8–§3.11 were
+written on the session's recommendations; and "go", after the session stopped at a refused `sed -i` on a
+scratch file and reported it, with the earlier `python3` rewrites and heredocs that the lesson of
+2026-10-22 also rules out (`tasks/lessons.md`). The session's own, in the ledger: no plan document (the
+owner's word; CLAUDE.md's loop); no board (the 2026-10-21 concept board is the look); the row loop reuses
+`dayOrdinal(for:in:)` (rule `30-rollover`); `simctl shutdown all` not run, two other projects' simulators
+being booted — only WaterBuddy's own were shut down, one at a time.
+
+### The final review
+
+A fresh reviewer, read-only: no Critical. The Important — the cyan line unmeasured — had been measured
+(5.21). Fixed, tests first where they were tests: the pending line's wording (*need*, not *appear after*,
+which a finished month could never keep); a median test that a missing sort passed — proved by mutation;
+bars and fills kept present at zero; the weekday tracks on `LiquidGlass.innerCornerRadius`; a DocC on
+`.nextTime`; the spec's drift and the hour-18 check. Deferred to the owner as #172: a time-zone change that
+keeps the date (#167 M3's root), VoiceOver's met state, duplicated saturating helpers.
+
+### Files
+
+`WaterBuddy/DataManager.swift` · `WaterBuddy/HistoryView.swift` · `WaterBuddy/Localizable.xcstrings` ·
+`WaterBuddyTests/MonthPatternsTests.swift` (new) · `WaterBuddyTests/MonthHistoryTests.swift` ·
+`WaterBuddyTests/HistoryViewTests.swift` · `WaterBuddyTests/LocalizationTests.swift` ·
+`docs/superpowers/specs/2026-10-23-patterns-design.md` (new) · `docs/AI_CONTEXT.md` · `docs/STATE.md` ·
+`docs/DESIGN.md` · `docs/ROADMAP.md` · `CLAUDE.md` · `tasks/lessons.md` · this file. Unstaged, for the
+owner: the rule wording in `.claude/rules/30-rollover.md`, `43-concurrency.md`, `50-views.md` and
+`85-testing.md`.
+
+### Verification
+
+- **Tests first:** every new test run and seen RED before its code — `MonthPatterns` against stubs (22 of
+  23 new tests failed, the 23rd a guard expecting `nil`), the statics against stubs, the keys before the
+  catalogue, the review's median test by mutation — then GREEN.
+- **The walk**, on *WaterBuddy Probe 27* in a scratch copy, seeded and with a lifetime test purchase:
+  October and September checked by hand against the seed, June's pending line, ‹ ›, Russian, Uzbek, the
+  largest text size, Reduce Transparency forced in the copy; re-walked after the review's fixes.
+- **The colour pairs:** 22, one under its floor — the heading's line on the aurora, 4.17 over forty
+  frames (`docs/DESIGN.md`, *The patterns, measured*; #171, the owner's).
+- **The cost** beside a `HEAD` twin: `MonthPatterns.make` 0.5–0.7 ms a month read at 500 days, under the
+  6 ms budget end to end (`docs/STATE.md`).
+- **The gate**, on the final code, under two other projects' load: unit, *iPhone 17*, 842 `@Test` in 98
+  suites — `theLinksAreApplesTermsAndAPageOfOurs` alone failing (#159), one skipped (#157); UI on *Gate
+  27*, 73 executed, 1 skipped, 1 failure (`testAnOlderPoursTimerDoesNotEndANewerOffer`'s speed guard),
+  which passed alone; UI on *Gate 26.5*, 73 executed, 1 skipped, 2 failures (`testAnOrdinaryRunHasNoPremiumCard`,
+  `testUseSetsTheGoalItSuggests`, 5-second waits), which passed alone; watch, *Apple Watch Series 12
+  (46mm)*, 70 of 70; both widget builds succeeded. **Warnings unchanged on all four schemes** — 20, 17, 2,
+  2 by file and message, 36, 29, 2, 2 sites — clean builds of a copy of the index against a clean build of
+  a `HEAD` `24b2de4` export.
+- **Not run:** any device proof (#173); the colour pairs on 26.5 and 18.6 (#174).
+
+**Staging.** Read from the commands at 22:42 on 2026-10-23, after this step's `git add` of its fifteen
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No
+`git commit` was run.** HEAD `24b2de4`, 172 commits, level with `origin/main`. **15 staged** — 13
+modified, 2 added (`WaterBuddyTests/MonthPatternsTests.swift`, the spec). **10 unstaged**: the four rule
+files carrying this step's wording, for the owner; `.claude/settings.json` (the owner's); and five of
+Xcode's rewrites (#50) — the `WaterBuddyWatch` and `WaterBuddyWatchWidget` schemes,
+`WaterBuddy/AppShortcuts.xcstrings` and the watch's and the watch widget's catalogues. **1 untracked**:
+`Screenshots/census/`. None in both; `git diff --cached --check` clean.
+
+## [2026-10-23] — The eighty-sixth `/doc_sync`: two sheets step 3's records left unheaded
+
+### What
+
+The owner ran `/doc_sync` on set A's step 3's staged tree, straight after its records (the checkpoint
+above). No code has changed since its gate. The command's checks were run by script files in the
+session's scratchpad.
+
+- **Checked and current:** 104 `.swift` files in the seven target folders, tracked and on disk, and 104
+  *Files on disk* rows, every count equal to `wc -l`; 842 phone `@Test`, 70 watch, 60 UI `func test`, as
+  *Targets* states them; 13 keys on `DataManager.Key`, as `docs/STATE.md` says; the three
+  `membershipExceptions` sets, six files each, as `CLAUDE.md` names them; 18 rules cited and 18 rule
+  files; `StoreKit` in `HomeView.swift` and `PremiumStore.swift` alone; 197 keys in the app's catalogue; no
+  ARCHITECTURE, CAPABILITIES or dependencies sheet; the bare-citation sweep into the two code files step 3
+  grew — no current-text pointer on an old line. `docs/WIDGET.md` and `docs/ROADMAP.md` read and left;
+  `CLAUDE.md` read against the code and current.
+- **Drift, fixed — two:** `docs/STATE.md` and `docs/DESIGN.md` still headed themselves with step 2's passes
+  though step 3's records had added *`month.patterns`* and *The patterns, measured*; each gains a block
+  naming what changed.
+- **Lesson:** a records pass prints the changed sheets beside their newest *Last updated* before it stages
+  (`tasks/lessons.md`).
+
+### Files
+
+`docs/AI_CONTEXT.md` (the header, *Git*) · `docs/STATE.md` (the header) · `docs/DESIGN.md` (the header) ·
+`tasks/lessons.md` (one entry) · `HISTORY.md`. Nothing under the code or test targets, nothing under
+`.claude/`.
+
+### Gate
+
+Not run by this sync. The last gate is step 3's, on its final code, earlier the same evening (the
+checkpoint above).
+
+**Staging.** Read from the commands at 22:47 on 2026-10-23, after this sync's `git add` of its five files
+by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git
+commit` was run.** HEAD `24b2de4`, 172 commits, level with `origin/main`. **15 staged** — 13 modified, 2
+added, the same set as above. **10 unstaged**, the same ten. **1 untracked**: `Screenshots/census/`. None
+in both; `git diff --cached --check` clean.
