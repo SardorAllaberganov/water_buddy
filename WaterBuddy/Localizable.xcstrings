@@ -1253,6 +1253,29 @@
         }
       }
     },
+    "%1$@ L": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ L"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ л"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ l"
+          }
+        }
+      }
+    },
     "%1$@ ml": {
       "extractionState": "manual",
       "localizations": {
@@ -1420,6 +1443,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@, %2$d millilitr qo‘shish"
+          }
+        }
+      }
+    },
+    "%1$@/%2$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@/%2$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@/%2$@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@/%2$@"
           }
         }
       }
@@ -1666,6 +1712,164 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$d ml"
+          }
+        }
+      }
+    },
+    "%1$d of %2$d days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d of %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d из %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дней"
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дней"
+                    }
+                  },
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дня"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дня"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$d kundan %1$d"
+          }
+        }
+      }
+    },
+    "%1$d of %2$d days on goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d of %#@arg2@ on goal"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цель достигнута в %1$d из %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дней"
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дней"
+                    }
+                  },
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дня"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg дня"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$d kundan %1$d kunida maqsadga erishildi"
           }
         }
       }
@@ -2461,6 +2665,88 @@
         }
       }
     },
+    "Average %1$@ ml a day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Average %1$@ ml a day"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В среднем %1$@ мл в день"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuniga o‘rtacha %1$@ ml"
+          }
+        }
+      }
+    },
+    "Average %1$d millilitres a day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Average %1$d millilitre a day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Average %1$d millilitres a day"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "В среднем %1$d миллилитра в день"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "В среднем %1$d миллилитров в день"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "В среднем %1$d миллилитр в день"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "В среднем %1$d миллилитра в день"
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuniga o‘rtacha %1$d millilitr"
+          }
+        }
+      }
+    },
     "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.": {
       "extractionState": "manual",
       "localizations": {
@@ -2667,6 +2953,29 @@
         }
       }
     },
+    "Back to this week": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to this week"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Назад к этой неделе"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shu haftaga qaytish"
+          }
+        }
+      }
+    },
     "Best day": {
       "extractionState": "manual",
       "localizations": {
@@ -2686,6 +2995,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eng yaxshi kun"
+          }
+        }
+      }
+    },
+    "Best streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best streak"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лучшая серия"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eng uzun seriya"
           }
         }
       }
@@ -2851,6 +3183,29 @@
         }
       }
     },
+    "Days on goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Days on goal"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дни с целью"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maqsadli kunlar"
+          }
+        }
+      }
+    },
     "Delete": {
       "localizations": {
         "en": {
@@ -2869,6 +3224,88 @@
           "stringUnit": {
             "state": "translated",
             "value": "O‘chirish"
+          }
+        }
+      }
+    },
+    "Down %1$@ ml on the month before": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Down %1$@ ml on the month before"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На %1$@ мл меньше, чем в предыдущем месяце"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi oydan %1$@ ml kam"
+          }
+        }
+      }
+    },
+    "Down %1$d millilitres on the month before": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Down %1$d millilitre on the month before"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Down %1$d millilitres on the month before"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитра меньше, чем в предыдущем месяце"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитров меньше, чем в предыдущем месяце"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитр меньше, чем в предыдущем месяце"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитра меньше, чем в предыдущем месяце"
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi oydan %1$d millilitr kam"
           }
         }
       }
@@ -2915,6 +3352,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu porsiyani tahrirlaydi"
+          }
+        }
+      }
+    },
+    "Every day you have logged is kept. Premium shows it as months, with your patterns and a recap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day you have logged is kept. Premium shows it as months, with your patterns and a recap."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Каждый записанный день сохраняется. Premium показывает их по месяцам — с вашими привычками и итогами."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yozilgan har bir kun saqlanadi. Premium ularni oylar bo‘yicha, odatlaringiz va xulosa bilan ko‘rsatadi."
           }
         }
       }
@@ -3415,6 +3875,29 @@
         }
       }
     },
+    "Month": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Month"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Месяц"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oy"
+          }
+        }
+      }
+    },
     "Mostly sitting": {
       "extractionState": "manual",
       "localizations": {
@@ -3697,6 +4180,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "iOS sozlamalarini ochish"
+          }
+        }
+      }
+    },
+    "Part of it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Part of it"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Частично"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qisman"
           }
         }
       }
@@ -4000,6 +4506,75 @@
         }
       }
     },
+    "The same as the month before": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The same as the month before"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Столько же, сколько в предыдущем месяце"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi oy bilan bir xil"
+          }
+        }
+      }
+    },
+    "The week, today and every serving stay free. Nothing you logged is ever hidden or deleted.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The week, today and every serving stay free. Nothing you logged is ever hidden or deleted."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неделя, сегодняшний день и каждая порция остаются бесплатными. Ничто из записанного не скрывается и не удаляется."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafta, bugungi kun va har bir porsiya bepul qoladi. Yozganlaringizdan hech narsa yashirilmaydi va o‘chirilmaydi."
+          }
+        }
+      }
+    },
+    "This month": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This month"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "За месяц"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shu oy"
+          }
+        }
+      }
+    },
     "Time for water": {
       "extractionState": "manual",
       "localizations": {
@@ -4157,6 +4732,88 @@
           "stringUnit": {
             "state": "translated",
             "value": "Qaytarish"
+          }
+        }
+      }
+    },
+    "Up %1$@ ml on the month before": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up %1$@ ml on the month before"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На %1$@ мл больше, чем в предыдущем месяце"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi oydan %1$@ ml ko‘p"
+          }
+        }
+      }
+    },
+    "Up %1$d millilitres on the month before": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Up %1$d millilitre on the month before"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Up %1$d millilitres on the month before"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитра больше, чем в предыдущем месяце"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитров больше, чем в предыдущем месяце"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитр больше, чем в предыдущем месяце"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "На %1$d миллилитра больше, чем в предыдущем месяце"
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi oydan %1$d millilitr ko‘p"
           }
         }
       }
@@ -4502,6 +5159,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vazningiz"
+          }
+        }
+      }
+    },
+    "Your whole month at a glance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your whole month at a glance"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Весь месяц на одном экране"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Butun oyingiz bir qarashda"
           }
         }
       }

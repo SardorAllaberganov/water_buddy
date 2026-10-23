@@ -306,3 +306,77 @@ struct HistoryLayoutTests {
         #expect(HistoryView.daySlot(across: 322, count: 0).isFinite)
     }
 }
+
+// MARK: - The month, as values
+
+/// History's Month decisions, pinned without building a view (spec `2026-10-22-month-view-design.md`
+/// §3.1, §3.3, §3.5). Not `@MainActor`: everything read here is `nonisolated` on purpose
+/// (rule `43-concurrency`). The month's seven columns are the week card's ``DayRow`` slots, whose
+/// 44-pt floor `everyDayClearsTheTapFloor(across:)` already holds.
+struct MonthLayoutTests {
+
+    @Test func theSwitchWaitsForTheFirstReadOfPurchases() {
+        #expect(!HistoryView.offersMonth(status: nil, offered: true))
+        #expect(!HistoryView.offersMonth(status: nil, offered: false))
+    }
+
+    @Test func aHolderKeepsTheMonthWhereThePaywallIsNotOffered() {
+        #expect(HistoryView.offersMonth(status: .lifetime, offered: false))
+        #expect(HistoryView.offersMonth(status: .monthly(until: .distantFuture), offered: true))
+    }
+
+    @Test func aFreeUserMeetsTheSwitchOnlyWhereThePaywallIs() {
+        #expect(HistoryView.offersMonth(status: .free, offered: true))
+        #expect(!HistoryView.offersMonth(status: .free, offered: false))
+    }
+
+    @Test func aMonthIsLaidUnderItsWeekdays() {
+        // 1 October 2026 is a Thursday (5).
+        let sundayFirst = HistoryView.monthGrid(dayCount: 31, weekdayOfFirst: 5, firstWeekday: 1)
+        #expect(sundayFirst.count == 5)
+        #expect(sundayFirst.first == [nil, nil, nil, nil, 0, 1, 2])
+        let mondayFirst = HistoryView.monthGrid(dayCount: 31, weekdayOfFirst: 5, firstWeekday: 2)
+        #expect(mondayFirst.first == [nil, nil, nil, 0, 1, 2, 3])
+        #expect(mondayFirst.last == [25, 26, 27, 28, 29, 30, nil])
+    }
+
+    @Test func aMonthTakesFourToSixWeeks() {
+        // February 2026 starts on a Sunday, August 2026 on a Saturday, September 2026 on a Tuesday.
+        #expect(HistoryView.monthGrid(dayCount: 28, weekdayOfFirst: 1, firstWeekday: 1).count == 4)
+        #expect(HistoryView.monthGrid(dayCount: 31, weekdayOfFirst: 7, firstWeekday: 1).count == 6)
+        #expect(HistoryView.monthGrid(dayCount: 30, weekdayOfFirst: 3, firstWeekday: 1).count == 5)
+    }
+
+    @Test(arguments: [(28, 1), (29, 4), (30, 3), (31, 7)])
+    func everyDayStandsOnceAndInOrder(dayCount: Int, weekdayOfFirst: Int) {
+        for firstWeekday in 1...7 {
+            let weeks = HistoryView.monthGrid(dayCount: dayCount, weekdayOfFirst: weekdayOfFirst, firstWeekday: firstWeekday)
+            #expect(weeks.allSatisfy { $0.count == 7 })
+            #expect(weeks.flatMap { $0 }.compactMap { $0 } == Array(0..<dayCount))
+        }
+    }
+
+    @Test func noDaysIsNoWeeks() {
+        #expect(HistoryView.monthGrid(dayCount: 0, weekdayOfFirst: 1, firstWeekday: 1).isEmpty)
+    }
+
+    @Test func theWeekStartsOnTheLanguagesFirstDay() {
+        #expect(HistoryView.firstWeekday(in: Locale(identifier: "en")) == 1)
+        #expect(HistoryView.firstWeekday(in: Locale(identifier: "ru")) == 2)
+        #expect(HistoryView.firstWeekday(in: Locale(identifier: "uz")) == 2)
+    }
+
+    @Test func theLettersFollowTheFirstDay() {
+        #expect(HistoryView.weekdayLetters(in: Locale(identifier: "en")) == ["S", "M", "T", "W", "T", "F", "S"])
+        let russian = HistoryView.weekdayLetters(in: Locale(identifier: "ru"))
+        #expect(russian.count == 7)
+        #expect(russian.first == "П", "Monday first, in Russian's own letter: \(russian)")
+    }
+
+    @Test func litresAreDrawnToOneDecimal() {
+        #expect(HistoryView.litres(62_570, locale: Locale(identifier: "en")) == "62.6")
+        #expect(HistoryView.litres(62_570, locale: Locale(identifier: "ru")) == "62,6")
+        #expect(HistoryView.litres(0, locale: Locale(identifier: "en")) == "0.0")
+        #expect(HistoryView.litres(1_234_500, locale: Locale(identifier: "en")) == "1,234.5")
+    }
+}

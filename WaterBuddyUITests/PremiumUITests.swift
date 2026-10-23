@@ -68,4 +68,56 @@ final class PremiumUITests: XCTestCase {
         app.buttons["Not now"].tap()
         XCTAssertTrue(see.waitForExistence(timeout: 5), "Not now did not close the paywall")
     }
+
+    /// Step 2 (spec `2026-10-22-month-view-design.md` §6, plan M1): an ordinary run's History has no
+    /// *Week · Month* switch.
+    @MainActor
+    func testAnOrdinaryRunsHistoryHasNoMonthSwitch() throws {
+        let app = XCUIApplication()
+        app.launch()
+        completeWelcomeIfShown(app)
+
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.buttons["Add a serving"].waitForExistence(timeout: 5))
+        // The switch waits for the first StoreKit read; give it the time it would take to come.
+        XCTAssertFalse(app.buttons["Month"].waitForExistence(timeout: 3),
+                       "the switch showed in a run not launched to offer it")
+    }
+
+    /// A free user's Month is the locked month: *See Premium* opens the paywall and *Back to this week*
+    /// returns to the week. A holder's month has no UI test (spec §6): holding Premium here would take
+    /// a StoreKit testing purchase.
+    @MainActor
+    func testAFreeUsersMonthIsLockedAndOpensThePaywall() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-WaterBuddyPremium", "YES"]
+        app.launch()
+        completeWelcomeIfShown(app)
+
+        app.buttons["History"].tap()
+        let week = app.buttons["Week"]
+        let month = app.buttons["Month"]
+        XCTAssertTrue(month.waitForExistence(timeout: 10), "no Week · Month switch")
+        XCTAssertEqual(app.buttons.matching(identifier: "Week").count, 1)
+        XCTAssertEqual(app.buttons.matching(identifier: "Month").count, 1)
+        XCTAssertEqual(month.value as? String, "Premium")
+        XCTAssertTrue(week.isSelected)
+        tapWhenReady(month)
+
+        let locked = app.staticTexts["Your whole month at a glance"]
+        XCTAssertTrue(locked.waitForExistence(timeout: 5), "no locked month")
+        XCTAssertTrue(month.isSelected)
+        XCTAssertEqual(count("See Premium", in: app), 1, "See Premium is not one element")
+        XCTAssertEqual(count("Back to this week", in: app), 1, "Back to this week is not one element")
+        tapWhenReady(app.buttons["See Premium"])
+
+        let paywall = app.staticTexts["See how you really drink, and what would help."]
+        XCTAssertTrue(paywall.waitForExistence(timeout: 5), "See Premium opened no paywall")
+        app.buttons["Not now"].tap()
+        XCTAssertTrue(paywall.waitForNonExistence(timeout: 5), "Not now did not close the paywall")
+
+        tapWhenReady(app.buttons["Back to this week"])
+        XCTAssertTrue(locked.waitForNonExistence(timeout: 5), "Back to this week left the locked month up")
+        XCTAssertTrue(week.isSelected)
+    }
 }

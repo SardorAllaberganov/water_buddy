@@ -25,7 +25,10 @@ struct PaywallView: View {
 
     /// Where the sheet was opened from — its `.sheet(item:)` selection (rule `50-views`).
     enum Entry: Identifiable, Hashable {
+        /// Settings' *See Premium*.
         case settings
+        /// History's locked month (spec `2026-10-22-month-view-design.md` §3.6).
+        case history
 
         var id: Self { self }
     }

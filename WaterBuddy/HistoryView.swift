@@ -186,10 +186,55 @@ struct HistoryView: View {
         (width - 2 * dayRowInset(across: width, count: count)) / CGFloat(max(count, 1))
     }
 
+    /// Whether History draws its *Week · Month* switch (spec `2026-10-22-month-view-design.md` §3.1):
+    /// never while the first StoreKit read is outstanding, so a holder never sees a locked month flash;
+    /// always for a holder, who keeps the month even where the paywall is not offered; for a free user
+    /// only where it is, so the locked month always has a paywall to open.
+    nonisolated static func offersMonth(status: PremiumAccess.Status?, offered: Bool) -> Bool {
+        guard let status else { return false }
+        return status.isPremium || offered
+    }
+
+    /// The month's days laid into weeks of seven, `nil` where a week runs past either end: the 1st
+    /// under its own weekday, counted from the locale's first (§3.3). The entries index
+    /// ``MonthHistory/days``. `weekdayOfFirst` comes from the model's calendar, `firstWeekday` from the
+    /// app's locale (``firstWeekday(in:)``) — a view holds no calendar of its own (rule `30-rollover`).
+    nonisolated static func monthGrid(dayCount: Int, weekdayOfFirst: Int, firstWeekday: Int) -> [[Int?]] {
+        guard dayCount > 0 else { return [] }
+        let leading = ((weekdayOfFirst - firstWeekday) % 7 + 7) % 7
+        var cells: [Int?] = Array(repeating: nil, count: leading) + (0..<dayCount).map { Optional($0) }
+        cells += Array(repeating: nil, count: (7 - cells.count % 7) % 7)
+        return stride(from: 0, to: cells.count, by: 7).map { Array(cells[$0..<($0 + 7)]) }
+    }
+
+    /// The locale's first weekday, `1` for Sunday: Sunday under US English, Monday under Russian and
+    /// Uzbek, and the user's own *First Day of Week* under *Follow device*, which `firstDayOfWeek`
+    /// honours. Never `Calendar.waterBuddyDay`'s, which is fixed to `en_US_POSIX` (§3.3).
+    nonisolated static func firstWeekday(in locale: Locale) -> Int {
+        let week: [Locale.Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
+        return (week.firstIndex(of: locale.firstDayOfWeek) ?? 0) + 1
+    }
+
+    /// The grid's weekday letters in the locale's own script, from its first weekday.
+    nonisolated static func weekdayLetters(in locale: Locale) -> [String] {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        let letters = calendar.veryShortStandaloneWeekdaySymbols
+        let first = firstWeekday(in: locale)
+        return (0..<7).map { letters[(first - 1 + $0) % 7] }
+    }
+
+    /// Millilitres as litres to one decimal, through `Decimal` — never a `Double`, which may only be a
+    /// drawing fraction (rule `20-state`) — in the app's locale: *62.6*, *62,6* (§3.5).
+    nonisolated static func litres(_ millilitres: Int, locale: Locale) -> String {
+        (Decimal(millilitres) / 1_000).formatted(.number.precision(.fractionLength(1)).locale(locale))
+    }
+
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(PremiumStore.self) private var premium
 
     /// The day the week card picked, as an ordinal — `nil` for today. Presentation state, which is
     /// the only kind a view owns (rule `50-views`); leaving the tab resets it to today, when the
@@ -208,6 +253,23 @@ struct HistoryView: View {
     @State private var picks = 0
     @State private var removals = 0
 
+    /// Week or Month — presentation state, Week whenever the page is built (spec
+    /// `2026-10-22-month-view-design.md` §3.2). Which month is shown is the model's
+    /// (``DataManager/showMonth(_:)``): History holds no month of its own and does no month arithmetic
+    /// (rule `30-rollover`).
+    @State private var mode = HistoryMode.week
+
+    /// The month's opened day, as an ordinal — `nil` for none (§3.4).
+    @State private var openedDay: Int?
+
+    /// The paywall, while the locked month has it open — its `.sheet(item:)` selection (rule `50-views`).
+    @State private var paywall: PaywallView.Entry?
+
+    /// Bumped by the user's own taps on the switch and on a month's arrows, as ``picks`` is by a day
+    /// (rule `60-design-system`).
+    @State private var switches = 0
+    @State private var steps = 0
+
     /// The `+`'s diameter, a real magnitude scaled with the header's own text (rule
     /// `65-accessibility`), bounded at its use site.
     @ScaledMetric(relativeTo: .title2) private var addButtonSize: CGFloat = 44
@@ -224,43 +286,17 @@ struct HistoryView: View {
                 // Every tab's inset, less the point this list itself stands off the safe area.
                 .historyRow(top: ScreenMetrics.topInset - 1, bottom: 10)
 
-            // Drawn only once there is a past to show. A fresh install would otherwise open on
-            // seven empty bars, which reads as a broken chart rather than as a new account — and
-            // this is the one screen guaranteed to render its empty state for every new user.
-            // Note the condition is `history`, not `todaysLogs`: the morning after a rollover,
-            // today is empty and the week is exactly what the user wants to see.
-            if hasSomethingToShow {
-                HistoryCard(
-                    shown: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal,
-                    arrived: arrived
-                ) { ordinal in
-                    let picked = Self.selection(forDay: ordinal, in: manager.history)
-                    // A tick for a choice, and none for a tap on the day already shown.
-                    if picked != selectedDay { picks += 1 }
-                    selectedDay = picked
-                }
-                // Were History the page the app opens on, everything under the header would
-                // settle in; a page that slides in is whole as it comes (``Arrival``).
-                .arrives(arrived, order: 0)
-                .historyRow()
+            // Under the header, in both modes, so it never moves under the finger (spec §3.2).
+            if drawsSwitch {
+                ModeSwitch(mode: mode, locked: !holdsPremium) { choose($0) }
+                    .arrives(arrived, order: 0)
+                    .historyRow(top: 0, bottom: 8)
             }
 
-            if shownLogs.isEmpty {
-                emptyState
-                    .arrives(arrived, order: 1)
-                    .historyRow(top: 22)
+            if showsMonth {
+                monthRows
             } else {
-                // Today's strip also marks the next reminder; a past day has none to mark.
-                DayStrip(
-                    logs: shownLogs,
-                    day: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal,
-                    marksReminder: shownPastDay == nil,
-                    arrived: arrived
-                )
-                    .arrives(arrived, order: 1)
-                    .historyRow()
-
-                servings
+                weekRows
             }
         }
         .listStyle(.plain)
@@ -268,6 +304,9 @@ struct HistoryView: View {
         // Scoped to the value that actually changed — never a bare `withAnimation` around a model
         // mutation. Identity, not amount: an edit redraws its own row and must not slide the list.
         .animation(.smooth(duration: 0.35), value: shownLogs.map(\.id))
+        // The opened day comes and goes, and Month's rows with the mode (spec §3.8).
+        .animation(.smooth(duration: 0.35), value: openedDay)
+        .animation(.smooth(duration: 0.35), value: showsMonth)
         // One point clear of the status bar, and it is not spacing. A scroll view whose top edge
         // meets the safe area's draws its content on up under the status bar; with nothing fixed
         // above the list any more, the rows ran under the clock and the battery — *15:26*
@@ -282,7 +321,24 @@ struct HistoryView: View {
         // declared once on `RootTabView`, which owns the hosting controller both tabs share.
         // Another process may have logged while this one was away, and the day may have turned.
         // `refresh()` re-derives the rows as well as the total, so both arrive together.
-        .onAppear { manager.refresh() }
+        .onAppear {
+            // A page is built in Week mode: a month a previous visit left the model reading is let go
+            // before the refresh would read it again (plan M13).
+            if !showsMonth { manager.showMonth(nil) }
+            manager.refresh()
+        }
+        // The pager keeps a page it has left for the length of its slide, and gives the same page
+        // back, state and all, to a tab tapped again inside it (`RootTabView.page(_:)`). So History
+        // lets go of a month when the page is removed, not at the turn: at the turn it emptied the
+        // month on the page sliding away, and a quick return found Month on an empty card (the final
+        // review's I1 and I2; the owner's ruling of 2026-10-23, amending spec §3.8 and plan M13).
+        .onDisappear { manager.showMonth(nil) }
+        // Premium bought, or refunded, with Month on screen: the month is read, or let go.
+        .onChange(of: holdsPremium) { _, holds in
+            guard mode == .month else { return }
+            openedDay = nil
+            manager.showMonth(holds ? manager.thisMonth : nil)
+        }
         // Leaving the tab returns the screen to today, and nothing here has to say so: a page
         // is rebuilt each time it is shown (`testHistoryReturnsToTodayWhenItsTabIsLeft`). A
         // sheet over this screen does not rebuild it, so the day a serving was just saved to
@@ -291,6 +347,8 @@ struct HistoryView: View {
         // A tick for a day picked, a light tap for a serving taken away.
         .sensoryFeedback(Haptics.select, trigger: picks)
         .sensoryFeedback(Haptics.remove, trigger: removals)
+        .sensoryFeedback(Haptics.select, trigger: switches)
+        .sensoryFeedback(Haptics.select, trigger: steps)
         // A selection the card can no longer show is dropped, so it cannot resurface on a later
         // serving and take the screen back to a day the user had left.
         .onChange(of: hasSomethingToShow) { _, isShowing in
@@ -309,6 +367,51 @@ struct HistoryView: View {
                 selectedDay = Self.selection(forDay: manager.dayOrdinal(for: saved), in: manager.history)
             }
         }
+        .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
+    }
+
+    /// Week mode — History as it was before the month: the week card, then the shown day's strip and
+    /// servings, or its empty state (spec §3.2).
+    @ViewBuilder
+    private var weekRows: some View {
+        // Drawn only once there is a past to show. A fresh install would otherwise open on
+        // seven empty bars, which reads as a broken chart rather than as a new account — and
+        // this is the one screen guaranteed to render its empty state for every new user.
+        // Note the condition is `history`, not `todaysLogs`: the morning after a rollover,
+        // today is empty and the week is exactly what the user wants to see.
+        if hasSomethingToShow {
+            HistoryCard(
+                shown: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal,
+                arrived: arrived
+            ) { ordinal in
+                let picked = Self.selection(forDay: ordinal, in: manager.history)
+                // A tick for a choice, and none for a tap on the day already shown.
+                if picked != selectedDay { picks += 1 }
+                selectedDay = picked
+            }
+            // Were History the page the app opens on, everything under the header would
+            // settle in; a page that slides in is whole as it comes (``Arrival``).
+            .arrives(arrived, order: 0)
+            .historyRow()
+        }
+
+        if shownLogs.isEmpty {
+            emptyState
+                .arrives(arrived, order: 1)
+                .historyRow(top: 22)
+        } else {
+            // Today's strip also marks the next reminder; a past day has none to mark.
+            DayStrip(
+                logs: shownLogs,
+                day: shownPastDay?.dayOrdinal ?? manager.history.last?.dayOrdinal,
+                marksReminder: shownPastDay == nil,
+                arrived: arrived
+            )
+                .arrives(arrived, order: 1)
+                .historyRow()
+
+            servings
+        }
     }
 
     /// Whether any day in the published window carries water.
@@ -324,7 +427,9 @@ struct HistoryView: View {
     /// The selection counts only while the card is drawn — with no card there is nothing to pick a
     /// day from, so the screen is on today.
     private var shownPastDay: DaySummary? {
-        guard let day = Self.shownDay(selected: hasSomethingToShow ? selectedDay : nil, in: manager.history),
+        // Month mode's header is today's (spec §3.2); the week's selection waits for Week.
+        guard !showsMonth,
+              let day = Self.shownDay(selected: hasSomethingToShow ? selectedDay : nil, in: manager.history),
               day.dayOrdinal != manager.history.last?.dayOrdinal
         else { return nil }
         return day
@@ -340,6 +445,86 @@ struct HistoryView: View {
     private var shownLogs: [WaterLog] {
         guard let day = shownPastDay else { return manager.todaysLogs }
         return manager.historyLogs[day.dayOrdinal] ?? []
+    }
+
+    /// Whether the switch is drawn (``offersMonth(status:offered:)``).
+    private var drawsSwitch: Bool {
+        Self.offersMonth(status: premium.state.status, offered: PaywallView.isOfferedHere)
+    }
+
+    /// Whether the user holds Premium — `false` while the first read is outstanding.
+    private var holdsPremium: Bool {
+        premium.state.status?.isPremium == true
+    }
+
+    /// Whether Month mode is on screen. With no switch drawn History is the week, whatever ``mode`` holds.
+    private var showsMonth: Bool {
+        drawsSwitch && mode == .month
+    }
+
+    /// The month's opened day, while the shown month holds it and it can be opened.
+    private var openedMonthDay: MonthHistory.Day? {
+        manager.month?.days.first { $0.summary.dayOrdinal == openedDay && $0.canOpen }
+    }
+
+    /// Month mode: for a holder the month, the day opened in it and the month's figures; for a free user
+    /// the locked month (spec §3.2).
+    @ViewBuilder
+    private var monthRows: some View {
+        if holdsPremium {
+            MonthCard(month: manager.month, opened: openedDay, open: { open($0) }, move: { move(to: $0) })
+                .historyRow()
+
+            if let day = openedMonthDay {
+                OpenedDayHeading(day: day)
+                    .historyRow(top: 14, bottom: 2)
+
+                // A day with nothing logged draws its heading alone (plan M12).
+                let logs = manager.monthLogs[day.summary.dayOrdinal] ?? []
+                if !logs.isEmpty {
+                    DayStrip(logs: logs, day: day.summary.dayOrdinal, marksReminder: false, arrived: arrived)
+                        .historyRow()
+
+                    // Read-only, for every day (spec §3.4): no sheet, no swipe.
+                    ForEach(logs, id: \.id) { log in
+                        ServingRow(log: log, vessel: Self.vessel(forAmount: log.amount, amounts: manager.servings), edit: nil)
+                            .historyRow(top: 5, bottom: 5, sides: Self.margin)
+                    }
+                }
+            }
+
+            if let month = manager.month, month.daysCounted > 0 {
+                MonthFigures(month: month)
+                    .historyRow(top: 8, bottom: 24)
+            }
+        } else {
+            LockedMonth { paywall = .history } back: { choose(.week) }
+                .historyRow(bottom: 24)
+        }
+    }
+
+    /// The switch: Week, or Month — this month on the model's own clock, for a holder alone; a free
+    /// user's Month asks for nothing (spec §3.6).
+    private func choose(_ chosen: HistoryMode) {
+        guard chosen != mode else { return }
+        switches += 1
+        mode = chosen
+        openedDay = nil
+        manager.showMonth(chosen == .month && holdsPremium ? manager.thisMonth : nil)
+    }
+
+    /// An arrow: the month it names, which the shown month says exists.
+    private func move(to month: Int?) {
+        guard let month else { return }
+        steps += 1
+        openedDay = nil
+        manager.showMonth(month)
+    }
+
+    /// A day on the month: opened, or closed when it is the one open (spec §3.4).
+    private func open(_ ordinal: Int) {
+        picks += 1
+        openedDay = openedDay == ordinal ? nil : ordinal
     }
 
     // MARK: - Header
@@ -1027,6 +1212,644 @@ private struct LetterCentres: PreferenceKey {
     }
 }
 
+// MARK: - The month
+
+/// Week or Month — History's two modes (spec `2026-10-22-month-view-design.md` §3.2).
+private enum HistoryMode {
+    case week, month
+}
+
+/// History's own measures for the month.
+private enum MonthStyle {
+    /// The primary buttons' 56 (rule `65-accessibility`), as the paywall's and the Premium card's are.
+    static let buttonHeight: CGFloat = 56
+
+    /// The locked month's drawn month as the board draws it (*Step 2 — Month, free user*): a title bar
+    /// and its weeks, at the top of a pane taller than the card centred on it, so the month shows round
+    /// the card — at the month card's own spacing and height it hid behind it (the walk's W1).
+    static let drawnTitleBar = CGSize(width: 150, height: 18)
+    static let drawnWeekSpacing: CGFloat = 12
+    static let lockedHeight: CGFloat = 392
+}
+
+/// *Week · Month*: two buttons on one frosted capsule, the shown one marked as a selected slot is —
+/// `LiquidGlass.Selection`'s fill and rim, never solid white, which would read as the primary surface
+/// the locked month's *See Premium* is (spec §3.8, rule `60-design-system`).
+///
+/// For a free user Month carries a lock, drawn and not spoken: its value says *Premium* (spec §3.9).
+private struct ModeSwitch: View {
+
+    @Environment(\.strings) private var strings
+
+    let mode: HistoryMode
+    let locked: Bool
+    let choose: (HistoryMode) -> Void
+
+    var body: some View {
+        HStack(spacing: 4) {
+            segment(.week, Text("Week", bundle: strings))
+            segment(.month, Text("Month", bundle: strings))
+        }
+        .padding(3)
+        // The screen's own pair: sibling panes on one screen share one (rule `60-design-system`).
+        .liquidGlass(in: Capsule(), density: .frosted, elevation: .raised)
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private func segment(_ choice: HistoryMode, _ title: Text) -> some View {
+        let isSelected = choice == mode
+        let isLocked = choice == .month && locked
+
+        return Button {
+            choose(choice)
+        } label: {
+            HStack(spacing: 6) {
+                title
+                if isLocked {
+                    Image(systemName: "lock.fill")
+                        .imageScale(.small)
+                        .accessibilityHidden(true)
+                }
+            }
+            .font(.subheadline.weight(isSelected ? .bold : .semibold))
+            .foregroundStyle(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            // The whole half is the target (rule `65-accessibility`).
+            .frame(maxWidth: .infinity, minHeight: HistoryView.dayTapFloor)
+            .background {
+                Capsule()
+                    .fill(.white.opacity(isSelected ? LiquidGlass.Selection.fillOpacity : 0))
+                    .strokeBorder(.white.opacity(isSelected ? LiquidGlass.Selection.rimOpacity : 0), lineWidth: 1)
+                    .animation(Motion.land, value: isSelected)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityValue(isLocked ? Text("Premium", bundle: strings) : Text(verbatim: ""))
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+}
+
+/// The month as rings: ‹, its name, ›; the weekday letters; a ring a day; the legend and the
+/// disclosure (spec §3.3).
+///
+/// **The days are laid out by ``DayRow``, a week to a row** — the week card's own slots, seven of which
+/// clear the 44-pt floor on the narrowest supported iPhone (`everyDayClearsTheTapFloor(across:)`).
+///
+/// **Every mark is the model's answer** — counted, openable, met, today, the arc
+/// (``MonthHistory/Day``): nothing is judged against the goal here (rule `50-views`). A met ring is
+/// closed as well as cyan, never colour alone (rule `65-accessibility`).
+///
+/// **VoiceOver hears a summary and a button a day**: the month's name as a heading, the days on goal
+/// its value; each day that can be opened one button, its date the label, its total against the goal
+/// the value, selected when it is open. The quiet days, the letters and the legend are hidden.
+private struct MonthCard: View {
+
+    @Environment(DataManager.self) private var manager
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    /// The month on screen, or `nil` before its first read has answered.
+    let month: MonthHistory?
+
+    /// The opened day's ordinal, marked and announced as selected.
+    let opened: Int?
+
+    let open: (Int) -> Void
+    let move: (Int?) -> Void
+
+    /// A ring's diameter: a real magnitude scaled with the text, capped at its use site inside the
+    /// 44-pt slot with room for the opened day's ring round it (rule `65-accessibility`).
+    @ScaledMetric(relativeTo: .body) private var scaledRing: CGFloat = 34
+
+    private var ring: CGFloat { min(scaledRing, 36) }
+
+    /// The arc's width, a ratio of the ring.
+    private var arc: CGFloat { ring * 0.1 }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if let month {
+                titleRow(month)
+                    .padding(.horizontal, 8)
+                letters
+                weeks(month)
+                legend
+                    .padding(.horizontal, 20)
+                Text("Measured against your current goal", bundle: strings)
+                    .font(.caption2)
+                    // The week card's value, measured on its pane (`docs/DESIGN.md`, *The look,
+                    // measured*); measured on this one in the walk.
+                    .foregroundStyle(.white.opacity(0.88))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+            } else {
+                // Before the first read answers: the quiet form — no title, no arrow, no ring, no
+                // figure (spec §3.3).
+                DrawnMonth(pattern: false)
+                    .accessibilityHidden(true)
+            }
+        }
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(.white)
+        // The week card's pair (rule `60-design-system`).
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .padding(.horizontal, HistoryView.margin)
+        .animation(.smooth(duration: 0.3), value: month)
+    }
+
+    private func titleRow(_ month: MonthHistory) -> some View {
+        HStack(spacing: 8) {
+            arrow(to: month.earlier, systemName: "chevron.left")
+            Spacer(minLength: 0)
+            if let first = month.days.first {
+                // Formatted in the app's language, never keyed (spec §3.11).
+                Text(first.summary.date, format: .dateTime.month(.wide).year())
+                    .font(.headline.weight(.bold))
+                    // Two lines at the accessibility sizes, as a past day's heading is, rather than cut
+                    // between the arrows: on one it drew *October 2…* (the walk's L1).
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.7)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityValue(strings.localized("%1$d of %2$d days on goal", month.daysMet, month.daysCounted, locale: locale))
+            }
+            Spacer(minLength: 0)
+            arrow(to: month.later, systemName: "chevron.right")
+        }
+    }
+
+    /// ‹ or ›: a chevron with a 44-pt target, labelled with the month it goes to (plan M8). At a bound
+    /// it is drawn quieter, does nothing, and VoiceOver does not stop on it — there is no month to name.
+    private func arrow(to neighbour: MonthHistory.Neighbour?, systemName: String) -> some View {
+        Button {
+            move(neighbour?.firstDay)
+        } label: {
+            Image(systemName: systemName)
+                // A ratio of its target, never a text style of its own (rule `65-accessibility`).
+                .font(.system(size: HistoryView.dayTapFloor * 0.4, weight: .semibold))
+                .frame(width: HistoryView.dayTapFloor, height: HistoryView.dayTapFloor)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(PressStyle())
+        .disabled(neighbour == nil)
+        .opacity(neighbour == nil ? 0.35 : 1)
+        .accessibilityLabel(Text(neighbour?.start.formatted(.dateTime.month(.wide).year().locale(locale)) ?? ""))
+        .accessibilityHidden(neighbour == nil)
+    }
+
+    /// The weekday letters, from the app's language's first weekday. Hidden: each day speaks its date.
+    private var letters: some View {
+        DayRow {
+            ForEach(Array(HistoryView.weekdayLetters(in: locale).enumerated()), id: \.offset) { _, letter in
+                Text(letter)
+                    .font(.system(size: ring * 0.34, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityHidden(true)
+    }
+
+    private func weeks(_ month: MonthHistory) -> some View {
+        let grid = HistoryView.monthGrid(
+            dayCount: month.days.count,
+            weekdayOfFirst: month.weekdayOfFirst,
+            firstWeekday: HistoryView.firstWeekday(in: locale)
+        )
+        return VStack(spacing: 4) {
+            ForEach(grid.indices, id: \.self) { week in
+                DayRow {
+                    ForEach(0..<7, id: \.self) { weekday in
+                        cell(grid[week][weekday].map { month.days[$0] })
+                    }
+                }
+                // As the week card's row: its slots claim their height (`tasks/lessons.md`).
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func cell(_ day: MonthHistory.Day?) -> some View {
+        if let day, day.canOpen {
+            dayButton(day)
+        } else if let day {
+            quietDay(day)
+        } else {
+            Color.clear
+                .frame(height: HistoryView.dayTapFloor)
+                .accessibilityHidden(true)
+        }
+    }
+
+    private func dayButton(_ day: MonthHistory.Day) -> some View {
+        let ordinal = day.summary.dayOrdinal
+        let isOpened = ordinal == opened
+
+        return Button {
+            open(ordinal)
+        } label: {
+            ZStack {
+                // The track, then the day's arc over it from twelve o'clock, both inside the ring.
+                Circle()
+                    .inset(by: arc / 2)
+                    .stroke(.white.opacity(0.14), lineWidth: arc)
+                Circle()
+                    .inset(by: arc / 2)
+                    .trim(from: 0, to: day.fraction)
+                    .stroke(day.isMet ? Aurora.cyan : Color.white, style: StrokeStyle(lineWidth: arc, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                // The opened day's ring and disc, at zero opacity on every other day, so what animates
+                // is a mark and not a layer (rule `60-design-system`, plan M7).
+                Circle()
+                    .strokeBorder(.white.opacity(isOpened ? LiquidGlass.Selection.ringOpacity : 0), lineWidth: LiquidGlass.Selection.ringWidth)
+                    .padding(-3)
+                Circle()
+                    .fill(LiquidGlass.Selection.discFill.opacity(isOpened ? 1 : 0))
+                    .padding(arc + 2)
+                Text(day.summary.date, format: .dateTime.day())
+                    // A ratio of the ring, never a text style of its own (rule `65-accessibility`).
+                    .font(.system(size: ring * 0.38, weight: isOpened || day.isToday ? .heavy : .semibold, design: .rounded))
+                    .monospacedDigit()
+                    // `Aurora.top` on the white disc, as the week card's shown letter is
+                    // (`theShownDaysLetterReadsOnItsDisc`).
+                    .foregroundStyle(isOpened ? Aurora.top : Color.white)
+            }
+            .frame(width: ring, height: ring)
+            .animation(Motion.land, value: isOpened)
+            .frame(maxWidth: .infinity, minHeight: HistoryView.dayTapFloor)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(name(of: day))
+        .accessibilityValue(strings.localized("%1$d of %2$d millilitres", day.summary.total, manager.dailyGoal, locale: locale))
+        .accessibilityAddTraits(isOpened ? [.isSelected] : [])
+    }
+
+    /// A day that cannot be opened — still to come, or before the first serving: a faint disc and its
+    /// number, not a button (spec §3.3). Its white is the empty state's 0.7 until the walk measures it
+    /// on this pane (plan M9).
+    private func quietDay(_ day: MonthHistory.Day) -> some View {
+        ZStack {
+            Circle()
+                .fill(.white.opacity(0.06))
+            Text(day.summary.date, format: .dateTime.day())
+                .font(.system(size: ring * 0.38, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .frame(width: ring, height: ring)
+        .frame(maxWidth: .infinity, minHeight: HistoryView.dayTapFloor)
+        .accessibilityHidden(true)
+    }
+
+    /// *Goal met* and *Part of it*, each beside its mark — side by side while they fit, one above the
+    /// other where they do not. Hidden: every day speaks its own figures.
+    private var legend: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 18) {
+                legendItem(Text("Goal met", bundle: strings), colour: Aurora.cyan, fraction: 1)
+                legendItem(Text("Part of it", bundle: strings), colour: .white, fraction: 0.6)
+            }
+            .fixedSize()
+            VStack(alignment: .leading, spacing: 6) {
+                legendItem(Text("Goal met", bundle: strings), colour: Aurora.cyan, fraction: 1)
+                legendItem(Text("Part of it", bundle: strings), colour: .white, fraction: 0.6)
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(.white.opacity(0.9))
+        .frame(maxWidth: .infinity)
+        .accessibilityHidden(true)
+    }
+
+    private func legendItem(_ title: Text, colour: Color, fraction: Double) -> some View {
+        let mark = ring * 0.34
+
+        return HStack(spacing: 6) {
+            ZStack {
+                Circle()
+                    .inset(by: mark * 0.125)
+                    .stroke(.white.opacity(0.14), lineWidth: mark * 0.25)
+                Circle()
+                    .inset(by: mark * 0.125)
+                    .trim(from: 0, to: fraction)
+                    .stroke(colour, style: StrokeStyle(lineWidth: mark * 0.25, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+            }
+            .frame(width: mark, height: mark)
+            title
+        }
+    }
+
+    /// What VoiceOver calls a day: *Today*, or its date spelled out.
+    private func name(of day: MonthHistory.Day) -> Text {
+        guard !day.isToday else { return Text("Today", bundle: strings) }
+        return Text(day.summary.date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(locale)))
+    }
+}
+
+/// The month's opened day: its name and its total against the goal, a heading on the aurora above its
+/// strip and its servings (spec §3.4, plan M6) — one element, as History's own heading is.
+private struct OpenedDayHeading: View {
+
+    @Environment(DataManager.self) private var manager
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    let day: MonthHistory.Day
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Group {
+                if day.isToday {
+                    Text("Today", bundle: strings)
+                } else {
+                    Text(day.summary.date, format: .dateTime.weekday(.wide).day().month(.wide))
+                }
+            }
+            .font(.title3.weight(.bold))
+            // Two lines before a word is cut: a day's name is the longest word this screen draws.
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .legibleOnBackdrop()
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityValue(strings.localized("%1$d of %2$d millilitres", day.summary.total, manager.dailyGoal, locale: locale))
+
+            Text(strings.figure("%1$@ of %2$@ ml", day.summary.total, manager.dailyGoal, locale: locale))
+                .font(.subheadline.weight(.semibold))
+                .fontDesign(.rounded)
+                .monospacedDigit()
+                .legibleOnBackdrop()
+                .accessibilityHidden(true)
+        }
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, HistoryView.margin)
+    }
+}
+
+/// The month's figures: *Days on goal*, *Best streak* and *This month* as tiles — three across where
+/// they fit, a column where they do not — then the average and the change (spec §3.5, §3.9). Drawn
+/// only for a month with a counted day.
+private struct MonthFigures: View {
+
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    let month: MonthHistory
+
+    var body: some View {
+        VStack(spacing: 10) {
+            // Offered the row's whole width; it chooses among whole layouts (`tasks/lessons.md`).
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 10) { tiles(fixed: true) }
+                VStack(spacing: 10) { tiles(fixed: false) }
+            }
+            .frame(maxWidth: .infinity)
+
+            if let average = month.average {
+                averageLine(average)
+            }
+        }
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    @ViewBuilder
+    private func tiles(fixed: Bool) -> some View {
+        tile(
+            strings.figure("%1$@/%2$@", month.daysMet, month.daysCounted, locale: locale),
+            label: Text("Days on goal", bundle: strings),
+            spoken: strings.localized("%1$d of %2$d days", month.daysMet, month.daysCounted, locale: locale),
+            fixed: fixed
+        )
+        tile(
+            strings.localized("%1$d days", month.bestRun, locale: locale),
+            label: Text("Best streak", bundle: strings),
+            spoken: strings.localized("%1$d days", month.bestRun, locale: locale),
+            fixed: fixed
+        )
+        // Litres drawn, millilitres spoken, as the sliders speak them (spec §3.9).
+        tile(
+            strings.localized("%1$@ L", HistoryView.litres(month.total, locale: locale), locale: locale),
+            label: Text("This month", bundle: strings),
+            spoken: strings.localized("%1$d millilitres", month.total, locale: locale),
+            fixed: fixed
+        )
+    }
+
+    private func tile(_ figure: String, label: Text, spoken: String, fixed: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(figure)
+                .font(.title3.weight(.bold))
+                .fontDesign(.rounded)
+                .monospacedDigit()
+            label
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(.white.opacity(0.9))
+        }
+        .lineLimit(1)
+        // At its own size across the row; in the column, with a line to itself, it may shrink.
+        .minimumScaleFactor(fixed ? 1 : 0.6)
+        .fixedSize(horizontal: fixed, vertical: false)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .foregroundStyle(.white)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(spoken)
+    }
+
+    private func averageLine(_ average: Int) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(strings.figure("Average %1$@ ml a day", average, locale: locale))
+                    .font(.subheadline.weight(.bold))
+                if let change = month.change {
+                    Text(drawnChange(change))
+                        .font(.footnote)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+            }
+            .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+
+            if let change = month.change {
+                Image(systemName: change > 0 ? "arrow.up.right" : change < 0 ? "arrow.down.right" : "equal")
+                    .font(.body.weight(.semibold))
+                    // A glyph on dark glass, read at 3:1 in the walk (`tasks/lessons.md`, 2026-10-22).
+                    .foregroundStyle(Aurora.cyan)
+                    .accessibilityHidden(true)
+            }
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(strings.localized("Average %1$d millilitres a day", average, locale: locale))
+        .accessibilityValue(month.change.map(spokenChange) ?? "")
+    }
+
+    /// Names no month: Russian would need it in the prepositional case, which Foundation does not
+    /// produce (spec §3.11).
+    private func drawnChange(_ change: Int) -> String {
+        if change > 0 { return strings.figure("Up %1$@ ml on the month before", change, locale: locale) }
+        if change < 0 { return strings.figure("Down %1$@ ml on the month before", -change, locale: locale) }
+        return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
+    }
+
+    private func spokenChange(_ change: Int) -> String {
+        if change > 0 { return strings.localized("Up %1$d millilitres on the month before", change, locale: locale) }
+        if change < 0 { return strings.localized("Down %1$d millilitres on the month before", -change, locale: locale) }
+        return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
+    }
+}
+
+/// What a free user meets in Month: a drawn month — not theirs, and never read (spec §3.6) — blurred
+/// under a card that offers Premium, and the promise under it.
+private struct LockedMonth: View {
+
+    @Environment(\.strings) private var strings
+
+    let open: () -> Void
+    let back: () -> Void
+
+    var body: some View {
+        VStack(spacing: 14) {
+            card
+                .padding(16)
+                .frame(maxWidth: .infinity, minHeight: MonthStyle.lockedHeight)
+                // Behind the card and sized by it, so it stands round the card at every text size.
+                .background {
+                    VStack(spacing: 14) {
+                        // Where a month's name would stand — drawn, never read.
+                        Capsule()
+                            .fill(.white.opacity(0.28))
+                            .frame(width: MonthStyle.drawnTitleBar.width, height: MonthStyle.drawnTitleBar.height)
+                        DrawnMonth(pattern: true, weekSpacing: MonthStyle.drawnWeekSpacing)
+                    }
+                        .blur(radius: 5)
+                        .opacity(0.75)
+                        .padding(.vertical, 18)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                        .liquidGlass(density: .frosted, elevation: .raised)
+                        .accessibilityHidden(true)
+                }
+            promise
+        }
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var card: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "calendar")
+                // White, as the Settings card's glyph is: cyan read 2.88:1 there (step 1's walk, R4).
+                .font(.title2.weight(.semibold))
+                .accessibilityHidden(true)
+            Text("Your whole month at a glance", bundle: strings)
+                .font(.title3.weight(.bold))
+                .accessibilityAddTraits(.isHeader)
+            Text("Every day you have logged is kept. Premium shows it as months, with your patterns and a recap.", bundle: strings)
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.92))
+            Button(action: open) {
+                // The surface sets its label's colour (rule `60-design-system`).
+                Text("See Premium", bundle: strings)
+                    .font(.body.weight(.bold))
+                    .frame(maxWidth: .infinity, minHeight: MonthStyle.buttonHeight)
+                    .primarySurface(in: Capsule())
+            }
+            .buttonStyle(PressStyle())
+            .padding(.top, 6)
+            Button(action: back) {
+                Text("Back to this week", bundle: strings)
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, minHeight: HistoryView.dayTapFloor)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        .foregroundStyle(.white)
+        .padding(.horizontal, 20)
+        .padding(.top, 22)
+        .padding(.bottom, 10)
+        .frame(maxWidth: .infinity)
+        // Sentence-length text, on `.frosted` (rule `60-design-system`), and Premium's mark.
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .premiumRim()
+    }
+
+    private var promise: some View {
+        HStack(alignment: .top, spacing: 12) {
+            // White, step 1's ruling R4 for the paywall's check.
+            Image(systemName: "checkmark")
+                .font(.body.weight(.semibold))
+                .accessibilityHidden(true)
+            Text("The week, today and every serving stay free. Nothing you logged is ever hidden or deleted.", bundle: strings)
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(.white)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// A month drawn, not read: five weeks of rings, with no number, date or name (spec §3.3, §3.6) — the
+/// locked month's backdrop, `pattern` cyan and white as a month of water would be, and a month's quiet
+/// form before its first read, every ring empty. No pane of its own; its callers hide it from VoiceOver.
+private struct DrawnMonth: View {
+
+    let pattern: Bool
+
+    /// The gap between weeks: the month card's 4 for its quiet form, so it stands at the card's height;
+    /// more under the locked month's card, so the month shows round it.
+    var weekSpacing: CGFloat = 4
+
+    @ScaledMetric(relativeTo: .body) private var scaledRing: CGFloat = 34
+
+    private var ring: CGFloat { min(scaledRing, 36) }
+
+    var body: some View {
+        VStack(spacing: weekSpacing) {
+            ForEach(0..<5, id: \.self) { week in
+                DayRow {
+                    ForEach(0..<7, id: \.self) { weekday in
+                        Circle()
+                            .inset(by: ring * 0.05)
+                            .stroke(colour(at: week * 7 + weekday), lineWidth: ring * 0.1)
+                            .frame(width: ring, height: ring)
+                            .frame(maxWidth: .infinity, minHeight: HistoryView.dayTapFloor)
+                    }
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    /// The board's drawn month (*Step 2 — Month, free user*): the third and seventh of every nine days
+    /// short of the goal, the last week still to come.
+    private func colour(at index: Int) -> Color {
+        guard pattern, index < 28 else { return .white.opacity(0.10) }
+        return [2, 6].contains(index % 9) ? .white.opacity(0.45) : Aurora.cyan
+    }
+}
+
 // MARK: - The day
 
 /// When the shown day's servings were poured: one bar each, across the whole day.
@@ -1252,7 +2075,8 @@ private struct ServingRow: View {
     /// The vessel this amount is drawn as, or `nil` — ``HistoryView/vessel(forAmount:amounts:)``.
     let vessel: HomeView.Serving?
 
-    let edit: () -> Void
+    /// `nil` in Month mode, whose rows are read-only (spec §3.4).
+    let edit: (() -> Void)?
 
     /// The glyph's disc, a real magnitude scaled with the row's own text and capped at its use
     /// site (rule `65-accessibility`).
@@ -1276,72 +2100,85 @@ private struct ServingRow: View {
         .frame(maxWidth: .infinity)
     }
 
+    @ViewBuilder
     private func row(stacked: Bool) -> some View {
-        Button(action: edit) {
-            HStack(spacing: 14) {
-                // The vessel's glyph when the amount is one of the current three; the drop
-                // otherwise.
-                Image(systemName: vessel?.symbol ?? "drop.fill")
-                    // A ratio of the disc it sits in, never its own text style.
-                    .font(.system(size: disc * 0.44, weight: .semibold))
-                    // White on the canvas's cyan wash. The canvas's glyph was cyan, and a cyan
-                    // glyph on a cyan wash read 2.46–2.79:1 against the 3:1 floor for a non-text
-                    // mark at every wash tried — the wash lightens its own ground, and the sheen
-                    // lands on the row's top left, where the glyph sits. White on the 0.16 wash
-                    // read 4.42–5.30 swept (`docs/DESIGN.md`, *The look, measured*). The canvas's
-                    // wash is not an `Aurora` colour; `Aurora.cyan` stands in.
-                    .foregroundStyle(.white)
-                    .frame(width: disc, height: disc)
-                    .background(Circle().fill(Aurora.cyan.opacity(0.16)))
-                    .accessibilityHidden(true)
-
-                if stacked {
-                    // The last layout, so the one that may shrink: each line has the row's
-                    // whole width to do it in.
-                    VStack(alignment: .leading, spacing: 1) {
-                        amount
-                        name
-                        time
-                    }
-                    .minimumScaleFactor(0.6)
-
-                    Spacer(minLength: 0)
-                } else {
-                    // At their own size or not at all.
-                    VStack(alignment: .leading, spacing: 1) {
-                        amount
-                        name
-                    }
-                    .fixedSize()
-
-                    Spacer(minLength: 8)
-
-                    time
-                        .fixedSize()
-                }
-            }
-            .foregroundStyle(.white)
-            .lineLimit(1)
-            .padding(.leading, 12)
-            .padding(.trailing, 20)
-            .padding(.vertical, 10)
-            // WidgetKit's 44pt floor is a widget rule, but a list row is a control here too, and a
-            // `minHeight` lets it grow with Dynamic Type instead of clipping.
-            .frame(minHeight: 56)
-            .liquidGlass(in: Capsule(), density: .frosted, elevation: .resting, interactive: true)
+        if let edit {
+            Button(action: edit) { pane(stacked: stacked) }
+                .buttonStyle(PressStyle())
+                // One serving, one stop. The swipe action reaches VoiceOver on its own, as a rotor action.
+                //
+                // The label goes on the **button**, not on an `.accessibilityElement(children: .ignore)`
+                // wrapper around it. That is the idiom the vessel uses, and it is wrong here: the vessel
+                // wraps plain drawing, while this wraps a *control*, which VoiceOver surfaces
+                // regardless. The wrapper became a second element above it and every serving was
+                // announced twice — "250 millilitres, 21:22", then "250 ml, 21:22, button". Only the real
+                // accessibility tree shows that; no unit test in this project can see one.
+                .accessibilityLabel(strings.localized("%1$d millilitres", log.amount, locale: locale))
+                .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
+                .accessibilityHint(Text("Edits this serving", bundle: strings))
+        } else {
+            // Month mode's row: the same pane, drawn, and no control to wrap — so here the wrapper is
+            // the right idiom, one element speaking what the button would (spec §3.9).
+            pane(stacked: stacked)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(strings.localized("%1$d millilitres", log.amount, locale: locale))
+                .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
         }
-        .buttonStyle(PressStyle())
-        // One serving, one stop. The swipe action reaches VoiceOver on its own, as a rotor action.
-        //
-        // The label goes on the **button**, not on an `.accessibilityElement(children: .ignore)`
-        // wrapper around it. That is the idiom the vessel uses, and it is wrong here: the vessel
-        // wraps plain drawing, while this wraps a *control*, which VoiceOver surfaces
-        // regardless. The wrapper became a second element above it and every serving was
-        // announced twice — "250 millilitres, 21:22", then "250 ml, 21:22, button". Only the real
-        // accessibility tree shows that; no unit test in this project can see one.
-        .accessibilityLabel(strings.localized("%1$d millilitres", log.amount, locale: locale))
-        .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
-        .accessibilityHint(Text("Edits this serving", bundle: strings))
+    }
+
+    private func pane(stacked: Bool) -> some View {
+        HStack(spacing: 14) {
+            // The vessel's glyph when the amount is one of the current three; the drop
+            // otherwise.
+            Image(systemName: vessel?.symbol ?? "drop.fill")
+                // A ratio of the disc it sits in, never its own text style.
+                .font(.system(size: disc * 0.44, weight: .semibold))
+                // White on the canvas's cyan wash. The canvas's glyph was cyan, and a cyan
+                // glyph on a cyan wash read 2.46–2.79:1 against the 3:1 floor for a non-text
+                // mark at every wash tried — the wash lightens its own ground, and the sheen
+                // lands on the row's top left, where the glyph sits. White on the 0.16 wash
+                // read 4.42–5.30 swept (`docs/DESIGN.md`, *The look, measured*). The canvas's
+                // wash is not an `Aurora` colour; `Aurora.cyan` stands in.
+                .foregroundStyle(.white)
+                .frame(width: disc, height: disc)
+                .background(Circle().fill(Aurora.cyan.opacity(0.16)))
+                .accessibilityHidden(true)
+
+            if stacked {
+                // The last layout, so the one that may shrink: each line has the row's
+                // whole width to do it in.
+                VStack(alignment: .leading, spacing: 1) {
+                    amount
+                    name
+                    time
+                }
+                .minimumScaleFactor(0.6)
+
+                Spacer(minLength: 0)
+            } else {
+                // At their own size or not at all.
+                VStack(alignment: .leading, spacing: 1) {
+                    amount
+                    name
+                }
+                .fixedSize()
+
+                Spacer(minLength: 8)
+
+                time
+                    .fixedSize()
+            }
+        }
+        .foregroundStyle(.white)
+        .lineLimit(1)
+        .padding(.leading, 12)
+        .padding(.trailing, 20)
+        .padding(.vertical, 10)
+        // WidgetKit's 44pt floor is a widget rule, but a list row is a control here too, and a
+        // `minHeight` lets it grow with Dynamic Type instead of clipping.
+        .frame(minHeight: 56)
+        // Pressable only where it is a button.
+        .liquidGlass(in: Capsule(), density: .frosted, elevation: .resting, interactive: edit != nil)
     }
 
     private var amount: some View {
@@ -1772,11 +2609,36 @@ private func previewManager(named name: String) -> DataManager {
     }
 
     // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
-    return HistoryView().background { AuroraBackground() }.environment(manager)
+    return HistoryView()
+        .background { AuroraBackground() }
+        .environment(manager)
+        .environment(PremiumStore(source: .silent()))
 }
 
 #Preview("Nothing logged") {
     HistoryView()
         .background { AuroraBackground() }
         .environment(previewManager(named: "preview.waterbuddy.history.empty"))
+        .environment(PremiumStore(source: .silent()))
+}
+
+#Preview("Month, held") {
+    let manager = previewManager(named: "preview.waterbuddy.history.month")
+
+    // Pinned to the start of the day, as the other previews are; twenty days back, every fourth short.
+    let start = Calendar.waterBuddyDay.startOfDay(for: .now)
+    for offset in 1...20 {
+        if let day = Calendar.waterBuddyDay.date(byAdding: .day, value: -offset, to: start) {
+            manager.addLog(amount: offset % 4 == 0 ? 1_500 : 2_600, at: day.addingTimeInterval(10 * 3_600))
+        }
+    }
+
+    // A source that holds the lifetime purchase and reaches no store (rule `85-testing`).
+    var source = PremiumStore.Source.silent()
+    source.entitlements = { [PremiumAccess.Entitlement(productID: PremiumAccess.lifetimeID, expires: nil, revoked: nil)] }
+
+    return HistoryView()
+        .background { AuroraBackground() }
+        .environment(manager)
+        .environment(PremiumStore(source: source))
 }

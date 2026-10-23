@@ -212,6 +212,12 @@ final class DataManager {
     @ObservationIgnored private var storedHistory: [DaySummary] = []
     @ObservationIgnored private var storedHistoryLogs: [Int: [WaterLog]] = [:]
     @ObservationIgnored private var storedStreak = 0
+    @ObservationIgnored private var storedMonth: MonthHistory?
+    @ObservationIgnored private var storedMonthLogs: [Int: [WaterLog]] = [:]
+
+    /// The month History has asked for (``showMonth(_:)``), as the ordinal of its 1st — `nil` for none.
+    /// Not observed: what is drawn is ``month``.
+    @ObservationIgnored private var wantedMonth: Int?
 
     /// The run of closed days — every day before today — as last counted, with what it was counted
     /// under: the day it was today, the goal and the calendar's zone (``readClosedRun(at:)``).
@@ -282,6 +288,8 @@ final class DataManager {
             rescheduleRemindersNow()
             // The goal is half of "a day that reached it", for every day the streak counts.
             republishStreak()
+            // And for every day the shown month judges (spec §3.5).
+            republishMonth()
         }
     }
 
@@ -421,6 +429,39 @@ final class DataManager {
     var streak: Int {
         access(keyPath: \.streak)
         return storedStreak
+    }
+
+    /// The month History's Month view shows, or `nil` while none is asked for (``showMonth(_:)``).
+    ///
+    /// Derived, never stored: ``MonthHistory/make(rows:month:firstServing:goal:now:calendar:)`` over
+    /// the rows, republished from every site that can change what it draws — a mutation, a refresh, the
+    /// day turning, the goal moving — and only while a month is asked for, so a user who never opens
+    /// it pays nothing (spec `2026-10-22-month-view-design.md` §3.7).
+    ///
+    /// **Equality-guarded**, like ``history``: a value that did not move redraws nothing, and
+    /// ``refresh()`` runs on every foreground. **A failed read leaves it as it stands.** `nil` wherever
+    /// ``role`` does not draw history. Read-only — a consequence of the rows, never an input.
+    var month: MonthHistory? {
+        access(keyPath: \.month)
+        return storedMonth
+    }
+
+    /// The shown month's servings by day ordinal, newest first within each day — what History lists
+    /// for a day the month has opened, read-only.
+    ///
+    /// **Published from the fetch ``month`` is worked out from**, as ``historyLogs`` is from
+    /// ``history``'s. **No equality guard**, for ``historyLogs``' reason: a `[WaterLog]` compares by
+    /// `persistentModelID`, so the rows after an edit equal the rows before it. Empty while no month is
+    /// shown, and wherever ``role`` does not draw history.
+    var monthLogs: [Int: [WaterLog]] {
+        access(keyPath: \.monthLogs)
+        return storedMonthLogs
+    }
+
+    /// The ordinal of the 1st of this month, on this model's clock and calendar — what History asks for
+    /// when Month is chosen. Worked out on read and stored nowhere.
+    var thisMonth: Int {
+        MonthHistory.firstDay(ofMonthHolding: now(), in: calendar)
     }
 
     /// Whether the user wants a nudge every two hours between 09:00 and 21:00.
@@ -629,7 +670,8 @@ final class DataManager {
     /// Re-reads the store first, for the reason given on ``addWater(amount:)``.
     func removeWater(amount: Int) {
         guard amount > 0 else { return }
-        refresh()
+        // The save below republishes the shown month; the re-read leaves it.
+        refresh(republishingMonth: false)
 
         // Today's total is derived from the logs now, so subtracting from the cached figure
         // would be undone by the next recompute. Take the water off the servings themselves,
@@ -669,7 +711,8 @@ final class DataManager {
     @discardableResult
     func addLog(amount: Int, at date: Date? = nil) -> UUID? {
         guard amount > 0 else { return nil }
-        refresh()
+        // The save below republishes the shown month; the re-read leaves it.
+        refresh(republishingMonth: false)
 
         let log = WaterLog(amount: amount, timestamp: date ?? now())
         modelContext.insert(log)
@@ -1105,6 +1148,83 @@ final class DataManager {
         withMutation(keyPath: \.streak) { storedStreak = counted }
     }
 
+    /// Asks for the month whose 1st is `firstDay`, or for none.
+    ///
+    /// History's one call into the month (spec §3.8): when Month is chosen, when an arrow is tapped, and
+    /// with `nil` when Week is chosen, the page is left or Premium stops being held. **It writes neither
+    /// store**, rings no doorbell and reschedules nothing — a read, like ``refresh()``, not a mutation.
+    /// With `nil` both properties go quiet, so a later Month never draws a stale month first.
+    func showMonth(_ firstDay: Int?) {
+        wantedMonth = firstDay
+        guard firstDay != nil else {
+            if storedMonth != nil {
+                withMutation(keyPath: \.month) { storedMonth = nil }
+            }
+            if !storedMonthLogs.isEmpty {
+                withMutation(keyPath: \.monthLogs) { storedMonthLogs = [:] }
+            }
+            return
+        }
+        republishMonth()
+    }
+
+    /// Republishes the wanted month's rows to ``monthLogs``, then works the month out from the same
+    /// rows and publishes it if it moved.
+    ///
+    /// **Two reads**: the store's one range query (``readLogs(from:to:)``), from the 1st of the month
+    /// before — whose average ``MonthHistory/change`` compares with — to the end of the wanted one; and
+    /// the first serving ever (``readOldestLog()``). **Either failing returns** and leaves both
+    /// properties as they stand: an empty month is indistinguishable from a user who never drank.
+    ///
+    /// Behind `role.drawsHistory` for ``republishHistory()``'s reason — cost, not correctness — and a
+    /// no-op while no month is wanted.
+    private func republishMonth() {
+        guard Self.role.drawsHistory, let wanted = wantedMonth else { return }
+        guard let shown = MonthHistory.interval(of: wanted, in: calendar),
+              let before = MonthHistory.firstDay(of: wanted, movedBy: -1, in: calendar),
+              let start = MonthHistory.interval(of: before, in: calendar)?.start,
+              let rows = readLogs(from: start, to: shown.end),
+              let oldest = readOldestLog(),
+              let month = MonthHistory.make(
+                  rows: rows,
+                  month: wanted,
+                  firstServing: oldest.first?.timestamp,
+                  goal: storedDailyGoal,
+                  now: now(),
+                  calendar: calendar
+              )
+        else { return }
+
+        // The month before's rows are read for the change and published nowhere.
+        let days = Set(month.days.map(\.summary.dayOrdinal))
+        withMutation(keyPath: \.monthLogs) {
+            storedMonthLogs = Dictionary(grouping: rows.filter { days.contains(dayOrdinal(for: $0.timestamp)) }) {
+                dayOrdinal(for: $0.timestamp)
+            }
+        }
+
+        guard month != storedMonth else { return }
+        withMutation(keyPath: \.month) { storedMonth = month }
+    }
+
+    /// The oldest serving in the store as a one-row read: `nil` when the store could not be read, empty
+    /// when it holds none — never the same thing (``fetch(_:)``'s ruling). Its own descriptor because
+    /// ``fetch(_:)`` sorts newest first (plan M10).
+    private func readOldestLog() -> [WaterLog]? {
+        var descriptor = FetchDescriptor<WaterLog>(sortBy: [SortDescriptor(\.timestamp, order: .forward)])
+        descriptor.fetchLimit = 1
+        descriptor.includePendingChanges = true
+        do {
+            return try modelContext.fetch(descriptor)
+        } catch {
+            #if DEBUG
+            // Names the condition, never the user's water (rule `75-diagnostics`).
+            print("[WaterBuddy] Could not read the first serving; leaving the month as it stands.")
+            #endif
+            return nil
+        }
+    }
+
     /// The run as the store holds it now, or `nil` when the store could not be read.
     ///
     /// The kept run of closed days (``closedRun``), plus today once today has reached the goal —
@@ -1178,6 +1298,8 @@ final class DataManager {
             saved = false
         }
         recomputeTodayAndTheWeek()
+        // Every path that changes a row ends here, so the shown month hears of each.
+        republishMonth()
         return saved
     }
 
@@ -1320,6 +1442,8 @@ final class DataManager {
         guard resetIfNeeded() else { return }
         republishTodaysLogs()
         republishHistory()
+        // A month that ends on screen stays shown, and turns past (spec §3.7).
+        republishMonth()
     }
 
     /// Clears today's total unconditionally, for a user-facing "start over" action.
@@ -1352,10 +1476,23 @@ final class DataManager {
     /// ``resetIfNeeded()``, so a rollover has already emptied the day before the rows are read
     /// (rule `30-rollover`).
     func refresh() {
+        refresh(republishingMonth: true)
+    }
+
+    /// ``refresh()``, leaving the shown month to the caller when it is about to write.
+    ///
+    /// ``addLog(amount:at:)`` and ``removeWater(amount:)`` re-read before they write, and their write
+    /// ends in ``saveAndRecompute()``, which republishes the month from the rows after it. Republishing
+    /// it in the re-read as well read two months of rows twice a pour — 7 ms at 500 days, where once is
+    /// 3.5 — for a month nobody sees between the two (the owner's ruling of 2026-10-22, plan Task 4).
+    private func refresh(republishingMonth: Bool) {
         loadFromStore()
         resetIfNeeded()
         republishTodaysLogs()
         republishHistory()
+        if republishingMonth {
+            republishMonth()
+        }
 
         // The backstop for the widget. `AddWaterIntent` reconciles reminders itself, but whether an
         // app extension is permitted at runtime to reach the notification service is the one thing
@@ -2418,6 +2555,229 @@ extension DaySummary {
     nonisolated private static func closedDays(of series: [DaySummary], goal: Int) -> ArraySlice<DaySummary> {
         guard let today = series.last, !today.reached(goal) else { return series[...] }
         return series.dropLast()
+    }
+}
+
+// MARK: - A month
+
+/// One month of the user's water, as History's Month view draws it (spec
+/// `2026-10-22-month-view-design.md` §3.5, §3.7).
+///
+/// **At file scope in this file, for ``DaySummary``'s reason.** ``DataManager`` publishes it, and every
+/// target that compiles `DataManager.swift` — the widget extension and both watch targets beside the
+/// app — must see the type, though only the app draws it. It is derived on every read and stored
+/// nowhere.
+///
+/// **Every day is judged against the goal handed in** — the current one, because no past goal is
+/// recorded (``DaySummary``'s ruling). History says so under the grid.
+///
+/// **Which days count is the streak's rule, a month wide.** A past month counts every day; this month
+/// the days before today, and today once it has reached the goal, so a morning never reads *17 / 21*;
+/// the first month counts from the day of the first serving, so an install on the 15th is not averaged
+/// over fourteen empty days. A day still to come counts in nothing, the total included (plan M5).
+nonisolated struct MonthHistory: Sendable, Equatable {
+
+    /// One day of the month, with what History draws for it worked out here — the view judges
+    /// nothing against the goal (rule `50-views`).
+    nonisolated struct Day: Sendable, Equatable {
+        let summary: DaySummary
+        /// Whether it counts toward the month's figures.
+        let isCounted: Bool
+        /// Whether History may open it: on or after the first serving's day, and not after today.
+        let canOpen: Bool
+        let isToday: Bool
+        /// Whether its water reached the goal.
+        let isMet: Bool
+        /// Its ring's arc — a drawing fraction, clamped to `0...1`, the one place a `Double` may stand
+        /// for water.
+        let fraction: Double
+    }
+
+    /// A neighbouring month: the ordinal of its 1st, and its first instant **for formatting an arrow's
+    /// label and nothing else**, as ``DaySummary/date`` is (plan M2).
+    nonisolated struct Neighbour: Sendable, Equatable {
+        let firstDay: Int
+        let start: Date
+    }
+
+    /// The month's name: the ordinal of its 1st (``DataManager/dayOrdinal(for:in:)``).
+    let firstDay: Int
+
+    /// The weekday of its 1st on the model's calendar, `1` for Sunday. History lays it under the app's
+    /// own first weekday (`HistoryView.monthGrid(dayCount:weekdayOfFirst:firstWeekday:)`).
+    let weekdayOfFirst: Int
+
+    /// Every day of the month, the 1st first.
+    let days: [Day]
+
+    let daysMet: Int
+    let daysCounted: Int
+
+    /// The longest run of met days inside the month. A run does not carry over from the month before.
+    let bestRun: Int
+
+    /// Every millilitre logged in the month up to today, today's included.
+    let total: Int
+
+    /// The counted days' water over the counted days, `nil` when none counts.
+    let average: Int?
+
+    /// ``average`` less the month before's, worked out the same way; `nil` when either has no
+    /// counted day.
+    let change: Int?
+
+    /// The month before, while the first serving is earlier than this month; the month after, while
+    /// this one is before the month holding today.
+    let earlier: Neighbour?
+    let later: Neighbour?
+}
+
+extension MonthHistory {
+
+    /// The ordinal of the 1st of the month holding `instant`: its day's ordinal with the day set to
+    /// the 1st, the one day representation (rule `30-rollover`).
+    nonisolated static func firstDay(ofMonthHolding instant: Date, in calendar: Calendar) -> Int {
+        DataManager.dayOrdinal(for: instant, in: calendar) / 100 * 100 + 1
+    }
+
+    /// The month whose 1st is `firstDay`, as the calendar's own interval of it — however long its days
+    /// are. Found from noon on the 1st, which every zone has; a midnight a zone skips does not move it.
+    /// `nil` for an ordinal that names no month.
+    nonisolated static func interval(of firstDay: Int, in calendar: Calendar) -> DateInterval? {
+        let month = (firstDay / 100) % 100
+        guard (1...12).contains(month),
+              let noon = calendar.date(from: DateComponents(year: firstDay / 10_000, month: month, day: 1, hour: 12))
+        else { return nil }
+        return calendar.dateInterval(of: .month, for: noon)
+    }
+
+    /// The 1st of the month `offset` months from `firstDay`'s, or `nil`.
+    nonisolated static func firstDay(of firstDay: Int, movedBy offset: Int, in calendar: Calendar) -> Int? {
+        guard let start = interval(of: firstDay, in: calendar)?.start,
+              let moved = calendar.date(byAdding: .month, value: offset, to: start)
+        else { return nil }
+        return Self.firstDay(ofMonthHolding: moved, in: calendar)
+    }
+
+    /// Every day of the month whose 1st is `firstDay`, the 1st first, as its ordinal and its start —
+    /// walked with `date(byAdding: .day, …)`, never by 86,400 seconds, so a DST month keeps every day
+    /// (rule `30-rollover`). Empty for an ordinal that names no month.
+    nonisolated static func days(of firstDay: Int, in calendar: Calendar) -> [(ordinal: Int, date: Date)] {
+        guard let month = interval(of: firstDay, in: calendar) else { return [] }
+        var days: [(ordinal: Int, date: Date)] = []
+        var offset = 0
+        while offset < 31, let date = calendar.date(byAdding: .day, value: offset, to: month.start), date < month.end {
+            days.append((DataManager.dayOrdinal(for: date, in: calendar), calendar.startOfDay(for: date)))
+            offset += 1
+        }
+        return days
+    }
+
+    /// The month whose 1st is `firstDay`, worked out from `rows` — which may reach outside it; the
+    /// month before's are what ``change`` compares with — the instant of the first serving ever
+    /// recorded, the current `goal`, `now` and the calendar. `nil` for an ordinal that names no month.
+    nonisolated static func make(
+        rows: [WaterLog],
+        month firstDay: Int,
+        firstServing: Date?,
+        goal: Int,
+        now: Date,
+        calendar: Calendar
+    ) -> MonthHistory? {
+        let walked = days(of: firstDay, in: calendar)
+        guard let opening = walked.first else { return nil }
+
+        let totals = dayTotals(of: rows, in: calendar)
+        let today = DataManager.dayOrdinal(for: now, in: calendar)
+        let first = firstServing.map { DataManager.dayOrdinal(for: $0, in: calendar) }
+        // At least 1, as the `dailyGoal` setter clamps it, so an arc never divides by zero.
+        let judged = max(goal, 1)
+
+        let days = summaries(of: walked, totals: totals).map { summary in
+            Day(
+                summary: summary,
+                isCounted: counts(summary, first: first, today: today, goal: judged),
+                canOpen: first.map { summary.dayOrdinal >= $0 && summary.dayOrdinal <= today } ?? false,
+                isToday: summary.dayOrdinal == today,
+                isMet: summary.reached(judged),
+                fraction: min(max(Double(summary.total) / Double(judged), 0), 1)
+            )
+        }
+        let counted = days.filter(\.isCounted).map(\.summary)
+        let average = counted.isEmpty ? nil : DaySummary.average(of: counted)
+
+        var previous: Int?
+        if let before = Self.firstDay(of: firstDay, movedBy: -1, in: calendar) {
+            let countedBefore = summaries(of: Self.days(of: before, in: calendar), totals: totals)
+                .filter { counts($0, first: first, today: today, goal: judged) }
+            previous = countedBefore.isEmpty ? nil : DaySummary.average(of: countedBefore)
+        }
+        var change: Int?
+        if let average, let previous { change = average - previous }
+
+        let firstMonth = first.map { $0 / 100 * 100 + 1 }
+        return MonthHistory(
+            firstDay: firstDay,
+            weekdayOfFirst: calendar.component(.weekday, from: opening.date),
+            days: days,
+            daysMet: counted.filter { $0.reached(judged) }.count,
+            daysCounted: counted.count,
+            bestRun: longestRun(of: counted, goal: judged),
+            total: saturatedSum(days.filter { $0.summary.dayOrdinal <= today }.map(\.summary.total)),
+            average: average,
+            change: change,
+            earlier: neighbour(of: firstDay, by: -1, exists: firstMonth.map { $0 < firstDay } ?? false, in: calendar),
+            later: neighbour(of: firstDay, by: 1, exists: firstDay < Self.firstDay(ofMonthHolding: now, in: calendar), in: calendar)
+        )
+    }
+
+    /// Each day's water, bucketed by its instant's day on `calendar` and saturated at
+    /// ``DataManager/maximumDailyIntake`` — ``DaySummary/series(from:days:endingOn:in:)``'s bucketing.
+    nonisolated private static func dayTotals(of rows: [WaterLog], in calendar: Calendar) -> [Int: Int] {
+        var totals: [Int: Int] = [:]
+        for row in rows {
+            let ordinal = DataManager.dayOrdinal(for: row.timestamp, in: calendar)
+            // Saturate rather than overflow: a corrupt `Int.max` row would trap a plain `+` (rule `20-state`).
+            let (sum, overflowed) = (totals[ordinal] ?? 0).addingReportingOverflow(row.amount)
+            totals[ordinal] = overflowed ? DataManager.maximumDailyIntake : min(sum, DataManager.maximumDailyIntake)
+        }
+        return totals
+    }
+
+    nonisolated private static func summaries(of days: [(ordinal: Int, date: Date)], totals: [Int: Int]) -> [DaySummary] {
+        days.map { DaySummary(dayOrdinal: $0.ordinal, total: totals[$0.ordinal] ?? 0, date: $0.date) }
+    }
+
+    /// Spec §3.5's rule: on or after the first serving's day, and before today — or today, once it has
+    /// reached the goal.
+    nonisolated private static func counts(_ day: DaySummary, first: Int?, today: Int, goal: Int) -> Bool {
+        guard let first, day.dayOrdinal >= first, day.dayOrdinal <= today else { return false }
+        return day.dayOrdinal < today || day.reached(goal)
+    }
+
+    nonisolated private static func longestRun(of days: [DaySummary], goal: Int) -> Int {
+        var best = 0
+        var run = 0
+        for day in days {
+            run = day.reached(goal) ? run + 1 : 0
+            best = max(best, run)
+        }
+        return best
+    }
+
+    nonisolated private static func saturatedSum(_ values: [Int]) -> Int {
+        values.reduce(0) { running, value in
+            let (sum, overflowed) = running.addingReportingOverflow(value)
+            return overflowed ? Int.max : sum
+        }
+    }
+
+    nonisolated private static func neighbour(of firstDay: Int, by offset: Int, exists: Bool, in calendar: Calendar) -> Neighbour? {
+        guard exists,
+              let moved = Self.firstDay(of: firstDay, movedBy: offset, in: calendar),
+              let start = interval(of: moved, in: calendar)?.start
+        else { return nil }
+        return Neighbour(firstDay: moved, start: start)
     }
 }
 

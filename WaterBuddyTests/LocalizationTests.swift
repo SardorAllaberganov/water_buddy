@@ -130,6 +130,26 @@ private let historyKeys = [
     "When you drank",
     "%1$d servings",
     "Average %1$d millilitres. Best %2$d millilitres. Goal met on %3$d of %4$d days.",
+    "Month",
+    "Part of it",
+    "Days on goal",
+    "Best streak",
+    "This month",
+    "%1$@/%2$@",
+    "%1$@ L",
+    "Average %1$@ ml a day",
+    "Up %1$@ ml on the month before",
+    "Down %1$@ ml on the month before",
+    "The same as the month before",
+    "Your whole month at a glance",
+    "Every day you have logged is kept. Premium shows it as months, with your patterns and a recap.",
+    "Back to this week",
+    "The week, today and every serving stay free. Nothing you logged is ever hidden or deleted.",
+    "%1$d of %2$d days",
+    "%1$d of %2$d days on goal",
+    "Average %1$d millilitres a day",
+    "Up %1$d millilitres on the month before",
+    "Down %1$d millilitres on the month before",
 ]
 
 /// The welcome's own strings (spec 2026-10-14 §8). The keys it shares with Settings or the reminder
@@ -938,6 +958,11 @@ private let countedKeys = [
     CountedKey(key: "Last %1$d days", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d days", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d servings", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "%1$d of %2$d days", arity: 2, counted: [1], bundles: ["app"]),
+    CountedKey(key: "%1$d of %2$d days on goal", arity: 2, counted: [1], bundles: ["app"]),
+    CountedKey(key: "Average %1$d millilitres a day", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Up %1$d millilitres on the month before", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Down %1$d millilitres on the month before", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — %2$lld millilitres to go.", arity: 2,
                counted: [0, 1], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — you've reached your goal.", arity: 1,
@@ -1032,6 +1057,27 @@ private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: L
     case ("%1$d servings", "en"): return "\(f[0]) " + english(n[0], "serving", "servings")
     case ("%1$d servings", "ru"): return "\(f[0]) " + russian(n[0], "порция", "порции", "порций")
     case ("%1$d servings", "uz"): return "\(f[0]) porsiya"
+
+    case ("%1$d of %2$d days", "en"): return "\(f[0]) of \(f[1]) " + english(n[1], "day", "days")
+    case ("%1$d of %2$d days", "ru"): return "\(f[0]) из \(f[1]) " + russian(n[1], "дня", "дней", "дней")
+    case ("%1$d of %2$d days", "uz"): return "\(f[1]) kundan \(f[0])"
+
+    case ("%1$d of %2$d days on goal", "en"): return "\(f[0]) of \(f[1]) " + english(n[1], "day", "days") + " on goal"
+    case ("%1$d of %2$d days on goal", "ru"):
+        return "Цель достигнута в \(f[0]) из \(f[1]) " + russian(n[1], "дня", "дней", "дней")
+    case ("%1$d of %2$d days on goal", "uz"): return "\(f[1]) kundan \(f[0]) kunida maqsadga erishildi"
+
+    case ("Average %1$d millilitres a day", "en"): return "Average \(f[0]) \(ml(0)) a day"
+    case ("Average %1$d millilitres a day", "ru"): return "В среднем \(f[0]) \(mlRu(0)) в день"
+    case ("Average %1$d millilitres a day", "uz"): return "Kuniga o‘rtacha \(f[0]) millilitr"
+
+    case ("Up %1$d millilitres on the month before", "en"): return "Up \(f[0]) \(ml(0)) on the month before"
+    case ("Up %1$d millilitres on the month before", "ru"): return "На \(f[0]) \(mlRu(0)) больше, чем в предыдущем месяце"
+    case ("Up %1$d millilitres on the month before", "uz"): return "Oldingi oydan \(f[0]) millilitr ko‘p"
+
+    case ("Down %1$d millilitres on the month before", "en"): return "Down \(f[0]) \(ml(0)) on the month before"
+    case ("Down %1$d millilitres on the month before", "ru"): return "На \(f[0]) \(mlRu(0)) меньше, чем в предыдущем месяце"
+    case ("Down %1$d millilitres on the month before", "uz"): return "Oldingi oydan \(f[0]) millilitr kam"
 
     case ("%1$lld millilitres so far today — %2$lld millilitres to go.", "en"):
         return "\(f[0]) \(ml(0)) so far today — \(f[1]) \(ml(1)) to go."
