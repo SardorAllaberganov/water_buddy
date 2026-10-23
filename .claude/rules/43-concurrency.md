@@ -142,5 +142,6 @@ warning here is a Swift 6 error later.
   `ReminderPlanTests`, `AppTabTests`, `AuroraLightTests`, `HapticLadderTests`,
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
-  `PremiumSetTests`, `PaywallOfferTests` or `PaywallScreenTests` to make them compile. They are
+  `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests` or
+  `MonthLayoutTests` to make them compile. They are
   compile-time canaries: fix the declaration they read instead

@@ -79,7 +79,8 @@ persist anything.
 - On Home the Glass is ranked above Cup and Bottle: it is the screen's primary surface, because
   slot `DataManager.usualSlot` is what every one-tap door logs
 - History is one `List`, and everything on the screen is a row of it: the header, the week card,
-  the strip and the servings, each with the list's own surfaces cleared. Nothing is fixed above
+  the strip and the servings — in Month mode the header, the switch, the month card, an opened day
+  and the figures — each with the list's own surfaces cleared. Nothing is fixed above
   it, so the `+` scrolls away with the header. The list stops one point short of the top safe
   area (`.padding(.top, 1)`), so its rows are clipped under the status bar and never drawn across it
 - What History decides is a `static` on `HistoryView` that takes its state as parameters —
@@ -102,10 +103,13 @@ persist anything.
 - A widget's link from outside the app is an entrance, not a second route: `RootTabView` answers
   `WidgetLink.history` in `.onOpenURL`, through `AppTab(link:)`, by turning to History as its tab
   would. Before setup the link is ignored
+- History's *Week · Month* switch is a control inside the screen, not a route. It is drawn where
+  `HistoryView.offersMonth(status:offered:)` says, and Month mode's servings are read-only —
+  adding and correcting stay Week mode's, for every user
 - Present a sheet with `.sheet(item:)` bound to an optional `@State`, handing the thing being edited
   to the sheet as an `init` parameter — not a `Bool` plus a separately-stored selection
 - The paywall is presented with `.sheet(item:)` bound to an optional `PaywallView.Entry` — where it
-  was opened from — never a `Bool`
+  was opened from, `.settings` or `.history` — never a `Bool`
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen
   whose last card sits under the bar needs its own bottom padding
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the

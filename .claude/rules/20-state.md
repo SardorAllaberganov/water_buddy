@@ -62,7 +62,9 @@ after the body above had already conceded it.
 ## Mutate only after a re-read
 - `addLog(amount:at:)` and `removeWater(amount:)` call `refresh()` as their first statement after
   the `amount > 0` guard, before touching `modelContext`. Two processes hold their own
-  `DataManager`; an idle instance otherwise computes `staleTotal + amount` over a newer figure
+  `DataManager`; an idle instance otherwise computes `staleTotal + amount` over a newer figure.
+  They call its private form, `refresh(republishingMonth: false)`: the save after their write
+  republishes the shown month, and a second read of it doubled a pour's cost
 - `refresh()` republishes rows only. It must **not** call `recomputeToday()`: a cross-process read
   can succeed while missing a row the extension just wrote, and re-deriving would overwrite it
 - Every path that changes a `WaterLog` ends in `saveAndRecompute()` — `try modelContext.save()` in
@@ -87,18 +89,22 @@ after the body above had already conceded it.
   (`defaults.object(forKey:) as? Bool != true`) and the **observation** separately on
   `storedIsGoalSet`. They are not the same: `resolveIsGoalSet(in:goal:)` infers `true` from a
   non-default goal when the key is absent
-- `isGoalSet`, `todaysLogs`, `historyLogs` and `streak` stay get-only. All four are consequences,
-  not inputs
+- `isGoalSet`, `todaysLogs`, `historyLogs`, `month`, `monthLogs` and `streak` stay get-only. All six
+  are consequences, not inputs
 - `streak` is published from `republishHistory()` and from the `dailyGoal` setter, behind
   `role.drawsHistory`, with an equality guard. A failed read leaves it as it stands, never zero.
   Every day is judged against the current goal. It never leaves the app: not the snapshot, not a
   notification, not the wrist's mirror, not Siri
+- `month` and `monthLogs` are published only while History has asked for a month through
+  `showMonth(_:)`, behind `role.drawsHistory`, from `showMonth`, `refresh()`, `saveAndRecompute()`,
+  `dayDidTurn()` and the `dailyGoal` setter — never `init`. A failed read leaves both as they stand.
+  `showMonth(_:)` writes neither store
 - `remaining`, `hasReachedGoal`, `lastDrink` and `nextReminder` are computed on read from the
   observable state and stored nowhere. `nextReminder` is the first slot of the plan
   `currentReminderSlots()` files, cut to today. `WaterSnapshot` carries `remaining` and
   `hasReachedGoal` too, for Siri's answer; `theSnapshotAgreesWithTheManager` pins the two pairs
   together
-- Do **not** add an equality guard to the `todaysLogs` or `historyLogs` republish. `WaterLog` is a
+- Do **not** add an equality guard to the `todaysLogs`, `historyLogs` or `monthLogs` republish. `WaterLog` is a
   `@Model` class hashed by `persistentModelID`, so the array after an amount edit compares equal to
   the array before it — a guard would swallow exactly the change it is meant to publish
 - `loadFromStore()` compares each re-read value against its `stored…` field before wrapping the

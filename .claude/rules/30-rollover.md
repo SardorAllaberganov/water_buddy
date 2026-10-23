@@ -63,6 +63,9 @@ changed.
   window starts — the bars' fetch and History's sheet both call it
 - It computes through `Calendar.nextDate(after:matching:matchingPolicy:)`. Never add `86_400` — a
   DST day is 23 or 25 hours long
+- A month is named by the ordinal of its 1st. Its bounds come from the injected calendar's
+  `dateInterval(of: .month, for:)` and its days from `date(byAdding: .day, …)`. Its grid's first
+  weekday is the app's locale's, never `Calendar.waterBuddyDay`'s
 
 ## Detecting the turn
 - Read `Key.lastActiveDay` as `defaults.object(forKey:) as? Int`, never `integer(forKey:)`. A
@@ -80,8 +83,9 @@ changed.
 - `dayDidTurn()` runs `resetIfNeeded()` and, only when it reports a new day, republishes today's
   rows and the history. It never recomputes the total from the rows
 - Keep `refresh()`'s calls in order: `loadFromStore()` → `resetIfNeeded()` → `republishTodaysLogs()`
-- `addLog(amount:at:)` and `removeWater(amount:)` call `refresh()` first, so a mutation always lands
-  on the right day. Any new mutator that computes from current state must too. (`deleteLog(_:)` and
+- `addLog(amount:at:)` and `removeWater(amount:)` call `refresh()` first — its private form,
+  `refresh(republishingMonth: false)`, which re-reads and rolls over exactly as `refresh()` does —
+  so a mutation always lands on the right day. Any new mutator that computes from current state must too. (`deleteLog(_:)` and
   `updateLog(_:newAmount:timestamp:)` currently do not — they address a row by identity rather
   than by total)
 - `seedFromCachedTotalIfNeeded()` may only seed a cached total whose `lastActiveDay` equals today's;
