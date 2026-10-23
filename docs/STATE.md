@@ -4,6 +4,21 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-23 (eighty-fifth pass — `/doc_sync` run by the owner on step 2's staged
+tree). **No key and no stored byte moved**: 13 keys on `DataManager.Key`, counted from the source.
+**Drift, fixed:** *Who may write on behalf of the group*'s guard list still cited `HEAD` `2e2f3a7`'s
+seven lines, every one 41 to 137 short of the code, and said three further sites where step 2 made
+four — `republishMonth()` (`:1182`) is the eighth, behind `drawsHistory`. Re-derived by the words of
+each guard; the old lines kept in the note under it.
+
+**Last updated:** 2026-10-23 (set A's step 2's own Task 10, after its walk, its review and its gate —
+not a `/doc_sync` pass). **No key and no stored byte moved**: 13 `static let`s on `DataManager.Key`,
+counted from the source, no schema change. A new section, *`month` and `monthLogs` — one month, only
+while History asks for it*, after *`historyLogs`*: the two published values, the two reads and their
+measured cost against the owner's 6 ms, the read-once pour, the counting rule, and the release moved to
+the page's removal on the owner's ruling of 2026-10-23. The walk ran on a throwaway suite
+(`-WaterBuddyFreshStart`, seeded in a scratch copy only) and wrote nothing to the App Group.
+
 **Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` after set A's step 2 was specified and
 planned). **No key and no stored byte moved; nothing was built.** Step 1, recorded below as staged, is
 committed (`d5cf816`). Step 2's plan (`docs/superpowers/plans/2026-10-22-month-view.md`) adds to the
@@ -375,7 +390,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:305` (`:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:363` (`:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours — and a tenth, the rating request's mark
@@ -770,6 +785,45 @@ wrist publish still move only with today's total.)* A watch pour can be re-timed
 ledger is keyed by the pour's own `at`, which a resend repeats, and the existence check finds the row
 by `id` wherever its time moved (`aRetimedWatchPourStaysDeletedWhenTheWatchResendsIt`).
 
+### `month` and `monthLogs` — one month, only while History asks for it
+
+*Added 2026-10-23, set A's step 2 (roadmap 1.4.2), staged; spec
+`docs/superpowers/specs/2026-10-22-month-view-design.md` §3.4–3.7.*
+
+`month` is a `MonthHistory?` and `monthLogs` its rows, `[Int: [WaterLog]]` by day ordinal as
+`historyLogs` is. **Both are published, and neither is stored**: no key, no schema change, nothing for
+the widget or the watch. They exist only while History has asked for a month through
+`showMonth(_:)` — a holder choosing Month, an arrow, Premium bought with Month on screen — and
+`showMonth(nil)` lets go of both: choosing Week, Premium ceasing to be held, and the page being removed
+when its slide out has ended (`onDisappear`, the owner's ruling of 2026-10-23 on the final review's I1
+and I2 — at the turn it emptied the month on the page sliding away). `showMonth(_:)` writes neither
+store.
+
+- **What is wanted is an ordinal, the month's 1st** (`wantedMonth`, private, in memory), and `thisMonth`
+  answers this month's. A month's bounds come from the injected calendar's `dateInterval(of: .month,
+  for:)` and its days from `date(byAdding: .day, …)`; the grid's first weekday is the app's locale's.
+- **Two reads, wherever the history's length:** `republishMonth()` fetches the rows from the 1st of
+  the month before to the end of the wanted month — the change line needs last month's average — and
+  `readOldestLog()` fetches the first serving (forward sort, `fetchLimit` 1, pending changes included),
+  which bounds ‹ and starts the first month's count. Either read failing returns before either value is
+  touched: a failed read leaves the month as it stands, never empty.
+- **Published from** `showMonth`, `refresh()`, `saveAndRecompute()`, `dayDidTurn()` (so a month ending
+  on screen stays shown and becomes past) and the `dailyGoal` setter (every day is judged against the
+  current goal) — **never `init`**: `wantedMonth` starts `nil`. Behind `role.drawsHistory`, as
+  `history` is. `month` has an equality guard; `monthLogs`, like `historyLogs`, has none.
+- **A pour reads the shown month once.** `addLog` and `removeWater` re-read through the private
+  `refresh(republishingMonth: false)`, and the `saveAndRecompute()` after their write republishes it
+  (the owner's ruling of 2026-10-22). `ingest(_:)` keeps `refresh()`, so a watch batch reads it twice.
+- **The counting rule** (`MonthHistory.make`): every day is judged against the **current** goal; a past
+  month counts every day; this month counts the days before today, and today once it has reached the
+  goal; the first month counts from the first serving's day; a day after today counts nowhere and
+  cannot be opened. Sums saturate at `maximumDailyIntake` a day.
+- **Measured cost**, on the built code, a probe in a copy of the index (iPhone 17, iOS 27.0), at 500
+  days of rows: `refresh()` 0.59 ms alone, **+2.34 ms** with a month shown; a pour 3.68 ms alone,
+  **+2.77 ms** with a month shown — inside the owner's **6 ms** (the spec's 3 ms, amended on 2026-10-22).
+  The month's two-month window is the cost (~4.5 ms for ~490 rows before the read-once ruling); the
+  first-serving read is 0.05–0.6 ms from 7 to 500 days.
+
 ## The sixth key, and the seam that reads it
 
 `remindersEnabled` is a `Bool`, **absent until the user turns reminders on**. Like `isGoalSet` and
@@ -1036,7 +1090,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1787 (read :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
+nonisolated static let role: Role = {          // DataManager.swift:1924 (read :1787 until set A's step 2; :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -1062,20 +1116,26 @@ for #73 moved all six, by four lines or by thirteen; and 2026-10-08: all six had
 2026-09-01 check that followed the watchOS plan's ~500-line addition. *This sentence said "by three
 different questions" until the twenty-sixth pass; the four writes have only ever asked two.*):
 
-1. **Materialising `dailyGoal` in `init`** (`:592`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:633`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1294`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:1215`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:1931`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1416`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:1337`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:2068`, `mayHaveLegacyStandardDefaults`).
 
-Three further sites are guarded by the same enum but are not group bookkeeping:
-`republishHistory` (`:1042`, `drawsHistory`, cost rather than correctness); `republishStreak`
-(`:1103`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
-because the `dailyGoal` setter calls it outside `republishHistory`); and
-`requestReminderReschedule` (`:1531`, `mayFileReminders`, the one whose wrong answer is immediately
-user-visible). Rule `25-shared-storage` still counts six (`docs/AI_CONTEXT.md` known issue #103).
-*(Lines re-derived by their words on 2026-10-20, the seventy-fourth pass, on the staged tree — they
+Four further sites are guarded by the same enum but are not group bookkeeping:
+`republishHistory` (`:1085`, `drawsHistory`, cost rather than correctness); `republishStreak`
+(`:1146`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
+because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1182`,
+`drawsHistory` a third time — **new with set A's step 2, staged, the eighth site**, with a guard of
+its own for the same reason: `showMonth(_:)`, `refresh()`, `saveAndRecompute()`, `dayDidTurn()` and
+the `dailyGoal` setter call it outside `republishHistory`); and `requestReminderReschedule` (`:1668`,
+`mayFileReminders`, the one whose wrong answer is immediately user-visible). Rule `25-shared-storage`
+still counts six (`docs/AI_CONTEXT.md` known issue #103).
+*(Lines re-derived by their words on 2026-10-23, the eighty-fifth pass, on step 2's staged tree —
+they read `:592`, `:1294`, `:1215`, `:1931`, `:1042`, `:1103` and `:1531`, `HEAD` `2e2f3a7`'s lines,
+and the paragraph said three further sites. Before that, re-derived on 2026-10-20, the
+seventy-fourth pass, on the staged tree — they
 read `:551`, `:1162`, `:1083`, `:1709`, `:969`, `:1000` and `:1329`, several passes old. Since 1.3.1's
 6c, `republishHistory`'s guard is `draws || cachingTheWeek`: the week's cache runs in any process
 that recomputes today, and only what the app draws stays behind `drawsHistory` — no new role

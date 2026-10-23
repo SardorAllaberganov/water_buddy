@@ -4684,3 +4684,72 @@ month.
 
 **The rule:** never set a formatted month or weekday inside a translated sentence. Word the sentence so
 it names none, or draw the name on its own, as a heading or a label.
+
+## 2026-10-23 — Letting go at the turn emptied a page the user could still see, or get back
+
+**What happened.** Set A's step 2 had History let go of its month when `\.pageIsShown` turned `false`,
+on the lesson of 2026-10-16 that the turn, not `onDisappear`, is when a page is left. The final
+reviewer read `RootTabView.page(_:)`'s DocC — a tab tapped again inside the 0.45-s slide gets the
+**same page back, state and all** — and found two defects the walk's stills could not show: the month
+emptied on the page sliding away, and a quick return found Month on an empty card for good. A harness
+test reproduced the second (RED), and the owner moved the release to `.onDisappear`, the page's
+removal (GREEN). The 2026-10-16 lesson was about stopping a **request** that would land on the next
+page; this was **state the leaving page still draws**.
+
+**The rule:** at the turn, stop what must not reach the next page; at the removal, let go of what the
+leaving page still draws. Before choosing either, ask what a turn back inside the slide gets.
+
+## 2026-10-23 — An XCUITest tap cannot land inside a slide, and its tree is not VoiceOver's
+
+**What happened.** Two probes in step 2's walk measured nothing. A tap meant to return within the
+0.45-s slide landed 2.1 s after the first: every XCUITest action waits for the app to go idle. The
+in-slide case was reached by a walk-only argument that turned the page back from inside the app, 0.2 s
+after the leave. And a bound's › arrow showed in the frames run's tree as an image, *Forward*, which
+read as an element VoiceOver stops on; the same tree also listed the weekday letters and the quiet
+days' numbers (`accessibilityHidden`) and each tile's children (`.ignore`). The fix was withdrawn
+before it was built.
+
+**The rule:** a timed window shorter than XCUITest's idle wait is reached from inside the app, never by
+two taps; and presence in an XCUITest snapshot says nothing about VoiceOver — check a hidden control's
+siblings in the same tree before calling it a finding.
+
+## 2026-10-23 — "Matching the board" by its spacing was not matching its geometry
+
+**What happened.** The locked month's drawn month hid behind its card (W1). The first fix took the
+board's title bar and 12-pt row gap, and the re-walk showed it still hidden: the board's pane is a
+**fixed 392 pt**, the month pinned to its top and the card centred, while the build's pane sized to its
+own content, 336 pt, so the card still covered it. Read again, the board itself shows only the title
+bar above the card and 7-pt slivers of ring at its sides; its rings "show" only through an 80 %-opaque
+CSS fill that the app's frosted glass does not have. The owner kept the board's geometry.
+
+**The rule:** before matching a board, read every dimension that decides what overlaps — the
+container's height and alignment, the card's width and padding, the overlay's opacity — and work out
+what the board itself shows; a gap or a spacing alone is not the geometry.
+
+## 2026-10-23 — A walk run that failed in its first language hung for six hours
+
+**What happened.** Step 2's walk ran the refund and both languages in one `xcodebuild`. The shared
+`completeWelcomeIfShown(_:)` looks for *Get Started* in English, so in Russian the welcome never closed
+and the History tab was never on screen; the test failed in 35 s, and `xcodebuild` then sat after its
+tear-down until it was stopped six and a half hours later. The refund never ran.
+
+**The rule:** a walk in another language walks the welcome in that language; and one test per
+`xcodebuild`, with `-test-timeouts-enabled YES -maximum-test-execution-time-allowance`, so one stuck
+test cannot hold the rest — and a background run that has said nothing for longer than its slowest
+test is read, not waited on.
+
+## 2026-10-23 — A lesson already written did not run, and a list in prose was never compared
+
+**What happened.** Step 2's records re-pointed every `File.swift:N` citation into the files it grew
+and called the rest dated. The process role's table and its twin in `docs/STATE.md` cite seven guard
+sites as bare `` `:N` `` under a heading that names the file, and all seven still read `HEAD`'s lines —
+the exact miss the lesson of 2026-10-14 records, with its rule written out. The same records, and three
+`/doc_sync` passes before them, read `CLAUDE.md` "against the code" and left it; its *Targets* row
+for `WaterBuddyUITests` had not named `PremiumUITests` since `d5cf816` added it, and its "seven sites"
+missed step 2's eighth guard. The eighty-fifth pass found all three.
+
+**The rule:** a lesson that is a check becomes a script, and the script runs in every records pass —
+the bare-citation sweep attributes each `` `:N` `` to the last file named before it and lists those
+into the files the change touched. A list a doc writes in prose — the classes in a target, the guard
+sites, the callers — is checked by printing the code's own list beside it (`grep` for the class
+declarations, for `role.` guards), never by reading the sentence and agreeing with it.

@@ -3,6 +3,17 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-23 (set A's step 2's own Task 10 — not a `/doc_sync` pass). **No contract
+here moved.** Step 2 changed one of the six shared files, `DataManager.swift` — `MonthHistory`, a
+`nonisolated` value at file scope, and the app's `month`, `monthLogs` and `showMonth(_:)` behind
+`role.drawsHistory` — and nothing on the widget's read path: no key, no field on `WaterSnapshot`, no
+file under `WaterBuddyWidget/`, no change to `AddWaterIntent`'s pour beyond the re-read it already made
+(`addWater` reaches `addLog`, whose re-read now leaves an unasked-for month alone). Both widget builds
+in its gate, on the final code: `WaterBuddyWidgetExtension` (iOS 27.0) and `WaterBuddyWatchWidget`
+(watchOS 27.0), each `** BUILD SUCCEEDED **`; a clean build of a copy of the index gives the widget
+scheme the same 17 warning messages as the `HEAD` export, and the watch widget's 2. Nothing placed on a
+Home Screen: no widget's view tree changed.
+
 **Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` after set A's step 2 was specified and
 planned). **No contract here moved; nothing was built.** Step 1 is committed (`d5cf816`). Step 2's
 plan changes one of the six shared files, `DataManager.swift` — a new value type, `MonthHistory`, and

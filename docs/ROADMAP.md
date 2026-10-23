@@ -338,6 +338,11 @@ month; the model shows one month at a time. Boards on the canvas, row *Set A, st
 `docs/superpowers/specs/2026-10-22-month-view-design.md` and plan
 `docs/superpowers/plans/2026-10-22-month-view.md`, both approved. Nobody meets it until step 5 puts
 set A on sale.)*
+*(2026-10-23: **set A's step 2 — built test-first, walked, measured, reviewed, gated and staged; not
+committed.** The month view as specified, with the owner's rulings made on the way: the reads' budget
+6 ms, a pour reading the shown month once, History letting go of the month when its page is removed,
+the locked month as drawn. 815 unit `@Test`, 60 UI `func test`, warnings unchanged. Nobody meets it
+until step 5; the Russian and Uzbek wording waits for the owner's sweep.)*
 
 **1.4.3 — Custom reminder schedule.** The user's own hours and interval, and quiet days, in place of
 the fixed grid of seven hours (`ReminderPlan.hours`). Any schedule must keep the plan within

@@ -9,7 +9,7 @@
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: three `StaticConfiguration`s over one provider — the Home Screen widget, the week widget (`WeekWidget`, medium, a tap opens History) and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month* switch and locked month — the one class launched with DEBUG's `-WaterBuddyPremium`) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
@@ -185,7 +185,11 @@ something to record.
   stripped — `-scheme WaterBuddy` 20 (the `StoreKitTest` line among them), `WaterBuddyWidgetExtension`
   17, `WaterBuddyWatch` 2, `WaterBuddyWatchWidget` 2; and step 1's own comparison, on 2026-10-22 from
   a clean build of a copy of its index (Tasks 3–7, the final review's fixes and the walk's), against
-  that export, the same way: unchanged on all four schemes — 20, 17, 2, 2, no line new or gone
+  that export, the same way: unchanged on all four schemes — 20, 17, 2, 2, no line new or gone; and
+  read again on 2026-10-22 from a clean build of a `HEAD` `2e2f3a7` export before set A's step 2's code
+  — 20, 17, 2, 2 — and step 2's own comparison, on 2026-10-23 from a clean build of a copy of its index
+  (Tasks 3–7, the walk's fixes and the final review's), against that export, the same way: unchanged on
+  all four schemes — 20, 17, 2, 2, no line new or gone, and the same sites by line
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
@@ -274,7 +278,9 @@ something to record.
 - **Today's total is derived, never authored** — `recomputeToday()` sums today's logs and writes
   the figure through the `currentWater` setter, so the clamp, the equality guard and the widget
   doorbell all still fire exactly once per real change (rule `20-state`)
-- **Mutate only after a re-read.** `addLog` and `removeWater` call `refresh()` first. Two
+- **Mutate only after a re-read.** `addLog` and `removeWater` call `refresh()` first — its private
+  form, `refresh(republishingMonth: false)`, which re-reads everything but History's shown month, left
+  to the save after the write (the owner's read-once ruling, 2026-10-22). Two
   processes hold their own `DataManager`, and an instance that has been idle would otherwise
   compute `staleTotal + amount` and write it over a newer figure (rule `20-state`)
 - **The widget reads through `WaterSnapshot`, never through `DataManager.shared`.** A timeline
@@ -299,9 +305,10 @@ something to record.
   pass: the `currentWater` setter rings for today, the week only when it was missing or a past day
   moved (rule `20-state`)
 - **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
-  fresh install, the one-shot migration, the seed from a cached total, drawing the history and
-  the streak, and filing reminders are all guarded by `DataManager.role` — seven sites, the
-  seventh the redesign's stage 2's — a four-state
+  fresh install, the one-shot migration, the seed from a cached total, drawing the history, the
+  streak and History's shown month, and filing reminders are all guarded by `DataManager.role` —
+  eight sites, the seventh the redesign's stage 2's, the eighth set A's step 2's
+  (`republishMonth()`) — a four-state
   `nonisolated static let` (`.phoneApp`, `.phoneExtension`, `.watchApp`, `.watchExtension`) that
   replaced the two-state `isAppExtension` at every guard site on 2026-08-31. A grep for
   `!Self.isAppExtension` now returns zero. An extension that stamped an empty group would

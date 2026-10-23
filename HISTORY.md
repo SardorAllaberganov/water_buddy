@@ -12243,3 +12243,139 @@ records by name; this file and `docs/AI_CONTEXT.md` are added again once their b
 **No `git commit` was run.** HEAD `a6e287b`, 166 commits, level with `origin/main`. **9 staged** — 7
 modified, 2 added: the spec and the plan, and the records. **6 unstaged**: `.claude/settings.json` (the
 owner's) and five of Xcode's rewrites (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-23] — Set A's step 2, the month view, built, walked, measured, reviewed and gated; staged whole
+
+### What
+
+The owner ran `/start_task` and approved running `docs/superpowers/plans/2026-10-22-month-view.md`
+(Tasks 0–10) inline, test-first, from 2026-10-22 13:41 to 2026-10-23 ~02:00. The ledger,
+`.superpowers/sdd/2026-10-22-month-view/progress.md` (git-ignored), holds every command, figure and
+ruling. **Nobody meets it until step 5 puts set A on sale.**
+
+- **Task 0 — the baseline:** a clean build of a `HEAD` `2e2f3a7` export (the plan's `a6e287b` with
+  only docs since): warnings 20 / 17 / 2 / 2 by file and message.
+- **Task 1 — the probe**, in a copy of the index: the reads' cost at 7 to 500 days, a DST month, each
+  language's first weekday. Over the 3 ms budget at 500 days (~5 ms; the month's two-month window
+  ~4.5 ms for ~490 rows, which the spec's fallback would not touch) — stopped; **the owner raised it to
+  6 ms**.
+- **Task 2 — the rules' wording**, six files, typed and **left unstaged** for the owner.
+- **Task 3 — `MonthHistory`**, test-first (RED, then GREEN): a pure `nonisolated` value at file scope in
+  `DataManager.swift` — the counting rule, a DST month, a flight across a month's edge, a serving after
+  today counting nowhere, saturation, the neighbours. `MonthHistoryTests`, 22.
+- **Task 4 — the publishing**, test-first: `month`, `monthLogs`, `thisMonth`, `showMonth(_:)`,
+  `republishMonth()`, `readOldestLog()`; published only while asked, behind `role.drawsHistory`, never
+  from `init`, a failed read left standing. A pour then read the shown month twice (+7 ms at 500 days) —
+  stopped; **the owner ruled a pour reads it once**: `addLog` and `removeWater` re-read through the
+  private `refresh(republishingMonth: false)`. Re-measured on the built code at 500 days: `refresh()`
+  +2.34 ms, a pour +2.77 ms. `MonthPublishingTests`, 15 — the plan's 12 and three for the ruling.
+- **Tasks 5–7 — History**, test-first where a test reaches: five `nonisolated` statics
+  (`MonthLayoutTests`, 10); 20 strings in en/ru/uz (187 keys; `LocalizationTests`); the switch, Month
+  mode, the opened day read-only, the figures, the locked month and `PaywallView.Entry.history`; two
+  `PremiumUITests`.
+- **Task 8 — the walk**, on the owner's word, by a throwaway XCUITest in a scratch copy of the index —
+  seeded from June 15 by a DEBUG-only argument there, Premium bought and refunded through an
+  `SKTestSession` — on *WaterBuddy Probe 27*. Every figure checked by hand against the seed. A run of the
+  refund and both languages hung for six and a half hours after the shared welcome helper, English only,
+  failed in Russian; it was stopped and the harness rewritten, one test per run with a time allowance.
+  **W1** — the locked month's drawn month hidden behind its card: matched to the board's geometry (a
+  392-pt pane, the month at its top, the card centred as its background), re-walked twice. **L1** — the
+  month's name cut to *October 2…* at the largest text size: two lines, re-walked. **V1** withdrawn
+  before any build: the XCUITest tree lists hidden views. Reduce Transparency forced in the copy. **51
+  colour pairs** read off 60 frames on rings around each element's own ink, none under its floor; the
+  quiet day's number at 0.7 reads 4.80 (`docs/DESIGN.md`, *The month, measured*).
+- **Task 9 — the final review** (a fresh reviewer, opus, read-only, beside the walk): no Critical, three
+  Important, nine Minor, its twelve confirmations all yes. **I1**, a turn back to History inside the
+  0.45-s slide found Month on an empty card, and **I2**, the month emptied on the page sliding away —
+  both from letting go at the turn; on the owner's ruling History lets go in `.onDisappear`, proved RED
+  → GREEN in the walk harness by a walk-only turn back from inside the app (no XCUITest tap lands inside
+  a slide), and a full leave proved still to let go. **I3**, W1's look, ruled as built. The minors
+  deferred (`docs/AI_CONTEXT.md` #167).
+
+### Rulings it rests on
+
+The owner's: "ok" to start; **the budget 6 ms** ("Raise budget to 6 ms"); **a pour reads the month
+once** ("Read once per pour"); **the walk driven by me** ("Drive it yourself"); and on the review —
+**let go when the page is removed** ("When the page is removed"), the locked month **as built**, the
+Uzbek tiles' **column** kept, the tiles' figures **one size**. Spec §3.7 and §3.8 and plan M13 carry
+dated amendments. Mine, each in the ledger with its cost if wrong: among them the baseline from
+`2e2f3a7`, walk runs at any load after the hang, Reduce Transparency forced in the copy, the reviewer
+on opus, and I1/I2 proved in the harness rather than in-tree.
+
+### Files
+
+Code and tests, staged: `WaterBuddy/DataManager.swift`, `WaterBuddy/HistoryView.swift`,
+`WaterBuddy/PaywallView.swift`, `WaterBuddy/Localizable.xcstrings`,
+`WaterBuddyTests/MonthHistoryTests.swift` (new), `WaterBuddyTests/HistoryViewTests.swift`,
+`WaterBuddyTests/LocalizationTests.swift`, `WaterBuddyUITests/PremiumUITests.swift`. Records, staged:
+the spec and the plan (dated amendments), `CLAUDE.md` (the warning trail; the re-read bullet),
+`docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/DESIGN.md`, `docs/WIDGET.md`, `docs/ROADMAP.md`,
+`tasks/lessons.md` (four entries), this file. **Unstaged, for the owner:** `.claude/rules/20-state.md`,
+`30-rollover.md`, `43-concurrency.md`, `50-views.md`, `60-design-system.md`, `85-testing.md`. No
+`project.pbxproj`, entitlement, Info.plist, privacy manifest or key change.
+
+### Gate
+
+On the final code, 2026-10-23: unit, *iPhone 17* (27.0), **815** — `theLinksAreApplesTermsAndAPageOfOurs`
+alone failing (#159), `anExpiredYearlyReadsFree` skipped (#157); UI on *WaterBuddy Gate 27* and
+*WaterBuddy Gate 26.5*, three runs each started at a 1-minute load of 8 or under, **73 executed, 1
+skipped, 0 failures** on each; watch, *WaterBuddy Watch 27*, **70** passed; `WaterBuddyWidgetExtension`
+and `WaterBuddyWatchWidget`, `** BUILD SUCCEEDED **`. **Warnings:** a clean build of a copy of the
+index, by file and message against Task 0's export — 20 = 20, 17 = 17, 2 = 2, 2 = 2, none new or gone;
+the same sites by line. **Not run:** any device (#168); iOS 18.6; the colour pairs on 26.5 and in Russian
+and Uzbek (#169).
+
+**Staging.** Read from the commands at 01:52 on 2026-10-23, after Task 10's `git add` of its records
+by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git
+commit` was run.** HEAD `2e2f3a7`, 168 commits, level with `origin/main`. **18 staged** — 17 modified,
+1 added: the code and tests, the spec's and the plan's amendments, and the records. **12 unstaged**: the
+six rule files (the owner's to commit as `chore(claude)`), `.claude/settings.json` (the owner's) and
+five of Xcode's rewrites (#50). **1 untracked**: `Screenshots/census/`. None in both.
+
+## [2026-10-23] — The eighty-fifth `/doc_sync`: three drifts step 2's records left, a lesson that did not run
+
+### What
+
+The owner ran `/doc_sync` on set A's step 2's staged tree, straight after its records (the checkpoint
+above). No code has changed since its gate. The command's checks were run by a script in the
+session's scratchpad.
+
+- **Checked and current**, by `comm` over sorted lists: 103 `.swift` files in the seven target
+  folders, tracked and on disk, and 103 *Files on disk* rows, every count equal to `wc -l`; 815 phone
+  `@Test` in 97 suites, 70 watch, 60 UI `func test`, as *Targets* states them; 13 keys on
+  `DataManager.Key`, as `docs/STATE.md` says; the three `membershipExceptions` sets, six files each, as
+  `CLAUDE.md` names them; 18 rules cited and 18 rule files; `StoreKit` in `HomeView.swift` and
+  `PremiumStore.swift` alone; no ARCHITECTURE, CAPABILITIES or dependencies sheet. The month's release
+  is described as the page's removal wherever a sheet describes it; the current-text citations Task 10
+  re-pointed (`HistoryView.swift:363`, `DataManager.swift:1924`, `:1933`) open on what they quote.
+  `docs/WIDGET.md`, `docs/DESIGN.md` (its `MonthStyle` figures against the code) and
+  `docs/ROADMAP.md` read and left.
+- **Drift, fixed — three:** *The process role* in `docs/AI_CONTEXT.md` and its twin in
+  `docs/STATE.md` cite the guard sites as bare `` `:N` ``, and all seven still read `HEAD` `2e2f3a7`'s
+  lines, 41 to 137 short; re-derived by each guard's words, the old lines kept in each section's note.
+  Step 2's `republishMonth()` (`DataManager.swift:1182`) is an **eighth** guarded site, a third behind
+  `drawsHistory` — added to both, and `CLAUDE.md`'s "seven sites" now reads eight. And `CLAUDE.md`'s
+  *Targets* row for `WaterBuddyUITests` had not named `PremiumUITests` since `d5cf816` added it; it
+  does now, with what it covers.
+- **For the owner, not fixable here:** rule `25-shared-storage` still counts six sites and
+  `Role.drawsHistory`'s DocC still says it gates "the seven-day roll-up" — known issue #103 gains (h).
+- **Lesson:** the bare-citation miss is the one the lesson of 2026-10-14 already names, so a check
+  that lives as a lesson becomes a script run in every records pass (`tasks/lessons.md`).
+
+### Files
+
+`CLAUDE.md` (*Targets*' UI-test row; the guard-site bullet) · `docs/AI_CONTEXT.md` (the header, *The
+process role*, #103 (h), *Git*) · `docs/STATE.md` (the header, *Who may write on behalf of the group*)
+· `tasks/lessons.md` (one entry) · `HISTORY.md`. Nothing under the code or test targets, nothing
+under `.claude/`.
+
+### Gate
+
+Not run by this sync. The last gate is step 2's, on its final code, earlier the same day (the checkpoint
+above).
+
+**Staging.** Read from the commands at 19:50 on 2026-10-23, after this sync's `git add` of its five
+files by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No
+`git commit` was run.** HEAD `2e2f3a7`, 168 commits, level with `origin/main`. **18 staged** — 17
+modified, 1 added, the same set as above. **12 unstaged**, the same twelve. **1 untracked**:
+`Screenshots/census/`. None in both.

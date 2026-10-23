@@ -7,6 +7,13 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-23 (set A's step 2's own Task 10 — not a `/doc_sync` pass). **No shared
+token changed.** A new section, *The month, measured*, after *The paywall, measured*: what the month
+view draws — the switch, the month card, the opened day, the figures, the locked month — and 51 colour
+pairs read off renders on iOS 27.0, none under its floor; the quiet day's number at white **0.7** holds
+(4.80), so no value moved. The month's own measures live in `HistoryView.swift`'s `MonthStyle` — 56 pt
+for *See Premium*, the drawn month's 150 × 18 title bar and 12-pt weeks, the locked pane's 392 pt.
+
 **Last updated:** 2026-10-22 (eighty-fourth pass — `/doc_sync` after set A's step 2 was specified and
 planned). **No token changed and nothing was measured; nothing was built.** Step 1 is committed
 (`d5cf816`). Step 2's design is drawn on the canvas (row *Set A, step 2*) and its plan lists the pairs
@@ -2090,6 +2097,75 @@ sheet, where an element is at both; beside the glyphs unless marked clean:
 **Not measured:** iOS 26.5 and 18.6 (#165); Increase Contrast; the thank-you and held screens' lines
 (the walk saw them, its frames were not held); the sheet's lines in Russian and Uzbek, which wrap
 differently over the same grounds.
+
+## The month, measured
+
+**2026-10-23, set A's step 2, Task 8** (spec `docs/superpowers/specs/2026-10-22-month-view-design.md`
+§3.3–3.9; plan `docs/superpowers/plans/2026-10-22-month-view.md`, Task 8 Step 3). **No token moved:**
+every pair cleared its floor at the value the plan gave it, the quiet day's 0.7 (plan M9) among them.
+
+**What is drawn.** History's *Week · Month* switch, two halves on one `.frosted` + `.raised` capsule,
+the shown half marked with `LiquidGlass.Selection`'s fill and rim and its label bold, both labels full
+white — a lock beside *Month* for a free user. The month card, `.frosted` + `.raised`: its name
+`.headline` bold, white, between two chevrons (a bound's at 0.35); the weekday letters at white 0.9 in
+the app's language's order; a ring a day, 34 pt (capped at 36), its arc a tenth of it — a white 0.14
+track, the day's fraction drawn over it from twelve o'clock in `Aurora.cyan` when the goal was met and
+white when it was not; the number white, `.semibold` rounded at 0.38 of the ring, `.heavy` for today;
+the opened day ringed with `Selection.ringOpacity` and its number `.heavy` in `Aurora.top` on
+`Selection.discFill`; a day to come or before the first serving a white 0.06 disc with its number at
+**0.7**; the legend at 0.9, its marks the rings' own; *Measured against your current goal* at 0.88.
+Under the card, on the aurora, the opened day's heading and total, white with the two shadows. The
+figures: three `.frosted` tiles, the figure `.title3` bold white over a `.footnote` label at 0.9; the
+average line on its own pane, the average `.subheadline` bold white, the change `.footnote` at 0.9,
+the trend glyph `Aurora.cyan`. A free user's month: a 392-pt `.frosted` pane (`MonthStyle.lockedHeight`)
+holding a drawn month — a white 0.28 title bar and five weeks of rings, blurred 5 at 0.75 — with the
+locked card centred on it, 16 pt in: `.frosted` + `.raised` with `.premiumRim()`, a white calendar
+glyph, the title `.title3` bold white, the line `.subheadline` at 0.92, *See Premium* the primary
+surface, *Back to this week* white; under it the promise, white, its check white.
+
+**Method.** As *The paywall, measured*, with my own tool (a scratch Swift program, never in the tree):
+a throwaway XCUITest method in a scratch copy of the index — the app seeded from June 15 by a DEBUG-only
+argument in that copy, Premium bought through an `SKTestSession` — held three places for a minute, a
+frame every 3 s: the month with a day open, its figures, the locked month; *WaterBuddy Probe 27*
+(iPhone 17, iOS 27.0), sRGB frames. Each element's box came from the accessibility tree dumped at that
+place; its own ink was found in the box by threshold; its ground read on a ring 2–6 pt out of the ink's
+bounds (and 10–14 pt, clean, for the heading on the aurora), clipped to its pane, or — for a day's
+number — to the inside of its ring or disc; every other ink (text, rims, marks, cyan) masked and
+dilated 3 px; white composited at its opacity over each ground pixel, `Aurora.top` taken as itself, a
+glyph or an arc at its rendered colour. **The worst pixel of the worst frame.** Each ring was drawn on a
+capture and looked at before its figure was kept.
+
+**51 readings, none under its floor** — iOS 27.0 only:
+
+| Pair | Floor | Reading |
+|---|---|---|
+| The switch: *Week* (1.0) / *Month* shown (1.0) / *Month* with its lock | 4.5 | 5.96 / 7.08 / 7.08 |
+| The month's name (1.0) | 4.5 | 6.01 |
+| A weekday letter (0.9) — M / W / S | 4.5 | 4.90 / 5.91 / 7.59 |
+| A counted day's number (1.0), on its ring — worst of four / part-met / nothing logged | 4.5 | 8.23 / 7.56 / 8.78 |
+| Today's number (1.0, heavy) | 4.5 | 9.74 |
+| **A quiet day's number (0.7)**, on its 0.06 disc — 24 / 26 / 31 | 4.5 | 5.03 / 5.23 / **4.80** |
+| The opened day's number (`Aurora.top`) on its disc | 4.5 | 13.39 |
+| A met day's arc (cyan) against the glass — worst of three | 3 | 4.36 |
+| A part day's arc (white) against the glass / against its track | 3 | 7.30 / 5.29 |
+| The legend (0.9) — *Goal met* / *Part of it* | 4.5 | 7.77 / 7.51 |
+| The legend's marks — cyan / white, and white against its track | 3 | 5.63 / 8.98, 6.48 |
+| *Measured against your current goal* (0.88) | 4.5 | 7.17 |
+| The opened day's heading (1.0), beside / clean · its total | 4.5 | 5.62 / 5.55 · 7.08 / 6.72 |
+| A tile's figure (1.0) / label (0.9), worst of three | 4.5 | 5.46 / 5.73 |
+| The average (1.0) / the change (0.9) | 4.5 | 5.38 / 4.82 |
+| The trend glyph (cyan) | 3 | 4.76 |
+| The locked card: title (1.0) / line (0.92) / *Back to this week* (1.0) | 4.5 | 5.86 / 5.94 / 10.62 |
+| The locked card's calendar glyph / the lock in the switch / the promise's check | 3 | 8.30 / 7.33 / 5.40 |
+| The promise (1.0) | 4.5 | 6.30 |
+
+A met ring is whole, so its cyan never stands beside its own track; it is read against the glass inside
+and outside it. *See Premium* is the primary surface, derived rather than measured
+(`thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`).
+
+**Not measured:** iOS 26.5 and 18.6; Increase Contrast; the month in Russian and Uzbek, whose names and
+labels are wider over the same grounds; the largest text sizes, where the letters and numbers keep the
+ring's capped size and the labels grow.
 
 ## The header and a screen arriving
 
