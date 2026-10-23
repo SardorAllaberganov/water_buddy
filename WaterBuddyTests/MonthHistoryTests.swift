@@ -246,6 +246,23 @@ struct MonthHistoryTests {
         #expect(try #require(make(rows, first: instant, now: now, calendar: london)).total == 0)
         #expect(try #require(make(rows, month: 20260901, first: instant, now: now, calendar: london)).total == 500)
     }
+
+    // MARK: Its patterns (spec `2026-10-23-patterns-design.md` §3.6)
+
+    /// The month carries its patterns from its own rows: a September of water beside six October days
+    /// is no October pattern, and a seventh October day is.
+    @Test func aMonthCarriesThePatternsOfItsOwnRows() throws {
+        let september = (1...30).map { log(500, at: utc(2026, 9, $0)) }
+
+        let six = try #require(make(september + october(1...6, 500)))
+        #expect(six.patterns == nil, "the month before's rows never reach this month's patterns")
+
+        let seven = try #require(make(september + october(1...7, 500)))
+        let patterns = try #require(seven.patterns)
+        #expect(patterns.daysWithWater == 7)
+        #expect(patterns.hourly[12] == 3_500)
+        #expect(patterns.goal == goal)
+    }
 }
 
 // MARK: - Publishing
@@ -500,6 +517,23 @@ struct MonthPublishingTests {
             manager.dailyGoal = 2_000
 
             #expect(manager.month?.daysMet == 1)
+        }
+    }
+
+    /// Today joins the patterns at midnight (spec `2026-10-23-patterns-design.md` §3.1): six finished
+    /// days and today's water are no pattern until the day turns, and then they are.
+    @Test func theDayTurningAddsYesterdayToThePatterns() throws {
+        var clock = utc(2026, 10, 7, 20)
+        try withMonthStore(now: { clock }) { manager in
+            for day in 1...7 { manager.addLog(amount: 500, at: utc(2026, 10, day, 9)) }
+            manager.showMonth(manager.thisMonth)
+            #expect(manager.month != nil)
+            #expect(manager.month?.patterns == nil, "the 7th is today, and not over")
+
+            clock = utc(2026, 10, 8, 0, 30)
+            manager.dayDidTurn()
+
+            #expect(manager.month?.patterns?.daysWithWater == 7)
         }
     }
 

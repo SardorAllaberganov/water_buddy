@@ -2630,6 +2630,10 @@ nonisolated struct MonthHistory: Sendable, Equatable {
     /// this one is before the month holding today.
     let earlier: Neighbour?
     let later: Neighbour?
+
+    /// The month's patterns, from its finished days — `nil` until seven of them hold water
+    /// (``MonthPatterns/minimumDays``), which History says in a line of its own.
+    let patterns: MonthPatterns?
 }
 
 extension MonthHistory {
@@ -2727,7 +2731,11 @@ extension MonthHistory {
             average: average,
             change: change,
             earlier: neighbour(of: firstDay, by: -1, exists: firstMonth.map { $0 < firstDay } ?? false, in: calendar),
-            later: neighbour(of: firstDay, by: 1, exists: firstDay < Self.firstDay(ofMonthHolding: now, in: calendar), in: calendar)
+            later: neighbour(of: firstDay, by: 1, exists: firstDay < Self.firstDay(ofMonthHolding: now, in: calendar), in: calendar),
+            // From the same rows: the month before's fall outside `walked` and count in nothing.
+            patterns: MonthPatterns.make(
+                rows: rows, days: walked, firstServing: firstServing, goal: judged, now: now, calendar: calendar
+            )
         )
     }
 
@@ -2778,6 +2786,206 @@ extension MonthHistory {
               let start = interval(of: moved, in: calendar)?.start
         else { return nil }
         return Neighbour(firstDay: moved, start: start)
+    }
+}
+
+// MARK: - A month's patterns
+
+/// When in the day the user drinks, weekdays against weekends, and their usual first and last drink,
+/// for one month — what History draws under the month's figures (spec
+/// `2026-10-23-patterns-design.md` §3).
+///
+/// **At file scope in this file, for ``DaySummary``'s reason**, and carried on ``MonthHistory``, so it
+/// is published, equality-guarded, kept through a failed read and let go exactly as the month is. It is
+/// derived on every read and stored nowhere.
+///
+/// **Only finished days count**: the shown month's days on or after the first serving's and before
+/// today. Today joins at midnight — before then its hours and its last drink are still moving, and a
+/// morning would pull *When you drink* toward breakfast. **Nothing until seven of them hold water**
+/// (``minimumDays``); seven days with water among consecutive finished days span a week, so every
+/// weekday is in the window, whatever the locale's weekend.
+///
+/// **Hours and times are the wall clock's** — a serving's hour and minute on the model's calendar,
+/// never seconds since midnight, which a daylight-saving day stretches or shrinks (rule
+/// `30-rollover`). After a flight the same servings regroup into the new zone's hours, as the month
+/// regroups its days.
+nonisolated struct MonthPatterns: Sendable, Equatable {
+
+    /// One weekday's finished days: their water, and how many of them there were.
+    nonisolated struct Tally: Sendable, Equatable {
+        let water: Int
+        let days: Int
+    }
+
+    /// Weekdays or weekends: the average day, its bar against the goal, and whether it reached it.
+    nonisolated struct Side: Sendable, Equatable {
+        let average: Int
+        /// A drawing fraction, clamped to `0...1`.
+        let fraction: Double
+        let isMet: Bool
+    }
+
+    /// The two sides of a week, `nil` for one with no day.
+    nonisolated struct Split: Sendable, Equatable {
+        let weekdays: Side?
+        let weekends: Side?
+    }
+
+    /// How many finished days must hold water before a month has patterns (spec §3.1).
+    nonisolated static let minimumDays = 7
+
+    /// The latest a usual time is drawn: a minute rounded past 23:55 would name the next day's midnight.
+    nonisolated static let latestMinute = 23 * 60 + 55
+
+    /// Each hour's water across the counted days, midnight's first: 24 entries.
+    let hourly: [Int]
+
+    /// The hour with the most water; a tie goes to the earlier.
+    let busiestHour: Int
+
+    /// Each weekday's tally, Sunday's first: 7 entries, indexed by the calendar's weekday less one.
+    let weekdays: [Tally]
+
+    /// The usual first and last drink, in minutes after midnight on the wall clock — each the median of
+    /// the days with water, rounded to five minutes.
+    let firstDrink: Int
+    let lastDrink: Int
+
+    /// The counted days that hold water.
+    let daysWithWater: Int
+
+    /// The goal the two sides were judged against — the current one, as everything in History is.
+    let goal: Int
+
+    /// The busiest hour, the first drink and the last drink as instants on the month's 1st — **for
+    /// formatting and nothing else**, as ``MonthHistory/Neighbour/start`` is, so History formats them
+    /// through the phone's 12/24-hour setting and holds no calendar.
+    let busiestHourAt: Date
+    let firstDrinkAt: Date
+    let lastDrinkAt: Date
+}
+
+extension MonthPatterns {
+
+    /// The week split at `weekend` — weekday numbers, `1` for Sunday, the app's locale's
+    /// (`HistoryView.weekend(in:)`) — each side its days' water over its days, empty days included.
+    nonisolated func split(weekend: Set<Int>) -> Split {
+        Split(weekdays: side(where: { !weekend.contains($0) }), weekends: side(where: { weekend.contains($0) }))
+    }
+
+    /// The days whose weekday `includes` answers for, as one side — `nil` when there are none.
+    nonisolated private func side(where includes: (Int) -> Bool) -> Side? {
+        let chosen = weekdays.enumerated().filter { includes($0.offset + 1) }.map(\.element)
+        let days = chosen.reduce(0) { $0 + $1.days }
+        guard days > 0 else { return nil }
+        // `DaySummary.average(of:)`'s arithmetic: saturated, then truncated.
+        let average = Self.saturatedSum(chosen.map(\.water)) / days
+        let judged = max(goal, 1)
+        return Side(
+            average: average,
+            fraction: min(max(Double(average) / Double(judged), 0), 1),
+            isMet: average >= judged
+        )
+    }
+
+    /// The month's patterns from `rows` — which may reach outside it — over `days`, its walked days
+    /// (``MonthHistory/days(of:in:)``), or `nil` while fewer than ``minimumDays`` finished days hold
+    /// water.
+    nonisolated static func make(
+        rows: [WaterLog],
+        days: [(ordinal: Int, date: Date)],
+        firstServing: Date?,
+        goal: Int,
+        now: Date,
+        calendar: Calendar
+    ) -> MonthPatterns? {
+        guard let firstServing, let opening = days.first?.date else { return nil }
+        let first = DataManager.dayOrdinal(for: firstServing, in: calendar)
+        let today = DataManager.dayOrdinal(for: now, in: calendar)
+        let counted = days.filter { $0.ordinal >= first && $0.ordinal < today }
+        let countedOrdinals = Set(counted.map(\.ordinal))
+
+        // Each counted day's servings as wall-clock minutes, and its water.
+        var times: [Int: [Int]] = [:]
+        var water: [Int: Int] = [:]
+        var hourly = Array(repeating: 0, count: 24)
+        for row in rows {
+            let ordinal = DataManager.dayOrdinal(for: row.timestamp, in: calendar)
+            guard countedOrdinals.contains(ordinal) else { continue }
+            let minute = minuteOfDay(row.timestamp, in: calendar)
+            let hour = min(max(minute / 60, 0), 23)
+            times[ordinal, default: []].append(minute)
+            // A day saturates where ``MonthHistory``'s does; an hour, at the largest figure there is.
+            // Either way a corrupt row degrades rather than traps (rule `20-state`).
+            water[ordinal] = Self.saturating(water[ordinal] ?? 0, row.amount, at: DataManager.maximumDailyIntake)
+            hourly[hour] = Self.saturating(hourly[hour], row.amount, at: .max)
+        }
+
+        let watered = counted.filter { (water[$0.ordinal] ?? 0) > 0 }
+        guard watered.count >= minimumDays else { return nil }
+
+        var tallies = Array(repeating: Tally(water: 0, days: 0), count: 7)
+        for day in counted {
+            let index = min(max(calendar.component(.weekday, from: day.date) - 1, 0), 6)
+            tallies[index] = Tally(
+                water: saturatedSum([tallies[index].water, water[day.ordinal] ?? 0]),
+                days: tallies[index].days + 1
+            )
+        }
+
+        let firsts = watered.compactMap { times[$0.ordinal]?.min() }
+        let lasts = watered.compactMap { times[$0.ordinal]?.max() }
+        let firstDrink = usual(firsts)
+        let lastDrink = usual(lasts)
+        // The first of the largest: `max(by:)` would keep the last.
+        let busiestHour = hourly.firstIndex(of: hourly.max() ?? 0) ?? 0
+
+        return MonthPatterns(
+            hourly: hourly,
+            busiestHour: busiestHour,
+            weekdays: tallies,
+            firstDrink: firstDrink,
+            lastDrink: lastDrink,
+            daysWithWater: watered.count,
+            goal: max(goal, 1),
+            busiestHourAt: instant(atMinute: busiestHour * 60, on: opening, in: calendar),
+            firstDrinkAt: instant(atMinute: firstDrink, on: opening, in: calendar),
+            lastDrinkAt: instant(atMinute: lastDrink, on: opening, in: calendar)
+        )
+    }
+
+    /// `instant`'s minutes after midnight on the wall clock of `calendar`: its hour and minute, never
+    /// the seconds since the day began — 23:59 on a 25-hour day is 1,439, not 1,499.
+    nonisolated static func minuteOfDay(_ instant: Date, in calendar: Calendar) -> Int {
+        let parts = calendar.dateComponents([.hour, .minute], from: instant)
+        return (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
+    }
+
+    /// The median of `minutes` — the earlier of the middle two for an even count, so no time is named
+    /// that no day had — rounded to five minutes and held inside the day (spec §3.5).
+    nonisolated private static func usual(_ minutes: [Int]) -> Int {
+        let sorted = minutes.sorted()
+        guard !sorted.isEmpty else { return 0 }
+        let median = sorted[(sorted.count - 1) / 2]
+        return min((median + 2) / 5 * 5, latestMinute)
+    }
+
+    /// The wall-clock `minute` on the day starting at `day`, set the way a reminder's slot is (rule
+    /// `80-notifications`) — for formatting only. A time the day skips — a month whose 1st springs
+    /// forward — comes back as the next time that day has (`.nextTime`, the call's default), so a usual
+    /// 02:15 would draw as 03:00; a time the calendar cannot place at all draws as the day's start
+    /// rather than trapping.
+    nonisolated private static func instant(atMinute minute: Int, on day: Date, in calendar: Calendar) -> Date {
+        calendar.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: day) ?? day
+    }
+
+    nonisolated private static func saturating(_ running: Int, _ amount: Int, at ceiling: Int) -> Int {
+        let (sum, overflowed) = running.addingReportingOverflow(amount)
+        return overflowed ? ceiling : min(sum, ceiling)
+    }
+
+    nonisolated private static func saturatedSum(_ values: [Int]) -> Int {
+        values.reduce(0) { saturating($0, $1, at: .max) }
     }
 }
 

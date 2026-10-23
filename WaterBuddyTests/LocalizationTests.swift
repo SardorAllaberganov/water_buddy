@@ -150,6 +150,17 @@ private let historyKeys = [
     "Average %1$d millilitres a day",
     "Up %1$d millilitres on the month before",
     "Down %1$d millilitres on the month before",
+    "Patterns",
+    "From this month's finished days",
+    "When you drink",
+    "Most around %1$@",
+    "Weekdays",
+    "Weekends",
+    "%1$@ ml a day",
+    "%1$d millilitres a day",
+    "First drink, usually",
+    "Last drink, usually",
+    "Patterns need %1$d days of water",
 ]
 
 /// The welcome's own strings (spec 2026-10-14 §8). The keys it shares with Settings or the reminder
@@ -963,6 +974,8 @@ private let countedKeys = [
     CountedKey(key: "Average %1$d millilitres a day", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "Up %1$d millilitres on the month before", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "Down %1$d millilitres on the month before", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "%1$d millilitres a day", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Patterns need %1$d days of water", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — %2$lld millilitres to go.", arity: 2,
                counted: [0, 1], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — you've reached your goal.", arity: 1,
@@ -1078,6 +1091,19 @@ private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: L
     case ("Down %1$d millilitres on the month before", "en"): return "Down \(f[0]) \(ml(0)) on the month before"
     case ("Down %1$d millilitres on the month before", "ru"): return "На \(f[0]) \(mlRu(0)) меньше, чем в предыдущем месяце"
     case ("Down %1$d millilitres on the month before", "uz"): return "Oldingi oydan \(f[0]) millilitr kam"
+
+    case ("%1$d millilitres a day", "en"): return "\(f[0]) \(ml(0)) a day"
+    case ("%1$d millilitres a day", "ru"): return "\(f[0]) \(mlRu(0)) в день"
+    case ("%1$d millilitres a day", "uz"): return "Kuniga \(f[0]) millilitr"
+
+    case ("Patterns need %1$d days of water", "en"):
+        return "Patterns need \(f[0]) " + english(n[0], "day", "days") + " of water"
+    case ("Patterns need %1$d days of water", "ru"):
+        // «Нужен» agrees with a singular «день»; «нужно» goes with «дня» and «дней».
+        return russian(n[0], "Для привычек нужен \(f[0]) день", "Для привычек нужно \(f[0]) дня", "Для привычек нужно \(f[0]) дней")
+            + " с водой"
+    case ("Patterns need %1$d days of water", "uz"):
+        return "Odatlar uchun suv ichilgan \(f[0]) kun kerak"
 
     case ("%1$lld millilitres so far today — %2$lld millilitres to go.", "en"):
         return "\(f[0]) \(ml(0)) so far today — \(f[1]) \(ml(1)) to go."

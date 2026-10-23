@@ -230,6 +230,40 @@ struct HistoryView: View {
         (Decimal(millilitres) / 1_000).formatted(.number.precision(.fractionLength(1)).locale(locale))
     }
 
+    /// The locale's weekend as weekday numbers, `1` for Sunday — what the month's patterns split the
+    /// week at (spec `2026-10-23-patterns-design.md` §3.4).
+    ///
+    /// Asked of a Gregorian calendar under the locale, as ``weekdayLetters(in:)`` is, never of
+    /// `Calendar.waterBuddyDay`, which is fixed to `en_US_POSIX` and would call every weekend Saturday
+    /// and Sunday — Friday and Saturday in Saudi Arabia under *Follow device*, Sunday alone in India.
+    /// One known week is walked: 4 January 2026 is a Sunday.
+    nonisolated static func weekend(in locale: Locale) -> Set<Int> {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        guard let sunday = calendar.date(from: DateComponents(year: 2026, month: 1, day: 4, hour: 12)) else { return [1, 7] }
+        return Set((0..<7).compactMap { offset in
+            guard let day = calendar.date(byAdding: .day, value: offset, to: sunday), calendar.isDateInWeekend(day) else { return nil }
+            return calendar.component(.weekday, from: day)
+        })
+    }
+
+    /// Where the bar of `hour` stands across the patterns' chart: `0` for midnight's, `1` for 23:00's —
+    /// the strip's model of a plot, a bar's leading edge at its fraction of the travel, and the axis's
+    /// labels centred under the bars of the hours they name.
+    nonisolated static func hourPosition(_ hour: Int) -> Double {
+        Double(min(max(hour, 0), 23)) / 23
+    }
+
+    /// Each hour's bar as a fraction of the plot (spec §3.3): its water against the busiest hour's, a
+    /// sip held at ``stripFloor`` so it is still seen, an hour with no water at nothing.
+    nonisolated static func hourBars(_ hourly: [Int]) -> [Double] {
+        let busiest = hourly.max() ?? 0
+        guard busiest > 0 else { return hourly.map { _ in 0 } }
+        return hourly.map { water in
+            water > 0 ? min(max(Double(water) / Double(busiest), stripFloor), 1) : 0
+        }
+    }
+
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
@@ -467,8 +501,8 @@ struct HistoryView: View {
         manager.month?.days.first { $0.summary.dayOrdinal == openedDay && $0.canOpen }
     }
 
-    /// Month mode: for a holder the month, the day opened in it and the month's figures; for a free user
-    /// the locked month (spec §3.2).
+    /// Month mode: for a holder the month, the day opened in it, the month's figures and its patterns;
+    /// for a free user the locked month (spec §3.2).
     @ViewBuilder
     private var monthRows: some View {
         if holdsPremium {
@@ -495,7 +529,28 @@ struct HistoryView: View {
 
             if let month = manager.month, month.daysCounted > 0 {
                 MonthFigures(month: month)
-                    .historyRow(top: 8, bottom: 24)
+                    .historyRow(top: 8)
+            }
+
+            // The month's patterns, or the line that says what they wait for; a month never read
+            // draws neither (spec `2026-10-23-patterns-design.md` §3.2).
+            if let month = manager.month {
+                PatternsHeading()
+                    .historyRow(top: 14, bottom: 2)
+
+                if let patterns = month.patterns {
+                    HoursChart(patterns: patterns)
+                        .historyRow()
+                    // The week split at the app's locale's weekend, as the grid starts on its first
+                    // day (spec §3.4).
+                    WeekSplit(split: patterns.split(weekend: Self.weekend(in: locale)))
+                        .historyRow()
+                    UsualTimes(patterns: patterns)
+                        .historyRow(bottom: 24)
+                } else {
+                    PatternsPending()
+                        .historyRow(bottom: 24)
+                }
             }
         } else {
             LockedMonth { paywall = .history } back: { choose(.week) }
@@ -1712,6 +1767,329 @@ private struct MonthFigures: View {
         if change > 0 { return strings.localized("Up %1$d millilitres on the month before", change, locale: locale) }
         if change < 0 { return strings.localized("Down %1$d millilitres on the month before", -change, locale: locale) }
         return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
+    }
+}
+
+// MARK: - The month's patterns
+
+/// *Patterns*, and the days they come from, on the aurora above their panes — the opened day's kind of
+/// heading, one element (spec `2026-10-23-patterns-design.md` §3.2, §3.8). The line names no month:
+/// Russian would need it in a case Foundation cannot give (`tasks/lessons.md`, 2026-10-22).
+private struct PatternsHeading: View {
+
+    @Environment(\.strings) private var strings
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Patterns", bundle: strings)
+                .font(.title3.weight(.bold))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .legibleOnBackdrop()
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityValue(Text("From this month's finished days", bundle: strings))
+
+            Text("From this month's finished days", bundle: strings)
+                .font(.subheadline.weight(.semibold))
+                .fixedSize(horizontal: false, vertical: true)
+                .legibleOnBackdrop()
+                .accessibilityHidden(true)
+        }
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, HistoryView.margin)
+    }
+}
+
+/// *When you drink*: a bar an hour across the whole day, the busiest in `Aurora.cyan`, on the day
+/// strip's axis — so the month's hours and a day's servings read alike (spec §3.2, §3.3).
+///
+/// **One element**: the title, its value the busiest hour. The bars and the axis are hidden.
+private struct HoursChart: View {
+
+    @Environment(DataManager.self) private var manager
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    let patterns: MonthPatterns
+
+    /// The strip's measures, capped at its use site (rule `65-accessibility`).
+    @ScaledMetric(relativeTo: .footnote) private var scaledPlotHeight: CGFloat = 64
+
+    private var plotHeight: CGFloat { min(scaledPlotHeight, 92) }
+
+    private let barWidth: CGFloat = 8
+
+    private var bars: [Double] { HistoryView.hourBars(patterns.hourly) }
+
+    /// *Most around 13:00*, through the phone's own 12- or 24-hour form under the app's locale.
+    private var busiest: String {
+        strings.localized(
+            "Most around %1$@",
+            patterns.busiestHourAt.formatted(.dateTime.hour().minute().locale(locale)),
+            locale: locale
+        )
+    }
+
+    /// The strip's labelled hours, as instants on the month's 1st — the model's answer, on its calendar.
+    private var labels: [(hour: Int, at: Date)] {
+        HistoryView.stripHours.compactMap { hour in
+            manager.hours([hour], onDayOf: patterns.busiestHourAt).first.map { (hour, $0) }
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            heading
+
+            VStack(spacing: 6) {
+                plot
+                axis
+            }
+            .accessibilityHidden(true)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(.white)
+        // The week card's pair: sibling panes on one screen share one (rule `60-design-system`).
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    /// The title, and the busiest hour trailing it — under it where the two do not fit on one line.
+    private var heading: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                title
+                    .fixedSize()
+                Spacer(minLength: 0)
+                busiestLine
+                    .fixedSize()
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                title
+                busiestLine
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var title: some View {
+        Text("When you drink", bundle: strings)
+            .font(.callout.weight(.semibold))
+            .lineLimit(2)
+            .minimumScaleFactor(0.7)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityValue(busiest)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    /// In the board's cyan, the busiest bar's colour. Hidden: the title speaks it.
+    private var busiestLine: some View {
+        Text(busiest)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(Aurora.cyan)
+            .accessibilityHidden(true)
+    }
+
+    private var plot: some View {
+        GeometryReader { proxy in
+            let travel = max(proxy.size.width - barWidth, 0)
+
+            ZStack(alignment: .bottomLeading) {
+                // The ground the bars stand on, as the strip's.
+                Capsule()
+                    .fill(.white.opacity(0.3))
+                    .frame(height: 1)
+
+                // Every hour's bar is always there, an hour with no water at no height, so another
+                // month grows and shrinks the bars rather than inserting them (rule `50-views`).
+                ForEach(bars.indices, id: \.self) { hour in
+                    Capsule()
+                        .fill(hour == patterns.busiestHour ? Aurora.cyan : Color.white.opacity(0.7))
+                        .frame(width: barWidth, height: bars[hour] > 0 ? max(proxy.size.height * bars[hour], barWidth) : 0)
+                        .offset(x: travel * HistoryView.hourPosition(hour))
+                }
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .bottomLeading)
+        }
+        .frame(height: plotHeight)
+        .animation(.smooth(duration: 0.45), value: bars)
+    }
+
+    private var axis: some View {
+        GeometryReader { proxy in
+            let travel = max(proxy.size.width - barWidth, 0)
+
+            ForEach(labels, id: \.hour) { label in
+                Text(label.at, format: .dateTime.hour())
+                    // A ratio of the plot it annotates, as the strip's (rule `65-accessibility`).
+                    .font(.system(size: plotHeight * 0.18, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(.white.opacity(0.9))
+                    .fixedSize()
+                    .position(x: travel * HistoryView.hourPosition(label.hour) + barWidth / 2, y: proxy.size.height / 2)
+            }
+        }
+        .frame(height: plotHeight * 0.24)
+    }
+}
+
+/// *Weekdays* and *Weekends*: each its average day, and a bar against the goal's tick at its end —
+/// `Aurora.cyan` when the average reaches the goal and white when it does not, the week card's
+/// meaning, and never colour alone: a met bar reaches the tick (spec §3.2, §3.4).
+///
+/// **Each row one element**: its name, its average in millilitres.
+private struct WeekSplit: View {
+
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    let split: MonthPatterns.Split
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if let weekdays = split.weekdays {
+                row(Text("Weekdays", bundle: strings), weekdays)
+            }
+            if let weekends = split.weekends {
+                row(Text("Weekends", bundle: strings), weekends)
+            }
+
+            Text("Measured against your current goal", bundle: strings)
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.9))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(.white)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private func row(_ name: Text, _ side: MonthPatterns.Side) -> some View {
+        let figure = Text(strings.figure("%1$@ ml a day", side.average, locale: locale))
+            .font(.subheadline.weight(.bold))
+            .fontDesign(.rounded)
+            .monospacedDigit()
+
+        return VStack(alignment: .leading, spacing: 8) {
+            // Offered the row's whole width; it chooses among whole layouts (`tasks/lessons.md`).
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    name.font(.subheadline.weight(.semibold)).fixedSize()
+                    Spacer(minLength: 0)
+                    figure.fixedSize()
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    name.font(.subheadline.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
+                    figure
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            bar(side)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(name)
+        .accessibilityValue(strings.localized("%1$d millilitres a day", side.average, locale: locale))
+    }
+
+    /// The average against the goal: the week card's track and its goal line's rule, at the bar's end.
+    ///
+    /// The week's own shape for a track and a bar inside a pane (rule `60-design-system`). The fill is
+    /// always there, at no width for a side with no water, so its length and colour animate rather
+    /// than a layer coming and going (rule `50-views`).
+    private func bar(_ side: MonthPatterns.Side) -> some View {
+        let shape = RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous)
+
+        return GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                shape
+                    .fill(.white.opacity(0.10))
+                shape
+                    .fill(side.isMet ? Aurora.cyan : Color.white)
+                    .frame(width: side.fraction > 0 ? max(proxy.size.width * side.fraction, proxy.size.height) : 0)
+            }
+            .overlay(alignment: .trailing) {
+                Capsule()
+                    .fill(.white.opacity(0.62))
+                    .frame(width: 1.5, height: proxy.size.height + 8)
+            }
+        }
+        .frame(height: 10)
+        .animation(.smooth(duration: 0.45), value: side)
+    }
+}
+
+/// *First drink, usually* and *Last drink, usually*: the month's figures' tiles — across where they
+/// fit, a column where they do not (spec §3.2, §3.5).
+private struct UsualTimes: View {
+
+    @Environment(\.strings) private var strings
+
+    let patterns: MonthPatterns
+
+    var body: some View {
+        // Offered the row's whole width; it chooses among whole layouts (`tasks/lessons.md`).
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: 10) { tiles(fixed: true) }
+            VStack(spacing: 10) { tiles(fixed: false) }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    @ViewBuilder
+    private func tiles(fixed: Bool) -> some View {
+        tile(patterns.firstDrinkAt, label: Text("First drink, usually", bundle: strings), fixed: fixed)
+        tile(patterns.lastDrinkAt, label: Text("Last drink, usually", bundle: strings), fixed: fixed)
+    }
+
+    private func tile(_ time: Date, label: Text, fixed: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            // The phone's own 12- or 24-hour form, as every time here.
+            Text(time, format: .dateTime.hour().minute())
+                .font(.title3.weight(.bold))
+                .fontDesign(.rounded)
+                .monospacedDigit()
+            label
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(.white.opacity(0.9))
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(fixed ? 1 : 0.6)
+        .fixedSize(horizontal: fixed, vertical: false)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .foregroundStyle(.white)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(Text(time, format: .dateTime.hour().minute()))
+    }
+}
+
+/// A month with fewer than seven days of water: one line, so the section says what patterns need rather
+/// than vanishing — true of a month still filling and of a finished one that never will (spec §3.2).
+private struct PatternsPending: View {
+
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    var body: some View {
+        // *Need*, not *appear after*: a finished month with fewer days will never have them (the final
+        // review's M4).
+        Text(strings.localized("Patterns need %1$d days of water", MonthPatterns.minimumDays, locale: locale))
+            .font(.subheadline)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .foregroundStyle(.white)
+            .liquidGlass(density: .frosted, elevation: .raised)
+            .padding(.horizontal, HistoryView.margin)
     }
 }
 

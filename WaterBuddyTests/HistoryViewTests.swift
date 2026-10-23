@@ -379,4 +379,42 @@ struct MonthLayoutTests {
         #expect(HistoryView.litres(0, locale: Locale(identifier: "en")) == "0.0")
         #expect(HistoryView.litres(1_234_500, locale: Locale(identifier: "en")) == "1,234.5")
     }
+
+    // MARK: Patterns (spec `2026-10-23-patterns-design.md` §3.4, §3.7)
+
+    /// The weekend is the app's locale's, as its first weekday is: Saturday and Sunday in all three of
+    /// the app's languages, and the device's own under *Follow device*.
+    @Test func theWeekendIsTheLanguagesOwn() {
+        #expect(HistoryView.weekend(in: Locale(identifier: "en")) == [1, 7])
+        #expect(HistoryView.weekend(in: Locale(identifier: "ru")) == [1, 7])
+        #expect(HistoryView.weekend(in: Locale(identifier: "uz")) == [1, 7])
+        #expect(HistoryView.weekend(in: Locale(identifier: "ar_SA")) == [6, 7], "Friday and Saturday")
+        #expect(HistoryView.weekend(in: Locale(identifier: "en_IN")) == [1], "Sunday alone")
+    }
+
+    @Test func anHourStandsOnTheChartsTwentyFourSlots() {
+        #expect(HistoryView.hourPosition(0) == 0)
+        #expect(HistoryView.hourPosition(6) == 6.0 / 23)
+        #expect(HistoryView.hourPosition(12) == 12.0 / 23)
+        #expect(HistoryView.hourPosition(18) == 18.0 / 23)
+        #expect(HistoryView.hourPosition(23) == 1)
+        #expect(HistoryView.hourPosition(-1) == 0)
+        #expect(HistoryView.hourPosition(24) == 1)
+    }
+
+    /// Each hour's bar against the busiest, a sip still seen and an empty hour drawing nothing.
+    @Test func theHoursAreDrawnAgainstTheBusiest() throws {
+        var hourly = Array(repeating: 0, count: 24)
+        hourly[8] = 1_000
+        hourly[13] = 2_000
+        hourly[22] = 50
+        let bars = HistoryView.hourBars(hourly)
+        try #require(bars.count == 24)
+        #expect(bars[13] == 1)
+        #expect(bars[8] == 0.5)
+        #expect(bars[22] == HistoryView.stripFloor, "a sip still has to be seen")
+        #expect(bars[0] == 0, "an hour with no water draws nothing")
+        #expect(HistoryView.hourBars(Array(repeating: 0, count: 24)).allSatisfy { $0 == 0 })
+        #expect(HistoryView.hourBars([Int.max] + Array(repeating: 1, count: 23)).first == 1, "a corrupt hour degrades")
+    }
 }
