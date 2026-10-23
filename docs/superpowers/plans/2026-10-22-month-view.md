@@ -62,6 +62,9 @@ Each is a reading of the spec where its text left a choice; each says what it co
   empty state points at a `+` the opened day does not carry.
 - **M13 — History lets go of a month in `.onAppear` only while Week is shown**, and when
   `\.pageIsShown` turns `false`; a holder's Premium lapsing with Month open lets it go too.
+  *(Amended 2026-10-23, the owner's ruling on the final review's I1 and I2: not when `\.pageIsShown`
+  turns `false` but when the page is removed, in `.onDisappear` — spec §3.8, as amended. Task 7's code
+  below keeps its original text; the tree's `HistoryView` is the authority.)*
 - **M14 — the warnings baseline is a clean build of a `HEAD` `a6e287b` export:** 20 / 17 / 2 / 2,
   as step 1 left them.
 

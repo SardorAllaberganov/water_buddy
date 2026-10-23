@@ -229,6 +229,11 @@ As the board *Step 2 — Month, free user*:
   `refresh()` and a pour, with and without a month shown. **The budget:** no more than 3 ms added to
   either at 500 days. Over it, the plan stops and reports; the first fallback is to hold the first
   serving's instant in memory, forgotten on every delete.
+  *(Amended 2026-10-22, two owner's rulings in the plan's Tasks 1 and 4: the budget is **6 ms** — the
+  probe read the month's two-month window at ~4.5 ms for ~490 rows, which the fallback would not touch;
+  and a pour reads the shown month **once** — `addLog` and `removeWater` re-read through the private
+  `refresh(republishingMonth: false)`, and the save after the write republishes it. Measured on the
+  built code at 500 days: `refresh()` +2.34 ms, a pour +2.77 ms.)*
 
 ### 3.8 The view (`WaterBuddy/HistoryView.swift`)
 
@@ -237,8 +242,12 @@ As the board *Step 2 — Month, free user*:
   Int?`, `paywall: PaywallView.Entry?`, and haptic counters for the switch, the arrows and a day
   (`Haptics.select`, rule `60-design-system`).
 - **Its calls into the model:** choosing Month as a holder — `showMonth(manager.thisMonth)`; an arrow —
-  `showMonth(month.earlier)` or `showMonth(month.later)`; choosing Week, the page being left
-  (`\.pageIsShown` turning `false`) and Premium ceasing to be held — `showMonth(nil)`. History holds no
+  `showMonth(month.earlier)` or `showMonth(month.later)`; choosing Week, the page being removed
+  (`onDisappear`, when its slide out has ended) and Premium ceasing to be held — `showMonth(nil)`.
+  *(Amended 2026-10-23, the owner's ruling on the final review's I1 and I2: this read "the page being
+  left (`\.pageIsShown` turning `false`)". Letting go at the turn emptied the month on the page sliding
+  away, and a tab tapped back inside the slide got the same page back in Month on an empty card. The
+  cost: the month is read for the slide's 0.45 s longer — the page arriving reads it once.)* History holds no
   month of its own and does no month arithmetic.
 - **Its decisions are `nonisolated static`s taking their state as parameters** (rule `50-views`):
   `offersMonth(status:offered:)` (§3.1) and `monthGrid(for:firstWeekday:)` — the month's days laid
