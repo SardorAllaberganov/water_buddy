@@ -65,7 +65,10 @@ changed.
   DST day is 23 or 25 hours long
 - A month is named by the ordinal of its 1st. Its bounds come from the injected calendar's
   `dateInterval(of: .month, for:)` and its days from `date(byAdding: .day, …)`. Its grid's first
-  weekday is the app's locale's, never `Calendar.waterBuddyDay`'s
+  weekday and the weekend its patterns split are the app's locale's, never `Calendar.waterBuddyDay`'s
+- A serving's hour and time of day in the month's patterns are its instant's wall-clock hour and
+  minute on the injected calendar — never seconds since midnight, which a DST day stretches or
+  shrinks
 
 ## Detecting the turn
 - Read `Key.lastActiveDay` as `defaults.object(forKey:) as? Int`, never `integer(forKey:)`. A

@@ -79,8 +79,8 @@ persist anything.
 - On Home the Glass is ranked above Cup and Bottle: it is the screen's primary surface, because
   slot `DataManager.usualSlot` is what every one-tap door logs
 - History is one `List`, and everything on the screen is a row of it: the header, the week card,
-  the strip and the servings — in Month mode the header, the switch, the month card, an opened day
-  and the figures — each with the list's own surfaces cleared. Nothing is fixed above
+  the strip and the servings — in Month mode the header, the switch, the month card, an opened day,
+  the figures and the patterns — each with the list's own surfaces cleared. Nothing is fixed above
   it, so the `+` scrolls away with the header. The list stops one point short of the top safe
   area (`.padding(.top, 1)`), so its rows are clipped under the status bar and never drawn across it
 - What History decides is a `static` on `HistoryView` that takes its state as parameters —
