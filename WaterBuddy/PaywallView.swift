@@ -174,30 +174,16 @@ struct PaywallView: View {
     private var topBar: some View {
         if typeSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 12) {
-                closeButton
+                SheetCloseButton(label: "Not now")
                 promise(in: RoundedRectangle(cornerRadius: LiquidGlass.cornerRadius, style: .continuous))
             }
         } else {
             HStack(alignment: .center, spacing: 12) {
-                closeButton
+                SheetCloseButton(label: "Not now")
                 Spacer(minLength: 0)
                 promise(in: Capsule())
             }
         }
-    }
-
-    private var closeButton: some View {
-        Button {
-            dismiss()
-        } label: {
-            Image(systemName: "xmark")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: PaywallStyle.closeSize, height: PaywallStyle.closeSize)
-                .liquidGlass(in: Circle(), density: .sheer, elevation: .resting, interactive: true)
-        }
-        .buttonStyle(PressStyle())
-        .accessibilityLabel(Text("Not now", bundle: strings))
     }
 
     private func promise<S: Shape & InsettableShape>(in shape: S) -> some View {
@@ -612,8 +598,6 @@ private enum PaywallStyle {
     static let verticalInset: CGFloat = 12
     static let sectionGap: CGFloat = 18
     static let rowGap: CGFloat = 12
-    /// The 44 floor (rule `65-accessibility`).
-    static let closeSize: CGFloat = 44
     static let capsuleInset: CGFloat = 14
     /// At the ordinary size; it grows with ``PaywallView/glyphBox``, to the ceiling.
     static let glyphBox: CGFloat = 28

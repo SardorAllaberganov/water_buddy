@@ -25,7 +25,6 @@ struct RecapSheet: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
-    @Environment(\.dismiss) private var dismiss
 
     /// The card, rendered — presentation state, gone with the sheet.
     @State private var image: UIImage?
@@ -69,19 +68,7 @@ struct RecapSheet: View {
                 .legibleOnBackdrop()
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
-            Button {
-                dismiss()
-            } label: {
-                // Sized from its fixed circle, never from a text style: at the accessibility sizes a
-                // `.body` glyph outgrew the circle (the walk, W3; rule `65-accessibility`).
-                Image(systemName: "xmark")
-                    .font(.system(size: Self.closeSize * Self.closeGlyph, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: Self.closeSize, height: Self.closeSize)
-                    .liquidGlass(in: Circle(), density: .sheer, elevation: .resting, interactive: true)
-            }
-            .buttonStyle(PressStyle())
-            .accessibilityLabel(Text("Done", bundle: strings))
+            SheetCloseButton(label: "Done")
         }
     }
 
@@ -162,10 +149,6 @@ struct RecapSheet: View {
 
     private static let gap: CGFloat = 16
     private static let verticalInset: CGFloat = 24
-    /// The paywall's close button's, the 44-pt floor (rule `65-accessibility`).
-    private static let closeSize: CGFloat = 44
-    /// The ✕'s size as a share of its circle — 17 pt at 44, the `.body` it drew at the default size.
-    private static let closeGlyph: CGFloat = 17.0 / 44.0
     /// The share button before its image exists — a few milliseconds, at most.
     private static let pending: Double = 0.5
 }
