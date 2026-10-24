@@ -392,6 +392,12 @@ and plan `docs/superpowers/plans/2026-10-24-monthly-recap.md`. Its rule wording 
 recap's image, on the user's own tap* among nine files — is typed and unstaged for the owner. A Release
 build offers set A once the privacy URL replaces the token (#159); App Store Connect's products and a
 device purchase (#155, #156) stay the owner's.)*
+*(2026-10-25: **set A finished — five of its known issues closed, staged; not committed.** On the owner's
+choice "Finish set A": one close button for the paywall and the recap, its ✕ the same at every text size
+(#183); the recap's tiles take History's own glass, derived into a flat fill (#182); the patterns' heading
+line spoken, not drawn (#171); headings on the aurora held to the large-text floor of 3 (#177); and the
+watch's totals no longer trap on a corrupt store (#154). Spec
+`docs/superpowers/specs/2026-10-24-finish-set-a-design.md`.)*
 
 **1.4.8 — Vessel library.** More than three vessels, each with its own name and glyph; Home's row of
 three is picked from them. Every one-tap door still logs the Glass, slot `DataManager.usualSlot`.

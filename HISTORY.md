@@ -12899,3 +12899,128 @@ was run.** HEAD `4c76e61`, 184 commits, level with `origin/main`. **20 staged** 
 same twenty as the privacy policy's records. **9 unstaged** — the three rule files, for the owner, and the six
 from before the session. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check`
 clean.
+
+## [2026-10-25] — Finishing set A: five known issues closed, the recap's tiles derived from History's glass
+
+Known issues #154, #171, #177, #182 and #183. Taken by `/start_task` with no task named, on the owner's
+choice "Finish set A", over set B, export and splitting `HistoryView.swift`. Specified, built test-first,
+measured and gated across the night of 2026-10-24; staged, not committed. Spec
+`docs/superpowers/specs/2026-10-24-finish-set-a-design.md`, no plan document.
+
+### What changed
+
+- **One close button (#183).** `SheetCloseButton`, a file of its own because a second screen wants it: the
+  44-pt `.sheer` interactive circle that dismisses its sheet, its ✕ 17/44 of the circle at every text size,
+  its spoken name a parameter — *Not now* on the paywall, *Done* on the recap. Both screens' copies go.
+- **The watch no longer traps on a corrupt store (#154).** `WristPlan` counts an outbox pour only in
+  `1...maximumDailyIntake`, the filter the phone's `ingest` folds by, and sums saturating there; the
+  mirror's total is held to the same range; `Face.percentage` is held while a `Double`. A sibling the
+  reading found: `WristView.syncedCaption` reads an age no `Int` holds as *Not yet synced*.
+- **The patterns' heading line is spoken, not drawn (#171).**
+- **The recap's tiles take History's own glass (#182)** — `RecapCard.tileBase`, a flat fill of sRGB
+  (0.0287, 0.1761, 0.8521) at 0.4856, derived from Apple's regular glass tinted `Aurora.top` on iOS 27.0.
+- **Headings on the aurora are large text, held to 3 (#177)** — records only; `InsightsHeading`'s DocC
+  gives the floor.
+
+### The rulings it rests on
+
+The owner's: the task; #171 "Spoken only"; #177 "Large text, floor 3"; #182 "Derive the app's own pane";
+the design ("ok"); then, when the probe showed the tiles' `.sheer` glass is Apple's *clear* glass and the
+question had named the tinted one, "(B) frosted, tinted" from the three cards drawn side by side; and "ok"
+to go on with Edit after a `sed -i` on the probe's copy was refused — the work stopped and was reported
+first. The executor's: the button's file and name; `tileFill`'s home in `RecapCard.swift`, so the shared
+`LiquidGlassModifier.swift` is untouched; the acceptance limit, ΔE₂₀₀₀ 2, written into the spec before the
+probe ran.
+
+### RED, then GREEN
+
+RED on iOS 27.0: `anAmountThePhoneWouldRefuseIsNotCounted` (`Int.max` where 250 was due),
+`theOutboxSaturatesAtTheMostADayHolds` (150,000) and `aMirroredTotalBelowZeroCountsAsNone`, by assertion;
+`aCorruptMirrorTotalNeverOverflows` — `Swift runtime failure: arithmetic overflow`, from the crash report —
+and `aFaceFromAnyTotalReadsWithinItsThreeDigits`, by trapping, each run alone; on watchOS 27.0,
+`aSyncTimeNoClockCouldHaveWrittenReadsAsNeverSynced` by trapping. `theGlyphDoesNotGrowWithTheTextSize`
+with the paywall's `.body` glyph moved into the new file unchanged (17,342 bytes against 14,959; its white-✕
+check passing, so the test is not vacuous). `theTilesFillGivesBackTheAppsOwnGlass` with `archived`'s own
+fill, which drew (49, 51, 92) where the glass reads (28, 45, 154). All GREEN after the change.
+
+### Measured
+
+A throwaway probe in a scratch copy, *iPhone 17* (27.0), dark, five panes a column over `Aurora.gradient`,
+live and bare: the tinted glass fitted at worst ΔE₂₀₀₀ 0.26 and drew hand-made at 0.29; the clear glass
+only with an opacity of −0.31, its best real fill 3.34. The tiles' pairs, like for like on one sample month:
+moved by 0.09 at most, the lowest 6.49 against 4.5, in English and Russian. The heading: white ink on the
+title's rows alone. (`docs/DESIGN.md`, *The recap, measured* and *The patterns, measured*.)
+
+### Files
+
+Code and tests (staged): `WaterBuddy/SheetCloseButton.swift` (new) · `WaterBuddy/PaywallView.swift` ·
+`WaterBuddy/RecapSheet.swift` · `WaterBuddy/RecapCard.swift` · `WaterBuddy/HistoryView.swift` ·
+`WaterBuddy/WristPlan.swift` · `WaterBuddyWatch/WristView.swift` · `WaterBuddyTests/SheetCloseButtonTests.swift`
+(new) · `WaterBuddyTests/RecapImageTests.swift` · `WaterBuddyTests/WristSyncTests.swift` ·
+`WaterBuddyWatchTests/WristViewLogicTests.swift`. Records: the spec (new) · `CLAUDE.md` ·
+`docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/DESIGN.md` · `docs/ROADMAP.md` · `tasks/lessons.md` (four
+entries) · this file. Rule wording, **unstaged for the owner**: `.claude/rules/` `60-design-system`,
+`65-accessibility`.
+
+### Gate
+
+Run in this session on the final code, `build-for-testing` then `test-without-building`, one simulator at a
+time, `-parallel-testing-enabled NO`: phone unit on *iPhone 17* (27.0) — **942 tests in 107 suites, 941
+passed, `anExpiredYearlyReadsFree` skipped (#157), none failing**, on the second run; the first, on a
+simulator just booted, failed the eight of `StoreKitSessionTests` that load products (#158's cold start),
+and that suite passed alone. UI by class, `GoalSetupUITests` in chunks of eight — 27.0: 75 executed, 1
+skipped, 1 failure, #140's `testUseComesBackWhenTheGoalIsMovedAway` at `:355`, which failed once more and
+passed once alone; 26.5: 75 executed, 1 skipped, 3 failures, each a wait under another project's load,
+each passed alone. Watch on *Apple Watch Series 12 (46mm)* (watchOS 27.0) — 71 in 7 suites passed;
+`WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` built. **Warnings**: clean builds of a `HEAD`
+`128630c` export and of that export with the change's eleven files, by file and message — 20, 17, 2, 17 on
+both sides, sites 36, 29, 2, 29, no line new or gone and every site on its line. **Not run**: the paywall
+and the recap walked by hand at the accessibility sizes; the fill on iOS 26.5's glass; anything on a
+device.
+
+**Staging.** Read from the commands at 01:43 on 2026-10-25, after this session's `git add` of 19 files by
+name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit`
+was run.** HEAD `128630c`, 190 commits, level with `origin/main`. **19 staged** — 16 modified, 3 added.
+**8 unstaged** — the two rule files, for the owner; `.claude/settings.json`, two watch schemes and three
+string catalogues, all from before the session. **1 untracked** in `git status`: `Screenshots/census/`. None
+in both; `git diff --cached --check` clean.
+
+## [2026-10-25] — The ninety-first `/doc_sync`: a pending-wording claim the rules had overtaken
+
+Run by the owner straight after finishing set A's records, on the staged tree; no code changed since its
+gate.
+
+### Drift found, and fixed
+
+- `CLAUDE.md`'s *Architecture* bullet on the recap ended "the rule wording awaits the owner". Rule
+  `70-privacy` at `HEAD` carries *The recap's image, on the user's own tap*, admitted in `4c76e61`; the
+  sentence now names that commit. It had survived the ninetieth pass and finishing set A's records.
+- `docs/DESIGN.md`'s *`LiquidGlass.Base.archived` is derived, not guessed* named `archived` as the derived
+  flat fill; a dated pointer now names the second, `RecapCard.tileFill`, and where its derivation lives.
+
+### Checked and already accurate
+
+By one read-only script, every figure printed: 115 `.swift` files in the seven target folders by `git` and
+by `find`, 115 *Files on disk* rows, every count equal to `wc -l`; 942 phone `@Test`, 71 watch, 62 UI `func
+test`, as *Targets* states them; 13 keys on `DataManager.Key` and in `Key.all`; three six-file exception
+sets, as `CLAUDE.md` names them; 18 rules cited, 18 files; `StoreKit` in `HomeView.swift` and
+`PremiumStore.swift` alone, `FoundationModels` in `InsightWriter.swift` alone, no `SwiftData` under
+`WaterBuddyWidget/`; no forbidden doc. Every hit for the change's replaced surfaces, read by hand, is
+current or in a dated note or block the records supersede; the five `ROADMAP.md` "typed and unstaged" hits
+are dated notes. Line citations past each changed code file's first hunk: as the records found — two in
+dated text, none in current. `docs/STATE.md`, `docs/WIDGET.md` and `docs/ROADMAP.md`: read, current.
+
+### Files
+
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/DESIGN.md` · `tasks/lessons.md` (one entry) · this file.
+
+### Gate
+
+Not run by this pass; the last is finishing set A's, on its final code, the same night.
+
+**Staging.** Read from the commands at 01:48 on 2026-10-25, after this pass's `git add` of its five files by
+name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit`
+was run.** HEAD `128630c`, 190 commits, level with `origin/main`. **19 staged** — 16 modified, 3 added — the
+same nineteen as finishing set A's records. **8 unstaged** — the two rule files, for the owner, and the six
+from before the session. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check`
+clean.

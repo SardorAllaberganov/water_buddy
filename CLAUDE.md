@@ -211,7 +211,10 @@ something to record.
   36 sites on the app scheme on both sides; and the privacy policy's own comparison, on 2026-10-24 from a
   clean build of a copy of its index against a clean build of a `HEAD` `4c76e61` export, the same way:
   unchanged on all four schemes — 20, 17, 2, 17 by message, 36, 29, 2, 29 sites, no line new or gone and
-  every site on its line
+  every site on its line; and finishing set A's own comparison, on 2026-10-25 from a clean build of a
+  `HEAD` `128630c` export with the change's eleven files laid over it, against a clean build of that
+  export, the same way, `-scheme WaterBuddy` by `build-for-testing`: unchanged on all four schemes — 20,
+  17, 2, 17 by message, 36, 29, 2, 29 sites, no line new or gone and every site on its line
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
@@ -363,7 +366,8 @@ something to record.
   drawn and rendered by `ImageRenderer` (1,080 px, the default text size) and shared through `ShareLink`
   in memory; the best streak is drawn beside it, never on it. iOS offers *Save Image* only to an app with
   a Photos usage key, which this one never carries (measured)
-  (`docs/superpowers/specs/2026-10-24-monthly-recap-design.md`; the rule wording awaits the owner)
+  (`docs/superpowers/specs/2026-10-24-monthly-recap-design.md`; rule `70-privacy`'s *The recap's image, on
+  the user's own tap*, admitted in `4c76e61`)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

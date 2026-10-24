@@ -7,6 +7,18 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-25 (ninety-first pass — `/doc_sync` run by the owner on finishing set A's staged
+tree; no code changed since its gate). *`LiquidGlass.Base.archived` is derived, not guessed* gains a dated
+pointer to the second derived flat fill, `RecapCard.tileFill`, so the section that explains derived bases
+names both. Every other figure in this pass's sweep was current. No token moved.
+
+**Last updated:** 2026-10-25 (finishing set A's own records — not a `/doc_sync` pass). **One token new:**
+`RecapCard.tileFill`, derived from Apple's regular glass tinted `Aurora.top` — a dated note under *The
+recap, measured*, with its fit, its proof drawn hand-made, and the tiles' pairs before and after (#182).
+Two rulings recorded as dated notes, no figure moved: *The patterns, measured* — the heading's line is no
+longer drawn (#171), and the title is large text, held to 3 (#177); *Insights, measured* — the heading's
+floor is 3 (#177).
+
 **Last updated:** 2026-10-24, late evening (the privacy policy's records). A subsection under *Settings,
 measured*, *Settings' privacy link, measured*: one pair, the link's text on the aurora, 5.80 / 5.61 on
 iOS 27.0 and 5.74 / 5.60 on 26.5, over its 4.5.
@@ -476,6 +488,12 @@ when the watch target joined the file: the colour does not exist on watchOS.)*
 
 **Do not delete the derivation comment because the number "looks arbitrary". The number is the
 record of the measurement.**
+
+*(2026-10-25, the ninety-first pass: **a second derived flat fill exists** — `RecapCard.tileFill`,
+History's frosted glass frozen for the recap's tiles, which took `archived` until #182. It is derived the
+other way round — fitted to a live render of Apple's glass rather than read off a material recipe — and its
+fit, its proof and its pairs are under *The recap, measured*. It shares `archived`'s `opaque` fill. *Three
+ways to draw a pane*'s `.flat` row covers it: a flat base is drawn hand-made, whichever it is.)*
 
 ## `Aurora` — colour is shared, shape is not
 
@@ -2274,6 +2292,14 @@ rim below the line and is not a reading.
 **Not measured:** iOS 26.5 and 18.6; Increase Contrast; Russian and Uzbek, whose lines are wider over the
 same grounds; the largest text sizes.
 
+*(2026-10-25, finishing set A — spec `docs/superpowers/specs/2026-10-24-finish-set-a-design.md`. **The
+heading's line is no longer drawn**: the owner's ruling on #171, as Insights' heading draws none; it stays
+the heading's spoken value. A frame of the heading on the aurora, in a scratch copy on iOS 27.0, holds
+white ink on the title's rows alone (561–602 of 2,622). **The title is large text, held to 3**: the
+owner's ruling on #177 — `.title3` bold, as History's heading and the recap's are held — and set A's step
+4's unmasked re-measure read it **3.14** at its worst, over 3 by 0.14. The table's 5.73 is the masked
+tool's reading (#177), kept as it was taken.)*
+
 ## Insights, measured
 
 *Added 2026-10-24, set A's step 4 (spec `docs/superpowers/specs/2026-10-23-insights-design.md`, §4a).*
@@ -2309,6 +2335,10 @@ style on the aurora, not this heading alone (known issue #177, the owner's, with
 locked page's new card copy (the locked month's style, measured in *The month, measured*); the switch's
 third segment, *Insights*, and its lock — the *Month* segment's own style, which *The month, measured*
 read as a two-segment switch (the eighty-seventh pass, 2026-10-24).
+
+*(2026-10-25, finishing set A: **the heading's floor is 3** — the owner's ruling on #177: a heading of
+`.title3` bold or larger on the aurora is large text. Its 3.37 passes, by 0.37; the table's floor of 4.5
+is kept as the step held it. Clean ground, #95's other yardstick, is still not measured for it.)*
 
 ## The recap, measured
 
@@ -2351,6 +2381,40 @@ known issue #177's caveat holds for the heading and the row.
 Every pair clears its floor; the unmet ring by 0.10. **W1 — the tiles' colour** is `Base.archived`'s
 derived fill over the card's gradient (`white 0.24` at 50 %), grey-brown beside the app's own panes, and not
 retuned by eye: the owner's (`docs/AI_CONTEXT.md` #182).
+
+*(2026-10-25, finishing set A — #182, spec `docs/superpowers/specs/2026-10-24-finish-set-a-design.md`
+§2.4.) **The tiles take `RecapCard.tileBase`**: `.flat(translucent: RecapCard.tileFill, opaque:
+Base.archived.opaqueFill)`, the fill **sRGB (0.0287, 0.1761, 0.8521) at 0.4856** — History's own pane,
+Apple's regular glass tinted `Aurora.top`, frozen. **How derived:** a throwaway probe in a scratch copy,
+*iPhone 17* (iOS 27.0), dark, drew `Aurora.gradient` full screen with five `.flush` panes a column, 150 × 70
+pt at `innerCornerRadius` — `.sheer` (Apple's clear glass) and `.frosted` (the regular glass, tinted) — and
+the same layout bare. Each pane read as the median of its interior 10 pt inside the rim where the sheen is at
+its clear stop (`t` 0.50–0.60 along the light's diagonal), live and bare at the same pixels; taken back
+through the hand-made sheer stack's black scrim (0.16) and white (0.05) to `a·F + (1 − a)·B`, and fitted to
+one `F` and one `a` by least squares.
+
+| Glass | Fill (opacity · colour) | Worst ΔE₂₀₀₀ fitted | Drawn hand-made |
+|---|---|---|---|
+| `.sheer`, clear — best a real fill can do | 0.569 · (0.488, 0.324, 1.000) | 3.34 | 3.34 |
+| **`.frosted`, tinted — the one taken** | **0.4856 · (0.0287, 0.1761, 0.8521)** | **0.26** | **0.29** |
+
+The clear glass fits only with an opacity of −0.31 — it lightens every ground alike, while the stack's
+scrim darkens in proportion — so it failed the spec's limit of 2; the owner chose the tinted glass from the
+three cards drawn side by side. `theTilesFillGivesBackTheAppsOwnGlass` composites the fill through the
+stack's own scrim and tint over the top and bottom grounds and expects the live glass, within 2 of 255.
+
+**The tiles' pairs, before and after, like for like** — the recap's own method (a box per band, Otsu's
+threshold, the ink class's brighter-half median, the ground class's 90th-percentile pixel) on the probe's
+frames of one sample September (*Days on goal* 0/30), the card on screen at 3×. The table above came from
+another month and another tool, and does not compare with these.
+
+| Pair | Floor | `archived`, en | `tileBase`, en | `tileBase`, ru |
+|---|---|---|---|---|
+| The left tile's figure / label | 3 / 4.5 | 7.14 / 6.56 | 7.16 / 6.49 | 7.33 / 6.51 |
+| The right tile's figure / label | 3 / 4.5 | 7.64 / 6.83 | 7.64 / 6.74 | 7.48 / 6.73 |
+
+The fill moves no pair by more than 0.09. **Not measured:** the fill on iOS 26.5's glass, which is darker
+(*The look, measured*) — the derivation is 27.0's; Increase Contrast; Uzbek.)*
 
 **Not measured:** iOS 26.5 and 18.6; Increase Contrast; Uzbek (the same tokens as Russian's, read by eye);
 the largest text sizes' pairs (the layout read by eye — W2's fix); the image under the sender's Reduce

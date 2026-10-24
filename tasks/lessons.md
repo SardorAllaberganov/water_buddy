@@ -4978,3 +4978,59 @@ pass had just moved. The ninetieth pass found it by printing the staged diff's h
 **The rule:** a summary of a sweep is written from the sweep's own output — `git diff --cached -U0 | grep
 '^@@'` for where a file grew, the re-pointed list for what moved — after the sweep, never from the edit
 remembered as the big one.
+
+## 2026-10-25 — "The app's glass" was two glasses, and the question to the owner named the wrong one
+
+**What happened.** Finishing set A asked the owner how the recap's tiles should look, describing the app's
+panes on iOS 26 as "Apple's glass tinted `Aurora.top`", and the owner chose to derive the tiles from it.
+The tiles are `.sheer` and not interactive, and `LiquidGlass.systemVariant(density:interactive:)` makes such
+a pane Apple's *clear* glass, which `systemTintOpacity(for:)` tints not at all; only `.frosted` and `.opaque`
+take the tinted regular glass. The probe found it when it drew both, and the choice went back to the owner
+with the two measured and drawn.
+
+**The rule:** before matching or deriving from "the app's glass", read `systemVariant` and
+`systemTintOpacity` for the exact density and interactivity of the pane in question, and name that glass —
+clear or regular, tinted or not — in the question put to the owner.
+
+## 2026-10-25 — `sed -i` is on the deny list, in a scratch copy too
+
+**What happened.** A command that copied files into the probe's scratch copy and patched it with `sed -i`
+was refused. `.claude/settings.json` denies `Bash(sed -i:*)` whatever the path. The work stopped and was
+reported, as the rule says; the owner said to go on, and the copy was patched with Edit.
+
+**The rule:** edit with the Edit tool everywhere, a scratch copy included. Read the deny list before
+composing a shell command that edits files, rather than learning it from a refusal mid-chain.
+
+## 2026-10-25 — A build and its tests chained in one call passed 600 s again
+
+**What happened.** The 2026-10-24 lesson says `build-for-testing` once, then `test-without-building`, each
+its own call under 600 s. Finishing set A chained the two in one `Bash` call; the build took most of the
+limit, the tests finished, and `xcodebuild` sat after its tear-down (#180) — the harness moved the call to
+the background, and its result was read from the log and the task stopped.
+
+**The rule:** one `xcodebuild` per call. A run stopped from its log is read for its `Test run with` or
+`Executed N tests` line before anything is reported from it.
+
+## 2026-10-25 — A clean build in 34 seconds, and a warning diff that compared paths
+
+**What happened.** The warnings comparison's clean builds took 14–76 s into empty DerivedData folders —
+the toolchain's compilation cache. The `HEAD` log was checked against the known baseline before anything
+else (36 sites, 20 messages — equal), so the cache replays its warnings. The first diff then reported every
+line changed: the logs print `/tmp/…`, the scratch folder is `/private/tmp/…`, and stripping by the variable
+left each tree's name in every line.
+
+**The rule:** when a clean build is faster than it has any right to be, compare its warning count with the
+recorded baseline before comparing two trees. Strip a log's paths by a marker inside the tree
+(`…/warn/<tree>/`), not by a variable that may name the same folder another way.
+
+## 2026-10-25 — "The rule wording awaits the owner" outlived the commit that admitted it
+
+**What happened.** Set A's step 5's records ended `CLAUDE.md`'s recap bullet with "the rule wording awaits
+the owner". The owner admitted it in `4c76e61` (`chore(claude): admit set A's step 5 to rules`), and the
+sentence stayed — through the ninetieth pass and finishing set A's records — until the ninety-first read
+`CLAUDE.md` for "awaits" and checked it against `git show HEAD:.claude/rules/70-privacy.md`. A dated note
+saying the same thing is history; a sentence in `CLAUDE.md`'s *Architecture* is a present claim.
+
+**The rule:** each `/doc_sync` greps `CLAUDE.md` for `awaits|unstaged|for the owner` and checks each hit
+against `git log --oneline --grep=admit` and the rule file at `HEAD`; a claim the log has overtaken is
+rewritten to name the commit that admitted it.
