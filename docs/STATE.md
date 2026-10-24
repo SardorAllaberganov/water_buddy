@@ -4,6 +4,11 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-24, late evening (the privacy policy's own records, not a `/doc_sync` pass). **No
+key and no stored byte moved**: 13 keys on `DataManager.Key`. *What Apple is told about all of this* gains
+a dated note — the four manifests declare the system boot time, `35F9.1`, for `AuroraClock` — and one
+citation into `SettingsView.swift` is re-pointed, its old number kept.
+
 **Last updated:** 2026-10-24, evening (set A's step 5's own records, not a `/doc_sync` pass). **No key and
 no stored byte moved**: 13 keys on `DataManager.Key`. A section, *`recap(of:)`*, under *The rows are
 published too*: the month a page offers is derived on `MonthHistory`, and the recap is a read that
@@ -950,7 +955,8 @@ reminders off has to *clear* what is already filed with the system, not merely s
 *(2026-10-14, the redesign's stage 5: who sets it, all app-only. Turning reminders **on** — Settings'
 switch, or *Turn on reminders* on the welcome's last step — stores iOS's answer through
 `ReminderPermission.enable(on:using:)`, which asks only when iOS has not been asked. Settings'
-switch turning **off** writes `false` itself (`SettingsView.swift:213` since set A's step 1; `:189` at
+switch turning **off** writes `false` itself (`SettingsView.swift:214` since the privacy policy's link,
+2026-10-24; `:213` since set A's step 1; `:189` at
 `HEAD`). And
 `ReminderPermission.reconcile(_:using:)` clears it when iOS reads *denied* and changes nothing
 otherwise; it runs whenever the app comes forward (`WaterBuddyApp`) and whenever Settings appears
@@ -1298,6 +1304,15 @@ and no networking import anywhere in the tree (rule `70-privacy`, rule `95-depen
 are file timestamp, disk space, system boot time and active keyboard — none of which this product
 touches today. A new category means editing all four manifests together, exactly as a new key means
 touching both this file's count and `CLAUDE.md`'s.
+
+*(2026-10-24, the privacy policy, staged: "none of which this product touches today" stopped being true
+at stage 3b, `7368dec`, when `AuroraClock` began reading `ProcessInfo.systemUptime` — the **system boot
+time** — to place the aurora's lights. Nothing noticed until the policy's audit read the code; it was
+never uploaded. All four manifests now declare `NSPrivacyAccessedAPICategorySystemBootTime` with
+**`35F9.1`** — the time elapsed between events within the app — beside the two codes above, still
+byte-identical; `PrivacyManifestTests` reads the four built manifests and pins every category and reason.
+It is not about a key, so no key moved; the lesson is that the question above is asked of keys, and a
+category can arrive with a view (known issue #190).)*
 
 *(2026-10-16, the thirty-eighth pass: asked for `reviewRequestedVersion`, the key roadmap item 1.2.5
 added — it brings none. It is `UserDefaults` in the App Group, the use `1C8F.1` already declares, and

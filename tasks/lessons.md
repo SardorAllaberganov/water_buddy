@@ -4917,3 +4917,64 @@ the census's own reckoning, which already counts `republishMonth()` and `republi
 **The rule:** a claim that something was *not* added is checked against the census it would join, by the
 same grep that builds the census — never written from the design's intent. A guard is a site whatever the
 function guarded does.
+
+## 2026-10-24 — A required-reason API arrived with a view, and no check saw it for eleven days
+
+**What happened.** Stage 3b (`7368dec`) gave the aurora a shared clock, `AuroraClock`, read from
+`ProcessInfo.systemUptime` — on Apple's required-reason list as *System boot time*. No manifest declared
+it, and nothing in the gate could notice: the build is green, the tests are green, and App Store Connect
+refuses the upload only after a good archive. `docs/STATE.md` even said the boot time was a category "this
+product touches" none of, because its question was asked only when a **key** was added. The privacy
+policy's audit found it by reading every import and system call for the policy.
+
+**The rule:** before any upload, and in any change that calls a new system API, read the code against
+Apple's required-reason list — file timestamps, disk space, active keyboards, boot time (`systemUptime`,
+`mach_absolute_time()`), `UserDefaults` — not just the keys. `PrivacyManifestTests` pins what the four
+manifests declare; it cannot see a call they do not.
+
+## 2026-10-24 — XCUITest lists the screen beneath a sheet, so a shared label counts twice
+
+**What happened.** Settings gained a *Privacy Policy* link, and `PremiumUITests`, which opens the paywall
+over Settings and counts the paywall's own *Privacy Policy* as one element, read two. Nothing in the
+paywall had changed: the query counts the whole app, the screen under the sheet included. The work
+stopped, as the plan said it would, and the owner ruled **"Count what the sheet adds"**: read the label's
+count before the sheet opens, and assert that opening it adds exactly one.
+
+**The rule:** where a sheet carries a label the screen beneath it also carries, count the difference the
+sheet makes, never the absolute — and never narrow the query to hittable elements, which drops a sheet's
+own controls below its fold. Predict the double count when a label is added to a screen a sheet opens over.
+
+## 2026-10-24 — SwiftUI's `Link` is a link to XCUITest on iOS 27.0 and a button on 26.5
+
+**What happened.** The new Settings test looked for `app.links["Privacy Policy"]` and passed on iOS 27.0.
+On 26.5 it found nothing; a dump of the tree showed `Button … label: 'Privacy Policy'` — the same control,
+another element type. `PremiumUITests.count` already added buttons to links for exactly this reason, and the
+new test had not read it.
+
+**The rule:** find a `Link` by its label among links **and** buttons — one predicate on `elementType` — and
+assert the count of that query. Read the helpers a sibling test already wrote for the same control before
+writing a query of your own, and run a new UI test on both runtimes before calling it green.
+
+## 2026-10-24 — A probe's environment never reached the runner, and its folder fed the measurement
+
+**What happened.** The contrast probe took its output folder from `PROBE_OUT` set on `xcodebuild`'s
+command line. `xcodebuild` forwards to the test runner only variables prefixed `TEST_RUNNER_`, so the probe
+fell back to its default folder — the other system's frames — and wrote diagnostic screenshots beside
+them. The measuring script read every `.png` in the folder and reported a worst of 1.00, from a capture of
+Home. Separately, `timeout` does not exist on macOS: a command wrapped in it exited 127 having run nothing.
+
+**The rule:** pass a probe's settings as `TEST_RUNNER_NAME=…`, give each run its own folder, and have the
+measurement read the frames by name (`f00`–`f19`), never a glob of the folder. Read a run's own output —
+here, `exit 127` — before reading what it was meant to produce.
+
+## 2026-10-24 — A records header summed up a sweep it had not re-read, and contradicted it
+
+**What happened.** The privacy policy's records re-pointed three citations into `SettingsView.swift`,
+then wrote, in `docs/AI_CONTEXT.md`'s *Last updated*, that the file "grew after its line 249" and that "no
+citation in current text falls past" it. The file first grew after line 98 — a one-line insertion in the
+body, beside the 26-line block everyone remembers — and three citations had fallen past, which that same
+pass had just moved. The ninetieth pass found it by printing the staged diff's hunks.
+
+**The rule:** a summary of a sweep is written from the sweep's own output — `git diff --cached -U0 | grep
+'^@@'` for where a file grew, the re-pointed list for what moved — after the sweep, never from the edit
+remembered as the big one.

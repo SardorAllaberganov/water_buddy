@@ -7,6 +7,10 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-24, late evening (the privacy policy's records). A subsection under *Settings,
+measured*, *Settings' privacy link, measured*: one pair, the link's text on the aurora, 5.80 / 5.61 on
+iOS 27.0 and 5.74 / 5.60 on 26.5, over its 4.5.
+
 **Last updated:** 2026-10-24, evening (set A's step 5's records, finished under the eighty-ninth `/doc_sync`).
 A section, *The recap, measured*: the row, the sheet, the card and the 1,080-px image, the walk's
 twenty-seven colour pairs off its renders, all over their floors, and W1 — the tiles' `Base.archived`
@@ -1840,6 +1844,32 @@ Each cell is the worst of 20 frames.
 **Not measured.** The *Open iOS Settings* button (shown only while notifications are refused);
 Settings under Reduce Transparency (this stage changes no pane); a minute's sweep on the final
 source; Russian and Uzbek figures; iOS 17; a device.
+
+### Settings' privacy link, measured
+
+**2026-10-24, the privacy policy** (spec `docs/superpowers/specs/2026-10-24-privacy-policy-design.md`
+§3.2). Under the language card, the last thing on the screen: *Privacy Policy*, `.footnote` semibold
+(`SettingsStyle.link`), white at **0.92** (`SettingsStyle.noteOpacity`) with `.legibleOnBackdrop()`'s two
+shadows, centred in a full-width row 44 pt tall — text on the aurora, not a pane, as the paywall's footer
+link is.
+
+**Method.** As *The paywall, measured*: a throwaway XCUITest method in a scratch copy of the working
+tree scrolled Settings to its end and held it for a minute, a frame every 3 s, 20 frames, on *iPhone 17*.
+The link's ink — every whitish pixel (no channel under 170) inside its frame — was boxed, 259 × 37 px at
+3×; its ground read on a ring 2–6 pt out (beside its glyphs, the halo under them) and 10–14 pt out (clean
+ground, #95), the ink masked and dilated 3 px; white composited at 0.92 over each ground pixel. Worst
+frame. The box was drawn on a capture and looked at on both systems: on the glyphs, the rings on open
+purple, no other ink in them. Every frame put the link at the same place, 354 × 44 pt at y 715.
+
+| Pair | Floor | iOS 27.0 | iOS 26.5 |
+|---|---|---|---|
+| *Privacy Policy* (0.92), beside / clean | 4.5 | **5.80** / **5.61** | **5.74** / **5.60** |
+
+Each cell is the worst of 20 frames — the paywall's footer, the same style on its own backdrop, read
+5.15 / 5.05 (*The paywall, measured*).
+
+**Not measured.** iOS 18.6; Increase Contrast; Russian and Uzbek — *Политика конфиденциальности* draws a
+longer line over the same ground; a device (known issue #189).
 
 ## Welcome, measured
 

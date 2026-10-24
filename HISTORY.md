@@ -12766,3 +12766,136 @@ was run.** HEAD `ad244c2`, 180 commits, level with `origin/main`. **20 staged** 
 **15 unstaged** — the nine rule files, for the owner; `.claude/settings.json`, two watch schemes and three
 string catalogues, all from before the session. **1 untracked** in `git status`: `Screenshots/census/`.
 None in both; `git diff --cached --check` clean.
+
+## [2026-10-24] — The privacy policy, published in code and linked from Settings; the boot time declared
+
+Known issue #159's code half, the last switch in code before a Release build offers set A. Taken by
+`/start_task` with no task named, on the owner's choice "Unblock the release", over set B, Apple Health
+and export. Specified, rewritten, built test-first, measured and gated in one session; staged, not
+committed.
+
+### What changed
+
+- **The address.** `PaywallView.privacyPolicy` is `https://sardorallaberganov.github.io/waterbuddy/privacy/`,
+  the owner's GitHub user site. With set A on sale, `PaywallView.isOffered` is now `true` in a Release
+  build, and History's Month switch is drawn for a free user.
+- **Settings links it for every user**: `privacyPolicyLink`, under the language card — the paywall's
+  address and key, `.footnote` semibold at white 0.92 with the backdrop's halo, 44 pt, drawn only while the
+  address is `https`.
+- **The policy.** `PRIVACY.md` rewritten from a read-only audit of the code: sixteen of the draft's
+  statements had gone false or stale since Premium and set A — "the app is free and contains no
+  purchases", "not a single server address", a framework list without `StoreKit` and `FoundationModels`,
+  a *Clear today* reset no screen offers, the Watch's "wake" sent the wrong way — and nothing named
+  Premium, the insights, the recap's image, Siri's spoken total, the rating request, *Log a Glass*, the
+  Lock Screen and StandBy, or the goal calculator. Published as `Tools/PrivacyPolicy.html`: one
+  self-contained page, light and dark, phone width, English only; `CONTACT-EMAIL` a token for the owner.
+- **The boot time.** `AuroraClock` has read `ProcessInfo.systemUptime` — a required-reason API, *System
+  boot time* — since stage 3b (`7368dec`, 2026-10-13), and no manifest declared it; never uploaded. All
+  four `PrivacyInfo.xcprivacy` declare `NSPrivacyAccessedAPICategorySystemBootTime`, `35F9.1`,
+  byte-identical (`5ee5655…`).
+- **Tests**: `PrivacyManifestTests` (new, 3) reads the four built manifests; `aReleaseBuildWithSetAOnSaleOffersThePaywall`;
+  `theLinksAreApplesTermsAndAPageOfOurs` pins the whole address; `testSettingsLinksThePrivacyPolicyForEveryone`;
+  `PremiumUITests` counts the paywall's footer as what its sheet adds; `setAOnSaleStillWaitsForThePrivacyLink`
+  renamed `setAOnSaleWithoutAPrivacyLinkIsNotOffered`, its assertions unchanged.
+
+### The rulings it rests on
+
+The owner's, in conversation: the task; hosting on the user site (`SardorAllaberganov.github.io`,
+`waterbuddy/privacy/index.html`); the Settings link "under Language"; a contact address other than the
+account's, not yet given; English only; the plan, with the boot time declared rather than engineered away,
+"Ok"; and **"Count what the sheet adds"**, when `PremiumUITests` read Settings' link beneath the paywall's
+sheet — `("2") is not equal to ("1") - Privacy Policy is not one element` — and the work stopped for it.
+The executor's: the developer's name *Sardor Allaberganov* and the effective date 24 October 2026, both
+offered as defaults; that deleting the app removes its data, from Apple's engineers on the developer
+forums, against `SettingsView`'s simulator-born DocC (#188).
+
+### RED, then GREEN
+
+RED on iOS 27.0: `theLinksAreApplesTermsAndAPageOfOurs` and `aReleaseBuildWithSetAOnSaleOffersThePaywall`
+(the token), `theManifestDeclaresUserDefaultsAndTheBootTimeTheAuroraReads` (no boot time),
+`testSettingsLinksThePrivacyPolicyForEveryone` (*Settings carries no Privacy Policy link*). Two manifest
+tests passed at RED as guards of what already held; `everyShippingBundleCarriesTheSameManifest` was then
+seen to fail — three issues — with the app's manifest edited alone. GREEN after the four manifests, the
+address and the row. The UI test passed on 27.0 and failed on 26.5, where XCUITest lists the `Link` as a
+button; rewritten to find either, and green on both.
+
+### Measured
+
+Settings' link, held a minute at the end of the screen, a frame every 3 s, by a throwaway probe in a
+scratch copy: worst **5.80** beside its glyphs and **5.61** on clean ground on iOS 27.0, **5.74** and
+**5.60** on 26.5, against 4.5 (`docs/DESIGN.md`, *Settings' privacy link, measured*). The page rendered by
+headless Chrome inside a 390-px frame, light and dark, nothing overflowing.
+
+### Files
+
+Code and tests (staged): `WaterBuddy/PaywallView.swift` · `WaterBuddy/SettingsView.swift` · the four
+`PrivacyInfo.xcprivacy` · `WaterBuddyTests/PremiumAccessTests.swift` · `WaterBuddyTests/PrivacyManifestTests.swift`
+(new) · `WaterBuddyUITests/GoalSetupUITests.swift` · `WaterBuddyUITests/PremiumUITests.swift`. The policy
+(staged): `PRIVACY.md` · `Tools/PrivacyPolicy.html` (new). Records: `docs/superpowers/specs/2026-10-24-privacy-policy-design.md`
+(new) · `CLAUDE.md` · `docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/DESIGN.md` · `docs/ROADMAP.md` ·
+`tasks/lessons.md` (four entries) · this file. Rule wording, **unstaged for the owner**: `.claude/rules/`
+`15-project`, `65-accessibility`, `70-privacy`.
+
+### Gate
+
+Run in this session on the final code, `build-for-testing` then `test-without-building`, one simulator at a
+time, `-parallel-testing-enabled NO`: phone unit on *iPhone 17* (27.0) — **935 tests in 106 suites, 934
+passed, `anExpiredYearlyReadsFree` skipped (#157), none failing**, the first unit run without a failure
+since 2026-10-21; UI by class and in chunks of thirteen — 27.0: 75 executed, 1 skipped, no failure; 26.5:
+75 executed, 1 skipped, no failure; watch on *Apple Watch Series 12 (46mm)* (watchOS 27.0) — 70 in 7 suites
+passed; `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` built. **Warnings**: clean builds of a
+`HEAD` `4c76e61` export and of a copy of the index, by file and message — 20, 17, 2, 17 on both sides, sites
+36, 29, 2, 29, no line new or gone and every site on its line. **Not run**: anything on a device (#188,
+#189); the page at its address, which answered 404 — it is not yet pushed (#159).
+
+**Still the owner's before the next upload:** the contact address, the user-site repository and its push,
+and App Store Connect's *Privacy Policy URL* (#159); the products (#155); a device purchase (#156); the
+version number, `1.1` on all fourteen `MARKETING_VERSION` sites (#187).
+
+**Staging.** Read from the commands at 20:22 on 2026-10-24, after this session's `git add` of 20 files by
+name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit`
+was run.** HEAD `4c76e61`, 184 commits, level with `origin/main`. **20 staged** — 17 modified, 3 added.
+**9 unstaged** — the three rule files, for the owner; `.claude/settings.json`, two watch schemes and three
+string catalogues, all from before the session. **1 untracked** in `git status`: `Screenshots/census/`.
+None in both; `git diff --cached --check` clean.
+
+## [2026-10-24] — The ninetieth `/doc_sync`: a records header that misdescribed its own sweep
+
+Run by the owner straight after the privacy policy's records, on the staged tree; no code changed since
+its gate.
+
+### Drift found, and fixed
+
+- `docs/AI_CONTEXT.md`'s *Last updated* for the privacy policy said `SettingsView.swift` grew "after its
+  line 249" and that "no citation in current text falls past" it. The staged diff's hunks put the first
+  growth after line 98, and the same records had re-pointed three citations past it. Corrected in place,
+  the correction dated, since the block is this session's and uncommitted.
+- `CLAUDE.md`'s warning trail ended at set A's step 5's comparison; extended with the privacy policy's — 20,
+  17, 2, 17 by message, 36, 29, 2, 29 sites, unchanged.
+
+### Checked and already accurate
+
+By one read-only script, every figure printed: 113 `.swift` files and 113 *Files on disk* rows, every count
+equal to `wc -l`; 935 phone `@Test`, 70 watch, 62 UI `func test`; 13 keys on `DataManager.Key` and in
+`Key.all`; three six-file exception sets, as `CLAUDE.md` names them; 18 rules cited, 18 files; `StoreKit` in
+`HomeView.swift` and `PremiumStore.swift` alone, `FoundationModels` in `InsightWriter.swift` alone, no
+`SwiftData` under `WaterBuddyWidget/`; no forbidden doc. Every citation into the five files the change grew,
+past its first growth: `AI_CONTEXT` `:293` and `:803` and `STATE` `:214` land on what they name; `:806`,
+`:486`, `:348` and `:366` sit in notes dated 2026-10-11 to 14. The replaced surfaces — `OWNER-PRIVACY-URL`,
+the draft's `[PLACEHOLDERS]`, "the one required-reason API" — appear only in dated blocks and notes.
+`docs/STATE.md`, `docs/DESIGN.md`, `docs/WIDGET.md` and `docs/ROADMAP.md`: read, current.
+
+### Files
+
+`CLAUDE.md` · `docs/AI_CONTEXT.md` · `tasks/lessons.md` (one entry) · this file.
+
+### Gate
+
+Not run by this pass; the last is the privacy policy's, on its final code, earlier the same evening.
+
+**Staging.** Read from the commands at 20:35 on 2026-10-24, after this pass's `git add` of its four files by
+name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit`
+was run.** HEAD `4c76e61`, 184 commits, level with `origin/main`. **20 staged** — 17 modified, 3 added — the
+same twenty as the privacy policy's records. **9 unstaged** — the three rule files, for the owner, and the six
+from before the session. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check`
+clean.

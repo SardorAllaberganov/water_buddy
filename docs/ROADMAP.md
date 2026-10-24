@@ -327,6 +327,14 @@ gates a Release build.)*
 
 *(2026-10-22, afternoon: step 1 **committed** — its spec and plan `4577d92`, the code `d5cf816`, its
 records `fd12b7f`, its rule wording `a6e287b`.)*
+*(2026-10-24, late evening: **the privacy policy's address is in code, staged** — known issue #159's
+code half, on the owner's choice to unblock the release before set B. The page is the owner's GitHub user
+site; Settings links it for every user; `PRIVACY.md` is rewritten from the code and published as
+`Tools/PrivacyPolicy.html`; and the four manifests now declare the system boot time `AuroraClock` reads,
+which no upload has carried undeclared. Spec `docs/superpowers/specs/2026-10-24-privacy-policy-design.md`.
+A Release build now offers set A. Before the next upload, still the owner's: the contact address, the
+user-site repository and its push (#159), App Store Connect's products (#155), a device purchase (#156)
+and the version number (#187).)*
 
 **1.4.2 — Full history.** History beyond the week shown today: a month calendar of goal days, and
 trends. Free users keep today's week. **No serving is ever deleted or hidden from the store because

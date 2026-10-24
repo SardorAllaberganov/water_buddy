@@ -23,7 +23,16 @@
 > `DataManager.swift`, so all four need it; declaring only the iOS pair still fails. Each target's
 > synchronized root group grants membership, so **adding one needs no `project.pbxproj` edit** — and a
 > new target added later needs its own, which nothing will remind you of (`docs/STATE.md`,
-> rule `15-project`'s *Submission* section).
+> rule `15-project`'s *Submission* section). **Since 2026-10-24 they declare a second category, the
+> system boot time (`35F9.1`)**: `AuroraClock` has read `ProcessInfo.systemUptime` since stage 3b, and
+> nothing noticed until the privacy policy's audit read the code. `PrivacyManifestTests` reads the four
+> built manifests and pins what they declare — not what the code calls, so a new required-reason call
+> still passes the gate (`docs/AI_CONTEXT.md` #190).
+>
+> **The privacy policy** is `PRIVACY.md`, published as `Tools/PrivacyPolicy.html` on the owner's user
+> site; `PaywallView.privacyPolicy` is its one address, linked from the paywall and from Settings for
+> every user. A change that alters what the app stores, sends or shows outside its screens changes the
+> policy too (rule `70-privacy`; `docs/superpowers/specs/2026-10-24-privacy-policy-design.md`).
 >
 > **`DataManager.swift`, `WaterLog.swift`, `WaterSurface.swift`, `LiquidGlassModifier.swift`,
 > `ReminderPlan.swift` and `NotificationManager.swift` are compiled into both the app and the
@@ -199,7 +208,10 @@ something to record.
   DerivedData, on both sides); and set A's step 5's own comparison, on 2026-10-24 from a clean build of a
   copy of its index against a clean build of a `HEAD` `ad244c2` export, the same way, `-scheme WaterBuddy`
   by `build-for-testing`: unchanged on all four schemes — 20, 17, 2, 17 by message, no line new or gone;
-  36 sites on the app scheme on both sides
+  36 sites on the app scheme on both sides; and the privacy policy's own comparison, on 2026-10-24 from a
+  clean build of a copy of its index against a clean build of a `HEAD` `4c76e61` export, the same way:
+  unchanged on all four schemes — 20, 17, 2, 17 by message, 36, 29, 2, 29 sites, no line new or gone and
+  every site on its line
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
