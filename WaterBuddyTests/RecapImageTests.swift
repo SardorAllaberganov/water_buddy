@@ -60,6 +60,31 @@ struct RecapImageTests {
         #expect(plain.size == huge.size)
     }
 
+    /// Known issue #182: the tiles' fill is derived from History's own pane — Apple's regular glass tinted
+    /// `Aurora.top` — read live on iOS 27.0 over the card's gradient (spec
+    /// `2026-10-24-finish-set-a-design.md` §2.4). Drawn through the hand-made sheer stack, with the scrim
+    /// and the tint the stack itself declares, it gives that glass back at both ends of the gradient. A
+    /// fill retuned by eye fails this, and so does a change to the stack the derivation rests on.
+    @Test func theTilesFillGivesBackTheAppsOwnGlass() {
+        let scrim = LiquidGlass.scrim(density: .sheer, scheme: .dark, base: RecapCard.tileBase, onPhone: true)
+        let tint = LiquidGlass.Density.sheer.tintOpacity(for: .dark)
+        #expect(scrim.color == .black, "the derivation takes the flat base's black scrim")
+        let fill = RecapCard.tileFill
+        // The ground, then the live glass over it, sRGB of 255 — the probe's top and bottom panes.
+        let measured: [(ground: [Double], glass: [Double])] = [
+            ([30, 34, 137], [28, 45, 154]),
+            ([83, 28, 155], [50, 41, 160]),
+        ]
+        for (ground, glass) in measured {
+            for (channel, colour) in [fill.red, fill.green, fill.blue].enumerated() {
+                let base = fill.opacity * colour + (1 - fill.opacity) * ground[channel] / 255
+                let drawn = tint + (1 - tint) * (1 - scrim.opacity) * base
+                #expect(abs(drawn * 255 - glass[channel]) <= 2,
+                        "channel \(channel) over \(ground) drew \(drawn * 255), the glass read \(glass[channel])")
+            }
+        }
+    }
+
     @Test(arguments: [AppLanguage.english, .russian, .uzbek])
     func itRendersInEveryLanguage(language: AppLanguage) throws {
         let month = try #require(september())

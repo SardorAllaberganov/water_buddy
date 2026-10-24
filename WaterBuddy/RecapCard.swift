@@ -12,9 +12,11 @@ import SwiftUI
 ///
 /// **The card is the image**: one view from one ``MonthHistory``, so what is sent is what was seen.
 ///
-/// **Flat, because it is rendered.** Its canvas is `Aurora.gradient`, not glass, and its tiles take
-/// ``LiquidGlass/Base/archived`` — the widget's base — because `ImageRenderer`, like a widget snapshot,
-/// has no live backdrop for a `Material` to sample (rule `40-widget`'s ruling, in its second case).
+/// **Flat, because it is rendered.** Its canvas is `Aurora.gradient`, not glass, and its tiles take a
+/// flat base, ``tileBase`` — History's own glass, frozen into a derived fill — because `ImageRenderer`,
+/// like a widget snapshot, has no live backdrop for a `Material` to sample (rule `40-widget`'s ruling, in
+/// its second case). They took the widget's ``LiquidGlass/Base/archived`` until known issue #182, and
+/// read grey-brown beside the app's panes.
 ///
 /// **No streak, no goal, no serving, no time of day.** The streak never leaves the app (rule
 /// `20-state`): the sheet draws it beside the card, never on it.
@@ -177,7 +179,7 @@ struct RecapCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .liquidGlass(cornerRadius: LiquidGlass.innerCornerRadius, base: .archived, density: .sheer, elevation: .flush)
+        .liquidGlass(cornerRadius: LiquidGlass.innerCornerRadius, base: Self.tileBase, density: .sheer, elevation: .flush)
     }
 
     private func changeLine(_ change: Int) -> some View {
@@ -221,6 +223,31 @@ struct RecapCard: View {
     private static let ringWidth: CGFloat = 2
     private static let tileGap: CGFloat = 10
     private static let imageMargin: CGFloat = 20
+
+    // MARK: - The tiles' fill
+
+    /// History's own pane — Apple's regular glass tinted `Aurora.top`, a `.frosted` pane — frozen into
+    /// one flat fill under the hand-made sheer stack (known issue #182, the owner's ruling; spec
+    /// `2026-10-24-finish-set-a-design.md` §2.4).
+    ///
+    /// **Derived, never chosen.** A `.flat` base is always drawn hand-made: in the dark scheme the fill,
+    /// then the black scrim at 0.16, then white at 0.05 — `out = w + (1 − w)(1 − s)(a·F + (1 − a)·B)`.
+    /// Five live panes over `Aurora.gradient` on iOS 27.0, each read where its sheen is clear and over
+    /// the same pixels bare, fitted one colour `F` and one opacity `a` by least squares: worst ΔE₂₀₀₀
+    /// 0.26 fitted, 0.29 drawn. sRGB. Retune it only by measuring again — and if the scrim or the tint a
+    /// flat base takes moves, this moves with them (`theTilesFillGivesBackTheAppsOwnGlass`).
+    ///
+    /// Not the tile's own `.sheer` glass: that is Apple's clear glass, untinted, which lightens every
+    /// ground alike while the stack's scrim darkens in proportion — no fill in range gives it back
+    /// (best 3.34).
+    static let tileFill = (red: 0.0287, green: 0.1761, blue: 0.8521, opacity: 0.4856)
+
+    /// The tiles' base: ``tileFill``, and `archived`'s slab under Reduce Transparency — the one opaque
+    /// colour every pane takes there, so no second literal.
+    static let tileBase = LiquidGlass.Base.flat(
+        translucent: Color(red: tileFill.red, green: tileFill.green, blue: tileFill.blue).opacity(tileFill.opacity),
+        opaque: LiquidGlass.Base.archived.opaqueFill
+    )
 }
 
 // MARK: - The image
