@@ -230,6 +230,27 @@ struct HistoryView: View {
         (Decimal(millilitres) / 1_000).formatted(.number.precision(.fractionLength(1)).locale(locale))
     }
 
+    /// A month's change, drawn — naming no month: Russian would need it in the prepositional case,
+    /// which Foundation does not produce (spec `2026-10-22-month-view-design.md` §3.11). The month's
+    /// figures and the recap's card both draw it (spec `2026-10-24-monthly-recap-design.md` §3.4).
+    nonisolated static func drawnChange(_ change: Int, strings: Bundle, locale: Locale) -> String {
+        if change > 0 { return strings.figure("Up %1$@ ml on the month before", change, locale: locale) }
+        if change < 0 { return strings.figure("Down %1$@ ml on the month before", -change, locale: locale) }
+        return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
+    }
+
+    /// A month's change, spoken in millilitres.
+    nonisolated static func spokenChange(_ change: Int, strings: Bundle, locale: Locale) -> String {
+        if change > 0 { return strings.localized("Up %1$d millilitres on the month before", change, locale: locale) }
+        if change < 0 { return strings.localized("Down %1$d millilitres on the month before", -change, locale: locale) }
+        return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
+    }
+
+    /// A month's change, as a glyph.
+    nonisolated static func changeSymbol(_ change: Int) -> String {
+        change > 0 ? "arrow.up.right" : change < 0 ? "arrow.down.right" : "equal"
+    }
+
     /// A week's first and last day as one range in the app's locale — *Oct 11 – 17*, *11–17 окт.* —
     /// formatted, never computed: the two days are the model's (``WeekInsights/firstDay``), and the
     /// interval style spells the month once when both days share it.
@@ -306,6 +327,10 @@ struct HistoryView: View {
 
     /// The paywall, while the locked month has it open — its `.sheet(item:)` selection (rule `50-views`).
     @State private var paywall: PaywallView.Entry?
+
+    /// The recap, while its sheet is open — read once on the row's tap, a value (spec
+    /// `2026-10-24-monthly-recap-design.md` §3.7; rule `50-views`).
+    @State private var recap: MonthHistory?
 
     /// Bumped by the user's own taps on the switch and on a month's arrows, as ``picks`` is by a day
     /// (rule `60-design-system`).
@@ -385,6 +410,9 @@ struct HistoryView: View {
         }
         // Premium bought, or refunded, with Month or Insights on screen: what it draws is read, or let go.
         .onChange(of: holdsPremium) { _, holds in
+            // A recap is a holder's: Premium refunded with its sheet open closes it (spec
+            // `2026-10-24-monthly-recap-design.md` §3.3).
+            if !holds { recap = nil }
             switch mode {
             case .week:
                 return
@@ -424,6 +452,7 @@ struct HistoryView: View {
             }
         }
         .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
+        .sheet(item: $recap) { month in RecapSheet(month: month) }
     }
 
     /// Week mode — History as it was before the month: the week card, then the shown day's strip and
@@ -566,6 +595,13 @@ struct HistoryView: View {
                     .historyRow(top: 8)
             }
 
+            // The month's recap — a finished month's own, or in the month's first days the month
+            // before's (spec `2026-10-24-monthly-recap-design.md` §3.1).
+            if let offered = manager.month?.recap {
+                RecapRow(offered: offered) { openRecap(offered) }
+                    .historyRow(top: 8)
+            }
+
             // The month's patterns, or the line that says what they wait for; a month never read
             // draws neither (spec `2026-10-23-patterns-design.md` §3.2).
             if let month = manager.month {
@@ -668,6 +704,12 @@ struct HistoryView: View {
         openedDay = nil
         manager.showMonth(chosen == .month && holdsPremium ? manager.thisMonth : nil)
         manager.showInsights(chosen == .insights && holdsPremium ? insightsRequest : nil)
+    }
+
+    /// Reads the offered month once and opens its recap; a read that fails opens nothing (spec
+    /// `2026-10-24-monthly-recap-design.md` §3.2).
+    private func openRecap(_ offered: MonthHistory.Neighbour) {
+        recap = manager.recap(of: offered.firstDay)
     }
 
     /// An arrow: the month it names, which the shown month says exists.
@@ -1848,7 +1890,7 @@ private struct MonthFigures: View {
                 Text(strings.figure("Average %1$@ ml a day", average, locale: locale))
                     .font(.subheadline.weight(.bold))
                 if let change = month.change {
-                    Text(drawnChange(change))
+                    Text(HistoryView.drawnChange(change, strings: strings, locale: locale))
                         .font(.footnote)
                         .foregroundStyle(.white.opacity(0.9))
                 }
@@ -1858,7 +1900,7 @@ private struct MonthFigures: View {
             Spacer(minLength: 0)
 
             if let change = month.change {
-                Image(systemName: change > 0 ? "arrow.up.right" : change < 0 ? "arrow.down.right" : "equal")
+                Image(systemName: HistoryView.changeSymbol(change))
                     .font(.body.weight(.semibold))
                     // A glyph on dark glass, read at 3:1 in the walk (`tasks/lessons.md`, 2026-10-22).
                     .foregroundStyle(Aurora.cyan)
@@ -1872,21 +1914,54 @@ private struct MonthFigures: View {
         .liquidGlass(density: .frosted, elevation: .raised)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(strings.localized("Average %1$d millilitres a day", average, locale: locale))
-        .accessibilityValue(month.change.map(spokenChange) ?? "")
+        .accessibilityValue(month.change.map { HistoryView.spokenChange($0, strings: strings, locale: locale) } ?? "")
     }
+}
 
-    /// Names no month: Russian would need it in the prepositional case, which Foundation does not
-    /// produce (spec §3.11).
-    private func drawnChange(_ change: Int) -> String {
-        if change > 0 { return strings.figure("Up %1$@ ml on the month before", change, locale: locale) }
-        if change < 0 { return strings.figure("Down %1$@ ml on the month before", -change, locale: locale) }
-        return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
-    }
+// MARK: - The month's recap
 
-    private func spokenChange(_ change: Int) -> String {
-        if change > 0 { return strings.localized("Up %1$d millilitres on the month before", change, locale: locale) }
-        if change < 0 { return strings.localized("Down %1$d millilitres on the month before", -change, locale: locale) }
-        return strings.localizedString(forKey: "The same as the month before", value: nil, table: nil)
+/// The way in to the monthly recap: its title and the offered month's name, which no sentence holds —
+/// Russian would need a case Foundation does not produce, and Uzbek writes *your* as a suffix (spec
+/// `2026-10-24-monthly-recap-design.md` §3.2). One button.
+private struct RecapRow: View {
+
+    @Environment(\.strings) private var strings
+
+    let offered: MonthHistory.Neighbour
+    let open: () -> Void
+
+    var body: some View {
+        Button(action: open) {
+            HStack(spacing: 12) {
+                // White, not cyan: in cyan it read 2.6:1 where the aurora's cyan light passes under
+                // the row (the walk, W4; known issue #177's effect); white was re-measured at 5.12:1.
+                Image(systemName: PremiumSet.Feature.recap.symbol)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Monthly recap", bundle: strings)
+                        .font(.subheadline.weight(.bold))
+                    Text(offered.start, format: .dateTime.month(.wide).year())
+                        .font(.footnote)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .accessibilityHidden(true)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+            .contentShape(Rectangle())
+            .liquidGlass(density: .frosted, elevation: .raised, interactive: true)
+        }
+        .buttonStyle(PressStyle())
+        .padding(.horizontal, HistoryView.margin)
+        .accessibilityLabel(Text("Monthly recap", bundle: strings))
+        .accessibilityValue(Text(offered.start, format: .dateTime.month(.wide).year()))
     }
 }
 
@@ -3425,4 +3500,36 @@ private func previewManager(named name: String) -> DataManager {
         .environment(manager)
         .environment(PremiumStore(source: source))
         .environment(InsightWriter(source: .silent()))
+}
+
+#Preview("The recap row, in a month's first week") {
+    RecapRowPreview.row
+}
+
+/// The new month's first days offering the month before's recap — the case the simulator's own date
+/// cannot reach in a walk (spec `2026-10-24-monthly-recap-design.md` §4). No store and no `DataManager`.
+private enum RecapRowPreview {
+
+    @MainActor static var row: some View {
+        let calendar = Calendar.waterBuddyDay
+        let september = calendar.date(from: DateComponents(year: 2026, month: 9, day: 1, hour: 12))
+        let thirdOfOctober = calendar.date(from: DateComponents(year: 2026, month: 10, day: 3, hour: 9))
+        let rows = september.map { start in
+            (0..<7).compactMap { offset in
+                calendar.date(byAdding: .day, value: offset, to: start).map { WaterLog(amount: 2_000, timestamp: $0) }
+            }
+        } ?? []
+        let offered = thirdOfOctober.flatMap {
+            MonthHistory.make(rows: rows, month: 20261001, firstServing: september, goal: 2_500, now: $0, calendar: calendar)
+        }?.recap
+        return ZStack {
+            AuroraBackground()
+            if let offered {
+                RecapRow(offered: offered) {}
+            }
+        }
+        .environment(\.strings, AppLanguage.english.bundle)
+        .environment(\.locale, AppLanguage.english.locale)
+        .preferredColorScheme(.dark)
+    }
 }

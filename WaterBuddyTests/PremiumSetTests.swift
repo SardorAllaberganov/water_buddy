@@ -19,10 +19,11 @@ struct PremiumSetTests {
         #expect(PremiumSet.understand.features == [.monthView, .patterns, .insights, .recap])
     }
 
-    /// Step 5 of the spec's §1 puts set A on sale, with the recap — and changes this test with it.
-    @Test func setAIsNotOnSaleUntilItsLastFeatureIsBuilt() {
-        #expect(!PremiumSet.understand.isOnSale)
-        #expect(PremiumSet.onSale.isEmpty)
+    /// Step 5 of the spec's §1 built the recap, set A's last feature, and put the set on sale (spec
+    /// `2026-10-24-monthly-recap-design.md` §3.8).
+    @Test func setAIsOnSaleNowEveryFeatureIsBuilt() {
+        #expect(PremiumSet.understand.isOnSale)
+        #expect(PremiumSet.onSale == [.understand])
     }
 
     /// An unknown symbol draws nothing at all (rule `65-accessibility`).

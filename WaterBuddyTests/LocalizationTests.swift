@@ -191,6 +191,12 @@ private let historyKeys = [
     "Your first drink came %1$d minutes later than the week before.",
     "Nothing was logged on %1$d days.",
     "Half your water came before %1$@.",
+    // The monthly recap (spec 2026-10-24 §3.10).
+    "Monthly recap",
+    "A day, on average",
+    "Share as an image",
+    "Stays in the app, not on the image",
+    "The image leaves your phone only when you send it.",
 ]
 
 /// The welcome's own strings (spec 2026-10-14 §8). The keys it shares with Settings or the reminder

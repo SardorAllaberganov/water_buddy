@@ -338,6 +338,14 @@ struct PaywallOfferTests {
         #expect(PaywallView.shownSets(debug: false) == PremiumSet.onSale)
     }
 
+    /// Set A on sale is not the paywall offered: a Release build still waits for the privacy policy's
+    /// address (#159), so the token can never ship as a live link.
+    @Test func setAOnSaleStillWaitsForThePrivacyLink() {
+        #expect(!PaywallView.isOffered(debug: false, arguments: [], setsOnSale: PremiumSet.onSale.count,
+                                       privacyPolicy: URL(string: "OWNER-PRIVACY-URL")))
+        #expect(PaywallView.shownSets(debug: false) == [.understand])
+    }
+
     @Test func theLinksAreApplesTermsAndAPageOfOurs() {
         #expect(PaywallView.termsOfUse?.absoluteString == "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
         #expect(PaywallView.privacyPolicy?.scheme == "https")

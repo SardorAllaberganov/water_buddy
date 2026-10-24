@@ -1192,29 +1192,15 @@ final class DataManager {
     /// Republishes the wanted month's rows to ``monthLogs``, then works the month out from the same
     /// rows and publishes it if it moved.
     ///
-    /// **Two reads**: the store's one range query (``readLogs(from:to:)``), from the 1st of the month
-    /// before — whose average ``MonthHistory/change`` compares with — to the end of the wanted one; and
-    /// the first serving ever (``readOldestLog()``). **Either failing returns** and leaves both
-    /// properties as they stand: an empty month is indistinguishable from a user who never drank.
+    /// Its two reads are ``readMonth(_:)``'s. **Either failing returns** and leaves both properties as
+    /// they stand: an empty month is indistinguishable from a user who never drank.
     ///
     /// Behind `role.drawsHistory` for ``republishHistory()``'s reason — cost, not correctness — and a
     /// no-op while no month is wanted.
     private func republishMonth() {
-        guard Self.role.drawsHistory, let wanted = wantedMonth else { return }
-        guard let shown = MonthHistory.interval(of: wanted, in: calendar),
-              let before = MonthHistory.firstDay(of: wanted, movedBy: -1, in: calendar),
-              let start = MonthHistory.interval(of: before, in: calendar)?.start,
-              let rows = readLogs(from: start, to: shown.end),
-              let oldest = readOldestLog(),
-              let month = MonthHistory.make(
-                  rows: rows,
-                  month: wanted,
-                  firstServing: oldest.first?.timestamp,
-                  goal: storedDailyGoal,
-                  now: now(),
-                  calendar: calendar
-              )
-        else { return }
+        guard Self.role.drawsHistory, let wanted = wantedMonth, let read = readMonth(wanted) else { return }
+        let rows = read.rows
+        let month = read.month
 
         // The month before's rows are read for the change and published nowhere.
         let days = Set(month.days.map(\.summary.dayOrdinal))
@@ -1226,6 +1212,48 @@ final class DataManager {
 
         guard month != storedMonth else { return }
         withMutation(keyPath: \.month) { storedMonth = month }
+    }
+
+    /// The finished month whose 1st is `firstDay`, for its recap — or `nil` (spec
+    /// `2026-10-24-monthly-recap-design.md` §3.6).
+    ///
+    /// **A read, not a mutation.** It returns a value and publishes nothing: it **writes neither store**,
+    /// rings no doorbell, reschedules nothing and leaves ``month`` and ``monthLogs`` as they stand. The
+    /// sheet it feeds covers the screen, and nothing can change a finished month under it, so publishing
+    /// it would be machinery with nothing to keep fresh.
+    ///
+    /// The month is returned only when its own ``MonthHistory/recap`` names itself — finished, and on the
+    /// bar. A failed read is `nil`, never an empty month. Behind `role.drawsHistory` for
+    /// ``republishMonth()``'s reason.
+    func recap(of firstDay: Int) -> MonthHistory? {
+        guard Self.role.drawsHistory, let read = readMonth(firstDay), read.month.recap?.firstDay == firstDay
+        else { return nil }
+        return read.month
+    }
+
+    /// The month whose 1st is `firstDay`, and the rows it was worked out from — ``republishMonth()``'s
+    /// two reads and ``recap(of:)``'s, spelled once.
+    ///
+    /// **Two reads**: the store's one range query (``readLogs(from:to:)``), from the 1st of the month
+    /// before — whose average ``MonthHistory/change`` compares with, and whose days the first-week recap
+    /// offer counts — to the end of the month; and the first serving ever (``readOldestLog()``). **Either
+    /// failing returns `nil`**: an empty month is indistinguishable from a user who never drank.
+    private func readMonth(_ firstDay: Int) -> (rows: [WaterLog], month: MonthHistory)? {
+        guard let shown = MonthHistory.interval(of: firstDay, in: calendar),
+              let before = MonthHistory.firstDay(of: firstDay, movedBy: -1, in: calendar),
+              let start = MonthHistory.interval(of: before, in: calendar)?.start,
+              let rows = readLogs(from: start, to: shown.end),
+              let oldest = readOldestLog(),
+              let month = MonthHistory.make(
+                  rows: rows,
+                  month: firstDay,
+                  firstServing: oldest.first?.timestamp,
+                  goal: storedDailyGoal,
+                  now: now(),
+                  calendar: calendar
+              )
+        else { return nil }
+        return (rows, month)
     }
 
     /// Asks for the last finished week's insights, by the app's locale's first weekday and weekend, or
@@ -2647,7 +2675,7 @@ extension DaySummary {
 /// the days before today, and today once it has reached the goal, so a morning never reads *17 / 21*;
 /// the first month counts from the day of the first serving, so an install on the 15th is not averaged
 /// over fourteen empty days. A day still to come counts in nothing, the total included (plan M5).
-nonisolated struct MonthHistory: Sendable, Equatable {
+nonisolated struct MonthHistory: Sendable, Equatable, Identifiable {
 
     /// One day of the month, with what History draws for it worked out here — the view judges
     /// nothing against the goal (rule `50-views`).
@@ -2706,6 +2734,19 @@ nonisolated struct MonthHistory: Sendable, Equatable {
     /// The month's patterns, from its finished days — `nil` until seven of them hold water
     /// (``MonthPatterns/minimumDays``), which History says in a line of its own.
     let patterns: MonthPatterns?
+
+    /// The month whose recap this page offers, or `nil` (spec `2026-10-24-monthly-recap-design.md` §3.1):
+    /// a finished month offers its own once ``MonthPatterns/minimumDays`` of its days hold water; the
+    /// month holding today offers the month before's, on the same bar, while today is one of its first
+    /// ``recapDays`` days; no page offers more than one. Its instant is for formatting the row's label and
+    /// nothing else, as a ``Neighbour``'s always is.
+    let recap: Neighbour?
+
+    /// A `.sheet(item:)` selection names a month by its 1st (rule `50-views`).
+    var id: Int { firstDay }
+
+    /// How many of a month's first days still offer the month before's recap — the turn of the month.
+    nonisolated static let recapDays = 7
 }
 
 extension MonthHistory {
@@ -2750,7 +2791,8 @@ extension MonthHistory {
     }
 
     /// The month whose 1st is `firstDay`, worked out from `rows` — which may reach outside it; the
-    /// month before's are what ``change`` compares with — the instant of the first serving ever
+    /// month before's are what ``change`` compares with, and what the first-week offer of a ``recap``
+    /// reads — the instant of the first serving ever
     /// recorded, the current `goal`, `now` and the calendar. `nil` for an ordinal that names no month.
     nonisolated static func make(
         rows: [WaterLog],
@@ -2791,6 +2833,19 @@ extension MonthHistory {
         var change: Int?
         if let average, let previous { change = average - previous }
 
+        // A finished month offers its own recap; the first days of the month holding today offer the
+        // month before's (spec `2026-10-24-monthly-recap-design.md` §3.1). The day of the month is
+        // today's ordinal's, on this calendar.
+        let thisMonth = Self.firstDay(ofMonthHolding: now, in: calendar)
+        var offered: Int?
+        if firstDay < thisMonth {
+            offered = holdsARecap(firstDay, totals: totals, in: calendar) ? firstDay : nil
+        } else if firstDay == thisMonth, today % 100 <= recapDays,
+                  let before = Self.firstDay(of: firstDay, movedBy: -1, in: calendar),
+                  holdsARecap(before, totals: totals, in: calendar) {
+            offered = before
+        }
+
         let firstMonth = first.map { $0 / 100 * 100 + 1 }
         return MonthHistory(
             firstDay: firstDay,
@@ -2807,7 +2862,8 @@ extension MonthHistory {
             // From the same rows: the month before's fall outside `walked` and count in nothing.
             patterns: MonthPatterns.make(
                 rows: rows, days: walked, firstServing: firstServing, goal: judged, now: now, calendar: calendar
-            )
+            ),
+            recap: offered.flatMap { neighbour(of: $0, by: 0, exists: true, in: calendar) }
         )
     }
 
@@ -2833,6 +2889,13 @@ extension MonthHistory {
     nonisolated private static func counts(_ day: DaySummary, first: Int?, today: Int, goal: Int) -> Bool {
         guard let first, day.dayOrdinal >= first, day.dayOrdinal <= today else { return false }
         return day.dayOrdinal < today || day.reached(goal)
+    }
+
+    /// Whether the month whose 1st is `firstDay` holds water on ``MonthPatterns/minimumDays`` days — the
+    /// patterns' own bar, by name, so the two cannot drift (spec `2026-10-24-monthly-recap-design.md`
+    /// §3.1). A day before the first serving holds none.
+    nonisolated private static func holdsARecap(_ firstDay: Int, totals: [Int: Int], in calendar: Calendar) -> Bool {
+        days(of: firstDay, in: calendar).filter { (totals[$0.ordinal] ?? 0) > 0 }.count >= MonthPatterns.minimumDays
     }
 
     nonisolated private static func longestRun(of days: [DaySummary], goal: Int) -> Int {

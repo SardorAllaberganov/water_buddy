@@ -90,11 +90,12 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
         }
     }
 
-    /// Whether every feature the set lists is built. **Set A goes on sale in step 5**, with the
-    /// recap; `PremiumSetTests` pins the `false` and names that step.
+    /// Whether every feature the set lists is built. **Set A went on sale in step 5**, with the recap
+    /// (spec `2026-10-24-monthly-recap-design.md` §3.8); a Release build offers it only once the privacy
+    /// policy's address is set (`PaywallView.isOffered(arguments:)`).
     var isOnSale: Bool {
         switch self {
-        case .understand: false
+        case .understand: true
         }
     }
 
