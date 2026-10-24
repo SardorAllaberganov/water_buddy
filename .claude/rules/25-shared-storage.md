@@ -63,7 +63,8 @@ somebody answers all four for it — a grep for `!Self.isAppExtension` in the tr
   `.appex`'s own bundle, or a different physical device entirely for a watch — and has never held
   WaterBuddy state; it would copy nothing while still burning the flag)
 - **`role.drawsHistory`** — *do I have a history surface to draw?* Gates `republishHistory()`, and
-  since set A `republishMonth()` and `republishInsights()` — the eighth and ninth guarded sites. Cost
+  since set A `republishMonth()`, `republishInsights()` and `recap(of:)` — the eighth, ninth and tenth
+  guarded sites, the last a read for the recap's sheet that publishes nothing. Cost
   rather than correctness: `recomputeToday()` is deliberately unguarded, so `AddWaterIntent` still
   reaches `saveAndRecompute()` on every widget tap. The week's cache is not group bookkeeping but a
   derived figure, like today's total: `saveAndRecompute()` writes it in the extension too, and no

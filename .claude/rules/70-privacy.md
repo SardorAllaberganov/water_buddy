@@ -17,6 +17,7 @@ That is a property to defend, not a phase.
   any other capability requires a written justification in this file first
 - Add no `NS*UsageDescription` key to any Info.plist. The project carries zero, and notification
   authorization is the only permission this product ever asks for
+- The one thing that leaves on the user's own tap is the recap's image, on the conditions below
 
 ## WatchConnectivity is a ruling, not an omission
 
@@ -123,6 +124,28 @@ Six limits are conditions of the permission:
 - **It says who wrote it, and what it is not.** The footer names WaterBuddy or Apple's on-device model
   and says *Not medical advice*. The copy never names *Apple Intelligence* — an Apple mark is never part
   of a feature's name (the owner's ruling on #164) — and the paywall's row names no model at all
+
+## The recap's image, on the user's own tap
+
+The monthly recap (roadmap 1.4.7, `docs/superpowers/specs/2026-10-24-monthly-recap-design.md`) may be
+shared as an image. It leaves the phone the way a photo the user sends does: the system's share sheet,
+on their tap, to a destination they choose. The app sends nothing on its own and learns nothing of where
+it went.
+
+Five limits are conditions of the permission:
+- **One way out.** Only through the system share sheet, from *Share as an image* in the recap sheet —
+  `ShareLink` in `RecapSheet.swift`. Never from the widget, the watch, Siri, the control, a
+  notification or a reminder's button, and never without the tap
+- **The card's figures, and nothing else.** The image is `RecapCard` rendered: the month's name, days
+  on goal of days counted, a dot a day, the month's litres, the daily average and the change from the
+  month before. Never the streak — the sheet draws the best streak beside the card, never on it (rule
+  `20-state`) — and never a serving, a time of day or the goal
+- **In memory only.** Rendered by `ImageRenderer` when the sheet appears, held in the sheet's state,
+  written to no file and to neither store
+- **No usage key.** *Add no `NS*UsageDescription` key* stands. iOS offers *Save Image* only to an app
+  that carries `NSPhotoLibraryAddUsageDescription` (measured on iOS 27.0, 26.5 and 18.6, the spec's §4a),
+  so the share sheet leaves Photos out on its own — never add the key to bring it back
+- **Nothing recorded.** No completion handler, no count of shares, no diagnostic of the destination
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

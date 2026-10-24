@@ -147,5 +147,6 @@ warning here is a Swift 6 error later.
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
-  `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests` or `InsightCopyTests` to make them
+  `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests` or
+  `MonthRecapTests` to make them
   compile. They are compile-time canaries: fix the declaration they read instead

@@ -93,6 +93,11 @@ rather than re-deriving it.
 - Insights' heading is one element with the header trait, the week's range its value. Each of its panes
   is one element — label the pane's title, value its sentences — and its glyphs, the suggested vessel's
   among them, are hidden. The footer is one element, *Writing…* while the model writes
+- The recap's row is one button: label *Monthly recap*, value the offered month's name. The recap
+  sheet's heading carries the header trait and its close button is *Done*. The card is one element —
+  label *Monthly recap*, value the month's name and every figure it draws, in millilitres — and its
+  dots, rim, glyphs and mark are hidden. The best streak's pane is one element, its footnote included.
+  The card follows the text size on screen; the image it shares is always rendered at the default size
 - History's heading is one element: label the shown day, value its total against the goal, the
   header trait. At an accessibility text size a past day's heading is drawn on two lines — the
   weekday, which is that element, and the date, hidden — because on one line beside the `+` the

@@ -98,11 +98,16 @@ after the body above had already conceded it.
 - `streak` is published from `republishHistory()` and from the `dailyGoal` setter, behind
   `role.drawsHistory`, with an equality guard. A failed read leaves it as it stands, never zero.
   Every day is judged against the current goal. It never leaves the app: not the snapshot, not a
-  notification, not the wrist's mirror, not Siri
+  notification, not the wrist's mirror, not Siri, and not the recap's shared image — a month's best run
+  is drawn in the recap sheet, beside the card, never on it
 - `month` and `monthLogs` are published only while History has asked for a month through
   `showMonth(_:)`, behind `role.drawsHistory`, from `showMonth`, `refresh()`, `saveAndRecompute()`,
   `dayDidTurn()` and the `dailyGoal` setter — never `init`. A failed read leaves both as they stand.
   `showMonth(_:)` writes neither store
+- `recap(of:)` is a read beside `showMonth(_:)`, not a mutation: it returns a finished month's
+  `MonthHistory` — the same two reads as the month, through `readMonth(_:)` — publishes nothing, writes
+  neither store, rings no doorbell and reschedules nothing, behind `role.drawsHistory`; a failed read is
+  `nil`. `MonthHistory.recap`, the month a page offers, is a consequence worked out in `make`
 - `remaining`, `hasReachedGoal`, `lastDrink` and `nextReminder` are computed on read from the
   observable state and stored nowhere. `nextReminder` is the first slot of the plan
   `currentReminderSlots()` files, cut to today. `WaterSnapshot` carries `remaining` and

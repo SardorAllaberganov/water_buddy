@@ -43,9 +43,14 @@ measured.
   ring **and** disc behind its number, the number heavier; today's number is heavier and takes no
   disc. Each mark is present at zero opacity when nothing is selected. Never a fill, a rim, a ring
   or a disc written as a literal in a view
-- Premium's Settings card and History's locked month are marked with `.premiumRim()` —
-  `Aurora.cyan`, `Aurora.magenta` and `Aurora.blue` stroked around a standard pane — and nothing
-  else is. Never a gradient stroke written in a view
+- Premium's Settings card, History's locked month and the recap's card are marked with
+  `.premiumRim()` — `Aurora.cyan`, `Aurora.magenta` and `Aurora.blue` stroked around a standard pane —
+  and nothing else is. Never a gradient stroke written in a view
+- The recap's card is rendered into the image the user may share, so it is drawn flat: its canvas is
+  `Aurora.gradient` in a `LiquidGlass.cornerRadius` shape, not glass, and its tiles take
+  `base: .archived` — the one use of the widget's base in the app, for the widget's reason: an
+  `ImageRenderer`, like a widget snapshot, has no live backdrop for a `Material` to sample. Its image is
+  rendered at `.dynamicTypeSize(.large)`, so the picture never depends on the sender's text size
 - Glass goes over content, imagery or colour — never over a flat background
 - Choose density by what the pane carries: `.frosted` or `.opaque` behind sentence-length text,
   `.sheer` only for short labels and controls
@@ -73,7 +78,8 @@ measured.
 
 ## The primary surface
 - A screen's one main action is drawn with `.primarySurface(in:)`: solid white, `Aurora.top` content.
-  It is the only surface that is not glass, and a screen carries at most one
+  It is the only control that is not glass — the recap's card, a rendered picture, is the one other
+  surface that is not — and a screen carries at most one. The recap sheet's is *Share as an image*
 - In the Home Screen widget the pour button is the primary surface in `.fullColor` —
   `.primarySurface(in:ring: false)`, so it stays exactly its 44-pt target and the vessel's clearance
   holds (rule `40-widget`). Outside `.fullColor` it is white content in the lit rim, as every pane

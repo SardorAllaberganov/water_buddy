@@ -121,6 +121,9 @@ from before this design was read, kept deliberately rather than renamed for its 
   weakly linked below it — `otool -l` on the built binary shows `LC_LOAD_WEAK_DYLIB` — so the floor stays
   17.0. **The third version check is the insights'**: `InsightWriter.Source.live()` reaches the model
   only inside `if #available(iOS 26.0, *)`. Run-verified on iOS 18.6 and 27.0; 17.x compile-verified only
+- `RecapCard` and `RecapSheet` are app-only and stay out of every exception set; the month they read,
+  `MonthHistory`, lives in `DataManager.swift`. `ImageRenderer` and `ShareLink` are iOS 16, so the
+  recap adds no version check
 - `PremiumAccess`, `PremiumSet`, `PremiumStore` and `PaywallView` are app-only and stay out of every
   exception set. `WaterBuddyTests/WaterBuddy.storekit` is the local StoreKit configuration: a test
   resource, in no shipping bundle. The checked-in `WaterBuddy` scheme's Run action names it, so a

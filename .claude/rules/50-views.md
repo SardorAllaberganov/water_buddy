@@ -112,11 +112,19 @@ persist anything.
   to the sheet as an `init` parameter — not a `Bool` plus a separately-stored selection
 - The paywall is presented with `.sheet(item:)` bound to an optional `PaywallView.Entry` — where it
   was opened from, `.settings` or `.history` — never a `Bool`
+- The recap is presented with `.sheet(item:)` bound to an optional `MonthHistory`, read once by the
+  row's tap through `manager.recap(of:)` and handed to `RecapSheet` through `init`. The row is drawn in
+  Month mode where `MonthHistory.recap` says: on a finished month's page, and on the new month's for its
+  first `MonthHistory.recapDays` days — a second way in to one sheet, argued: the turn of the month is
+  when the recap is news, and the finished month's own page is where it lives. A lapse clears the
+  selection, so the sheet closes
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen
   whose last card sits under the bar needs its own bottom padding
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the
   three tabs, and separately on a sheet or the pre-setup root. Never substitute
-  `.environment(\.colorScheme, .dark)` in the app (that spelling is the widget's, rule `40-widget`)
+  `.environment(\.colorScheme, .dark)` in the app (that spelling is the widget's, rule `40-widget`) —
+  except in `RecapCard.Rendered`, which an `ImageRenderer` draws with no hosting controller for
+  `.preferredColorScheme` to reach
 - A tab that draws model data calls `.onAppear { manager.refresh() }`. `HomeView`, `HistoryView`
   and `SettingsView` all do
 
