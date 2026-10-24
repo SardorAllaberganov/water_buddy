@@ -18,6 +18,12 @@ That is a property to defend, not a phase.
 - Add no `NS*UsageDescription` key to any Info.plist. The project carries zero, and notification
   authorization is the only permission this product ever asks for
 - The one thing that leaves on the user's own tap is the recap's image, on the conditions below
+- The app links its privacy policy for every user from Settings, and from the paywall beside the
+  *Terms of Use*: `PaywallView.privacyPolicy`, the one spelling of the address, which Settings reads
+  too. Both open Safari through `Link` on the user's tap; the app fetches no page itself. The policy's
+  text is `PRIVACY.md`, published as `Tools/PrivacyPolicy.html` — they change together, and any change
+  this file allows that the policy does not yet describe changes the policy first
+  (`docs/superpowers/specs/2026-10-24-privacy-policy-design.md`)
 
 ## WatchConnectivity is a ruling, not an omission
 
@@ -97,7 +103,8 @@ Six limits are conditions of the permission:
   only while a set is on sale and the privacy policy link is set
   (`PaywallView.isOffered(arguments:)`)
 - **Two links, on the user's own tap.** *Terms of Use* (Apple's standard licence) and *Privacy
-  Policy* open in Safari. The app fetches neither
+  Policy* open in Safari. The app fetches neither. Settings carries the second for every user, Premium
+  or not (*Nothing leaves the device*)
 - **What never moves behind it.** No way of logging, and nothing a free user can do today —
   *The Premium line*, `docs/ROADMAP.md` §1
 

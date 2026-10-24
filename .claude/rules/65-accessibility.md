@@ -68,8 +68,9 @@ rather than re-deriving it.
   `.minimumScaleFactor(0.6)`
 
 ## Tap targets
-- Every tappable row carries an explicit `.frame(minHeight:)` of at least 44 — 44 for a tab slot,
-  50 for a language row, 56 for a serving row and the primary buttons. Never a fixed `height`
+- Every tappable row carries an explicit `.frame(minHeight:)` of at least 44 — 44 for a tab slot and
+  for Settings' *Privacy Policy* link, 50 for a language row, 56 for a serving row and the primary
+  buttons. Never a fixed `height`
 - Make the whole slot the target, not the glyph: `.frame(maxWidth: .infinity, minHeight: 44)` plus
   `.contentShape(Rectangle())` where the label does not already fill the row
 - In the widget, size every `Button(intent:)` label to at least `PourButton.minimumTarget` (44) with
@@ -164,6 +165,12 @@ rather than re-deriving it.
   resolves to exactly one element
 - Treat the labels the UI suite queries as a public surface — renaming one breaks the suite, and that
   is the point
+- XCUITest lists the screen beneath a sheet with the sheet. Where a sheet carries a label the screen
+  under it carries too — the paywall's *Privacy Policy* over Settings' — count what the sheet adds:
+  the label's count before it opens, subtracted from the count after, must be one (the owner's ruling,
+  2026-10-24). Never narrow the query to hittable elements, which drops a sheet's own controls below
+  its fold
+- Settings' *Privacy Policy* is one link, its label the paywall's string
 - Every VoiceOver string resolves through the `strings` environment bundle, and the shared ones are
   listed in `LocalizationTests` so every bundle that draws them is checked (rule `70-privacy`)
 - Never write a probe that queries an element the product deliberately hides, and when verifying at a

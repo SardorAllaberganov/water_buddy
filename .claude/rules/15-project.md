@@ -167,11 +167,16 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   two iOS bundles would still be rejected
 - The declared reasons are **`1C8F.1`** (App Group-scoped access — `DataManager.sharedDefaults`
   resolving `group.sardor.WaterBuddy`) and **`CA92.1`** (app-scoped — the `.standard` fallback and
-  the one-shot migration). `NSPrivacyTracking` is `false` with both arrays empty, which is true by
+  the one-shot migration) for `UserDefaults`, and **`35F9.1`** for the system boot time (the time
+  elapsed between events within the app — `AuroraClock` reads `ProcessInfo.systemUptime`, since
+  stage 3b, `7368dec`; undeclared until 2026-10-24, and never uploaded undeclared).
+  `NSPrivacyTracking` is `false` with both arrays empty, which is true by
   construction: no account, no server, no analytics, no networking import anywhere (rule
   `70-privacy`, rule `95-dependencies`). If a future change adds a required-reason API — the file
-  timestamp, disk space and active-keyboard categories are the other likely ones — all four files
-  change together
+  timestamp, disk space and active-keyboard categories are the other likely ones, and `systemUptime`
+  and `mach_absolute_time()` are the boot-time category — all four files change together, and
+  `PrivacyManifestTests` changes with them: it reads the four **built** manifests, pins them
+  byte-identical, and pins the declared categories and reasons exactly
 - **`INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO`** on the app target's two configurations only.
   Extensions and the watch app inherit the containing app's declaration; do not duplicate it.
   Verified as `false` in the built `Info.plist`. Without it every upload stalls on a manual
