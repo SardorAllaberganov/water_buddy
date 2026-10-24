@@ -48,9 +48,12 @@ measured.
   and nothing else is. Never a gradient stroke written in a view
 - The recap's card is rendered into the image the user may share, so it is drawn flat: its canvas is
   `Aurora.gradient` in a `LiquidGlass.cornerRadius` shape, not glass, and its tiles take
-  `base: .archived` — the one use of the widget's base in the app, for the widget's reason: an
-  `ImageRenderer`, like a widget snapshot, has no live backdrop for a `Material` to sample. Its image is
-  rendered at `.dynamicTypeSize(.large)`, so the picture never depends on the sender's text size
+  `RecapCard.tileBase` — a `.flat` base, for the widget's reason: an `ImageRenderer`, like a widget
+  snapshot, has no live backdrop for a `Material` to sample. Its fill, `RecapCard.tileFill`, is History's
+  `.frosted` glass — Apple's regular glass tinted `Aurora.top` — frozen by measurement on iOS 27.0 and held
+  by `theTilesFillGivesBackTheAppsOwnGlass` (the owner's ruling on #182). Never retune it by eye; derive it
+  again when the hand-made stack's scrim or tint for a flat base moves. Its image is rendered at
+  `.dynamicTypeSize(.large)`, so the picture never depends on the sender's text size
 - Glass goes over content, imagery or colour — never over a flat background
 - Choose density by what the pane carries: `.frosted` or `.opaque` behind sentence-length text,
   `.sheer` only for short labels and controls
@@ -114,8 +117,8 @@ measured.
 
 ## Colour
 - Every colour comes from `Aurora` — `top`, `bottom`, `blue`, `magenta`, `cyan`, `gradient`. The
-  only permitted literals outside it are the two `WaterSurface` wave gradients and
-  `LiquidGlass.Base.archived`
+  only permitted literals outside it are the two `WaterSurface` wave gradients,
+  `LiquidGlass.Base.archived` and `RecapCard.tileFill` — the last two derived, never chosen
 - Share `Aurora`'s colours between app, widget and watch, but **never** the geometry: absolute
   offsets belong to `AuroraBackground`, proportional `UnitPoint`s to `WidgetAurora` **and to
   `WaterBuddyWatch/WristAurora.swift`** — a watch face is a small, fixed canvas with no wallpaper to

@@ -149,6 +149,9 @@ rather than re-deriving it.
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1
+- A heading of `.title3` bold or larger on the aurora is large text and holds 3:1 — *Patterns*,
+  *Insights*, History's heading and the recap's alike (the owner's ruling on #177, 2026-10-25). A line
+  under such a heading is not, and is held to 4.5 — where it cannot be, it is spoken, not drawn (#171)
 - When a colour lands on a `Material`, **measure the composite off a rendered screenshot** and write
   the figure into the comment and `docs/DESIGN.md`. Never derive it from the token
 - Never let a tint be the only carrier of state — the tab bar's active slot keeps a white caption and
