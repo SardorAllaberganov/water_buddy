@@ -32,6 +32,23 @@ struct PremiumSetTests {
         }
     }
 
+    /// The insights row names Apple's on-device model nowhere, and never *Apple Intelligence*: Apple's
+    /// marks are never part of a feature's name, and the model writes only English (spec
+    /// `2026-10-23-insights-design.md` §3.9, the owner's ruling on #164).
+    @Test func theInsightsRowCarriesNoAppleMark() {
+        for language in [AppLanguage.english, .russian, .uzbek] {
+            let code = language.code ?? ""
+            let strings = language.bundle
+            #expect(strings.bundleURL.lastPathComponent == "\(code).lproj", "the \(code) strings did not resolve")
+            let feature = PremiumSet.Feature.insights
+            for words in [feature.title(in: strings), feature.line(in: strings), feature.caption(in: strings) ?? ""] {
+                #expect(!words.contains("Apple Intelligence"), "\(code): \(words)")
+                #expect(!words.contains("AI") && !words.contains("ИИ"), "\(code): \(words)")
+            }
+        }
+        #expect(PremiumSet.Feature.insights.title(in: AppLanguage.english.bundle) == "Personal insights")
+    }
+
     @Test func theCardPreviewsEveryFeatureButTheRecap() {
         let strings = Bundle.main
         #expect(PremiumSet.Feature.recap.caption(in: strings) == nil)

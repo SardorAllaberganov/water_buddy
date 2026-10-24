@@ -990,48 +990,48 @@
         }
       }
     },
-    "Personal AI insights": {
+    "Personal insights": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Personal AI insights"
+            "value": "Personal insights"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Личные советы ИИ"
+            "value": "Личные советы"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Shaxsiy AI tavsiyalari"
+            "value": "Shaxsiy tavsiyalar"
           }
         }
       }
     },
-    "Using Apple Intelligence, private on your iPhone": {
+    "Each week, from your own figures, on your iPhone": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Using Apple Intelligence, private on your iPhone"
+            "value": "Each week, from your own figures, on your iPhone"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "С Apple Intelligence, только на вашем iPhone"
+            "value": "Каждую неделю, по вашим данным, на вашем iPhone"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Intelligence bilan, faqat iPhone’ingizda"
+            "value": "Har hafta, o‘z raqamlaringizdan, iPhone’ingizda"
           }
         }
       }
@@ -1151,25 +1151,25 @@
         }
       }
     },
-    "AI insights": {
+    "Insights": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "AI insights"
+            "value": "Insights"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Советы ИИ"
+            "value": "Советы"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "AI tavsiyalari"
+            "value": "Tavsiyalar"
           }
         }
       }
@@ -5599,6 +5599,839 @@
           "stringUnit": {
             "state": "translated",
             "value": "Odatlar uchun suv ichilgan %1$d kun kerak"
+          }
+        }
+      }
+    },
+    "The one thing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The one thing"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Главное"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asosiysi"
+          }
+        }
+      }
+    },
+    "What is working": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What is working"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что получается"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nima yaxshi chiqyapti"
+          }
+        }
+      }
+    },
+    "Worth knowing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worth knowing"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стоит знать"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilib qo‘ying"
+          }
+        }
+      }
+    },
+    "Writing…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Writing…"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пишется…"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yozilmoqda…"
+          }
+        }
+      }
+    },
+    "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Написано WaterBuddy по вашим данным на вашем iPhone. Это не медицинский совет."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WaterBuddy o‘z raqamlaringizdan iPhone’ingizda yozdi. Bu tibbiy maslahat emas."
+          }
+        }
+      }
+    },
+    "Written by Apple's on-device model from your own figures, on your iPhone. Not medical advice.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Written by Apple's on-device model from your own figures, on your iPhone. Not medical advice."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Написано моделью Apple прямо на вашем iPhone по вашим данным. Это не медицинский совет."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple’ning qurilmadagi modeli o‘z raqamlaringizdan iPhone’ingizda yozdi. Bu tibbiy maslahat emas."
+          }
+        }
+      }
+    },
+    "Insights need %1$d days of water in a week": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Insights need %1$d day of water in a week"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Insights need %1$d days of water in a week"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Для советов нужно %1$d дня с водой за неделю"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Для советов нужно %1$d дней с водой за неделю"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Для советов нужен %1$d день с водой за неделю"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Для советов нужно %1$d дня с водой за неделю"
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tavsiyalar uchun haftada suv ichilgan %1$d kun kerak"
+          }
+        }
+      }
+    },
+    "Next on %1$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next on %1$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Следующие — %1$@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyingisi: %1$@"
+          }
+        }
+      }
+    },
+    "A few lines each week on how you drank": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A few lines each week on how you drank"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Каждую неделю — пара строк о том, как вы пили"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har hafta qanday ichganingiz haqida bir necha satr"
+          }
+        }
+      }
+    },
+    "Premium writes them from your own figures, on your iPhone, with one thing to try.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium writes them from your own figures, on your iPhone, with one thing to try."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium пишет их по вашим данным на вашем iPhone и подсказывает, что попробовать."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium ularni o‘z raqamlaringizdan iPhone’ingizda yozadi va sinab ko‘rish uchun bitta maslahat beradi."
+          }
+        }
+      }
+    },
+    "Weekends ran %1$@ ml a day below weekdays.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekends ran %1$@ ml a day below weekdays."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В выходные — на %1$@ мл в день меньше, чем в будни."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dam olish kunlari ish kunlaridan kuniga %1$@ ml kam bo‘ldi."
+          }
+        }
+      }
+    },
+    "Weekdays ran %1$@ ml a day below weekends.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekdays ran %1$@ ml a day below weekends."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В будни — на %1$@ мл в день меньше, чем в выходные."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ish kunlari dam olish kunlaridan kuniga %1$@ ml kam bo‘ldi."
+          }
+        }
+      }
+    },
+    "%1$@ ml a day less than the week before.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml a day less than the week before."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На %1$@ мл в день меньше, чем на прошлой неделе."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi haftadan kuniga %1$@ ml kam."
+          }
+        }
+      }
+    },
+    "%1$@ ml a day more than the week before.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml a day more than the week before."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На %1$@ мл в день больше, чем на прошлой неделе."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldingi haftadan kuniga %1$@ ml ko‘p."
+          }
+        }
+      }
+    },
+    "An average day was %1$@ ml short of your goal.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An average day was %1$@ ml short of your goal."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В среднем до цели не хватало %1$@ мл в день."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O‘rtacha kunda maqsadgacha %1$@ ml yetmadi."
+          }
+        }
+      }
+    },
+    "An average day: %1$@ ml, against a goal of %2$@ ml.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An average day: %1$@ ml, against a goal of %2$@ ml."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Средний день: %1$@ мл при цели %2$@ мл."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O‘rtacha kun: %1$@ ml, maqsad — %2$@ ml."
+          }
+        }
+      }
+    },
+    "Another %1$@ ml on each weekend day would help close the gap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another %1$@ ml on each weekend day would help close the gap."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё %1$@ мл в каждый выходной помогут сократить разрыв."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har bir dam olish kunida yana %1$@ ml farqni qisqartirishga yordam beradi."
+          }
+        }
+      }
+    },
+    "Another %1$@ ml on each weekday would help close the gap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another %1$@ ml on each weekday would help close the gap."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё %1$@ мл в каждый будний день помогут сократить разрыв."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har bir ish kunida yana %1$@ ml farqni qisqartirishga yordam beradi."
+          }
+        }
+      }
+    },
+    "Another %1$@ ml each morning would help close the gap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another %1$@ ml each morning would help close the gap."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё %1$@ мл каждое утро помогут сократить разрыв."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har kuni ertalab yana %1$@ ml farqni qisqartirishga yordam beradi."
+          }
+        }
+      }
+    },
+    "Another %1$@ ml each afternoon would help close the gap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another %1$@ ml each afternoon would help close the gap."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё %1$@ мл каждый день после обеда помогут сократить разрыв."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har kuni tushdan keyin yana %1$@ ml farqni qisqartirishga yordam beradi."
+          }
+        }
+      }
+    },
+    "Another %1$@ ml each evening would help close the gap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another %1$@ ml each evening would help close the gap."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё %1$@ мл каждый вечер помогут сократить разрыв."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har kuni kechqurun yana %1$@ ml farqni qisqartirishga yordam beradi."
+          }
+        }
+      }
+    },
+    "Every day on goal.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day on goal."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цель — каждый день."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har kuni maqsadga erishildi."
+          }
+        }
+      }
+    },
+    "Your goal on every weekday.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your goal on every weekday."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цель достигнута во все будни."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barcha ish kunlarida maqsadga erishildi."
+          }
+        }
+      }
+    },
+    "Your goal on every weekend day.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your goal on every weekend day."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цель достигнута во все выходные."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barcha dam olish kunlarida maqsadga erishildi."
+          }
+        }
+      }
+    },
+    "Goal met on %1$d days, up from %2$d.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goal met on %#@arg1@, up from %2$d."
+          },
+          "substitutions": {
+            "arg1": {
+              "argNum": 1,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дней с целью: %1$d, на прошлой неделе — %2$d."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maqsadga erishilgan kunlar: %1$d, oldingi haftada — %2$d."
+          }
+        }
+      }
+    },
+    "Your first drink came %1$d minutes earlier than the week before.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Your first drink came %1$d minute earlier than the week before."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Your first drink came %1$d minutes earlier than the week before."
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минуты раньше, чем на прошлой неделе."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минут раньше, чем на прошлой неделе."
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минуту раньше, чем на прошлой неделе."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минуты раньше, чем на прошлой неделе."
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birinchi porsiya oldingi haftadan %1$d daqiqa erta bo‘ldi."
+          }
+        }
+      }
+    },
+    "Your first drink came %1$d minutes later than the week before.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Your first drink came %1$d minute later than the week before."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Your first drink came %1$d minutes later than the week before."
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минуты позже, чем на прошлой неделе."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минут позже, чем на прошлой неделе."
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минуту позже, чем на прошлой неделе."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Первая порция — на %1$d минуты позже, чем на прошлой неделе."
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birinchi porsiya oldingi haftadan %1$d daqiqa kech bo‘ldi."
+          }
+        }
+      }
+    },
+    "Nothing was logged on %1$d days.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Nothing was logged on %1$d day."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Nothing was logged on %1$d days."
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ничего не записано за %1$d дня."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ничего не записано за %1$d дней."
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ничего не записано за %1$d день."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ничего не записано за %1$d дня."
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d kun hech narsa qayd etilmadi."
+          }
+        }
+      }
+    },
+    "Half your water came before %1$@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Half your water came before %1$@."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Половина воды — до %1$@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suvingizning yarmi soat %1$@ gacha ichildi."
           }
         }
       }

@@ -18,7 +18,7 @@ import Foundation
 /// `nonisolated`, so the switch reads it from off the main actor (rule `43-concurrency`).
 nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
 
-    /// Set A — month view and full history, patterns, personal AI insights, the monthly recap.
+    /// Set A — month view and full history, patterns, personal insights, the monthly recap.
     case understand
 
     /// One thing a set does, as the paywall and the Settings card name it.
@@ -55,7 +55,10 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             switch self {
             case .monthView: "Month view and full history"
             case .patterns: "Your patterns"
-            case .insights: "Personal AI insights"
+            // Never *Apple Intelligence*: Apple's marks are not part of a feature's name, and the model
+            // writes only in English — a Russian or Uzbek user reads WaterBuddy's own sentences (spec
+            // `2026-10-23-insights-design.md` §3.9, the owner's ruling closing #164's naming half).
+            case .insights: "Personal insights"
             case .recap: "A monthly recap"
             }
         }
@@ -64,7 +67,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             switch self {
             case .monthView: "Every day you have logged, a month at a glance"
             case .patterns: "When you drink, weekdays against weekends"
-            case .insights: "Using Apple Intelligence, private on your iPhone"
+            case .insights: "Each week, from your own figures, on your iPhone"
             case .recap: "Your month in one card, yours to share"
             }
         }
@@ -73,7 +76,8 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             switch self {
             case .monthView: "Month view"
             case .patterns: "Patterns"
-            case .insights: "AI insights"
+            // History's own word for the mode, so the card and the switch name it alike.
+            case .insights: "Insights"
             case .recap: nil
             }
         }

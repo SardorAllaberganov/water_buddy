@@ -557,5 +557,9 @@ private struct GlassTabBar: View {
     manager.addLog(amount: 250)
     manager.addLog(amount: 500)
 
-    return RootTabView().environment(manager).environment(PremiumStore(source: .silent()))
+    return RootTabView()
+        .environment(manager)
+        .environment(PremiumStore(source: .silent()))
+        // History reads it; a canvas never reaches Apple's model.
+        .environment(InsightWriter(source: .silent()))
 }

@@ -57,7 +57,7 @@ final class PremiumUITests: XCTestCase {
         // Each row is one element carrying its title and its line. Counted by the whole row's label:
         // XCUITest also lists the row's own title beneath it, which VoiceOver does not stop on
         // (`tasks/lessons.md`, 2026-10-17; the owner's ruling, 2026-10-22).
-        for title in ["Month view and full history", "Your patterns", "Personal AI insights", "A monthly recap"] {
+        for title in ["Month view and full history", "Your patterns", "Personal insights", "A monthly recap"] {
             let row = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", title + ", "))
             XCTAssertEqual(row.count, 1, "\(title) is not one element")
         }
@@ -118,6 +118,43 @@ final class PremiumUITests: XCTestCase {
 
         tapWhenReady(app.buttons["Back to this week"])
         XCTAssertTrue(locked.waitForNonExistence(timeout: 5), "Back to this week left the locked month up")
+        XCTAssertTrue(week.isSelected)
+    }
+
+    /// Step 4 (spec `2026-10-23-insights-design.md` §3.4, §3.11): the switch's third segment, and a free
+    /// user's Insights locked as Month is — *See Premium* opens the paywall, *Back to this week* returns.
+    /// A holder's Insights has no UI test, for the month's reason.
+    @MainActor
+    func testAFreeUsersInsightsAreLockedAndOpenThePaywall() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-WaterBuddyPremium", "YES"]
+        app.launch()
+        completeWelcomeIfShown(app)
+
+        // The first match: run first in the class, straight after the welcome closed, the tap found two
+        // *History* buttons for a moment, and passed alone (the gate of 2026-10-24). The tab bar is not
+        // what this test is for.
+        app.buttons["History"].firstMatch.tap()
+        let week = app.buttons["Week"]
+        let insights = app.buttons["Insights"]
+        XCTAssertTrue(insights.waitForExistence(timeout: 10), "no Insights segment")
+        XCTAssertEqual(app.buttons.matching(identifier: "Insights").count, 1)
+        XCTAssertEqual(insights.value as? String, "Premium")
+        tapWhenReady(insights)
+
+        let locked = app.staticTexts["A few lines each week on how you drank"]
+        XCTAssertTrue(locked.waitForExistence(timeout: 5), "no locked Insights")
+        XCTAssertTrue(insights.isSelected)
+        XCTAssertEqual(count("See Premium", in: app), 1, "See Premium is not one element")
+        tapWhenReady(app.buttons["See Premium"])
+
+        let paywall = app.staticTexts["See how you really drink, and what would help."]
+        XCTAssertTrue(paywall.waitForExistence(timeout: 5), "See Premium opened no paywall")
+        app.buttons["Not now"].tap()
+        XCTAssertTrue(paywall.waitForNonExistence(timeout: 5), "Not now did not close the paywall")
+
+        tapWhenReady(app.buttons["Back to this week"])
+        XCTAssertTrue(locked.waitForNonExistence(timeout: 5), "Back to this week left the locked Insights up")
         XCTAssertTrue(week.isSelected)
     }
 }

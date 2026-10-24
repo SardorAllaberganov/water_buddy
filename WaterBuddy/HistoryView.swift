@@ -230,6 +230,13 @@ struct HistoryView: View {
         (Decimal(millilitres) / 1_000).formatted(.number.precision(.fractionLength(1)).locale(locale))
     }
 
+    /// A week's first and last day as one range in the app's locale — *Oct 11 – 17*, *11–17 окт.* —
+    /// formatted, never computed: the two days are the model's (``WeekInsights/firstDay``), and the
+    /// interval style spells the month once when both days share it.
+    nonisolated static func weekRange(from first: Date, to last: Date, locale: Locale) -> String {
+        (first..<max(first, last)).formatted(.interval.day().month(.abbreviated).locale(locale))
+    }
+
     /// The locale's weekend as weekday numbers, `1` for Sunday — what the month's patterns split the
     /// week at (spec `2026-10-23-patterns-design.md` §3.4).
     ///
@@ -269,6 +276,7 @@ struct HistoryView: View {
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(PremiumStore.self) private var premium
+    @Environment(InsightWriter.self) private var writer
 
     /// The day the week card picked, as an ordinal — `nil` for today. Presentation state, which is
     /// the only kind a view owns (rule `50-views`); leaving the tab resets it to today, when the
@@ -329,6 +337,8 @@ struct HistoryView: View {
 
             if showsMonth {
                 monthRows
+            } else if showsInsights {
+                insightsRows
             } else {
                 weekRows
             }
@@ -341,6 +351,7 @@ struct HistoryView: View {
         // The opened day comes and goes, and Month's rows with the mode (spec §3.8).
         .animation(.smooth(duration: 0.35), value: openedDay)
         .animation(.smooth(duration: 0.35), value: showsMonth)
+        .animation(.smooth(duration: 0.35), value: showsInsights)
         // One point clear of the status bar, and it is not spacing. A scroll view whose top edge
         // meets the safe area's draws its content on up under the status bar; with nothing fixed
         // above the list any more, the rows ran under the clock and the battery — *15:26*
@@ -359,6 +370,8 @@ struct HistoryView: View {
             // A page is built in Week mode: a month a previous visit left the model reading is let go
             // before the refresh would read it again (plan M13).
             if !showsMonth { manager.showMonth(nil) }
+            // And a week's insights, by the same reasoning (spec `2026-10-23-insights-design.md` §3.6).
+            if !showsInsights { manager.showInsights(nil) }
             manager.refresh()
         }
         // The pager keeps a page it has left for the length of its slide, and gives the same page
@@ -366,12 +379,21 @@ struct HistoryView: View {
         // lets go of a month when the page is removed, not at the turn: at the turn it emptied the
         // month on the page sliding away, and a quick return found Month on an empty card (the final
         // review's I1 and I2; the owner's ruling of 2026-10-23, amending spec §3.8 and plan M13).
-        .onDisappear { manager.showMonth(nil) }
-        // Premium bought, or refunded, with Month on screen: the month is read, or let go.
+        .onDisappear {
+            manager.showMonth(nil)
+            manager.showInsights(nil)
+        }
+        // Premium bought, or refunded, with Month or Insights on screen: what it draws is read, or let go.
         .onChange(of: holdsPremium) { _, holds in
-            guard mode == .month else { return }
-            openedDay = nil
-            manager.showMonth(holds ? manager.thisMonth : nil)
+            switch mode {
+            case .week:
+                return
+            case .month:
+                openedDay = nil
+                manager.showMonth(holds ? manager.thisMonth : nil)
+            case .insights:
+                manager.showInsights(holds ? insightsRequest : nil)
+            }
         }
         // Leaving the tab returns the screen to today, and nothing here has to say so: a page
         // is rebuilt each time it is shown (`testHistoryReturnsToTodayWhenItsTabIsLeft`). A
@@ -496,6 +518,18 @@ struct HistoryView: View {
         drawsSwitch && mode == .month
     }
 
+    /// Whether Insights is on screen, as ``showsMonth`` is for Month.
+    private var showsInsights: Bool {
+        drawsSwitch && mode == .insights
+    }
+
+    /// The week Insights asks for: the app's locale's first weekday and weekend, as the month's grid and
+    /// patterns take them — never `Calendar.waterBuddyDay`'s, which is fixed to `en_US_POSIX` (spec
+    /// `2026-10-23-insights-design.md` §3.1).
+    private var insightsRequest: WeekInsights.Request {
+        WeekInsights.Request(firstWeekday: Self.firstWeekday(in: locale), weekend: Self.weekend(in: locale))
+    }
+
     /// The month's opened day, while the shown month holds it and it can be opened.
     private var openedMonthDay: MonthHistory.Day? {
         manager.month?.days.first { $0.summary.dayOrdinal == openedDay && $0.canOpen }
@@ -553,19 +587,87 @@ struct HistoryView: View {
                 }
             }
         } else {
-            LockedMonth { paywall = .history } back: { choose(.week) }
+            LockedPage(kind: .month) { paywall = .history } back: { choose(.week) }
                 .historyRow(bottom: 24)
         }
     }
 
-    /// The switch: Week, or Month — this month on the model's own clock, for a holder alone; a free
-    /// user's Month asks for nothing (spec §3.6).
+    /// Insights: for a holder the heading, then the week's three parts and who wrote them, or the line
+    /// that says what they wait for; for a free user the locked page (spec
+    /// `2026-10-23-insights-design.md` §3.4). A week never read draws the heading alone.
+    @ViewBuilder
+    private var insightsRows: some View {
+        if holdsPremium {
+            InsightsHeading(insights: manager.insights)
+                .historyRow(top: 6, bottom: 2)
+
+            if let insights = manager.insights {
+                if let content = insights.content {
+                    insightPanes(insights, content)
+                } else {
+                    InsightsPending(nextWeek: insights.nextWeek)
+                        .historyRow(bottom: 24)
+                }
+            }
+        } else {
+            LockedPage(kind: .insights) { paywall = .history } back: { choose(.week) }
+                .historyRow(bottom: 24)
+        }
+    }
+
+    /// The week's parts: Apple's model's note where it wrote one this run and it was accepted, the app's
+    /// own sentences otherwise — the facts the model is handed are those same sentences, so it can say
+    /// nothing the page would not (§3.5). Only an English page is handed to it.
+    @ViewBuilder
+    private func insightPanes(_ insights: WeekInsights, _ content: WeekInsights.Content) -> some View {
+        let page = InsightCopy.page(for: content, vessels: manager.servings, in: strings, locale: locale)
+        let english = InsightWriter.speaksEnglish(manager.language)
+        let note = english ? writer.note(for: page) : nil
+        let shown = note ?? page
+        let footer: InsightFooter.Source = note != nil ? .model : english && writer.isWriting(page) ? .writing : .app
+        let glyph = content.suggestion?.vessel(in: manager.servings).flatMap { slot in
+            vesselSlots.indices.contains(slot) ? vesselSlots[slot].symbol : nil
+        }
+
+        OneThingPane(
+            range: Self.weekRange(from: insights.firstDay, to: insights.lastDay, locale: locale),
+            headline: shown.oneThing,
+            detail: shown.detail,
+            glyph: glyph
+        )
+            .historyRow()
+            // The model's words arrive in place of the app's, once — scoped to who wrote them, never a
+            // bare `withAnimation` (rule `50-views`); a once-per-change fade, so no Reduce Motion branch.
+            .animation(.smooth(duration: 0.35), value: footer)
+            // Keyed on the facts, so a new week, a moved goal or an edited vessel asks again; a page the
+            // model may not have asks nothing (``InsightWriter/write(_:language:)``).
+            .task(id: english ? page : nil) {
+                await writer.write(page, language: manager.language)
+            }
+        if let working = shown.working {
+            InsightPane(kind: .working, text: working)
+                .historyRow()
+                .animation(.smooth(duration: 0.35), value: footer)
+        }
+        if let worthKnowing = shown.worthKnowing {
+            InsightPane(kind: .worthKnowing, text: worthKnowing)
+                .historyRow()
+                .animation(.smooth(duration: 0.35), value: footer)
+        }
+        InsightFooter(source: footer)
+            .historyRow(bottom: 24)
+            .animation(.smooth(duration: 0.35), value: footer)
+    }
+
+    /// The switch: Week, Month or Insights — this month on the model's own clock, or the last finished
+    /// week at the locale's first weekday, for a holder alone; a free user's asks for nothing (spec §3.6).
     private func choose(_ chosen: HistoryMode) {
         guard chosen != mode else { return }
         switches += 1
         mode = chosen
         openedDay = nil
         manager.showMonth(chosen == .month && holdsPremium ? manager.thisMonth : nil)
+        manager.showInsights(chosen == .insights && holdsPremium ? insightsRequest : nil)
     }
 
     /// An arrow: the month it names, which the shown month says exists.
@@ -1269,9 +1371,10 @@ private struct LetterCentres: PreferenceKey {
 
 // MARK: - The month
 
-/// Week or Month — History's two modes (spec `2026-10-22-month-view-design.md` §3.2).
+/// Week, Month or Insights — History's three modes (spec `2026-10-22-month-view-design.md` §3.2; spec
+/// `2026-10-23-insights-design.md` §3.4 adds the third). Month and Insights are Premium's.
 private enum HistoryMode {
-    case week, month
+    case week, month, insights
 }
 
 /// History's own measures for the month.
@@ -1287,11 +1390,12 @@ private enum MonthStyle {
     static let lockedHeight: CGFloat = 392
 }
 
-/// *Week · Month*: two buttons on one frosted capsule, the shown one marked as a selected slot is —
-/// `LiquidGlass.Selection`'s fill and rim, never solid white, which would read as the primary surface
-/// the locked month's *See Premium* is (spec §3.8, rule `60-design-system`).
+/// *Week · Month · Insights*: three buttons on one frosted capsule, the shown one marked as a selected
+/// slot is — `LiquidGlass.Selection`'s fill and rim, never solid white, which would read as the primary
+/// surface the locked pages' *See Premium* is (spec §3.8, rule `60-design-system`).
 ///
-/// For a free user Month carries a lock, drawn and not spoken: its value says *Premium* (spec §3.9).
+/// For a free user Month and Insights each carry a lock, drawn and not spoken: its value says *Premium*
+/// (spec §3.9).
 private struct ModeSwitch: View {
 
     @Environment(\.strings) private var strings
@@ -1301,19 +1405,34 @@ private struct ModeSwitch: View {
     let choose: (HistoryMode) -> Void
 
     var body: some View {
+        // Three labels drawn whole: where they overflow the row — the accessibility sizes, where the third
+        // was cut to *Insig…* (the insights walk's W2) — the row scrolls rather than any label being cut
+        // or shrunk (rule `65-accessibility`).
+        ViewThatFits(in: .horizontal) {
+            segments
+            ScrollView(.horizontal, showsIndicators: false) {
+                segments
+            }
+            // Elevated glass inside a scroll view keeps its shadows (rule `60-design-system`).
+            .scrollClipDisabled()
+        }
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var segments: some View {
         HStack(spacing: 4) {
             segment(.week, Text("Week", bundle: strings))
             segment(.month, Text("Month", bundle: strings))
+            segment(.insights, Text("Insights", bundle: strings))
         }
         .padding(3)
         // The screen's own pair: sibling panes on one screen share one (rule `60-design-system`).
         .liquidGlass(in: Capsule(), density: .frosted, elevation: .raised)
-        .padding(.horizontal, HistoryView.margin)
     }
 
     private func segment(_ choice: HistoryMode, _ title: Text) -> some View {
         let isSelected = choice == mode
-        let isLocked = choice == .month && locked
+        let isLocked = choice != .week && locked
 
         return Button {
             choose(choice)
@@ -1328,9 +1447,10 @@ private struct ModeSwitch: View {
             }
             .font(.subheadline.weight(isSelected ? .bold : .semibold))
             .foregroundStyle(.white)
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-            // The whole half is the target (rule `65-accessibility`).
+            // Its whole width, so the switch's ideal size is honest and it scrolls instead of cutting it.
+            .fixedSize()
+            .padding(.horizontal, 10)
+            // The whole third is the target (rule `65-accessibility`).
             .frame(maxWidth: .infinity, minHeight: HistoryView.dayTapFloor)
             .background {
                 Capsule()
@@ -2093,12 +2213,238 @@ private struct PatternsPending: View {
     }
 }
 
-/// What a free user meets in Month: a drawn month — not theirs, and never read (spec §3.6) — blurred
-/// under a card that offers Premium, and the promise under it.
-private struct LockedMonth: View {
+// MARK: - Insights
+
+/// *Insights*, on the aurora at *Patterns*' size and weight — 5.73:1 there — with **no line drawn under
+/// it**: the patterns' white subtitle read 4.17 where the aurora's cyan light passes (#171). The week's
+/// range is the heading's spoken value, and drawn inside the first pane (spec
+/// `2026-10-23-insights-design.md` §3.4, §3.8).
+private struct InsightsHeading: View {
+
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    let insights: WeekInsights?
+
+    var body: some View {
+        Text("Insights", bundle: strings)
+            .font(.title3.weight(.bold))
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .legibleOnBackdrop()
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityValue(Text(verbatim: range))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var range: String {
+        insights.map { HistoryView.weekRange(from: $0.firstDay, to: $0.lastDay, locale: locale) } ?? ""
+    }
+}
+
+/// *The one thing* — the week's largest shortfall and its suggestion, or its best improvement and the
+/// average day — on a frosted, raised pane, the screen's pair (rule `60-design-system`). The suggested
+/// vessel's glyph stands before a suggestion, drawn and not spoken: the sentence names its amount.
+///
+/// **One element**: its title, and the range and its sentences as the value (spec §3.8).
+private struct OneThingPane: View {
 
     @Environment(\.strings) private var strings
 
+    let range: String
+    let headline: String
+    let detail: String?
+    let glyph: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Offered the row's whole width; it chooses among whole layouts (`tasks/lessons.md`). The two
+            // texts are fixed, not the row, so the spacer still carries the range to the trailing edge
+            // (the walk's W1).
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    title
+                        .fixedSize()
+                    Spacer(minLength: 8)
+                    Text(verbatim: range)
+                        .fixedSize()
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    title
+                    Text(verbatim: range)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.white.opacity(0.9))
+
+            Text(verbatim: headline)
+                .font(.title3.weight(.bold))
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let detail {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let glyph {
+                        Image(systemName: glyph)
+                            .accessibilityHidden(true)
+                    }
+                    Text(verbatim: detail)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .font(.body)
+            }
+        }
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("The one thing", bundle: strings))
+        .accessibilityValue(Text(verbatim: ([range, headline] + [detail].compactMap { $0 }).joined(separator: " ")))
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var title: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            // The paywall's glyph for the feature, white (step 1's R4).
+            Image(systemName: PremiumSet.Feature.insights.symbol)
+                .accessibilityHidden(true)
+            Text("The one thing", bundle: strings)
+        }
+    }
+}
+
+/// *What is working* or *Worth knowing*: a glyph, the title and one sentence on the screen's pane.
+/// **One element**: the title, its sentence the value (spec §3.8).
+private struct InsightPane: View {
+
+    enum Kind {
+        case working, worthKnowing
+    }
+
+    @Environment(\.strings) private var strings
+
+    let kind: Kind
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Image(systemName: kind == .working ? "checkmark.circle" : "clock")
+                .font(.body.weight(.semibold))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 3) {
+                title
+                    .font(.subheadline.weight(.bold))
+                Text(verbatim: text)
+                    .font(.subheadline)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(.white)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(Text(verbatim: text))
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var title: Text {
+        switch kind {
+        case .working: Text("What is working", bundle: strings)
+        case .worthKnowing: Text("Worth knowing", bundle: strings)
+        }
+    }
+}
+
+/// Who wrote the page — WaterBuddy, or Apple's on-device model, or *Writing…* while the model is at it
+/// — and *Not medical advice*, on a pane rather than the aurora, for #171's reason (spec §3.4).
+private struct InsightFooter: View {
+
+    /// Who wrote the sentences on screen.
+    enum Source: Equatable {
+        case app, writing, model
+    }
+
+    @Environment(\.strings) private var strings
+
+    let source: Source
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Image(systemName: "lock.fill")
+                .accessibilityHidden(true)
+            line
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .font(.footnote)
+        .foregroundStyle(.white)
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .combine)
+        .padding(.horizontal, HistoryView.margin)
+    }
+
+    private var line: Text {
+        switch source {
+        case .app: Text("Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.", bundle: strings)
+        case .writing: Text("Writing…", bundle: strings)
+        case .model: Text("Written by Apple's on-device model from your own figures, on your iPhone. Not medical advice.", bundle: strings)
+        }
+    }
+}
+
+/// A week that does not qualify yet: what insights need, and when the week now running finishes — so
+/// the page never silently vanishes (spec §3.4).
+private struct InsightsPending: View {
+
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    let nextWeek: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(strings.localized("Insights need %1$d days of water in a week", WeekInsights.minimumDays, locale: locale))
+                .font(.subheadline)
+            Text(strings.localized(
+                "Next on %1$@",
+                nextWeek.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(locale)),
+                locale: locale
+            ))
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.9))
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .foregroundStyle(.white)
+        .liquidGlass(density: .frosted, elevation: .raised)
+        .accessibilityElement(children: .combine)
+        .padding(.horizontal, HistoryView.margin)
+    }
+}
+
+/// What a free user meets in Month or Insights: a drawn month or a drawn insight — not theirs, and never
+/// read (spec §3.6) — blurred under a card that offers Premium, and the promise under it. One view for
+/// both, so the two locked pages cannot drift apart (spec `2026-10-23-insights-design.md` §3.4).
+private struct LockedPage: View {
+
+    /// Which paid mode is locked.
+    enum Kind {
+        case month, insights
+    }
+
+    @Environment(\.strings) private var strings
+
+    let kind: Kind
     let open: () -> Void
     let back: () -> Void
 
@@ -2110,11 +2456,14 @@ private struct LockedMonth: View {
                 // Behind the card and sized by it, so it stands round the card at every text size.
                 .background {
                     VStack(spacing: 14) {
-                        // Where a month's name would stand — drawn, never read.
+                        // Where a month's name or a week's would stand — drawn, never read.
                         Capsule()
                             .fill(.white.opacity(0.28))
                             .frame(width: MonthStyle.drawnTitleBar.width, height: MonthStyle.drawnTitleBar.height)
-                        DrawnMonth(pattern: true, weekSpacing: MonthStyle.drawnWeekSpacing)
+                        switch kind {
+                        case .month: DrawnMonth(pattern: true, weekSpacing: MonthStyle.drawnWeekSpacing)
+                        case .insights: DrawnInsight()
+                        }
                     }
                         .blur(radius: 5)
                         .opacity(0.75)
@@ -2130,14 +2479,27 @@ private struct LockedMonth: View {
 
     private var card: some View {
         VStack(spacing: 10) {
-            Image(systemName: "calendar")
-                // White, as the Settings card's glyph is: cyan read 2.88:1 there (step 1's walk, R4).
+            // The Settings card's glyph for the feature (`PremiumSet.Feature.symbol`), white as it is:
+            // cyan read 2.88:1 there (step 1's walk, R4).
+            Image(systemName: kind == .month ? PremiumSet.Feature.monthView.symbol : PremiumSet.Feature.insights.symbol)
                 .font(.title2.weight(.semibold))
                 .accessibilityHidden(true)
-            Text("Your whole month at a glance", bundle: strings)
+            Group {
+                switch kind {
+                case .month: Text("Your whole month at a glance", bundle: strings)
+                case .insights: Text("A few lines each week on how you drank", bundle: strings)
+                }
+            }
                 .font(.title3.weight(.bold))
                 .accessibilityAddTraits(.isHeader)
-            Text("Every day you have logged is kept. Premium shows it as months, with your patterns and a recap.", bundle: strings)
+            Group {
+                switch kind {
+                case .month:
+                    Text("Every day you have logged is kept. Premium shows it as months, with your patterns and a recap.", bundle: strings)
+                case .insights:
+                    Text("Premium writes them from your own figures, on your iPhone, with one thing to try.", bundle: strings)
+                }
+            }
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.92))
             Button(action: open) {
@@ -2225,6 +2587,46 @@ private struct DrawnMonth: View {
     private func colour(at index: Int) -> Color {
         guard pattern, index < 28 else { return .white.opacity(0.10) }
         return [2, 6].contains(index % 9) ? .white.opacity(0.45) : Aurora.cyan
+    }
+}
+
+/// An insight drawn, not read: a page's lines as bars, with no word, figure or date — the locked
+/// Insights' backdrop (spec `2026-10-23-insights-design.md` §3.4). No pane of its own; its caller hides
+/// it from VoiceOver.
+private struct DrawnInsight: View {
+
+    /// Each line's share of the width, its height and its strength — a label, the headline's two lines
+    /// and the detail's, then two shorter parts.
+    private static let parts: [[(width: CGFloat, height: CGFloat, opacity: Double)]] = [
+        [(0.4, 10, 0.5), (0.9, 16, 0.55), (0.7, 16, 0.55), (0.85, 11, 0.3), (0.6, 11, 0.3)],
+        [(0.45, 13, 0.45), (0.8, 11, 0.3)],
+        [(0.4, 13, 0.45), (0.75, 11, 0.3)],
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            ForEach(Self.parts.indices, id: \.self) { part in
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(Self.parts[part].indices, id: \.self) { line in
+                        bar(Self.parts[part][line], lead: part == 0 && line == 0)
+                    }
+                }
+            }
+        }
+        // Inside the card's own 16-pt inset, so the lines' ends show beside the card as the locked month's
+        // rings do; at 28 the card hid every one (the insights walk's W4).
+        .padding(.horizontal, 8)
+        .padding(.top, 6)
+    }
+
+    /// One line, its leading part of the width; the first label cyan, as a week of water would mark it.
+    private func bar(_ line: (width: CGFloat, height: CGFloat, opacity: Double), lead: Bool) -> some View {
+        GeometryReader { proxy in
+            Capsule()
+                .fill(lead ? Aurora.cyan : .white.opacity(line.opacity))
+                .frame(width: proxy.size.width * line.width)
+        }
+        .frame(height: line.height)
     }
 }
 
@@ -2991,6 +3393,8 @@ private func previewManager(named name: String) -> DataManager {
         .background { AuroraBackground() }
         .environment(manager)
         .environment(PremiumStore(source: .silent()))
+        // Never Apple's model on a canvas: the app's own sentences, always.
+        .environment(InsightWriter(source: .silent()))
 }
 
 #Preview("Nothing logged") {
@@ -2998,6 +3402,7 @@ private func previewManager(named name: String) -> DataManager {
         .background { AuroraBackground() }
         .environment(previewManager(named: "preview.waterbuddy.history.empty"))
         .environment(PremiumStore(source: .silent()))
+        .environment(InsightWriter(source: .silent()))
 }
 
 #Preview("Month, held") {
@@ -3019,4 +3424,5 @@ private func previewManager(named name: String) -> DataManager {
         .background { AuroraBackground() }
         .environment(manager)
         .environment(PremiumStore(source: source))
+        .environment(InsightWriter(source: .silent()))
 }

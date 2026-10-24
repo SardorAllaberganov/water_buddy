@@ -161,6 +161,36 @@ private let historyKeys = [
     "First drink, usually",
     "Last drink, usually",
     "Patterns need %1$d days of water",
+    "Insights",
+    "The one thing",
+    "What is working",
+    "Worth knowing",
+    "Writing…",
+    "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.",
+    "Written by Apple's on-device model from your own figures, on your iPhone. Not medical advice.",
+    "Insights need %1$d days of water in a week",
+    "Next on %1$@",
+    "A few lines each week on how you drank",
+    "Premium writes them from your own figures, on your iPhone, with one thing to try.",
+    "Weekends ran %1$@ ml a day below weekdays.",
+    "Weekdays ran %1$@ ml a day below weekends.",
+    "%1$@ ml a day less than the week before.",
+    "%1$@ ml a day more than the week before.",
+    "An average day was %1$@ ml short of your goal.",
+    "An average day: %1$@ ml, against a goal of %2$@ ml.",
+    "Another %1$@ ml on each weekend day would help close the gap.",
+    "Another %1$@ ml on each weekday would help close the gap.",
+    "Another %1$@ ml each morning would help close the gap.",
+    "Another %1$@ ml each afternoon would help close the gap.",
+    "Another %1$@ ml each evening would help close the gap.",
+    "Every day on goal.",
+    "Your goal on every weekday.",
+    "Your goal on every weekend day.",
+    "Goal met on %1$d days, up from %2$d.",
+    "Your first drink came %1$d minutes earlier than the week before.",
+    "Your first drink came %1$d minutes later than the week before.",
+    "Nothing was logged on %1$d days.",
+    "Half your water came before %1$@.",
 ]
 
 /// The welcome's own strings (spec 2026-10-14 §8). The keys it shares with Settings or the reminder
@@ -243,14 +273,14 @@ private let premiumKeys = [
     "Every day you have logged, a month at a glance",
     "Your patterns",
     "When you drink, weekdays against weekends",
-    "Personal AI insights",
-    "Using Apple Intelligence, private on your iPhone",
+    "Personal insights",
+    "Each week, from your own figures, on your iPhone",
     "A monthly recap",
     "Your month in one card, yours to share",
     "New Premium features arrive in updates, included.",
     "Month view",
     "Patterns",
-    "AI insights",
+    "Insights",
     "Done",
     "No purchases to restore.",
 ]
@@ -976,6 +1006,11 @@ private let countedKeys = [
     CountedKey(key: "Down %1$d millilitres on the month before", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$d millilitres a day", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "Patterns need %1$d days of water", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Insights need %1$d days of water in a week", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Goal met on %1$d days, up from %2$d.", arity: 2, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Your first drink came %1$d minutes earlier than the week before.", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Your first drink came %1$d minutes later than the week before.", arity: 1, counted: [0], bundles: ["app"]),
+    CountedKey(key: "Nothing was logged on %1$d days.", arity: 1, counted: [0], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — %2$lld millilitres to go.", arity: 2,
                counted: [0, 1], bundles: ["app"]),
     CountedKey(key: "%1$lld millilitres so far today — you've reached your goal.", arity: 1,
@@ -1104,6 +1139,41 @@ private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: L
             + " с водой"
     case ("Patterns need %1$d days of water", "uz"):
         return "Odatlar uchun suv ichilgan \(f[0]) kun kerak"
+
+    case ("Insights need %1$d days of water in a week", "en"):
+        return "Insights need \(f[0]) " + english(n[0], "day", "days") + " of water in a week"
+    case ("Insights need %1$d days of water in a week", "ru"):
+        // «Нужен» agrees with a singular «день», as the patterns' line does.
+        return russian(n[0], "Для советов нужен \(f[0]) день", "Для советов нужно \(f[0]) дня", "Для советов нужно \(f[0]) дней")
+            + " с водой за неделю"
+    case ("Insights need %1$d days of water in a week", "uz"):
+        return "Tavsiyalar uchun haftada suv ichilgan \(f[0]) kun kerak"
+
+    case ("Goal met on %1$d days, up from %2$d.", "en"):
+        return "Goal met on \(f[0]) " + english(n[0], "day", "days") + ", up from \(f[1])."
+    // A label and its count: no noun stands beside the figure, so no form to take.
+    case ("Goal met on %1$d days, up from %2$d.", "ru"): return "Дней с целью: \(f[0]), на прошлой неделе — \(f[1])."
+    case ("Goal met on %1$d days, up from %2$d.", "uz"): return "Maqsadga erishilgan kunlar: \(f[0]), oldingi haftada — \(f[1])."
+
+    case ("Your first drink came %1$d minutes earlier than the week before.", "en"):
+        return "Your first drink came \(f[0]) " + english(n[0], "minute", "minutes") + " earlier than the week before."
+    case ("Your first drink came %1$d minutes earlier than the week before.", "ru"):
+        return "Первая порция — на \(f[0]) " + russian(n[0], "минуту", "минуты", "минут") + " раньше, чем на прошлой неделе."
+    case ("Your first drink came %1$d minutes earlier than the week before.", "uz"):
+        return "Birinchi porsiya oldingi haftadan \(f[0]) daqiqa erta bo‘ldi."
+
+    case ("Your first drink came %1$d minutes later than the week before.", "en"):
+        return "Your first drink came \(f[0]) " + english(n[0], "minute", "minutes") + " later than the week before."
+    case ("Your first drink came %1$d minutes later than the week before.", "ru"):
+        return "Первая порция — на \(f[0]) " + russian(n[0], "минуту", "минуты", "минут") + " позже, чем на прошлой неделе."
+    case ("Your first drink came %1$d minutes later than the week before.", "uz"):
+        return "Birinchi porsiya oldingi haftadan \(f[0]) daqiqa kech bo‘ldi."
+
+    case ("Nothing was logged on %1$d days.", "en"):
+        return "Nothing was logged on \(f[0]) " + english(n[0], "day", "days") + "."
+    case ("Nothing was logged on %1$d days.", "ru"):
+        return "Ничего не записано за \(f[0]) " + russian(n[0], "день", "дня", "дней") + "."
+    case ("Nothing was logged on %1$d days.", "uz"): return "\(f[0]) kun hech narsa qayd etilmadi."
 
     case ("%1$lld millilitres so far today — %2$lld millilitres to go.", "en"):
         return "\(f[0]) \(ml(0)) so far today — \(f[1]) \(ml(1)) to go."

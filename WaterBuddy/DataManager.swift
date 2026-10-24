@@ -214,10 +214,15 @@ final class DataManager {
     @ObservationIgnored private var storedStreak = 0
     @ObservationIgnored private var storedMonth: MonthHistory?
     @ObservationIgnored private var storedMonthLogs: [Int: [WaterLog]] = [:]
+    @ObservationIgnored private var storedInsights: WeekInsights?
 
     /// The month History has asked for (``showMonth(_:)``), as the ordinal of its 1st — `nil` for none.
     /// Not observed: what is drawn is ``month``.
     @ObservationIgnored private var wantedMonth: Int?
+
+    /// The week History's Insights has asked for (``showInsights(_:)``) — `nil` for none. Not observed:
+    /// what is drawn is ``insights``.
+    @ObservationIgnored private var wantedInsights: WeekInsights.Request?
 
     /// The run of closed days — every day before today — as last counted, with what it was counted
     /// under: the day it was today, the goal and the calendar's zone (``readClosedRun(at:)``).
@@ -288,8 +293,9 @@ final class DataManager {
             rescheduleRemindersNow()
             // The goal is half of "a day that reached it", for every day the streak counts.
             republishStreak()
-            // And for every day the shown month judges (spec §3.5).
+            // And for every day the shown month judges (spec §3.5), and the week's insights.
             republishMonth()
+            republishInsights()
         }
     }
 
@@ -456,6 +462,21 @@ final class DataManager {
     var monthLogs: [Int: [WaterLog]] {
         access(keyPath: \.monthLogs)
         return storedMonthLogs
+    }
+
+    /// The last finished week's insights, as History's Insights draws them, or `nil` while none is asked
+    /// for (``showInsights(_:)``).
+    ///
+    /// Derived, never stored: ``WeekInsights/make(rows:request:firstServing:goal:now:calendar:)`` over the
+    /// rows, republished from the sites that republish ``month`` — a mutation, a refresh, the day
+    /// turning, the goal moving — and only while asked for (spec `2026-10-23-insights-design.md` §3.6).
+    /// Not from the `servings` setter: the suggestion's vessel is chosen when drawn.
+    ///
+    /// **Equality-guarded**, like ``month``. **A failed read leaves it as it stands.** `nil` wherever
+    /// ``role`` does not draw history. Read-only — a consequence of the rows, never an input.
+    var insights: WeekInsights? {
+        access(keyPath: \.insights)
+        return storedInsights
     }
 
     /// The ordinal of the 1st of this month, on this model's clock and calendar — what History asks for
@@ -1207,6 +1228,52 @@ final class DataManager {
         withMutation(keyPath: \.month) { storedMonth = month }
     }
 
+    /// Asks for the last finished week's insights, by the app's locale's first weekday and weekend, or
+    /// for none.
+    ///
+    /// History's one call into the insights (spec `2026-10-23-insights-design.md` §3.6): when Insights is
+    /// chosen by a holder, and with `nil` when Week or Month is chosen, the page is removed or Premium
+    /// stops being held — ``showMonth(_:)``'s lifecycle. **It writes neither store**, rings no doorbell and
+    /// reschedules nothing. With `nil` the insights go quiet, so a later Insights never draws a stale week
+    /// first.
+    func showInsights(_ request: WeekInsights.Request?) {
+        wantedInsights = request
+        guard request != nil else {
+            if storedInsights != nil {
+                withMutation(keyPath: \.insights) { storedInsights = nil }
+            }
+            return
+        }
+        republishInsights()
+    }
+
+    /// Works the wanted week's insights out from the rows and publishes them if they moved.
+    ///
+    /// **Two reads**, as ``republishMonth()``'s: the rows from the week before's first day to the first
+    /// day of the week now running, and the first serving ever. **Either failing returns** and leaves
+    /// ``insights`` as it stands: an empty week is indistinguishable from a user who never drank.
+    ///
+    /// Behind `role.drawsHistory` for ``republishHistory()``'s reason — cost, not correctness — and a no-op
+    /// while none is wanted.
+    private func republishInsights() {
+        guard Self.role.drawsHistory, let wanted = wantedInsights else { return }
+        let instant = now()
+        guard let interval = WeekInsights.interval(of: wanted, now: instant, calendar: calendar),
+              let rows = readLogs(from: interval.start, to: interval.end),
+              let oldest = readOldestLog(),
+              let insights = WeekInsights.make(
+                  rows: rows,
+                  request: wanted,
+                  firstServing: oldest.first?.timestamp,
+                  goal: storedDailyGoal,
+                  now: instant,
+                  calendar: calendar
+              ),
+              insights != storedInsights
+        else { return }
+        withMutation(keyPath: \.insights) { storedInsights = insights }
+    }
+
     /// The oldest serving in the store as a one-row read: `nil` when the store could not be read, empty
     /// when it holds none — never the same thing (``fetch(_:)``'s ruling). Its own descriptor because
     /// ``fetch(_:)`` sorts newest first (plan M10).
@@ -1298,8 +1365,10 @@ final class DataManager {
             saved = false
         }
         recomputeTodayAndTheWeek()
-        // Every path that changes a row ends here, so the shown month hears of each.
+        // Every path that changes a row ends here, so the shown month hears of each, and the week's
+        // insights.
         republishMonth()
+        republishInsights()
         return saved
     }
 
@@ -1442,8 +1511,9 @@ final class DataManager {
         guard resetIfNeeded() else { return }
         republishTodaysLogs()
         republishHistory()
-        // A month that ends on screen stays shown, and turns past (spec §3.7).
+        // A month that ends on screen stays shown, and turns past (spec §3.7); a new week finishes one.
         republishMonth()
+        republishInsights()
     }
 
     /// Clears today's total unconditionally, for a user-facing "start over" action.
@@ -1492,6 +1562,8 @@ final class DataManager {
         republishHistory()
         if republishingMonth {
             republishMonth()
+            // The insights read with the month, for its reason: a mutation's save republishes them.
+            republishInsights()
         }
 
         // The backstop for the widget. `AddWaterIntent` reconciles reminders itself, but whether an
@@ -2962,8 +3034,9 @@ extension MonthPatterns {
     }
 
     /// The median of `minutes` — the earlier of the middle two for an even count, so no time is named
-    /// that no day had — rounded to five minutes and held inside the day (spec §3.5).
-    nonisolated private static func usual(_ minutes: [Int]) -> Int {
+    /// that no day had — rounded to five minutes and held inside the day (spec §3.5). File-private, not
+    /// private: ``WeekInsights`` reads a week's usual first drink the same way.
+    nonisolated fileprivate static func usual(_ minutes: [Int]) -> Int {
         let sorted = minutes.sorted()
         guard !sorted.isEmpty else { return 0 }
         let median = sorted[(sorted.count - 1) / 2]
@@ -2975,17 +3048,396 @@ extension MonthPatterns {
     /// forward — comes back as the next time that day has (`.nextTime`, the call's default), so a usual
     /// 02:15 would draw as 03:00; a time the calendar cannot place at all draws as the day's start
     /// rather than trapping.
-    nonisolated private static func instant(atMinute minute: Int, on day: Date, in calendar: Calendar) -> Date {
+    nonisolated fileprivate static func instant(atMinute minute: Int, on day: Date, in calendar: Calendar) -> Date {
         calendar.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: day) ?? day
     }
 
-    nonisolated private static func saturating(_ running: Int, _ amount: Int, at ceiling: Int) -> Int {
+    // File-private, with `usual` and `instant`, so ``WeekInsights`` saturates and formats as the month
+    // does rather than keeping a third copy (#172's M9).
+    nonisolated fileprivate static func saturating(_ running: Int, _ amount: Int, at ceiling: Int) -> Int {
         let (sum, overflowed) = running.addingReportingOverflow(amount)
         return overflowed ? ceiling : min(sum, ceiling)
     }
 
-    nonisolated private static func saturatedSum(_ values: [Int]) -> Int {
+    nonisolated fileprivate static func saturatedSum(_ values: [Int]) -> Int {
         values.reduce(0) { saturating($0, $1, at: .max) }
+    }
+}
+
+// MARK: - A week's insights
+
+/// The last finished week, against the week before: what History's Insights says (spec
+/// `2026-10-23-insights-design.md` §3.1 to §3.3).
+///
+/// **At file scope in this file, for ``MonthPatterns``' reason**: ``DataManager`` publishes it, and every
+/// target that compiles `DataManager.swift` must see the type, though only the app draws it. It is
+/// derived on every read and stored nowhere.
+///
+/// **The app decides; Apple's model only words it.** Every figure, every choice of what to say and the
+/// suggestion are worked out here, the same on every phone. `InsightCopy` turns this into the app's own
+/// sentences, and `InsightWriter` may hand those — never this value, never a row — to the on-device
+/// model to be reworded (spec §3.5). So the model cannot choose a different finding, or see anything
+/// the page would not show.
+///
+/// **The week is the last finished calendar week**, from the app's locale's first weekday, which History
+/// hands in (``Request``) because the model's calendar is fixed to `en_US_POSIX`. It changes at midnight
+/// as a new week starts. **Counted days** are a week's days on or after the first serving's, as the
+/// month's first month counts. It says something once four of them hold water (``minimumDays``), and
+/// compares with the week before only when that week does too. Every day is judged against the current
+/// goal, as everything in History is.
+///
+/// **A difference is said only at a tenth of the goal or more, never under 50 ml** (``threshold(goal:)``),
+/// and every figure is rounded to 50 ml (``rounded(_:)``), so neither the app nor the model sounds more
+/// exact than a week of servings is. Days and times are the wall clock's (rule `30-rollover`).
+nonisolated struct WeekInsights: Sendable, Equatable {
+
+    /// What History asks with: its locale's first weekday and weekend days, `1` for Sunday
+    /// (`HistoryView.firstWeekday(in:)` and `HistoryView.weekend(in:)`).
+    nonisolated struct Request: Sendable, Equatable {
+        let firstWeekday: Int
+        let weekend: Set<Int>
+    }
+
+    /// A part of the day on the wall clock: before noon, noon to five, from five.
+    nonisolated enum Part: Sendable, Hashable, CaseIterable {
+        case morning, afternoon, evening
+
+        /// The part holding a wall-clock minute.
+        nonisolated init(minute: Int) {
+            self = minute < 12 * 60 ? .morning : minute < 17 * 60 ? .afternoon : .evening
+        }
+    }
+
+    /// When a suggestion asks for the extra water.
+    nonisolated enum When: Sendable, Hashable {
+        case weekendDays
+        case weekdays
+        case each(Part)
+    }
+
+    /// One more serving where the week fell short.
+    nonisolated struct Suggestion: Sendable, Hashable {
+        /// The shortfall a day, in millilitres and unrounded — what the vessel is chosen against.
+        let gap: Int
+        let when: When
+
+        /// The slot in `amounts` — the user's vessels, ``DataManager/servings`` — nearest the gap, a tie
+        /// to the smaller; `nil` for none. Chosen when drawn, so an edited vessel is followed without a
+        /// re-read (spec §3.3).
+        nonisolated func vessel(in amounts: [Int]) -> Int? {
+            amounts.indices.min { left, right in
+                let near = abs(amounts[left] - gap), far = abs(amounts[right] - gap)
+                return near != far ? near < far : amounts[left] < amounts[right]
+            }
+        }
+    }
+
+    /// One thing the week says, with its figures — already rounded where they are millilitres.
+    nonisolated enum Finding: Sendable, Hashable {
+        // Shortfalls: the one thing, when there is one.
+        case weekendsLower(Int)
+        case weekdaysLower(Int)
+        case lessThanBefore(Int)
+        case shortOfGoal(Int)
+        // Improvements: what is working, or the one thing when nothing fell short.
+        case everyDayMet
+        case everyWeekdayMet
+        case everyWeekendDayMet
+        case moreDaysMet(Int, before: Int)
+        case moreThanBefore(Int)
+        case earlierStart(minutes: Int)
+        case daysMet(Int, of: Int)
+        // Worth knowing.
+        case emptyDays(Int)
+        case laterStart(minutes: Int)
+        /// The whole hour by which half the week's water was in, as an instant on the week's first day
+        /// — **for formatting and nothing else**, as ``MonthPatterns/firstDrinkAt`` is.
+        case halfBy(Date)
+        // The average day against the goal: an improvement's detail, or the one thing on its own.
+        case average(Int, goal: Int)
+    }
+
+    /// What a qualifying week says: the board's three parts, a part with nothing to say left out.
+    nonisolated struct Content: Sendable, Equatable {
+        let oneThing: Finding
+        /// A shortfall's suggestion; `nil` under an improvement.
+        let suggestion: Suggestion?
+        /// The average day, under an improvement.
+        let detail: Finding?
+        let working: Finding?
+        let worthKnowing: Finding?
+    }
+
+    /// How many counted days of a week must hold water before it says anything (spec §3.1).
+    nonisolated static let minimumDays = 4
+
+    /// How far the usual first drink must move, in minutes, to be said.
+    nonisolated static let movedStart = 30
+
+    /// The week's first day and its last — **for formatting the range and nothing else**.
+    let firstDay: Date
+    let lastDay: Date
+
+    /// The first day of next week: when the week now running finishes, which the pending line names.
+    let nextWeek: Date
+
+    /// What the week says, or `nil` while it does not qualify.
+    let content: Content?
+
+    /// The least difference worth saying: a tenth of the goal, never under 50 ml.
+    nonisolated static func threshold(goal: Int) -> Int {
+        max(max(goal, 1) / 10, 50)
+    }
+
+    /// `millilitres` to the nearest 50, half up.
+    nonisolated static func rounded(_ millilitres: Int) -> Int {
+        guard millilitres > 0 else { return 0 }
+        let (sum, overflowed) = millilitres.addingReportingOverflow(25)
+        return (overflowed ? millilitres : sum) / 50 * 50
+    }
+
+    /// The rows a read needs: from the week before's first day to the first day of the week now running,
+    /// half-open — or `nil` where the calendar cannot place them.
+    nonisolated static func interval(of request: Request, now: Date, calendar: Calendar) -> (start: Date, end: Date)? {
+        guard let current = startOfWeek(holding: now, firstWeekday: request.firstWeekday, in: calendar),
+              let start = calendar.date(byAdding: .day, value: -14, to: current)
+        else { return nil }
+        return (calendar.startOfDay(for: start), current)
+    }
+
+    /// The week's insights from `rows` — which may reach outside the two weeks — or `nil` where the
+    /// calendar cannot place the week. A week that does not qualify comes back with no ``content``.
+    nonisolated static func make(
+        rows: [WaterLog],
+        request: Request,
+        firstServing: Date?,
+        goal: Int,
+        now: Date,
+        calendar: Calendar
+    ) -> WeekInsights? {
+        guard let current = startOfWeek(holding: now, firstWeekday: request.firstWeekday, in: calendar),
+              let start = calendar.date(byAdding: .day, value: -7, to: current),
+              let earlier = calendar.date(byAdding: .day, value: -14, to: current),
+              let next = calendar.date(byAdding: .day, value: 7, to: current)
+        else { return nil }
+        let week = days(from: start, in: calendar)
+        let before = days(from: earlier, in: calendar)
+        guard week.count == 7, before.count == 7, let opening = week.first?.date, let closing = week.last?.date
+        else { return nil }
+
+        let pending = WeekInsights(firstDay: opening, lastDay: closing, nextWeek: calendar.startOfDay(for: next), content: nil)
+        guard let firstServing else { return pending }
+        let first = DataManager.dayOrdinal(for: firstServing, in: calendar)
+        let thisWeek = Set(week.map(\.ordinal))
+        let lastWeek = Set(before.map(\.ordinal))
+
+        // Each day's water and first serving, and this week's servings as wall-clock minutes.
+        var water: [Int: Int] = [:]
+        var firsts: [Int: Int] = [:]
+        var servings: [(minute: Int, amount: Int)] = []
+        for row in rows {
+            let ordinal = DataManager.dayOrdinal(for: row.timestamp, in: calendar)
+            guard ordinal >= first, thisWeek.contains(ordinal) || lastWeek.contains(ordinal) else { continue }
+            let minute = MonthPatterns.minuteOfDay(row.timestamp, in: calendar)
+            // A day saturates where ``MonthHistory``'s does, and a negative row reads as nothing: a corrupt
+            // row degrades rather than trapping a score's multiplication (the final review's M5).
+            let amount = max(row.amount, 0)
+            water[ordinal] = MonthPatterns.saturating(water[ordinal] ?? 0, amount, at: DataManager.maximumDailyIntake)
+            firsts[ordinal] = min(firsts[ordinal] ?? minute, minute)
+            if thisWeek.contains(ordinal) {
+                servings.append((minute, amount))
+            }
+        }
+
+        let judged = max(goal, 1)
+        let shown = Tally(days: week.filter { $0.ordinal >= first }, water: water, firsts: firsts, goal: judged, calendar: calendar)
+        guard shown.watered >= minimumDays else { return pending }
+        let earlierTally = Tally(days: before.filter { $0.ordinal >= first }, water: water, firsts: firsts, goal: judged, calendar: calendar)
+        let compared = earlierTally.watered >= minimumDays ? earlierTally : nil
+
+        let threshold = threshold(goal: judged)
+        let weekdays = shown.side(weekend: false, of: request.weekend)
+        let weekends = shown.side(weekend: true, of: request.weekend)
+        let quiet = quietestPart(of: servings)
+
+        // The shortfalls, in the order a tie goes to, each scored as millilitres missed across the week.
+        var shortfalls: [(finding: Finding, suggestion: Suggestion, score: Int)] = []
+        // A side is a shortfall only while it is short of the goal itself: more water asked for days that
+        // met it would stand beside *Your goal on every weekend day* (the final review's M7, amending
+        // spec §3.3).
+        if let weekdays, let weekends {
+            let gap = weekdays.average - weekends.average
+            if gap >= threshold, weekends.average < judged {
+                shortfalls.append((.weekendsLower(rounded(gap)), Suggestion(gap: gap, when: .weekendDays), gap * weekends.days))
+            } else if -gap >= threshold, weekdays.average < judged {
+                shortfalls.append((.weekdaysLower(rounded(-gap)), Suggestion(gap: -gap, when: .weekdays), -gap * weekdays.days))
+            }
+        }
+        if let compared {
+            let drop = compared.average - shown.average
+            if drop >= threshold {
+                shortfalls.append((.lessThanBefore(rounded(drop)), Suggestion(gap: drop, when: .each(quiet)), drop * shown.days.count))
+            }
+        }
+        let short = judged - shown.average
+        if short >= threshold {
+            shortfalls.append((.shortOfGoal(rounded(short)), Suggestion(gap: short, when: .each(quiet)), short * shown.days.count))
+        }
+        // The first of the largest: `max(by:)` would keep the last.
+        let largest = shortfalls.map(\.score).max()
+        let worst = shortfalls.first { $0.score == largest }
+
+        // The improvements, in the order *what is working* takes them.
+        var improvements: [Finding] = []
+        let everyDay = shown.met == shown.days.count
+        if everyDay {
+            improvements.append(.everyDayMet)
+        } else {
+            if let weekdays, weekdays.days >= 3, weekdays.met == weekdays.days {
+                improvements.append(.everyWeekdayMet)
+            }
+            if let weekends, weekends.met == weekends.days {
+                improvements.append(.everyWeekendDayMet)
+            }
+        }
+        var countedMet = everyDay
+        if let compared {
+            if shown.met > compared.met {
+                improvements.append(.moreDaysMet(shown.met, before: compared.met))
+                countedMet = true
+            }
+            if shown.average - compared.average >= threshold {
+                improvements.append(.moreThanBefore(rounded(shown.average - compared.average)))
+            }
+            if let now = shown.usualFirst, let then = compared.usualFirst, then - now >= movedStart {
+                improvements.append(.earlierStart(minutes: then - now))
+            }
+        }
+        // *n of m days on goal* is the weakest form of *every day on goal* and of *Goal met on n days, up
+        // from m*, and never beside either: it would say the count twice (the final review's I2).
+        if !countedMet, shown.met > 0 {
+            improvements.append(.daysMet(shown.met, of: shown.days.count))
+        }
+
+        var worth: [Finding] = []
+        if shown.watered < shown.days.count {
+            worth.append(.emptyDays(shown.days.count - shown.watered))
+        }
+        if let compared, let now = shown.usualFirst, let then = compared.usualFirst, now - then >= movedStart {
+            worth.append(.laterStart(minutes: now - then))
+        }
+        if let half = halfway(of: servings) {
+            worth.append(.halfBy(MonthPatterns.instant(atMinute: half, on: opening, in: calendar)))
+        }
+
+        let average = Finding.average(rounded(shown.average), goal: judged)
+        let content: Content
+        if let worst {
+            content = Content(oneThing: worst.finding, suggestion: worst.suggestion, detail: nil,
+                              working: improvements.first, worthKnowing: worth.first)
+        } else if let lead = improvements.first {
+            content = Content(oneThing: lead, suggestion: nil, detail: average,
+                              working: improvements.dropFirst().first, worthKnowing: worth.first)
+        } else {
+            content = Content(oneThing: average, suggestion: nil, detail: nil, working: nil, worthKnowing: worth.first)
+        }
+        return WeekInsights(firstDay: opening, lastDay: closing, nextWeek: pending.nextWeek, content: content)
+    }
+
+    /// One week's counted days, judged against the goal.
+    private nonisolated struct Tally {
+
+        /// One side of the week: its days' average, how many days, how many on goal.
+        struct Side {
+            let average: Int
+            let days: Int
+            let met: Int
+        }
+
+        let days: [(ordinal: Int, weekday: Int)]
+        /// Each counted day's water, in ``days``' order.
+        let water: [Int]
+        /// The watered days' first servings, as wall-clock minutes.
+        let firsts: [Int]
+        let goal: Int
+
+        init(days: [(ordinal: Int, date: Date)], water: [Int: Int], firsts: [Int: Int], goal: Int, calendar: Calendar) {
+            self.days = days.map { ($0.ordinal, calendar.component(.weekday, from: $0.date)) }
+            self.water = days.map { water[$0.ordinal] ?? 0 }
+            self.firsts = days.compactMap { (water[$0.ordinal] ?? 0) > 0 ? firsts[$0.ordinal] : nil }
+            self.goal = goal
+        }
+
+        var watered: Int { water.filter { $0 > 0 }.count }
+        var met: Int { water.filter { $0 >= goal }.count }
+
+        /// The counted days' water over the counted days, empty days included — `DaySummary`'s
+        /// arithmetic: saturated, then truncated.
+        var average: Int {
+            days.isEmpty ? 0 : MonthPatterns.saturatedSum(water) / days.count
+        }
+
+        var usualFirst: Int? {
+            firsts.isEmpty ? nil : MonthPatterns.usual(firsts)
+        }
+
+        /// The weekend's side, or the weekdays', at `weekend` — `nil` with no day on it.
+        func side(weekend: Bool, of weekendDays: Set<Int>) -> Side? {
+            let chosen = zip(days, water).filter { weekendDays.contains($0.0.weekday) == weekend }.map(\.1)
+            guard !chosen.isEmpty else { return nil }
+            return Side(
+                average: MonthPatterns.saturatedSum(chosen) / chosen.count,
+                days: chosen.count,
+                met: chosen.filter { $0 >= goal }.count
+            )
+        }
+    }
+
+    /// The first day of the week holding `now`, from `firstWeekday` — clamped into `1...7` — on `calendar`.
+    private nonisolated static func startOfWeek(holding now: Date, firstWeekday: Int, in calendar: Calendar) -> Date? {
+        let today = calendar.startOfDay(for: now)
+        let first = ((firstWeekday - 1) % 7 + 7) % 7 + 1
+        let back = (calendar.component(.weekday, from: today) - first + 7) % 7
+        return calendar.date(byAdding: .day, value: -back, to: today).map { calendar.startOfDay(for: $0) }
+    }
+
+    /// Seven days from `start`, each as its ordinal and its start, walked by the calendar — never by
+    /// 86,400 seconds, which a daylight-saving day is not (rule `30-rollover`).
+    private nonisolated static func days(from start: Date, in calendar: Calendar) -> [(ordinal: Int, date: Date)] {
+        (0..<7).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: start).map { day in
+                let midnight = calendar.startOfDay(for: day)
+                return (DataManager.dayOrdinal(for: midnight, in: calendar), midnight)
+            }
+        }
+    }
+
+    /// The part of the day that held the least of the week's water, a tie to the earlier.
+    private nonisolated static func quietestPart(of servings: [(minute: Int, amount: Int)]) -> Part {
+        var water: [Part: Int] = [:]
+        for serving in servings {
+            let part = Part(minute: serving.minute)
+            water[part] = MonthPatterns.saturating(water[part] ?? 0, serving.amount, at: .max)
+        }
+        // `min(by:)` keeps the first of the least.
+        return Part.allCases.min { (water[$0] ?? 0) < (water[$1] ?? 0) } ?? .morning
+    }
+
+    /// The whole hour after the minute by which half the week's water was in, held to 23:55 so it
+    /// never names the next day's midnight; `nil` with no water, and `nil` when half was in only at 23:55
+    /// or later — *before 23:55* would then be untrue (the final review's M4).
+    private nonisolated static func halfway(of servings: [(minute: Int, amount: Int)]) -> Int? {
+        let total = MonthPatterns.saturatedSum(servings.map(\.amount))
+        guard total > 0 else { return nil }
+        var running = 0
+        for serving in servings.sorted(by: { $0.minute < $1.minute }) {
+            running = MonthPatterns.saturating(running, serving.amount, at: .max)
+            if running >= total - running {
+                guard serving.minute < MonthPatterns.latestMinute else { return nil }
+                return min((serving.minute / 60 + 1) * 60, MonthPatterns.latestMinute)
+            }
+        }
+        return nil
     }
 }
 

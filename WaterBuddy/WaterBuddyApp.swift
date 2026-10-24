@@ -24,6 +24,10 @@ struct WaterBuddyApp: App {
     /// Premium's paid state, read from StoreKit and kept in memory only (``PremiumStore``).
     private let premium: PremiumStore
 
+    /// Apple's on-device model, for Insights' English sentences, and what it wrote this run, in memory
+    /// only (``InsightWriter``).
+    private let writer: InsightWriter
+
     init() {
         // Resolve the App Group before anything draws, so the container probe and the one-shot
         // migration out of `UserDefaults.standard` both happen here, in the app, at a moment we
@@ -36,6 +40,8 @@ struct WaterBuddyApp: App {
         // so its listener hears every transaction from launch — a renewal, a refund, an approved Ask
         // to Buy (spec §3.3). It reads StoreKit and writes nothing.
         premium = PremiumStore()
+        // Asks nothing of the model until a holder opens Insights in English. It writes neither store.
+        writer = InsightWriter()
 
         #if DEBUG
         if let fresh = Self.freshStartManager(arguments: ProcessInfo.processInfo.arguments) {
@@ -123,6 +129,7 @@ struct WaterBuddyApp: App {
             RootView()
                 .environment(manager)
                 .environment(premium)
+                .environment(writer)
         }
         .onChange(of: scenePhase) { _, phase in
             // Another process may have written while we were away — the widget's `AddWaterIntent`
