@@ -1278,6 +1278,32 @@ final class GoalSetupUITests: XCTestCase {
         }
     }
 
+    /// Settings links the privacy policy for every user — App Review 5.1.1(i) asks for it "within the
+    /// app in an easily accessible manner", and the paywall, its other home, is never offered to an
+    /// ordinary run (spec `2026-10-24-privacy-policy-design.md` §3.2). One link, by the label VoiceOver
+    /// speaks, and a tap that leaves for Safari: the app fetches nothing itself (rule `70-privacy`).
+    ///
+    /// Found as a link **or** a button: XCUITest lists SwiftUI's `Link` as a link on iOS 27.0 and as
+    /// a button on 26.5 (measured, 2026-10-24) — `PremiumUITests.count`'s reason. Never its text alone,
+    /// which XCUITest may also list beneath the control (`tasks/lessons.md`, 2026-10-17).
+    @MainActor
+    func testSettingsLinksThePrivacyPolicyForEveryone() throws {
+        let app = launchedOnHome()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5), "Settings did not appear")
+
+        let row = app.descendants(matching: .any).matching(NSPredicate(
+            format: "label == %@ AND (elementType == %d OR elementType == %d)",
+            "Privacy Policy", XCUIElement.ElementType.link.rawValue, XCUIElement.ElementType.button.rawValue
+        ))
+        XCTAssertTrue(row.firstMatch.waitForExistence(timeout: 5), "Settings carries no Privacy Policy link")
+        XCTAssertEqual(row.count, 1, "Settings' Privacy Policy row is not one element")
+
+        row.firstMatch.tap()
+        let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
+        XCTAssertTrue(safari.wait(for: .runningForeground, timeout: 10), "the Privacy Policy link did not open Safari")
+    }
+
     /// Guards the extraction of `AuroraBackground` and `PressStyle` out of `HomeView.swift`:
     /// the vessel is a single accessibility element, and it is the thing that would go missing
     /// if the view tree came apart.

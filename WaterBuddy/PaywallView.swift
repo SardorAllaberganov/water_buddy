@@ -49,8 +49,11 @@ struct PaywallView: View {
     /// Apple's standard licence, which an app without its own uses (foundation spec §3.7).
     nonisolated static let termsOfUse = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
 
-    /// The owner's privacy policy. App Review asks every app for one inside it (spec §8).
-    nonisolated static let privacyPolicy = URL(string: "OWNER-PRIVACY-URL")
+    /// The owner's privacy policy, on their GitHub user site — `Tools/PrivacyPolicy.html`, the
+    /// published form of `PRIVACY.md`. App Review asks every app to link one inside it (spec §8), so
+    /// Settings reads this declaration too and links it for every user (spec
+    /// `2026-10-24-privacy-policy-design.md` §3).
+    nonisolated static let privacyPolicy = URL(string: "https://sardorallaberganov.github.io/waterbuddy/privacy/")
 
     /// The switch, as a pure function of the build, the arguments, the sets on sale and the privacy
     /// link: DEBUG offers it when launched to; Release only while a set is on sale **and** the link

@@ -49,6 +49,13 @@ final class PremiumUITests: XCTestCase {
         let goal = app.sliders["Daily water goal"]
         XCTAssertTrue(goal.waitForExistence(timeout: 5))
         XCTAssertLessThan(see.frame.minY, goal.frame.minY, "the Premium card is not first")
+        // What Settings already carries under these labels — its own *Privacy Policy* link — read
+        // before the sheet opens: XCUITest lists the screen beneath a sheet with the sheet, so the
+        // paywall's footer is counted as what the sheet adds (spec
+        // `2026-10-24-privacy-policy-design.md` §4.5; the owner's ruling, 2026-10-24). Settings' own
+        // link is pinned to one by `testSettingsLinksThePrivacyPolicyForEveryone`.
+        let footer = ["Restore Purchases", "Terms of Use", "Privacy Policy", "Not now"]
+        let onSettings = Dictionary(uniqueKeysWithValues: footer.map { ($0, count($0, in: app)) })
         tapWhenReady(see)
 
         XCTAssertTrue(app.staticTexts["See how you really drink, and what would help."].waitForExistence(timeout: 5),
@@ -61,8 +68,8 @@ final class PremiumUITests: XCTestCase {
             let row = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", title + ", "))
             XCTAssertEqual(row.count, 1, "\(title) is not one element")
         }
-        for label in ["Restore Purchases", "Terms of Use", "Privacy Policy", "Not now"] {
-            XCTAssertEqual(count(label, in: app), 1, "\(label) is not one element")
+        for label in footer {
+            XCTAssertEqual(count(label, in: app) - (onSettings[label] ?? 0), 1, "\(label) is not one element")
         }
 
         app.buttons["Not now"].tap()

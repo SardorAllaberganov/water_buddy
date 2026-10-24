@@ -338,17 +338,27 @@ struct PaywallOfferTests {
         #expect(PaywallView.shownSets(debug: false) == PremiumSet.onSale)
     }
 
-    /// Set A on sale is not the paywall offered: a Release build still waits for the privacy policy's
-    /// address (#159), so the token can never ship as a live link.
-    @Test func setAOnSaleStillWaitsForThePrivacyLink() {
+    /// Set A on sale is not, alone, the paywall offered: without an `https` privacy address — the
+    /// token the constant held until #159 — a Release build does not offer it, so a token can never
+    /// ship as a live link.
+    @Test func setAOnSaleWithoutAPrivacyLinkIsNotOffered() {
         #expect(!PaywallView.isOffered(debug: false, arguments: [], setsOnSale: PremiumSet.onSale.count,
                                        privacyPolicy: URL(string: "OWNER-PRIVACY-URL")))
         #expect(PaywallView.shownSets(debug: false) == [.understand])
     }
 
+    /// The policy's page is the owner's GitHub user site, pinned whole as Apple's terms are: a scheme
+    /// alone would pass any `https` address (spec `2026-10-24-privacy-policy-design.md` §3.1).
     @Test func theLinksAreApplesTermsAndAPageOfOurs() {
         #expect(PaywallView.termsOfUse?.absoluteString == "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
-        #expect(PaywallView.privacyPolicy?.scheme == "https")
+        #expect(PaywallView.privacyPolicy?.absoluteString == "https://sardorallaberganov.github.io/waterbuddy/privacy/")
+    }
+
+    /// With the policy's address set, a Release build offers set A — the last switch #159 held
+    /// (spec `2026-10-24-privacy-policy-design.md` §3.1).
+    @Test func aReleaseBuildWithSetAOnSaleOffersThePaywall() {
+        #expect(PaywallView.isOffered(debug: false, arguments: [], setsOnSale: PremiumSet.onSale.count,
+                                      privacyPolicy: PaywallView.privacyPolicy))
     }
 }
 

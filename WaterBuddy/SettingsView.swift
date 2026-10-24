@@ -11,7 +11,7 @@ import UIKit
 import UserNotifications
 
 /// The app's settings: the daily goal, the three quick-add vessels, the reminders switch and the
-/// language.
+/// language — and, under them, the link to the privacy policy.
 ///
 /// It was built as a *Settings* screen with a section rather than a *Reminders* screen precisely so
 /// the goal editor could drop in beside the reminders card without a second surface. ``GoalCard``
@@ -96,6 +96,7 @@ struct SettingsView: View {
                     ServingsCard(current: manager.servings).arrives(arrived, order: lead + 1).scrollDepth()
                     remindersCard.arrives(arrived, order: lead + 2).scrollDepth()
                     LanguageCard().arrives(arrived, order: lead + 3).scrollDepth()
+                    privacyPolicyLink.arrives(arrived, order: lead + 4).scrollDepth()
                     Spacer(minLength: 0)
                 }
                 // The reminders card changes what it says, and with it its height: when
@@ -108,10 +109,10 @@ struct SettingsView: View {
                 // Every tab's inset, less the point the reader stands off the safe area (below):
                 // the title stands where Home's and History's do (`testTheTitleHoldsItsPlaceOnEveryTab`).
                 .padding(.top, ScreenMetrics.topInset - 1)
-                // The language card is the tallest on this screen and sits last, so without this
-                // its footnote rests under the floating tab bar at the un-scrolled position. The
-                // bar's height is reserved for scrolling, not for the resting layout, by
-                // `RootTabView`'s `safeAreaInset`.
+                // The language card is the tallest on this screen and sits last but for the privacy
+                // policy's link, so without this the link rests under the floating tab bar at the
+                // un-scrolled position. The bar's height is reserved for scrolling, not for the
+                // resting layout, by `RootTabView`'s `safeAreaInset`.
                 .padding(.bottom, 16)
                 .frame(maxWidth: .infinity, alignment: .top)
                 .frame(minHeight: proxy.size.height, alignment: .top)
@@ -245,6 +246,32 @@ struct SettingsView: View {
                 .liquidGlass(in: Capsule(), density: .sheer, elevation: .resting, interactive: true)
         }
         .buttonStyle(PressStyle())
+    }
+
+    // MARK: - The privacy policy
+
+    /// The owner's privacy policy, for every user. App Review 5.1.1(i) asks for it "within the app in
+    /// an easily accessible manner", and the paywall — its other home — is offered only while a set is
+    /// on sale (spec `2026-10-24-privacy-policy-design.md` §3.2).
+    ///
+    /// The paywall's declaration and the paywall's key, so the address and the words have one
+    /// spelling each (rule `50-views`), drawn only while the address is `https` — the paywall's own
+    /// condition, so no build draws a dead link. Text on the aurora below the cards, as the paywall's
+    /// footer link is, not a pane. Safari opens it; the app fetches nothing (rule `70-privacy`). No
+    /// haptic: the tap leaves the app, and Safari's arrival is the answer.
+    @ViewBuilder
+    private var privacyPolicyLink: some View {
+        if let policy = PaywallView.privacyPolicy, policy.scheme == "https" {
+            Link(destination: policy) {
+                Text("Privacy Policy", bundle: strings)
+                    .font(SettingsStyle.link)
+                    .foregroundStyle(.white.opacity(SettingsStyle.noteOpacity))
+                    .multilineTextAlignment(.center)
+                    .legibleOnBackdrop()
+                    .frame(maxWidth: .infinity, minHeight: SettingsStyle.linkHeight)
+                    .contentShape(Rectangle())
+            }
+        }
     }
 
     // MARK: - Permission
@@ -839,6 +866,13 @@ private enum SettingsStyle {
 
     /// The rule between the language rows and above the vessels note.
     static let hairlineOpacity = 0.16
+
+    /// The privacy policy's link, on the aurora under the cards: the paywall's footer link — a
+    /// semibold footnote — at the notes' opacity, with the backdrop's halo.
+    static let link: Font = .footnote.weight(.semibold)
+
+    /// The link's 44 floor (rule `65-accessibility`).
+    static let linkHeight: CGFloat = 44
 }
 
 private extension Text {
