@@ -4,6 +4,24 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-24 (eighty-eighth pass — `/doc_sync` run by the owner straight after the
+eighty-seventh; no code changed since step 4's gate). **No key and no stored byte moved**: 13 keys on
+`DataManager.Key`, counted from the source. **Drift, one citation:** the `role` declaration's comment in
+*Who may write on behalf of the group*'s code block still read `DataManager.swift:1924`, `HEAD` `5b511bd`'s
+line, where the declaration stands at `:1996` — step 4's records re-derived the nine guard lines under it
+and `docs/AI_CONTEXT.md`'s own `role` citation, and left this one; the eighty-seventh pass checked the
+guard lines and missed it too. Re-pointed, its old number kept. Every other line citation here into
+`DataManager.swift` past line 216 or `HistoryView.swift` past line 52 — where step 4's insertions begin —
+printed with the text it lands on: current ones land on what they name, the rest are dated notes.
+
+**Last updated:** 2026-10-24, early morning (set A's step 4's own records — not a `/doc_sync` pass). **No
+key and no stored byte moved**: 13 keys on `DataManager.Key`. A new subsection, *`insights`*, after
+*`month.patterns`*: the last finished week, asked for and let go as the month is, its two reads, the ninth
+`role.drawsHistory` site, and the model's words kept in memory only. *Who may write on behalf of the
+group*: every guard's line re-derived by its words (step 4's insertions in `DataManager.swift` begin at
+line 217) and the ninth site added; the `usualSlot` row's pointer to History's `servings[1]` re-pointed
+`:397` → `:419`.
+
 **Last updated:** 2026-10-23, evening (eighty-sixth pass — `/doc_sync` run by the owner on set A's step
 3's staged tree; this header was the drift: step 3's records added a section and left it). **No key and
 no stored byte moved**: 13 keys on `DataManager.Key`, counted from the source. A new subsection,
@@ -400,7 +418,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:397` (`:363` until set A's step 3, `:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:419` (`:397` until set A's step 4, `:363` until set A's step 3, `:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours — and a tenth, the rating request's mark
@@ -865,6 +883,29 @@ widget nor the watch.
   rounds — the difference inside the run-to-run noise, every figure under the owner's 6 ms. Each run
   started at a load of 7 or under and drove it to 83–136 by its own simulator boot.
 
+### `insights` — the last finished week, while History's Insights asks
+
+*Added 2026-10-24, set A's step 4 (spec `docs/superpowers/specs/2026-10-23-insights-design.md`).* **No
+key and no stored byte**: `insights: WeekInsights?` is derived on every read and published like `month`.
+
+- **Asked for** through `showInsights(_ request: WeekInsights.Request?)` — the app's locale's first
+  weekday and weekend, because the model's calendar is fixed to `en_US_POSIX` — and let go with `nil`:
+  when Week or Month is chosen, when the page is removed, when Premium stops being held.
+- **Two reads**, as the month's: the rows from the first day of the week before to the first day of the
+  week now running (`WeekInsights.interval(of:now:calendar:)`), and the first serving. Either failing
+  leaves `insights` as it stands; equality-guarded.
+- **Republished** beside every `republishMonth()` — the `dailyGoal` setter, `saveAndRecompute()`,
+  `dayDidTurn()`, `refresh()`'s public form — and from `showInsights(_:)`; never from `init`, never from
+  the `servings` setter: the suggestion's vessel is chosen when drawn (`Suggestion.vessel(in:)`).
+- **Behind `role.drawsHistory`**, the ninth guarded site (*Who may write on behalf of the group*).
+- **What it holds**: the week's first and last day and the next week's first, for formatting only; and,
+  when the week has four counted days with water, the three parts as `Finding`s with the shortfall's
+  `Suggestion`. Counted days start at the first serving's day; every day is judged against the current
+  goal; a negative row reads as nothing.
+- **The model's words are not state.** `InsightWriter` keeps the notes Apple's on-device model wrote in
+  memory, for the run of the app, keyed by the English sentences it was handed; nothing reaches either
+  store, the widget, the watch or a notification (rule `70-privacy`).
+
 ## The sixth key, and the seam that reads it
 
 `remindersEnabled` is a `Bool`, **absent until the user turns reminders on**. Like `isGoalSet` and
@@ -1131,7 +1172,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1924 (read :1787 until set A's step 2; :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
+nonisolated static let role: Role = {          // DataManager.swift:1996 (read :1924 until set A's step 4; :1787 until set A's step 2; :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -1157,21 +1198,25 @@ for #73 moved all six, by four lines or by thirteen; and 2026-10-08: all six had
 2026-09-01 check that followed the watchOS plan's ~500-line addition. *This sentence said "by three
 different questions" until the twenty-sixth pass; the four writes have only ever asked two.*):
 
-1. **Materialising `dailyGoal` in `init`** (`:633`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:654`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1416`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:1337`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:2068`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1485`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:1406`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:2140`, `mayHaveLegacyStandardDefaults`).
 
-Four further sites are guarded by the same enum but are not group bookkeeping:
-`republishHistory` (`:1085`, `drawsHistory`, cost rather than correctness); `republishStreak`
-(`:1146`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
-because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1182`,
-`drawsHistory` a third time — **new with set A's step 2, staged, the eighth site**, with a guard of
+Five further sites are guarded by the same enum but are not group bookkeeping:
+`republishHistory` (`:1106`, `drawsHistory`, cost rather than correctness); `republishStreak`
+(`:1167`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
+because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1203`,
+`drawsHistory` a third time — **new with set A's step 2, the eighth site**, with a guard of
 its own for the same reason: `showMonth(_:)`, `refresh()`, `saveAndRecompute()`, `dayDidTurn()` and
-the `dailyGoal` setter call it outside `republishHistory`); and `requestReminderReschedule` (`:1668`,
-`mayFileReminders`, the one whose wrong answer is immediately user-visible). Rule `25-shared-storage`
+the `dailyGoal` setter call it outside `republishHistory`); `republishInsights` (`:1259`,
+`drawsHistory` a fourth time — **new with set A's step 4, staged, the ninth site**, called beside each
+`republishMonth()` and from `showInsights(_:)`); and `requestReminderReschedule` (`:1740`,
+`mayFileReminders`, the one whose wrong answer is immediately user-visible).
+*(Lines re-derived by their words on 2026-10-24, set A's step 4, on its working tree — they read `:633`,
+`:1416`, `:1337`, `:2068`, `:1085`, `:1146`, `:1182` and `:1668` at `HEAD` `5b511bd`.)* Rule `25-shared-storage`
 still counts six (`docs/AI_CONTEXT.md` known issue #103).
 *(Lines re-derived by their words on 2026-10-23, the eighty-fifth pass, on step 2's staged tree —
 they read `:592`, `:1294`, `:1215`, `:1931`, `:1042`, `:1103` and `:1531`, `HEAD` `2e2f3a7`'s lines,

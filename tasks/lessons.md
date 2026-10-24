@@ -4811,3 +4811,71 @@ its script printed every sheet's newest *Last updated* line.
 **The rule:** before a records pass stages, print `git diff --name-only -- docs CLAUDE.md` beside each of
 those sheets' newest *Last updated* line; every sheet the pass changed heads itself with that pass.
 `docs/ROADMAP.md` keeps no such header and is the one exception.
+
+## 2026-10-24 — The contrast tool counted the aurora's cyan light as ink, not ground
+
+**What happened.** Set A's step 4 measured *Insights* on the aurora with step 2's `t8-measure.swift` and
+got `nan`: the tool sets aside a cyan pixel as "other ink" so a cyan mark is not read as ground, and the
+aurora's cyan light, passing behind the heading, is cyan too — 100 % of the ground was set aside. A
+second script with the same method and no mask read the heading 3.37, and *Patterns*' own title 3.14 in
+step 3's frames, where the tool had read 5.73 with 5 % set aside. The tool's readings on the aurora were
+kind wherever that light passed (#177).
+
+**The rule:** read the tool's *masked* figure beside every reading on the aurora; above a few percent the
+reading is of a ground the tool chose, not the one drawn. Measure white text on the aurora without the
+cyan mask, and say which method each figure in `docs/DESIGN.md` came from.
+
+## 2026-10-24 — A RED test that its old code would also have passed
+
+**What happened.** Of step 4's review tests, `aTimeIsReadWhole` passed against the old, pooled figure
+check — not because the old check read *1:30* whole, but because its fixture held no *30* to pool. The
+run listed it with the passes, and only the missing line in the failure list showed it. The fixture was
+rebuilt with facts holding each digit on its own, and failed as it should.
+
+**The rule:** at RED, list every new test and its outcome; one that passes has not been shown to test
+anything. Change its fixture until the old code would accept what the new code must refuse.
+
+## 2026-10-24 — Two figures typed from memory again, caught by printing
+
+**What happened.** Step 4's records gave `WeekInsightsTests` 30 tests and `InsightWriterTests` 22, and
+said the rule wording sat in nine files. The next commands printed 31, 20 and ten. The lesson of
+2026-10-23 says print, then type; the figures were typed first and checked after.
+
+**The rule:** the print comes first, every time — a count goes into prose only from a line the session
+can point to above it.
+
+## 2026-10-24 — The gate's foreground limit, split by build and by class
+
+**What happened.** The unit run passed 600 s twice: once with its build, and once alone, when its tests
+had finished in 12 s and `xcodebuild` sat after its tear-down (#180) — the harness moved both to the
+background. The UI suite, 74 executions, is longer than 600 s on its own.
+
+**The rule:** `build-for-testing` once in the foreground, then `test-without-building` — the unit target
+whole, the UI target a class or a chunk of thirteen tests at a time — each under 600 s, each with
+`-test-timeouts-enabled YES`. A run that has printed its *Test run with* line and not exited is read
+from its log and stopped, never waited on.
+
+## 2026-10-24 — A records pass moved every count in `CLAUDE.md` and missed a subsystem in its prose
+
+**What happened.** Set A's step 4's records updated `CLAUDE.md`'s guard-site count, its warning trail and
+its UI-test row, and left its *Architecture* list as it was: Premium and `StoreKit`'s two files named,
+Insights and the one `import FoundationModels` not at all. The eighty-seventh `/doc_sync` found it by
+reading the list against the imports its script printed.
+
+**The rule:** a change that adds a type another process or a framework reaches through — a new import, a
+new `@Observable` injected at the root — gets a bullet in `CLAUDE.md`'s *Architecture* list in its own
+records, checked against `grep '^import '` over the app's files, not only its counts.
+
+## 2026-10-24 — A re-derived section kept one citation at the old line, inside its code block
+
+**What happened.** Set A's step 4's records re-derived the nine guard lines in `docs/STATE.md`'s *Who may
+write on behalf of the group*, and `role`'s own citation in `docs/AI_CONTEXT.md`, and left the same
+section's code block citing `role` at `DataManager.swift:1924`, `HEAD`'s line; it stands at `:1996`. The
+eighty-seventh `/doc_sync` checked "every guard-site citation" — the list it had in mind — and passed it.
+The eighty-eighth found it by printing every citation past the first inserted line beside the text it
+lands on.
+
+**The rule:** when a change inserts lines into a file, re-point by sweep, not by memory: list every
+`File.swift:N` (and every bare `:N` after it) past the first inserted line, in every doc, code blocks
+included, print the line each lands on, and judge each current or dated. A checklist of the citations
+you remember is exactly the set that cannot show you the one you forgot.

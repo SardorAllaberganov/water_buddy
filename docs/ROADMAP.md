@@ -402,6 +402,17 @@ from fixed sentences in all three languages, and each says how it was made. Noth
 phone: Apple's Private Cloud Compute and a cloud model were set aside by the owner ("a"). The name
 *Apple Intelligence* in the app's copy is checked against Apple's guidelines for it before set A goes
 on sale. **Needs a rule change** (§8).
+*(2026-10-24, early morning: **set A's step 4 — designed, specified, built test-first, walked, measured,
+reviewed, gated and staged; not committed.** The owner's rulings: **the app decides and the model only
+words it** — Apple's model speaks English alone of the three languages (measured), so Russian and Uzbek
+always read the app's own sentences; Insights is **History's third mode**; **the last finished week**
+against the week before; the model's words **kept in memory, with fixed wording**; the copy names
+**Apple's on-device model, never *Apple Intelligence*** — the paywall's row is now *Personal insights*
+(#164's naming half); then "all ok go implementation". Spec
+`docs/superpowers/specs/2026-10-23-insights-design.md`, no plan document. Its rule wording — `70-privacy`'s
+*FoundationModels, for the insights* among ten files — is typed and unstaged for the owner. The model has
+not yet been seen writing: this Mac's was not ready (#178). Nobody meets it until step 5 puts set A on
+sale.)*
 
 ## 6. Release 1.5 — more to log, more people
 

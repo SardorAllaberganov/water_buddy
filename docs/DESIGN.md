@@ -7,6 +7,16 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-24 (eighty-seventh pass — `/doc_sync` run by the owner on set A's step 4's staged
+tree; no code changed since its gate). *Insights, measured*'s *Not measured* gains the switch's third
+segment: *The month, measured* read the switch with two. Every figure in the section re-read against the
+measuring tool's printed output: equal. No token moved.
+
+**Last updated:** 2026-10-24, early morning (set A's step 4's own records — not a `/doc_sync` pass). A new
+section, *Insights, measured*: eleven pairs over 45 frames, every pane's over its floor, the heading on
+the aurora under it (3.37 against 4.5) by a second script without step 2's tool's cyan mask — which also
+reads *Patterns*' title 3.14 (#177). No token moved.
+
 **Last updated:** 2026-10-23, evening (eighty-sixth pass — `/doc_sync` run by the owner on set A's step
 3's staged tree; this header was the drift: step 3's records added a section and left it). **No shared
 token changed.** A new section, *The patterns, measured*, after *The month, measured*: what the patterns
@@ -2228,6 +2238,42 @@ rim below the line and is not a reading.
 
 **Not measured:** iOS 26.5 and 18.6; Increase Contrast; Russian and Uzbek, whose lines are wider over the
 same grounds; the largest text sizes.
+
+## Insights, measured
+
+*Added 2026-10-24, set A's step 4 (spec `docs/superpowers/specs/2026-10-23-insights-design.md`, §4a).*
+
+**What is drawn.** *Insights* on the aurora, `.title3` bold white with the two shadows — *Patterns*' style
+— and **no line under it**, for #171's reason. Then four `.frosted` + `.raised` panes, the screen's pair:
+*The one thing* — its label `.footnote` semibold at white 0.9 with the `sparkles` glyph, the week's range
+the same, the headline `.title3` bold, the detail `.body` with the suggested vessel's glyph; *What is
+working* and *Worth knowing* — a white glyph, the title `.subheadline` bold, the sentence `.subheadline`;
+the footer, `.footnote` white with a lock. No cyan text: step 1's R4.
+
+**How measured.** *WaterBuddy Probe 27* (iOS 27.0), a holder's seeded week in a walk copy, 45 frames two
+seconds apart (90 s — `tasks/lessons.md`, 2026-10-23), boxes from the tree dump, step 2's ring-around-ink
+tool for the panes. The heading by a second script with the same method and **no cyan mask**: the tool
+sets the aurora's cyan light aside as "other ink" and, behind *Insights*, found no ground at all.
+
+| Pair | Floor | Reading |
+|---|---|---|
+| **The heading *Insights* (1.0), beside its glyphs, on the aurora** | 4.5 | **3.37** (p1 3.41) worst; median 4.55, best 5.22 |
+| *The one thing* (0.9) / the week's range (0.9) | 4.5 | 4.60 / 7.47 |
+| The headline (1.0) / the detail (1.0) | 4.5 | 5.12 / 6.54 |
+| The vessel's glyph / *What is working*'s glyph | 3 | 6.02 / 5.16 |
+| *What is working* (1.0) / its sentence (1.0) | 4.5 | 6.06 / 6.35 |
+| *Worth knowing*'s sentence (1.0) | 4.5 | 6.51 |
+| The footer (1.0) | 4.5 | 5.89 |
+
+The tool set aside 0–1 % of the panes' ground, so their readings stand. **The heading is under 4.5**
+where the aurora's cyan light passes behind it, the brightest ground L 0.262 (printed). The same script
+reads *Patterns*' own title **3.14** in step 3's frames, which the tool read 5.73: the every-tab heading
+style on the aurora, not this heading alone (known issue #177, the owner's, with #171).
+
+**Not measured:** iOS 26.5 and 18.6; Increase Contrast; Russian and Uzbek; the largest text sizes; the
+locked page's new card copy (the locked month's style, measured in *The month, measured*); the switch's
+third segment, *Insights*, and its lock — the *Month* segment's own style, which *The month, measured*
+read as a two-segment switch (the eighty-seventh pass, 2026-10-24).
 
 ## The header and a screen arriving
 

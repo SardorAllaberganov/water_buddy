@@ -12500,3 +12500,179 @@ by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks ar
 commit` was run.** HEAD `24b2de4`, 172 commits, level with `origin/main`. **15 staged** — 13 modified, 2
 added, the same set as above. **10 unstaged**, the same ten. **1 untracked**: `Screenshots/census/`. None
 in both; `git diff --cached --check` clean.
+
+## [2026-10-24] — Set A's step 4, Insights, designed, built, walked, measured, reviewed and gated; staged whole
+
+### What
+
+Roadmap item 1.4.12, set A's step 4 of 5. History's switch becomes *Week · Month · Insights*. A holder's
+Insights: *Insights*, then *The one thing* — the last finished week's range, its largest shortfall and a
+suggestion sized to the user's own vessel, or its best improvement and the average day — *What is
+working*, *Worth knowing*, and a footer naming who wrote it, *Not medical advice*. Below four days of
+water, *Insights need 4 days of water in a week · Next on …*. A free user meets the locked page.
+
+- **The model:** `WeekInsights`, pure and `nonisolated`, at file scope in `DataManager.swift` — the last
+  finished calendar week from the locale's first weekday against the week before, six findings, a tenth
+  of the goal and 50 ml as the threshold, figures to 50 ml, the three parts. `DataManager.insights`,
+  `showInsights(_:)`, `republishInsights()` — the ninth `role.drawsHistory` site — beside each
+  `republishMonth()`. No key, no stored byte, nothing for the widget or the watch.
+- **The words:** `InsightCopy` (new, app-only, `Foundation` alone), the app's own sentences, 29 new keys
+  in en/ru/uz; `InsightWriter` (new, app-only, the one `import FoundationModels`) — on an English iPhone
+  where Apple's on-device model is available it rewords those sentences, greedy, kept in memory, and its
+  note is drawn only if each part adds no figure its fact lacks. Below iOS 26 the model is never reached,
+  and the framework is weakly linked.
+- **The view:** `HistoryMode.insights`; the switch's third segment, scrolling where the labels overflow;
+  six private views; `LockedMonth` made `LockedPage(kind:)`. The paywall's row: *Personal insights*.
+
+### The rulings it rests on
+
+The owner's, in order: the app decides and the model only words it (Apple's model speaks English alone
+of the three, measured); a third History mode; the last finished week; in memory, fixed wording;
+"Apple's on-device model", never *Apple Intelligence*, after Apple's trademark guidelines were read; the
+design's first section, "ok go"; its second, "all ok go implementation". The session's own, in the spec's
+§4a: the final review's I1, I2, M3–M7 and the walk's W1, W2, W4 — M7 (a side's gap counts only while that
+side is short of the goal) amends §3.3 and is the owner's to overrule.
+
+### The final review
+
+A fresh reviewer, read-only: no Critical. **I1** — the model's note was checked against the facts'
+figures pooled, so a figure could move between parts; now part by part, a time or a decimal read whole,
+non-ASCII digits refused, quantities, units and weekdays in words refused unless their fact has them.
+**I2** — *n of m days on goal* beside *Goal met on n days, up from m*. **M3** — a busy model declined for
+the run; now asked again (`InsightWriter.Retry`), and the English gate moved into the writer. **M4** — a
+half-way time after 23:55. **M5** — a negative row could trap a score. **M6** — the tie order unpinned.
+**M7** — a weekend gap suggested more on weekends that met the goal. Each built test-first; the RED runs
+are in the scratchpad. Deferred: #181.
+
+### Files
+
+`WaterBuddy/DataManager.swift` · `WaterBuddy/HistoryView.swift` · `WaterBuddy/Localizable.xcstrings` ·
+`WaterBuddy/PremiumSet.swift` · `WaterBuddy/RootTabView.swift` · `WaterBuddy/WaterBuddyApp.swift` ·
+`WaterBuddy/InsightCopy.swift` (new) · `WaterBuddy/InsightWriter.swift` (new) ·
+`WaterBuddyTests/WeekInsightsTests.swift` (new) · `WaterBuddyTests/InsightCopyTests.swift` (new) ·
+`WaterBuddyTests/LocalizationTests.swift` · `WaterBuddyTests/PremiumSetTests.swift` ·
+`WaterBuddyUITests/PremiumUITests.swift` · `docs/superpowers/specs/2026-10-23-insights-design.md` (new) ·
+`docs/AI_CONTEXT.md` · `docs/STATE.md` · `docs/DESIGN.md` · `docs/ROADMAP.md` · `CLAUDE.md` ·
+`tasks/lessons.md` · this file. Unstaged, for the owner: the rule wording in ten rule files —
+`10-architecture`, `15-project`, `20-state`, `25-shared-storage`, `43-concurrency`, `50-views`,
+`65-accessibility`, `70-privacy`, `85-testing`, `95-dependencies`.
+
+### Verification
+
+- **Tests first:** the four new suites RED by compile, then GREEN (53, then 65 after the review's tests);
+  the review's tests RED before their fixes — nine by failure (five of the writer's, three of the week's,
+  and `aTimeOrADecimalIsReadWhole`, rebuilt after it passed at RED, `tasks/lessons.md`), one by a crash
+  (`aNegativeRowIsReadAsNothing`), the English gate's by compile; `aTieGoesToTheEarlierShortfall` pins
+  behaviour the code already had and passed from the first run.
+- **The walk**, on *WaterBuddy Probe 27* in two scratch copies, seeded, a lifetime test purchase: English,
+  a stand-in model (*Writing…* to its note), Russian, Uzbek, the largest text, Reduce Transparency forced,
+  the pending page, the locked page; W1, W2 and W4 fixed and re-walked; English, the stand-in and Russian
+  re-walked on the reviewed code. Every figure on the English page checked by hand against the seed.
+- **The colour pairs:** eleven over 45 frames; every pane's over its floor, the tightest *The one thing*
+  at 4.60; the heading on the aurora 3.37 against 4.5 by a script without step 2's tool's cyan mask,
+  which reads *Patterns*' title 3.14 too (#177, the owner's).
+- **The weak link:** `LC_LOAD_WEAK_DYLIB …/FoundationModels`, `minos 17.0`; the app run on iOS 18.6.
+- **The gate**, on the final code: unit, *iPhone 17*, 908 `@Test` in 102 suites — 906 passed, #157
+  skipped, #159 failing by design; UI on *iPhone 17* (27.0), 74 executed, 1 skipped, no failure (the new
+  test's first class run failed on an ambiguous *History* tap, passed alone, and taps its first match
+  now); UI on *WaterBuddy Gate 26.5*, 74 executed, 1 skipped, `testADoubleTapMovesOneStep` failed at a load
+  of ~140 and passed alone; watch, *Apple Watch Series 12 (46mm)*, 70 of 70; both widget builds
+  succeeded. `xcodebuild` sat after its tear-down twice and was stopped after its results were read
+  (#180). **Warnings unchanged on all four schemes** — 20, 17, 2, 17 by file and message, 36, 29, 2, 29
+  sites — clean builds of a copy of the working tree against a clean build of a `HEAD` `5b511bd` export.
+- **Not run:** anything on a device — Apple's model was not ready on this Mac, so no note it wrote has
+  been seen (#178); the colour pairs on 26.5 and 18.6 (#181).
+
+**Staging.** Read from the commands at 02:04 on 2026-10-24, after this step's `git add` of its 21 files by
+name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit`
+was run.** HEAD `5b511bd`, 176 commits, level with `origin/main`. **21 staged** — 16 modified, 5 added
+(`InsightCopy.swift`, `InsightWriter.swift`, `InsightCopyTests.swift`, `WeekInsightsTests.swift`, the
+spec). **16 unstaged**: the ten rule files carrying this step's wording, for the owner;
+`.claude/settings.json` (the owner's); and five of Xcode's rewrites (#50) — the `WaterBuddyWatch` and
+`WaterBuddyWatchWidget` schemes, `WaterBuddy/AppShortcuts.xcstrings` and the watch's and the watch
+widget's catalogues. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check`
+clean.
+
+## [2026-10-24] — The eighty-seventh `/doc_sync`: `CLAUDE.md`'s architecture list missed Insights
+
+### What changed
+
+- **`CLAUDE.md`** — the *Architecture* list gains *Insights: the app decides, Apple's model only words
+  it*: `WeekInsights`, `InsightCopy`, `InsightWriter` and its one `import FoundationModels`, the model's
+  note in memory, neither store written. Step 4's records had moved the file's counts and not its prose.
+- **`docs/DESIGN.md`** — *Insights, measured*'s *Not measured* gains the switch's third segment, which
+  *The month, measured* read with two; a header block. Every figure in the section re-read against the
+  tool's printed output: equal.
+- **`docs/AI_CONTEXT.md`** — this pass's header block. **`tasks/lessons.md`** — one entry.
+
+### Checked and already accurate
+
+By one read-only script, printing what it read: 108 `.swift` files in the seven target folders and 108
+*Files on disk* rows, every count equal to `wc -l`; 908 phone `@Test`, 70 watch, 61 UI `func test`, as
+*Targets* states them; 13 keys on `DataManager.Key`; three exception sets of six files, as `CLAUDE.md`
+names them; 18 rules cited, 18 files; `StoreKit` in two files, `FoundationModels` in one, no `SwiftData`
+under `WaterBuddyWidget/`; 226 catalogue keys; no forbidden doc. Every guard-site citation in *The process
+role* and `docs/STATE.md` lands on its guard; History's `servings[1]` at `:419`. The replaced surface's
+words survive only in dated blocks, #164's history and the roadmap's item name. `docs/STATE.md`,
+`docs/WIDGET.md` and `docs/ROADMAP.md`: nothing in their subjects moved since the records.
+
+### Files
+
+`CLAUDE.md` · `docs/DESIGN.md` · `docs/AI_CONTEXT.md` · `tasks/lessons.md` · this file.
+
+### Gate
+
+Not run by this pass; the last is set A's step 4's, on its final code, earlier the same night (the
+checkpoint above).
+
+**Staging.** Read from the commands at 02:08 on 2026-10-24, after this sync's `git add` of its five files
+by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git
+commit` was run.** HEAD `5b511bd`, 176 commits, level with `origin/main`. **21 staged** — 16 modified, 5
+added, the same set as above. **16 unstaged**, the same sixteen. **1 untracked**: `Screenshots/census/`.
+None in both; `git diff --cached --check` clean.
+
+## [2026-10-24] — The eighty-eighth `/doc_sync`: one `role` citation in `docs/STATE.md` left at `HEAD`'s line
+
+Run by the owner straight after the eighty-seventh. No code changed since set A's step 4's gate.
+
+### What changed
+
+- **`docs/STATE.md`** — *Who may write on behalf of the group*'s code block cited the `role` declaration
+  at `DataManager.swift:1924`, `HEAD` `5b511bd`'s line; it stands at `:1996`. Re-pointed, the old number
+  kept in the comment's list. Step 4's records re-derived the nine guard lines under it and
+  `docs/AI_CONTEXT.md`'s `role` and `Role` (`:1996`, `:2005`, both right) and left this one; the
+  eighty-seventh pass checked the guard lines and passed it. A header block.
+- **`docs/AI_CONTEXT.md`** — this pass's header block, and a dated note under known issue #84(c): the
+  stale "two destinations" comment is at `WaterBuddyApp.swift:157` (`:150` at `HEAD`), still stale.
+- **`tasks/lessons.md`** — one entry: re-point line citations by a sweep that prints each landing line,
+  code blocks included, never by the list one remembers.
+
+### Checked and already accurate
+
+The eighty-seventh's read-only script, run again, every figure printed: 108 `.swift` files and 108 *Files
+on disk* rows, every count equal to `wc -l` (`WaterBuddyWatchWidgetBundle.swift` 9 = 9 by hand); 908 phone
+`@Test` in 102 suites — `WeekInsightsTests` 31, `InsightsPublishingTests` 7, `InsightCopyTests` 7,
+`InsightWriterTests` 20, as the rows say — 70 watch, 61 UI `func test`; 13 keys on `DataManager.Key` and
+in `Key.all`; three exception sets of six, as `CLAUDE.md` names them; 18 rules cited, 18 files;
+`StoreKit` in two files, `FoundationModels` in one, no `SwiftData` under `WaterBuddyWidget/`; 226 catalogue
+keys; no forbidden doc. **New: two citation sweeps** — every `DataManager.swift` citation past line 216
+and `HistoryView.swift` past line 52 (where step 4's insertions begin), and every `File.swift:N` naming
+`WaterBuddyApp.swift`, `RootTabView.swift`, `PremiumSet.swift` or the three test files step 4 changed —
+across `CLAUDE.md` and the five sheets, each printed beside the line it lands on. All eleven guard and
+declaration lines land; History's `servings[1]` at `:419`; every other hit is a dated note.
+`RootTabView.swift`'s change sits below every line cited into it. `docs/WIDGET.md`, `docs/DESIGN.md`,
+`docs/ROADMAP.md` and `CLAUDE.md`: nothing moved.
+
+### Files
+
+`docs/STATE.md` · `docs/AI_CONTEXT.md` · `tasks/lessons.md` · this file.
+
+### Gate
+
+Not run by this pass; the last is set A's step 4's, on its final code, earlier the same night.
+
+**Staging.** Read from the commands at 14:14 on 2026-10-24, after this sync's `git add` of its four files
+by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git
+commit` was run.** HEAD `5b511bd`, 176 commits, level with `origin/main`. **21 staged** — 16 modified, 5
+added, the same set as above: all four files were already staged. **16 unstaged**, the same sixteen. **1
+untracked** in `git status`: `Screenshots/census/`. None in both; `git diff --cached --check` clean.

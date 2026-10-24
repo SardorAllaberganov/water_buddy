@@ -9,7 +9,7 @@
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: three `StaticConfiguration`s over one provider — the Home Screen widget, the week widget (`WeekWidget`, medium, a tap opens History) and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month* switch and locked month — the one class launched with DEBUG's `-WaterBuddyPremium`) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights — the one class launched with DEBUG's `-WaterBuddyPremium`) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
@@ -192,7 +192,11 @@ something to record.
   all four schemes — 20, 17, 2, 2, no line new or gone, and the same sites by line; and set A's step
   3's own comparison, on 2026-10-23 from a clean build of a copy of its index against a clean build of
   a `HEAD` `24b2de4` export, the same way: unchanged on all four schemes — 20, 17, 2, 2 by message,
-  36, 29, 2, 2 sites by line, none inside the new code
+  36, 29, 2, 2 sites by line, none inside the new code; and set A's step 4's own comparison, on
+  2026-10-24 from a clean build of a copy of its working tree against a clean build of a `HEAD`
+  `5b511bd` export, the same way: unchanged on all four schemes — 20, 17, 2, 17 by message, 36, 29, 2,
+  29 sites, none new or gone (the watch widget's 17 the phone app's own, rebuilt into its empty
+  DerivedData, on both sides)
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
@@ -309,9 +313,9 @@ something to record.
   moved (rule `20-state`)
 - **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
   fresh install, the one-shot migration, the seed from a cached total, drawing the history, the
-  streak and History's shown month, and filing reminders are all guarded by `DataManager.role` —
-  eight sites, the seventh the redesign's stage 2's, the eighth set A's step 2's
-  (`republishMonth()`) — a four-state
+  streak, History's shown month and its week's insights, and filing reminders are all guarded by
+  `DataManager.role` — nine sites, the seventh the redesign's stage 2's, the eighth set A's step 2's
+  (`republishMonth()`), the ninth set A's step 4's (`republishInsights()`) — a four-state
   `nonisolated static let` (`.phoneApp`, `.phoneExtension`, `.watchApp`, `.watchExtension`) that
   replaced the two-state `isAppExtension` at every guard site on 2026-08-31. A grep for
   `!Self.isAppExtension` now returns zero. An extension that stamped an empty group would
@@ -328,6 +332,13 @@ something to record.
 - **Premium is read, never stored.** `PremiumStore` reads StoreKit for the app alone and writes
   neither store; StoreKit is imported in `HomeView.swift` and `PremiumStore.swift` only (rule
   `70-privacy`, rule `10-architecture`)
+- **Insights: the app decides, Apple's model only words it.** `WeekInsights`, a pure value in
+  `DataManager.swift`, decides what the last finished week says, published while History asks
+  (`showInsights(_:)`); `InsightCopy` writes it as the app's own sentences; `InsightWriter`, app-only
+  and the one file that imports `FoundationModels`, may hand those English sentences — never a row —
+  to `SystemLanguageModel.default` on the phone, keeps its note in memory and draws it only if no part
+  adds a figure its fact lacks. Writes neither store
+  (`docs/superpowers/specs/2026-10-23-insights-design.md`; the rule wording awaits the owner)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 
