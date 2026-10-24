@@ -196,7 +196,10 @@ something to record.
   2026-10-24 from a clean build of a copy of its working tree against a clean build of a `HEAD`
   `5b511bd` export, the same way: unchanged on all four schemes — 20, 17, 2, 17 by message, 36, 29, 2,
   29 sites, none new or gone (the watch widget's 17 the phone app's own, rebuilt into its empty
-  DerivedData, on both sides)
+  DerivedData, on both sides); and set A's step 5's own comparison, on 2026-10-24 from a clean build of a
+  copy of its index against a clean build of a `HEAD` `ad244c2` export, the same way, `-scheme WaterBuddy`
+  by `build-for-testing`: unchanged on all four schemes — 20, 17, 2, 17 by message, no line new or gone;
+  36 sites on the app scheme on both sides
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two
@@ -313,9 +316,10 @@ something to record.
   moved (rule `20-state`)
 - **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
   fresh install, the one-shot migration, the seed from a cached total, drawing the history, the
-  streak, History's shown month and its week's insights, and filing reminders are all guarded by
-  `DataManager.role` — nine sites, the seventh the redesign's stage 2's, the eighth set A's step 2's
-  (`republishMonth()`), the ninth set A's step 4's (`republishInsights()`) — a four-state
+  streak, History's shown month, its week's insights and a finished month's recap, and filing reminders
+  are all guarded by `DataManager.role` — ten sites, the seventh the redesign's stage 2's, the eighth
+  set A's step 2's (`republishMonth()`), the ninth set A's step 4's (`republishInsights()`), the tenth
+  set A's step 5's (`recap(of:)`, a read that publishes nothing) — a four-state
   `nonisolated static let` (`.phoneApp`, `.phoneExtension`, `.watchApp`, `.watchExtension`) that
   replaced the two-state `isAppExtension` at every guard site on 2026-08-31. A grep for
   `!Self.isAppExtension` now returns zero. An extension that stamped an empty group would
@@ -338,7 +342,16 @@ something to record.
   and the one file that imports `FoundationModels`, may hand those English sentences — never a row —
   to `SystemLanguageModel.default` on the phone, keeps its note in memory and draws it only if no part
   adds a figure its fact lacks. Writes neither store
-  (`docs/superpowers/specs/2026-10-23-insights-design.md`; the rule wording awaits the owner)
+  (`docs/superpowers/specs/2026-10-23-insights-design.md`; rule `70-privacy`'s *FoundationModels, for
+  the insights*)
+- **The recap: a finished month, read when asked, shared on the user's tap.** `MonthHistory.recap`
+  names the month a page offers — a finished month with water on seven days, or the month before's for
+  the new month's first seven days — and `DataManager.recap(of:)` reads it once for `RecapSheet`,
+  publishing nothing and writing neither store, behind `role.drawsHistory`. `RecapCard`, app-only, is
+  drawn and rendered by `ImageRenderer` (1,080 px, the default text size) and shared through `ShareLink`
+  in memory; the best streak is drawn beside it, never on it. iOS offers *Save Image* only to an app with
+  a Photos usage key, which this one never carries (measured)
+  (`docs/superpowers/specs/2026-10-24-monthly-recap-design.md`; the rule wording awaits the owner)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

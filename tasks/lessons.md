@@ -4879,3 +4879,41 @@ lands on.
 `File.swift:N` (and every bare `:N` after it) past the first inserted line, in every doc, code blocks
 included, print the line each lands on, and judge each current or dated. A checklist of the citations
 you remember is exactly the set that cannot show you the one you forgot.
+
+## 2026-10-24 — Three empty gate runs: zsh does not split `$ARGS`, and an XCTest method wants `()`
+
+**What happened.** Set A's step 5's gate cut `GoalSetupUITests` into chunks of thirteen and passed each
+chunk's methods as `-only-testing:` arguments built into a variable. The first three runs exited 0 having
+executed **0 tests**: the method names first carried indentation (macOS `sed` has no `\s`), then lacked
+`()` — under `test-without-building` an XCTest method matched only as `…/testName()` — and then the shell,
+which is **zsh**, passed the unquoted `$ARGS` as one argument, because zsh does not word-split a
+parameter expansion. An exit of 0 read alone would have reported a green chunk that ran nothing.
+
+**The rule:** read the run's `Executed N tests` line, never its exit status alone — zero executed is a
+broken filter, not a pass. Build method filters as `-only-testing:Target/Class/testName()`, expand a list
+held in a variable with zsh's `${=ARGS}`, and prove a filter on one method before a chunk.
+
+## 2026-10-24 — What a share sheet receives is the item's export, not the image in memory
+
+**What happened.** Set A's step 5's walk wrote the recap's rendered `UIImage` to a file and recorded it
+as 1,080 px — and the final review pointed out that `ShareLink` hands the share sheet the item's
+`Transferable` export, which nothing had read: a picture exported in points would reach a recipient at
+360 px. The share sheet's own *Save to Files* lives behind *View More*, which a UI test's element tree
+does not reach. `Transferable.exported(as: .png)` (iOS 18.2 and later) reads the same bytes in a unit test;
+SwiftUI's `Image(uiImage:)` kept all 1,080 px, and a mutation to a system glyph failed the test.
+
+**The rule:** prove what leaves through a share by exporting the item `ShareLink` is given, in a test, and
+keep that item behind one function the view and the test both call. An image a walk wrote from memory
+proves the render, not the share.
+
+## 2026-10-24 — A records claim contradicted the bullet above it, and the census caught it
+
+**What happened.** Set A's step 5's spec said, in one section, that `recap(of:)` sits behind
+`role.drawsHistory` — and, two lines below, "no new `role` site"; the same sentence went into
+`docs/AI_CONTEXT.md`. Only the line-citation sweep of the guard census, re-pointing every guard past the
+step's insertions, printed `recap(of:)`'s guard beside the eight others and showed it as the tenth site by
+the census's own reckoning, which already counts `republishMonth()` and `republishInsights()` — reads too.
+
+**The rule:** a claim that something was *not* added is checked against the census it would join, by the
+same grep that builds the census — never written from the design's intent. A guard is a site whatever the
+function guarded does.

@@ -4,6 +4,14 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-24, evening (set A's step 5's own records, not a `/doc_sync` pass). **No key and
+no stored byte moved**: 13 keys on `DataManager.Key`. A section, *`recap(of:)`*, under *The rows are
+published too*: the month a page offers is derived on `MonthHistory`, and the recap is a read that
+publishes nothing. *Who may write on behalf of the group*: the tenth guarded site, `recap(of:)`, and
+every line under it re-derived — this step's insertions in `DataManager.swift` begin after line 1191 —
+with the `role` declaration's comment (`:2024`, `:1996` at `HEAD` `ad244c2`); the literal
+`manager.servings[1]` at `HistoryView.swift:447`.
+
 **Last updated:** 2026-10-24 (eighty-eighth pass — `/doc_sync` run by the owner straight after the
 eighty-seventh; no code changed since step 4's gate). **No key and no stored byte moved**: 13 keys on
 `DataManager.Key`, counted from the source. **Drift, one citation:** the `role` declaration's comment in
@@ -418,7 +426,7 @@ All `nonisolated static` on `DataManager`, so a timeline provider can reach them
 | `defaultDailyGoal` | `2_000` ml | also the value `isGoalSet`'s inference treats as ambiguous |
 | `defaultServing` | `250` ml | the middle vessel **before the user edits it**, and the resolver's fallback. Renamed from `standardServing`, which asserted an invariant the editable vessels removed |
 | `defaultServings` | `[150, 250, 500]` | the three vessels before the user edits them; `[1]` is `defaultServing` |
-| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:419` (`:397` until set A's step 4, `:363` until set A's step 3, `:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
+| `usualSlot` | `1` | which vessel the one-tap doors log — the Glass. `usualServing(in:)` reads its amount there, the Control Center control draws that slot's glyph — as, since 2026-10-15, does the reminder's *Log a Glass* button (`NotificationManager.reminderCategory(in:)`) — and — since the redesign's stage 2 — Home marks its primary disc by it (`HomeView.swift:108`; `:107` until 1.2.5); `theUsualSlotIsTheGlass` pins it to the Glass by name. Added 2026-10-08. **The index is not spelled only here:** `HistoryView.swift:447` (`:419` until set A's step 5, `:397` until set A's step 4, `:363` until set A's step 3, `:305` until set A's step 2, `:283` until the redesign's stage 3c, `:271` after the first build of stage 3b, `:240` until it) seeds a new serving with `manager.servings[1]`, and the watch has its own `primaryIndex = 1` (`WristView.swift:136`) — `docs/AI_CONTEXT.md` known issue #104. *(Read "so the index is spelled once" until the twenty-seventh pass.)* *(2026-10-20, the seventy-seventh pass: roadmap item 1.3.2's stage 7b, staged, deletes `primaryIndex` — the watch reads `usualSlot` — so History's literal is the one other spelling left.)* |
 | `maximumDailyIntake` | `100_000` ml | upper clamp for both the total and the goal |
 
 ## The eight phone keys, plus a ninth: the phone's ledger of the watch's pours — and a tenth, the rating request's mark
@@ -906,6 +914,28 @@ key and no stored byte**: `insights: WeekInsights?` is derived on every read and
   memory, for the run of the app, keyed by the English sentences it was handed; nothing reaches either
   store, the widget, the watch or a notification (rule `70-privacy`).
 
+### `recap(of:)` — a finished month, read for its sheet, published nowhere
+
+*Added 2026-10-24, set A's step 5 (spec `docs/superpowers/specs/2026-10-24-monthly-recap-design.md`).*
+**No key and no stored byte**, and — unlike `month` and `insights` — **nothing published**.
+
+- **Which month a page offers** is `MonthHistory.recap: Neighbour?`, worked out in `make` from the rows it
+  already has: a finished month offers its own once `MonthPatterns.minimumDays` (7) of its days hold
+  water; the month holding today offers the month before's, on the same bar, while today is one of its
+  first `MonthHistory.recapDays` (7) days, today's day of the month read off its ordinal on the model's
+  calendar. It takes part in `month`'s equality, so the row appears and goes through the republish that
+  already runs (`dayDidTurn()` at the 7th→8th turn).
+- **Read once, on the row's tap**, through `recap(of firstDay:)`: the month's own two reads, spelled once in
+  `readMonth(_:)`, which `republishMonth()` calls too — the rows from the 1st of the month before to the
+  end of the month, and the first serving. It returns the month only when its own `recap` names itself; a
+  failed read is `nil`, never an empty month.
+- **Writes nothing**: neither store, no doorbell, no reschedule; `month` and `monthLogs` stand as they were.
+  Behind `role.drawsHistory`, the **tenth guarded site** (*Who may write on behalf of the group*).
+- **The shared image is not state.** `RecapSheet` renders the card with `ImageRenderer` into a `UIImage` it
+  holds while it is open, and `ShareLink` exports it as PNG on the user's tap; no file is written, no key,
+  and the app records nothing of where it went (rule `70-privacy`). The streak is drawn beside the card,
+  never on it (rule `20-state`).
+
 ## The sixth key, and the seam that reads it
 
 `remindersEnabled` is a `Bool`, **absent until the user turns reminders on**. Like `isGoalSet` and
@@ -1172,7 +1202,7 @@ is a `static let`. **It is no longer read at any guard site.** Since 2026-08-31 
 `DataManager.role`, and the guards ask that instead:
 
 ```swift
-nonisolated static let role: Role = {          // DataManager.swift:1996 (read :1924 until set A's step 4; :1787 until set A's step 2; :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
+nonisolated static let role: Role = {          // DataManager.swift:2024 (read :1996 until set A's step 5; :1924 until set A's step 4; :1787 until set A's step 2; :1647 until 2026-10-20; :1565, a line of its DocC, until 1.2.5)
     #if os(watchOS)
     return isAppExtension ? .watchExtension : .watchApp
     #else
@@ -1201,20 +1231,25 @@ different questions" until the twenty-sixth pass; the four writes have only ever
 1. **Materialising `dailyGoal` in `init`** (`:654`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1485`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:1406`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:2140`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1513`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:1434`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:2168`, `mayHaveLegacyStandardDefaults`).
 
-Five further sites are guarded by the same enum but are not group bookkeeping:
+Six further sites are guarded by the same enum but are not group bookkeeping:
 `republishHistory` (`:1106`, `drawsHistory`, cost rather than correctness); `republishStreak`
 (`:1167`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
-because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1203`,
+because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1201`,
 `drawsHistory` a third time — **new with set A's step 2, the eighth site**, with a guard of
 its own for the same reason: `showMonth(_:)`, `refresh()`, `saveAndRecompute()`, `dayDidTurn()` and
-the `dailyGoal` setter call it outside `republishHistory`); `republishInsights` (`:1259`,
-`drawsHistory` a fourth time — **new with set A's step 4, staged, the ninth site**, called beside each
-`republishMonth()` and from `showInsights(_:)`); and `requestReminderReschedule` (`:1740`,
+the `dailyGoal` setter call it outside `republishHistory`); `recap(of:)` (`:1229`, `drawsHistory` a
+fourth time — **new with set A's step 5, staged, the tenth site**: a read for the recap's sheet, which
+returns a value and publishes nothing, guarded for `republishMonth()`'s reason); `republishInsights`
+(`:1287`, `drawsHistory` a fifth time — **new with set A's step 4, the ninth site**, called beside each
+`republishMonth()` and from `showInsights(_:)`); and `requestReminderReschedule` (`:1768`,
 `mayFileReminders`, the one whose wrong answer is immediately user-visible).
+*(Lines re-derived by `grep` for each guard's own words on 2026-10-24, set A's step 5, on its staged tree —
+its insertions in `DataManager.swift` begin after line 1191; at `HEAD` `ad244c2` they read `:1485`,
+`:1406`, `:2140`, `:1203`, `:1259` and `:1740`; `:654`, `:1106` and `:1167` did not move.)*
 *(Lines re-derived by their words on 2026-10-24, set A's step 4, on its working tree — they read `:633`,
 `:1416`, `:1337`, `:2068`, `:1085`, `:1146`, `:1182` and `:1668` at `HEAD` `5b511bd`.)* Rule `25-shared-storage`
 still counts six (`docs/AI_CONTEXT.md` known issue #103).

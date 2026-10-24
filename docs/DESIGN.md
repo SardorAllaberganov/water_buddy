@@ -7,6 +7,11 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-24, evening (set A's step 5's records, finished under the eighty-ninth `/doc_sync`).
+A section, *The recap, measured*: the row, the sheet, the card and the 1,080-px image, the walk's
+twenty-seven colour pairs off its renders, all over their floors, and W1 — the tiles' `Base.archived`
+colour — for the owner. No token moved.
+
 **Last updated:** 2026-10-24 (eighty-seventh pass — `/doc_sync` run by the owner on set A's step 4's staged
 tree; no code changed since its gate). *Insights, measured*'s *Not measured* gains the switch's third
 segment: *The month, measured* read the switch with two. Every figure in the section re-read against the
@@ -2274,6 +2279,52 @@ style on the aurora, not this heading alone (known issue #177, the owner's, with
 locked page's new card copy (the locked month's style, measured in *The month, measured*); the switch's
 third segment, *Insights*, and its lock — the *Month* segment's own style, which *The month, measured*
 read as a two-segment switch (the eighty-seventh pass, 2026-10-24).
+
+## The recap, measured
+
+*Added 2026-10-24, set A's step 5 (spec `docs/superpowers/specs/2026-10-24-monthly-recap-design.md`, §4b).*
+
+**What is drawn.** The row: a `.frosted` + `.raised` interactive pane, `doc.text.image` in **white** (W4 —
+cyan read 2.6:1 where the aurora's cyan light passes), *Monthly recap* `.subheadline` bold, the month
+`.footnote` at white 0.9, a chevron. The sheet: *Monthly recap* `.title2` bold on the aurora with
+`legibleOnBackdrop()`, the paywall's ✕ in a `.sheer` circle (its glyph 17/44 of the circle — W3); **the
+card** — `Aurora.gradient` in a `LiquidGlass.cornerRadius` shape with `.premiumRim()`, the month
+`.footnote` heavy upper-cased in `Aurora.cyan`, the mark `.caption` bold at white 0.86, the hero `.largeTitle`
+heavy rounded, *Days on goal* `.headline`, a dot a day (met `Aurora.cyan`, unmet a white 0.4 ring 2 pt,
+uncounted white 0.12), two tiles `.liquidGlass(cornerRadius: innerCornerRadius, base: .archived, density:
+.sheer, elevation: .flush)` with `.title3` heavy figures over `.footnote` labels at white 0.86, the change
+line `.subheadline` bold beside a cyan glyph; the best streak's and the footnote's `.frosted` + `.raised`
+panes; *Share as an image*, the primary surface. **The image** is the card on an `Aurora.top` margin of 20
+pt, 360 pt × 3 = 1,080 px wide, `.dynamicTypeSize(.large)`, dark.
+
+**How measured.** *iPhone 17* (iOS 27.0), a seeded holder's September in a walk copy, one frame per state;
+the image off the PNG `RecapSheet` renders; a box per element, ink and ground split by Otsu's threshold,
+ink the median of the ink class's brighter half, ground its 90th-percentile brightest pixel (dark ink:
+the 10th-darkest ground). A single frame, so where the aurora drifts under a pane the readings move —
+known issue #177's caveat holds for the heading and the row.
+
+| Pair | Floor | Reading |
+|---|---|---|
+| The month (cyan) on the card's gradient — en / ru | 4.5 | **7.35** / 7.36 |
+| The mark (0.86) / *23/30* / *Days on goal* | 4.5 / 3 / 4.5 | 9.86 / 12.43 / 12.17 |
+| A tile's figure / its label (0.86) — en / ru | 3 / 4.5 | 12.03 / 9.34 / 6.67 |
+| The change line / its glyph (cyan) | 4.5 / 3 | 10.20 / 5.79 |
+| A met dot (cyan) / an unmet ring (0.4) | 3 | 6.67 / **3.10** |
+| The rim on the margin | 3 | 5.91 |
+| The heading on the aurora (`.title2` bold, large text) | 3 | 9.60 — one frame (#177) |
+| *Best streak* / its days / its footnote (0.9) | 4.5 | 5.57 / 8.84 / 5.04 |
+| *Share as an image* on white | 4.5 | 11.45 |
+| The footnote's pane / the ✕ | 4.5 / 3 | 6.33 / 9.89 |
+| The row: title / month (0.9) / glyph (white) / chevron | 4.5 / 4.5 / 3 / 3 | 6.17 / 5.52 / 5.12 / 9.38 |
+| Under Reduce Transparency: the footnotes / a tile's label | 4.5 | 9.94, 12.03 / 9.34 |
+
+Every pair clears its floor; the unmet ring by 0.10. **W1 — the tiles' colour** is `Base.archived`'s
+derived fill over the card's gradient (`white 0.24` at 50 %), grey-brown beside the app's own panes, and not
+retuned by eye: the owner's (`docs/AI_CONTEXT.md` #182).
+
+**Not measured:** iOS 26.5 and 18.6; Increase Contrast; Uzbek (the same tokens as Russian's, read by eye);
+the largest text sizes' pairs (the layout read by eye — W2's fix); the image under the sender's Reduce
+Transparency, which an `ImageRenderer` does not inherit (inferred, spec §4b).
 
 ## The header and a screen arriving
 

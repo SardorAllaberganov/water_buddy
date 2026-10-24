@@ -373,6 +373,17 @@ streak, the litres drunk, and the change from the month before. It may be shared
 leaves the phone only on the user's own tap, as 1.4.4's file does. **Needs a rule change** (§8).
 The streak never leaves the app today (rule `20-state`), so whether the shared image carries it is
 its design's question.
+*(2026-10-24: **set A's step 5 — designed, specified, planned, built test-first, walked, measured,
+reviewed, gated and staged; not committed — and set A is on sale in code.** The owner's rulings: the
+recap appears on a finished month's page and, for its first seven days, on the new month's; **the best
+streak stays in the sheet, off the image**; a month needs water on seven days; Save to Photos is left out
+if it would need a usage key — measured: iOS withholds *Save Image* from an app without one, so
+`ShareLink` shares the card with no exclusion and the app still asks for one permission; the month is read
+when the sheet opens, published nowhere. Spec `docs/superpowers/specs/2026-10-24-monthly-recap-design.md`
+and plan `docs/superpowers/plans/2026-10-24-monthly-recap.md`. Its rule wording — `70-privacy`'s *The
+recap's image, on the user's own tap* among nine files — is typed and unstaged for the owner. A Release
+build offers set A once the privacy URL replaces the token (#159); App Store Connect's products and a
+device purchase (#155, #156) stay the owner's.)*
 
 **1.4.8 — Vessel library.** More than three vessels, each with its own name and glyph; Home's row of
 three is picked from them. Every one-tap door still logs the Glass, slot `DataManager.usualSlot`.

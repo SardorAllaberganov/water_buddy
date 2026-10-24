@@ -12676,3 +12676,93 @@ by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks ar
 commit` was run.** HEAD `5b511bd`, 176 commits, level with `origin/main`. **21 staged** — 16 modified, 5
 added, the same set as above: all four files were already staged. **16 unstaged**, the same sixteen. **1
 untracked** in `git status`: `Screenshots/census/`. None in both; `git diff --cached --check` clean.
+
+## [2026-10-24] — Set A's step 5, the Monthly recap, designed, built, walked, measured, reviewed and gated; set A on sale in code; and the eighty-ninth `/doc_sync`
+
+Roadmap item 1.4.7 and the last of set A's five steps. Designed with the owner, specified, planned,
+measured, built test-first, walked, reviewed and gated in one session; the records begun as the step's
+own and finished under `/doc_sync`, which the owner ran while they were being written.
+
+### What changed
+
+- **The recap.** In History's Month mode a holder's finished month with water on seven or more days
+  offers a *Monthly recap* row after its figures; the month holding today offers the month before's for
+  its first seven days. The row opens `RecapSheet`: `RecapCard` — the month, days on goal of days counted,
+  a dot a day, the litres, the daily average, the change from the month before — the best streak beside
+  it with *Stays in the app, not on the image*, *Share as an image* (`ShareLink`) and its footnote.
+- **The model** (`DataManager.swift`): `MonthHistory.recap: Neighbour?`, `recapDays`, `Identifiable`;
+  `recap(of:)`, a read behind `role.drawsHistory` — the tenth guarded site — that publishes nothing and
+  writes neither store; `readMonth(_:)`, the month's two reads spelled once for it and `republishMonth()`.
+- **The image**: `ImageRenderer`, 360 pt × 3 = 1,080 px, `.dynamicTypeSize(.large)`, dark, in memory only;
+  the tiles on `Base.archived`, for a rendered pane's reason.
+- **History**: `RecapRow`, the third `.sheet(item:)`, a lapse clearing it, a `#Preview` of the first-week
+  row; the change line's helpers lifted to `HistoryView` statics the card shares.
+- **Set A on sale**: `PremiumSet.understand.isOnSale` is `true`; a Release build still waits for the privacy
+  URL (#159).
+- **Five strings** in en, ru (drafts) and uz (drafts); the app's catalogue 231 keys.
+
+### The rulings it rests on
+
+The owner's, in conversation: step 5 as the task; the turn of the month and the finished month's page
+("Finished month + new month's first week"); the best streak in the sheet, off the image; Save to Photos
+left out if it would need a usage key; water on seven days; approach A, read when the sheet opens; the
+design's four sections, the spec and the plan, each "ok". **Measured, Task 0**: iOS offers *Save Image* only
+to an app carrying `NSPhotoLibraryAddUsageDescription` — absent on 27.0, 26.5 and 18.6 without the key,
+offered with it in a control — so `ShareLink` needs no exclusion and the app still asks for one permission.
+The executor's rulings, in the ledger and the spec's §4a–§4c: the walk's W2–W4 fixed and re-walked, W1 (the
+tiles' colour) left for the owner; the image rendered without the sender's Reduce Transparency (inferred);
+the final review's I1 answered by a test and I2 by a 31-day test.
+
+### Drift found by the sync, and fixed
+
+- `CLAUDE.md`'s Insights bullet still said its rule wording awaited the owner — admitted in `ad244c2`.
+- The spec and `docs/AI_CONTEXT.md` said "no new `role` site" beside a bullet naming `recap(of:)`'s guard:
+  the census sweep showed the tenth site; corrected in the spec (dated), `AI_CONTEXT`, `STATE`, `CLAUDE.md`
+  and rule `25-shared-storage`'s unstaged wording.
+- Every guard line past `DataManager.swift:1191` re-pointed in `STATE` and `AI_CONTEXT`'s *The process
+  role*, with `role`/`Role` (`:2024`/`:2033`), each old number kept; the literal `manager.servings[1]` at
+  `HistoryView.swift:447` in both.
+- `docs/DESIGN.md`'s header named "twenty-four" pairs, typed before counting: the table holds twenty-seven.
+
+### Checked and already accurate
+
+By a read-only script, every figure printed: 112 `.swift` files and 112 *Files on disk* rows, every count
+equal to `wc -l`; 931 phone `@Test`, 70 watch, 61 UI `func test`, as *Targets* states them; 13 keys on
+`DataManager.Key` and in `Key.all`; three six-file exception sets, as `CLAUDE.md` names them; 18 rules cited,
+18 files; `StoreKit` in `HomeView.swift` and `PremiumStore.swift` alone, `FoundationModels` in
+`InsightWriter.swift` alone, no `SwiftData` under `WaterBuddyWidget/`; no forbidden doc. `docs/WIDGET.md`:
+nothing in its subject moved — `MonthHistory` compiles into the widget, which draws none of it. Every
+*until step 5* in the docs sits in an earlier step's dated block.
+
+### Files
+
+Code and tests (staged): `WaterBuddy/DataManager.swift` · `WaterBuddy/HistoryView.swift` ·
+`WaterBuddy/Localizable.xcstrings` · `WaterBuddy/PremiumSet.swift` · `WaterBuddy/RecapCard.swift` (new) ·
+`WaterBuddy/RecapSheet.swift` (new) · `WaterBuddyTests/LocalizationTests.swift` ·
+`WaterBuddyTests/MonthRecapTests.swift` (new) · `WaterBuddyTests/PremiumAccessTests.swift` ·
+`WaterBuddyTests/PremiumSetTests.swift` · `WaterBuddyTests/RecapImageTests.swift` (new).
+Records: `docs/superpowers/specs/2026-10-24-monthly-recap-design.md` (new) ·
+`docs/superpowers/plans/2026-10-24-monthly-recap.md` (new) · `CLAUDE.md` · `docs/AI_CONTEXT.md` ·
+`docs/STATE.md` · `docs/DESIGN.md` · `docs/ROADMAP.md` · `tasks/lessons.md` (three entries) · this file.
+Rule wording, **unstaged for the owner**: `.claude/rules/` `15-project`, `20-state`, `25-shared-storage`,
+`43-concurrency`, `50-views`, `60-design-system`, `65-accessibility`, `70-privacy`, `85-testing`.
+
+### Gate
+
+Run in this session on the final code, `build-for-testing` then `test-without-building`, one simulator,
+`-parallel-testing-enabled NO`, `-collect-test-diagnostics never`: phone unit on *iPhone 17* (27.0) — 931
+tests in 105 suites, 929 passed, `anExpiredYearlyReadsFree` skipped (#157), `theLinksAreApplesTermsAndAPageOfOurs`
+failing by design (#159); UI by class and chunks of at most thirteen — 27.0: 74 executed, 1 skipped, 1
+failure, `WelcomeUITests.testAStepIsAsItWasLeftWhenBackReturnsToIt`'s lost tap (#140), which passed alone;
+26.5: 74 executed, 1 skipped, no failure; watch on *Apple Watch Series 12 (46mm)* (watchOS 27.0) — 70 in 7
+suites passed; `WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget` built. **Warnings**: clean builds of
+a `HEAD` `ad244c2` export and of a copy of the index, by file and message — 20, 17, 2, 17 on both sides
+(`-scheme WaterBuddy` by `build-for-testing`, 36 sites on both), no line new or gone. **Not run**: anything
+on a device (#184).
+
+**Staging.** Read from the commands at 17:20 on 2026-10-24, after this session's `git add` of 20 files by
+name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit`
+was run.** HEAD `ad244c2`, 180 commits, level with `origin/main`. **20 staged** — 14 modified, 6 added.
+**15 unstaged** — the nine rule files, for the owner; `.claude/settings.json`, two watch schemes and three
+string catalogues, all from before the session. **1 untracked** in `git status`: `Screenshots/census/`.
+None in both; `git diff --cached --check` clean.
