@@ -9,9 +9,14 @@
 	  URLSession, Network, CloudKit, HealthKit, CoreLocation and every third-party SDK returns
 	  nothing, and rule `95-dependencies` keeps it that way.
 
-	  The one required-reason API this product does use is UserDefaults, and it is unavoidable:
-	  the widget's read path cannot open SwiftData, so the App Group suite is the only surface
-	  both processes share (rule `40-widget`).
+	  Two required-reason APIs are used. UserDefaults is unavoidable: the widget's read path cannot
+	  open SwiftData, so the App Group suite is the only surface both processes share (rule
+	  `40-widget`). The system boot time is `AuroraClock`'s: the aurora's lights are placed by the
+	  seconds since the first backdrop drew, read from `ProcessInfo.systemUptime`.
+
+	  The four manifests — the app, the widget, the watch app and the watch widget — stay
+	  byte-identical, so this one declares both for every bundle, including those that call only
+	  one (rule `15-project`, *Submission*; `PrivacyManifestTests`).
 	-->
 	<key>NSPrivacyTracking</key>
 	<false/>
@@ -38,6 +43,20 @@
 				  `migrateIfNeeded(from:into:)` that copies legacy `.standard` state into the suite.
 				-->
 				<string>CA92.1</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!--
+				  35F9.1 — the time elapsed between events within the app. `AuroraClock` reads
+				  `ProcessInfo.processInfo.systemUptime` (`AuroraBackground.swift`) once as its
+				  epoch and again on each frame, and places the aurora's lights by the difference.
+				  The value never leaves the device and is never stored.
+				-->
+				<string>35F9.1</string>
 			</array>
 		</dict>
 	</array>
