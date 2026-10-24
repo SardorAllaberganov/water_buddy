@@ -605,6 +605,62 @@ struct WristPlanTests {
         #expect(WristPlan.Face(total: 100_000, goal: 2_000).progress == 1)
     }
 
+    // MARK: - A corrupt store saturates, never traps (known issue #154)
+
+    /// The wrist counts what the phone will apply: `DataManager.ingest(_:)` folds a pour only when its
+    /// amount is in `1...maximumDailyIntake`, so one outside it — which only a corrupt store can hold —
+    /// is not today's water here either.
+    @Test
+    func anAmountThePhoneWouldRefuseIsNotCounted() {
+        let now = Date(timeIntervalSince1970: 1_767_279_600) // 2026-01-01 15:00 UTC
+        let pours = [0, -250, Int.max, 250].map { WristPour(id: UUID(), amount: $0, at: now) }
+        #expect(WristPlan.todaysTotal(from: pours, now: now, calendar: Self.utc) == 250)
+    }
+
+    /// The phone's own sum saturates at the most a day holds; the wrist's agrees with it.
+    @Test
+    func theOutboxSaturatesAtTheMostADayHolds() {
+        let now = Date(timeIntervalSince1970: 1_767_279_600)
+        let pours = (0..<3).map { _ in WristPour(id: UUID(), amount: 50_000, at: now) }
+        #expect(WristPlan.todaysTotal(from: pours, now: now, calendar: Self.utc) == DataManager.maximumDailyIntake)
+    }
+
+    /// A mirrored total at `Int.max` plus one pour overflowed a plain `+` and trapped the watch app and
+    /// its complication alike.
+    @Test
+    func aCorruptMirrorTotalNeverOverflows() {
+        let mirror = Self.mirror(
+            currentWater: .max,
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_225_600), // 2026-01-01 00:00 UTC
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_312_000)    // 2026-01-02 00:00 UTC
+        )
+        let now = Date(timeIntervalSince1970: 1_767_279_600)
+        let pour = WristPour(id: UUID(), amount: 250, at: now)
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [pour], now: now, calendar: Self.utc)
+                == DataManager.maximumDailyIntake)
+    }
+
+    /// The phone never sends a total below zero; one that arrives counts as none.
+    @Test
+    func aMirroredTotalBelowZeroCountsAsNone() {
+        let mirror = Self.mirror(
+            currentWater: -500,
+            phoneDayStart: Date(timeIntervalSince1970: 1_767_225_600),
+            phoneDayEnd: Date(timeIntervalSince1970: 1_767_312_000)
+        )
+        let now = Date(timeIntervalSince1970: 1_767_279_600)
+        let pour = WristPour(id: UUID(), amount: 250, at: now)
+        #expect(WristPlan.todaysTotal(mirror: mirror, outbox: [pour], now: now, calendar: Self.utc) == 250)
+    }
+
+    /// `Face` is a plain value anyone can build, so its readout must be safe on its own: the share is
+    /// held to three digits before it becomes an `Int`, not after.
+    @Test
+    func aFaceFromAnyTotalReadsWithinItsThreeDigits() {
+        #expect(WristPlan.Face(total: .max, goal: 1).percentage == 999)
+        #expect(WristPlan.Face(total: .min, goal: 1).percentage == 0)
+    }
+
     @Test
     func aFaceSpeaksAndDrawsItsFiguresInTheAppsSentences() throws {
         let english = try #require(Self.english)

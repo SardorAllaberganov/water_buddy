@@ -66,6 +66,18 @@ struct WristViewLogicTests {
         #expect(WristView.syncedCaption(composedAt: nil, now: .now, strings: english, locale: Locale(identifier: "en")) == "Not yet synced")
     }
 
+    /// A stored mirror's `composedAt` so far from now that its age fits no `Int` cannot be a real sync —
+    /// only a corrupt store holds one — and it trapped the screen. It reads as no sync at all
+    /// (known issue #154's sibling).
+    @Test(arguments: [-1e300, 1e300])
+    func aSyncTimeNoClockCouldHaveWrittenReadsAsNeverSynced(offset: TimeInterval) throws {
+        let english = try #require(shipped("en"))
+        let now = Date(timeIntervalSince1970: 1_767_279_600)
+        let text = WristView.syncedCaption(composedAt: now.addingTimeInterval(offset), now: now, strings: english,
+                                           locale: Locale(identifier: "en"))
+        #expect(text == "Not yet synced")
+    }
+
     // MARK: - Attribution (the always-present line, spec §8's "never an alert")
 
     /// `servings:` is a parameter rather than the fixed triple it used to be so a test can hand the

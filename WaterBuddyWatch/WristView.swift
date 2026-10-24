@@ -362,11 +362,15 @@ struct WristView: View {
     ///
     /// Russian writes the minutes as `мин`, which needs no plural form, and Uzbek takes none after a
     /// numeral — so one `%1$d` key serves every count.
+    ///
+    /// A `composedAt` whose age in minutes no `Int` holds reads as "Not yet synced", as a missing one
+    /// does: no clock wrote it, only a corrupt store holds it, and converting it trapped the screen
+    /// (known issue #154's sibling).
     nonisolated static func syncedCaption(composedAt: Date?, now: Date, strings: Bundle, locale: Locale) -> String {
-        guard let composedAt else {
+        guard let composedAt,
+              let minutes = Int(exactly: (now.timeIntervalSince(composedAt) / 60).rounded(.towardZero)) else {
             return strings.localizedString(forKey: "Not yet synced", value: nil, table: nil)
         }
-        let minutes = Int(now.timeIntervalSince(composedAt) / 60)
         guard minutes >= 1 else {
             return strings.localizedString(forKey: "Synced just now", value: nil, table: nil)
         }

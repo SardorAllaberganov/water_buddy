@@ -26,6 +26,11 @@ enum WristPlan {
     /// simply filters, on every call, from each pour's own instant. A pour carries no stored day of
     /// its own (`WristPour` has none, deliberately): a stamp made in one time zone and re-read in
     /// another would name a day the watch may no longer be in.
+    ///
+    /// **Counts what the phone will apply, and saturates** (known issue #154). A pour counts only
+    /// when its amount is in `1...maximumDailyIntake` — the filter `DataManager.ingest(_:)` folds by —
+    /// and the sum stops at `maximumDailyIntake`, where the phone's own does. Only a corrupt store
+    /// holds anything else, and a plain `+` over it trapped the watch app and its complication.
     nonisolated static func todaysTotal(from pours: [WristPour], now: Date, calendar: Calendar) -> Int {
         let startOfToday = calendar.startOfDay(for: now)
         guard let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: startOfToday) else {
@@ -33,7 +38,8 @@ enum WristPlan {
         }
         return pours
             .filter { $0.at >= startOfToday && $0.at < startOfTomorrow }
-            .reduce(0) { $0 + $1.amount }
+            .filter { (1...DataManager.maximumDailyIntake).contains($0.amount) }
+            .reduce(0) { saturating($0, $1.amount) }
     }
 
     /// What the watch draws as today's water: the phone's mirrored total while the phone's own day is
@@ -50,9 +56,22 @@ enum WristPlan {
     ///
     /// Both watch surfaces read this — `WristModel.todaysTotal` and the complication — so the screen
     /// and the face cannot disagree.
+    ///
+    /// The mirrored figure is held to `0...maximumDailyIntake`, the phone's own clamp on what it
+    /// sends, and the outbox is added the saturating way (#154).
     nonisolated static func todaysTotal(mirror: WristMirror?, outbox: [WristPour], now: Date, calendar: Calendar) -> Int {
         let phoneTotal = mirror.map { now < dayEnd(of: $0, calendar: calendar) ? $0.currentWater : 0 } ?? 0
-        return phoneTotal + todaysTotal(from: outbox, now: now, calendar: calendar)
+        return saturating(
+            min(max(phoneTotal, 0), DataManager.maximumDailyIntake),
+            todaysTotal(from: outbox, now: now, calendar: calendar)
+        )
+    }
+
+    /// `running + amount`, stopped at `maximumDailyIntake` rather than overflowing — the phone's own
+    /// sums' rule (`75-diagnostics`). `DataManager.swift`'s helpers are `fileprivate` to that file.
+    private nonisolated static func saturating(_ running: Int, _ amount: Int) -> Int {
+        let (sum, overflowed) = running.addingReportingOverflow(amount)
+        return overflowed ? DataManager.maximumDailyIntake : min(sum, DataManager.maximumDailyIntake)
     }
 
     /// The instants after `now` at which ``todaysTotal(mirror:outbox:now:calendar:)`` changes with
@@ -104,9 +123,12 @@ extension WristPlan {
 
         /// The readout: the share in whole percent, rounded as the complication always rounded it,
         /// held to `0...999` so it fits a face in three digits. 0 for a goal of 0.
+        ///
+        /// Held while still a `Double`, then converted: a `Face` is a plain value anyone can build, and
+        /// a share past `Int`'s range trapped in the conversion (#154).
         var percentage: Int {
             guard goal > 0 else { return 0 }
-            return min(999, max(0, Int((Double(total) / Double(goal) * 100).rounded())))
+            return Int(min(999, max(0, (Double(total) / Double(goal) * 100).rounded())))
         }
 
         /// The vessel's own sentence — `WaterSnapshot.spokenFigures(in:locale:)`'s twin, the same key —
