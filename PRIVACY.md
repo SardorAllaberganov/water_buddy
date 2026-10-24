@@ -1,211 +1,247 @@
-> **Placeholders:** every `[SQUARE-BRACKETED]` item below must be filled in by the app owner before publishing.
+<!--
+  WaterBuddy's privacy policy — the repository's copy. Its published form is
+  `Tools/PrivacyPolicy.html`, served at https://sardorallaberganov.github.io/waterbuddy/privacy/
+  (`PaywallView.privacyPolicy`). The two change together: an edit to one is an edit to both.
+  Written from the code (spec `docs/superpowers/specs/2026-10-24-privacy-policy-design.md`).
+  `CONTACT-EMAIL` is the one token left for the owner to fill before publishing.
+-->
 
 # WaterBuddy Privacy Policy
 
-**App:** WaterBuddy (iPhone and Apple Watch)
-**Developer:** [DEVELOPER NAME OR LEGAL ENTITY]
-**Contact:** [CONTACT EMAIL ADDRESS]
-**Effective date:** [EFFECTIVE DATE, e.g. 1 October 2026]
-**Last updated:** [DATE THIS VERSION WAS PUBLISHED]
+**App:** WaterBuddy, for iPhone and Apple Watch
+**Developer:** Sardor Allaberganov
+**Contact:** CONTACT-EMAIL
+**Effective date:** 24 October 2026
+**Last updated:** 24 October 2026
 
 ---
 
 ## In one sentence
 
-WaterBuddy keeps everything you log on your own devices, sends nothing to us or to anyone else, and contains no code capable of contacting a server — the only data that ever leaves your iPhone is the water you logged, travelling to your own paired Apple Watch and back.
+WaterBuddy keeps what you log on your own iPhone and Apple Watch: it has no account and no server, and it sends nothing to us — your water travels only between your own iPhone and your own Watch, and anything else that leaves a device does so through Apple (a purchase, a Siri request) or because you chose to share it (a monthly recap image).
 
 ---
 
 ## Why we can say "we collect nothing" and mean it
 
-Most privacy policies ask you to trust a promise. This one describes a structural fact about how the app is built.
+Most privacy policies ask you to trust a promise. This one describes how the app is built.
 
-WaterBuddy contains **no networking code at all**. There is no `URLSession`, no `URLRequest`, no `Network` framework, no web view, no HTTP request of any kind anywhere in the app's source. A search across all four shipping parts of the app (the iPhone app, the Home Screen widget, the Watch app and the Watch complication) returns zero matches for every networking API. There is not a single server address, domain name or API endpoint anywhere in the code or its resources.
+**WaterBuddy has no server, and no networking code.** There is no `URLSession`, no `Network` framework, no web view and no HTTP request of any kind in the app's source. The only web addresses in it are two links — Apple's standard Terms of Use and this page — which open in Safari when you tap them; the app never loads them itself.
 
-The complete list of Apple frameworks the shipping app uses is: Foundation, SwiftUI, SwiftData, WidgetKit, Observation, UserNotifications, WatchConnectivity, AppIntents, and UIKit (used in exactly one place, to open the iOS Settings app so you can change notification permissions). None of them can reach a network on the app's behalf, and none of them is used to.
+The Apple frameworks the app is built from are Foundation, SwiftUI, SwiftData, Observation, WidgetKit, AppIntents, UserNotifications, WatchConnectivity, UIKit, Core Graphics, **StoreKit** and **FoundationModels**. Two of them deserve a sentence each:
 
-There are also **zero third-party libraries** in the project. No Swift packages, no CocoaPods, no embedded frameworks. Nothing was added by anyone but the developer, so nothing can phone home behind the developer's back.
+- **StoreKit** is Apple's own in-app purchase system. It talks to Apple's App Store — never to us — when you look at or buy Premium, restore a purchase, or when the app asks iOS to show its rating request. See *Premium* and *The rating request* below.
+- **FoundationModels** is Apple's on-device language model. It runs on your iPhone. See *Personal insights* below.
 
-Because there is no way for the app to send anything anywhere, there is no data for us to collect, store, sell, share, lose or be compelled to hand over. We do not have a server. We do not have a database with your name in it. We do not have your name.
+There are **no third-party libraries** in the project: no Swift packages, no CocoaPods, no embedded frameworks. Nothing was added by anyone but the developer, so nothing can report back behind the developer's back.
+
+We have no server, no database with your name in it, and no way to receive what you log. We do not have your name.
 
 ---
 
 ## What the app stores, and where
 
-Everything below lives on your device, inside the app's own private storage (an Apple "App Group" container). Nothing here is uploaded.
+Everything below lives on your own devices, in WaterBuddy's own storage. None of it is uploaded by the app.
 
 **On your iPhone:**
 
 | What | Details |
 |---|---|
-| Your water servings | Each serving you log: an amount in millilitres, the date and time you logged it, and a random identifier generated fresh for that serving. This is the app's record of your history. |
-| Today's total | Recalculated from your servings, kept so the widget can display it quickly. |
+| Your water servings | For each serving you log: the amount in millilitres, the moment you logged it, and a random identifier made for that serving. This is your history. |
+| Today's total | Worked out again from your servings after every change, and kept so the widgets can show it at once. |
+| The last seven days' totals | Seven daily figures, kept for the week widget, which cannot read your history directly. |
 | Your daily goal | A number of millilitres. |
-| The current day marker | Used to reset your total at midnight. |
-| Your three quick-add serving sizes | Three amounts in millilitres. |
-| Your chosen language | `en`, `ru` or `uz`, or nothing at all if you let the app follow your device's language. |
-| Two internal flags | Whether you have set a goal yet, and whether a one-time internal data move has already happened. |
-| Your reminders on/off setting | A yes/no value. |
-| A record of which Watch servings have already been counted | A list of serving identifiers grouped by day, so a serving logged on your Watch is never counted twice. This list is kept for 90 days and then discarded. |
+| The current day | A date marker, used to start a new day at midnight. |
+| Your three quick-add amounts | Three amounts in millilitres — the Cup, the Glass and the Bottle. |
+| Your chosen language | English, Russian or Uzbek — or nothing at all, if the app follows your device's language. |
+| Your reminders setting | Whether you turned reminders on. |
+| Two internal flags | Whether you have chosen a goal yet, and whether a one-time move of older settings has already happened. |
+| The rating request | The app version in which WaterBuddy last asked iOS to show its rating request, so it never asks twice in one version. |
+| Which Watch servings are already counted | The identifiers of servings your Watch sent, grouped by day, so one is never counted twice — or brought back after you delete it. Entries older than about 90 days are dropped the next time a Watch serving is recorded. |
 
 **On your Apple Watch:**
 
 | What | Details |
 |---|---|
-| Servings you logged on the Watch that your iPhone has not confirmed yet | Amount, time and identifier for each. Cleared as soon as your iPhone confirms them. |
-| A copy of what your iPhone last sent | Your total, goal, serving sizes, language and goal-set flag, so the Watch face and complication can show something before the next sync. |
+| Servings logged on the Watch that your iPhone has not confirmed yet | The amount, the moment and the identifier of each. Removed as soon as your iPhone confirms it. |
+| A copy of what your iPhone last sent | Today's total, your goal, your three amounts, your language, whether you have chosen a goal, when the copy was made, when your iPhone's day starts and ends, and the identifiers of up to 256 Watch servings your iPhone has already counted — so the Watch and its complications can show the right figures before the next sync. |
 
-**Also on your iPhone, held by iOS itself:** up to 28 pending reminder notifications, if you turn reminders on. See *Notifications* below.
+**Held by iOS itself, on your iPhone:** up to 28 pending reminder notifications, if you turn reminders on. See *Notifications*.
 
-**That is the complete list.** WaterBuddy stores no name, no email address, no account, no password, no device identifier, no advertising identifier, no location, no health record, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of those things is ever created, so none of them can be stored.
+**Worked out when shown, and stored nowhere:** your streak, your month view, your patterns, your insights and your monthly recap are all computed from your servings on your iPhone each time they are drawn.
 
-The app uses no Keychain storage, no iCloud storage and no CloudKit sync. Your history is not backed up to iCloud by the app itself. (If you have iOS device backups enabled, your device backup is handled by Apple under Apple's terms, not by us.)
+**Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes — only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); and the recap image (made in memory when you open the recap).
 
-**One honest note about "private":** the app's storage container is shared between the four parts of WaterBuddy — the app, the Home Screen widget, the Watch app and the Watch complication — because they need to show you the same numbers. Apple scopes this kind of shared container to a single developer, so no other company's app can read it. But it is accurate to say the data is readable by all four parts of WaterBuddy, rather than by the main app alone.
+**That is the complete list.** WaterBuddy stores no name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
+
+The app uses no Keychain, no iCloud storage and no CloudKit sync, so it does not back your history up itself. If your device's own backups are on, those are made by Apple under Apple's terms.
+
+**Where exactly it lives.** On your iPhone, WaterBuddy and its widgets — the Home Screen, week and Lock Screen widgets and the Control Center control — share one storage container, because they show you the same numbers; your history itself is read only by the app. On your Apple Watch, the Watch app and its complications share a second container, on the Watch. Apple confines each container to WaterBuddy: no other company's app can read it.
 
 ---
 
 ## What leaves your device
 
-**Nothing is ever sent to us, to a server, or to any third party.** There is no code in the app that could do so.
+**Nothing is ever sent to us, to a server of ours, or to a third party chosen by us.** What does leave a device, and how:
 
-There is exactly one thing that does leave a device, and it deserves to be stated precisely rather than glossed over: **your iPhone and your own paired Apple Watch exchange data with each other.**
+### 1. Between your iPhone and your own Apple Watch
 
-This uses Apple's WatchConnectivity, which links two devices that you own and that you personally paired. It involves no account, no server, no third party, and no special permission. Here is everything that travels on that link:
+Your iPhone and the Apple Watch paired with it exchange data through Apple's WatchConnectivity, which links two devices you own and personally paired. It needs no account, no server and no special permission. This is everything that travels on it:
 
 **From your Watch to your iPhone**, when you log water on your wrist:
 - the amount in millilitres
 - the moment you logged it
 - a random identifier for that serving
-- a batch identifier and a couple of numbers used to reassemble a split message
+- a batch identifier and a few numbers used to put a split message back together
+- a "wake" signal that carries no data at all, so your iPhone takes the serving promptly
 
-**From your iPhone to your Watch**, so the Watch can show the right numbers:
-- today's total in millilitres
-- your daily goal
-- your three quick-add serving sizes
-- your chosen language code (or nothing, if you follow your device's language)
-- whether you have set a goal yet
-- when the message was composed, and when your phone's day starts and ends
-- a list of serving identifiers your phone has already counted, so the Watch knows it can stop resending them
+**From your iPhone to your Watch**, so the Watch shows the right figures:
+- today's total, your goal and your three amounts, in millilitres
+- your language (or nothing, if you follow your device's language)
+- whether you have chosen a goal
+- when the message was composed, and when your iPhone's day starts and ends
+- the identifiers of servings your iPhone has already counted, so your Watch can stop resending them
 
-The app also sends your Watch a one-word "wake up" signal that carries no data at all.
+Your iPhone may also send that same summary straight to your Watch's complication. Nothing else travels between the two: no name, no device identifier, no account, no location.
 
-That is the entire contents of the link. No name, no device identifier, no account, no health data, no location — because none of those exist in the app.
+**A qualification we would rather state than hide:** when your Watch hands a serving to iOS for delivery, iOS holds it in a system queue outside the app until your iPhone can be reached, and that queue survives the app being closed. If you delete a serving on your iPhone before its Watch copy arrives, the copy is not cancelled; your iPhone recognises it on arrival and discards it, so the deleted serving does not come back.
 
-**A qualification we would rather state than hide:** when your Watch hands a serving to iOS for delivery, iOS holds it in a system queue outside the app until your iPhone is reachable. That queue survives the app being closed. If you delete a serving on your iPhone before its Watch copy has arrived, the copy is not cancelled — instead, your iPhone recognises it as one it has already handled and discards it on arrival, so the deleted serving does not come back. It is discarded, not re-added, but it is technically true that it sat in an Apple system queue for a while.
+### 2. Premium, through Apple
+
+WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase — monthly, yearly or once — that adds a month view and full history, patterns, personal insights and a monthly recap.
+
+Premium is sold and paid for entirely through Apple's App Store, under your Apple Account. When you open the Premium screen, the app asks the App Store for the plans and their prices in your country, and whether a free week is open to you; buying, restoring a purchase, asking a parent to approve one (*Ask to Buy*) and managing a subscription all take place in Apple's own sheets. Apple processes the payment, and StoreKit checks the purchase on your iPhone.
+
+**We receive nothing about you from any of this** — not your name, your email, your Apple Account or your payment details. The app stores nothing about a purchase: it asks StoreKit whether you have Premium each time it starts, and keeps the answer in memory. Apple gives developers anonymous, aggregate sales reports through App Store Connect, which are not tied to anything you log. If a subscription ends, the extras go quiet; no serving, setting or figure is lost or hidden.
+
+### 3. The rating request
+
+At most once per app version — after you reach your goal on the Home screen on the third day in a row — WaterBuddy asks iOS to show Apple's standard rating request. iOS decides whether it appears. If you rate the app or write a review, that goes to Apple, under Apple's terms; the app learns nothing of what you chose. The app keeps only the version number in which it asked.
+
+### 4. Siri and the Shortcuts app
+
+WaterBuddy offers three actions in the Shortcuts app; the first two can also be asked of Siri by phrase, and appear in Spotlight:
+
+- **Log a Glass** — logs your Glass amount. Siri replies with the same two words every time, *"Water logged."*, which carry no number. It works on a locked iPhone, because logging water reveals nothing.
+- **Today's Water** — Siri says aloud today's total and how much is left to your goal. **On a locked iPhone, Siri asks you to unlock first**, so your figures are said only once you have authenticated. Bear in mind that Siri speaks them out loud.
+- **Log Water** — logs an amount you choose, in a Shortcut; it is also what the widgets' buttons and the Control Center control run.
+
+Your request to Siri is handled by Apple, under Apple's privacy policy. WaterBuddy does not volunteer or donate your activity to Siri. If **you** build a Shortcut with one of these actions, Apple's Shortcuts app stores it, and it may sync through your own iCloud if Shortcuts syncing is on — your Shortcut, in your iCloud, under Apple's terms, not something WaterBuddy sends.
+
+### 5. A monthly recap you choose to share
+
+The monthly recap (Premium) can be shared as an image, **only when you tap *Share as an image***. The image shows the month's name, the days you met your goal out of the days counted, a dot for each day, the litres you drank, your daily average and the change from the month before. It never shows your streak, a single serving, a time of day or your goal. It is made in memory and written to no file by the app. Where it goes is your choice in iOS's share sheet, and once it arrives there it is governed by whatever app or person you sent it to. WaterBuddy does not ask for access to your photo library, so iOS does not offer to save the image to Photos.
+
+### 6. Links you tap
+
+*Terms of Use* (Apple's standard licence) and *Privacy Policy* (this page) open in Safari when you tap them. This page is hosted by GitHub Pages, so a visit to it is handled by GitHub under GitHub's privacy statement, which may include your IP address; the app itself sends nothing when you tap.
 
 ---
 
-## Third parties
+## Personal insights, written on your iPhone
 
-There are none.
+Insights (Premium) describe your last finished week — what changed, what went well and one suggestion. **WaterBuddy decides what an insight says.** It writes its own sentences from your weekly figures — averages, the days you met your goal, when in the day you drank — on your iPhone.
 
-No advertising network. No analytics provider. No crash reporting service. No A/B testing service. No attribution or "growth" SDK. No payment processor — the app is free and contains no purchases. No third-party code of any kind is compiled into WaterBuddy.
-
-We sell nothing, share nothing and disclose nothing to anyone, because we receive nothing in the first place.
+When the app is in English, on an iPhone where Apple's on-device model is available and turned on, WaterBuddy may hand **those sentences, and the name of the vessel it suggests**, to Apple's on-device language model to word them more naturally. It never hands over your servings, their times or anything else. The model runs on your iPhone: WaterBuddy uses only the on-device model, never Apple's Private Cloud Compute and never any other provider. The wording it returns is kept in memory until the app closes, and shown only if every number in it is one the app gave it; otherwise the app's own sentences are shown. Each insight says who wrote it — WaterBuddy or Apple's on-device model. **An insight is not medical advice.**
 
 ---
 
-## Analytics, tracking and advertising
+## Where your figures appear outside the app
 
-WaterBuddy performs **no tracking, of any kind, ever.**
+Widgets and complications show your figures because you put them there:
 
-- It does not use Apple's advertising identifier, the vendor identifier, or any other device identifier.
-- It never shows the App Tracking Transparency prompt, because it has nothing to ask for.
-- It contains no analytics events, no usage counters sent anywhere, no session logging, no telemetry.
-- It generates no crash reports of its own and uploads none.
-- The app's own privacy manifest, which Apple requires and which is included in the shipped build, declares tracking as **false**, its list of tracking domains as **empty**, and its list of collected data types as **empty**.
+- **Home Screen widgets**, including the week widget, show today's progress and your last seven days.
+- **The Lock Screen widget** and **StandBy** show your percentage and total. If you turn off *Allow Access When Locked → Lock Screen Widgets* in iOS Settings, they show no figure until your iPhone is unlocked.
+- **Your Watch's complications** show today's figures, and hide them whenever watchOS asks apps to hide private data.
+- **The Control Center control** shows a button and a name, and no figure.
 
-The only identifiers the app creates at all are random ones attached to a single serving of water or a single sync message. A new one is made each time you tap a button, and they are never reused. They identify a glass of water, not a person, and they never travel further than your own paired Watch.
-
-The app writes nothing to the clipboard, and writes no files anywhere outside its own storage.
+A notification never shows a figure (below).
 
 ---
 
 ## Notifications
 
-Reminders are **entirely optional and off until you turn them on.**
+Reminders are **optional, and off until you turn them on.**
 
-- They are **local notifications only.** WaterBuddy does not use push notifications, does not register with Apple's push service, and has no push capability in its build. There is no server that could send you a message.
-- When you turn reminders on, the app asks iOS for permission to show alerts and play a sound. Nothing else is requested — no badge, no critical alerts, no provisional authorisation. If you decline, reminders stay off.
-- Every reminder is scheduled by the app on your own device, on a fixed daily schedule.
-- **A reminder contains no personal information and no numbers at all.** Every reminder uses the same two fixed sentences — a title and a line of encouragement — in whichever of the three languages you use. Your total, your goal, your serving sizes and your logging times never appear in a notification. This is deliberate: a lock screen can be read by anyone standing nearby, so nothing about your day is put there.
-- Turning reminders off removes the app's pending reminders from your device.
-
-If you have your Apple Watch set to mirror iPhone notifications, iOS may show these reminders on your wrist. That is iOS doing the mirroring, and the reminder text is digit-free either way.
+- They are **local notifications only**: WaterBuddy has no push service and no server that could message you.
+- When you turn them on, the app asks iOS for permission to show alerts and play a sound — nothing else: no badge, no critical alerts, no provisional permission. If you decline, reminders stay off.
+- They follow a fixed daily schedule set on your iPhone; at most 28 are pending at once. A reminder due within an hour of a drink is skipped, and the rest of today's are skipped once you reach your goal.
+- **A reminder contains no number and no personal information.** Each uses the same fixed title and line, in your language. Your total, your goal, your amounts and your times never appear in one, because a lock screen can be read by anyone nearby.
+- Each reminder carries a **Log a Glass** button. Pressing it logs your Glass amount without opening the app and without unlocking your iPhone, and shows nothing in return.
+- iOS may group reminders into its Notification Summary, and may mirror them to your Apple Watch; either way the text carries no number.
+- Turning reminders off removes WaterBuddy's pending reminders from your device.
 
 ---
 
-## Siri and the Shortcuts app
+## Analytics, tracking and advertising
 
-WaterBuddy provides a "log water" action that appears in Apple's Shortcuts app and can be used with Siri. The action itself carries no personal data, and the app never volunteers or donates your activity to Siri.
+WaterBuddy performs **no tracking of any kind.**
 
-One thing worth flagging, because it is outside our control: if **you** build a Shortcut that uses this action, that Shortcut is stored by Apple's Shortcuts app, and it may sync through your own iCloud if you have Shortcuts syncing enabled. In that case a phrase such as "add 250 ml of water" could exist in your own iCloud account. That is your Shortcut in your iCloud, governed by Apple's privacy policy — not something WaterBuddy sends or stores. We mention it rather than claim an absolute containment we cannot promise.
+- It does not use Apple's advertising identifier, the vendor identifier or any other device identifier, and never shows the App Tracking Transparency prompt, because it has nothing to ask for.
+- It has no analytics, no usage counting, no session logging, no telemetry and no crash reporting of its own.
+- It writes nothing to the clipboard and no file outside its own storage.
+- The only identifiers it creates are random ones for a single serving or a single sync message. They name a glass of water, not a person, and they travel no further than your own Watch.
+- The app's privacy manifest, which Apple requires and which ships inside every part of the app, declares tracking **off**, no tracking domains and **no collected data**. It also declares, as Apple asks, the two system features the app reads and why: its own settings storage (to share your figures with its widgets), and the time since your device started (to move the background's slow lights smoothly — used only to measure time passing inside the app).
 
 ---
 
 ## The App Store privacy label
 
-WaterBuddy's App Store privacy label says **"Data Not Collected."** That answer and this policy agree, and both match the code: the app collects nothing, transmits nothing to any server, and shares nothing with any third party.
+WaterBuddy's App Store privacy label says **"Data Not Collected."** That label, this policy and the code agree: the developer collects nothing, receives nothing and shares nothing with anyone.
 
 ---
 
 ## Apple's own role
 
-WaterBuddy is distributed through Apple's App Store. Apple collects its own information about downloads, purchases, device details and App Store usage under **Apple's** privacy policy, and Apple may provide the developer with anonymous, aggregate sales and usage statistics through App Store Connect. That data comes from Apple, not from inside the app, and it is not tied to anything you log in WaterBuddy.
-
-We have no control over what Apple collects. If you want to know, read Apple's privacy policy at <https://www.apple.com/legal/privacy/>.
+WaterBuddy is distributed through Apple's App Store, and some of what it offers is provided by Apple: payments and subscriptions, Siri, notifications, the link between your iPhone and Watch, and the on-device model. Apple handles those under **Apple's** privacy policy, which we do not control: <https://www.apple.com/legal/privacy/>.
 
 ---
 
 ## Children's privacy
 
-WaterBuddy is a hydration tracker suitable for general audiences. It collects no personal information from anyone, including children, because it collects no personal information at all — there is no sign-up, no profile, no messaging, no advertising and no way for the app to transmit anything to us.
-
-Since nothing is ever collected from any user of any age, there is nothing for a parent or guardian to request, correct or ask us to delete. If a parent or guardian has a question, please write to [CONTACT EMAIL ADDRESS].
+WaterBuddy is a hydration tracker for a general audience. It collects no personal information from anyone, including children: there is no sign-up, no profile, no messaging, no advertising and no way for the app to send anything to us. A purchase made by a child in a Family Sharing group goes through Apple's *Ask to Buy*, which Apple runs. If a parent or guardian has a question, please write to CONTACT-EMAIL.
 
 ---
 
 ## How long data is kept, and how to delete it
 
-**We keep nothing, because we never receive anything.** Retention is entirely a matter of what sits on your own devices, and you control all of it.
+**We keep nothing, because we receive nothing.** What is kept is on your own devices, and you control it.
 
-- **Your servings are kept until you delete them.** The app does not prune your history automatically. If you have logged water for years, every one of those entries is still on your iPhone. (The History screen shows a recent window of days, but that is only what is displayed — nothing older is being thrown away.)
-- **Delete a single serving** from the History screen. It is removed from your records immediately. If that serving was logged on your Watch and a copy is still queued for delivery by iOS, your iPhone recognises and discards it on arrival rather than re-adding it.
-- **Clear today** using the app's reset for today's progress, which removes only today's entries.
-- **Delete everything** by deleting the app from your iPhone (and from your Apple Watch, if you installed it there). iOS removes the app's storage container along with the app, taking your servings, your goal, your settings and the Watch's own stored copies with it. Any pending reminders are removed too.
-- The internal record of which Watch servings have already been counted is discarded automatically after 90 days.
+- **Your servings are kept until you delete them.** The app never prunes your history: if you have logged water for years, every serving is still on your iPhone.
+- **Delete or correct a serving** in History's week view, which shows the last seven days. A serving you have just logged can also be taken back with *Undo* on the Home screen. If a deleted serving came from your Watch and a copy is still queued by iOS, your iPhone discards the copy on arrival. Servings older than the week are shown, read-only, in the month view; they cannot be removed one by one in the app.
+- **Delete everything** by deleting WaterBuddy from your iPhone, and the Watch app from your Apple Watch. iOS removes an app's storage with it — including the container the app shares with its widgets, once no app that uses it is left on the device, and no other app of ours uses it. Your servings, your goal, your settings, the Watch's copies and any pending reminders go with it.
+- The record of which Watch servings are already counted keeps about 90 days and drops older days.
 
-Because none of this data was ever sent anywhere, deleting the app is genuinely the end of it. There is no copy on a server to chase.
+Nothing was ever sent anywhere, so deleting the app is the end of it: there is no copy on a server to chase.
 
 ---
 
-## Your rights under GDPR, CCPA/CPRA and similar laws
+## Your rights under GDPR, UK GDPR, CCPA/CPRA and similar laws
 
-We are not claiming a certification here — no one certifies a privacy policy. What follows is the factual position, which you can check against the description above.
+These laws give you rights over personal information that a company **collects, processes or holds about you**: to access it, correct it, delete it, port it, object to its processing, and — under CCPA/CPRA — to know whether it is sold or shared and to opt out.
 
-Laws such as the EU/UK GDPR and the California Consumer Privacy Act give you rights over personal information that a company **collects, processes or holds about you**: the right to access it, correct it, delete it, port it, object to its processing, and — under CCPA/CPRA — to know whether it has been sold or shared and to opt out.
+**WaterBuddy's developer collects, processes and holds none of your personal information.** There is no server, no account, no database and no code that could send us your data. So:
 
-**WaterBuddy's developer collects, processes and holds none of your personal information.** There is no server, no account, no database, no log file, and no code capable of transmitting your data. Every one of those rights would attach to data we simply do not have:
+- **Access and portability:** there is nothing on our side to give you. What the app knows is shown in the app, on your device.
+- **Correction:** correct a serving in History's week view, and your goal and amounts in Settings.
+- **Deletion:** delete a serving, or delete the app — see above. There is no other copy to erase.
+- **Sale or sharing:** your personal information has never been sold or shared, for any purpose including cross-context behavioural advertising, because we never receive it. There is nothing to opt out of.
+- **Objection and restriction:** there is no processing by us to object to.
+- **Non-discrimination:** logging water is free for everyone, and nothing you do about your privacy changes what you get.
 
-- **Access / portability:** there is nothing on our side to give you. Everything the app knows is visible in the app itself, on your own device.
-- **Correction:** you can edit or delete any serving directly in the app.
-- **Deletion:** delete a serving, reset today, or delete the app — see above. There is no copy anywhere else to erase.
-- **Sale or sharing:** your personal information has never been sold or shared, for any purpose including cross-context behavioural advertising, because it is never received. There is nothing to opt out of.
-- **Objection / restriction:** there is no processing by us to object to or restrict.
-- **Non-discrimination:** the app is free and identical for everyone; exercising a privacy right cannot change what you get, because it does not change anything we hold.
+Purchases, Siri and the other services Apple provides are Apple's to answer for, under Apple's privacy policy.
 
-If you believe any of the above is wrong, or you want it confirmed in writing, contact [CONTACT EMAIL ADDRESS] and you will get a straight answer. If you are in the EU, EEA or UK, you also have the right to lodge a complaint with your national data protection authority.
+If you believe anything here is wrong, or want it confirmed in writing, write to CONTACT-EMAIL and you will get a straight answer. In the EU, the EEA or the UK you may also complain to your national data protection authority.
 
-To the extent a legal basis under GDPR is needed at all: the app stores your water log on your own device to provide the function you opened it for, and reminders are sent only on your explicit opt-in, which you can withdraw at any time by turning reminders off.
+Where a legal basis is needed at all: the app keeps your water log on your own device to do what you opened it for; reminders and insights run only when you turn them on or open them; and a purchase is a contract you make with Apple.
 
 ---
 
 ## Changes to this policy
 
-If the app changes in a way that affects this document, this document will be updated before or alongside that change, and the "Last updated" date at the top will change. If a future version of WaterBuddy were ever to add a network connection, an account, analytics, or any third-party service, that would be described here plainly — and the App Store privacy label would be updated to match.
+If WaterBuddy changes in a way that affects this page, the page is updated before or with that change, and its *Last updated* date changes. If a version ever added a network connection, an account, analytics or a third-party service, it would be said here plainly, and the App Store privacy label would change to match.
 
-Older versions of the app already installed on your device are not changed by an update to this page. What an installed version does is fixed by the code that shipped in it.
+A version already installed on your device is not changed by an edit to this page: what it does is fixed by the code it shipped with.
 
 ---
 
@@ -213,12 +249,10 @@ Older versions of the app already installed on your device are not changed by an
 
 Questions, corrections or concerns about privacy in WaterBuddy:
 
-**[CONTACT EMAIL ADDRESS]**
-[OPTIONAL: POSTAL ADDRESS, IF THE OWNER WANTS OR NEEDS TO PUBLISH ONE]
-[OPTIONAL: NAME AND CONTACT OF AN EU/UK REPRESENTATIVE, IF ONE IS REQUIRED]
+**CONTACT-EMAIL**
 
 ---
 
 ## About this document
 
-This is a factual description of how WaterBuddy works, written from a line-by-line audit of the app's own source code. It is not legal advice, and it is not a certification of compliance with any law. If your circumstances call for it — a change in where the app is distributed, a change in what it does, or a specific regulator's requirements — have this reviewed by a qualified lawyer before relying on it.
+This is a factual description of how WaterBuddy works, written from a reading of the app's own source code. It is not legal advice and not a certificate of compliance with any law. If your circumstances call for one, have it reviewed by a qualified lawyer.
