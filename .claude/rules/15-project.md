@@ -116,6 +116,11 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `LogServingIntent`, `TodaysWaterIntent` and `WaterBuddyShortcuts` are app-only and stay out of
   every exception set: a provider and its intents share a target. `AddWaterIntent` stays the widget extension's own,
   differently named action
+- `InsightCopy` and `InsightWriter` are app-only and stay out of every exception set; `WeekInsights`
+  lives in `DataManager.swift`, for `MonthPatterns`' reason. `FoundationModels` is iOS 26 and later and
+  weakly linked below it — `otool -l` on the built binary shows `LC_LOAD_WEAK_DYLIB` — so the floor stays
+  17.0. **The third version check is the insights'**: `InsightWriter.Source.live()` reaches the model
+  only inside `if #available(iOS 26.0, *)`. Run-verified on iOS 18.6 and 27.0; 17.x compile-verified only
 - `PremiumAccess`, `PremiumSet`, `PremiumStore` and `PaywallView` are app-only and stay out of every
   exception set. `WaterBuddyTests/WaterBuddy.storekit` is the local StoreKit configuration: a test
   resource, in no shipping bundle. The checked-in `WaterBuddy` scheme's Run action names it, so a

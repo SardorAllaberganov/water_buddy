@@ -103,9 +103,11 @@ persist anything.
 - A widget's link from outside the app is an entrance, not a second route: `RootTabView` answers
   `WidgetLink.history` in `.onOpenURL`, through `AppTab(link:)`, by turning to History as its tab
   would. Before setup the link is ignored
-- History's *Week · Month* switch is a control inside the screen, not a route. It is drawn where
-  `HistoryView.offersMonth(status:offered:)` says, and Month mode's servings are read-only —
-  adding and correcting stay Week mode's, for every user
+- History's *Week · Month · Insights* switch is a control inside the screen, not a route. It is drawn
+  where `HistoryView.offersMonth(status:offered:)` says, and Month mode's servings are read-only —
+  adding and correcting stay Week mode's, for every user. Where its three labels overflow the row, it
+  scrolls; a label is never cut. Insights asks for its week through `showInsights(_:)` as Month asks
+  for its month, and lets go of it on the same three occasions
 - Present a sheet with `.sheet(item:)` bound to an optional `@State`, handing the thing being edited
   to the sheet as an `init` parameter — not a `Bool` plus a separately-stored selection
 - The paywall is presented with `.sheet(item:)` bound to an optional `PaywallView.Entry` — where it

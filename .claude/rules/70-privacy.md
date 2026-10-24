@@ -11,7 +11,8 @@ That is a property to defend, not a phase.
 ## Nothing leaves the device
 - Import no networking, analytics or sensor framework: `URLSession`, `Network`, `CoreLocation`,
   `HealthKit`, `CloudKit`, `StoreKit` (two uses, below), `AdSupport`,
-  `AppTrackingTransparency` — and no third-party SDK (rule `95-dependencies`)
+  `AppTrackingTransparency` — and no third-party SDK (rule `95-dependencies`). `FoundationModels` is
+  permitted in one file, on the conditions below
 - Keep `com.apple.security.application-groups` the only entitlement on either signed target. Adding
   any other capability requires a written justification in this file first
 - Add no `NS*UsageDescription` key to any Info.plist. The project carries zero, and notification
@@ -98,6 +99,30 @@ Six limits are conditions of the permission:
   Policy* open in Safari. The app fetches neither
 - **What never moves behind it.** No way of logging, and nothing a free user can do today —
   *The Premium line*, `docs/ROADMAP.md` §1
+
+## FoundationModels, for the insights
+
+`FoundationModels` — Apple's on-device model — may reword the insights History's Insights draws
+(roadmap 1.4.12, `docs/superpowers/specs/2026-10-23-insights-design.md`). It runs on the iPhone: no
+server, no account, no third party, and no entitlement or usage-description key. The app decides what
+the week says; the model only words it.
+
+Six limits are conditions of the permission:
+- **One file.** `InsightWriter.swift` alone imports `FoundationModels`, and reaches the model only
+  through `InsightWriter.Source`. No view, no widget or watch file, not `DataManager.swift`
+- **Apple's model on the phone, and nothing else.** `SystemLanguageModel.default` only — never
+  `PrivateCloudComputeLanguageModel`, never another provider through the `LanguageModel` protocol
+  (the owner's ruling, set aside as "a"). A second model needs an amendment here first
+- **The app's own sentences in, nothing else.** The model is handed the English sentences
+  `InsightCopy` writes for the page — what the page would draw anyway — and the suggested vessel's
+  name. Never a `WaterLog`, a timestamp, the goal history, the streak or the user's language
+- **Nothing it adds is shown.** Its note is drawn only when `InsightWriter.accepts(_:for:)` passes:
+  every number in it one of the facts' own. Anything else is declined and the app's sentences stand
+- **Kept in memory only.** A note lives for the run of the app and is written to neither store, and
+  never reaches a notification, a widget, the watch, Siri or the control
+- **It says who wrote it, and what it is not.** The footer names WaterBuddy or Apple's on-device model
+  and says *Not medical advice*. The copy never names *Apple Intelligence* — an Apple mark is never part
+  of a feature's name (the owner's ruling on #164) — and the paywall's row names no model at all
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

@@ -90,6 +90,9 @@ rather than re-deriving it.
   or above the goal line
 - Each of the paywall's plans is one button — label the plan's name, value its price line,
   `.isSelected` on the chosen one. The renewal terms are spoken in full, never hidden
+- Insights' heading is one element with the header trait, the week's range its value. Each of its panes
+  is one element — label the pane's title, value its sentences — and its glyphs, the suggested vessel's
+  among them, are hidden. The footer is one element, *Writing…* while the model writes
 - History's heading is one element: label the shown day, value its total against the goal, the
   header trait. At an accessibility text size a past day's heading is drawn on two lines — the
   weekday, which is that element, and the date, hidden — because on one line beside the `+` the

@@ -53,6 +53,9 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   over `WaterBuddyTests/WaterBuddy.storekit` — never the App Store or its sandbox. A suite that opens
   an `SKTestSession` is `.serialized` and clears its transactions in a `defer`: a session is the
   simulator's own state, shared by every test in the run
+- Apple's model is reached in a test only through `InsightWriter.Source`'s closures — never
+  `Source.live()`. Its writing, its fixed wording across launches and VoiceOver's reading of an insight
+  are proved by hand, on a device with Apple Intelligence on, in English
 - Inject the `Calendar` and the `now: () -> Date` clock rather than waiting for a real day
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process
@@ -84,7 +87,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
-  `MonthLayoutTests`, `MonthPatternsTests`. They are
+  `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving

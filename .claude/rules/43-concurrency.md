@@ -29,6 +29,10 @@ warning here is a Swift 6 error later.
   calling StoreKit in its own body — `ReminderScheduler`'s shape — so no StoreKit value sits in a
   `static let`
 - `PremiumAccess` is `nonisolated` and imports `Foundation` alone, as `ReminderPlan` does
+- `InsightWriter` is `@MainActor @Observable`, `PremiumStore`'s shape: the model only through
+  `InsightWriter.Source`, main-actor closures built by `static func live()`, each building its
+  `LanguageModelSession` in its own body — nothing from `FoundationModels` in a `static let`.
+  `WeekInsights` and `InsightCopy` are `nonisolated` and import `Foundation` alone
 
 ## Sendable, and what may cross a process
 - `WaterSnapshot` is the only **state** value handed to a widget process: `Sendable`, `Equatable`,
@@ -143,5 +147,5 @@ warning here is a Swift 6 error later.
   `LiquidGlassInteractionTests`, `NotificationManagerTests`, `ReconcileQueueTests`,
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
-  `MonthLayoutTests` or `MonthPatternsTests` to make them compile. They are
-  compile-time canaries: fix the declaration they read instead
+  `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests` or `InsightCopyTests` to make them
+  compile. They are compile-time canaries: fix the declaration they read instead

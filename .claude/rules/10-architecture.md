@@ -64,6 +64,12 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
   update. The widget and the watch never compile it and never ask StoreKit — a later item that needs
   them to know writes a derived key through `DataManager` (rule `70-privacy`)
 
+- **The insights are decided by the app and worded by Apple's model.** `WeekInsights` — a pure value
+  in `DataManager.swift`, published like the month — decides what a week says; `InsightCopy` writes it
+  as sentences; `InsightWriter`, app-only and `@MainActor @Observable`, injected beside `PremiumStore`,
+  may hand those English sentences to the on-device model and draws its note only if it adds no figure
+  (rule `70-privacy`)
+
 ## Import direction
 - The widget may import from the six shared files. **Nothing shared may import from the widget or
   from a view**
@@ -95,3 +101,4 @@ membership* section.
 - `WristModel` writing to the phone's SwiftData store or `DataManager` writing to the watch's local
   suite — the one-writer-per-store split is exact, not a shared free-for-all
 - `import StoreKit` outside `HomeView.swift` and `PremiumStore.swift`
+- `import FoundationModels` outside `InsightWriter.swift`, and any model but `SystemLanguageModel.default`

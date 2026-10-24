@@ -10,6 +10,9 @@ framework, and the project file carries no package references at all.
 
 - Do not add a Swift Package, a CocoaPod, a Carthage dependency, or a vendored `.xcframework`. Every
   target keeps `packageProductDependencies` empty
+- `FoundationModels` is an Apple SDK framework, not a dependency, and enters as `StoreKit` does: an
+  `import` in one file, `InsightWriter.swift`, on rule `70-privacy`'s conditions. It is weakly linked
+  below its iOS 26 floor — read with `otool -l` (`LC_LOAD_WEAK_DYLIB`), never assumed
 - Keep every `PBXFrameworksBuildPhase` at `files = ()`. Never add an explicit link in Xcode's
   *Frameworks, Libraries, and Embedded Content* — a framework enters only as an `import` line
 - When a visual or arithmetic effect is roughly forty lines of arithmetic, hand-roll it as a pure,

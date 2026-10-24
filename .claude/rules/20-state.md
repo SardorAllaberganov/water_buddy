@@ -89,8 +89,12 @@ after the body above had already conceded it.
   (`defaults.object(forKey:) as? Bool != true`) and the **observation** separately on
   `storedIsGoalSet`. They are not the same: `resolveIsGoalSet(in:goal:)` infers `true` from a
   non-default goal when the key is absent
-- `isGoalSet`, `todaysLogs`, `historyLogs`, `month`, `monthLogs` and `streak` stay get-only. All six
-  are consequences, not inputs
+- `isGoalSet`, `todaysLogs`, `historyLogs`, `month`, `monthLogs`, `insights` and `streak` stay
+  get-only. All seven are consequences, not inputs
+- `insights` is published only while History has asked for a week through `showInsights(_:)`, behind
+  `role.drawsHistory`, from the sites that publish `month` — never `init`, never the `servings` setter
+  (the suggestion's vessel is chosen when drawn). A failed read leaves it as it stands. `showInsights(_:)`
+  writes neither store. The model's wording of it lives in `InsightWriter`, in memory, and never here
 - `streak` is published from `republishHistory()` and from the `dailyGoal` setter, behind
   `role.drawsHistory`, with an equality guard. A failed read leaves it as it stands, never zero.
   Every day is judged against the current goal. It never leaves the app: not the snapshot, not a
