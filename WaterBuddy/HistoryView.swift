@@ -1967,32 +1967,27 @@ private struct RecapRow: View {
 
 // MARK: - The month's patterns
 
-/// *Patterns*, and the days they come from, on the aurora above their panes — the opened day's kind of
-/// heading, one element (spec `2026-10-23-patterns-design.md` §3.2, §3.8). The line names no month:
-/// Russian would need it in a case Foundation cannot give (`tasks/lessons.md`, 2026-10-22).
+/// *Patterns*, on the aurora above their panes — the opened day's kind of heading, one element (spec
+/// `2026-10-23-patterns-design.md` §3.2, §3.8). **The days they come from are spoken, not drawn**: drawn
+/// under the title at `.subheadline` semibold, *From this month's finished days* read 4.17 against 4.5
+/// where the aurora's cyan light passes, at full white already — the owner's ruling on known issue #171,
+/// as Insights' heading draws no line for the same reason. The value names no month: Russian would need
+/// it in a case Foundation cannot give (`tasks/lessons.md`, 2026-10-22).
 private struct PatternsHeading: View {
 
     @Environment(\.strings) private var strings
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("Patterns", bundle: strings)
-                .font(.title3.weight(.bold))
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-                .legibleOnBackdrop()
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityValue(Text("From this month's finished days", bundle: strings))
-
-            Text("From this month's finished days", bundle: strings)
-                .font(.subheadline.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
-                .legibleOnBackdrop()
-                .accessibilityHidden(true)
-        }
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, HistoryView.margin)
+        Text("Patterns", bundle: strings)
+            .font(.title3.weight(.bold))
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .legibleOnBackdrop()
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityValue(Text("From this month's finished days", bundle: strings))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, HistoryView.margin)
     }
 }
 
@@ -2290,10 +2285,10 @@ private struct PatternsPending: View {
 
 // MARK: - Insights
 
-/// *Insights*, on the aurora at *Patterns*' size and weight — 5.73:1 there — with **no line drawn under
-/// it**: the patterns' white subtitle read 4.17 where the aurora's cyan light passes (#171). The week's
-/// range is the heading's spoken value, and drawn inside the first pane (spec
-/// `2026-10-23-insights-design.md` §3.4, §3.8).
+/// *Insights*, on the aurora at *Patterns*' size and weight — large text, held to 3:1, the owner's ruling
+/// on known issue #177; 3.37 at its worst — with **no line drawn under it**: the patterns' white subtitle
+/// read 4.17 where the aurora's cyan light passes (#171). The week's range is the heading's spoken value,
+/// and drawn inside the first pane (spec `2026-10-23-insights-design.md` §3.4, §3.8).
 private struct InsightsHeading: View {
 
     @Environment(\.strings) private var strings
