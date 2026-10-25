@@ -13229,3 +13229,127 @@ name — `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md`, this file;
 from before the session, `.claude/settings.json`, two watch schemes and three string catalogues.
 **2 untracked**: `Screenshots/census/`, and `Screenshots/en-US/iPhone-6.9/02-widgets.png`, the wrong
 shot. None in both; `git diff --cached --check` clean.
+
+## [2026-10-25] — The store set's eight taken, the listing rewritten for 1.4, the version 1.4 (4)
+
+Asked by the owner after the ninety-third pass was committed (`ca63f9e`): *"can you update the screenshots
+and write the updated data for submission to appstore and all parts are developed as we planned?"* Two
+read-only agents gathered the listing's facts and audited the roadmap against the tree; the rest was done
+in the main loop. The four hand-placed shots still wait for a person.
+
+### What changed
+
+- **The store capture's eight**, by `bash Tools/CaptureScreenshots.sh`. The first run, from 13:45:06,
+  failed at step 06 after seven shots — `AppStoreScreenshotUITests.swift:273: Failed to tap "Insights"
+  Button: No matches found`. Root cause, from the failure's element dump: step 08 left the month before's
+  page scrolled to the recap's row, and History's switch is a `List` row out of sight, absent from the
+  tree; step 08 itself returns to the top before switching mode, and step 06 did not. Fix: step 06 calls
+  `returnToTop(of:in:proof:)` first (three lines). Second run: **`Executed 1 test, with 0 failures` in
+  120.5 s, `** TEST SUCCEEDED **`**; `01-home`, `03-history`, `05-month`, `06-insights`, `07-patterns`,
+  `08-recap`, `09-goal-setup`, `10-settings` at 13:54, each read by eye; `VerifyScreenshots.sh`: 23 files,
+  all acceptable. `02-history.png`, `03-settings.png` and `04-goal-setup.png` removed with `git rm` (spec
+  §3.6), once nothing but records named them.
+- **The listing.** `README.md`'s *App Store Connect* (1.0's, from `e93802d`) rewritten for 1.4 against
+  the code: the name and subtitle kept (30/30 each); promotional text 164/170; keywords 98/100 (`ml`,
+  `offline`, `sip` out, `watch`, `streak` in); a description of 3,992/4,000 carrying the Premium sentence
+  of spec §3.7, the renewal terms and the Terms of Use link; What's New for 1.4, written against 1.1
+  (830); *In-App Purchases* — the Paid Apps Agreement, the group and its three products from
+  `WaterBuddy.storekit`, Family Sharing, review screenshots, selecting them on the version; *App
+  Privacy* still *Data Not Collected*, with Premium, the insights and the recap image accounted for; the
+  screenshot order; review notes that say how to reach Premium and that a new install shows no recap and
+  no Patterns the same day; and the outstanding list. Each count by script, and each README block compared
+  byte for byte with the counted text. Facts checked against the code, not the reports: the goal's
+  1,000–4,000 in 100s, the vessels' 50–1,000 in 50s, the reminder hours and quiet hour, the add range
+  (today and six days back, `correctionRange`), the thresholds (Insights 4, Patterns 7 finished days, the
+  recap 7), and the empty states' lines. The README's header images, *What it does*, *Screenshots* and
+  *Privacy* follow.
+- **The version, 1.4 (4)**, on the owner's ruling, with the bump: 14 `MARKETING_VERSION` and 14
+  `CURRENT_PROJECT_VERSION`, 28 lines and no other; a build of the `WaterBuddy` scheme succeeded, and the
+  app, its widget extension, the watch app and the watch widget each read `1.4 (4)`. No test pins a
+  version.
+- **The pair, booted again** at 14:00 for the hand-placed shots, its phone's status bar frozen at 13:54
+  to match the eight; the capture's phone shut down by its id, since another project's *WareStack 18.6*
+  was booted by then.
+
+### Built as planned?
+
+The audit, every cited commit checked with `git cat-file`: releases 1.2 and 1.3 and Premium's set A are
+built and committed, set A on sale in code (`PremiumSet.swift:95`). Not built: Apple Health (1.3.3); never
+run: the device sweep (1.2.7). Before upload, the owner's: the privacy policy published with its contact
+address (#159), Premium's products in App Store Connect (#155), a purchase on a device (#156), a Support
+URL; and their call: the Russian and Uzbek drafts on Premium's screens, the device checks, the colour pairs
+measured on iOS 27.0 alone, #188.
+
+### Records
+
+`docs/AI_CONTEXT.md`: a *Current state* block; two *Files on disk* rows (the harness 821, the iPhone set);
+#82, #88 and #187 dated notes — #82 stays open for its census method, #88 for the four missing shots, #187
+for #155 and #156. `docs/ROADMAP.md`: 1.2.8. `tasks/lessons.md`: one entry.
+
+### Gate
+
+**Not run.** Since the last gate: three lines of a capture harness the gate skips — compiled and passed in
+the capture's own run — the version numbers, built and read back, and docs and PNGs. The five invocations
+wait for the four hand-placed shots: their `shutdown all` would stop the pair and another project's booted
+simulator.
+
+**Staging.** Read from the commands at 14:14 on 2026-10-25, after this task's `git add` of 16 paths by name
+and its `git rm` of three; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written.
+**No `git commit` was run.** HEAD `ca63f9e`, 203 commits, level with `origin/main`. **19 staged** — 9
+modified (`README.md`, `project.pbxproj`, the harness, `01-wrist.png`, `01-home.png` and the four records),
+7 added (`03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`,
+`10-settings`), 3 deleted (`02-history`, `03-settings`, `04-goal-setup`). **6 unstaged** — from before the
+session, `.claude/settings.json`, two watch schemes and three string catalogues. **2 untracked**:
+`Screenshots/census/`, and `02-widgets.png`, the wrong shot. None in both; `git diff --cached --check`
+clean.
+
+## [2026-10-25] — The ninety-fourth `/doc_sync`: three drifts on the store set's staged tree, the four shots still unplaced
+
+Run by the owner at 19:49, on the tree the store set's and the listing's checkpoint above staged at 14:14.
+No code changed since that checkpoint; between them, the session checked the pair once, at 14:17, and found
+nothing placed.
+
+### Checked, and already accurate
+
+Read-only scripts, every figure printed. 117 `.swift` files in the seven target folders by `git` and by
+`find`; 120 fixed-width *Files on disk* rows — the 117 and `Tools/`' three — every count equal to `wc -l`,
+no file without a row. 954 phone `@Test`, 71 watch, 63 UI `func test`, as *Targets* states them. 13 keys
+on `DataManager.Key`. Three exception sets of six, as `CLAUDE.md` names them; four schemes. 18 rules cited,
+18 files. `StoreKit` in `HomeView.swift` and `PremiumStore.swift` alone of the shipping targets,
+`FoundationModels` in `InsightWriter.swift` alone, no `SwiftData` under `WaterBuddyWidget/`. No forbidden
+doc. No *awaits*, *unstaged* or *for the owner* claim in `CLAUDE.md`. `MARKETING_VERSION = 1.4` and
+`CURRENT_PROJECT_VERSION = 4` on fourteen sites each. `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and
+`docs/DESIGN.md` name neither the version nor the store set; *Last updated* kept on all four.
+`docs/ROADMAP.md`'s 1.2.8 note stands.
+
+### Drift found and fixed, in `docs/AI_CONTEXT.md`
+
+- ***The six shared files*' paragraph said "the other twenty-three are app-only"**, stale since 1.2.5 on
+  2026-10-15. `WaterBuddy/` holds 44 files, less the six and `WristPlan.swift`: thirty-seven. The fourteen
+  left out — `ReviewPrompt.swift`, `TodaysWaterIntent.swift`, `WaterMotion.swift`, Premium's seven, the
+  recap's two, `SheetCloseButton.swift`, `StoreSample.swift` — are named; no exception set names any of
+  them, and the file table had each as app-only all along. A dated note says what it said.
+- **The iPhone store set's row counted 4 files**; nine are on disk — the store capture's eight and the
+  wrong `02-widgets`. The column moved, with a dated note.
+- **Five notes written before the 14:14 `git add` still said "unstaged" or "untracked"** — the harness's
+  row, the iPhone set's, `01-wrist.png`'s, #82 and #187. A dated note on each says what was staged when.
+
+### Written
+
+Those; a note in *Current state* — at 19:54 the phone still on Apple's own widgets and the watch on Numerals
+Duo, its clock current where at 14:17 it had stood at 14:00; the pass's *Last updated*; the Git block.
+`tasks/lessons.md`: one entry — a watch simulator whose clock has stopped is most likely one no DeviceHub
+window shows, so check two pictures a minute apart before asking a person to place a surface.
+
+### Gate
+
+**Not run.** No code changed since the checkpoint above, which held the gate for the four hand-placed shots:
+its `shutdown all` would stop the pair and another project's booted *WareStack 18.6*, both still booted at
+19:49. The last gate is the store page's, on its final code, the night before.
+
+**Staging.** Read from the commands at 19:57 on 2026-10-25, after this pass's `git add` of its three files
+by name; this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git
+commit` was run.** HEAD `ca63f9e`, 203 commits, level with `origin/main`. **19 staged** — 9 modified, 7
+added, 3 deleted — the same paths as the checkpoint above. **6 unstaged**, from before the session. **2
+untracked**: `Screenshots/census/`, and `02-widgets.png`, the wrong shot. None in both; `git diff --cached
+--check` clean.

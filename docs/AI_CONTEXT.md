@@ -4,6 +4,27 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-25, evening (ninety-fourth pass — `/doc_sync` run by the owner on the store set's
+and the listing's staged tree; no code changed since the harness's three lines and the version's 28, that
+afternoon). Read-only scripts, every figure printed: 117 `.swift` files in the seven target folders by `git`
+and by `find`, and 120 fixed-width *Files on disk* rows — those 117 and `Tools/`' three — every count equal
+to `wc -l`, no file without a row; 954 phone `@Test`, 71 watch, 63 UI `func test`, as *Targets* states them;
+13 keys on `DataManager.Key`; three six-file exception sets, as `CLAUDE.md` names them; four schemes; 18
+rules cited, 18 files; `StoreKit` in `HomeView.swift` and `PremiumStore.swift` alone of the shipping targets,
+`FoundationModels` in `InsightWriter.swift` alone, no `SwiftData` under `WaterBuddyWidget/`; no forbidden
+doc; no *awaits*, *unstaged* or *for the owner* claim in `CLAUDE.md`; `MARKETING_VERSION = 1.4` and
+`CURRENT_PROJECT_VERSION = 4`, fourteen sites each. **Drift found, three:** *The six shared files*' paragraph
+said "the other twenty-three are app-only", stale since 1.2.5 on 2026-10-15 — `WaterBuddy/` holds 44 files,
+so thirty-seven, the fourteen left out now named, with a dated note; the iPhone store set's row counted 4
+files where nine are on disk — the column moved, with a dated note; and five notes written before the
+afternoon's `git add` still said "unstaged" or "untracked" — the harness's row, the iPhone set's,
+`01-wrist.png`'s, #82 and #187 — a dated note on each. **Written:** those, a note in *Current state* on the
+pair at 19:54, and the Git block. `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: read
+for the version and the store set — none names either — *Last updated* kept. `docs/ROADMAP.md`: 1.2.8's
+note stands. `tasks/lessons.md`: one entry. Gate: not run — held since the harness's fix and the version,
+because its `shutdown all` would stop the pair and another project's booted simulator; the last is the store
+page's, on its final code, the night before (*Targets*).
+
 **Last updated:** 2026-10-25, afternoon (ninety-third pass — `/doc_sync` run by the owner partway through
 the store page's capture; no code changed since the ninety-second pass, and HEAD is now `e554fe5`, the store
 page committed whole at 12:29–12:30). One read-only script, every figure printed: 117 `.swift` files in the
@@ -1939,15 +1960,22 @@ They live in `WaterBuddy/` and compile into **both** phone targets — and five 
 `NotificationManager.swift`, into the two watch targets as well, so most of them are in four
 binaries (the exception sets above). Of everything else under
 `WaterBuddy/`, **`WristPlan.swift` is shared too — with the two watch targets, not with the
-widget** (the two watch exception sets above) — and the other twenty-three are app-only:
+widget** (the two watch exception sets above) — and the other thirty-seven are app-only:
 `RootTabView.swift`, `HomeView.swift`, `WaterBuddyApp.swift`,
 `HistoryView.swift`, `SettingsView.swift`, `AuroraBackground.swift`, `PressStyle.swift`,
 `Celebration.swift`, `Haptics.swift`, `LogServingIntent.swift`, `WaterBuddyShortcuts.swift`,
 `WristInbox.swift`, stage 3b's six — `Arrival.swift`, `ScreenHeader.swift`, `Motion.swift`,
 `PageTurn.swift`, `PourDrop.swift` and `ScrollDepth.swift` — and stage 5's four, `WelcomeView.swift`,
 `GoalSuggestion.swift`, `ReminderPermission.swift` and `VesselSliders.swift`, and 1.2.4's
-`ReminderResponder.swift`. *(1.2.4, 2026-10-15: it said twenty-two; the folder is 30 files in the
-index.)* *(Stage 5, 2026-10-14:
+`ReminderResponder.swift`, 1.2.5's `ReviewPrompt.swift`, 1.3.4's `TodaysWaterIntent.swift`, the lag
+fix's `WaterMotion.swift`, Premium's seven — `PremiumAccess.swift`, `PremiumSet.swift`,
+`PremiumStore.swift`, `PaywallView.swift`, `PremiumRim.swift`, `InsightCopy.swift` and
+`InsightWriter.swift` — the recap's `RecapCard.swift` and `RecapSheet.swift`, finishing set A's
+`SheetCloseButton.swift`, and the store page's `StoreSample.swift`. *(Ninety-fourth pass, 2026-10-25:
+it said twenty-three, stale since 1.2.5 on 2026-10-15 — the fourteen after `ReminderResponder.swift`
+were left out, while the file table below had each as app-only; the folder is 44 files on disk, less
+the six and `WristPlan.swift`, and no exception set names any of the fourteen.)* *(1.2.4, 2026-10-15:
+it said twenty-two; the folder is 30 files in the index.)* *(Stage 5, 2026-10-14:
 it said nineteen and named `GoalSetupView.swift`, which the stage deleted; the folder is 29 files
 in the index, less the six and `WristPlan.swift`.)* *(Until the forty-seventh pass this
 sentence listed eight files and called "everything else" app-only, `WristPlan.swift` included;
@@ -2078,7 +2106,7 @@ WaterBuddyTests/WeekCacheTests.swift             297   new 2026-10-19, 1.3.1 6c,
 WaterBuddyTests/WeekInsightsTests.swift          482   new 2026-10-24 (set A's step 4, staged): `WeekInsightsTests`, 31 — not `@MainActor` — the week's bounds, DST, pending, counted days, each finding, the threshold and rounding, the order and the tie, the review's fixes; `InsightsPublishingTests`, 7 — `@MainActor` — published while asked, republished, a failed read, no key written
 WaterBuddyTests/WelcomeTests.swift               427   (2026-10-25, the store page, staged: `FreshStartTests` is `.serialized`, on a fixed afternoon, +5 — the sample needs the fresh start, a fresh start alone holds no servings, the sample lands (1,300 ml today, a 5-day streak, a September recap of 30 days counted, no goal set), the held Premium needs the fresh start, and reads a lifetime purchase; 379 lines before) (2026-10-15: PermissionSpy's scheduler takes pending and setCategories; 378 lines before) stage 5 — ReminderPermissionTests (7: a grant stored, a refusal and a failed request stored as off, a phone already allowed or already refused not asked again, a re-read that turns reminders off on a refusal and leaves the switch alone otherwise) + WelcomeStepTests (not @MainActor, 8: the order, no Back first and no Continue last, Continue and Back as a pair, the dots from one, where the next and previous steps wait, a slid step seen all the way out, under Reduce Motion nothing travels, the bells at the reminder hours) + WelcomeFinishTests (6: vessels left alone store nothing, vessels set are stored, the goal saved closes the welcome, reminders asked for before it closes, a refusal still opens the app with reminders off, Not now asks nothing) + FreshStartTests (DEBUG only, 2: no argument, no fresh start; a fresh start is a throwaway cleared at each launch) — the first and third against PermissionSpy, a ReminderScheduler built from a spy's closures
 WaterBuddyTests/WristSyncTests.swift            1011   (2026-10-25, finishing set A, staged: WristPlanTests +5 — an amount the phone would refuse is not counted, the outbox saturates, a corrupt mirror total never overflows, one below zero counts as none, a face from any total reads within three digits (#154); 955 lines before) (2026-10-20, 1.3.2 7b, staged: WristPlanTests gains the face's six — the default goal before a sync, the phone's total and the watch's pours, the turnover at the phone's day end, the complication's rounding, a goal of zero and an overflowing readout, the app's sentences; 882 lines before) WristWireTests + WristIngestTests + WristPlanTests + WristInboxReassemblyTests + WristPublishTests + WristMirrorNewsTests (not @MainActor) + WristLinkDecodingTests + WristLinkChunkingTests + WristLinkReachabilityTests; staged 2026-10-11: WristIngestTests' failed-read test makes its store unreadable with UnreadableStore, no longer by overwriting the file (known issue #92)
-WaterBuddyUITests/AppStoreScreenshotUITests.swift  818   (2026-10-25, the store page, staged: the store method takes eight of the ten shots in two launches — a free user with the paywall offered (`09-goal-setup`, `01-home`, `03-history`, `10-settings`), then a holder on the seed (`05-month`, `07-patterns`, `08-recap`, `06-insights`) — and refuses a run before the 8th; the wheel table and `setTime` are gone; `testBuildTheLivedInWeek` (new) builds the set's week through History's sheet into a device's own stores, for the pair script; never run, the store method; the lived-in method passed once, 849 s; 717 lines before) (2026-10-18, #144, DocC only, staged with 1.2.8: *Why it starts clean* says the launch still resolves the App Group suite and runs the migration, and the run's figures live only in the throwaway; setTime's afternoon failure is the request and the read-back, the snap-back inferred; 714 lines before) (2026-10-18, roadmap item 1.2.8, staged: the store method rewritten — launched with -WaterBuddyFreshStart and en_US, refuses to start outside 1:45–11:45 PM, builds a lived-in week through History's + and wheel (today's five at set times, six earlier days from the sheet's shortcuts), asserts Home at 65 % with a 5 days chip; run three times, the last two passing — the store method is no longer non-idempotent, the census still is, still not run; 559 lines before) (2026-10-17, 1.2.6: its spoken figures through a private grouped(_:), the capture device's own grouping — it is en_UZ; not run.) (stage 5, compiled and not run: both methods tap Get Started, shoot the goal step, and walk on with Continue, Continue and Not now through tapWhenReady; 540 lines before) NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
+WaterBuddyUITests/AppStoreScreenshotUITests.swift  821   (2026-10-25, afternoon, unstaged: step 06 returns to the top before it taps *Insights* — three lines — after the store method's first run could not find the switch below the recap's scrolled page; the second run passed, all eight shots (#82). Staged at 14:14, by name.) (2026-10-25, the store page, staged: the store method takes eight of the ten shots in two launches — a free user with the paywall offered (`09-goal-setup`, `01-home`, `03-history`, `10-settings`), then a holder on the seed (`05-month`, `07-patterns`, `08-recap`, `06-insights`) — and refuses a run before the 8th; the wheel table and `setTime` are gone; `testBuildTheLivedInWeek` (new) builds the set's week through History's sheet into a device's own stores, for the pair script; never run, the store method; the lived-in method passed once, 849 s; 717 lines before) (2026-10-18, #144, DocC only, staged with 1.2.8: *Why it starts clean* says the launch still resolves the App Group suite and runs the migration, and the run's figures live only in the throwaway; setTime's afternoon failure is the request and the read-back, the snap-back inferred; 714 lines before) (2026-10-18, roadmap item 1.2.8, staged: the store method rewritten — launched with -WaterBuddyFreshStart and en_US, refuses to start outside 1:45–11:45 PM, builds a lived-in week through History's + and wheel (today's five at set times, six earlier days from the sheet's shortcuts), asserts Home at 65 % with a 5 days chip; run three times, the last two passing — the store method is no longer non-idempotent, the census still is, still not run; 559 lines before) (2026-10-17, 1.2.6: its spoken figures through a private grouped(_:), the capture device's own grouping — it is en_UZ; not run.) (stage 5, compiled and not run: both methods tap Get Started, shoot the goal step, and walk on with Continue, Continue and Not now through tapWhenReady; 540 lines before) NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
 WaterBuddyUITests/GoalSetupUITests.swift        1322   (2026-10-24, the privacy policy, staged: +1, `testSettingsLinksThePrivacyPolicyForEveryone` — one link or button, a tap that brings Safari forward; 39 tests) (2026-10-17, 1.2.6: 38 tests — total(in:), waitForTotal and millilitres(on:) read grouped figures, as do the Undo and the sheet's-shortcut sites; the chip's and the strip's spoken values checked, and testTheChipSpeaksItsNounAtTheLargestTextSize and testTheStripSpeaksItsCountAtTheLargestTextSize added; the strip's "second element" check dropped by the owner's decision, #139.) (stage 5: eleven Get Started preambles are now completeWelcomeIfShown(app), the class's DocC says the welcome; still 36 tests; 1236 lines before) (stage 4, staged 2026-10-13, 36 tests: testSettingsSaysWhichVesselTheOneTapDoorsLog — the new note drawn, the old one not; testEverySettingsControlIsOneElement — the goal slider, three vessel sliders, the switch and four language rows one element each, a guard green before and after; 1196 lines before) (2026-10-13, stage 3c, staged, 34 tests: testEveryDayOnTheWeekCardIsATapTarget — every day button at least 44 × 44, which bites on a 375-pt phone) (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
 WaterBuddyUITests/PremiumUITests.swift           167   (2026-10-24, the privacy policy, staged: the paywall's footer counted as what the sheet adds, Settings' own count read first — the owner's ruling) (2026-10-24, set A's step 4, staged: +1, `testAFreeUsersInsightsAreLockedAndOpenThePaywall`; the paywall's row is *Personal insights*) (2026-10-23, set A's step 2, staged: +2 — `testAnOrdinaryRunsHistoryHasNoMonthSwitch`, `testAFreeUsersMonthIsLockedAndOpensThePaywall`) (2026-10-22, step 1's Task 7, staged: both tests rewritten — `testAnOrdinaryRunHasNoPremiumCard` waits three seconds for a card that must not come; `testTheCardLeadsSettingsAndOpensThePaywall` — the card one element and above the goal, the sheet's line and promise, each feature row one element counted by its whole label (`"<title>, "`, the owner's ruling — XCUITest also lists the row's own title, `tasks/lessons.md` 2026-10-17 and 2026-10-22), the four links and *Not now* one element each, *Not now* closing it; 64 lines before) new 2026-10-21 (1.4.1's Task 6, staged; superseded by the above): the only class launched with `-WaterBuddyPremium` — `testAnOrdinaryRunHasNoPremiumCard` and `testTheCardOpensThePaywall` (the card one element, the sheet's title, promise, *Restore Purchases*, both links and *Not now* one element each, *Not now* closing it); asserts nothing that needs products to load
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
@@ -2183,8 +2211,8 @@ WaterBuddy/PrivacyInfo.xcprivacy                  —   \
 WaterBuddyWidget/PrivacyInfo.xcprivacy            —    | four byte-identical manifests, one per shipping
 WaterBuddyWatch/PrivacyInfo.xcprivacy             —    | bundle. Each target's synchronized root group
 WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with NO project.pbxproj edit
-Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)* *(2026-10-25, 13:00, the capture under way: a fifth file, `02-widgets.png`, untracked — **a wrong shot, not of the widgets**: it was taken on a person's "widgets ready" while the pair's phone still had WaterBuddy in the foreground, and draws the app's Home tab. It is to be shot again; the other four are as above.)*
-Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)*
+Screenshots/en-US/iPhone-6.9/*.png                9    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)* *(2026-10-25, 13:00, the capture under way: a fifth file, `02-widgets.png`, untracked — **a wrong shot, not of the widgets**: it was taken on a person's "widgets ready" while the pair's phone still had WaterBuddy in the foreground, and draws the app's Home tab. It is to be shot again; the other four are as above.)* *(2026-10-25, 13:57: **nine files** — the store capture's eight, `01-home` (retaken, modified), `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` (new, untracked), at 13:54, iPhone 18 Pro Max, iOS 27.0; `02-history`, `03-settings` and `04-goal-setup` removed with `git rm`, staged; and the wrong `02-widgets`. `04-lock-screen` and a right `02-widgets` are a person's to place.)* *(Ninety-fourth pass, 19:50: the eight staged at 14:14, by name, beside the three removals; the wrong `02-widgets` left untracked. The count column said 4 until this pass — nine files on disk, and the ten-shot set short of `02-widgets` and `04-lock-screen`.)*
+Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)* *(14:14: staged, by name. Still not taken at 19:50: the two faces.)*
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
 Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states, from 2026-09-02; untracked
 ```
@@ -2442,6 +2470,37 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Ready for submission in the repository, short of four hand-placed shots: the store capture's eight
+taken, the listing rewritten for 1.4, the version 1.4 (4)** (2026-10-25, afternoon; HEAD `ca63f9e`, the
+ninety-third pass committed since the block below). Taken on the owner's request to "update the
+screenshots and write the updated data for submission to appstore", and to say whether "all parts are
+developed as we planned".
+
+- **The store capture.** `bash Tools/CaptureScreenshots.sh` at 13:45 failed at step 06 — *Insights* not
+  found below the recap's scrolled page, the harness's first full run (#82). One fix in the harness: step
+  06 returns to the top first, as step 08 does. Rerun: `Executed 1 test, with 0 failures` in 120.5 s,
+  eight shots at 13:54, each read by eye; `VerifyScreenshots.sh` green. The three renumbered 2026-10-18
+  shots are removed with `git rm`.
+- **The listing.** `README.md`'s *App Store Connect*, written for 1.0, is rewritten for 1.4 against the
+  app as built: promotional text 164/170, keywords 98/100, description 3,992/4,000, What's New 830 — each
+  counted by script and compared byte for byte with the README's blocks; Premium's three products for App
+  Store Connect, from the local StoreKit configuration; the privacy label kept at *Data Not Collected*;
+  the screenshot order; review notes that say how to reach Premium and what a new install cannot show;
+  and the outstanding list. The README's header images, *What it does*, *Screenshots* and *Privacy* follow.
+- **The version.** 1.4, build 4, on the owner's ruling — 28 lines of `project.pbxproj`, read back as
+  `1.4 (4)` from all four built bundles (#187).
+- **Built as planned?** Releases 1.2 and 1.3 and Premium's set A are built and committed — every commit
+  the roadmap cites exists. **Not built:** Apple Health (1.3.3), and the device sweep (1.2.7) has never
+  run. Before upload, the owner's: the privacy policy live with its contact address (#159), Premium's
+  products in App Store Connect (#155), a purchase on a device (#156), a Support URL.
+- **Not done:** `02-widgets` (again), `04-lock-screen`, `02-face-modular`, `03-face-infograph` — a person
+  in DeviceHub, the pair booted again for it at 14:00 with its status bar at 13:54; the gate, held until
+  they are taken because its `shutdown all` would stop the pair and another project's booted simulator.
+  *(19:54, the ninety-fourth pass: still none of the four. A scratch picture of each: the phone on Apple's
+  own Maps and Calendar widgets, the watch on Numerals Duo — its clock current this time, where at 14:17
+  it had stood at 14:00 (`tasks/lessons.md`). Both still booted, beside another project's WareStack
+  18.6.)*
 
 **The store page is committed, and its capture is under way: two of the thirteen shots are on disk, one
 of them wrong** (2026-10-25, afternoon; HEAD `e554fe5`, 202 commits, level with `origin/main`). Taken by
@@ -5578,6 +5637,24 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
+**Read at 19:57 on 2026-10-25, in the ninety-fourth pass, after its `git add` of its three files by name:
+`ca63f9e`, 203 commits, level with `origin/main` — unchanged since the block below; 19 staged — 9 modified,
+7 added, 3 deleted — 6 unstaged, 2 untracked entries, none in both; `git diff --cached --check` clean.** The
+same paths as below: this pass changed only this file, `tasks/lessons.md` and `HISTORY.md`, all three
+already staged, and adds this file and `HISTORY.md` again once their blocks are written. No `git commit` in
+this session since `ca63f9e`.
+
+**Read at 14:14 on 2026-10-25, in the store set's and the listing's records, after their `git add` of 16
+paths by name and `git rm` of three: `ca63f9e`, 203 commits, level with `origin/main` — the ninety-third
+pass committed since the block below; 19 staged — 9 modified, 7 added, 3 deleted — 6 unstaged, 2
+untracked entries, none in both.** Staged: `README.md`, `WaterBuddy.xcodeproj/project.pbxproj` (the
+version), `WaterBuddyUITests/AppStoreScreenshotUITests.swift`, the watch's `01-wrist.png`, the iPhone
+set's eight (`01-home` modified, seven added) and its three removed, this file, `docs/ROADMAP.md`,
+`tasks/lessons.md` and `HISTORY.md`. Unstaged: from before the session, `.claude/settings.json`, the two
+watch schemes and the three string catalogues the blocks below describe. Untracked: `Screenshots/census/`,
+and `Screenshots/en-US/iPhone-6.9/02-widgets.png`, the wrong shot. This file and `HISTORY.md` are added
+again once their blocks are written. No `git commit` in this session since `ca63f9e`.
+
 **Read at 13:26 on 2026-10-25, in the ninety-third pass, after its `git add` of its four files by name:
 `e554fe5`, 202 commits, level with `origin/main` — the store page committed whole since the block below
 (`ee1d588`, `c823594`, `ca81940`, `f0913af`, `e554fe5`); 4 staged — 4 modified — 7 unstaged, 2 untracked
@@ -7971,6 +8048,15 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     near the top, the scroll to the recap's row, Insights' *The one thing* — and a first run between
     1:45 and 11:45 PM may need fixes. `testBuildTheLivedInWeek`, new, passed once (849 s), on the pair
     `Tools/CapturePairScreenshots.sh` made. The census method is untouched.
+    **2026-10-25, afternoon: the store method ran, failed once, and passed after one fix; unstaged.** Its
+    first run (13:45) took seven shots and then could not find *Insights*: the recap's row had left the
+    month before's page scrolled to its foot, and the switch — a `List` row out of sight — was not in the
+    tree (the failure's dump lists the tabs, the arrows, September's days and *Monthly recap*, no switch).
+    Step 06 now returns to the top first, as step 08 already did (`returnToTop(of:in:proof:)`, three
+    lines). The second run: `Executed 1 test, with 0 failures` in 120.5 s, all eight shots, each read by
+    eye. `testBuildTheLivedInWeek` passed again (484.6 s). **Still open for the census method**, which
+    needs an erased device, names shots 10 and 11 for two detents and cites `HistoryView.swift:159`.
+    *(Ninety-fourth pass, 19:50: the fix staged at 14:14, by name; the gate has not run since it.)*
 83. **History's header gave a UI test no value.** In stage 1's probe `app.staticTexts["Today"].value`
     did not carry "N of M millilitres" (it parsed as −1). The header is
     `.accessibilityElement(children: .ignore)` with a label and a value. **Whether VoiceOver speaks the
@@ -8123,6 +8209,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     Home tab, not the Home Screen — to be shot again. `04-lock-screen`, the two faces and the store
     capture's eight are not taken, so `02-history.png`, `03-settings.png` and `04-goal-setup.png` stay.
     Open.)*
+    *(2026-10-25, 14:10: **the store capture's eight are taken** — `01-home`, `03-history`, `05-month`,
+    `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings`, at 13:54, each read by eye —
+    and `02-history.png`, `03-settings.png` and `04-goal-setup.png` are removed with `git rm`, staged.
+    `VerifyScreenshots.sh`: every file acceptable. **Still missing:** `02-widgets` (the file there is the
+    wrong shot), `04-lock-screen`, `02-face-modular`, `03-face-infograph` — a person in DeviceHub. Open
+    until they exist.)*
 89. **At the largest text size the first-run screen scrolls under the status bar.** Seen on iOS 18.6
     and 27.0 in stage 1's probe: scrolled up, the question's first line runs beneath the clock. The
     screen is the old one, replaced in stage 5; recorded so the new one is checked for it.
@@ -9892,6 +9984,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     products exist, and before a purchase on a device (#156), would show a paywall whose plans cannot
     load. **Before the next upload:** #155, #156, and the version number — `MARKETING_VERSION` still reads
     `1.1` on all fourteen sites, the version already submitted.
+    *(2026-10-25, afternoon: **the version number is done, unstaged** — on the owner's ruling, 1.4, build 4:
+    `MARKETING_VERSION = 1.4` and `CURRENT_PROJECT_VERSION = 4` on all fourteen sites each, 28 lines and no
+    other, and read back as `1.4 (4)` from the built app, its widget extension, the watch app and the watch
+    widget. #155 and #156 stay the owner's; `README.md`'s *App Store Connect* lists both.)*
+    *(Ninety-fourth pass, 19:50: `project.pbxproj` staged at 14:14, by name; still 14 sites of each, as
+    `grep | sort | uniq -c` prints them.)*
 188. **Whether deleting the app removes its App Group container, on a device** (the privacy policy,
     2026-10-24). The policy says it does — iOS removes a group's container once no app using it is left,
     as Apple's engineers say on the developer forums. `SettingsView`'s DocC says "the App Group container

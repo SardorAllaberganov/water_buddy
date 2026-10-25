@@ -5087,3 +5087,34 @@ which is luck, not design.
 (`xcrun simctl io <udid> screenshot`) and read it, or read the foreground app from SpringBoard's log; shoot
 into `Screenshots/` only when that picture shows the surface the slot names. When it does not, say what the
 device shows and which device it is, and wait.
+
+## 2026-10-25 — A `List` row scrolled out of sight is not in the tree, and a harness never run finds it first
+
+**What happened.** The store capture's first full run took seven shots and failed at step 06: `Failed to tap
+"Insights" Button: No matches found`. Step 08 had scrolled the month before's page to the recap's row, and
+History's *Week · Month · Insights* switch is a row of the same `List` — out of sight, so out of the
+accessibility tree; the failure's dump listed the tabs, the arrows, the month's days and *Monthly recap*, and
+no switch. Step 08 itself had already handled the same state with `returnToTop(of:in:proof:)`; step 06,
+written after it and never run, did not. The harness had been compiled by every gate and skipped by all of
+them, and its records said its new steps were "by reading only".
+
+**The rule:** in a UI test, before tapping a control that lives in a `List` row, bring that row on screen —
+or return the screen to its top — whenever an earlier step may have scrolled it away; never assume a tap
+target exists because it existed before the scroll. And a capture harness is not built until it has run once
+in its own window: schedule that run in the task that writes it.
+
+## 2026-10-25 — A watch whose clock has stopped says no DeviceHub window is showing the pair
+
+**What happened.** After the store capture's eight, the session asked the owner to place the widgets, the
+Lock Screen and two watch faces on the pair in DeviceHub, and the owner answered "ok". A scratch picture of
+each device at 14:17 showed the phone still on Apple's own Maps and Calendar widgets and the watch on
+Numerals Duo with its clock reading **14:00**, the minute the pair was booted again. The morning's watch had
+stalled the same way, at 03:06 (the entry above on the uncounted watch app). A watch simulator that does not
+redraw is most likely one no DeviceHub window is showing, so whatever a person arranges is landing on some
+other device — the likeliest reading, though not a proved one, of how "widgets ready" earlier became a shot
+of the app.
+
+**The rule:** before asking a person to place a surface on the pair, take two scratch pictures of the watch
+a minute apart (`xcrun simctl io <udid> screenshot`). If its clock has not moved, DeviceHub is not showing
+the pair: say so, name the two devices to select, *WaterBuddy Store iPhone* and *WaterBuddy Store Watch*,
+and wait for "ready" until a picture shows the clock moving.

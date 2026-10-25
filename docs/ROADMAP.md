@@ -199,6 +199,11 @@ subscription or one-time purchase. Logging water is always free."* Still English
 `ca81940` (test), `f0913af` (docs), `e554fe5` (the rule wording). **The capture is under way:** the
 synced watch shot is taken; the Home Screen shot must be taken again; the Lock Screen, the two faces and
 the store capture's eight are not taken.)*
+*(2026-10-25, later: **the store capture's eight are taken**, after one fix to the harness's first full
+run; the three renumbered shots are removed. **The pitch is written**: `README.md`'s *App Store
+Connect* is rewritten for 1.4 — promotional text, keywords, description with the Premium sentence,
+What's New, Premium's products, the screenshot order and the review notes — and the version is 1.4,
+build 4. Still a person's: the Home Screen and Lock Screen shots and the two watch faces.)*
 
 ## 4. Release 1.3 — every surface
 
