@@ -147,9 +147,12 @@ something to record.
      -skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` — phone UI tests. The skip is
      **mandatory**: `AppStoreScreenshotUITests` is the App Store capture harness. Its store method
      starts clean on its own through the fresh start, but runs for minutes, fails as it starts
-     outside 1:45–11:45 PM, and is driven only by `Tools/CaptureScreenshots.sh`, which writes the
-     PNGs into `Screenshots/`; its census method is still deliberately non-idempotent, and fails on
-     any device where setup has already been completed
+     outside 1:45–11:45 PM or before the 8th of a month, and is driven only by
+     `Tools/CaptureScreenshots.sh`, which writes the PNGs into `Screenshots/`; its lived-in method
+     fails on any phone that has finished its welcome, and is driven only by
+     `Tools/CapturePairScreenshots.sh setup`, on a phone that script makes; its census method is
+     still deliberately non-idempotent, and fails on any device where setup has already been
+     completed
   3. `xcodebuild test -scheme WaterBuddyWatch -only-testing:WaterBuddyWatchTests` — watch unit tests
   4. `xcodebuild build -scheme WaterBuddyWidgetExtension` — the phone widget, its own scheme
   5. `xcodebuild build -scheme WaterBuddyWatchWidget` — the watch widget, its own scheme (no
@@ -214,7 +217,11 @@ something to record.
   every site on its line; and finishing set A's own comparison, on 2026-10-25 from a clean build of a
   `HEAD` `128630c` export with the change's eleven files laid over it, against a clean build of that
   export, the same way, `-scheme WaterBuddy` by `build-for-testing`: unchanged on all four schemes — 20,
-  17, 2, 17 by message, 36, 29, 2, 29 sites, no line new or gone and every site on its line
+  17, 2, 17 by message, 36, 29, 2, 29 sites, no line new or gone and every site on its line; and the
+  store page's own comparison, on 2026-10-25 from a clean build of a `HEAD` `e674d59` export with the
+  change's seven Swift files laid over it, against a clean build of that export, the same way: unchanged
+  on all four schemes — 20, 17, 2, 17 by message, 36, 29, 2, 29 sites, no line new or gone and every site
+  on its line
   — counting primary `file:line:col: warning:` lines only, since Xcode 27 also
   prints a `` `- warning: `` line under each quoted snippet (`tasks/lessons.md`) — 29 outside the
   tests on both, 35 on `HEAD` with the six in two

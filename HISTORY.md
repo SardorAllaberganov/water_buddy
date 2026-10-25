@@ -13024,3 +13024,139 @@ was run.** HEAD `128630c`, 190 commits, level with `origin/main`. **19 staged** 
 same nineteen as finishing set A's records. **8 unstaged** — the two rule files, for the owner, and the six
 from before the session. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check`
 clean.
+
+## [2026-10-25] — The store page, retaken for everything built: the capture built and gated, the shots not yet taken
+
+Roadmap item 1.2.8, taken again, with known issues #32, #45, #82 and #88. Taken by `/start_task` with no task
+named, on the owner's choice *Store page* over set B, splitting `HistoryView.swift` and export. Spec
+`docs/superpowers/specs/2026-10-25-store-page-design.md`; plan `docs/superpowers/plans/2026-10-25-store-page.md`,
+executed inline. Built test-first and gated in the night of 2026-10-25; staged, not committed. **The thirteen
+shots are not taken**: the store capture runs from 1:45 PM, and the pair's five need a person in DeviceHub.
+
+### What changed
+
+- **A seed for the store capture.** `StoreSample` (DEBUG, app-only, pure) — today's five at set times
+  (1,300 ml), the 2026-10-18 set's week at times a person drinks, and every day back to the 1st of the month
+  two months before, weekday and weekend, met and short — logged by `freshStartManager(arguments:now:)`
+  through `addLog(amount:at:)` only beside `-WaterBuddyFreshStart`, given `-WaterBuddyStoreSample`. A seeded
+  manager builds in 0.61 s.
+- **A held Premium for it.** `PremiumStore.Source.held()` (DEBUG), a lifetime purchase from no store,
+  read by the app given `-WaterBuddyPremiumHeld` beside the fresh start (`WaterBuddyApp.premiumSource`). The
+  *Month, held* preview takes it.
+- **The store harness, two launches.** A free user with the paywall offered — `09-goal-setup`, `01-home`,
+  `03-history`, `10-settings` — then a holder — `05-month`, `07-patterns`, `08-recap`, `06-insights`; no wheel
+  is spun. `Tools/CaptureScreenshots.sh` refuses a run before the 8th beside its clock check and renames
+  eight.
+- **The lived-in week and the pair script.** `testBuildTheLivedInWeek` builds the set's week through
+  History's sheet into a device's own stores and chooses English; `Tools/CapturePairScreenshots.sh setup`
+  makes a new phone and watch pair by name, runs it, installs both apps through `simctl` and launches them;
+  `shoot <name>` takes each of `02-widgets`, `04-lock-screen`, `01-wrist`, `02-face-modular`,
+  `03-face-infograph`. `Tools/CaptureWatchScreenshot.sh` is gone.
+
+### The rulings it rests on
+
+The owner's: the task; the scope — the watch shot, the iPhone four as a Release build draws them, Premium
+shots, widget shots; two DEBUG arguments; all four Premium screens; raw shots and one sentence for the
+description; all four widget surfaces; a new pair per run; then *"do not ask nothing go with
+recommendations"*. Taken under it as recommended: the control in a Lock Screen corner slot so the set is
+ten; two face shots; the lived-in week at the sheet's own times; and, once a `read` pause proved
+unanswerable from the session's shell, `setup` and `shoot` in place of pauses.
+
+### RED, then GREEN
+
+RED by compile on iOS 27.0: `StoreSampleTests` (*cannot find 'StoreSample'*), the seed's three
+`FreshStartTests` (*no member 'storeSampleArgument'*, *extra argument 'now'*), the held source's two (*no
+member 'premiumSource'*). GREEN: `StoreSampleTests` 7, `FreshStartTests` 7. The lived-in method ran once,
+on a pair the script made: `Executed 1 test, with 0 failures` in 849 s; Home read 65 %, *1,300 of 2,000 ml*,
+*5 days*. The watch first drew *Not yet synced*: the phone's log read `WCErrorCodeWatchAppNotInstalled`
+after the test run's own install; with the phone app installed again through `simctl` before the watch
+app, the publish logged `size: 211` and the watch drew *65 % · Synced just now* (`tasks/lessons.md`). The
+script's step 4 now does that. Its `setup` has not run again since.
+
+### Files
+
+Code, tests and tools (staged): `WaterBuddy/StoreSample.swift` (new) · `WaterBuddy/WaterBuddyApp.swift` ·
+`WaterBuddy/PremiumStore.swift` · `WaterBuddy/HistoryView.swift` · `WaterBuddyTests/StoreSampleTests.swift`
+(new) · `WaterBuddyTests/WelcomeTests.swift` · `WaterBuddyUITests/AppStoreScreenshotUITests.swift` ·
+`Tools/CaptureScreenshots.sh` · `Tools/RenameScreenshots.py` · `Tools/CapturePairScreenshots.sh` (new) ·
+`Tools/CaptureWatchScreenshot.sh` (deleted). Records: the spec and the plan (new) · `tasks/lessons.md` (one
+entry) · this file. Rule wording, **unstaged for the owner**: `.claude/rules/` `85-testing`,
+`43-concurrency`, `15-project`. `/doc_sync` not run: it waits for the shots.
+
+### Gate
+
+Run in this session on the final code, `build-for-testing` then `test-without-building`, one of this
+project's simulators at a time, `-parallel-testing-enabled NO`: phone unit on *iPhone 17* (27.0) — **954
+tests in 108 suites passed**, `anExpiredYearlyReadsFree` skipped (#157). UI by class, `GoalSetupUITests` in
+chunks of thirteen — 27.0: **75 executed, 1 skipped, 0 failures**; 26.5: 75 executed, 1 skipped, 1 failure,
+`testAPressDraggedAlongTheBarChangesTheTab` (*the drag did not carry the selection to Settings*), which passed
+alone — at a load average of 64–152, another project's simulator (*AvtoLog iOS 27*) booted beside it. Watch
+on *Apple Watch Series 12 (46mm)* (watchOS 27.0) — **71 tests in 7 suites passed**; `WaterBuddyWidgetExtension`
+and `WaterBuddyWatchWidget` built. **Warnings**: clean builds of a `HEAD` `e674d59` export and of that export
+with the change's seven Swift files, into empty DerivedData, by file and message — 20, 17, 2, 17 on both
+sides, sites 36, 29, 2, 29, no line new or gone and every site on its line. **Not run**: both captures; the
+thirteen PNGs read; `VerifyScreenshots.sh` over them; the old `02-history`, `03-settings`, `04-goal-setup`
+removed. **Seen**: `xcrun simctl shutdown all`, which the rules ask for, also stops another project's
+simulator on this Mac; the runs after it shut down this project's devices by id.
+
+**Staging.** Read from the commands at 04:24 on 2026-10-25, after this session's `git add` of 13 paths by
+name and one `git rm`; this file is added once this block is written, the fifteenth. **No `git commit` was
+run.** HEAD `e674d59`, 197 commits, level with `origin/main`. **14 staged** — 8 modified, 5 added, 1 deleted. **9
+unstaged** — the three rule files, for the owner; `.claude/settings.json`, two watch schemes and three string
+catalogues, all from before the session. **1 untracked**: `Screenshots/census/`. None in both; `git diff
+--cached --check` clean.
+
+## [2026-10-25] — The ninety-second `/doc_sync`: the store page's records, written before its shots
+
+Run by the owner on the store page's staged tree, at 10:40, before either capture — the store capture's
+window opens at 1:45 PM. No code changed since its gate; this pass wrote only `CLAUDE.md`, `docs/` and
+`tasks/`.
+
+### What changed
+
+- **`docs/AI_CONTEXT.md`.** A *Last updated*; *Current state*'s block for the store page; *Targets*' three
+  test rows — 954 `@Test` in 108 suites, 63 UI `func test`, 71 watch, each with the store page's gate;
+  *Files on disk*: `StoreSample.swift` (104) and `StoreSampleTests.swift` (79) new, five recounted
+  (`HistoryView.swift` 3,527, `PremiumStore.swift` 391, `WaterBuddyApp.swift` 231, `WelcomeTests.swift` 427,
+  `AppStoreScreenshotUITests.swift` 818); *Outside every target*: `CapturePairScreenshots.sh` in place of the
+  deleted `CaptureWatchScreenshot.sh`, a note on `CaptureScreenshots.sh`; dated notes on the two store-set
+  rows, on #32, #45, #82 and #88 — none retired, since no new shot exists and `CaptureFullCensus.sh` still
+  names a dead device — and on #84(c), whose "two destinations" moved to `WaterBuddyApp.swift:191`.
+- **`CLAUDE.md`.** The gate's second step: the store method also refuses a run before the 8th, and the
+  lived-in method is driven only by `Tools/CapturePairScreenshots.sh setup`. The warning trail gains the
+  store page's comparison.
+- **`docs/STATE.md`.** No key moved; one dated note in *Tests that pin this* — the two new DEBUG arguments
+  write only the fresh start's in-memory rows, and the lived-in method writes a week into a made-for-purpose
+  simulator's own group.
+- **`docs/ROADMAP.md`.** 1.2.8's note: the set, the two scripts, the description's sentence.
+- **`tasks/lessons.md`.** Two entries: a pause for a person cannot be answered from the session's shell;
+  `shutdown all` stops another project's booted simulator whether or not an `xcodebuild` runs on it.
+
+### Drift found and fixed
+
+One: the iPhone set's row in *Files on disk* still called the 2026-10-18 shots "staged, not committed";
+`git log` puts them in `efa9ed3` — a dated note.
+
+### Checked and already accurate
+
+117 `.swift` files in the seven target folders by `git` and by `find`, 117 rows, every count equal to
+`wc -l` (one by hand); 13 keys on `DataManager.Key` and in `Key.all`; three six-file exception sets in
+`project.pbxproj`, as `CLAUDE.md` names them; 18 rules cited, 18 files; `StoreKit` in `HomeView.swift` and
+`PremiumStore.swift` alone, `FoundationModels` in `InsightWriter.swift` alone, no `SwiftData` under
+`WaterBuddyWidget/`; no forbidden doc; no *awaits*, *unstaged* or *for the owner* claim in `CLAUDE.md`
+(the 2026-10-25 lesson's check). `docs/WIDGET.md` and `docs/DESIGN.md`: nothing in their subjects moved.
+
+### Gate
+
+Not run by this pass. The last is the store page's, on its final code, in the night of 2026-10-25 (the
+checkpoint above): phone unit 954 in 108 suites, 953 passed, 1 skipped (#157); UI 75 executed on 27.0 with
+no failures and 75 on 26.5 with one, which passed alone; watch 71; both widget schemes built; warnings
+unchanged on all four schemes. **Still not run:** both captures.
+
+**Staging.** Read from the commands at 10:51 on 2026-10-25, after this pass's `git add` of its six files by
+name — `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/ROADMAP.md`, `tasks/lessons.md`, this file;
+this file and `docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit` was
+run.** HEAD `e674d59`, 197 commits, level with `origin/main`. **19 staged** — 13 modified, 5 added, 1
+deleted. **9 unstaged** — the three rule files, for the owner; `.claude/settings.json`, two watch schemes
+and three string catalogues, all from before the session. **1 untracked**: `Screenshots/census/`. None in
+both.

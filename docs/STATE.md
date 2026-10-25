@@ -4,6 +4,12 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-25, morning (ninety-second pass of `docs/AI_CONTEXT.md` — `/doc_sync` run by the
+owner on the store page's staged tree). **No key and no stored byte moved**: 13 keys on `DataManager.Key`
+and in `Key.all`. One dated note, in *Tests that pin this*' paragraph on the process the tests run in: the store
+capture's two new DEBUG arguments write only the fresh start's own in-memory rows, and its lived-in method
+writes a week into a made-for-purpose simulator's own group.
+
 **Last updated:** 2026-10-25 (finishing set A's own records, not a `/doc_sync` pass). **No key and no
 stored byte moved**: 13 keys on `DataManager.Key`. The watch's two keys, `wristOutbox` and `wristMirror`,
 gain dated notes in their *Range / clamp* cells: since #154 the watch validates both on the way out, through
@@ -1531,7 +1537,14 @@ before any test runs the host's own launch has called `prepareSharedStorage()` a
 app does. The UI suites launch that same real app, with no store override — except
 `WelcomeUITests`, which since stage 5 launches it with `-WaterBuddyFreshStart` *(2026-10-18: and,
 since roadmap item 1.2.8, the store capture, `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`
-— rule `85-testing` names both)*: in a DEBUG build the
+— rule `85-testing` names both)* *(2026-10-25, the store page, staged: the store capture also passes
+`-WaterBuddyStoreSample`, which logs `StoreSample`'s three months into that in-memory store through
+`addLog(amount:at:)` — the fresh start's own rows, never the group's — and, on its second launch,
+`-WaterBuddyPremiumHeld`, which reads a lifetime purchase from no store and writes nothing; alone, either
+does nothing (`FreshStartTests`). Its other new method, `testBuildTheLivedInWeek`, does the opposite: it
+runs with no fresh start and logs a week through History's sheet into the simulator's own group, on a phone
+`Tools/CapturePairScreenshots.sh setup` made for it by name — so the widgets and the watch have figures to
+draw)*: in a DEBUG build the
 app then runs on that throwaway suite, cleared at launch, and an in-memory store. The launch's own
 `prepareSharedStorage()` still runs first, against the simulator's group container, as on every
 launch — the app's bookkeeping on its own group, as `WaterBuddyApp.init()`'s comment says, not

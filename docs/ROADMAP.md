@@ -185,7 +185,16 @@ earlier days met, a *5 days* chip — in `en_US`, with a 24-hour status-bar cloc
 since the capture device's own region draws it. The header was already done. Not done: the pitch in
 the listing copy — the owner chose screenshots only for this task on 2026-10-17 — and the watch shot,
 which waits for 1.3.2.)* *(2026-10-18, evening: committed at 20:33 as `eecb6a7` (the plan), `efa9ed3`
-(feat), `4f21510` (docs) and `88d694f` (the rule wording).)*
+(feat), `4f21510` (docs) and `88d694f` (the rule wording).)* *(2026-10-25: **taken again, for everything
+built since — the capture built, gated and staged, not committed; the shots not taken.** Spec
+`docs/superpowers/specs/2026-10-25-store-page-design.md`, plan `docs/superpowers/plans/2026-10-25-store-page.md`.
+Ten iPhone shots — Home, the Home Screen widgets, History, the Lock Screen, Month, Insights, Patterns, the
+recap, the goal step, Settings — and three watch shots: the app synced, a Modular face, an Infograph face.
+Eight come from `Tools/CaptureScreenshots.sh`, between 1:45 and 11:45 PM from the 8th of a month; five from
+`Tools/CapturePairScreenshots.sh`, with a person placing each surface in DeviceHub. The pitch stays out of
+the art; the description gains one sentence the owner pastes, because four shots are Premium's:
+*"Month view, Patterns, Insights and the Monthly recap are part of WaterBuddy Premium, an optional
+subscription or one-time purchase. Logging water is always free."* Still English only.)*
 
 ## 4. Release 1.3 — every surface
 

@@ -5034,3 +5034,41 @@ saying the same thing is history; a sentence in `CLAUDE.md`'s *Architecture* is 
 **The rule:** each `/doc_sync` greps `CLAUDE.md` for `awaits|unstaged|for the owner` and checks each hit
 against `git log --oneline --grep=admit` and the rule file at `HEAD`; a claim the log has overtaken is
 rewritten to name the commit that admitted it.
+
+## 2026-10-25 — A phone app installed by `xcodebuild test` leaves its watch app uncounted
+
+**What happened.** The pair script's first `setup` let `xcodebuild test` install the phone app, then
+`simctl install`ed the watch app embedded in it — the 2026-10-05 order — and relaunched the phone. The
+watch drew *Not yet synced*, and the phone's own log, read with `simctl spawn <phone> log show`, said why:
+every `updateApplicationContext` after the install failed with `WCErrorCodeWatchAppNotInstalled`. With the
+phone app installed again by `simctl install` — the same build, its stores kept — then the watch app, then
+the phone launched, the next publish logged `size: 211` and the watch drew *65 % · Synced just now*. Two
+screenshots taken minutes apart had also been identical to the pixel, the watch's clock stuck at 03:06: a
+watch simulator with no DeviceHub window may not redraw, so a picture alone could not say whether it had
+synced.
+
+**The rule:** on paired simulators the phone app that carries the watch app goes in through
+`simctl install`, not a test run's own install, before the watch app. Ask the phone's log whether a
+publish landed before reading the watch's screen.
+
+## 2026-10-25 — A pause for a person cannot be answered from the session's shell
+
+**What happened.** The store page's plan first gave the pair script five `read -r -p` pauses, each followed
+by a screenshot — the shape of `Tools/CaptureWatchScreenshot.sh`'s *"Press Return when the watch screen is
+ready to shoot…"*. The session runs a script in a shell that is not the owner's terminal, so a pause there
+has nobody to answer it; the owner works in DeviceHub, not at the script's input.
+
+**The rule:** a script the session runs for a person stops wherever the person acts, and resumes as a
+command of its own — `setup`, then `shoot <name>` per surface. Never a `read` in a script the session
+drives.
+
+## 2026-10-25 — `shutdown all` stops another project's booted simulator, `xcodebuild` or not
+
+**What happened.** The store page's gate ran `xcrun simctl shutdown all`, as rule `85-testing` writes it,
+while another project's simulator, *AvtoLog iOS 27*, was booted on this Mac; it stopped that one too. The
+2026-10-07 rule reads `ps` for another `xcodebuild` — a booted device with no test run on it is somebody's
+just the same. The runs after it shut down this project's devices by UDID.
+
+**The rule:** before `shutdown all`, read `xcrun simctl list devices booted` as well as `ps`. If a device
+that is not this project's is booted, shut down this project's own by UDID instead, and say so in the
+gate's record. The command in the rule is the owner's to change.
