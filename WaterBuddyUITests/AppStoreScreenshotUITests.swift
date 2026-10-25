@@ -20,7 +20,9 @@ private func listed(_ figure: Int) -> String {
     figure.formatted(.number.locale(Locale(identifier: "en_US")))
 }
 
-/// The four iPhone screenshots App Store Connect is given, captured by driving the real app.
+/// The eight of the store set's ten iPhone screenshots that the app's own screens make, and the
+/// lived-in week the other two and the watch's three stand on, captured by driving the real app
+/// (spec `2026-10-25-store-page-design.md` §1).
 ///
 /// **This is not a test.** It asserts only what a wrong picture would get wrong and proves nothing
 /// about the product; it is a capture harness that happens to need XCUITest's ability to tap. It
@@ -30,7 +32,7 @@ private func listed(_ figure: Int) -> String {
 /// ## Why it starts clean on its own
 ///
 /// A capture must start from an empty install, or the figures on screen are whatever the last run
-/// left behind — and the welcome, shot `04`, exists only until a goal is committed. Until
+/// left behind — and the welcome, shot `09`, exists only until a goal is committed. Until
 /// 2026-10-18 that meant an erased device and a script that refused a dirty one. It now launches
 /// with `-WaterBuddyFreshStart`, as the welcome's own tests do (rule `85-testing`): a throwaway
 /// suite cleared at launch and an in-memory store, with no widget, reminder or watch side effects.
@@ -45,35 +47,45 @@ private func listed(_ figure: Int) -> String {
 ///
 /// ## Why it is excluded from the gate
 ///
-/// It runs for minutes, and it is driven only by `Tools/CaptureScreenshots.sh`, which pins the
-/// status bar and writes the four PNGs into `Screenshots/`. Rule `85-testing`'s gate carries
-/// `-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` to keep it, and the census below,
+/// The store method runs for minutes, and is driven only by `Tools/CaptureScreenshots.sh`, which
+/// pins the status bar and writes its eight PNGs into `Screenshots/`; the lived-in method only by
+/// `Tools/CapturePairScreenshots.sh`, on a phone that script made. Rule `85-testing`'s gate carries
+/// `-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` to keep both, and the census below,
 /// out of the ordinary run.
 ///
-/// ## Why History's sheet, and not Home's pours
+/// ## Why a seed, and not History's sheet
 ///
-/// A pour on Home is stamped *now*, so the 1.1 capture spaced five pours 65 s apart to give its
-/// rows five different minutes — and its History still drew five minutes of drinking, and its week
-/// one day. The set shows a lived-in week instead (roadmap item 1.2.8, approved 2026-10-17): today's
-/// servings at set times through the sheet's wheel, and six earlier days through the week card. And
-/// with nothing poured on Home, Home is shot with no *Undo* line, no slosh and no confetti, and no
-/// rating request can start.
+/// History's sheet offers seven days, and the month, Patterns and the recap need more: seven finished
+/// days of the month holding today, and a finished month with water on seven days. So the store
+/// method launches with `-WaterBuddyStoreSample` beside the fresh start, and the app logs
+/// `StoreSample`'s three months — today's five at set times, the 2026-10-18 set's week, and the
+/// months before — into the fresh start's in-memory store as it launches, never a device's App
+/// Group. Nothing is poured on Home, so Home is shot with no *Undo* line, no slosh and no
+/// confetti, and no rating request can start.
 ///
-/// The wheel offers nothing later than now, and today's last serving is at 1:30 PM — so the run
-/// refuses to start before 1:45 PM, and after 11:45 PM, where it would cross midnight and split the
-/// week it is building.
+/// Today's last serving is at 1:30 PM, so the run refuses to start before 1:45 PM — a launch drops
+/// any serving later than now — and after 11:45 PM, where its two launches could fall either side
+/// of midnight. It also refuses a run before the 8th of a month, when the month holding today has
+/// fewer than seven finished days for Patterns and the recap is not on the month before's page.
 ///
-/// ## Why one method and not four
+/// ## Why two launches in one method
 ///
-/// The four screens are four *steps of one session*, not four independent cases. Home has to show
-/// water, which means the servings have already been saved; History has to show those same
-/// servings. Splitting them into separate `func test…`s would relaunch between each — and a fresh
-/// start empties the store at every launch — and XCTest gives no ordering guarantee across methods.
+/// The free shots are a Release build's free user: the paywall offered (`-WaterBuddyPremium`), so
+/// History draws its *Week · Month · Insights* switch and Settings its Premium card. The Premium
+/// shots are a holder's (`-WaterBuddyPremiumHeld`, a lifetime purchase held by a DEBUG source that
+/// reaches no store). The seed is logged at each launch, so both see the same history; one method,
+/// because XCTest gives no ordering guarantee across methods and the welcome's shot must come first.
+///
+/// ## Why the lived-in week is a method of its own
+///
+/// The widgets and the watch read the device's own App Group, which the fresh start never opens, so
+/// the seed cannot reach them. `testBuildTheLivedInWeek` builds the set's week through History's
+/// sheet, on a new phone the pair script made, where a person then places the widgets.
 ///
 /// ## Capture order is not display order
 ///
-/// The welcome exists only until the first goal is committed, so its goal step is shot **first** and named
-/// `04`. The names are the App Store ordering; the sequence below is the only one the app permits.
+/// The welcome exists only until the first goal is committed, so its goal step is shot **first** and
+/// named `09`. The names are the App Store ordering; the sequence below is the only one the app permits.
 final class AppStoreScreenshotUITests: XCTestCase {
 
     /// Seconds between the census's quick-add taps.
@@ -81,21 +93,28 @@ final class AppStoreScreenshotUITests: XCTestCase {
     /// `HistoryView` renders a serving's time as `.dateTime.hour().minute()`, so five taps fired back
     /// to back produce five rows stamped with the same minute — which reads as fabricated in a
     /// screenshot. 65 s is the smallest gap that guarantees a distinct minute on every row. The store
-    /// capture no longer pours on Home; it sets each time on History's wheel.
+    /// capture pours nothing on Home; its history is the seed's.
     private let tapSpacing: TimeInterval = 65
 
-    /// The store set's today, in the order it is drunk: 1,300 ml, 65 % of the default 2,000 — short
-    /// of the goal, so no confetti. Every time is before 1:45 PM, the earliest the run starts.
-    private let today: [(vessel: String, hour: String, minute: String, period: String)] = [
-        ("Glass", "7", "40", "AM"),
-        ("Cup", "9", "15", "AM"),
-        ("Bottle", "10", "50", "AM"),
-        ("Glass", "12", "25", "PM"),
-        ("Cup", "1", "30", "PM"),
+    /// What both store launches pass: a new install, `StoreSample`'s history, in `en_US`.
+    private let storeLaunch = [
+        "-WaterBuddyFreshStart", "YES",
+        "-WaterBuddyStoreSample", "YES",
+        "-AppleLanguages", "(en)",
+        "-AppleLocale", "en_US",
     ]
 
-    /// The six days before today, oldest first: 1,650 (short of the goal), then 2,000, 2,250,
-    /// 2,150, 2,500 and 2,000 — five days met, so Home's chip reads *5 days*. Only the week card's
+    /// The first day of a month the store capture runs on: Patterns need seven finished days of the
+    /// month holding today, and the recap is then drawn on the month before's page.
+    private let earliestDay = 8
+
+    /// The lived-in week's today, by vessel: 1,300 ml, 65 % of the default 2,000 — short of the goal,
+    /// so no confetti. Logged at the time the sheet opens on: no shot the pair script makes draws a
+    /// serving's time (spec §3.4).
+    private let todaysVessels = ["Glass", "Cup", "Bottle", "Glass", "Cup"]
+
+    /// The lived-in week's six days before today, oldest first: 1,650 (short of the goal), then 2,000,
+    /// 2,250, 2,150, 2,500 and 2,000 — five days met, so Home's chip reads *5 days*. Only the widgets'
     /// bars show them, so each keeps the time of day the sheet opens on.
     private let earlierDays: [[String]] = [
         ["Bottle", "Bottle", "Bottle", "Cup"],
@@ -129,40 +148,45 @@ final class AppStoreScreenshotUITests: XCTestCase {
 
     @MainActor
     func testCaptureAppStoreScreenshots() throws {
-        // Before anything launches: a run outside the window fails at its first wheel, minutes in.
-        let clock = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        // Before anything launches: a run outside the window would shoot a history short of its
+        // servings, or one split across midnight between its two launches.
+        let clock = Calendar.current.dateComponents([.day, .hour, .minute], from: Date())
         let minutes = (clock.hour ?? 0) * 60 + (clock.minute ?? 0)
         guard (13 * 60 + 45)..<(23 * 60 + 45) ~= minutes else {
             XCTFail(
                 "the store capture runs between 1:45 PM and 11:45 PM: today's last serving is at "
-                    + "1:30 PM and the wheel offers nothing later than now, and a run across midnight "
-                    + "would split the week it builds"
+                    + "1:30 PM, and a run across midnight would split the history it shows"
+            )
+            return
+        }
+        guard (clock.day ?? 0) >= earliestDay else {
+            XCTFail(
+                "the store capture runs from the \(earliestDay)th of a month: Patterns need seven finished "
+                    + "days of the month holding today, and the recap is then on the month before's page"
             )
             return
         }
 
+        // ── the free launch: a Release build's free user, the paywall offered ────────────────────
         let app = XCUIApplication()
-        app.launchArguments += [
-            "-WaterBuddyFreshStart", "YES",
-            "-AppleLanguages", "(en)",
-            "-AppleLocale", "en_US",
-        ]
+        app.launchArguments += storeLaunch + ["-WaterBuddyPremium", "YES"]
         app.launch()
 
-        // ── 04 · the first-run screen ────────────────────────────────────────────────────────────
+        // ── 09 · the first-run screen ────────────────────────────────────────────────────────────
         // Shot before anything else, because committing a goal ends it. A fresh start always opens
         // on it, so its absence means the argument was not read — and the run would be on the
-        // device's own data, whose figures are nobody's listing.
+        // device's own data, whose figures are nobody's listing. The seed is logged at launch, so the
+        // first wait is a long one.
         let getStarted = app.buttons["Get Started"]
         XCTAssertTrue(
-            getStarted.waitForExistence(timeout: 10),
+            getStarted.waitForExistence(timeout: 30),
             "the welcome is not showing — the fresh start did not take, so this run is not a new install"
         )
         // The shot is the goal step: the number the rest of the product is measured against.
         getStarted.tap()
         XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 10), "the goal step did not appear")
         Thread.sleep(forTimeInterval: settle)
-        capture("04-goal-setup")
+        capture("09-goal-setup")
 
         // On through the vessels and past reminders without asking, as a new user might.
         tapWhenReady(app.buttons["Continue"])
@@ -170,8 +194,114 @@ final class AppStoreScreenshotUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Not now"].waitForExistence(timeout: 10), "the welcome's last step did not appear")
         tapWhenReady(app.buttons["Not now"])
 
-        let vessel = app.otherElements["Today's hydration"]
-        XCTAssertTrue(vessel.waitForExistence(timeout: 10), "the root did not swap to HomeView")
+        // ── 01 · Home, with the seed's water ─────────────────────────────────────────────────────
+        assertTheSetsHome(in: app)
+        Thread.sleep(forTimeInterval: settle)
+        capture("01-home")
+
+        // ── 03 · History, on today, its switch drawn ─────────────────────────────────────────────
+        app.buttons["History"].tap()
+        XCTAssertTrue(app.staticTexts["Last 7 days"].waitForExistence(timeout: 10), "the week card did not draw")
+        XCTAssertTrue(app.buttons["Today"].isSelected, "History did not open on today")
+        XCTAssertTrue(app.buttons["Month"].exists, "History draws no switch — the paywall is not offered")
+        Thread.sleep(forTimeInterval: settle)
+        capture("03-history")
+
+        // ── 10 · Settings, its Premium card first ────────────────────────────────────────────────
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(
+            app.sliders["Daily water goal"].waitForExistence(timeout: 10),
+            "the Settings tab did not draw"
+        )
+        XCTAssertTrue(app.buttons["See Premium"].exists, "Settings draws no Premium card — the paywall is not offered")
+        // Captured at rest. Do not scroll first: a mid-scroll shot with a sliced card reads as
+        // broken, and the reminders toggle must stay untouched — flipping it would raise the system
+        // notification-authorization alert over the screen (rule `70-privacy`).
+        Thread.sleep(forTimeInterval: settle)
+        capture("10-settings")
+        app.terminate()
+
+        // ── the held launch: a Premium holder, on the same history ───────────────────────────────
+        let held = XCUIApplication()
+        held.launchArguments += storeLaunch + ["-WaterBuddyPremiumHeld", "YES"]
+        held.launch()
+        XCTAssertTrue(
+            held.buttons["Get Started"].waitForExistence(timeout: 30),
+            "the held launch is not a new install"
+        )
+        completeWelcomeIfShown(held)
+        XCTAssertTrue(held.otherElements["Today's hydration"].waitForExistence(timeout: 10), "the root did not swap to HomeView")
+        held.buttons["History"].tap()
+        let month = held.buttons["Month"]
+        XCTAssertTrue(month.waitForExistence(timeout: 10), "History draws no switch for a holder")
+        month.tap()
+
+        // ── 05 · this month ──────────────────────────────────────────────────────────────────────
+        // The arrow to the month before is drawn because the seed opens two months back.
+        let earlier = held.buttons[monthName(movedBy: -1)]
+        XCTAssertTrue(earlier.waitForExistence(timeout: 10), "Month mode did not draw this month's page")
+        Thread.sleep(forTimeInterval: settle)
+        capture("05-month")
+
+        // ── 07 · Patterns, further down this month's page, lifted to the top ─────────────────────
+        let patterns = held.staticTexts["Patterns"]
+        scroll(held, from: earlier, until: patterns, step: 400, maxDrags: 8)
+        let lift = patterns.frame.minY - 120
+        if lift > 40 { scrollDown(from: patterns, byPoints: lift) }
+        Thread.sleep(forTimeInterval: settle)
+        capture("07-patterns")
+
+        // ── 08 · the month before's recap ────────────────────────────────────────────────────────
+        // Back to the top by bouncing off a tab, which rebuilds History in Week mode.
+        returnToTop(of: "History", in: held, proof: month)
+        month.tap()
+        XCTAssertTrue(earlier.waitForExistence(timeout: 10), "Month mode did not draw this month's page again")
+        earlier.tap()
+        let later = held.buttons[monthName(movedBy: 0)]
+        XCTAssertTrue(later.waitForExistence(timeout: 10), "the month before's page did not draw")
+        let recap = held.buttons["Monthly recap"]
+        scroll(held, from: later, until: recap, step: 400, maxDrags: 8)
+        recap.tap()
+        let done = held.buttons["Done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 10), "the recap sheet did not open")
+        Thread.sleep(forTimeInterval: settle)
+        capture("08-recap")
+        done.tap()
+        XCTAssertTrue(done.waitForNonExistence(timeout: 5), "the recap sheet did not close")
+
+        // ── 06 · Insights, last week ─────────────────────────────────────────────────────────────
+        held.buttons["Insights"].tap()
+        let firstPane = held.descendants(matching: .any).matching(identifier: "The one thing").firstMatch
+        XCTAssertTrue(firstPane.waitForExistence(timeout: 10), "Insights drew no week — the seed's last week holds too little")
+        Thread.sleep(forTimeInterval: settle)
+        capture("06-insights")
+    }
+
+    /// Builds the set's week through History's sheet into the device's own stores, for the widgets and
+    /// the watch — run only by `Tools/CapturePairScreenshots.sh`, on a new phone it made (spec §3.4).
+    ///
+    /// No fresh start: the widgets and the watch read the device's App Group, which the fresh start
+    /// never opens. Today's five and the six days before keep the time the sheet opens on — no shot
+    /// the pair script makes draws a serving's time — so no wheel is spun and no afternoon is needed.
+    /// English is then chosen in Settings: the widgets and the watch draw in the app's language and
+    /// locale, and a simulator is in the Mac's region, which prints *1 300*.
+    @MainActor
+    func testBuildTheLivedInWeek() throws {
+        let clock = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        guard (clock.hour ?? 0) * 60 + (clock.minute ?? 0) < 23 * 60 + 45 else {
+            XCTFail("the lived-in week is built before 11:45 PM: a run across midnight would split it")
+            return
+        }
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launch()
+        XCTAssertTrue(
+            app.buttons["Get Started"].waitForExistence(timeout: 10),
+            "no welcome — this is not the pair script's new phone, and its own water would reach the shots"
+        )
+        completeWelcomeIfShown(app)
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 10), "the root did not swap to HomeView")
 
         // ── the week, through History's sheet ────────────────────────────────────────────────────
         app.buttons["History"].tap()
@@ -180,11 +310,10 @@ final class AppStoreScreenshotUITests: XCTestCase {
         // Today first: until a day carries water there is no week card, and no day to pick.
         let todayButton = app.buttons["Today"]
         var drunkToday = 0
-        for serving in today {
+        for vessel in todaysVessels {
             openSheet(in: app)
-            setTime(hour: serving.hour, minute: serving.minute, period: serving.period, in: app)
-            save(serving.vessel, in: app)
-            drunkToday += amounts[serving.vessel] ?? 0
+            save(vessel, in: app)
+            drunkToday += amounts[vessel] ?? 0
             waitForTotal(drunkToday, on: todayButton, named: "today")
         }
 
@@ -209,8 +338,24 @@ final class AppStoreScreenshotUITests: XCTestCase {
             waitForTotal(drunk, on: day, named: name)
         }
 
-        // ── 01 · Home, with water ────────────────────────────────────────────────────────────────
+        // ── English, chosen ──────────────────────────────────────────────────────────────────────
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 10), "the Settings tab did not draw")
+        let english = app.buttons["English"]
+        scroll(app, from: settingsAnchor(app), until: english, step: 300, maxDrags: 5)
+        english.tap()
+        let chosen = XCTNSPredicateExpectation(predicate: NSPredicate(format: "selected == true"), object: english)
+        XCTAssertEqual(XCTWaiter().wait(for: [chosen], timeout: 5), .completed, "English was not chosen")
+
+        // ── Home, left showing ───────────────────────────────────────────────────────────────────
         app.buttons["Home"].tap()
+        assertTheSetsHome(in: app)
+    }
+
+    /// Home as the set shows it: the vessel at 65 %, *1,300 of 2,000*, and the chip's *5 days*.
+    @MainActor
+    private func assertTheSetsHome(in app: XCUIApplication) {
+        let vessel = app.otherElements["Today's hydration"]
         XCTAssertTrue(vessel.waitForExistence(timeout: 10), "Home did not draw")
         XCTAssertEqual(
             vessel.value as? String,
@@ -220,32 +365,15 @@ final class AppStoreScreenshotUITests: XCTestCase {
         let chip = app.descendants(matching: .any).matching(identifier: "Day streak").firstMatch
         XCTAssertTrue(chip.waitForExistence(timeout: 5), "Home shows no streak")
         XCTAssertEqual(chip.value as? String, "5 days", "the streak is not the five days met before today")
-        Thread.sleep(forTimeInterval: settle)
-        capture("01-home")
+    }
 
-        // ── 02 · History, on today ───────────────────────────────────────────────────────────────
-        // History opens on today whichever day it was left on.
-        app.buttons["History"].tap()
-        XCTAssertTrue(
-            app.buttons["Add a serving"].waitForExistence(timeout: 10),
-            "the History tab did not draw"
-        )
-        XCTAssertTrue(app.staticTexts["Last 7 days"].waitForExistence(timeout: 5), "the week card did not draw")
-        XCTAssertTrue(todayButton.isSelected, "History did not open on today")
-        Thread.sleep(forTimeInterval: settle)
-        capture("02-history")
-
-        // ── 03 · Settings ────────────────────────────────────────────────────────────────────────
-        app.buttons["Settings"].tap()
-        XCTAssertTrue(
-            app.sliders["Daily water goal"].waitForExistence(timeout: 10),
-            "the Settings tab did not draw"
-        )
-        // Captured at rest. Do not scroll first: a mid-scroll shot with a sliced card reads as
-        // broken, and the reminders toggle must stay untouched — flipping it would raise the system
-        // notification-authorization alert over the screen (rule `70-privacy`).
-        Thread.sleep(forTimeInterval: settle)
-        capture("03-settings")
+    /// The month `months` from this one as Month mode's arrows are labelled in `en_US` —
+    /// *September 2026* — the app's `.dateTime.month(.wide).year()`.
+    private func monthName(movedBy months: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.setLocalizedDateFormatFromTemplate("MMMMy")
+        return formatter.string(from: Calendar.current.date(byAdding: .month, value: months, to: Date()) ?? Date())
     }
 
     /// Attaches a full-screen capture under a stable name.
@@ -271,33 +399,6 @@ final class AppStoreScreenshotUITests: XCTestCase {
     private func openSheet(in app: XCUIApplication) {
         tapWhenReady(app.buttons["Add a serving"])
         XCTAssertTrue(app.datePickers.firstMatch.waitForExistence(timeout: 5), "the sheet did not open on its wheel")
-    }
-
-    /// Sets today's serving to a time of day, and reads it back off the wheel.
-    ///
-    /// The wheel offers nothing later than now, and a wheel stopped on a later time snaps back to
-    /// now. So the spinning is done in the morning, where every time is earlier than now — the run
-    /// starts after 1:45 PM: *AM* first, then the hour, then the minute, and the serving's own half
-    /// of the day last, which lands on a time still earlier than now. Spun in the afternoon, at
-    /// 2:42 PM on 2026-10-18, the hour was asked for 12 and read back 2 — that it passed a time
-    /// later than now on the way and snapped back is inferred, and the morning order built on it
-    /// has passed since. Read back, because a snapped wheel says nothing. The wheels are the date,
-    /// the hour, the minute and the half of the day (a probe on 2026-10-17, in `en_US`), and they
-    /// speak *7 o’clock* and *40 minutes*.
-    @MainActor
-    private func setTime(hour: String, minute: String, period: String, in app: XCUIApplication) {
-        let wheels = app.datePickers.firstMatch.pickerWheels
-        XCTAssertEqual(wheels.count, 4, "the sheet's wheel is not date, hour, minute and AM/PM")
-        wheels.element(boundBy: 3).adjust(toPickerWheelValue: "AM")
-        wheels.element(boundBy: 1).adjust(toPickerWheelValue: hour)
-        wheels.element(boundBy: 2).adjust(toPickerWheelValue: minute)
-        wheels.element(boundBy: 3).adjust(toPickerWheelValue: period)
-
-        let read = (0..<4).map { wheels.element(boundBy: $0).value as? String ?? "" }
-        XCTAssertEqual(read[0], "Today", "the serving is not on today")
-        XCTAssertTrue(read[1].hasPrefix(hour + " "), "the hour reads \"\(read[1])\", not \(hour)")
-        XCTAssertTrue(read[2].hasPrefix(minute + " "), "the minute reads \"\(read[2])\", not \(minute)")
-        XCTAssertEqual(read[3], period, "the half of the day reads \"\(read[3])\", not \(period)")
     }
 
     /// Sets the serving's amount with a vessel's shortcut, and saves it.

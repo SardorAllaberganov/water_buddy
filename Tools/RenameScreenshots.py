@@ -4,7 +4,7 @@
 `xcresulttool export attachments` writes UUID-named files plus a `manifest.json` that carries, per
 attachment, `exportedFileName` and `suggestedHumanReadableName`. The latter is shaped
 "<attachment.name>_<index>_<UUID>.png", and `attachment.name` is the slot this harness set
-("01-home", "02-history", "03-settings", "04-goal-setup").
+("01-home", "03-history", … "10-settings").
 
 Run:  python3 Tools/RenameScreenshots.py <attachments-dir> <output-dir> [expected,names,…]
 

@@ -1,6 +1,8 @@
 #!/bin/bash
 #
-#  Tools/CaptureScreenshots.sh — the four iPhone App Store screenshots, English only.
+#  Tools/CaptureScreenshots.sh — eight of the ten iPhone App Store screenshots, English only: the
+#  app's own screens (spec `docs/superpowers/specs/2026-10-25-store-page-design.md` §1). Shots 02 and
+#  04 — the Home Screen and the Lock Screen — and the watch's three are `Tools/CapturePairScreenshots.sh`'s.
 #
 #  Lives in `Tools/` because that directory sits outside every PBXFileSystemSynchronizedRootGroup
 #  and therefore belongs to no build target (rule `15-project`). It drives
@@ -15,15 +17,17 @@
 #  Nothing else may hold a simulator while this runs — CLAUDE.md's hard limits allow one at a time,
 #  and a cloned parallel run writes into a container that cannot be read back.
 #
-#  Run it between 1:45 PM and 11:45 PM. The harness sets today's servings on History's wheel, which
-#  offers nothing later than now, and the last is at 1:30 PM; outside that window it fails at once,
-#  saying so.
+#  Run it between 1:45 PM and 11:45 PM, from the 8th of a month. The app logs the harness's history
+#  as it launches (`-WaterBuddyStoreSample`), today's last serving at 1:30 PM and none later than now;
+#  Patterns need seven finished days of the month holding today, and the recap is then on the month
+#  before's page. Outside either window it fails at once, saying so.
 #
 #  THIS SCRIPT NEVER ERASES ANYTHING, and since 2026-10-18 it no longer needs to. The harness
 #  launches the app with `-WaterBuddyFreshStart`: a throwaway suite cleared at launch and an
-#  in-memory store, so every run is a new install whatever the device holds. The launch still
-#  resolves the device's App Group suite and runs the one-shot migration, as every launch does; the
-#  run's servings, goal and total live only in the throwaway (rule `85-testing`).
+#  in-memory store, so every run is a new install whatever the device holds; the seed and the held
+#  Premium act only beside it. The launch still resolves the device's App Group suite and runs the
+#  one-shot migration, as every launch does; the run's servings, goal and total live only in the
+#  throwaway (rule `85-testing`).
 #
 set -euo pipefail
 
@@ -37,7 +41,12 @@ cd "$ROOT"
 NOW="$(date '+%H:%M')"
 CLOCK=$((10#${NOW/:/}))
 if (( CLOCK < 1345 || CLOCK >= 2345 )); then
-  echo "it is $NOW: the store capture runs between 1:45 PM and 11:45 PM — today's last serving is at 1:30 PM, the wheel offers nothing later than now, and a run across midnight would split the week" >&2
+  echo "it is $NOW: the store capture runs between 1:45 PM and 11:45 PM — today's last serving is at 1:30 PM, and a run across midnight would split the history it shows" >&2
+  exit 1
+fi
+DAY=$((10#$(date '+%d')))
+if (( DAY < 8 )); then
+  echo "it is the $DAY of the month: the store capture runs from the 8th — Patterns need seven finished days of the month holding today, and the recap is then on the month before's page" >&2
   exit 1
 fi
 
@@ -97,7 +106,7 @@ xcrun simctl ui "$PHONE" appearance dark
 xcrun simctl ui "$PHONE" content_size large
 
 echo "── 3. freeze the status bar ─────────────────────────────────────────────────"
-# The clock is frozen at the time read and checked at the top, so the four shots read one time, and
+# The clock is frozen at the time read and checked at the top, so the eight shots read one time, and
 # every row under it — the last is at 1:30 PM, and the run starts after 1:45 — is earlier. From
 # 2026-10-09 to 2026-10-18 it was left live, after a 12-hour string drawn over 24-hour rows had
 # contradicted them.
@@ -114,7 +123,7 @@ xcrun simctl status_bar "$PHONE" override \
   --cellularMode active --cellularBars 4 --operatorName "" \
   --batteryState charged --batteryLevel 100
 
-echo "── 4. drive it (a few minutes — 32 servings through History's sheet) ─────────"
+echo "── 4. drive it (two launches: a free user, then a Premium holder) ─────────────"
 # `id=` rather than a platform/OS/name triple: the device is already booted with the overrides on it,
 # and naming it by identity is what stops xcodebuild resolving a sibling instead. The private
 # -derivedDataPath keeps this out of the DerivedData the gate uses.
@@ -136,15 +145,16 @@ xcrun xcresulttool export attachments \
   --output-path "$WORK/attachments"
 
 echo "── 6. rename UUID → slot ────────────────────────────────────────────────────"
-# The four slugs are named explicitly so a partial run fails loudly. The full census
-# (Tools/CaptureFullCensus.sh) deliberately omits this list, because several of its shots are
-# conditional and a missing one there is a recorded outcome rather than a failure.
+# The eight slugs are named explicitly so a partial run fails loudly; 02 and 04 are the pair
+# script's, and this list leaves them alone. The full census (Tools/CaptureFullCensus.sh)
+# deliberately omits this list, because several of its shots are conditional and a missing one there
+# is a recorded outcome rather than a failure.
 python3 "$ROOT/Tools/RenameScreenshots.py" "$WORK/attachments" "$OUT" \
-  01-home,02-history,03-settings,04-goal-setup
+  01-home,03-history,05-month,06-insights,07-patterns,08-recap,09-goal-setup,10-settings
 
 echo "── 7. verify ────────────────────────────────────────────────────────────────"
 bash "$ROOT/Tools/VerifyScreenshots.sh"
 
 echo
-echo "Done. Four iPhone screenshots in $OUT"
-echo "The watch shot is a separate, human-driven run: bash Tools/CaptureWatchScreenshot.sh"
+echo "Done. Eight iPhone screenshots in $OUT"
+echo "Shots 02 and 04 and the watch's three are a separate, human-driven run: bash Tools/CapturePairScreenshots.sh"
