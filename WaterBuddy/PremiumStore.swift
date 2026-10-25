@@ -325,6 +325,16 @@ extension PremiumStore.Source {
             canManage: { false }
         )
     }
+
+    #if DEBUG
+    /// A source that holds the lifetime purchase and reaches no store — for a `#Preview`, and for the
+    /// store capture's held launch (`WaterBuddyApp.premiumHeldArgument`). Nothing is bought or stored.
+    static func held() -> Self {
+        var source = silent()
+        source.entitlements = { [PremiumAccess.Entitlement(productID: PremiumAccess.lifetimeID, expires: nil, revoked: nil)] }
+        return source
+    }
+    #endif
 }
 
 private extension PremiumAccess.Entitlement {

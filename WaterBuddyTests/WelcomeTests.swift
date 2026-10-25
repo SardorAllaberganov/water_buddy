@@ -352,9 +352,17 @@ struct WelcomeFinishTests {
 #if DEBUG
 /// The welcome's UI tests launch a DEBUG build with `-WaterBuddyFreshStart` (spec 2026-10-14 §9).
 /// What they get must be a throwaway: absent without the argument, writing its own suite and never
-/// the App Group's, and cleared at each launch (Review Focus 4).
+/// the App Group's, and cleared at each launch (Review Focus 4). Serialized: its tests share the
+/// fresh start's one fixed suite. The store capture's seed and held Premium act only beside the fresh
+/// start's argument (spec `2026-10-25-store-page-design.md` §3.1, §3.2).
 @MainActor
+@Suite(.serialized)
 struct FreshStartTests {
+
+    /// 2026-10-25 at 2 PM on the app's own calendar: after today's last serving, on the 25th.
+    private static let afternoon = Calendar.waterBuddyDay.date(
+        from: DateComponents(year: 2026, month: 10, day: 25, hour: 14)
+    )!
 
     @Test func withoutTheArgumentThereIsNoFreshStart() {
         #expect(WaterBuddyApp.freshStartManager(arguments: ["WaterBuddy"]) == nil)
@@ -374,6 +382,46 @@ struct FreshStartTests {
         let second = try #require(WaterBuddyApp.freshStartManager(arguments: arguments))
         #expect(second.isGoalSet == false, "the next launch found the last one's welcome finished")
         #expect(second.dailyGoal == DataManager.defaultDailyGoal)
+    }
+
+    @Test func theStoreSampleNeedsTheFreshStart() {
+        #expect(WaterBuddyApp.freshStartManager(arguments: ["WaterBuddy", WaterBuddyApp.storeSampleArgument, "YES"]) == nil)
+    }
+
+    @Test func aFreshStartAloneHoldsNoServings() throws {
+        defer { UserDefaults(suiteName: WaterBuddyApp.freshStartSuite)?.removePersistentDomain(forName: WaterBuddyApp.freshStartSuite) }
+        let manager = try #require(WaterBuddyApp.freshStartManager(
+            arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES"], now: { Self.afternoon }
+        ))
+        #expect(manager.currentWater == 0)
+        #expect(manager.recap(of: 20260901) == nil)
+    }
+
+    @Test func theStoreSampleLandsInTheFreshStart() throws {
+        defer { UserDefaults(suiteName: WaterBuddyApp.freshStartSuite)?.removePersistentDomain(forName: WaterBuddyApp.freshStartSuite) }
+        let manager = try #require(WaterBuddyApp.freshStartManager(
+            arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES", WaterBuddyApp.storeSampleArgument, "YES"],
+            now: { Self.afternoon }
+        ))
+        #expect(manager.currentWater == 1_300)
+        #expect(manager.streak == 5)
+        let september = try #require(manager.recap(of: 20260901), "September offers no recap")
+        #expect(september.daysCounted == 30)
+        #expect(manager.isGoalSet == false, "the seed finished the welcome")
+    }
+
+    @Test func theHeldPremiumNeedsTheFreshStart() {
+        #expect(WaterBuddyApp.premiumSource(arguments: ["WaterBuddy", WaterBuddyApp.premiumHeldArgument, "YES"]) == nil)
+        #expect(WaterBuddyApp.premiumSource(arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES"]) == nil)
+    }
+
+    @Test func theHeldPremiumReadsALifetimePurchase() async throws {
+        let source = try #require(WaterBuddyApp.premiumSource(
+            arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES", WaterBuddyApp.premiumHeldArgument, "YES"]
+        ))
+        let store = PremiumStore(source: source)
+        await store.refresh()
+        #expect(store.state == .known(.lifetime))
     }
 }
 #endif

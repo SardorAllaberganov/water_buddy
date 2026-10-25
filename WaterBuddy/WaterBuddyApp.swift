@@ -38,8 +38,14 @@ struct WaterBuddyApp: App {
 
         // Built right after the App Group is resolved, before anything draws — fresh start included —
         // so its listener hears every transaction from launch — a renewal, a refund, an approved Ask
-        // to Buy (spec §3.3). It reads StoreKit and writes nothing.
+        // to Buy (spec §3.3). It reads StoreKit and writes nothing. The store capture's held launch
+        // reads a held source instead, beside the fresh start alone.
+        #if DEBUG
+        premium = Self.premiumSource(arguments: ProcessInfo.processInfo.arguments).map { PremiumStore(source: $0) }
+            ?? PremiumStore()
+        #else
         premium = PremiumStore()
+        #endif
         // Asks nothing of the model until a holder opens Insights in English. It writes neither store.
         writer = InsightWriter()
 
@@ -85,6 +91,22 @@ struct WaterBuddyApp: App {
     /// fixed, so there is never more than one, and it is cleared at each launch (decision W11).
     static let freshStartSuite = "uitest.waterbuddy.freshstart"
 
+    /// The argument the store capture adds beside ``freshStartArgument`` to open on a lived-in history
+    /// (``StoreSample``; spec `2026-10-25-store-page-design.md` §3.1). Alone it does nothing.
+    static let storeSampleArgument = "-WaterBuddyStoreSample"
+
+    /// The argument the store capture adds beside ``freshStartArgument`` to draw a Premium holder's
+    /// screens (spec `2026-10-25-store-page-design.md` §3.2). Alone it does nothing.
+    static let premiumHeldArgument = "-WaterBuddyPremiumHeld"
+
+    /// The held source, given both arguments; otherwise `nil`, and the app reads StoreKit as a Release
+    /// build does. Nothing is bought, verified against the App Store or stored — the state is read
+    /// from the source, in memory, as every run reads it (rule `70-privacy`).
+    static func premiumSource(arguments: [String]) -> PremiumStore.Source? {
+        guard arguments.contains(freshStartArgument), arguments.contains(premiumHeldArgument) else { return nil }
+        return .held()
+    }
+
     /// A new install, for the welcome's UI tests, on a device that finished its welcome long ago
     /// (spec 2026-10-14 §9).
     ///
@@ -97,10 +119,15 @@ struct WaterBuddyApp: App {
     /// one does — save the rating request, which a Debug build asks only when launched with
     /// `ReviewPrompt.launchArgument`; a Release build does not contain it.
     ///
+    /// Given ``storeSampleArgument`` too, ``StoreSample``'s servings are logged through
+    /// ``DataManager/addLog(amount:at:)``, the one writer, before the manager is handed back — only
+    /// here, so a seed can only ever land in this in-memory store. `now` is the manager's clock and
+    /// the seed's; the app passes none.
+    ///
     /// `nil`, said aloud, if the throwaway cannot be made. The run then opens on the device's own
     /// state, and the welcome's tests fail on their first look rather than writing anywhere they
     /// should not.
-    static func freshStartManager(arguments: [String]) -> DataManager? {
+    static func freshStartManager(arguments: [String], now: @escaping () -> Date = Date.init) -> DataManager? {
         guard arguments.contains(freshStartArgument) else { return nil }
 
         guard let defaults = UserDefaults(suiteName: freshStartSuite),
@@ -114,13 +141,20 @@ struct WaterBuddyApp: App {
         }
         defaults.removePersistentDomain(forName: freshStartSuite)
 
-        return DataManager(
+        let manager = DataManager(
             defaults: defaults,
             modelContainer: store,
+            now: now,
             reloadWidgets: {},
             rescheduleReminders: { _ in },
             publishWrist: { _ in }
         )
+        if arguments.contains(storeSampleArgument) {
+            for serving in StoreSample.servings(endingAt: now(), calendar: .waterBuddyDay) {
+                manager.addLog(amount: serving.amount, at: serving.at)
+            }
+        }
+        return manager
     }
     #endif
 

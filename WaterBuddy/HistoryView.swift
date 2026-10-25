@@ -3486,14 +3486,11 @@ private func previewManager(named name: String) -> DataManager {
         }
     }
 
-    // A source that holds the lifetime purchase and reaches no store (rule `85-testing`).
-    var source = PremiumStore.Source.silent()
-    source.entitlements = { [PremiumAccess.Entitlement(productID: PremiumAccess.lifetimeID, expires: nil, revoked: nil)] }
-
+    // `.held()` holds the lifetime purchase and reaches no store (rule `85-testing`).
     return HistoryView()
         .background { AuroraBackground() }
         .environment(manager)
-        .environment(PremiumStore(source: source))
+        .environment(PremiumStore(source: .held()))
         .environment(InsightWriter(source: .silent()))
 }
 
