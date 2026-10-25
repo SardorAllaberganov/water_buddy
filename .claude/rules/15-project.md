@@ -124,6 +124,10 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `RecapCard` and `RecapSheet` are app-only and stay out of every exception set; the month they read,
   `MonthHistory`, lives in `DataManager.swift`. `ImageRenderer` and `ShareLink` are iOS 16, so the
   recap adds no version check
+- `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
+  `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
+  `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,
+  folded into the second (`docs/superpowers/specs/2026-10-25-store-page-design.md`)
 - `PremiumAccess`, `PremiumSet`, `PremiumStore` and `PaywallView` are app-only and stay out of every
   exception set. `WaterBuddyTests/WaterBuddy.storekit` is the local StoreKit configuration: a test
   resource, in no shipping bundle. The checked-in `WaterBuddy` scheme's Run action names it, so a

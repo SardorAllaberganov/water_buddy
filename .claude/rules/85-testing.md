@@ -49,6 +49,16 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `PaywallView.isOffered(arguments:)`. `PremiumUITests` passes it and no other UI test does, so no
   other run meets the Premium card. A purchase through the sheet has no automated coverage: prove it
   by hand on a simulator, with the scheme's local StoreKit configuration
+- `-WaterBuddyStoreSample` and `-WaterBuddyPremiumHeld` are DEBUG's store-capture arguments, and act
+  only beside `-WaterBuddyFreshStart`: the first logs `StoreSample`'s three months into the fresh
+  start's in-memory store through `addLog(amount:at:)`, the second builds the app's `PremiumStore` on
+  `PremiumStore.Source.held()`, a lifetime purchase from no store. Alone, either does nothing.
+  `testCaptureAppStoreScreenshots` passes them and no other UI test does; `FreshStartTests` pins both
+  (`docs/superpowers/specs/2026-10-25-store-page-design.md`)
+- `AppStoreScreenshotUITests.testBuildTheLivedInWeek` is the one capture that opens a device's own
+  App Group: it builds the store set's week through History's sheet for the widgets and the watch, on
+  the new phone `Tools/CapturePairScreenshots.sh setup` makes — the pair it deletes and makes again by
+  name on every run — and is run by nothing else
 - StoreKit is reached in a test only through `PremiumStore.Source`'s closures or an `SKTestSession`
   over `WaterBuddyTests/WaterBuddy.storekit` — never the App Store or its sandbox. A suite that opens
   an `SKTestSession` is `.serialized` and clears its transactions in a `defer`: a session is the
@@ -88,7 +98,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests`. They are
+  `MonthRecapTests`, `StoreSampleTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
@@ -135,8 +145,10 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
 - **`-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` on the UI-test invocation is
   mandatory, not an optimisation.** `AppStoreScreenshotUITests` is a capture harness, not a test.
   Its store method, `testCaptureAppStoreScreenshots`, starts clean on its own through the fresh
-  start, but it runs for minutes and is driven only by `bash Tools/CaptureScreenshots.sh`, which
-  writes into `Screenshots/`. Its census method, `testCaptureFullScreenCensus`, is still
+  start, but it runs for minutes, refuses a run outside 1:45–11:45 PM or before the 8th of a month,
+  and is driven only by `bash Tools/CaptureScreenshots.sh`, which writes into `Screenshots/`. Its
+  lived-in method, `testBuildTheLivedInWeek`, fails on any phone that has finished its welcome and is
+  driven only by `bash Tools/CapturePairScreenshots.sh setup`. Its census method, `testCaptureFullScreenCensus`, is still
   **deliberately non-idempotent** — it asserts *Get Started* exists, so it fails on any device where
   setup has already been completed, which is every ordinary run. Dropping the skip turns a green
   gate red for a reason that has nothing to do with the product
