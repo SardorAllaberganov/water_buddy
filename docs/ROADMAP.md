@@ -195,6 +195,10 @@ Eight come from `Tools/CaptureScreenshots.sh`, between 1:45 and 11:45 PM from th
 the art; the description gains one sentence the owner pastes, because four shots are Premium's:
 *"Month view, Patterns, Insights and the Monthly recap are part of WaterBuddy Premium, an optional
 subscription or one-time purchase. Logging water is always free."* Still English only.)*
+*(2026-10-25, afternoon: committed at 12:29–12:30 — `ee1d588` (the spec and plan), `c823594` (feat),
+`ca81940` (test), `f0913af` (docs), `e554fe5` (the rule wording). **The capture is under way:** the
+synced watch shot is taken; the Home Screen shot must be taken again; the Lock Screen, the two faces and
+the store capture's eight are not taken.)*
 
 ## 4. Release 1.3 — every surface
 

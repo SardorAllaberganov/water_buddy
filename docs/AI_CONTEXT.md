@@ -4,6 +4,24 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-25, afternoon (ninety-third pass — `/doc_sync` run by the owner partway through
+the store page's capture; no code changed since the ninety-second pass, and HEAD is now `e554fe5`, the store
+page committed whole at 12:29–12:30). One read-only script, every figure printed: 117 `.swift` files in the
+seven target folders by `git` and by `find`, and 117 *Files on disk* rows, every count equal to `wc -l`, no
+row without a file and no file without a row; 954 phone `@Test`, 71 watch, 63 UI `func test`, as *Targets*
+states them; 13 keys on `DataManager.Key` and in `Key.all`; three six-file exception sets, as `CLAUDE.md`
+names them; 18 rules cited, 18 files; `StoreKit` in `HomeView.swift` and `PremiumStore.swift` alone of the shipping
+targets (and `PremiumStoreTests.swift`, a test), `FoundationModels` in `InsightWriter.swift` alone, no
+`SwiftData` under `WaterBuddyWidget/`; no forbidden doc; no *awaits*, *unstaged* or *for the owner* claim in
+`CLAUDE.md`. **Drift found, two:** the store page's records said "staged; not committed" and "typed and
+unstaged for the owner", both overtaken by `ee1d588`, `c823594`, `ca81940`, `f0913af` and `e554fe5` — a new
+*Current state* block, a sentence atop *Files on disk* naming the commits behind its rows' tags, and a dated
+note on `docs/ROADMAP.md`'s 1.2.8. **Written for the capture:** *Current state*'s block; the two store-set
+rows; **#32 retired** — `01-wrist.png` is retaken synced, on disk and unstaged; #88 a dated note, open.
+`CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: read for the subject — nothing in them
+moved — *Last updated* kept. `tasks/lessons.md`: one entry. Gate: not run, since no code changed; the last
+is the store page's, on its final code, the night before (*Targets*).
+
 **Last updated:** 2026-10-25, morning (ninety-second pass — `/doc_sync` run by the owner on the store page's
 staged tree, before its shots; no code changed since its gate). One read-only script, every figure printed:
 117 `.swift` files in the seven target folders by `git` and by `find`, and 117 *Files on disk* rows, every
@@ -1965,6 +1983,11 @@ with a new count, and `NotificationManager.swift`'s row a moved citation; a note
 `2af8dbc`, 1.2.5's in `86a44ed` — so a row's "stage 5" or "1.2.5" now names a commit. The rows
 re-checked against their files, 86 by script and one by hand: none stale.)*
 
+*(2026-10-25, the ninety-third pass: every row's "the store page, staged" names a commit now — the four
+app files and the two test files in `c823594`, `AppStoreScreenshotUITests.swift`, the two capture
+scripts and `RenameScreenshots.py` (and the deletion of `CaptureWatchScreenshot.sh`) in `ca81940`, all at 12:29 that day. The 117
+rows re-checked against their files by script: every count equal to `wc -l`, none stale.)*
+
 ```
 WaterBuddy/Arrival.swift                         154   app only — unstaged 2026-10-12, stage 3b; rewritten by its second pass: Arrival (rise 14, stagger 0.05, hiddenOpacity never zero, and the pure opacity(arrived:settles:) and lift(arrived:settles:reduceMotion:)), EnvironmentValues.pageSettlesIn — true for the page the app opens on, false for every page a turn brings in, whose sections are whole as it slides (History's bars read the flag and not this, and grow on every page) — View.arrives(_:order:) and View.tracksArrival(_:), a task that sets the flag 50 ms after the page is built. isShownTab is gone
 WaterBuddy/AuroraBackground.swift                235   app only — the moving backdrop: RootTabView's one for the three tabs since stage 3b's second pass, and the first-run screen's and the serving sheet's own (stage 5: a comment names WelcomeView for the first-run screen); unstaged 2026-10-12, stage 3b: AuroraClock and AuroraDrift, a CustomAnimation that places a light by one clock every copy reads; staged 2026-10-11, the redesign's stage 3: legibleOnBackdrop(), the two shadows for text that sits straight on it, moved in from HomeView now that History draws on it too
@@ -2160,8 +2183,8 @@ WaterBuddy/PrivacyInfo.xcprivacy                  —   \
 WaterBuddyWidget/PrivacyInfo.xcprivacy            —    | four byte-identical manifests, one per shipping
 WaterBuddyWatch/PrivacyInfo.xcprivacy             —    | bundle. Each target's synchronized root group
 WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with NO project.pbxproj edit
-Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)*
-Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)*
+Screenshots/en-US/iPhone-6.9/*.png                4    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)* *(2026-10-25, 13:00, the capture under way: a fifth file, `02-widgets.png`, untracked — **a wrong shot, not of the widgets**: it was taken on a person's "widgets ready" while the pair's phone still had WaterBuddy in the foreground, and draws the app's Home tab. It is to be shot again; the other four are as above.)*
+Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)*
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
 Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states, from 2026-09-02; untracked
 ```
@@ -2419,6 +2442,27 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**The store page is committed, and its capture is under way: two of the thirteen shots are on disk, one
+of them wrong** (2026-10-25, afternoon; HEAD `e554fe5`, 202 commits, level with `origin/main`). Taken by
+`/start_task` with no task named, on the owner's choice *Take the store shots*. The block below said
+"staged; not committed" and "typed and unstaged for the owner"; since 12:29–12:30 the spec and plan are
+`ee1d588`, the code `c823594`, the tests and tools `ca81940`, the records `f0913af`, and the rule wording
+for `15-project`, `43-concurrency` and `85-testing` is admitted in `e554fe5`.
+
+- **Done.** `bash Tools/CapturePairScreenshots.sh setup` made a new pair — *WaterBuddy Store iPhone*
+  `DB8C07A0…` and *WaterBuddy Store Watch* `ED7BE8B9…` — and its lived-in method passed (`Executed 1
+  test, with 0 failures` in 484.6 s). The phone drew 65 %, *1,300 of 2,000 ml*, *5 days*; its log showed
+  the watch's context landing, and the watch drew *Synced just now*. **`01-wrist.png` is retaken synced**
+  (#32 retired); its caption's lower edge sits on the frame's, for the owner to keep or re-shoot.
+- **Wrong.** `02-widgets.png`, untracked, draws the app's Home tab: it was shot on the owner's "widgets
+  ready" while WaterBuddy had been in the phone's foreground since 12:57:58 by SpringBoard's log, and the
+  phone never reached its Home Screen. It is to be shot again once the widgets are on that phone
+  (`tasks/lessons.md`).
+- **Not done:** `02-widgets` again, `04-lock-screen`, `02-face-modular`, `03-face-infograph` (a person in
+  DeviceHub); the store capture's eight, after the pair's shots, because it shuts every simulator down;
+  `VerifyScreenshots.sh` over the whole set; the three renumbered shots removed; #45, #82 and #88 stay
+  open. No code changed, so no gate was run.
 
 **The store page — roadmap item 1.2.8 taken again, with known issues #32, #45, #82 and #88 — is
 specified, planned, built test-first, gated and staged; not committed. The thirteen shots are not taken**
@@ -5534,6 +5578,16 @@ both roots rendering at accessibility text sizes.
 
 ### Git
 
+**Read at 13:26 on 2026-10-25, in the ninety-third pass, after its `git add` of its four files by name:
+`e554fe5`, 202 commits, level with `origin/main` — the store page committed whole since the block below
+(`ee1d588`, `c823594`, `ca81940`, `f0913af`, `e554fe5`); 4 staged — 4 modified — 7 unstaged, 2 untracked
+entries, none in both.** Staged: this file, `docs/ROADMAP.md`, `tasks/lessons.md` and `HISTORY.md`.
+Unstaged: `Screenshots/en-US/AppleWatch/01-wrist.png`, retaken by this session's capture and held back
+until the set is whole; and, from before the session, `.claude/settings.json`, the two watch schemes and
+the three string catalogues the blocks below describe. Untracked: `Screenshots/census/`, and
+`Screenshots/en-US/iPhone-6.9/02-widgets.png` — the wrong shot, to be taken again. This file and
+`HISTORY.md` are added again once their blocks are written. No `git commit` in this session.
+
 **Read at 10:51 on 2026-10-25, in the ninety-second pass, after its `git add` of its six files by name:
 `e674d59`, 197 commits, level with `origin/main`; 19 staged — 13 modified, 5 added, 1 deleted — 9
 unstaged, 1 untracked entry, none in both.** Staged: the store page's eleven code, test and tool paths —
@@ -6933,7 +6987,9 @@ rather than fixed — the review's own explicit call, not an oversight:**
     applied it. Deliberately out of scope for the App Store pass, which needed only that the
     *capture* be pinned, and it is (`XCUIDevice.shared.orientation = .portrait` in both UI suites).
 
-32. **The shipped watch screenshot is the empty state, and that is a knowing trade.**
+32. ~~**The shipped watch screenshot is the empty state, and that is a knowing trade.**~~ **Retired
+    2026-10-25 (the ninety-third pass) — the fix is on disk, unstaged:** see the last bullet. The rest
+    is the record of what it was.
     `Screenshots/en-US/AppleWatch/01-wrist.png` exists, is 416x496, carries no alpha and is
     acceptable to App Store Connect — but it shows a 0% vessel captioned "Not yet synced · default
     goal". **App Review guideline 2.3.3** says screenshots "should show the app in use, and not
@@ -6978,6 +7034,14 @@ rather than fixed — the review's own explicit call, not an oversight:**
       script now keeps, and has not run in since. The set gains two face shots, `02-face-modular` and
       `03-face-infograph`, placed by a person in DeviceHub. Until they are taken, `01-wrist.png` is still
       the 2026-09-02 empty state.
+    - **2026-10-25, 12:58: taken.** `setup` ran again on a new pair — the lived-in method `Executed 1
+      test, with 0 failures` in 484.6 s, the phone app installed through `simctl` before the watch
+      app — and the phone's own log showed `updateApplicationContext` landing (`size: 207`, `212`,
+      `211`), no `WCErrorCodeWatchAppNotInstalled`. `shoot 01-wrist` then took the watch's screen: 65 %,
+      *1,300 of 2,000 ml*, Cup, Glass and Bottle, *Synced just now* — glass, not #35's dark disc — 416 ×
+      496, alpha removed, `VerifyScreenshots.sh` green. The caption's lower edge sits on the frame's;
+      whether to scroll the list a little and shoot again is the owner's. Unstaged, with the rest of
+      the capture still to come.
 
 33. **Two iPad artifacts survive the device-family change and cannot be removed.** Xcode 26.6's
     `actool` emits `AppIcon76x76@2x~ipad.png` and a `CFBundleIcons~ipad` Info.plist key from a modern
@@ -8053,6 +8117,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     the goal step to `09`, so `02-history.png`, `03-settings.png` and `04-goal-setup.png` are removed once
     the new shots exist, not before. Still from 2026-09-02: `en-US/AppleWatch/01-wrist.png` and the census's
     watch captures.)*
+    *(2026-10-25, 13:20, the ninety-third pass: **the capture is under way, two of thirteen on disk, one of
+    them wrong.** Committed meanwhile: the capture's code and scripts in `c823594` and `ca81940`.
+    `01-wrist.png` is retaken synced (#32, retired); `02-widgets.png` exists, untracked, and draws the app's
+    Home tab, not the Home Screen — to be shot again. `04-lock-screen`, the two faces and the store
+    capture's eight are not taken, so `02-history.png`, `03-settings.png` and `04-goal-setup.png` stay.
+    Open.)*
 89. **At the largest text size the first-run screen scrolls under the status bar.** Seen on iOS 18.6
     and 27.0 in stage 1's probe: scrolled up, the question's first line runs beneath the clock. The
     screen is the old one, replaced in stage 5; recorded so the new one is checked for it.

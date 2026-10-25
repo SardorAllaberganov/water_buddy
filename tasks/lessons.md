@@ -5072,3 +5072,18 @@ just the same. The runs after it shut down this project's devices by UDID.
 **The rule:** before `shutdown all`, read `xcrun simctl list devices booted` as well as `ps`. If a device
 that is not this project's is booted, shut down this project's own by UDID instead, and say so in the
 gate's record. The command in the rule is the owner's to change.
+
+## 2026-10-25 — A person's "ready" is not a picture: a shot went into the store set on a word
+
+**What happened.** The store capture's pair was booted and the owner said "widgets ready". The session ran
+`bash Tools/CapturePairScreenshots.sh shoot 02-widgets` at once, and the PNG it wrote into
+`Screenshots/en-US/iPhone-6.9/` drew WaterBuddy's Home tab, not the Home Screen. SpringBoard's log, read
+afterwards, said WaterBuddy had been in the phone's foreground since 12:57:58 and never left: whatever was
+arranged in DeviceHub, it was not on that phone. `shoot` writes straight into the store set, so a wrong
+shot of a slot that is already tracked replaces a good one in place — this one was a new, untracked file,
+which is luck, not design.
+
+**The rule:** before every `shoot`, take a scratch picture of the same device into the scratchpad
+(`xcrun simctl io <udid> screenshot`) and read it, or read the foreground app from SpringBoard's log; shoot
+into `Screenshots/` only when that picture shows the surface the slot names. When it does not, say what the
+device shows and which device it is, and wait.

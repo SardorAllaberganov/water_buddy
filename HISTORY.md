@@ -13160,3 +13160,72 @@ run.** HEAD `e674d59`, 197 commits, level with `origin/main`. **19 staged** — 
 deleted. **9 unstaged** — the three rule files, for the owner; `.claude/settings.json`, two watch schemes
 and three string catalogues, all from before the session. **1 untracked**: `Screenshots/census/`. None in
 both.
+
+## [2026-10-25] — The ninety-third `/doc_sync`: the store page committed, its capture two shots in, one wrong
+
+Run by the owner at 13:21, partway through the store page's capture, which this session took by
+`/start_task` on the owner's choice *Take the store shots*. No code changed since the ninety-second pass;
+this pass wrote only `docs/` and `tasks/`.
+
+### What happened before it, in this session
+
+- **The pair, made again.** `bash Tools/CapturePairScreenshots.sh setup`, from 12:46, after reading `xcrun
+  simctl list devices booted` (nothing booted) and `ps` (no `xcodebuild`), as the 2026-10-25 lesson asks
+  before the script's own `shutdown all`. It deleted the last run's pair by name and made *WaterBuddy Store
+  iPhone* `DB8C07A0-18B2-4700-AC06-5617C696523D` and *WaterBuddy Store Watch*
+  `ED7BE8B9-092E-4C80-BC09-9D6267AFF2D8`. The lived-in method: **`Executed 1 test, with 0 failures` in
+  484.6 s, `** TEST SUCCEEDED **`**, run in the background because it outlasts the 600 s foreground call,
+  its log read to its `exit 0`. The phone drew 65 %, *1,300 of 2,000 ml*, *5 days*; its log showed
+  `updateApplicationContext` landing at `size: 207`, `212` and `211`, with no
+  `WCErrorCodeWatchAppNotInstalled`; the watch drew *Synced just now*.
+- **`01-wrist.png`, retaken synced** at 12:58 by `shoot 01-wrist`: 416 × 496, alpha removed,
+  `VerifyScreenshots.sh` green (15 files). The caption's lower edge sits on the frame's — the owner's to
+  keep or re-shoot. Known issue #32 is retired on it.
+- **`02-widgets.png`, wrong.** Shot at once on the owner's "widgets ready", it draws the app's Home tab.
+  SpringBoard's log: WaterBuddy foreground and visible since 12:57:58, never left — the widgets were not on
+  that phone. A scratch picture at 13:21 showed the same. The file is new and untracked; it is to be shot
+  again (`tasks/lessons.md`).
+
+### What changed
+
+- **`docs/AI_CONTEXT.md`.** A *Last updated*; a *Current state* block above the store page's, naming its
+  five commits; a sentence atop *Files on disk* naming the commits behind the rows' "the store page,
+  staged"; dated notes on the two store-set rows; **#32 retired**, its record kept under a struck title and a
+  bullet for the shot; #88 a dated note, open.
+- **`docs/ROADMAP.md`.** 1.2.8: the five commits, and the capture's state.
+- **`tasks/lessons.md`.** One entry: a person's "ready" is not a picture — read a scratch shot of the same
+  device before `shoot` writes into the store set.
+
+### Drift found and fixed
+
+Two, one cause: the store page's records said its work was "staged; not committed" and its rule wording
+"typed and unstaged for the owner"; `ee1d588`, `c823594`, `ca81940` and `f0913af` committed the first and
+`e554fe5` admitted the second, all at 12:29–12:30. Superseded by the new block and notes, not rewritten.
+
+### Checked and already accurate
+
+117 `.swift` files in the seven target folders by `git` and by `find`, 117 *Files on disk* rows, every count
+equal to `wc -l`, no row without a file and none missing; 954 phone `@Test`, 71 watch, 63 UI `func test`; 13
+keys on `DataManager.Key` and in `Key.all`; three six-file exception sets as `CLAUDE.md` names them; 18
+rules cited, 18 files; `StoreKit` in `HomeView.swift` and `PremiumStore.swift` alone of the shipping
+targets, `FoundationModels` in `InsightWriter.swift` alone, no `SwiftData` under `WaterBuddyWidget/`; no
+forbidden doc; no *awaits*, *unstaged* or *for the owner* claim in `CLAUDE.md`. `CLAUDE.md`,
+`docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: nothing in their subjects moved; *Last updated*
+kept.
+
+### Gate
+
+Not run: no code changed. The last is the store page's, on its final code, in the night of 2026-10-25 —
+phone unit 954 in 108 suites, 953 passed, 1 skipped (#157); UI 75 executed on 27.0 with no failures and 75 on
+26.5 with one, which passed alone; watch 71; both widget schemes built; warnings unchanged. This session's
+one test run is the lived-in method above, a capture, not the gate. **Still not run:** the store capture;
+`04-lock-screen`, the two faces and `02-widgets` again.
+
+**Staging.** Read from the commands at 13:26 on 2026-10-25, after this pass's `git add` of its four files by
+name — `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md`, this file; this file and
+`docs/AI_CONTEXT.md` are added again once their blocks are written. **No `git commit` was run.** HEAD
+`e554fe5`, 202 commits, level with `origin/main`. **4 staged** — 4 modified. **7 unstaged** —
+`Screenshots/en-US/AppleWatch/01-wrist.png`, the capture's, held back until the set is whole; and,
+from before the session, `.claude/settings.json`, two watch schemes and three string catalogues.
+**2 untracked**: `Screenshots/census/`, and `Screenshots/en-US/iPhone-6.9/02-widgets.png`, the wrong
+shot. None in both; `git diff --cached --check` clean.
