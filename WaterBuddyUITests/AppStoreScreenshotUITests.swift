@@ -270,6 +270,9 @@ final class AppStoreScreenshotUITests: XCTestCase {
         XCTAssertTrue(done.waitForNonExistence(timeout: 5), "the recap sheet did not close")
 
         // ── 06 · Insights, last week ─────────────────────────────────────────────────────────────
+        // Back to the top first, as for 08: the recap's row left the month before's page scrolled to its
+        // foot, and the switch is a `List` row out of sight — absent from the tree until it is drawn.
+        returnToTop(of: "History", in: held, proof: month)
         held.buttons["Insights"].tap()
         let firstPane = held.descendants(matching: .any).matching(identifier: "The one thing").firstMatch
         XCTAssertTrue(firstPane.waitForExistence(timeout: 10), "Insights drew no week — the seed's last week holds too little")
