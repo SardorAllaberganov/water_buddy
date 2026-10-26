@@ -5118,3 +5118,61 @@ of the app.
 a minute apart (`xcrun simctl io <udid> screenshot`). If its clock has not moved, DeviceHub is not showing
 the pair: say so, name the two devices to select, *WaterBuddy Store iPhone* and *WaterBuddy Store Watch*,
 and wait for "ready" until a picture shows the clock moving.
+
+## 2026-10-26 — Placing a widget in DeviceHub logged water: five pours the scratch picture caught by its figures
+
+**What happened.** The store retake's pair was set up at 22:38 with the lived-in week — 65 %, *1,300 of
+2,000 ml* — and `01-wrist` was shot from it. The owner then placed the three Home Screen widgets in
+DeviceHub and said "ready". The scratch picture before `shoot 02-widgets` showed the right three widgets on
+the right phone, reading **90 %, 1,800 ml**; the watch read **102 %, 2,050 ml**. A read-only copy of the
+phone's store showed two 250 ml rows at 22:55:42 and 22:55:44 — the widget's Glass button, clicked twice —
+and the watch's suite three 250 ml pours in its outbox, 22:54:41 to 22:54:51 — its Glass disc. Every
+surface a person is asked to place carries a button that logs: the medium widget's *+250 ml*, the small
+one's *+*, the watch's three discs, and the Lock Screen's control. The shot was not taken; the owner then
+cut the four hand-placed shots from 1.4's set rather than mend the day's rows by hand before midnight.
+
+**The rule:** when a person is asked to place a surface on the capture pair, the same message says which
+of its controls log water and not to click them. Before every `shoot`, read the scratch picture's
+**figures** against the set's — 65 %, *1,300 of 2,000 ml* — as well as its surface and its device; a right
+surface reading the wrong water is a wrong shot.
+
+## 2026-10-26 — An empty path from a failed lookup turned a copy into a glob of the working directory
+
+**What happened.** To read the capture phone's store, a one-liner set `G` from `xcrun simctl
+get_app_container <udid> sardor.WaterBuddy group.sardor.WaterBuddy`, which printed nothing — the container
+argument takes `app`, `data` or `groups`, not a group identifier. With `G` empty, `ls
+"$G/Library/Application Support/"` listed the Mac's own `/Library/Application Support`, `find "$G" …` failed,
+and with `DB` empty `cp "$DB"* "$S/"` copied every file at the repository's root into the scratchpad. Nothing
+was written outside the scratchpad, which was cleared; read-only, and luck, not design.
+
+**The rule:** a path built from a lookup is checked before it is used — `[ -n "$G" ] || { echo …; exit
+1; }` — and never globbed bare. To find an app's App Group container on a simulator, ask for `groups` and
+take the identifier's line: `xcrun simctl get_app_container <udid> <bundle id> groups`.
+
+## 2026-10-27 — Three ways a shared Mac fails a gate that are not the code's
+
+**What happened.** The store retake's gate ran beside other sessions' AvtoLog runs and a Swift package's
+tests. Three failures came from the machine, each looking at first like something else: the UI runner's
+*"Failed to initialize for UI testing: Timed out waiting for AX loaded notification"*, which ran no test and
+then held `xcodebuild` 600 s collecting diagnostics — gone after that one simulator was restarted by its id;
+an `xcodebuild test` that listed **no simulator at all**, only placeholders and a real phone — `simctl list
+runtimes` took four minutes to answer while `swiftpm-testing-helper` held the load average near 700; and a
+whole run's `xcodebuild` that lived ten minutes past its last test, failing to save its result bundle, while
+reruns had already started beside it — a wait loop had given up after 120 s and gone on regardless.
+
+**The rule:** a UI runner that times out on accessibility is the simulator's — restart that device by id
+and run again, never reread the tests. An `xcodebuild` that lists no simulator is the simulator service —
+time `xcrun simctl list` and wait for the load before retrying, never retry into it. Before a rerun, wait
+for the previous `xcodebuild` to exit, without a cap that proceeds anyway; and a gate record names the load
+and the neighbours it ran beside.
+
+## 2026-10-27 — A stash holds Xcode's rewrite only until Xcode saves again
+
+**What happened.** The five files Xcode had rewritten outside any task — two watch schemes, three string
+catalogues — were set aside with `git stash` at 21:55, and `README.md` said the working tree was HEAD's. At
+staging, 00:43, the two schemes were modified again, timestamped 22:53:41, with the stashed edit exactly
+(each `BlueprintName` line dropped): Xcode, open beside DeviceHub, had saved them. No command of the session
+touched them.
+
+**The rule:** setting aside files an open Xcode rewrites is good only until it saves again — read `git diff
+--name-status` at staging, and never write "the tree is HEAD's" before that read.

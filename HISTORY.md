@@ -13353,3 +13353,149 @@ commit` was run.** HEAD `ca63f9e`, 203 commits, level with `origin/main`. **19 s
 added, 3 deleted — the same paths as the checkpoint above. **6 unstaged**, from before the session. **2
 untracked**: `Screenshots/census/`, and `02-widgets.png`, the wrong shot. None in both; `git diff --cached
 --check` clean.
+
+## [2026-10-26] — The store set retaken whole at nine shots; the four hand-placed ones cut by the owner
+
+Taken by `/start_task` with no task named, on the owner's *"recreate the all screenshots and write the
+changes for submission"*. The owner's rulings, asked once: the same set, raw and English only; tonight,
+stopping the other projects' simulators the capture scripts shut down; the listing re-checked and the
+records written, then the gate; the five files Xcode rewrote set aside with `git stash`. Later: *"do it
+yourself everything"*, and then, told the session cannot touch a simulator, **cut those shots**.
+
+### What changed
+
+- **Set aside**, not discarded: `WaterBuddyWatch.xcscheme`, `WaterBuddyWatchWidget.xcscheme` (each without
+  its `BlueprintName`), `AppShortcuts.xcstrings`, `WaterBuddyWatch/Localizable.xcstrings` and
+  `WaterBuddyWatchWidget/Localizable.xcstrings` (Xcode's re-save: spacing, `extractionState: stale` on the
+  Siri phrases, empty entries for `+%lld`, `1,450 ml` and `Today`) — `git stash push` by path, `stash@{0}`,
+  *"Xcode rewrite outside any task, set aside 2026-10-26 before the store retake"*. The index was untouched:
+  `project.pbxproj` (1.4 (4)) and the harness's three lines stay staged. `.claude/settings.json` left as the
+  owner's.
+- **The store capture's eight**, by `bash Tools/CaptureScreenshots.sh`, its clock read at 21:59: `Executed
+  1 test, with 0 failures` in 105.4 s, `** TEST SUCCEEDED **`; eight attachments exported and renamed;
+  `VerifyScreenshots.sh` every file acceptable. Each read by eye: Home 65 %, *1,300 of 2,000 ml*, *5 days*;
+  History's week, Month and Insights locked; October 2026, *20/25*, *5 days*, *50.8 L*, *Average 1,982 ml a
+  day*; Insights for Oct 18–24; Patterns, *Most around 2:00 PM*; September 2026's recap, *23/30*, *58.0 L*;
+  the goal step at 2,000; Settings with the Premium card first.
+- **A new pair**, by `CapturePairScreenshots.sh setup`, 22:06–22:38: the last run's two deleted by name,
+  *WaterBuddy Store iPhone* `3BAB4D38…` and *WaterBuddy Store Watch* `684E237F…` made and paired; the
+  lived-in week `Executed 1 test, with 0 failures` in 465.4 s. A scratch picture of each before shooting:
+  the watch at 65 %, *Synced just now*; the phone's Home at 65 %. **`01-wrist`** shot at 22:39, flattened,
+  416 × 496, acceptable.
+- **The widgets, placed by the owner and not shot.** The scratch picture at 22:57 showed the three widgets
+  on the right phone — the watch's clock moving, so DeviceHub was showing the pair — reading 90 %,
+  *1,800 ml*; the watch 102 %, *2,050 ml*, *Synced 18m ago*. A read-only copy of the phone's store: the
+  week's five rows at 22:12–22:13 (1,300 ml) and two 250 ml rows at 22:55:42 and :44; the watch's outbox,
+  read from a copy of its suite: three 250 ml pours, 22:54:41–51. Five Glass pours clicked while placing
+  (`tasks/lessons.md`). Asked to do everything itself, the session found no way to send a touch — no `idb`,
+  `cliclick` or `axe`, no desktop control — and said the only route is XCUITest through SpringBoard and the
+  watch's face editor, not buildable before midnight, when the pair's day ends. **The owner cut
+  `02-widgets`, `04-lock-screen`, `02-face-modular` and `03-face-infograph` from 1.4's set.**
+- **Not renumbered.** Renaming the files alone would let the next capture write `01-home`, `03-history` and
+  the rest beside them; the slot names stay and `README.md` gives the upload order. Said to the owner.
+- **The wrong `02-widgets.png`** of 2026-10-25 (untracked, the app's Home tab) moved out of the tree, into
+  the session's scratchpad.
+- **`README.md`**: the developer *Screenshots* block names the eight and `01-wrist`; *Description*'s note
+  says four of the eight; *Screenshots* rewritten — 8 iPhone and 1 watch, retaken 2026-10-26, the cut and
+  why, the upload order 1–8 by file, delete the older shots in Connect; *Before you submit* read
+  2026-10-26 — the shots move to *Done*, and the Xcode files are named as stashed. Re-counted by script, every
+  field as stated: promotional text 164, keywords 98, description 3,992, What's New 830, name and subtitle
+  30 each, all ASCII.
+
+### Records
+
+`docs/AI_CONTEXT.md`: #88 retired; the two store-set rows (the iPhone count 9 → 8); *Targets*' gate rows;
+a *Current state* block; *Last updated*. `docs/ROADMAP.md`: 1.2.8 done for 1.4 at nine shots.
+`tasks/lessons.md`: two entries — the placement that logged water, and an empty lookup path that globbed
+the working directory into the scratchpad (nothing written elsewhere; cleared). `CLAUDE.md`,
+`docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: nothing in them names the set — *Last updated* kept.
+`docs/AI_CONTEXT.md` also gains **#191**, below.
+
+### Gate
+
+On the staged tree — 1.4 (4) and the harness's three lines; HEAD `2b28ceb` plus the stash set aside. Other
+projects' simulators and test runs shared the Mac throughout; this project's devices were shut down by id,
+never `shutdown all`, after the capture scripts' own (`tasks/lessons.md`, 2026-10-25).
+
+1. **Phone unit**, *iPhone 17* (27.0). `xcodebuild test`, on the simulator it booted: **954 run, 11 issues,
+   all in `StoreKitSessionTests`** — every product load empty after StoreKit's *"Error updating Storefront …
+   StoreKitInternalError.unknown"*, each purchase then `Unreachable()`. #158's cold start, as on 2026-10-25:
+   the suite alone on the warm simulator, `test-without-building`, **10 passed, 1 skipped**; the whole target
+   after it, **`✔ Test run with 954 tests in 108 suites passed`, 953 passed, 1 skipped (#157)**.
+2. **Phone UI**, 27.0. `xcodebuild test` built, then its runner logged *"Failed to initialize for UI testing:
+   Timed out waiting for AX loaded notification"* and ran nothing; `xcodebuild` then spent 600 s failing to
+   collect diagnostics from that simulator. The simulator restarted by its id, `test-without-building`:
+   **75 executed, 1 skipped (`testTheBarsCaptionsShareALine`), 0 failures**, 1,547.8 s, `** TEST EXECUTE
+   SUCCEEDED **`.
+   **Phone UI**, 26.5. An `xcodebuild test` at 00:02 found no simulator at all — `simctl list runtimes` took
+   four minutes to answer while another project's `swiftpm-testing-helper` processes held the load average
+   near 700; held until it fell below 100. Then, `test-without-building`: **75 executed, 1 skipped, 2
+   failures**, 1,031.3 s — `testAnUndoOfferDoesNotOutliveTheAppLeavingTheScreen` (`:1045`, no *Undo* after
+   the Glass's tap) and `testAScreenComesBackWholeAfterItsTabIsLeft` (`:175`, Settings' slider absent for
+   5 s), both in the run's first minute at a load near 250. Alone at a load near 8: the second passed, the
+   first failed again — its recording shows no press and its tree *Last drink 00:27*: the tap never reached
+   the app. Its sibling, `testAnUndoOfferDoesNotOutliveItsScreen`, same first three lines, passed alone; the
+   first then passed alone twice. Cause not found: **#191**, open.
+3. **Watch unit**, *Apple Watch Series 12 (46mm)* (27.0): **`✔ Test run with 71 tests in 7 suites passed`**.
+4. **`WaterBuddyWidgetExtension`**: **`** BUILD SUCCEEDED **`**; warnings 29 sites, 17 messages by file and
+   message — the baseline's, in `DataManager.swift`, `NotificationManager.swift` and `WristView.swift`.
+5. **`WaterBuddyWatchWidget`**: **`** BUILD SUCCEEDED **`**, incremental, no warning printed.
+
+No clean-build warning comparison was run. The one Swift file the staged tree changes,
+`AppStoreScreenshotUITests.swift`, was recompiled by step 1's build with no warning; the other staged change
+is 28 version lines in `project.pbxproj`.
+
+**The schemes again.** Read at staging, 00:43: `WaterBuddyWatch.xcscheme` and `WaterBuddyWatchWidget.xcscheme`
+are modified once more, at 22:53:41 — while the owner had Xcode and DeviceHub open, and no command of this
+session touched either scheme — with the stashed edit exactly, each `BlueprintName` line dropped; `git diff
+stash@{0}` over them prints nothing. Left unstaged; `README.md` and *Current state* say so.
+
+**Staging.** Read from the commands at 00:44 on 2026-10-27, after this task's `git add` of 14 paths by name
+and again of `README.md`, `docs/AI_CONTEXT.md` and this file once their last lines were written. **No `git
+commit` was run.** HEAD `2b28ceb`, 206 commits, level with `origin/main`. **16 staged, all modified** —
+`HISTORY.md`, `README.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md`, the nine PNGs
+(`AppleWatch/01-wrist.png`, and `iPhone-6.9/` `01-home`, `03-history`, `05-month`, `06-insights`,
+`07-patterns`, `08-recap`, `09-goal-setup`, `10-settings`), and from before the session `project.pbxproj`
+and `AppStoreScreenshotUITests.swift`. **3 unstaged** — `.claude/settings.json` and the two watch schemes.
+**1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check` clean. **One stash**,
+`stash@{0}`, the five files Xcode rewrote.
+
+**Read after the staging block, 00:46.** The 26.5 whole run's `xcodebuild` exited only at 00:45, `** TEST
+EXECUTE FAILED **` for its two failures, after its result bundle failed to save (`mkstemp: No such file or
+directory`) — why no bundle of it was found. The alone runs of 00:37–00:42 overlapped its tail, which ran no
+test; #191 carries a dated note. `docs/AI_CONTEXT.md` and this file added again; the counts above stand.
+
+## [2026-10-27] — The ninety-sixth `/doc_sync`: the store retake's figures re-derived, no drift; #82 and #158 noted
+
+Run by the owner on the store retake's staged tree, after the ninety-fifth pass that task wrote for itself,
+which had left the code's figures un-derived. No code changed.
+
+### Checked, and already accurate
+
+One read-only script (in the session's scratchpad, not the tree), every figure printed: 117 `.swift` files in
+the seven target folders by `find` and by `git`, each with a *Files on disk* row whose count equals `wc -l`
+(two misses on its first reading were the script's own — `WaterBuddyWatchWidgetBundle.swift`'s row ends at
+its count, 9 = 9, and `Key.all` spans lines); 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 keys on
+`DataManager.Key` and in `Key.all`, eleven the phone suite's, the same in `CLAUDE.md` and `docs/STATE.md`;
+the three exception sets as `CLAUDE.md` names them, six files each; four schemes; `MARKETING_VERSION = 1.4`
+and `CURRENT_PROJECT_VERSION = 4` on fourteen sites each; 18 rules cited, 18 files; `StoreKit` in two files,
+`FoundationModels` in one, no `SwiftData` under `WaterBuddyWidget/`; no forbidden doc. `CLAUDE.md`,
+`docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: nothing in their subjects moved — *Last updated* kept.
+
+### Written
+
+`docs/AI_CONTEXT.md`: *Last updated*; a dated note on #82 — the harness's staged fix ran in the store
+method's own window again and has now been through a gate; one on #158 — the cold start again on a simulator
+`xcodebuild test` had just booted, 11 issues, green warm, and two of the last three gates meeting it (a first
+wording said three in a row; the store page's gate did not, and the note was corrected before staging).
+`tasks/lessons.md`: two entries — three ways a shared Mac fails a gate that are not the code's, and a stash
+that holds Xcode's rewrite only until Xcode saves again.
+
+### Gate
+
+Not run by this pass: no code changed since the retake's gate, recorded in the checkpoint above.
+
+**Staging.** Read from the commands at 00:52 on 2026-10-27, after this pass's `git add` of `docs/AI_CONTEXT.md`,
+`tasks/lessons.md` and this file, by name. **No `git commit` was run.** HEAD `2b28ceb`. **16 staged, all
+modified** — the same sixteen as the checkpoint above. **3 unstaged**: `.claude/settings.json` and the two watch
+schemes. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check` clean; one stash.

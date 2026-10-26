@@ -204,6 +204,12 @@ run; the three renumbered shots are removed. **The pitch is written**: `README.m
 Connect* is rewritten for 1.4 — promotional text, keywords, description with the Premium sentence,
 What's New, Premium's products, the screenshot order and the review notes — and the version is 1.4,
 build 4. Still a person's: the Home Screen and Lock Screen shots and the two watch faces.)*
+*(2026-10-26: **done for 1.4, at nine shots.** All retaken that night — the eight at 21:59, the watch
+app at 22:39 on a new pair. The four a person places are **out of 1.4's set by the owner's ruling**:
+the widgets' first placement logged water, and the session cannot touch a simulator to place them
+itself. The listing's screenshot order follows; the header is unchanged. A later store page that wants
+them back can automate their placement through XCUITest — SpringBoard for the widgets and the Lock
+Screen, the watch's face editor for the faces — the faces the least certain.)*
 
 ## 4. Release 1.3 — every surface
 
