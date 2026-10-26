@@ -175,10 +175,11 @@ baseline*; closing it is tracked as known issue #29.
 `Tools/` holds a capture harness. Nothing in it is compiled into any target.
 
 ```bash
-bash Tools/CaptureScreenshots.sh                      # 8 of the 10 iPhone shots, 6.9" (1:45–11:45 PM, from the 8th)
+bash Tools/CaptureScreenshots.sh                      # the 8 iPhone shots, 6.9" (1:45–11:45 PM, from the 8th)
 bash Tools/CapturePairScreenshots.sh setup            # a new phone + watch pair, a lived-in week on it
-bash Tools/CapturePairScreenshots.sh shoot <name>     # 02-widgets, 04-lock-screen and the watch's three,
-                                                      #   each once a person has placed it in DeviceHub
+bash Tools/CapturePairScreenshots.sh shoot <name>     # 01-wrist; also 02-widgets, 04-lock-screen and the two
+                                                      #   faces, once a person has placed each in DeviceHub —
+                                                      #   1.4's store page carries none of those four
 bash Tools/CaptureFullCensus.sh                       # every screen, state, scroll position (stale, #45)
 bash Tools/VerifyScreenshots.sh                       # size / alpha / format, per App Store slot
 ```
@@ -299,8 +300,8 @@ drink,intake,reminder,goal,daily,glass,bottle,cup,log,widget,watch,streak,privat
 
 The first ~170 characters are all that show before the "more" link, so the opening sentence carries
 the whole pitch on its own (it is 170). The *WaterBuddy Premium* paragraph is what guideline 2.3.2
-asks for — four of the ten screenshots show Premium's screens — and its closing sentence is the store
-page spec's (§3.7). The renewal sentence and the Terms of Use link are guideline 3.1.2's.
+asks for — four of the eight iPhone screenshots show Premium's screens — and its closing sentence is
+the store page spec's (§3.7). The renewal sentence and the Terms of Use link are guideline 3.1.2's.
 
 ```
 One tap logs a glass - from your Home Screen, your Lock Screen, Control Center or your Apple Watch - and you watch it fill. No account, no server, nothing to sign up for.
@@ -453,34 +454,37 @@ app.
 
 | Slot | Size | Files |
 |---|---|---|
-| iPhone 6.9″ | 1320 × 2868 (iPhone 18 Pro Max, iOS 27.0) | 10 |
-| Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | 3 — **required**, because the app embeds a watchOS app |
+| iPhone 6.9″ | 1320 × 2868 (iPhone 18 Pro Max, iOS 27.0) | 8 |
+| Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | 1 — **required**, because the app embeds a watchOS app; one meets it |
 | Product page header | 3840 × 1646 | 1 — `ProductPageHeader/01-one-tap.png`, *One tap. Watch it fill.* |
 
-Upload in file order — only the **first three** appear on search results and install cards:
+All nine were retaken on **2026-10-26** — the eight at 21:59, `01-wrist` at 22:39 — on Monday 26
+October's figures. **No shot of a system surface is in 1.4's set** — the Home Screen widgets, the Lock
+Screen and the two watch faces (the owner's ruling, 2026-10-26): each needs a person to place it in
+DeviceHub, and nothing automated can. The file names keep the capture harness's slots, so the iPhone
+numbers skip 02 and 04; App Store Connect shows no file name. Delete every older shot already in
+Connect — 1.1's, and any 6.5″ ones from 1.0 — since they show the old app.
+
+Upload in this order — only the **first three** appear on search results and install cards:
 
 | # | iPhone | Shows |
 |---|---|---|
-| 01 | `01-home.png` | Home at 65 %, *1,300 of 2,000 ml*, a five-day streak |
-| 02 | `02-widgets.png` | the Home Screen: the small and medium Hydration widgets and the week widget |
-| 03 | `03-history.png` | History's week, today shown, *Month* and *Insights* locked for a free user |
-| 04 | `04-lock-screen.png` | the Lock Screen widgets and the *Log Water* control |
-| 05 | `05-month.png` | Premium: this month's calendar and figures |
-| 06 | `06-insights.png` | Premium: last week's insights |
-| 07 | `07-patterns.png` | Premium: the month's patterns |
-| 08 | `08-recap.png` | Premium: last month's recap card |
-| 09 | `09-goal-setup.png` | the welcome's goal step |
-| 10 | `10-settings.png` | Settings, the Premium card first |
+| 1 | `01-home.png` | Home at 65 %, *1,300 of 2,000 ml*, a five-day streak |
+| 2 | `03-history.png` | History's week, today shown, *Month* and *Insights* locked for a free user |
+| 3 | `05-month.png` | Premium: October's calendar and figures — 20 of 25 days on goal |
+| 4 | `06-insights.png` | Premium: last week's insights, 18–24 October |
+| 5 | `07-patterns.png` | Premium: the month's patterns |
+| 6 | `08-recap.png` | Premium: September's recap card |
+| 7 | `09-goal-setup.png` | the welcome's goal step |
+| 8 | `10-settings.png` | Settings, the Premium card first |
 
 | # | Apple Watch | Shows |
 |---|---|---|
-| 01 | `01-wrist.png` | the watch app, synced from the phone, at 65 % |
-| 02 | `02-face-modular.png` | Modular, with the rectangle and the circle |
-| 03 | `03-face-infograph.png` | Infograph, with the corner and the circle |
+| 1 | `01-wrist.png` | the watch app, synced from the phone, at 65 % |
 
-Shots 01, 03 and 05–10 come from `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM, from the 8th of a
-month); 02, 04 and the watch's three from `bash Tools/CapturePairScreenshots.sh setup`, then
-`shoot <name>` once a person has placed each surface in DeviceHub.
+The eight come from `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM, from the 8th of a month);
+`01-wrist` from `bash Tools/CapturePairScreenshots.sh setup`, then `shoot 01-wrist` — no person is
+needed for it, since the watch opens on WaterBuddy.
 
 ## Review notes
 
@@ -508,7 +512,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ---
 
-## Before you submit — outstanding (1.4, read 2026-10-25)
+## Before you submit — outstanding (1.4, read 2026-10-26)
 
 **Blocking — the upload or the review fails without these, and each is yours:**
 
@@ -524,10 +528,12 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   configuration has ever been bought from, and a comma-decimal region's yearly saving is unchecked
   there (#162).
 - 🔴 **A Support URL.**
-- **The four shots placed by hand**, if any is still missing from `Screenshots/en-US/`: `02-widgets`,
-  `04-lock-screen`, `02-face-modular` and `03-face-infograph`.
 
 **Done in the repository:**
+
+- **The screenshots**: eight iPhone and one Apple Watch, retaken on 2026-10-26, each read by eye and
+  passed by `VerifyScreenshots.sh` — upload them in the order under *Screenshots* above, and delete
+  the older ones in Connect.
 
 - **Version 1.4, build 4**, on all fourteen sites in `project.pbxproj`; read back as `1.4 (4)` from
   the built app, its widget extension, the watch app and the watch widget.
@@ -550,8 +556,11 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   records ask for iOS 26.5 and 18.6 too.
 - **Whether deleting the app removes its data on a device** (#188) — the policy and a code comment
   disagree; one of them changes.
-- **Six files Xcode rewrote outside any task** sit uncommitted: `.claude/settings.json`, two watch
-  schemes and three string catalogues — `AppShortcuts.xcstrings` among them, its Siri phrases marked
-  `stale`. An archive builds from the working tree, so look at them or set them aside first.
+- **Five files Xcode rewrote outside any task are set aside**, not lost: two watch schemes and three
+  string catalogues — `AppShortcuts.xcstrings` among them, its Siri phrases marked `stale` — are in
+  `git stash` (`stash@{0}`, 2026-10-26). Read them before any `git stash pop`. Xcode rewrote the two
+  schemes again at 22:53 that night, while it was open — each loses its `BlueprintName` line, which
+  changes nothing an archive builds; the three catalogues stayed as HEAD has them. `.claude/settings.json`
+  is still modified; it is in no target and never reaches an archive.
 - **The app icon appears only after a build is processed.** The 1024² marketing icon ships *inside*
   the binary's asset catalog — App Store Connect has no icon upload field.
