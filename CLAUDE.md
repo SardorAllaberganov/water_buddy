@@ -16,6 +16,7 @@
 > | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets) |
 > | `Tools/` | standalone scripts, in **no** build target — the icon generator, and the screenshot harness |
 > | `Screenshots/` | the App Store assets (`en-US/`) and the coverage run (`census/`), in no target |
+> | `AppStore/` | the upload folder, one per version (`1.4/`): `README.md`'s *App Store Connect* text one file per field, and `Screenshots/en-US/` copied and renamed into upload order — a copy, in no target; `README.md` stays the master |
 >
 > **Every shipping bundle also carries its own `PrivacyInfo.xcprivacy`** — four of them, byte-identical,
 > one beside each target's sources. `UserDefaults` is a required-reason API, and since 1 May 2024 an

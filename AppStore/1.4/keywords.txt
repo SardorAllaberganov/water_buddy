@@ -1,0 +1,1 @@
+drink,intake,reminder,goal,daily,glass,bottle,cup,log,widget,watch,streak,private,h2o,thirst,habit

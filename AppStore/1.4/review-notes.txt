@@ -1,0 +1,13 @@
+No account or login is required. On first launch a short welcome asks for a daily goal (it can suggest one from weight and activity level, which it does not keep); the app is fully usable straight after. No demo credentials are needed.
+
+WaterBuddy Premium unlocks Month view, Patterns, Insights and the Monthly recap, all in the History tab. It is sold through StoreKit as a monthly or yearly auto-renewable subscription (the yearly with a one-week free trial) or a one-time lifetime purchase. Open the paywall from Settings > See Premium, or from History's locked Month or Insights; Restore Purchases is on the same screen. Logging water is free and never locked.
+
+Premium's screens need some history before they show content. Month view shows at once; Insights and Patterns each say how many days of water they need until they have them. Servings can be added to today and the six days before it with the + in History. Insights appear once the last finished week holds four days with water, Patterns once the month holds seven finished days with water (today is not counted), and the Monthly recap for a finished month with seven days of water - so a new install shows no recap.
+
+Insights are decided by the app from the user's own weekly figures. Where Apple's on-device model is available and the app is in English, the model may reword them on the iPhone; otherwise the app's own sentences are shown. Nothing is sent off the device.
+
+The app collects no data and contains no networking code. Everything is stored locally in an App Group container shared by the app and its widgets; the Apple Watch app syncs over WatchConnectivity between the user's own paired devices only. A recap image leaves the device only when the user shares it through the system share sheet.
+
+Notification permission is requested only when the user turns on reminders (in Settings, or on the welcome's last step), never at launch.
+
+Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBuddy".

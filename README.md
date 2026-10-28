@@ -227,6 +227,7 @@ WaterBuddy*Tests/        three test targets, two platforms
 Entitlements/            one App Group entitlement per signed target
 Tools/                   standalone scripts, in no build target
 Screenshots/             App Store assets
+AppStore/                the upload folder per version — the listing's text and the store set, copied
 docs/                    AI_CONTEXT · STATE · WIDGET · DESIGN
 .claude/rules/           the engineering rules this codebase is held to
 ```
@@ -246,6 +247,10 @@ the 1.0 listing, against the app as built. **Character counts were verified prog
 estimated — every field is inside Apple's limit, and two are exactly at it.
 
 Fields marked 🔴 **you must supply**; nothing in the repo can answer them.
+
+**The upload folder is [`AppStore/1.4/`](AppStore/1.4)** — this section's text one file per field,
+and the store set copied and renamed into upload order, with a start-here checklist. Copied on
+2026-10-28; this section stays the master copy, so a change here is made there too.
 
 1.4 carries everything since 1.1: the redesign (roadmap release 1.2), every surface (1.3) and
 WaterBuddy Premium's first set (1.4). Apple Health (1.3.3) is **not** in it — it was never built.
@@ -400,7 +405,11 @@ auto-renewable subscriptions, plus one non-consumable:
 - **Review information**, for each product: a screenshot of the paywall (Settings → *See Premium*),
   taken from a run of the `WaterBuddy` scheme in Xcode — that run buys from the local StoreKit
   configuration, so its prices draw. Review note: *Unlocks Month view, Patterns, Insights and the
-  Monthly recap in History. Logging water is never locked.*
+  Monthly recap in History. Logging water is never locked.* A debug run offers the paywall only with
+  `-WaterBuddyPremium` among the Run action's arguments, which the checked-in scheme does not carry —
+  add it for the shot and take it out after (#163). Check the yearly tile's saving reads 44 %: on
+  this Mac's `en_UZ` simulators it reads 20 % (#162). Step by step in
+  [`AppStore/1.4/in-app-purchases.md`](AppStore/1.4/in-app-purchases.md).
 - **First submission:** new in-app purchases go to App Review **with a new app version**. On the 1.4
   version page, under *In-App Purchases and Subscriptions*, select all three before you submit.
 - **Localizations:** English is enough to submit; Russian and Uzbek display names are optional.

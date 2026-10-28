@@ -1,0 +1,51 @@
+One tap logs a glass - from your Home Screen, your Lock Screen, Control Center or your Apple Watch - and you watch it fill. No account, no server, nothing to sign up for.
+
+A water tracker only earns its place if you are still using it in week three, and the surest way to keep using one is never having to stop what you are doing.
+
+LOGGING
+- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml. Each is editable from 50 to 1,000 ml, so they match the glass on your desk and the bottle in your bag.
+- A daily goal from 1,000 to 4,000 ml in 100 ml steps - or let WaterBuddy suggest one from your weight and how active you are. It keeps neither.
+- A vessel of moving water shows today's percentage and the exact millilitres.
+- Undo a pour with one tap. Reach your goal and the screen celebrates; keep reaching it and a day streak counts along.
+
+WITHOUT OPENING THE APP
+- Home Screen widgets: small and medium, with a button that logs your Glass right there, and a week widget with your last seven days against your goal. The small one also works in StandBy.
+- Lock Screen widgets: a ring, a line, and a rectangle with its own button.
+- A Log Water control for Control Center, the Lock Screen and the Action Button (iOS 18 and later).
+- Siri: say "Log water in WaterBuddy", or ask "How much water today in WaterBuddy". In English and Russian.
+- Reminders carry a Log a Glass button, so you can log from the notification itself.
+
+APPLE WATCH
+- Cup, Glass and Bottle on your wrist. It works with your iPhone out of range and syncs when it is back.
+- Three complications - circular, rectangular and corner - put today's progress on your watch face.
+
+LOOKING BACK
+- Your last seven days as bars against your goal, with your average and your best day.
+- Every serving with its time. Change an amount or a time, delete a mistap, or add one you forgot.
+
+REMINDERS THAT KNOW WHEN TO STOP
+Optional, and off until you turn them on: a nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reach your goal and the rest of the day stays quiet. Reminder text contains no numbers at all: a lock screen is a public surface, and what you have drunk today is nobody else's business.
+
+WATERBUDDY PREMIUM
+Optional, for seeing how you really drink:
+- Month view and full history: every day you have logged, a month at a glance.
+- Your patterns: when in the day you drink, weekdays against weekends, your usual first and last drink.
+- Personal insights: each week, the one thing that stands out, what is working and what is worth knowing, worked out from your own figures on your iPhone. Where Apple's on-device model is available, it can word them, in English. Not medical advice.
+- A monthly recap: your month in one card, yours to share as an image.
+Premium is a monthly or yearly subscription - the yearly plan starts with a free week - or a one-time lifetime purchase. Logging water is always free.
+
+PRIVATE BY CONSTRUCTION
+No account. No sign-up. No email address. No server, and no cloud.
+No analytics, no tracking, no ads and no third-party code: every framework in WaterBuddy is Apple's own, and there is no networking code in it, so what you log has no way to leave your device. It travels only between your own iPhone and Apple Watch, and a recap image leaves only when you share it.
+
+MADE TO LIVE WITH
+- A dark liquid-glass design over a slowly moving aurora.
+- English, Russian and Uzbek, switched inside the app.
+- VoiceOver, Dynamic Type, Reduce Motion and Reduce Transparency.
+
+WHAT IT IS NOT
+It is not a medical app and makes no health claims. No Apple Health. No friends, no feeds, no leaderboards. Water, and nothing else.
+
+Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period, in your Apple Account settings. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+Requires iOS 17.0 or later on iPhone. The Log Water control needs iOS 18, and the Apple Watch app watchOS 26.0.
