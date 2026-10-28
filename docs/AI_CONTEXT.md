@@ -4,6 +4,20 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-28, night (ninety-seventh pass — `/doc_sync` run by the owner on the 1.4 upload
+folder's staged tree; no code changed). The same read-only script, every figure printed: 117 `.swift` files by
+`git` and by `find`, each with a *Files on disk* row whose count equals `wc -l` (`WaterBuddyWatchWidgetBundle.swift`'s,
+9 = 9, read by hand, which its pattern misses); 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 keys on
+`DataManager.Key` and 13 in `Key.all` (counted by hand: it spans lines); three six-file exception sets as
+`CLAUDE.md` names them; four schemes; 1.4 (4) on fourteen sites each; 18 rules cited, 18 files; `StoreKit` in
+two files, `FoundationModels` in one, no `SwiftData` under `WaterBuddyWidget/`; no forbidden doc. **Drift
+found: none** in the code's figures. **Written:** a *Current state* block for the upload folder; a *Git* block
+— the last since 2026-10-25 had not been written by the two passes after it; `tasks/lessons.md` one entry.
+The `AppStore/1.4/` row and `CLAUDE.md`'s `AppStore/` row were written by the task itself and checked here:
+17 files on disk. `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: nothing in their subjects moved —
+*Last updated* kept. Gate: not run — no code changed since the retake's gate, which the commits
+`ce8b0b3`…`47bec44` carry.
+
 **Last updated:** 2026-10-27, night (ninety-sixth pass — `/doc_sync` run by the owner on the store retake's
 staged tree; no code changed). One read-only script, every figure printed: 117 `.swift` files in the seven
 target folders by `git` and by `find`, every one with a *Files on disk* row whose count equals `wc -l`, and
@@ -2240,6 +2254,7 @@ Screenshots/en-US/iPhone-6.9/*.png                8    the 6.9" store set, 1320x
 Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)* *(14:14: staged, by name. Still not taken at 19:50: the two faces.)* *(2026-10-26, 22:39: **retaken** by `shoot 01-wrist` on a new pair — 65 %, *1,300 of 2,000 ml*, *Synced just now*, the watch's clock 22:38; modified, unstaged. It is 1.4's only watch shot: the two faces are out of the set by the owner's ruling (#88, retired).)*
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
 Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states, from 2026-09-02; untracked
+AppStore/1.4/                                    17    new 2026-10-28, staged: the 1.4 upload folder — README.md (start here: the blocking items, the version page's fields, the upload order, the unchanged fields, Premium's three products in short); in-app-purchases.md (Premium in App Store Connect field by field — the agreement, the group, the three products, the free week, the levels, the review screenshot with the run argument it needs (#163) and the saving to check (#162), the purchase on a device (#156), attaching them to 1.4); whats-new.txt 830, promotional-text.txt 164, description.txt 3992, keywords.txt 98, review-notes.txt 1998 characters, each the main README's code block exactly, no trailing newline; screenshots/ the ten store PNGs, byte-identical copies (sha256) renamed into upload order — iPhone-6.9/1-home … 8-settings, AppleWatch/1-wrist, ProductPageHeader/1-one-tap. A copy: the main README and Screenshots/en-US/ stay the masters
 ```
 
 *(2026-10-21, 1.4.1, staged.)* And one file that is neither Swift nor shipped:
@@ -2495,6 +2510,25 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**The 1.4 upload folder is staged: `AppStore/1.4/`, the listing's text and the store set in one place**
+(2026-10-28, night; HEAD `47bec44`, 211 commits, level with `origin/main` — the store retake and its two
+syncs committed as `ce8b0b3`, `a8839da`, `79f5a19`, `4ec16f4` and `47bec44`, pushed `2b28ceb..47bec44`).
+
+- **What is in it.** 17 files: a start-here `README.md`; What's New (830), promotional text (164),
+  description (3,992), keywords (98) and review notes (1,998) as `.txt` files, each `README.md`'s code block
+  exactly, without a trailing newline; `in-app-purchases.md`, Premium in App Store Connect field by field;
+  and the ten store PNGs, byte-identical copies renamed into upload order. The owner's rulings: 1.1 is live,
+  so What's New stays written against it; the folder inside the repo; the copies renamed.
+- **A copy.** `README.md`'s *App Store Connect* and `Screenshots/en-US/` stay the masters; both READMEs
+  say so.
+- **Found by reading the code for the purchases guide.** `README.md`'s review-screenshot instruction could
+  not be followed as written — a debug run offers the paywall only with `-WaterBuddyPremium`, which the
+  checked-in scheme no longer carries (#163) — and on this Mac's simulators the yearly saving reads 20 % for
+  44 % (#162). Both written into the guide and the README; `tasks/lessons.md`.
+- **Still the owner's before upload:** #159, #155, #156, a Support URL, the copyright and the App Review
+  contact; the paywall's review screenshot; how to refund a sandbox purchase is not written down.
+- **Gate:** not run — no code, test or project file changed since the retake's gate below.
 
 **The store set is retaken whole, at nine shots — the four a person places are cut by the owner — and
 the listing follows** (2026-10-26, night, into the 27th; HEAD `2b28ceb`, 206 commits, level with
@@ -5692,6 +5726,17 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 23:58 on 2026-10-28, in the ninety-seventh pass, after its `git add` of this file and
+`tasks/lessons.md` by name: `47bec44`, 211 commits, level with `origin/main` — the store retake and its two
+syncs committed and pushed since the block below, by the owner's `/commit` (`ce8b0b3`, `a8839da`, `79f5a19`,
+`4ec16f4`, `47bec44`; `2b28ceb..47bec44`); 22 staged — 17 added, 5 modified — 3 unstaged, 1 untracked
+entry, none in both; `git diff --cached --check` clean; one stash.** Staged: `AppStore/1.4/` (17 files),
+`CLAUDE.md`, `README.md`, this file, `tasks/lessons.md` and `HISTORY.md`. Unstaged: `.claude/settings.json`
+(the owner's) and the two watch schemes, each without its two `BlueprintName` lines — `git diff stash@{0}`
+over them prints nothing, so the same edit `stash@{0}` holds, beside the three catalogues Xcode rewrote. Untracked: `Screenshots/census/`. This
+file and `HISTORY.md` are added again once their blocks are written. No `git commit` in this session since
+`47bec44`.
 
 **Read at 19:57 on 2026-10-25, in the ninety-fourth pass, after its `git add` of its three files by name:
 `ca63f9e`, 203 commits, level with `origin/main` — unchanged since the block below; 19 staged — 9 modified,

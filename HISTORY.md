@@ -13499,3 +13499,123 @@ Not run by this pass: no code changed since the retake's gate, recorded in the c
 `tasks/lessons.md` and this file, by name. **No `git commit` was run.** HEAD `2b28ceb`. **16 staged, all
 modified** — the same sixteen as the checkpoint above. **3 unstaged**: `.claude/settings.json` and the two watch
 schemes. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check` clean; one stash.
+
+## [2026-10-28] — The 1.4 upload folder: `AppStore/1.4/`, the listing's text and the store set in one place
+
+Asked for *"a final version of current version to upload to App Store … what's new … and final versions of
+screenshots … in one folder"*. The owner's rulings, asked once: **1.1 is live**, so What's New stays written
+against 1.1; the folder goes **inside the repo**; the screenshot copies are **renamed into upload order**. No
+code changed.
+
+### What changed
+
+- **`AppStore/1.4/`, 16 files, new.** Five text files, each the main `README.md`'s code block for its field,
+  extracted by a script (in the session's scratchpad, not the tree) rather than retyped, written without a
+  trailing newline so a select-all paste is exact, and counted from the file: `whats-new.txt` 830/4000,
+  `promotional-text.txt` 164/170, `description.txt` 3992/4000 and `keywords.txt` 98/100 — each equal to the
+  count `README.md` states — and `review-notes.txt` 1998/4000; all ASCII. Ten PNGs under `screenshots/`,
+  copied from `Screenshots/en-US/` and renamed: `iPhone-6.9/1-home` … `8-settings` from `01-home`,
+  `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings`;
+  `AppleWatch/1-wrist` from `01-wrist`; `ProductPageHeader/1-one-tap` from `01-one-tap`. Each copy's sha256
+  equals its original's, and `sips` reads 1320 × 2868 for the eight, 416 × 496 for the watch and
+  3840 × 1646 for the header, no alpha, PNG. A `README.md`: the four blocking items (#159, #155, #156, a
+  Support URL), the version page field by field, the upload order with what each shot shows, the fields
+  unchanged since 1.1, and Premium's three products.
+- **A copy, not a second master.** The main `README.md` and `Screenshots/en-US/` stay the masters, and both
+  READMEs say so; `Tools/VerifyScreenshots.sh` reads only `Screenshots/`, so the copies are held to it by
+  their checksums.
+- **`README.md`**: a pointer to the folder under *App Store Connect*, and `AppStore/` in *Repository layout*.
+  **`CLAUDE.md`**: an `AppStore/` row in the layout table, beside `Tools/` and `Screenshots/`.
+  **`docs/AI_CONTEXT.md`**: an `AppStore/1.4/` row under *Outside every target*.
+
+### Not changed, and said to the owner
+
+The promotional text's *"three watch faces"* names what the codebase calls the watch's three faces; on the
+store page they are three complications, as the description and What's New say. Left as written — the
+owner's to word.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 23:17 on 2026-10-28, after this task's `git add` of 19 paths by name,
+and again of this file once this block was written. **No `git commit` was run.** HEAD `47bec44`, 211 commits,
+level with `origin/main`. **20 staged** — 16 added (`AppStore/1.4/`) and 4 modified (`CLAUDE.md`, `README.md`,
+`docs/AI_CONTEXT.md`, this file). **3 unstaged**: `.claude/settings.json` and the two watch schemes. **1
+untracked**: `Screenshots/census/`. None in both; `git diff --cached --check` clean; one stash, `stash@{0}`.
+
+## [2026-10-28] — Premium's App Store Connect steps written out field by field: `AppStore/1.4/in-app-purchases.md`
+
+Asked whether the in-app purchases and subscriptions part was written in detail. It was not: a table of the
+three products and four bullets, enough to know what to create but not how. No code changed.
+
+### What changed
+
+- **`AppStore/1.4/in-app-purchases.md`, new**, read from the code rather than from the README: the IDs from
+  `PremiumAccess.swift`, the rest from `WaterBuddy.storekit`. Covered: the Paid Apps Agreement; the group
+  (*WaterBuddy Premium*, Use App Name); each product field by field — duration, price on a US base, Family
+  Sharing, display name and description, each counted (14, 15, 16 of 30; 39, 40, 31 of 45); the yearly's
+  free week, with no end date; the levels, yearly 1 and monthly 2; the review note (103) and screenshot; the
+  purchase on a device (#156); attaching all three to 1.4; what to leave off; localizations optional.
+- **Two things the README's instruction missed, read from the code.** A debug run offers the paywall only
+  with `-WaterBuddyPremium`, and the checked-in `WaterBuddy` scheme carries no argument — so "a run of the
+  scheme" never reaches *See Premium*. The guide says to add it for the shot and take it out after, since the
+  test action reuses run arguments and `theTestRunItselfIsNotOfferedThePaywall` then fails (#163). And on
+  this Mac's `en_UZ` simulators the yearly tile reads 20 % for 44 % (#162): the guide says to check it, and
+  to set the simulator's region to United States if it reads wrong — inferred, never tried, and said so.
+  Also stated: `PremiumStore.loadPlans` accepts all three products or none, so one missing ID leaves the
+  paywall at *"The App Store can't be reached right now."*; the paywall takes only `displayPrice` from
+  StoreKit, so Connect's names show in Apple's sheets only.
+- **Not written, and said so in the guide:** how to refund a sandbox purchase — not checked by this session.
+- **`AppStore/1.4/README.md`**: section 5 points to the guide and keeps the table short; the blocking item
+  for #155 links it. **`README.md`**: the review-screenshot bullet gains the argument, the 44 % check and a
+  link. **`docs/AI_CONTEXT.md`**: the `AppStore/1.4/` row, 16 → 17 files.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 23:25 on 2026-10-28, after this task's `git add` of four paths by name,
+and again of this file once this block was written. **No `git commit` was run.** HEAD `47bec44`. **21 staged**
+— 17 added (`AppStore/1.4/`) and 4 modified (`CLAUDE.md`, `README.md`, `docs/AI_CONTEXT.md`, this file).
+**3 unstaged**: `.claude/settings.json` and the two watch schemes. **1 untracked**: `Screenshots/census/`. None
+in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-10-28] — The ninety-seventh `/doc_sync`: the upload folder's records checked, no drift in the code
+
+Run by the owner on the 1.4 upload folder's staged tree. No code changed.
+
+### Checked, and already accurate
+
+The same read-only script as the ninety-sixth pass (in the session's scratchpad, not the tree), every figure
+printed: 117 `.swift` files in the seven target folders by `find` and by `git`, each with a *Files on disk*
+row whose count equals `wc -l` (`WaterBuddyWatchWidgetBundle.swift`'s, 9 = 9, read by hand — the script's
+pattern misses a row that ends at its count); 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 keys on
+`DataManager.Key` and 13 in `Key.all`, counted by hand since the list spans lines; the three exception sets as
+`CLAUDE.md` names them, six files each; four schemes; `MARKETING_VERSION = 1.4` and
+`CURRENT_PROJECT_VERSION = 4` on fourteen sites each; 18 rules cited, 18 files; `StoreKit` in `HomeView.swift`
+and `PremiumStore.swift`, `FoundationModels` in `InsightWriter.swift`, no `SwiftData` under
+`WaterBuddyWidget/`; no forbidden doc. The task's own records: `CLAUDE.md`'s `AppStore/` row and
+`docs/AI_CONTEXT.md`'s `AppStore/1.4/` row, 17 files, as `git` lists them. `docs/STATE.md`,
+`docs/WIDGET.md`, `docs/DESIGN.md`: nothing in their subjects moved — *Last updated* kept.
+
+### Written
+
+`docs/AI_CONTEXT.md`: *Last updated*; a *Current state* block for the upload folder — HEAD `47bec44`, the
+retake's five commits pushed `2b28ceb..47bec44` — and a *Git* block, the first since 2026-10-25's: the two
+passes after it wrote their staging into this file only. The two unstaged watch schemes read again: each
+without its two `BlueprintName` lines, and `git diff stash@{0}` over them prints nothing. `tasks/lessons.md`:
+one entry — a how-to for the owner is traced through the code's gates before it is written, from the review
+screenshot's instruction that no run of the checked-in scheme could follow.
+
+### Gate
+
+Not run: no code changed since the retake's gate, which its commits carry.
+
+**Staging.** Read from the commands at 23:58 on 2026-10-28, after this pass's `git add` of
+`docs/AI_CONTEXT.md` and `tasks/lessons.md` by name, and again of `docs/AI_CONTEXT.md` and this file once
+their blocks were written. **No `git commit` was run.** HEAD `47bec44`, 211 commits, level with
+`origin/main`. **22 staged** — 17 added (`AppStore/1.4/`) and 5 modified (`CLAUDE.md`, `HISTORY.md`,
+`README.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md`). **3 unstaged**: `.claude/settings.json` and the two
+watch schemes. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check` clean; one
+stash, `stash@{0}`. This supersedes the staging block above.

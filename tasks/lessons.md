@@ -5176,3 +5176,16 @@ touched them.
 
 **The rule:** setting aside files an open Xcode rewrites is good only until it saves again — read `git diff
 --name-status` at staging, and never write "the tree is HEAD's" before that read.
+
+## 2026-10-28 — A how-to for the owner is walked through the code's gates before it is written
+
+**What happened.** `README.md` told the owner to take Premium's review screenshot "from a run of the
+`WaterBuddy` scheme in Xcode". Written on 2026-10-25, never walked. Read against the code three days later:
+a debug build offers the paywall only with `-WaterBuddyPremium` among its launch arguments
+(`PaywallView.isOffered`), and the checked-in scheme carries none — the argument was taken out on 2026-10-22
+(#163) — so that run never reaches *See Premium*. And on this Mac's `en_UZ` simulators the yearly tile
+reads 20 % for 44 % (#162), which a screenshot would have carried to App Review.
+
+**The rule:** an instruction the owner will follow by hand is traced through every gate it passes —
+`#if DEBUG`, a launch argument, an availability check, a region — before it is written, and names what to
+look for in the result. Where a step cannot be traced, the instruction says so instead of reading as done.
