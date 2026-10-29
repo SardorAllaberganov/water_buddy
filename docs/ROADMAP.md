@@ -283,7 +283,10 @@ nothing read from Health; the whole history written when it is turned on; a swit
 turning it off deletes nothing; approach A, a pure plan and an app-only writer reconciling through one
 queue. Open for the owner: D6, whether a sample deleted in the Health app comes back while its serving
 stands. Before code: §8's wording, typed for approval — the spec's §3.12 names nine files — then the
-spec's Task 0 measurements.)*
+spec's Task 0 measurements.)* *(2026-10-29, later: **D6 ruled — "It comes back"; the spec approved; the plan
+written and staged**, `docs/superpowers/plans/2026-10-29-apple-health.md`, for the owner's review. The spec's
+§6 records what planning refined: the card is the reminders card's twin, eleven rule files rather than nine,
+and Task 0's measurements come before the wording, which names what they measure. No code yet.)*
 
 **1.3.4 — Siri: "how much today?"** A second Siri phrase that answers with today's total and
 what is left. **Needs a rule change** (§8): today every Siri reply is one fixed, digit-free line.

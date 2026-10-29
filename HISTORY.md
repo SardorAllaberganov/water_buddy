@@ -13803,3 +13803,68 @@ Health spec), 1 deleted (`Tools/ComposeStoreScreenshot.swift`) and 9 modified (`
 `docs/ROADMAP.md`, `tasks/lessons.md`). **3 unstaged**: `.claude/settings.json` and the two watch schemes.
 **No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This
 supersedes the staging block above.
+
+## [2026-10-29] — Apple Health (1.3.3): D6 ruled, the spec approved, the plan written
+
+On the owner's answers: **D6 — "It comes back"** (a sample deleted in the Health app is written again while
+its serving stands) and **"Approved, write the plan"**. No code changed; nothing pushed — the owner declined
+the push of the day's four commits (`618d518`, `49ddd90`, `a7e0b67`, `595d847`), which stand local, four
+ahead of `origin/main`.
+
+### What changed
+
+- **The spec** records D6 and the approval, and gains §6, *Refinements made while planning*, each naming
+  what it supersedes: the card is the reminders card's twin (the switch's label *Apple Health* is its title;
+  the refusal line names Settings › Privacy & Security › Health › WaterBuddy, for Task 0 to confirm);
+  `requestWrite` returns nothing and the plan takes its interval; `logs(since:)` is newest first; instants
+  compared to the millisecond, Task 0 gaining **f**; two more rule files (`00-workspace`,
+  `60-design-system`, for a `Double` at HealthKit's boundary); Task 0 before the rule wording.
+- **`docs/superpowers/plans/2026-10-29-apple-health.md`, new** — ten tasks: 0, the measurements in a scratch
+  worktree with the owner's clicks; 1, the wording of eleven rule files, typed for approval; 2, the branch
+  `feature/apple-health`; 3–7, test first — `DataManager`'s Health surface, `HealthPlan`, `HealthMirror`, the
+  entitlement and usage key, the app's wiring and Settings' card; 8, the policy; 9, the gate, the warnings,
+  the walk and the records. Its Review Focus names five failure modes and the test that pins each.
+- **Measured for the plan:** a `queue: .main` observer runs before a main-thread `post` returns (a scratch
+  script, on macOS), so a test may await the mirror's queue straight after a pour.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 16:23 on 2026-10-29, after this task's `git add` of the plan, the spec
+and this file, and again once this block was written. **No `git commit` was run.** HEAD `595d847`,
+217 commits, four ahead of `origin/main` — the push declined. **3 staged** — 1 added (the
+plan) and 2 modified (the spec, this file). **3 unstaged**: `.claude/settings.json` and the two watch schemes.
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`.
+
+## [2026-10-29] — The ninety-ninth `/doc_sync`: the plan recorded; no drift in the code
+
+Run by the owner on the Apple Health plan's staged tree. No code changed.
+
+### Checked, and already accurate
+
+The ninety-eighth pass's read-only script again, every figure printed and unchanged: 117 `.swift` files in
+the seven target folders by `find` and by `git`; 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 static
+keys on `DataManager.Key`; the three six-file exception sets as `CLAUDE.md` names them; four schemes; 1.4 (4)
+on fourteen sites each; 18 rules cited, 18 files; `StoreKit` in two files, `FoundationModels` in one, no
+`HealthKit`, no `SwiftData` under `WaterBuddyWidget/`; no forbidden doc; `AppStore/1.4/` 17 files.
+`CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: nothing in their subjects moved.
+
+### Drift, from the spec's approval — written
+
+- `docs/AI_CONTEXT.md`: *Last updated*; *Current state*'s Apple Health bullet a dated note (D6 ruled, the
+  spec approved, the plan staged) and a bullet for the four local commits and the declined push; the Git block.
+- `docs/ROADMAP.md`: 1.3.3 a dated note, the same.
+- `tasks/lessons.md`: nothing new since the last pass.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 16:48 on 2026-10-29, after this pass's `git add` of
+`docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and this file by name, and again of `docs/AI_CONTEXT.md` and this file
+once their blocks were written. **No `git commit` was run.** HEAD `595d847`, 217 commits, four ahead of
+`origin/main`. **5 staged** — 1 added (`docs/superpowers/plans/2026-10-29-apple-health.md`) and 4 modified
+(this file, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, the Apple Health spec). **3 unstaged**:
+`.claude/settings.json` and the two watch schemes. **No untracked file.** None in both;
+`git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes the staging block above.

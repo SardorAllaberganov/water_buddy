@@ -4,6 +4,17 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-29, later (ninety-ninth pass — `/doc_sync` run by the owner on the Apple Health
+plan's staged tree; no code changed). The same read-only script, every figure printed and unchanged since the
+ninety-eighth: 117 `.swift` files by `git` and by `find`; 954 phone `@Test`, 71 watch, 63 UI `func test`; 13
+static keys; three six-file exception sets; four schemes; 1.4 (4) on fourteen sites; 18 rules cited, 18 files;
+no `HealthKit` import; no forbidden doc. **Drift, two:** *Current state*'s Apple Health bullet and
+`docs/ROADMAP.md`'s 1.3.3 note both still called D6 open — a dated note on each: D6 ruled, the spec approved,
+the plan staged. Also written: *Current state* names the four local commits and the declined push; the Git
+block. `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: nothing in their subjects moved — no
+key, widget, token or target; Apple Health's are planned, not built — *Last updated* kept.
+`tasks/lessons.md`: nothing new to learn since the last pass. Gate: not run.
+
 **Last updated:** 2026-10-29 (ninety-eighth pass — `/doc_sync` run on the owner's "1", on the day's staged
 tree; no code changed). The same read-only checks, every figure printed: 117 `.swift` files in the seven
 target folders by `git` and by `find`; 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 static keys on
@@ -2550,6 +2561,14 @@ Health*. No code changed.
   deleted on turning off, a pure `HealthPlan` and an app-only `HealthMirror` reconciling through one queue.
   D6 is open for the owner. Before code: the rule wording of nine files, then Task 0's measurements; the
   code on `feature/apple-health`, so `main` stays the 1.4 upload.
+  *(Later on 2026-10-29: **D6 ruled — "It comes back"** — and **the spec approved**; its §6 records the
+  refinements found while planning, among them two more rule files, eleven in all, and Task 0 moved ahead
+  of the wording. **The plan is written and staged:** `docs/superpowers/plans/2026-10-29-apple-health.md`,
+  ten tasks — 0 the simulator measurements with the owner's clicks, 1 the rule wording for approval, 2 the
+  branch, 3–7 the code test first, 8 the policy, 9 the gate, the warnings and the walk — awaiting the
+  owner's review. No code yet.)*
+- **Committed and not pushed:** the cleanup, the pages and the spec as `618d518`, `49ddd90`, `a7e0b67` and
+  `595d847`, by the owner's `/commit`; the push was declined, so `main` is four ahead of `origin/main`.
 - **Gate:** not run — no code, test or project file changed.
 
 **The 1.4 upload folder is staged: `AppStore/1.4/`, the listing's text and the store set in one place**
@@ -5767,6 +5786,14 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 16:48 on 2026-10-29, in the ninety-ninth pass, after its `git add` of three paths by name:
+`595d847`, 217 commits, **four ahead of `origin/main`** — the block below's twelve committed by the owner's
+`/commit` as `618d518`, `49ddd90`, `a7e0b67` and `595d847`, and the push declined; 5 staged — 1 added, 4
+modified — 3 unstaged, no untracked entry, none in both; `git diff --cached --check` clean; one stash.**
+Staged: the Apple Health plan (added); the spec, `HISTORY.md`, this file and `docs/ROADMAP.md` (modified).
+Unstaged: `.claude/settings.json` (the owner's) and the two watch schemes. This file and `HISTORY.md` are
+added again once their blocks are written. No `git commit` in this pass.
 
 **Read at 15:55 on 2026-10-29, in the ninety-eighth pass, after its `git add` of five paths by name:
 `e4c70e4`, 213 commits, level with `origin/main` — the upload folder and the ninety-seventh pass committed
