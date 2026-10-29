@@ -1,0 +1,198 @@
+<!doctype html>
+<!--
+  Support.html
+  Tools
+
+  WaterBuddy's support page, as published — the address App Store Connect's *Support URL* names.
+
+  Where it goes: the owner's GitHub user site — the repository `SardorAllaberganov.github.io`, at
+  `waterbuddy/support/index.html` — which serves it at
+  https://sardorallaberganov.github.io/waterbuddy/support/, beside the privacy policy at
+  `waterbuddy/privacy/` (`Tools/PrivacyPolicy.html`).
+
+  Every answer here is read from the code as it stood on 2026-10-29 (1.4, build 4): the Siri phrases
+  from `WaterBuddyShortcuts`, the reminder hours from `ReminderPlan.hours`, the labels from the
+  English catalogue. A change to any of those changes this page too.
+
+  One self-contained page, the privacy policy's shape and colours: no script, no web font, no image,
+  nothing fetched. The contact address is the owner's, chosen on 2026-10-29.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>WaterBuddy Support</title>
+<meta name="description" content="Help with WaterBuddy, the iPhone and Apple Watch hydration tracker: logging, widgets, Siri, the Watch, reminders and Premium — and how to get in touch.">
+<style>
+  :root {
+    --aurora-top: #0a2185;
+    --aurora-bottom: #5c1a9e;
+    --ground: #f6f7fb;
+    --surface: #ffffff;
+    --ink: #10142b;
+    --muted: #4a5070;
+    --rule: #dde0ec;
+    --link: #0a2185;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b1030;
+      --surface: #121842;
+      --ink: #e9ecf8;
+      --muted: #aeb4d6;
+      --rule: #262e63;
+      --link: #6cc4ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b1030;
+    --surface: #121842;
+    --ink: #e9ecf8;
+    --muted: #aeb4d6;
+    --rule: #262e63;
+    --link: #6cc4ff;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .band {
+    background: linear-gradient(160deg, var(--aurora-top) 0%, var(--aurora-bottom) 100%);
+    color: #ffffff;
+    padding: 56px 16px 40px;
+  }
+  .band .inner, main { max-width: 720px; margin: 0 auto; }
+  .band p.app { margin: 0 0 6px; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; opacity: 0.92; }
+  .band h1 { margin: 0; font-size: 34px; line-height: 1.15; font-weight: 700; }
+  .band dl { margin: 20px 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; font-size: 15px; }
+  .band dt { opacity: 0.8; }
+  .band dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .band a { color: inherit; }
+
+  main { padding: 8px 16px 64px; }
+  h2 { font-size: 24px; line-height: 1.25; margin: 48px 0 12px; padding-top: 20px; border-top: 1px solid var(--rule); }
+  main > h2:first-child { margin-top: 32px; padding-top: 0; border-top: 0; }
+  h3 { font-size: 19px; line-height: 1.3; margin: 28px 0 8px; }
+  p, ul { margin: 0 0 14px; }
+  ul { padding-left: 22px; }
+  li { margin: 0 0 8px; }
+  a { color: var(--link); text-underline-offset: 2px; overflow-wrap: anywhere; }
+  .lead { font-size: 19px; line-height: 1.55; }
+
+  .card { margin: 0 0 18px; padding: 16px 18px; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+
+  footer { max-width: 720px; margin: 0 auto; padding: 0 16px 48px; color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 480px) {
+    body { font-size: 16px; }
+    .band { padding: 40px 16px 32px; }
+    .band h1 { font-size: 28px; }
+    h2 { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="inner">
+    <p class="app">WaterBuddy, for iPhone and Apple Watch</p>
+    <h1>Support</h1>
+    <dl>
+      <dt>Developer</dt><dd>Sardor Allaberganov</dd>
+      <dt>Contact</dt><dd><a href="mailto:sardorallaberganov96@gmail.com">sardorallaberganov96@gmail.com</a></dd>
+      <dt>Privacy</dt><dd><a href="../privacy/">Privacy Policy</a></dd>
+    </dl>
+  </div>
+</header>
+
+<main>
+
+<h2 id="contact">Get in touch</h2>
+<p class="lead">A question, a problem or an idea: write to <a href="mailto:sardorallaberganov96@gmail.com">sardorallaberganov96@gmail.com</a>.</p>
+<div class="card">
+  <p>WaterBuddy has no account and sends nothing to us, so we cannot see your data or look anything up. It helps if your message says:</p>
+  <ul>
+    <li>what you were doing, and what happened;</li>
+    <li>your iPhone model and iOS version — and your Apple Watch model and watchOS version, if it involves the Watch;</li>
+    <li>the language the app is in.</li>
+  </ul>
+</div>
+
+<h2 id="logging">Logging water</h2>
+<h3>How do I log a drink?</h3>
+<p>On the Home screen, tap the Cup, the Glass or the Bottle. If you tapped by mistake, tap <em>Undo</em>, which appears for a few seconds after each pour.</p>
+<h3>I forgot to log a drink, or logged the wrong amount.</h3>
+<p>Open History. Tap <em>+</em> to add a serving at an earlier time, or tap a serving from the last seven days to change its amount or time, or delete it.</p>
+<h3>How do I change the three amounts, or my goal?</h3>
+<p>In Settings, under <em>Quick-add vessels</em> and <em>Daily goal</em>. The Glass is the amount your widgets, Siri, Control Center and a reminder’s <em>Log a Glass</em> button log.</p>
+<h3>How do I change the app’s language?</h3>
+<p>In Settings, under <em>Language</em>: English, Русский or O‘zbekcha — or follow your iPhone’s language.</p>
+
+<h2 id="widgets">Widgets, Control Center and Siri</h2>
+<h3>How do I add a widget?</h3>
+<p>Touch and hold the Home Screen, tap <em>Edit</em>, then <em>Add Widget</em>, and search for WaterBuddy. <em>Hydration</em>, small or medium, shows today’s progress and its button logs your Glass. <em>Week</em> shows your last seven days; tap it to open History. On the Lock Screen, <em>Hydration</em> comes in three shapes.</p>
+<h3>Can I hide my figures on the Lock Screen?</h3>
+<p>Yes. In iOS Settings, under <em>Face ID &amp; Passcode</em> (or <em>Touch ID &amp; Passcode</em>), turn off <em>Lock Screen Widgets</em> in <em>Allow Access When Locked</em>. The widget then shows no figure until your iPhone is unlocked.</p>
+<h3>A widget shows an old figure.</h3>
+<p>iOS decides when a widget redraws. Open WaterBuddy once: it asks iOS to refresh its widgets.</p>
+<h3>How do I log from Control Center?</h3>
+<p>On iOS 18 or later, edit Control Center and add WaterBuddy’s <em>Log Water</em> control. It logs your Glass. You can also put it on the Lock Screen, or on the Action Button if your iPhone has one.</p>
+<h3>What can I ask Siri?</h3>
+<ul>
+  <li><strong>“Log water in WaterBuddy”</strong> logs your Glass.</li>
+  <li><strong>“How much water today in WaterBuddy”</strong> tells you today’s total and how much is left. On a locked iPhone, Siri asks you to unlock first.</li>
+</ul>
+
+<h2 id="watch">Apple Watch</h2>
+<h3>How do I get WaterBuddy on my Watch?</h3>
+<p>WaterBuddy on Apple Watch needs watchOS 26 or later. On your iPhone, open the Watch app, tap <em>My Watch</em>, scroll to <em>Available Apps</em> and tap <em>Install</em> beside WaterBuddy.</p>
+<h3>How does the Watch stay in step with my iPhone?</h3>
+<p>Water you log on your wrist is sent to your iPhone whenever the two can reach each other, and the Watch counts it in the meantime. If the Watch ever shows a different total, open WaterBuddy on your iPhone with the Watch nearby: the Watch takes your iPhone’s figures when they connect.</p>
+<h3>How do I put WaterBuddy on a watch face?</h3>
+<p>Touch and hold a watch face that has complication slots, such as Modular or Infograph, tap <em>Edit</em>, and choose WaterBuddy for a slot. It comes as a circle, a rectangle and a corner.</p>
+
+<h2 id="reminders">Reminders</h2>
+<h3>How do reminders work?</h3>
+<p>Turn on <em>Smart reminders</em> in Settings. They come every two hours between 9 AM and 9 PM. A reminder due within an hour after you drink is skipped, and the rest of the day’s are skipped once you reach your goal. Each reminder has a <em>Log a Glass</em> button: touch and hold the notification to log your Glass without opening the app.</p>
+<h3>I am not getting reminders.</h3>
+<p>In iOS Settings, open <em>Notifications</em>, then <em>WaterBuddy</em>, and check that <em>Allow Notifications</em> is on. A Focus, or iOS’s Notification Summary, can also hold reminders back to deliver them later.</p>
+
+<h2 id="premium">Premium</h2>
+<h3>What is Premium?</h3>
+<p>An optional purchase that adds a month view with your full history, patterns, personal insights and a monthly recap. <strong>Logging water is free for everyone, always</strong>, and nothing you can do for free today is taken away. Premium is monthly, yearly — its first week free, where the App Store offers that to you — or a one-time purchase; the app shows the prices in your currency. It can be shared with your Family Sharing group.</p>
+<h3>I bought Premium but the app does not show it.</h3>
+<p>Make sure you are signed in to the App Store with the Apple Account you bought it with. Then in Settings tap <em>See Premium</em>, then <em>Restore Purchases</em>.</p>
+<h3>How do I cancel a subscription?</h3>
+<p>In Settings, tap <em>Manage Subscription</em> — or in iOS Settings, tap your name, then <em>Subscriptions</em>. Cancel at least 24 hours before it renews to avoid the next charge. If a subscription ends, the extras go quiet: no serving, setting or figure is lost.</p>
+<h3>How do I get a refund?</h3>
+<p>Purchases are made through Apple, and Apple handles refunds: request one at <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>. We cannot issue refunds ourselves, because we never receive your payment details.</p>
+
+<h2 id="data">Your data</h2>
+<h3>Where is my data kept?</h3>
+<p>On your own iPhone and Apple Watch. WaterBuddy has no account and no server, and sends nothing to us. The <a href="../privacy/">Privacy Policy</a> lists everything it stores.</p>
+<h3>How do I delete my data?</h3>
+<p>Delete a single serving in History. To delete everything, delete WaterBuddy from your iPhone, and the Watch app from your Apple Watch.</p>
+
+<h2 id="requirements">What WaterBuddy needs</h2>
+<ul>
+  <li>An iPhone with iOS 17 or later. The Control Center control needs iOS 18 or later.</li>
+  <li>For the Watch app, an Apple Watch with watchOS 26 or later.</li>
+  <li>Personal insights are written by WaterBuddy on every iPhone. On iOS 26 or later, on an iPhone where Apple’s on-device model is available and turned on, and with the app in English, the model may word them.</li>
+</ul>
+
+</main>
+
+<footer>
+  <p>WaterBuddy · Sardor Allaberganov · Last updated 29 October 2026</p>
+</footer>
+
+</body>
+</html>

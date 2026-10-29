@@ -270,14 +270,14 @@ WaterBuddy Premium's first set (1.4). Apple Health (1.3.3) is **not** in it — 
 | **Age rating** | **4+.** No violence, mature themes, gambling, user-generated content, messaging, web browsing or ads. Apple revised the questionnaire in 2025; answer any new question on the same facts — the app gives no medical or treatment advice, and its goal calculator and insights each say *not medical advice* |
 | **Price** | **Free, with in-app purchases** — WaterBuddy Premium, below |
 | **Availability** | 🔴 your choice of territories |
-| **Copyright** | 🔴 e.g. `2026 Sardor Allaberganov` |
+| **Copyright** | `2026 Sardor Allaberganov` |
 
 ## URLs
 
 | Field | |
 |---|---|
-| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). 🔴 **Not yet live**: it returned 404 on 2026-10-24. Put your contact address in place of `CONTACT-EMAIL` in `PRIVACY.md` and `Tools/PrivacyPolicy.html`, then publish the HTML at that path on your `sardorallaberganov.github.io` site (known issue #159) |
-| **Support URL** | 🔴 required. A GitHub Issues page or a contact page on the same site is acceptable |
+| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). 🔴 **Not yet live**: it returned 404 on 2026-10-24. Its contact address is filled in (2026-10-29); publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159) |
+| **Support URL** | `https://sardorallaberganov.github.io/waterbuddy/support/` — 🔴 **not yet live**. The page is `Tools/Support.html` (2026-10-29), read from the code: contact, logging, widgets and Siri, the Watch, reminders, Premium, your data. Publish it as `waterbuddy/support/index.html` in the same repository |
 | **Marketing URL** | optional |
 | **Terms of Use (EULA)** | Apple's standard licence — leave App Store Connect's EULA field at its default. The description links it, as guideline 3.1.2 asks of an app with subscriptions |
 
@@ -517,7 +517,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 |---|---|
 | Sign-in required | **No** |
 | Demo account | Not needed |
-| Contact 🔴 | your name, phone, email |
+| Contact | Sardor Allaberganov, `sardorallaberganov96@gmail.com`, 🔴 your phone |
 
 ---
 
@@ -525,10 +525,11 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 **Blocking — the upload or the review fails without these, and each is yours:**
 
-- 🔴 **The privacy policy must be live** (known issue #159). Replace `CONTACT-EMAIL` in `PRIVACY.md`
-  and `Tools/PrivacyPolicy.html`, publish the HTML at
-  `https://sardorallaberganov.github.io/waterbuddy/privacy/`, and open that address to see it load.
-  Both the app (Settings, the paywall) and the listing link it; guideline 5.1.1(i).
+- 🔴 **The privacy policy must be live** (known issue #159). Its contact address is filled in
+  (2026-10-29); publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your
+  `SardorAllaberganov.github.io` repository, and open
+  `https://sardorallaberganov.github.io/waterbuddy/privacy/` to see it load. Both the app (Settings,
+  the paywall) and the listing link it; guideline 5.1.1(i).
 - 🔴 **Premium in App Store Connect** (#155): the Paid Apps Agreement with banking and tax, the
   *WaterBuddy Premium* group and its three products as listed above, each with its review screenshot,
   and all three selected on the 1.4 version page.
@@ -536,7 +537,9 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   make a sandbox purchase, a restore and a refund on a real iPhone. Nothing but the local StoreKit
   configuration has ever been bought from, and a comma-decimal region's yearly saving is unchecked
   there (#162).
-- 🔴 **A Support URL.**
+- 🔴 **The support page must be live.** `Tools/Support.html` (2026-10-29), published as
+  `waterbuddy/support/index.html` in the same repository; the field's value is
+  `https://sardorallaberganov.github.io/waterbuddy/support/`.
 
 **Done in the repository:**
 

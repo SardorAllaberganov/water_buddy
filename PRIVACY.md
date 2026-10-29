@@ -3,14 +3,14 @@
   `Tools/PrivacyPolicy.html`, served at https://sardorallaberganov.github.io/waterbuddy/privacy/
   (`PaywallView.privacyPolicy`). The two change together: an edit to one is an edit to both.
   Written from the code (spec `docs/superpowers/specs/2026-10-24-privacy-policy-design.md`).
-  `CONTACT-EMAIL` is the one token left for the owner to fill before publishing.
+  The contact address is the owner's, chosen on 2026-10-29.
 -->
 
 # WaterBuddy Privacy Policy
 
 **App:** WaterBuddy, for iPhone and Apple Watch
 **Developer:** Sardor Allaberganov
-**Contact:** CONTACT-EMAIL
+**Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
 **Last updated:** 24 October 2026
 
@@ -199,7 +199,7 @@ WaterBuddy is distributed through Apple's App Store, and some of what it offers 
 
 ## Children's privacy
 
-WaterBuddy is a hydration tracker for a general audience. It collects no personal information from anyone, including children: there is no sign-up, no profile, no messaging, no advertising and no way for the app to send anything to us. A purchase made by a child in a Family Sharing group goes through Apple's *Ask to Buy*, which Apple runs. If a parent or guardian has a question, please write to CONTACT-EMAIL.
+WaterBuddy is a hydration tracker for a general audience. It collects no personal information from anyone, including children: there is no sign-up, no profile, no messaging, no advertising and no way for the app to send anything to us. A purchase made by a child in a Family Sharing group goes through Apple's *Ask to Buy*, which Apple runs. If a parent or guardian has a question, please write to [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com).
 
 ---
 
@@ -231,7 +231,7 @@ These laws give you rights over personal information that a company **collects, 
 
 Purchases, Siri and the other services Apple provides are Apple's to answer for, under Apple's privacy policy.
 
-If you believe anything here is wrong, or want it confirmed in writing, write to CONTACT-EMAIL and you will get a straight answer. In the EU, the EEA or the UK you may also complain to your national data protection authority.
+If you believe anything here is wrong, or want it confirmed in writing, write to [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com) and you will get a straight answer. In the EU, the EEA or the UK you may also complain to your national data protection authority.
 
 Where a legal basis is needed at all: the app keeps your water log on your own device to do what you opened it for; reminders and insights run only when you turn them on or open them; and a purchase is a contract you make with Apple.
 
@@ -249,7 +249,7 @@ A version already installed on your device is not changed by an edit to this pag
 
 Questions, corrections or concerns about privacy in WaterBuddy:
 
-**CONTACT-EMAIL**
+**[sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)**
 
 ---
 

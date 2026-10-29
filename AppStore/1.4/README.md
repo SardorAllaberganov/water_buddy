@@ -9,13 +9,16 @@ without a newline, so the paste is exact. Every count below was computed from th
 
 ## 1. Before you upload — blocking, and yours
 
-- [ ] **The privacy policy is live** (#159). Replace `CONTACT-EMAIL` in `PRIVACY.md` and
-      `Tools/PrivacyPolicy.html`, publish the HTML at
-      `https://sardorallaberganov.github.io/waterbuddy/privacy/`, and open it to see it load.
+- [ ] **The privacy policy is live** (#159). Its contact address is filled in (2026-10-29). Publish
+      `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your
+      `SardorAllaberganov.github.io` repository, and open
+      `https://sardorallaberganov.github.io/waterbuddy/privacy/` to see it load.
 - [ ] **Premium exists in App Store Connect** (#155): the Paid Apps Agreement with banking and tax,
       then the three products — step by step in [`in-app-purchases.md`](in-app-purchases.md).
 - [ ] **One real purchase** (#156): a sandbox purchase, a restore and a refund on a real iPhone.
-- [ ] **A Support URL.**
+- [ ] **The support page is live.** Written as `Tools/Support.html` (2026-10-29): publish it as
+      `waterbuddy/support/index.html` in the same repository, and open
+      `https://sardorallaberganov.github.io/waterbuddy/support/` to see it load.
 
 ## 2. The version page
 
@@ -25,13 +28,13 @@ without a newline, so the paste is exact. Every count below was computed from th
 | Promotional Text | [`promotional-text.txt`](promotional-text.txt) | 164 / 170 |
 | Description | [`description.txt`](description.txt) | 3992 / 4000 |
 | Keywords | [`keywords.txt`](keywords.txt) | 98 / 100 |
-| Support URL | 🔴 yours | |
+| Support URL | `https://sardorallaberganov.github.io/waterbuddy/support/` — live first (section 1) | |
 | Marketing URL | optional | |
-| Copyright | 🔴 e.g. `2026 Sardor Allaberganov` | |
+| Copyright | `2026 Sardor Allaberganov` | |
 | Build | **1.4 (4)** | |
 | In-App Purchases and Subscriptions | select **all three** products | |
 | App Review notes | [`review-notes.txt`](review-notes.txt) — sign-in **not** required, no demo account | 1998 / 4000 |
-| App Review contact | 🔴 your name, phone, email | |
+| App Review contact | Sardor Allaberganov, `sardorallaberganov96@gmail.com`, 🔴 your phone | |
 
 What's New is written against **1.1**, which is live. Promotional Text can be changed later
 without a new build.
