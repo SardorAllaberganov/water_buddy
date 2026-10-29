@@ -276,6 +276,14 @@ deleted or edited. Whether it also *reads* water other apps logged is the design
 **Needs rule changes** (§8): HealthKit is banned by name; it adds an entitlement beside the App
 Group, the only one any target has today; and it needs a usage-description key, where the project
 carries none.
+*(2026-10-29: **designed — the spec written and staged, for the owner's review; no code.** Spec
+`docs/superpowers/specs/2026-10-29-apple-health-design.md`. The owner's rulings: the 1.4 upload first, this
+item after it on a branch, `feature/apple-health`; **write only** — the design's first question answered,
+nothing read from Health; the whole history written when it is turned on; a switch in Settings alone;
+turning it off deletes nothing; approach A, a pure plan and an app-only writer reconciling through one
+queue. Open for the owner: D6, whether a sample deleted in the Health app comes back while its serving
+stands. Before code: §8's wording, typed for approval — the spec's §3.12 names nine files — then the
+spec's Task 0 measurements.)*
 
 **1.3.4 — Siri: "how much today?"** A second Siri phrase that answers with today's total and
 what is left. **Needs a rule change** (§8): today every Siri reply is one fixed, digit-free line.

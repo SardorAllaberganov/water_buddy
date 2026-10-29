@@ -4,6 +4,19 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-10-29 (ninety-eighth pass — `/doc_sync` run on the owner's "1", on the day's staged
+tree; no code changed). The same read-only checks, every figure printed: 117 `.swift` files in the seven
+target folders by `git` and by `find`; 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 static keys on
+`DataManager.Key`; three six-file exception sets, as `CLAUDE.md` names them; four schemes; 1.4 (4) on
+fourteen sites each; 18 rules cited, 18 files; `StoreKit` in two files, `FoundationModels` in one, no
+`HealthKit` anywhere, no `SwiftData` under `WaterBuddyWidget/`; no forbidden doc. **Drift, from the day's
+own changes:** *Outside every target* lost the rows of `ComposeStoreScreenshot.swift` and
+`Screenshots/census/`, with a dated note where they are recorded gone; `Tools/PrivacyPolicy.html`'s row a
+note; `Tools/Support.html` a row; #159 a note; *Current state* a block; the Git block. `CLAUDE.md`: the
+*Screenshots* and *Tools* rows. `docs/ROADMAP.md`: 1.3.3's note. `docs/STATE.md`, `docs/WIDGET.md`,
+`docs/DESIGN.md`: nothing in their subjects moved — no key, widget or token; Apple Health's key is designed,
+not built — *Last updated* kept. `tasks/lessons.md`: two entries. Gate: not run.
+
 **Last updated:** 2026-10-28, night (ninety-seventh pass — `/doc_sync` run by the owner on the 1.4 upload
 folder's staged tree; no code changed). The same read-only script, every figure printed: 117 `.swift` files by
 `git` and by `find`, each with a *Files on disk* row whose count equals `wc -l` (`WaterBuddyWatchWidgetBundle.swift`'s,
@@ -2230,13 +2243,13 @@ omitting it:
 ```
 Tools/GenerateAppIcon.swift                      267   generates the three iOS icon variants at 1024². Run: swift Tools/GenerateAppIcon.swift. Does NOT own the watch icon — see known issue #34
 Tools/FlattenPNG.swift                            99   re-encodes a PNG to colour type 2, RGB untouched. Required for every watch capture: simctl writes RGBA on watchOS even with --mask=ignored
-Tools/ComposeStoreScreenshot.swift               161   composites an unaltered iPhone screen onto the product's own aurora at a target slot size — how the iPad 13" set was made (see below)
 Tools/CaptureScreenshots.sh                        —   the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5. Its default device is gone — known issue #45. It no longer overrides the status bar's clock (2026-10-09, committed in `12ddfc4`). *(2026-10-18, 1.2.8, staged: it finds the phone by name and runtime — iPhone 18 Pro Max, iOS 27.0, the first of two; WATERBUDDY_SCREENSHOT_PHONE still takes a UDID — so its half of #45 is fixed; no dirty-device gate, since the harness starts clean; the clock frozen again, at the run's start, in 24-hour form, the owner's ruling; DerivedData kept between runs. Run end to end twice.)* *(2026-10-18, #144, staged with 1.2.8: the clock is read once at the top and a run outside 1:45–11:45 PM is refused there, before the boot and the build — the harness keeps its own check — and the time checked is the time frozen; its header and `--time` comment say what the code and the 1.2.8 transcript show. Proved by fake-clock runs against a device name nothing matches; not run end to end since.)* *(2026-10-25, the store page, staged: eight of the ten iPhone shots — `01-home`, `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` — in the harness's two launches; it refuses a run before the 8th of a month beside its clock check, because Patterns need seven finished days of the month holding today. Not run since.)*
 Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position. Its default device is gone — #45
 Tools/CapturePairScreenshots.sh                    —   new 2026-10-25 (the store page, staged): the other five shots — the iPhone's Home Screen widgets and Lock Screen (`02-widgets`, `04-lock-screen`) and the watch's three (`01-wrist`, `02-face-modular`, `03-face-infograph`). `setup` deletes and makes again, by name, a *WaterBuddy Store iPhone* (iPhone 18 Pro Max, iOS 27.0) paired with a *WaterBuddy Store Watch* (Series 12 46mm, watchOS 27.0), runs `testBuildTheLivedInWeek` on the phone, installs the phone app through `simctl` and then the watch app embedded in it, launches both and freezes the clock; a person arranges each surface in DeviceHub; `shoot <name>` takes it, flattens it and verifies it. Replaces `Tools/CaptureWatchScreenshot.sh`, deleted the same day. `setup` ran once before its install step took its present order; not run since
 Tools/VerifyScreenshots.sh                         —   proves each capture's size/alpha/format against the slot it will be uploaded to
 Tools/RenameScreenshots.py                         —   xcresult attachment UUIDs → slot names, via manifest.json
-Tools/PrivacyPolicy.html                         —   the privacy policy as published (new 2026-10-24, staged): one self-contained page, PRIVACY.md's published form — they change together — for the owner's user site at waterbuddy/privacy/index.html; light and dark, 390 pt and up; CONTACT-EMAIL still a token
+Tools/PrivacyPolicy.html                         —   the privacy policy as published (new 2026-10-24, staged): one self-contained page, PRIVACY.md's published form — they change together — for the owner's user site at waterbuddy/privacy/index.html; light and dark, 390 pt and up; CONTACT-EMAIL still a token *(2026-10-29, staged: the contact is filled — the owner's account email, chosen that day, superseding 2026-10-24's "an address other than the account's" — four times, as `mailto:` links, in both forms; `.band a { color: inherit; }` keeps the band's address white; 313 lines. Not yet published, #159)*
+Tools/Support.html                               —   new 2026-10-29, staged: the page App Store Connect's Support URL names, for waterbuddy/support/index.html on the same site — contact, logging, widgets and Siri, the Watch, reminders, Premium (restore, cancel, refunds through Apple), your data, what it needs; every answer read from the code (the Siri phrases, `ReminderPlan.hours`, the catalogue's labels, the widgets' names, Family Sharing). The policy's shape and colours, nothing fetched; 198 lines. Not yet published
 Tools/ProductPageHeader.html                     —   the App Store product page header (staged 2026-10-13): the redesign's vessel, discs and "One tap. Watch it fill." over the aurora, 1920 × 823 CSS px rendered at 2× by headless Chrome to Screenshots/en-US/ProductPageHeader/01-one-tap.png (3840 × 1646, no alpha); the render command is in its header comment
 ```
 
@@ -2253,7 +2266,6 @@ WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with
 Screenshots/en-US/iPhone-6.9/*.png                8    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)* *(2026-10-25, 13:00, the capture under way: a fifth file, `02-widgets.png`, untracked — **a wrong shot, not of the widgets**: it was taken on a person's "widgets ready" while the pair's phone still had WaterBuddy in the foreground, and draws the app's Home tab. It is to be shot again; the other four are as above.)* *(2026-10-25, 13:57: **nine files** — the store capture's eight, `01-home` (retaken, modified), `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` (new, untracked), at 13:54, iPhone 18 Pro Max, iOS 27.0; `02-history`, `03-settings` and `04-goal-setup` removed with `git rm`, staged; and the wrong `02-widgets`. `04-lock-screen` and a right `02-widgets` are a person's to place.)* *(Ninety-fourth pass, 19:50: the eight staged at 14:14, by name, beside the three removals; the wrong `02-widgets` left untracked. The count column said 4 until this pass — nine files on disk, and the ten-shot set short of `02-widgets` and `04-lock-screen`.)* *(2026-10-26, night: **eight files, the whole iPhone set** — all eight retaken at 21:59 by `CaptureScreenshots.sh`, modified and unstaged; the wrong `02-widgets.png` moved out of the tree. `02-widgets` and `04-lock-screen` are out of 1.4's set by the owner's ruling (#88, retired), so the numbers skip 02 and 04. The count column said 9 until today.)*
 Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)* *(14:14: staged, by name. Still not taken at 19:50: the two faces.)* *(2026-10-26, 22:39: **retaken** by `shoot 01-wrist` on a new pair — 65 %, *1,300 of 2,000 ml*, *Synced just now*, the watch's clock 22:38; modified, unstaged. It is 1.4's only watch shot: the two faces are out of the set by the owner's ruling (#88, retired).)*
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
-Screenshots/census/AppleWatch/*.png               9    coverage run, five sizes plus four driven states, from 2026-09-02; untracked
 AppStore/1.4/                                    17    new 2026-10-28, staged: the 1.4 upload folder — README.md (start here: the blocking items, the version page's fields, the upload order, the unchanged fields, Premium's three products in short); in-app-purchases.md (Premium in App Store Connect field by field — the agreement, the group, the three products, the free week, the levels, the review screenshot with the run argument it needs (#163) and the saving to check (#162), the purchase on a device (#156), attaching them to 1.4); whats-new.txt 830, promotional-text.txt 164, description.txt 3992, keywords.txt 98, review-notes.txt 1998 characters, each the main README's code block exactly, no trailing newline; screenshots/ the ten store PNGs, byte-identical copies (sha256) renamed into upload order — iPhone-6.9/1-home … 8-settings, AppleWatch/1-wrist, ProductPageHeader/1-one-tap. A copy: the main README and Screenshots/en-US/ stay the masters
 ```
 
@@ -2271,6 +2283,11 @@ Gone from disk since 2026-10-09, on the owner's word ("delete the all other item
 and `Screenshots/en-US/iPad-13/` (four files each — in `8a44e8f`, deleted in `96ca467`) and
 `Screenshots/census/iPhone-6.9/` (nineteen files git never tracked, so not recoverable).
 `Tools/ComposeStoreScreenshot.swift`, which composited the iPad set, has no output left.
+*(2026-10-29, on the owner's choice of what to clean: `Tools/ComposeStoreScreenshot.swift` is removed with
+`git rm`, staged — in history at `e4c70e4`; and `Screenshots/census/` is gone, the nine watch captures of
+2026-09-02 with it — never tracked, so not recoverable, and kept only "until a new watch capture exists",
+which `01-wrist.png` has been since 2026-10-26. `Tools/CaptureFullCensus.sh` makes the folder again if the
+census is run.)*
 
 The four `PrivacyInfo.xcprivacy` files are a **submission blocker**, not paperwork: `UserDefaults` is
 a required-reason API and Apple does not accept an upload that fails to declare one. See rule
@@ -2287,7 +2304,8 @@ been processed. Filled with a raw iPad-simulator capture, the slot would show th
 iPad's floating compatibility window — the desktop rather than the product, and the kind of asset
 App Review 2.3.3 objects to. So the four images are the real, unaltered iPhone screens scaled onto
 the product's own aurora. The reasoning is `Tools/ComposeStoreScreenshot.swift`'s own header; this
-paragraph only points at it.
+paragraph only points at it. *(2026-10-29: the tool is removed, its header with it — read it at
+`e4c70e4`. The iPad set itself went on 2026-10-09.)*
 
 `AuroraBackground` and `PressStyle` were `private` inside `HomeView.swift` until `GoalSetupView`
 (the first-run screen until stage 5, `WelcomeView` since) became a second consumer. They are **app-only**: the widget re-expresses the same lights itself in
@@ -2510,6 +2528,29 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**The repository cleaned, the upload's text fields filled, and Apple Health designed** (2026-10-29; HEAD
+`e4c70e4`, 213 commits — the upload folder and the ninety-seventh pass committed since the block below).
+Taken by `/start_task` with no task named, on the owner's *"clean up the unnecessary files and folders and
+give me the app status according to our plan"*, then *"let's continue finish this"* — *Upload, then
+Health*. No code changed.
+
+- **Cleaned, on the owner's choice of four:** `build/` (1.3 GB, the capture scripts' DerivedData),
+  `.superpowers/` (445 MB, the subagent runs' scratch — so every `.superpowers/sdd/…` ledger this file
+  cites is gone from disk), `Screenshots/census/` and `Tools/ComposeStoreScreenshot.swift` (`git rm`),
+  and thirteen `.DS_Store`. The working tree is 276 MB.
+- **The status read against `docs/ROADMAP.md`:** 21 of 35 items built, 15 of 29 since 1.1 — 1.2 seven of
+  eight (1.2.7, the device sweep, left), 1.3 three of four (1.3.3 not built), 1.4 five of twelve (set A
+  whole), 1.5 and 2.0 none. Every cited commit checked with `git cat-file -e`.
+- **For the upload:** the policy's contact is the owner's account email (#159); `Tools/Support.html` is the
+  *Support URL*'s page; the copyright and the review contact are written into both READMEs. Still the
+  owner's: publishing both pages, the reviewer's phone, #155, #156, the device sweep.
+- **Apple Health (1.3.3) is designed** — `docs/superpowers/specs/2026-10-29-apple-health-design.md`, staged,
+  for the owner's review: write only, the whole history on turning on, a switch in Settings alone, nothing
+  deleted on turning off, a pure `HealthPlan` and an app-only `HealthMirror` reconciling through one queue.
+  D6 is open for the owner. Before code: the rule wording of nine files, then Task 0's measurements; the
+  code on `feature/apple-health`, so `main` stays the 1.4 upload.
+- **Gate:** not run — no code, test or project file changed.
 
 **The 1.4 upload folder is staged: `AppStore/1.4/`, the listing's text and the store set in one place**
 (2026-10-28, night; HEAD `47bec44`, 211 commits, level with `origin/main` — the store retake and its two
@@ -5726,6 +5767,17 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 15:55 on 2026-10-29, in the ninety-eighth pass, after its `git add` of five paths by name:
+`e4c70e4`, 213 commits, level with `origin/main` — the upload folder and the ninety-seventh pass committed
+since the block below (`1fe33c3`, `e4c70e4`); 12 staged — 2 added, 1 deleted, 9 modified — 3 unstaged, no
+untracked entry, none in both; `git diff --cached --check` clean; one stash.** Staged: `Tools/Support.html`
+and the Apple Health spec (added); `Tools/ComposeStoreScreenshot.swift` (deleted); `AppStore/1.4/README.md`,
+`CLAUDE.md`, `HISTORY.md`, `PRIVACY.md`, `README.md`, `Tools/PrivacyPolicy.html`, this file,
+`docs/ROADMAP.md` and `tasks/lessons.md` (modified). Unstaged: `.claude/settings.json` (the owner's) and the
+two watch schemes — `git diff stash@{0}` over them prints nothing, the same edit as before. `Screenshots/census/`
+is gone. This file and `HISTORY.md` are added again once their blocks are written. No `git commit` in this
+session.
 
 **Read at 23:58 on 2026-10-28, in the ninety-seventh pass, after its `git add` of this file and
 `tasks/lessons.md` by name: `47bec44`, 211 commits, level with `origin/main` — the store retake and its two
@@ -9878,6 +9930,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     in both forms of the policy); creating the repository `SardorAllaberganov.github.io` and pushing the
     page to `waterbuddy/privacy/index.html` — the address answered 404 on 2026-10-24; and App Store
     Connect's *Privacy Policy URL*. This issue closes when the page answers at that address.)*
+    *(2026-10-29, staged: **the contact address is in** — the owner's account email, chosen that day as a
+    choice offered to them, superseding 2026-10-24's "an address other than the account's" (the session
+    did not read that ruling before offering it; `tasks/lessons.md`) — in `PRIVACY.md` and
+    `Tools/PrivacyPolicy.html` alike. Beside it, `Tools/Support.html`, the page the *Support URL* names,
+    for `waterbuddy/support/` on the same site. **Still open, and the owner's:** the repository and its
+    push of both pages, and opening both addresses. Open until the policy answers.)*
 160. **One new warning line, from Apple's `StoreKitTest` header** (1.4.1's Task 4, found in Task 6's
     gate). `StoreKitTest.framework/Headers/SKTestTransaction.h:34:32: 'SKPaymentTransactionState' is
     deprecated: first deprecated in iOS 18.0`, emitted when the explicit module for the SDK's

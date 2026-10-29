@@ -14,8 +14,8 @@
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
 > | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets) |
-> | `Tools/` | standalone scripts, in **no** build target — the icon generator, and the screenshot harness |
-> | `Screenshots/` | the App Store assets (`en-US/`) and the coverage run (`census/`), in no target |
+> | `Tools/` | standalone scripts and pages, in **no** build target — the icon generator, the screenshot harness, and the two pages for the owner's user site: the privacy policy and the support page (`Support.html`, the *Support URL*) |
+> | `Screenshots/` | the App Store assets (`en-US/`), in no target; the coverage run writes `census/` beside them when it is run — deleted 2026-10-29, untracked |
 > | `AppStore/` | the upload folder, one per version (`1.4/`): `README.md`'s *App Store Connect* text one file per field, and `Screenshots/en-US/` copied and renamed into upload order — a copy, in no target; `README.md` stays the master |
 >
 > **Every shipping bundle also carries its own `PrivacyInfo.xcprivacy`** — four of them, byte-identical,

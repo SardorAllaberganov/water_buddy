@@ -5189,3 +5189,35 @@ reads 20 % for 44 % (#162), which a screenshot would have carried to App Review.
 **The rule:** an instruction the owner will follow by hand is traced through every gate it passes —
 `#if DEBUG`, a launch argument, an availability check, a region — before it is written, and names what to
 look for in the result. Where a step cannot be traced, the instruction says so instead of reading as done.
+
+## 2026-10-29 — A design is reviewed whole, in the spec, not approved section by section
+
+**What happened.** Apple Health's brainstorm (1.3.3) asked four deciding questions one at a time, then
+began presenting the design in five sections, each with its own approval question. At the first one the
+owner answered: "all sections are right and do not ask me all one by one".
+
+**The rule:** ask only what changes the design, batched where the questions are independent; then write
+the whole design into the spec, choices not yet made marked as numbered decisions with a recommendation.
+The owner's one review of the written spec is the approval.
+
+## 2026-10-29 — A choice offered to the owner is checked against their earlier rulings first
+
+**What happened.** Asked which email the privacy policy and the support page should show, the session
+offered *My account email* and *A separate address*, and the owner chose the first. The doc sync then found
+the privacy policy's spec of 2026-10-24 recording the owner's ruling: "an address other than the account's".
+The session had not read it before offering the choice; the new answer was recorded as superseding it, and
+the owner told so.
+
+**The rule:** before offering the owner a choice, grep the spec and `docs/AI_CONTEXT.md` for a ruling on the
+same question, and name it in the question — "on 2026-10-24 you ruled X; still so?" — so the answer is made
+knowing it, never by accident.
+
+## 2026-10-29 — Headless Chrome will not draw a page narrower than about 500 px
+
+**What happened.** The support page, rendered by headless Chrome at `--window-size=390,…` to check its phone
+layout, came back with every paragraph cut at the right edge. The reviewed privacy page, with the same CSS,
+cut identically at 390, and the support page laid out whole at 500: the window had stayed wider than the
+screenshot, not the page overflowing.
+
+**The rule:** a headless Chrome screenshot below 500 px wide proves nothing about a page's phone layout —
+check at 500 and against a page already known good, and leave the phone's own rendering to a phone.

@@ -13619,3 +13619,187 @@ their blocks were written. **No `git commit` was run.** HEAD `47bec44`, 211 comm
 `README.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md`). **3 unstaged**: `.claude/settings.json` and the two
 watch schemes. **1 untracked**: `Screenshots/census/`. None in both; `git diff --cached --check` clean; one
 stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-10-29] — The repository cleaned of four things no longer needed, and the status against the roadmap
+
+Taken by `/start_task` with no task named, on the owner's *"clean up the unnecessary files and folders and give
+me the app status according to our plan"*. Each candidate was read before it was listed, and the owner chose
+all four. No code changed.
+
+### What changed
+
+- **`build/`, deleted** — 1.3 GB, ignored: the two capture scripts' DerivedData (`build/screenshots`,
+  `build/screenshots-pair`). `CaptureScreenshots.sh` and `CapturePairScreenshots.sh` make it again on their
+  next run, from a clean build.
+- **`.superpowers/`, deleted** — 445 MB, ignored: the scratch of seventeen subagent-driven runs, every one of
+  them committed. The specs and plans they worked from stay in `docs/superpowers/`.
+- **`Screenshots/census/`, deleted** — the nine watch captures of 2026-09-02, of the watch before its
+  redesign: never tracked, so in no commit. Known issue #88 kept them "until a new watch capture exists";
+  `en-US/AppleWatch/01-wrist.png` has been one since 2026-10-26. `Tools/CaptureFullCensus.sh` writes the
+  folder again if the census is ever run.
+- **`Tools/ComposeStoreScreenshot.swift`, removed with `git rm`** — it composited the iPad 13″ set, which went
+  with iPad on 2026-09-02; nothing in the tree calls it, and `docs/AI_CONTEXT.md` already said it "has no
+  output left".
+- **Thirteen `.DS_Store` files, deleted** — Finder's, ignored.
+- **Kept, and why:** `WaterBuddyWidget-Info.plist` and `WaterBuddyWatchWidget-Info.plist` (the widgets'
+  `INFOPLIST_FILE`); `AppStore/1.4/` (the owner's ruled copy); `Tools/CaptureFullCensus.sh` (it drives
+  `testCaptureFullScreenCensus`); `stash@{0}`, the two watch schemes Xcode rewrote and `.claude/settings.json`,
+  none of them this task's.
+
+### The status reported
+
+Read from `docs/ROADMAP.md`, every cited commit checked with `git cat-file -e`: 21 of 35 items built, 15 of
+29 since 1.1 — 1.2 seven of eight (the device sweep, 1.2.7, left), 1.3 three of four (Apple Health, 1.3.3,
+not begun), 1.4 five of twelve (set A whole), 1.5 and 2.0 none.
+
+### Not yet written
+
+`docs/AI_CONTEXT.md`'s *Outside every target* row for `ComposeStoreScreenshot.swift` and its mentions of
+`Screenshots/census/`, and `CLAUDE.md`'s *Screenshots* row, which names `census/` — for `/doc_sync`, which
+alone writes those.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 00:32 on 2026-10-29, after this task's `git rm` of
+`Tools/ComposeStoreScreenshot.swift` and `git add` of this file, and again once this block was written.
+**No `git commit` was run.** HEAD `e4c70e4`, 213 commits. **2 staged** — 1 deleted
+(`Tools/ComposeStoreScreenshot.swift`) and 1 modified (this file). **3 unstaged**: `.claude/settings.json`
+and the two watch schemes. **No untracked file.** None in both; `git diff --cached --check` clean; one stash,
+`stash@{0}`.
+
+## [2026-10-29] — The upload's three text fields filled: the policy's contact, a support page, the listing's lines
+
+On the owner's *"let's continue finish this"*, and the choice *Upload, then Health*: what the repository can
+do toward the 1.4 upload, before Apple Health (1.3.3) starts on a branch of its own. No code changed.
+
+### Rulings
+
+- **The contact address is the owner's account email**, `sardorallaberganov96@gmail.com`, chosen knowing it
+  goes on a public page.
+- **One `sed -i` was refused by the project's deny list** (`Bash(sed -i:*)`). Reported and stopped; the owner
+  then said "ok edit", and the same changes were made with the Edit tool.
+
+### What changed
+
+- **`PRIVACY.md` and `Tools/PrivacyPolicy.html`**: `CONTACT-EMAIL`, four times in each, is the address as a
+  `mailto:` link; each file's note that the token was left for the owner now says whose address it is and
+  when it was chosen. The HTML gains `.band a { color: inherit; }`, so the address in the band stays white on
+  the aurora rather than taking the link colour. The policy's dates are unchanged: it has not yet been
+  published.
+- **`Tools/Support.html`, new** — the page App Store Connect's *Support URL* names, for
+  `https://sardorallaberganov.github.io/waterbuddy/support/`, beside the policy and in its shape and colours:
+  no script, no font, nothing fetched. Every answer read from the code: the Siri phrases from
+  `WaterBuddyShortcuts`, the reminder hours from `ReminderPlan.hours` and Settings' own line, the labels from
+  the English catalogue, the widget names from their configurations, Family Sharing from
+  `WaterBuddy.storekit` and `in-app-purchases.md`. Left out, because nothing here proves it: whether history
+  moves to a new iPhone in a backup.
+- **`AppStore/1.4/README.md` and `README.md`**, changed together: the policy's step says its contact is in
+  and where to publish it; *A Support URL* becomes the support page's publishing step and address; the
+  copyright is `2026 Sardor Allaberganov`; the App Review contact is the name and address, the phone still
+  the owner's.
+
+### Verification
+
+Both pages parsed by Python's `html.parser` with no unclosed or mismatched tag; no `CONTACT-EMAIL` left
+outside the records. Rendered by headless Chrome: at 390 px both pages clip on the right identically — the
+reviewed policy too — and at 500 px the support page lays out whole, so the clip is headless Chrome's
+minimum window width, not the page. A phone's own rendering is not checked until the pages are published.
+
+### Not yet written
+
+`docs/AI_CONTEXT.md` (#159's note, a *Files* row for `Tools/Support.html`) and `CLAUDE.md`'s privacy
+paragraph — for `/doc_sync`.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 00:52 on 2026-10-29, after this task's `git add` of six paths by name,
+and again once this block was written. **No `git commit` was run.** HEAD `e4c70e4`.
+**7 staged** — 1 added (`Tools/Support.html`), 1 deleted (`Tools/ComposeStoreScreenshot.swift`, the
+cleanup's) and 5 modified (`AppStore/1.4/README.md`, this file, `PRIVACY.md`, `README.md`,
+`Tools/PrivacyPolicy.html`). **3 unstaged**: `.claude/settings.json` and the two watch schemes. **No
+untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes
+the staging block above.
+
+## [2026-10-29] — Apple Health (1.3.3): designed, and the spec written for the owner's review
+
+Brainstormed on the owner's *Upload, then Health*, classified architectural — a new subsystem, a second
+entitlement, the project's first usage-description key, and amendments to rules `70-privacy` and
+`15-project` before any code. No code changed, and no rule file was touched.
+
+### Rulings
+
+The owner's, in order: **write only**; **the whole history** when it is turned on; **Settings only**; turning
+it off **leaves what is in Health**; approach **A, reconcile** — a pure `HealthPlan` and an app-only
+`HealthMirror`, the one file to import HealthKit, through one `ReconcileQueue`, reminders' shape; then "all
+sections are right and do not ask me all one by one" — recorded in `tasks/lessons.md`.
+
+### What changed
+
+- **`docs/superpowers/specs/2026-10-29-apple-health-design.md`, new.** What the user sees; seven decisions,
+  D6 — a sample deleted in the Health app comes back while its serving stands — recommended and open for
+  the owner; the pieces (`HealthPlan`, `HealthMirror`, and in `DataManager.swift` `Key.healthEnabled`,
+  `healthEnabled`, `logs(since:)` returning `nil` on a failed read, and a notification after a successful
+  save); when a pass runs; failures — never a deletion from an empty read; signing, the policy, the listing;
+  the amendments to nine rule files; the tests; and Task 0's five measurements on the simulator, without
+  which nothing is built.
+- **`tasks/lessons.md`**: one entry — a design is reviewed whole, in the spec.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 01:11 on 2026-10-29, after this task's `git add` of the spec,
+`tasks/lessons.md` and this file, and again once this block was written. **No `git commit` was run.** HEAD
+`e4c70e4`. **9 staged** — 2 added (`Tools/Support.html`, the spec), 1 deleted
+(`Tools/ComposeStoreScreenshot.swift`) and 6 modified (`AppStore/1.4/README.md`, this file, `PRIVACY.md`,
+`README.md`, `Tools/PrivacyPolicy.html`, `tasks/lessons.md`). **3 unstaged**: `.claude/settings.json` and
+the two watch schemes. **No untracked file.** None in both; `git diff --cached --check` clean; one stash,
+`stash@{0}`. This supersedes the staging block above.
+
+## [2026-10-29] — The ninety-eighth `/doc_sync`: the day's cleanup, pages and spec recorded; no drift in the code
+
+Run on the owner's "1" — the first of the next steps offered: `/doc_sync`, then `/commit`. No code changed.
+
+### Checked, and already accurate
+
+One read-only script (in the session's scratchpad, not the tree), every figure printed: 117 `.swift` files in
+the seven target folders by `find` and by `git`; 954 phone `@Test`, 71 watch, 63 UI `func test`; 13 static
+keys on `DataManager.Key`; the three exception sets as `CLAUDE.md` names them, six files each; four schemes;
+`MARKETING_VERSION = 1.4` and `CURRENT_PROJECT_VERSION = 4` on fourteen sites each; 18 rules cited, 18 files;
+`StoreKit` in `HomeView.swift` and `PremiumStore.swift`, `FoundationModels` in `InsightWriter.swift`, no
+`HealthKit`, no `SwiftData` under `WaterBuddyWidget/`; no forbidden doc; `AppStore/1.4/` 17 files.
+`docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`: none names a surface that moved — *Last updated* kept.
+
+### Drift, from the day's own changes — written
+
+- `docs/AI_CONTEXT.md`: *Last updated*; a *Current state* block; *Outside every target* — the rows of
+  `Tools/ComposeStoreScreenshot.swift` and `Screenshots/census/` removed, and recorded gone in the paragraph
+  that records `Screenshots/`' earlier deletions; `Tools/PrivacyPolicy.html`'s row a note; a row for
+  `Tools/Support.html`; the iPad set's paragraph a note that the tool it points at is in history; #159 a note;
+  the Git block.
+- **Found by the sync, and reported to the owner:** the privacy policy's spec of 2026-10-24 records the
+  owner's ruling "an address other than the account's"; the day's choice of the account email was offered
+  without that ruling read. Recorded as superseding it; `tasks/lessons.md`.
+- `CLAUDE.md`: the *Tools* row names the two pages; the *Screenshots* row says `census/` is gone and made
+  again only by a census run.
+- `docs/ROADMAP.md`: 1.3.3's note — designed, the spec for review, D6 open.
+- `tasks/lessons.md`: two entries — a choice offered to the owner is checked against their earlier rulings;
+  headless Chrome will not draw narrower than about 500 px.
+
+### Gate
+
+Not run: no code, test or project file changed.
+
+**Staging.** Read from the commands at 15:55 on 2026-10-29, after this pass's `git add` of
+`docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `CLAUDE.md`, `tasks/lessons.md` and this file by name, and again of
+`docs/AI_CONTEXT.md` and this file once their blocks were written. **No `git commit` was run.** HEAD
+`e4c70e4`, 213 commits, level with `origin/main`. **12 staged** — 2 added (`Tools/Support.html`, the Apple
+Health spec), 1 deleted (`Tools/ComposeStoreScreenshot.swift`) and 9 modified (`AppStore/1.4/README.md`,
+`CLAUDE.md`, this file, `PRIVACY.md`, `README.md`, `Tools/PrivacyPolicy.html`, `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `tasks/lessons.md`). **3 unstaged**: `.claude/settings.json` and the two watch schemes.
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This
+supersedes the staging block above.
