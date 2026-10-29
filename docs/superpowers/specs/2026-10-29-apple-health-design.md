@@ -5,8 +5,9 @@ work, *Upload, then Health* — what the repository can do toward the 1.4 upload
 branch of its own; **write only** ("Write only (Recommended)"); **all of the user's history** when it is
 turned on; **Settings only**; on turning it off, **leave what is in Health and stop writing**; approach
 **A, reconcile**; then, at the first section of the design, "all sections are right and do not ask me all
-one by one". This written spec awaits the owner's review; the plan follows it, and no code is written until
-the rule wording in §3.12 is approved as typed (roadmap §8).
+one by one". **The written spec is approved** (2026-10-29, "Approved, write the plan"), with D6 ruled the
+same day ("It comes back"). The plan follows it, and no code is written until the rule wording in §3.12 is
+approved as typed (roadmap §8).
 
 **Authority.** Subordinate to the DocC on the type being changed, then `.claude/rules/`, then `CLAUDE.md`.
 Where this spec and a rule disagree, the rule stands until the owner approves §3.12's amendment.
@@ -90,9 +91,9 @@ merge, and the version it ships in, are the owner's.
   wrote, and an app-only writer makes Health match, through one queue — reminders' shape.
 - **D6 — A sample the user deletes in the Health app comes back while its serving stands**, on the next
   pass that covers its day: Health is a copy of the log, and the way to remove water is to delete the
-  serving in WaterBuddy. *Recommended.* The alternative — remembering every sample written, so one deleted in
-  Health stays deleted — needs a stored record of the user's servings in a second place, and a turn-off and
-  turn-on would still have to choose. **The owner's to confirm at review.**
+  serving in WaterBuddy. The alternative — remembering every sample written, so one deleted in Health stays
+  deleted — needs a stored record of the user's servings in a second place, and a turn-off and turn-on would
+  still have to choose. **The owner's, 2026-10-29: "It comes back".**
 - **D7 — The widget's and the control's pours reach Health at the next pass in the app's process** — the
   app coming forward, or any later change made there — never from the extension (approach A over C). No
   door waits for Health before it answers: a Siri phrase or a reminder's button that returns before the
@@ -343,8 +344,36 @@ written into this section before Task 1:
 
 If **a** or **c** fails, the plan stops and this spec is revised: they are what approach A rests on.
 
-## 5. Open, for the owner at review
+## 5. Open, for the owner
 
-- **D6** — a sample deleted in the Health app comes back while its serving stands (recommended), or stays
-  deleted at the cost of a second stored record.
+- ~~**D6**~~ — ruled 2026-10-29: a sample deleted in the Health app comes back while its serving stands.
 - The version the branch ships in, and when it is merged — after the 1.4 upload.
+
+## 6. Refinements made while planning (2026-10-29)
+
+Found by reading the code the plan quotes, after the owner's approval; each supersedes the sentence it
+names, and the plan (`docs/superpowers/plans/2026-10-29-apple-health.md`) follows this section.
+
+- **The card is the reminders card's twin** (supersedes §3.1's and §3.7's heading plus switch): its switch's
+  label, *Apple Health*, is its title, drawn and spoken, and the line under it is the switch's hint —
+  `SettingsView`'s *Smart reminders* row exactly. §3.8's keys become: *Apple Health*; *Saves each serving to
+  Apple Health as water. WaterBuddy reads nothing from Health.*; and the refusal, *Health access is off for
+  WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.* — the path Task 0 (d)
+  confirms on iOS 27.0, and the string changes with it if it does not hold. §3.13's UI test counts one
+  switch labelled *Apple Health*.
+- **`Source.requestWrite` returns nothing** (supersedes §3.3's `-> Bool`): HealthKit's request succeeds
+  whether or not Water was allowed, so the mirror reads `status()` after it. `delete` takes a `Set<UUID>`,
+  and `HealthPlan.changes` takes the interval itself — `changes(servings:samples:within:)` — so the writer's
+  query may be loose at the edges and both sides are still cut to the same half-open interval.
+- **`logs(since:)` is newest first**, as every read in `DataManager` is (supersedes §3.3's "oldest first");
+  the plan does not depend on the order.
+- **Instants are compared to the millisecond**, so a date HealthKit hands back a hair different is not
+  written again on every pass; Task 0 gains **f.** — whether an instant and an amount come back exactly.
+  §4a's **e.**, whether `HKHealthStore` is `Sendable`, is answered by Task 5's build instead: a warning
+  there moves the store into each closure.
+- **Two more rule files** (supersedes §3.12's nine): `00-workspace` and `60-design-system` say a `Double`
+  of millilitres may exist only as a drawing fraction; `HealthKit` takes one, so both add *or at HealthKit's
+  boundary, in `HealthMirror.Source.live()`, from an `Int` and rounded back to one*.
+- **The order of work**: Task 0 before the rule wording — the plan was first asked for the other way
+  round — since the wording names what Task 0 measures, the one usage key (b) and the refusal's path (d),
+  and Task 0 builds nothing that stays. Still no product code before the wording is approved.
