@@ -344,6 +344,53 @@ written into this section before Task 1:
 
 If **a** or **c** fails, the plan stops and this spec is revised: they are what approach A rests on.
 
+### Measured, 2026-10-29
+
+On a throwaway simulator, *WaterBuddy Health Probe 27* (iPhone 17, iOS 27.0 `24A434`), created for this and
+deleted after. The probe was built from HEAD `8e2f0b5` in a detached scratch worktree, with
+`com.apple.developer.healthkit` and `NSHealthUpdateUsageDescription` and nothing else added. Health's sheet,
+the Health app and Settings were driven by a scratch XCUITest on the owner's "do yourself" (DeviceHub showed
+no window to System Events), and every screen was screenshotted and read. Nothing was kept, and no real App
+Group was touched. **(a) and (c) hold, so the plan goes on.**
+
+- **a. Holds.** Before the probe ran, 100 mL of Water was added in the Health app. With write permission
+  alone, a query over every source returned **0** before WaterBuddy wrote and **0** after it deleted its own
+  sample, so another source's samples are invisible to it.
+- **b. Holds.** `requestAuthorization(toShare: [Water], read: [])` with `NSHealthUpdateUsageDescription`
+  alone threw nothing, and the status went from 0 to **2** (`sharingAuthorized`). The sheet on iOS 27.0:
+  - It is titled *Health Access*: "Allow "WaterBuddy" to access your Health data? Choose which Health data
+    you'd like this app to be able to add to."
+  - It offers *Select All 1 Topic*, then *Write Access* with "App Explanation:" and the usage string.
+  - Under *Nutrition* there is one *Water* switch, **off until the user turns it on**. *Allow* stays
+    disabled until a switch is on, and *Don't Allow* is beside it.
+  - There is no read section. Its accessibility tree names `UIA.Health.Write.Water.SwitchCell.Switch` and no
+    read identifier.
+  - There is no *Turn On All*. No `NSHealthShareUsageDescription` is needed.
+- **c. Holds for approach A, with one difference from the plan's guess.** One sync identifier, saved in turn:
+  - v1 250 gave one sample, 250 v1.
+  - v2 300 **replaced** it: 300 v2.
+  - **An equal version replaces too:** v2 400 gave 400 v2. The plan expected it to leave 300.
+  - **A lower version is ignored without an error:** v1 500 left 400 v2, and the save did not throw.
+  - Deleting by object removed 1.
+
+  `HealthPlan` always saves one version above the sample it read, so a pass is unaffected. But a `true` from
+  `Source.save` proves HealthKit accepted the call, not that the sample changed; the next pass's read is
+  what checks it.
+- **d. Holds.** Settings › Privacy & Security › Health › WaterBuddy exists. It shows *Turn Off All*, then
+  *Allow "WaterBuddy" to Write* with the explanation, then *Nutrition › Water* (the switch), then *Data from
+  "WaterBuddy"*. That last page lists *Nutrition › Water* and **Delete All Data from "WaterBuddy"** once
+  WaterBuddy has a sample, and *No data found* when it has none. §6's refusal string stands as written.
+  **The Health app's own path is not the one to name:** profile › Privacy › Apps read *None* on this
+  simulator, ten seconds after Settings listed WaterBuddy from the same install. So the policy's deletion
+  sentence (Task 8) names the Settings path.
+- **e.** Answered by Task 5's build, as §6 says.
+- **f. Holds.** An instant of `815000000.123456` came back with **0.0 s** drift, and 250 mL came back as
+  250.0. The millisecond comparison stays as a guard; the measured drift is zero.
+- **Also seen.** Each `xcodebuild test` reinstalled the app into a new data container, and the grant
+  survived it: Settings still listed WaterBuddy with Water on, and a later save succeeded. After the first
+  grant, the Health app showed its *Welcome to Health* onboarding the next time it opened.
+- **On a device only, still open for the sweep:** whether a read fails on a locked iPhone (§3.5).
+
 ## 5. Open, for the owner
 
 - ~~**D6**~~ — ruled 2026-10-29: a sample deleted in the Health app comes back while its serving stands.
@@ -377,3 +424,32 @@ names, and the plan (`docs/superpowers/plans/2026-10-29-apple-health.md`) follow
 - **The order of work**: Task 0 before the rule wording — the plan was first asked for the other way
   round — since the wording names what Task 0 measures, the one usage key (b) and the refusal's path (d),
   and Task 0 builds nothing that stays. Still no product code before the wording is approved.
+
+## 7. Refinements from the final review (2026-10-29)
+
+Found by the whole-branch review after Task 8. The owner asked for the run to continue on the recommended
+option rather than stop for a question; each line below is a ruling for the owner's review at `/commit`, and
+supersedes the sentence it names.
+
+- **Only what this log held is deleted** (supersedes §3.3's "a sample whose serving is not among the
+  servings is deleted"). HealthKit reads back every sample of WaterBuddy's own source, an earlier install's
+  and another iPhone's among them, so turning the switch on over a new log would have deleted the user's
+  earlier entries — against D4 and the policy's "deleting WaterBuddy leaves it in Health". A sample without its
+  serving is now deleted only when the mirror saw that serving in the log during this run:
+  `HealthMirror.seen`, a set of ids in memory, never stored, handed to `HealthPlan.changes(…, deletable:)`.
+  Every serving deleted in the app was read by a pass before it went — the pass the app's coming forward
+  runs, the one the switch runs — so it still leaves Health; an earlier install's, another iPhone's and an
+  emptied store's never were. A second sample of a serving the log holds still goes. Costs: a serving deleted
+  in an earlier run while the switch was off, or deleted before the run's first pass had read it, keeps its
+  entry in Health. *A first ruling, a floor at the later of History's week and the oldest serving, was
+  superseded the same evening: deleting a new log's own first serving would never have reached Health.*
+- **The switch goes off when Health forgets the answer** (widens §3.1's "if the user withdraws the
+  permission"): `reconcile()` turns it off whenever the status is not `.allowed` — *Reset Location &
+  Privacy*, a restored phone — since nothing could be written.
+- **Nothing is saved after the off** (completes Review Focus 3): a pass reads the switch again after its
+  deletions, before its saves.
+- **The policy** names the new stored setting in its complete list, says Health syncs through iCloud only
+  under the user's iCloud settings, names the version and the user-entered mark a sample carries, says
+  earlier entries are left as they are, and says an entry deleted in Health comes back while its serving
+  stands (D6). Rule `70-privacy` gains the eighth limit, *Never delete what this log did not orphan*, and
+  names the version and the mark; rule `20-state`'s `logs(since:)` line follows the floor.
