@@ -7,6 +7,14 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-30 (hundredth pass — `/doc_sync` run by the owner on Apple Health's staged tree, on
+`feature/apple-health`). **No token moved.** Settings gains a fifth card, *Apple Health*, under *Smart
+reminders*: the reminders card's twin — `.settingsCard()`'s pane (`.frosted` + `.raised`), its title in
+`cardTitle()`, its line in `cardNote()`, the switch tinted `Aurora.cyan`. A dated note on the list of
+elevations. **Its contrast is not measured**: it sits lower on the aurora than the reminders card, so the
+reminders rows' figures in *Settings, measured* are not its figures — open as a known issue in
+`docs/AI_CONTEXT.md`, for the owner's measurement on a rendered screen.
+
 **Last updated:** 2026-10-25 (ninety-first pass — `/doc_sync` run by the owner on finishing set A's staged
 tree; no code changed since its gate). *`LiquidGlass.Base.archived` is derived, not guessed* gains a dated
 pointer to the second derived flat fill, `RecapCard.tileFill`, so the section that explains derived bases
@@ -377,7 +385,8 @@ In use: app vessel `.floating`, app tab bar `.frosted`/`.floating`, Home's two g
 *Undo* capsule `.raised`, Home's streak chip `.resting` (a label, and sitting lower is what keeps it
 from reading as something to press), widget card `.raised`, widget vessel and
 buttons `.resting`. The Glass disc is not glass: it is the screen's primary surface. **The rest,
-which this list left out until the forty-eighth pass:** `.raised` — Settings' four cards,
+which this list left out until the forty-eighth pass:** `.raised` — Settings' four cards *(five since
+2026-10-30, on `feature/apple-health`: *Apple Health* under the reminders card)*,
 History's week card, its strip (the redesign's stage 3, staged), its empty state and its `+`; `.floating` — the first-run card, the serving
 sheet's card and the watch's vessel; `.resting` — a serving row, the sheet's *Cancel*, *Open iOS
 Settings*, and the watch's two capsules, which pass no elevation and take the default.

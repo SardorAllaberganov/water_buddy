@@ -5221,3 +5221,95 @@ screenshot, not the page overflowing.
 
 **The rule:** a headless Chrome screenshot below 500 px wide proves nothing about a page's phone layout —
 check at 500 and against a page already known good, and leave the phone's own rendering to a phone.
+
+## 2026-10-29 — A simulator click handed to the owner is one an XCUITest can make
+
+**What happened.** Apple Health's Task 0 needed three things done on a simulator: add a Water entry in the
+Health app, answer HealthKit's sheet, and open Settings › Privacy & Security › Health. The plan gave all
+three to the owner, and the session asked for them. The owner answered "do yourself". DeviceHub was no way in:
+System Events listed it with pid 0 and no windows, even after System Events was restarted, so the 2026-09-02
+route through macOS accessibility did not carry over from `Simulator.app`. A scratch `XCUITest` did all three:
+- `XCUIApplication(bundleIdentifier: "com.apple.Health")` and `"com.apple.Preferences"` drove the Health and
+  Settings apps.
+- HealthKit's sheet appeared in the app's own tree, with stable identifiers such as
+  `UIA.Health.Write.Water.SwitchCell.Switch` and `UIA.Health.Allow.Button`.
+- `XCUIScreen.main.screenshot()` wrote PNGs straight into the scratchpad, read by eye.
+
+Two failures along the way:
+- The first sheet tap went to the word *Water*, not to its switch, so *Allow* stayed disabled. The
+  screenshot showed it; the test's pass did not.
+- A failed UI test held `xcodebuild` for ten minutes collecting diagnostics. `-collect-test-diagnostics
+  never` ended that on every later run.
+
+**The rule:** before asking the owner to tap through a simulator, write a scratch UI test that does it (any
+app by bundle id, system sheets through their identifiers), and leave the owner only what no test can reach:
+a device, or a judgement by eye. Screenshot every step and read the pictures, because a passing test proves
+only that its taps landed somewhere. A scratch UI run takes `-collect-test-diagnostics never`.
+
+## 2026-10-29 — HealthKit's "our own source" is the bundle's, not this install's
+
+**What happened.** Apple Health's mirror deleted every WaterBuddy sample whose serving was not in the log,
+reading "WaterBuddy's" samples through `HKQuery.predicateForObjects(from: HKSource.default())`. The plan, the
+spec and every test treated that set as *what this log wrote*. The whole-branch review saw that a source is
+keyed by bundle identifier. Measured on the walk afterwards: a reinstalled app's own-source query returned all
+4 samples, 3 of them written by the install before it. So turning Health on over a new log would have deleted
+the user's earlier entries, which the policy promises stay. The same was true of an emptied store and of
+another iPhone on the same Apple ID.
+
+**The rule:** a query scoped to "our source" includes every install and every device that shares the bundle
+id. A destructive pass decides from what *this run* knows it held (here, the serving ids the mirror has read),
+never from "ours, and not in my log".
+
+## 2026-10-29 — A fix ruled from a reviewer's finding is traced through a new user's first day
+
+**What happened.** The first fix for that Critical was a floor: delete an orphan only from the later of
+History's week and the oldest serving read. It was ledgered and fully tested within the hour. Writing the walk
+then showed that for a log younger than a week the floor *is* its oldest serving, so a new user deleting their
+first pour would never see it leave Health. That is a worse bug for the users most likely to hit it. The
+floor was superseded by the run's seen set the same evening.
+
+**The rule:** before ledgering a fix to a data-deleting path, trace it through the empty log, the one-serving
+log and the first week, not only the lived-in case the finding described.
+
+## 2026-10-29 — `simctl uninstall` on a shut-down device does nothing, and the next step reads stale state
+
+**What happened.** The walk's "delete the app, then read Health" ran `xcrun simctl uninstall` on the walk
+device right after an `xcodebuild` run had shut it down. It failed with `Unable to lookup in current state:
+Shutdown` (code 405). The next step ran anyway, and read Health with the app still installed. A zsh `rm -rf
+"$SCRATCH"/dd-*` with no match aborted a whole background chain the same way, its warnings comparison
+printing "No such file" for all four schemes before anything was built.
+
+**The rule:** boot a device by UDID, then `bootstatus -b`, before `simctl uninstall`, and prove it with
+`listapps` before the step that depends on it. In zsh, never glob a path that may not exist; use
+`find … -name 'dd-*' -exec rm -rf {} +`.
+
+## 2026-10-30 — A walk over system screens is written once per iOS version, not once
+
+**What happened.** Apple Health's walk ran on 27.0, 26.5 and 18.6, and each runtime broke a step that had
+passed on the one before:
+- **27.0:** the HealthKit sheet offers *Select All 1 Topic* and names its controls
+  (`UIA.Health.Write.Water.SwitchCell.Switch`, `UIA.Health.Allow.Button`). *Don't Allow* is answered by a
+  second alert, *"You can turn on health data categories later in the Health app"*, and the request
+  returns only once its *OK* is tapped.
+- **26.5:** the sheet offers *Turn On All*, and the Health app has no *Browse* tab; Summary's *Show All
+  Health Data* leads to Water.
+- **18.6:** a tap at a SwiftUI `Toggle`'s centre, over its title, does not flip it; the switch must be
+  tapped at the row's trailing edge.
+
+Each time, the test reported only that an element was missing, and the screenshot told the story.
+
+**The rule:** a scratch UI test that drives system UI looks for each version's control by role or
+identifier, with a fallback, and taps a `Toggle` at its switch, never at its centre. Run the walk on each
+runtime it claims to cover, and read every failure's picture before calling it the product's.
+
+## 2026-10-30 — When a count moves, every current-tense sentence carrying the old one moves with it
+
+**What happened.** The hundredth `/doc_sync` added `healthEnabled` to `docs/STATE.md`'s key table and wrote a
+dated note that the count had become twelve. Its own grep for "eleven keys" had printed `STATE.md` lines
+without being read through. The sync run straight after found four present-tense sentences still saying the
+phone had eleven: the two-stores table, the watch's "none of the phone's eleven keys", the migration
+paragraph and the roster test's coverage.
+
+**The rule:** when a count moves, grep for the old number in words and in figures, then sort every hit.
+Present-tense hits change, and each gets a dated aside. Dated or historical hits stay as written. A table and
+a note do not cover the prose around them.

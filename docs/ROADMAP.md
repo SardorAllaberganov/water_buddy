@@ -287,6 +287,15 @@ spec's Task 0 measurements.)* *(2026-10-29, later: **D6 ruled — "It comes back
 written and staged**, `docs/superpowers/plans/2026-10-29-apple-health.md`, for the owner's review. The spec's
 §6 records what planning refined: the card is the reminders card's twin, eleven rule files rather than nine,
 and Task 0's measurements come before the wording, which names what they measure. No code yet.)*
+*(2026-10-30: **built — staged on `feature/apple-health`, not committed, not merged**; `main` stays the 1.4
+upload. Task 0 measured on the iOS 27.0 simulator (spec §4a): write-only reads back only WaterBuddy's own
+samples, one usage key, a higher *and an equal* sync version replace, a lower one is ignored without an
+error. The rule wording of eleven files approved as typed. Tasks 3–8 built test first; the whole-branch
+review's Critical — turning it on over a new or emptied log deleted an earlier install's and another
+iPhone's entries — fixed by deleting only samples whose serving this run saw (spec §7, a ruling for the
+owner); 47 new `@Test`. The walk on 27.0, 26.5 and 18.6, the warnings unchanged against `main`. Open before
+it ships: the HealthKit capability on the App ID, the policy published with the release, a widget pour and
+VoiceOver by hand, and the device sweep's locked-phone and watch checks — `docs/AI_CONTEXT.md`.)*
 
 **1.3.4 — Siri: "how much today?"** A second Siri phrase that answers with today's total and
 what is left. **Needs a rule change** (§8): today every Siri reply is one fixed, digit-free line.

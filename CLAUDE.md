@@ -13,7 +13,7 @@
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
-> | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets) |
+> | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets); the app's alone also carries `com.apple.developer.healthkit` (2026-10-30, on `feature/apple-health`), so its file is no longer byte-identical to the other three |
 > | `Tools/` | standalone scripts and pages, in **no** build target — the icon generator, the screenshot harness, and the two pages for the owner's user site: the privacy policy and the support page (`Support.html`, the *Support URL*) |
 > | `Screenshots/` | the App Store assets (`en-US/`), in no target; the coverage run writes `census/` beside them when it is run — deleted 2026-10-29, untracked |
 > | `AppStore/` | the upload folder, one per version (`1.4/`): `README.md`'s *App Store Connect* text one file per field, and `Screenshots/en-US/` copied and renamed into upload order — a copy, in no target; `README.md` stays the master |
@@ -67,7 +67,7 @@ design:**
 | Store | Holds | Read by |
 |---|---|---|
 | SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared` (which recomputes today and the week from the rows in the same pass); never the widget's draw path |
-| `UserDefaults` — eleven keys | today's total, the goal, the day ordinal, three flags, the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
+| `UserDefaults` — twelve keys | today's total, the goal, the day ordinal, four flags (the fourth the Apple Health switch, since 2026-10-30 on `feature/apple-health`), the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget's draw path never opens
@@ -376,6 +376,17 @@ something to record.
   a Photos usage key, which this one never carries (measured)
   (`docs/superpowers/specs/2026-10-24-monthly-recap-design.md`; rule `70-privacy`'s *The recap's image, on
   the user's own tap*, admitted in `4c76e61`)
+- **Apple Health is a copy, written by the app** (roadmap 1.3.3, staged on `feature/apple-health`,
+  2026-10-30, not merged). Write only, Water only, asked from Settings' *Apple Health* switch alone.
+  `HealthPlan`, pure, decides from the rows and the samples WaterBuddy already wrote; `HealthMirror`,
+  app-only and the one file that imports HealthKit, carries it out through its own `ReconcileQueue` — on
+  the switch (the whole history), on every save in the app's process (`logsDidSaveNotification`) and on
+  coming forward (the last 90 days). A sample is deleted only if this run saw its serving in the log
+  (`HealthMirror.seen`, in memory), so an earlier install's and another iPhone's entries are never
+  touched; turning off deletes nothing. `DataManager` names no Health type: it gains `Key.healthEnabled`,
+  `healthEnabled`, `logs(since:)` and the notification
+  (`docs/superpowers/specs/2026-10-29-apple-health-design.md`; rule `70-privacy`'s *HealthKit, for Apple
+  Health*, typed and unstaged for the owner)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

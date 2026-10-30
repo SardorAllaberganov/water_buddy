@@ -13868,3 +13868,188 @@ once their blocks were written. **No `git commit` was run.** HEAD `595d847`, 217
 (this file, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, the Apple Health spec). **3 unstaged**:
 `.claude/settings.json` and the two watch schemes. **No untracked file.** None in both;
 `git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-10-30] — Apple Health (1.3.3): built test first on `feature/apple-health`; the review's Critical fixed
+
+The plan `docs/superpowers/plans/2026-10-29-apple-health.md` run inline (executing-plans), from `/start_task`
+with no task named, on the owner's "yes, start Task 0", "do yourself", "go", "go" and, after a question it
+rejected, "continue" — so every later choice took the recommended option and is a ruling for the owner's
+review. The branch `feature/apple-health` was made from `8e2f0b5` before §4a and the lesson were committed on
+`main` (committing is the owner's; staged changes ride the switch, so `/commit` still decides). Nothing
+committed; nothing merged.
+
+### What changed
+
+- **Task 0, measured** on a throwaway iOS 27.0 simulator in a scratch worktree, the owner's three clicks made
+  by a scratch XCUITest (DeviceHub showed no window to System Events): write-only permission reads back only
+  WaterBuddy's own samples; `NSHealthUpdateUsageDescription` alone suffices and the sheet asks to write Water
+  only; a higher and **an equal** sync version replace, a lower one is ignored without an error; Settings ›
+  Privacy & Security › Health › WaterBuddy exists, and *Data from "WaterBuddy"* offers *Delete All Data*;
+  instants and amounts round-trip exactly. Written into the spec's §4a.
+- **Task 1:** the rule wording of eleven files, typed and unstaged, approved by the owner as typed.
+- **Tasks 3–7, test first, each seen RED:** `DataManager` (`Key.healthEnabled` — 14 in `Key.all`, the phone's
+  suite 12 —, `healthEnabled`, `logs(since:)` returning `nil` on a failed read, `logsDidSaveNotification`,
+  `appliedLedgerRetentionDays` `nonisolated`); `HealthPlan`, pure; `HealthMirror`, the one `import HealthKit`;
+  the HealthKit entitlement on the app alone, `NSHealthUpdateUsageDescription` and `InfoPlist.xcstrings`;
+  `WaterBuddyApp`'s wiring and Settings' *Apple Health* card with three strings in en, ru and uz.
+- **Task 8:** the privacy policy, both forms, with Apple Health — to be published with that release, never
+  before.
+- **The final review** (Opus, a fresh context): *With fixes*. **Critical** — turning it on over a new or
+  emptied log deleted every WaterBuddy sample without a serving, an earlier install's and another iPhone's
+  among them; measured on the walk, a reinstalled app's own-source query returns them. Fixed: a sample is
+  deleted only if this run saw its serving in the log (`HealthMirror.seen`, in memory, handed to
+  `HealthPlan.changes(…, deletable:)`); the first ruling, a floor at History's week and the oldest serving,
+  was superseded the same evening when the walk's writing showed a new user's first pour would never leave
+  Health. **Important** — the policy's complete list lacked the setting; the switch read on when Health forgot
+  the answer (now off whenever not allowed); and, re-graded from Minor, a save could land after the switch
+  went off mid-pass (now re-read before the saves). Each fix seen RED then GREEN. Policy wording (iCloud, the
+  version and mark, D6, earlier entries) and rules `70-privacy` (an eighth limit) and `20-state` follow. Five
+  minors deferred (#197). Spec §7 records it all.
+- **Tests:** 47 new `@Test` — 1001 phone in 113 suites; the UI target 63 `func test`, one assertion added.
+- **Records:** `tasks/lessons.md`, five entries; known issues #192–#198 and a note on #191.
+
+### Rulings (the ledger's, in order; each with its cost)
+
+The four corrections to Task 0's commands (this session's scratchpad, no `shutdown all`, a throwaway device,
+no `--console-pty`); the clicks by XCUITest; §4a(c)'s equal-version result and that a `true` save proves
+acceptance only; Task 8 names the Settings path; the walk turns the sheet's switch on before *Allow*; Task 1's
+two Task-0 wording changes and 70-privacy's opening left as it was; the branch before the commit;
+`logsDidSaveNotification` above `saveAndRecompute()`'s DocC; `sameInstant`'s comment; a convenience `init`
+for the calendar's default; one `HKHealthStore` kept (no Sendable warning on Xcode 27.0); the entitlement read
+from `__TEXT,__entitlements` on the simulator; two policy passages amended beyond the plan; the Critical's
+fix, first a floor, then the seen set; the review's minors 4, 9(a–c) re-graded and fixed; the `.recent` read
+kept at 90 days on the 21-read median 5.3 ms against a 6 ms budget. All in
+`.superpowers/sdd/2026-10-29-apple-health/progress.md`.
+
+### The walk
+
+By scratch XCUITest on throwaway devices, the real launch: on iOS 27.0 — the sheet (write Water, no read
+identifier), allowed; Health's Water shows each serving with WaterBuddy as source; a pour in, an *Undo*'d pour
+never, an edit to 950 replacing its sample, a delete removing one; off, a pour adds nothing; on again, caught up
+with nothing doubled; withdrawn in Settings, the switch off and the refusal line on return; uninstalled, Health
+keeps its entries; reinstalled, the sheet asks again and turning on keeps the earlier install's three beside
+the new pour; a refusal on a fresh install (iOS 27 adds an *OK* alert after *Don't Allow*) shows the refusal
+line. On 26.5 (*Turn On All*, no *Browse* tab) and 18.6 (a Toggle flips only at its switch): allowed, Health
+shows every serving. Measured in-process: a v2 sample deleted and saved again at v1 comes back (the review's
+Minor 7 is not an issue); the `.recent` read on a year of servings, 720 rows, median 5.3 ms over 21 reads.
+
+### Gate
+
+On the final staged code, one simulator at a time by UDID (no `shutdown all`: AvtoLog's and WareStack's runs
+and another booted device beside it), load averages 9–250:
+- Phone unit, iOS 27.0: **1001 tests in 113 suites passed** (23:49), and again over the re-staged
+  `InfoPlist.xcstrings` (01:34).
+- Phone UI, iOS 27.0, harness skipped: **75 executed, 1 skipped, 0 failures** (23:50–00:13).
+- Watch unit, watchOS 27.0: **71 in 7 suites passed**. Both widget schemes: **BUILD SUCCEEDED**.
+- Phone UI, iOS 26.5: **2 failures**, then **4** in a second whole run — six different taps; all six passed
+  alone, alternated with `main`, four rounds; `main`'s own whole run failed 2 the same way. Known issue #191,
+  not this change.
+- Warnings, clean `build` of a `main` export and of the index into empty DerivedData: **unchanged** on all
+  four schemes by file and message — 17, 17, 2, 17.
+
+**Staging.** Written in the next checkpoint's block, after this session's last `git add`.
+
+## [2026-10-30] — The hundredth `/doc_sync`: Apple Health recorded on its branch
+
+Run by the owner on the staged tree above. Read-only checks, every figure printed: 121 `.swift` files by `git`
+and by `find`, the four new ones each given a *Files on disk* row; 1001 phone `@Test`, 71 watch, 63 UI `func
+test`; 14 keys in `Key.all`, the phone's suite 12; three exception sets unchanged; every rule citation
+resolves; no forbidden doc.
+
+### Drift, from the change — written
+
+- `docs/AI_CONTEXT.md`: *Last updated*; *Current state*'s block; *Targets*' three test rows; *Files on disk*
+  — four new rows and seven recounted, the policy's row, the entitlements paragraph, the catalogues (nine;
+  `InfoPlist.xcstrings` new, `Localizable.xcstrings` 234 keys); #191's note; #192–#198; the Git block.
+- `docs/STATE.md`: *Last updated*; the `healthEnabled` row; a dated count note (fourteen); *The twelfth key,
+  and Apple Health's copy*; *Tests that pin this* (three suites, 44 `@Test`).
+- `docs/DESIGN.md`: *Last updated*; Settings' fifth card, its contrast unmeasured.
+- `docs/ROADMAP.md`: 1.3.3, built.
+- `CLAUDE.md`: twelve keys and four flags; the entitlements row; an *Apple Health* architecture bullet.
+- `tasks/lessons.md`: five entries this session.
+
+### Checked and already accurate
+
+`docs/WIDGET.md` — no widget reads Health; its contract did not move. `.claude/` is not derived: the rule
+wording stays unstaged for the owner.
+
+### Gate
+
+Not run again by this pass; the run above is this session's, on the same code.
+
+**Staging.** Read from the commands at 01:37 on 2026-10-30, after this pass's `git add` of `CLAUDE.md`,
+`HISTORY.md`, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/DESIGN.md`, `docs/ROADMAP.md` and
+`tasks/lessons.md` by name, and again of this file and `docs/AI_CONTEXT.md` once their blocks were written.
+**No `git commit` was run.** On `feature/apple-health` (no upstream), HEAD `8e2f0b5`, 219 commits, `main` and
+`origin/main` level with it. **25 staged** — 5 added (`HealthMirror.swift`, `HealthPlan.swift`,
+`InfoPlist.xcstrings`, `HealthMirrorTests.swift`, `HealthPlanTests.swift`) and 20 modified (the code, the
+entitlement, the project file, the tests, the policy's two forms, the spec and the seven records above).
+**17 unstaged**: the eleven rule files' wording, for the owner's `/commit`; `.claude/settings.json`; the two
+watch schemes; three string catalogues Xcode re-saved as formatting only. **No untracked file.** None in both;
+`git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-10-30] — The hundred-and-first `/doc_sync`: four "eleven keys" left in STATE.md; no code changed
+
+Run by the owner straight after the hundredth pass, on the same staged tree. Read-only checks, every figure
+printed: no `.swift` file without a row; the 120 fixed-width *Files on disk* rows each equal to `wc -l` (the
+121st, `WaterBuddyWatchWidgetBundle.swift`, ends at its count); 1001 phone `@Test`, 71 watch, 63 UI `func
+test`; three exception sets; every rule citation resolves; no forbidden doc.
+
+### Drift — written
+
+- `docs/STATE.md`: four present-tense sentences still said the phone had eleven keys — the two-stores table,
+  the watch's suite, the migration paragraph (now naming `healthEnabled` among the keys born in the App Group)
+  and the roster test's coverage — each twelve, with a dated aside; *Last updated*.
+- `docs/AI_CONTEXT.md`: *Last updated*; the Git block.
+- `tasks/lessons.md`: one entry — when a count moves, every current-tense sentence carrying it moves too.
+
+### Checked and already accurate
+
+`CLAUDE.md`, `docs/DESIGN.md`, `docs/WIDGET.md`, `docs/ROADMAP.md` and `docs/AI_CONTEXT.md`'s standing
+sections, read for the old counts and for the retired claims a HealthKit entitlement and usage key made false
+— nothing stale.
+
+### Gate
+
+Not run again: no code, test or project file changed since this session's gate, recorded above.
+
+**Staging.** Read from the commands at 01:55 on 2026-10-30, after this pass's `git add` of `docs/STATE.md`,
+`docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file by name, and again of this file and
+`docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On `feature/apple-health`
+(no upstream), HEAD `8e2f0b5`, 219 commits. **25 staged** — 5 added, 20 modified, the same paths as the
+block above. **17 unstaged** — the same: the eleven rule files' wording, `.claude/settings.json`, the two
+watch schemes and Xcode's three catalogues. **No untracked file.** None in both; `git diff --cached --check`
+clean; one stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-10-30] — `/commit` stopped on its gate; the hundred-and-second `/doc_sync` records it
+
+**The `/commit`.** The owner approved five commits on `feature/apple-health` — the spec; the rule wording;
+the feature with its tests; the policy; the doc sync — then a push of the new branch. Its gates: phone unit
+and both widget builds skipped, each green this session after its files last changed (01:34, 00:15); the UI
+gate run again on iOS 27.0, since `InfoPlist.xcstrings` changed at 00:26 after the last green UI run. It ran
+75 with 1 skipped and **1 failure**, `testAVesselSetInTheWelcomeIsTheOneHomePours` (`WelcomeUITests.swift:202`,
+the Bottle slider at 600 ml after an adjust to its top, 1,000 asserted), in 2,188 s at a load near 40 rising
+past 200, AvtoLog's run beside it. Run alone at 02:36: 62 s to the first screen, the runner restarted, nothing
+run — no verdict. **Nothing committed, nothing pushed**, as `/commit` requires on a failed gate. Open for the
+owner: re-run the gate when the machine is quieter, or commit over it.
+
+### The `/doc_sync`
+
+Read-only checks, every figure printed: no `.swift` file without a row, every row equal to `wc -l`; 1001
+phone `@Test`, 71 watch, 63 UI `func test`; three exception sets; citations resolve; no forbidden doc; no
+`.swift` changed in the working tree. **Written:** `docs/AI_CONTEXT.md` — *Last updated*; a dated bullet in
+*Current state*'s Apple Health block; a dated note on *Targets*' UI row; a dated note on #191, now seen on 27.0;
+the Git block. **Already accurate:** `CLAUDE.md`, `docs/STATE.md`, `docs/DESIGN.md`, `docs/WIDGET.md`,
+`docs/ROADMAP.md` — nothing in their subjects moved. `tasks/lessons.md`: nothing new.
+
+### Gate
+
+The `/commit`'s UI gate above; nothing else run.
+
+**Staging.** Read from the commands at 03:31 on 2026-10-30, after this pass's `git add` of
+`docs/AI_CONTEXT.md` and this file by name, and again of both once their blocks were written. **No `git commit`
+was run** — the `/commit` above stopped before its first. On `feature/apple-health` (no upstream), HEAD
+`8e2f0b5`, 219 commits. **25 staged** — 5 added, 20 modified, the same paths as before. **17 unstaged** — the
+eleven rule files' wording, `.claude/settings.json`, the two watch schemes and Xcode's three catalogues.
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes
+the staging block above.
