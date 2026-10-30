@@ -31,7 +31,9 @@ private func slots(
     lastDrink: Date? = nil,
     now: Date = utc(2026, 8, 28, 12),
     calendar: Calendar = utcDay,
-    horizonDays: Int = ReminderPlan.horizonDays
+    schedule: ReminderPlan.Schedule = .standard,
+    onlyWhenBehind: Bool = false,
+    horizonDays: Int? = nil
 ) -> [ReminderPlan.Slot] {
     ReminderPlan.slots(
         enabled: enabled,
@@ -40,8 +42,15 @@ private func slots(
         lastDrink: lastDrink,
         now: now,
         calendar: calendar,
+        schedule: schedule,
+        onlyWhenBehind: onlyWhenBehind,
         horizonDays: horizonDays
     )
+}
+
+/// Today's planned hours, 2026-08-28 (a Friday) unless told otherwise.
+private func hoursToday(_ planned: [ReminderPlan.Slot], day: Int = 20_260_828) -> [Int] {
+    planned.filter { $0.dayOrdinal == day }.map(\.hour)
 }
 
 // MARK: - Tests
@@ -247,5 +256,179 @@ struct ReminderPlanTests {
             let hour = newYork.component(.hour, from: slot.fireDate)
             #expect(hour == slot.hour, "slot \(slot.identifier) drifted to \(hour):00 local")
         }
+    }
+
+    // MARK: Set B — the schedule (spec `2026-10-30-coaching-design.md`)
+
+    @Test func aChosenSchedulePlantsItsOwnHours() throws {
+        let schedule = try #require(ReminderPlan.Schedule(first: 7, last: 22, every: 3))
+        #expect(hoursToday(slots(now: utc(2026, 8, 28, 6), schedule: schedule)) == [7, 10, 13, 16, 19, 22])
+    }
+
+    /// 2026-08-28 is a Friday; Saturday is weekday 7 and Sunday 1 on the Gregorian calendar. The weekend plants
+    /// nothing, and the horizon's three days beyond today are reminder days — Monday to Wednesday.
+    @Test func aQuietWeekdayPlantsNothingAndLeavesTheOthers() throws {
+        let weekend = try #require(ReminderPlan.Schedule(first: 9, last: 21, every: 2, quietWeekdays: [7, 1]))
+        let days = Set(slots(now: utc(2026, 8, 28, 12), schedule: weekend).map(\.dayOrdinal))
+        #expect(days == [20_260_828, 20_260_831, 20_260_901, 20_260_902])
+    }
+
+    /// The final review's Important 1: quiet days use none of the horizon, so a user who set them to need the
+    /// app less still has reminders filed after them. 2026-08-27 is a Thursday; Friday to Sunday are quiet.
+    @Test func aQuietStretchDoesNotUseUpTheHorizon() throws {
+        let longWeekend = try #require(ReminderPlan.Schedule(first: 9, last: 21, every: 2, quietWeekdays: [6, 7, 1]))
+        let days = Set(slots(now: utc(2026, 8, 27, 20), schedule: longWeekend).map(\.dayOrdinal))
+        #expect(days == [20_260_827, 20_260_831, 20_260_901, 20_260_902])
+    }
+
+    /// One day of reminders a week, at the fullest schedule: still today and two more reminder days, and still
+    /// inside iOS's 64 — quiet days plant nothing, so they cost no requests.
+    @Test func aScheduleWithOneDayAWeekStillPlantsItsHorizonInsideTheCap() throws {
+        let mondays = try #require(ReminderPlan.Schedule(first: 5, last: 23, every: 1, quietWeekdays: [1, 3, 4, 5, 6, 7]))
+        let planned = slots(now: utc(2026, 8, 28, 0, 1), schedule: mondays)
+        #expect(Set(planned.map(\.dayOrdinal)) == [20_260_831, 20_260_907], "two Mondays: Friday today is quiet")
+        #expect(planned.count <= ReminderPlan.maximumPendingRequests)
+        #expect(hoursToday(slots(now: utc(2026, 8, 31, 0, 1), schedule: mondays, horizonDays: 0), day: 20_260_831).count == 19,
+                "a horizon of 0 is still today alone")
+    }
+
+    @Test func aQuietTodayPlantsNothingToday() throws {
+        let fridays = try #require(ReminderPlan.Schedule(first: 9, last: 21, every: 2, quietWeekdays: [6]))
+        #expect(hoursToday(slots(now: utc(2026, 8, 28, 8), schedule: fridays)).isEmpty)
+        #expect(hoursToday(slots(now: utc(2026, 8, 28, 8), schedule: fridays), day: 20_260_829).count == 7)
+    }
+
+    @Test func theFullestScheduleThePlanCanFileStaysInsideTheCap() throws {
+        let fullest = try #require(ReminderPlan.Schedule(first: 5, last: 23, every: 1))
+        let planned = slots(now: utc(2026, 8, 28, 0, 1), schedule: fullest)
+        #expect(planned.count == 19 * 3)
+        #expect(planned.count <= ReminderPlan.maximumPendingRequests)
+    }
+
+    /// The standard grid's other intervals keep the one-slot bound the two-hour grid has: no interval is
+    /// shorter than `quietAfterDrink`.
+    @Test func oneDrinkSilencesAtMostOneSlotOnEveryInterval() {
+        for every in ReminderPlan.Schedule.intervals {
+            // From 06:00, on each interval's own grid: 6–20 every 1 and 2, 6–18 every 3.
+            let schedule = ReminderPlan.Schedule.standard.with(first: 6).with(every: every)
+            #expect(schedule.every == every && schedule.first == 6)
+            // Each slot as its day and hour: `Slot`'s own `Hashable` is main-actor-isolated, and this suite is not.
+            let keys = { (planned: [ReminderPlan.Slot]) in Set(planned.map { [$0.dayOrdinal, $0.hour] }) }
+            for step in 0..<(24 * 4) {
+                let now = utc(2026, 8, 28, 0).addingTimeInterval(TimeInterval(step * 15 * 60))
+                let unsilenced = keys(slots(now: now, schedule: schedule))
+                let silenced = keys(slots(lastDrink: now, now: now, schedule: schedule))
+                #expect(silenced.isSubset(of: unsilenced))
+                #expect(unsilenced.subtracting(silenced).count <= 1, "every \(every) h, a drink at \(now)")
+            }
+        }
+    }
+
+    // MARK: Set B — only when behind
+
+    /// Goal 2,100 over seven slots: 300 is due by 09:00, 600 by 11:00, 900 by 13:00.
+    @Test func onlyWhenBehindDropsTheSlotsWhoseShareIsCovered() {
+        let planned = slots(water: 700, goal: 2_100, now: utc(2026, 8, 28, 8), onlyWhenBehind: true)
+        #expect(hoursToday(planned) == [13, 15, 17, 19, 21])
+    }
+
+    @Test func aShareCoveredExactlyDropsItsSlot() {
+        let planned = slots(water: 600, goal: 2_100, now: utc(2026, 8, 28, 8), onlyWhenBehind: true)
+        #expect(hoursToday(planned) == [13, 15, 17, 19, 21])
+    }
+
+    @Test func onlyWhenBehindNeverTouchesTomorrow() {
+        let planned = slots(water: 2_000, goal: 2_100, now: utc(2026, 8, 28, 8), onlyWhenBehind: true)
+        #expect(hoursToday(planned, day: 20_260_829) == ReminderPlan.hours)
+    }
+
+    @Test func withNothingDrunkOnlyWhenBehindDropsNothing() {
+        let now = utc(2026, 8, 28, 8)
+        #expect(slots(goal: 2_100, now: now, onlyWhenBehind: true) == slots(goal: 2_100, now: now))
+    }
+
+    /// `due` never falls through a day, so what it drops is always a run at the front of today's slots —
+    /// "you're ahead until 15:00" — never a hole in the middle. Swept through every amount short of the goal.
+    @Test func onlyWhenBehindDropsARunAtTheFrontOfToday() {
+        let now = utc(2026, 8, 28, 8)
+        let all = hoursToday(slots(goal: 2_100, now: now))
+        for water in stride(from: 0, to: 2_100, by: 50) {
+            let kept = hoursToday(slots(water: water, goal: 2_100, now: now, onlyWhenBehind: true))
+            #expect(Array(all.suffix(kept.count)) == kept, "\(water) ml left a hole: \(kept)")
+        }
+    }
+
+    // MARK: Set B — the pace
+
+    @Test func theDueAmountRisesAShareAtEachReminderHour() {
+        let due = { (hour: Int, minute: Int) in
+            ReminderPlan.due(goal: 2_100, schedule: .standard, at: utc(2026, 8, 28, hour, minute), calendar: utcDay)
+        }
+        #expect(due(8, 59) == 0)
+        #expect(due(9, 0) == 300)
+        #expect(due(10, 59) == 300)
+        #expect(due(11, 0) == 600)
+        #expect(due(21, 0) == 2_100)
+        #expect(due(23, 30) == 2_100)
+    }
+
+    @Test func theDueAmountRoundsToTheNearestMillilitreAndEndsOnTheGoal() {
+        let due = { (hour: Int) in
+            ReminderPlan.due(goal: 2_000, schedule: .standard, at: utc(2026, 8, 28, hour), calendar: utcDay)
+        }
+        #expect(due(9) == 286, "2,000 ÷ 7 = 285.7")
+        #expect(due(21) == 2_000)
+    }
+
+    @Test func theDueAmountNeverFallsThroughTheDay() {
+        var previous = 0
+        for step in 0..<(24 * 12) {
+            let instant = utc(2026, 8, 28, 0).addingTimeInterval(TimeInterval(step * 5 * 60))
+            let due = ReminderPlan.due(goal: 2_500, schedule: .standard, at: instant, calendar: utcDay)
+            #expect(due >= previous)
+            previous = due
+        }
+        #expect(previous == 2_500)
+    }
+
+    /// 2026-03-08 is New York's spring-forward day: 09:00 is still 09:00 on the wall.
+    @Test func theDueAmountFollowsTheWallClockOnADaylightSavingDay() {
+        let newYork = gregorian(in: "America/New_York")
+        let at = { (hour: Int) in
+            newYork.date(from: DateComponents(year: 2026, month: 3, day: 8, hour: hour, minute: 30))!
+        }
+        #expect(ReminderPlan.due(goal: 2_100, schedule: .standard, at: at(8), calendar: newYork) == 0)
+        #expect(ReminderPlan.due(goal: 2_100, schedule: .standard, at: at(9), calendar: newYork) == 300)
+        #expect(ReminderPlan.due(goal: 2_100, schedule: .standard, at: at(12), calendar: newYork) == 600)
+    }
+
+    @Test func thePaceIsNothingBeforeTheFirstShareAndOnceTheGoalIsMet() {
+        let pace = { (water: Int, hour: Int, minute: Int) in
+            ReminderPlan.pace(water: water, goal: 2_100, schedule: .standard,
+                              now: utc(2026, 8, 28, hour, minute), calendar: utcDay)
+        }
+        #expect(pace(0, 8, 0) == nil, "nothing is due before 09:00")
+        #expect(pace(2_100, 12, 10) == nil, "the goal is met")
+        #expect(pace(450, 12, 10) == .behind(150))
+        #expect(pace(600, 12, 10) == .onTrack)
+    }
+
+    /// Once every share is due — from the last reminder hour to midnight — *behind* is exactly what Home's
+    /// status already says is *to go*, so the pace has nothing of its own to add (the walk, W1).
+    @Test func thePaceIsNothingOnceEveryShareIsDue() {
+        let pace = { (water: Int, hour: Int, minute: Int) in
+            ReminderPlan.pace(water: water, goal: 2_100, schedule: .standard,
+                              now: utc(2026, 8, 28, hour, minute), calendar: utcDay)
+        }
+        #expect(pace(450, 20, 59) == .behind(1_350), "1,800 is due before the last share")
+        #expect(pace(450, 21, 0) == nil)
+        #expect(pace(450, 23, 30) == nil)
+    }
+
+    /// Quiet days silence reminders, not the goal.
+    @Test func thePaceRunsOnAQuietDayToo() throws {
+        let fridays = try #require(ReminderPlan.Schedule(first: 9, last: 21, every: 2, quietWeekdays: [6]))
+        #expect(ReminderPlan.pace(water: 450, goal: 2_100, schedule: fridays,
+                                  now: utc(2026, 8, 28, 12, 10), calendar: utcDay) == .behind(150))
     }
 }

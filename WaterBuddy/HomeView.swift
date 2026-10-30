@@ -187,7 +187,13 @@ struct HomeView: View {
     nonisolated static let undoSymbol = "arrow.uturn.backward"
     nonisolated static let glyphs = [streakSymbol, reminderSymbol, lastDrinkSymbol, undoSymbol]
 
+    /// The pace line's glyph. `thePaceLinesGlyphsResolveAndItsFigureIsSpokenWhole` proves both draw.
+    nonisolated static func paceSymbol(_ pace: ReminderPlan.Pace) -> String {
+        pace == .onTrack ? "checkmark.circle" : "hourglass"
+    }
+
     @Environment(DataManager.self) private var manager
+    @Environment(PremiumStore.self) private var premium
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverRunning
@@ -499,6 +505,8 @@ struct HomeView: View {
                 // The figure is drawn grouped and spoken as a number of millilitres.
                 .accessibilityLabel(spokenStatus)
 
+            paceLine
+
             quietLine
                 // One height for both of its states at the ordinary text sizes, so the row below
                 // does not jump when Undo arrives and leaves.
@@ -513,6 +521,49 @@ struct HomeView: View {
                 // spring; the owner, holding that build, asked for more life, and the rule's
                 // wording is proposed in the stage's spec.
                 .animation(Motion.land, value: standingOffer)
+        }
+    }
+
+    /// Set B's pace line (spec `2026-10-30-coaching-design.md` §3.4, D9): *On track*, or how far behind, for
+    /// Premium alone, while something is due and the goal is not met. Its own line — never inside the quiet
+    /// line, which *Undo* replaces for eight seconds. Nothing to say is nothing drawn.
+    @ViewBuilder
+    private var paceLine: some View {
+        if premium.state.status?.isPremium == true {
+            // Re-read every minute: a share falls due on the hour, and nothing else would say so.
+            TimelineView(.everyMinute) { _ in
+                if let pace = manager.pace {
+                    HStack(spacing: 6) {
+                        Image(systemName: Self.paceSymbol(pace))
+                            .accessibilityHidden(true)
+                        Text(drawnPace(pace))
+                    }
+                    .font(.footnote.weight(.medium))
+                    // The quiet line's measured style: full white, the screen's smallest text.
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .legibleOnBackdrop()
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text("Pace", bundle: strings))
+                    .accessibilityValue(spokenPace(pace))
+                }
+            }
+            .transition(.opacity)
+        }
+    }
+
+    private func drawnPace(_ pace: ReminderPlan.Pace) -> String {
+        switch pace {
+        case .onTrack: strings.localizedString(forKey: "On track", value: nil, table: nil)
+        case .behind(let amount): strings.figure("%1$@ ml behind", amount, locale: locale)
+        }
+    }
+
+    private func spokenPace(_ pace: ReminderPlan.Pace) -> String {
+        switch pace {
+        case .onTrack: strings.localizedString(forKey: "On track", value: nil, table: nil)
+        case .behind(let amount): strings.localized("%1$d millilitres behind", amount, locale: locale)
         }
     }
 
@@ -1231,4 +1282,6 @@ private struct WaterVessel: View {
 
     // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
     return HomeView().background { AuroraBackground() }.environment(manager)
+        // Held, so the canvas shows the pace line (set B).
+        .environment(PremiumStore(source: .held()))
 }

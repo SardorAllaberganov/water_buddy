@@ -119,6 +119,16 @@ final class DataManager {
         /// "missing" and "off" mean the same thing, so nothing materialises it. Read and written by the
         /// app alone: no widget, reminder or watch reads it (spec `2026-10-29-apple-health-design.md`).
         static let healthEnabled = prefix + "healthEnabled"
+        /// Set B's reminder schedule, as `ReminderPlan.Schedule.stored` — a positional `[Int]` of four: the
+        /// first and the last reminder's hour, the interval, and the quiet-weekday mask. **Absent means the
+        /// standard schedule**, so nothing materialises it and choosing *Standard schedule* removes it.
+        /// Read in every process that builds a `DataManager`, so a widget tap files the schedule the app set
+        /// (spec `2026-10-30-coaching-design.md` D7). `nonisolated`: ``DataManager/resolveReminderSchedule(in:)``
+        /// names it.
+        nonisolated static let reminderSchedule = prefix + "reminderSchedule"
+        /// Set B's *Only when behind*. Absent until turned on — like ``remindersEnabled``, "missing" and "off"
+        /// mean the same thing.
+        static let onlyWhenBehind = prefix + "onlyWhenBehind"
         /// The chosen UI language, as a code like `"ru"`. **Absent means follow the device**, which
         /// is the third key whose absence carries meaning — see ``AppLanguage/system``.
         static let language = prefix + "language"
@@ -181,7 +191,8 @@ final class DataManager {
         /// disagree. Production code never reads this — it names the constants directly.
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
-            didMigrateFromStandard, remindersEnabled, healthEnabled, language, servings, reviewRequestedVersion,
+            didMigrateFromStandard, remindersEnabled, healthEnabled, reminderSchedule, onlyWhenBehind,
+            language, servings, reviewRequestedVersion,
             weekTotals, wristOutbox, wristMirror, wristApplied,
         ]
     }
@@ -241,6 +252,8 @@ final class DataManager {
     @ObservationIgnored private var closedRun: (day: Int, goal: Int, zone: String, count: Int)?
     @ObservationIgnored private var storedRemindersEnabled: Bool
     @ObservationIgnored private var storedHealthEnabled: Bool
+    @ObservationIgnored private var storedReminderSchedule: ReminderPlan.Schedule
+    @ObservationIgnored private var storedOnlyWhenBehind: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
     @ObservationIgnored private var storedServings: [Int]
 
@@ -537,6 +550,50 @@ final class DataManager {
         }
     }
 
+    /// The hours reminders fall on — set B's schedule, or the standard one (spec
+    /// `2026-10-30-coaching-design.md`). A preference like ``remindersEnabled``, with its write-through and
+    /// equality guard, and it re-plans at once; it rings no widget doorbell and reaches no watch, because
+    /// neither draws it. ``ReminderPlan/Schedule/standard`` is the key's **absence**.
+    ///
+    /// **It knows nothing of Premium.** Settings decides who may change it; what is stored keeps working after
+    /// a lapse (D2), so no Premium bit has to reach the widget extension, which plans from this too.
+    var reminderSchedule: ReminderPlan.Schedule {
+        get {
+            access(keyPath: \.reminderSchedule)
+            return storedReminderSchedule
+        }
+        set {
+            guard newValue != storedReminderSchedule else { return }
+            withMutation(keyPath: \.reminderSchedule) {
+                storedReminderSchedule = newValue
+                if newValue == .standard {
+                    defaults.removeObject(forKey: Key.reminderSchedule)
+                } else {
+                    defaults.set(newValue.stored, forKey: Key.reminderSchedule)
+                }
+            }
+            rescheduleRemindersNow()
+        }
+    }
+
+    /// Set B's *Only when behind*: today's slots whose share is already drunk are dropped
+    /// (``ReminderPlan/slots(enabled:currentWater:dailyGoal:lastDrink:now:calendar:schedule:onlyWhenBehind:horizonDays:)``).
+    /// ``reminderSchedule``'s shape, for its reasons.
+    var onlyWhenBehind: Bool {
+        get {
+            access(keyPath: \.onlyWhenBehind)
+            return storedOnlyWhenBehind
+        }
+        set {
+            guard newValue != storedOnlyWhenBehind else { return }
+            withMutation(keyPath: \.onlyWhenBehind) {
+                storedOnlyWhenBehind = newValue
+                defaults.set(newValue, forKey: Key.onlyWhenBehind)
+            }
+            rescheduleRemindersNow()
+        }
+    }
+
     /// The language every string in the product is resolved through.
     ///
     /// A preference, like ``remindersEnabled`` — settable, write-through, equality-guarded, and
@@ -623,7 +680,7 @@ final class DataManager {
     /// Summary, which Settings discloses (rule `80-notifications`).
     ///
     /// It is the first slot of the plan ``currentReminderSlots()`` files, cut to today, so the
-    /// line a screen draws and the request iOS holds cannot disagree. The four `access` calls
+    /// line a screen draws and the request iOS holds cannot disagree. The six `access` calls
     /// are what make a view that reads this redraw: the plan is computed from stored values, which
     /// register nothing by themselves.
     var nextReminder: Date? {
@@ -631,7 +688,18 @@ final class DataManager {
         access(keyPath: \.currentWater)
         access(keyPath: \.dailyGoal)
         access(keyPath: \.todaysLogs)
+        access(keyPath: \.reminderSchedule)
+        access(keyPath: \.onlyWhenBehind)
         return reminderSlots(horizonDays: 0).first?.fireDate
+    }
+
+    /// Where today's water stands against set B's pace — ``ReminderPlan/pace(water:goal:schedule:now:calendar:)``
+    /// over the stored schedule — or `nil` while nothing is due, once the goal is met, and from the last
+    /// reminder hour on, when *behind* would only repeat *to go*. Computed on read and
+    /// stored nowhere, like ``remaining``; Home draws it for Premium alone, re-reading it every minute,
+    /// because a share falls due on the hour.
+    var pace: ReminderPlan.Pace? {
+        ReminderPlan.pace(water: currentWater, goal: dailyGoal, schedule: reminderSchedule, now: now(), calendar: calendar)
     }
 
     /// `true` when the App Group container is reachable, meaning state is genuinely shared
@@ -666,6 +734,8 @@ final class DataManager {
 
         storedRemindersEnabled = defaults.bool(forKey: Key.remindersEnabled)
         storedHealthEnabled = defaults.bool(forKey: Key.healthEnabled)
+        storedReminderSchedule = Self.resolveReminderSchedule(in: defaults)
+        storedOnlyWhenBehind = defaults.bool(forKey: Key.onlyWhenBehind)
         storedLanguage = Self.resolveLanguage(in: defaults)
         storedServings = Self.resolveServings(in: defaults)
         storedDailyGoal = Self.resolveDailyGoal(in: defaults)
@@ -1744,12 +1814,12 @@ final class DataManager {
     ///   re-plans when it also turns the day — so flying east soon after a drink can bring a kept
     ///   slot inside the hour, until the app next re-plans.
     func currentReminderSlots() -> [ReminderPlan.Slot] {
-        reminderSlots(horizonDays: ReminderPlan.horizonDays)
+        reminderSlots(horizonDays: nil)
     }
 
-    /// The plan out to `horizonDays`, from the state this instance holds. One spelling of the
-    /// plan's inputs, for the schedule that is filed and for ``nextReminder``.
-    private func reminderSlots(horizonDays: Int) -> [ReminderPlan.Slot] {
+    /// The plan out to `horizonDays` — the schedule's own when `nil` — from the state this instance
+    /// holds. One spelling of the plan's inputs, for the schedule that is filed and for ``nextReminder``.
+    private func reminderSlots(horizonDays: Int?) -> [ReminderPlan.Slot] {
         ReminderPlan.slots(
             enabled: storedRemindersEnabled,
             currentWater: storedCurrentWater,
@@ -1759,6 +1829,8 @@ final class DataManager {
             lastDrink: storedTodaysLogs.lazy.map(\.timestamp).max(),
             now: now(),
             calendar: calendar,
+            schedule: storedReminderSchedule,
+            onlyWhenBehind: storedOnlyWhenBehind,
             horizonDays: horizonDays
         )
     }
@@ -1885,6 +1957,16 @@ final class DataManager {
         if reminders != storedRemindersEnabled {
             withMutation(keyPath: \.remindersEnabled) { storedRemindersEnabled = reminders }
         }
+
+        // Set B's two, for `remindersEnabled`'s reason: the extension's instance plans from them.
+        let schedule = Self.resolveReminderSchedule(in: defaults)
+        if schedule != storedReminderSchedule {
+            withMutation(keyPath: \.reminderSchedule) { storedReminderSchedule = schedule }
+        }
+        let behind = defaults.bool(forKey: Key.onlyWhenBehind)
+        if behind != storedOnlyWhenBehind {
+            withMutation(keyPath: \.onlyWhenBehind) { storedOnlyWhenBehind = behind }
+        }
     }
 
     /// Writes the zeroed total *before* stamping the day. A crash between the two leaves a
@@ -1938,6 +2020,20 @@ final class DataManager {
               stored.allSatisfy({ (1...maximumDailyIntake).contains($0) })
         else { return defaultServings }
         return stored
+    }
+
+    /// Set B's schedule as stored, or the standard one — for absence, and for anything
+    /// ``ReminderPlan/Schedule/init(stored:)`` refuses, which is discarded whole, never repaired
+    /// (``resolveServings(in:)``'s rule). `nonisolated static`, as that is.
+    nonisolated static func resolveReminderSchedule(in defaults: UserDefaults) -> ReminderPlan.Schedule {
+        guard let value = defaults.object(forKey: Key.reminderSchedule) else { return .standard }
+        guard let stored = value as? [Int], let schedule = ReminderPlan.Schedule(stored: stored) else {
+            #if DEBUG
+            print("WaterBuddy: the stored reminder schedule could not be read; reminders follow the standard schedule.")
+            #endif
+            return .standard
+        }
+        return schedule
     }
 
     /// The serving every one-tap door logs: the middle quick-add vessel, the Glass.

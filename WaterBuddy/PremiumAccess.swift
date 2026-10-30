@@ -310,4 +310,20 @@ nonisolated enum PremiumAccess {
             }
         }
     }
+
+    /// How a Premium extra drawn in place of a free screen shows (spec `2026-10-30-coaching-design.md` D4).
+    nonisolated enum Gate: Sendable, Equatable {
+        /// The paywall is not offered here: nothing is drawn.
+        case hidden
+        /// Drawn with a lock; a tap opens the paywall. Also while the first read is still out.
+        case locked
+        case open
+    }
+
+    /// One answer for every extra drawn in place: open for Premium, locked where the paywall is offered,
+    /// hidden where it is not. `status` is `nil` while StoreKit has not answered.
+    static func gate(status: Status?, offered: Bool) -> Gate {
+        if status?.isPremium == true { return .open }
+        return offered ? .locked : .hidden
+    }
 }

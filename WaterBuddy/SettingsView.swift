@@ -183,10 +183,32 @@ struct SettingsView: View {
                 openSettingsRow
                     .transition(.opacity)
             }
+
+            if coachingGate != .hidden {
+                CoachingRows(gate: coachingGate) { paywall = .settings }
+            }
         }
         // `.frosted`, not `.sheer`: this pane carries sentence-length text, and the density scale
         // exists because tint and blur compete (rule `60-design-system`).
         .settingsCard()
+    }
+
+    /// Set B's rows on this card: open, locked or absent (spec `2026-10-30-coaching-design.md` D4).
+    private var coachingGate: PremiumAccess.Gate {
+        PremiumAccess.gate(status: premium.state.status, offered: PaywallView.isOfferedHere)
+    }
+
+    /// After a lapse, the free way back: *Use the standard schedule*, under a locked custom schedule
+    /// (spec `2026-10-30-coaching-design.md` D2). An open row's sheet has its own.
+    nonisolated static func offersStandardReset(gate: PremiumAccess.Gate, schedule: ReminderPlan.Schedule) -> Bool {
+        gate == .locked && schedule != .standard
+    }
+
+    /// Whether a tap on *Only when behind* opens the paywall: only where it would turn the switch on without
+    /// Premium. Turning it off is free for anyone (D2), so a lapsed user's switch that is still on is told
+    /// what it does, not *Opens Premium* (the final review's Important 2).
+    nonisolated static func behindTapOpensPaywall(gate: PremiumAccess.Gate, isOn: Bool) -> Bool {
+        gate != .open && !isOn
     }
 
     private var toggleRow: some View {
@@ -205,7 +227,9 @@ struct SettingsView: View {
         // above one VoiceOver surfaces anyway, and the row gets announced twice — the bug recorded
         // in `tasks/lessons.md` for `HistoryView`'s serving rows.
         .accessibilityLabel(Text("Smart reminders", bundle: strings))
-        .accessibilityHint(Text("Reminds you to drink every two hours between 9 AM and 9 PM", bundle: strings))
+        .accessibilityHint(manager.reminderSchedule == .standard
+            ? Text("Reminds you to drink every two hours between 9 AM and 9 PM", bundle: strings)
+            : Text("Reminds you to drink at the hours of your schedule", bundle: strings))
     }
 
     /// Writing through the model, never to `UserDefaults` directly (rule `10-architecture`), and
@@ -228,12 +252,21 @@ struct SettingsView: View {
         if isBlocked {
             return strings.localizedString(forKey: "Notifications are turned off for WaterBuddy in iOS Settings, so reminders can't be delivered.", value: nil, table: nil)
         }
+        // The standard schedule keeps its 9-to-9 sentences — their catalogue entries and the store capture's
+        // match on *A nudge every two hours* do not move; another schedule is named in its own row.
+        let standard = manager.reminderSchedule == .standard
         if manager.remindersEnabled && deliveryIsBatched {
             // Not a failure, and not hidden: `.timeSensitive` would break through a summary, and it
             // needs an entitlement this app deliberately does not carry (rule `70-privacy`).
-            return strings.localizedString(forKey: "A nudge every two hours from 9 AM to 9 PM, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour.", value: nil, table: nil)
+            return strings.localizedString(forKey: standard
+                ? "A nudge every two hours from 9 AM to 9 PM, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour."
+                : "A nudge at each hour of your schedule, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour.",
+                value: nil, table: nil)
         }
-        return strings.localizedString(forKey: "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day.", value: nil, table: nil)
+        return strings.localizedString(forKey: standard
+            ? "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day."
+            : "A nudge at each hour of your schedule, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day.",
+            value: nil, table: nil)
     }
 
     private var openSettingsRow: some View {
@@ -452,6 +485,147 @@ private struct LanguageCard: View {
         // (`tasks/lessons.md`).
         .accessibilityLabel(language.name(in: strings))
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+}
+
+// MARK: - Set B
+
+/// Set B's two rows on the reminders card (spec `2026-10-30-coaching-design.md` §3.1, D4, D8): the schedule and
+/// *Only when behind* — open for Premium, locked where the paywall is offered (``PremiumAccess/gate(status:offered:)``).
+///
+/// **What the user set keeps working on a lapse** (D2): the rows lock, the stored values stay, and going back is
+/// free — *Use the standard schedule*, and the switch's off.
+private struct CoachingRows: View {
+
+    let gate: PremiumAccess.Gate
+    let openPaywall: () -> Void
+
+    @Environment(DataManager.self) private var manager
+    @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
+
+    /// The schedule being edited — the sheet's `.sheet(item:)` selection (rule `50-views`).
+    @State private var editing: ReminderPlan.Schedule?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Hairline()
+            scheduleRow
+            if SettingsView.offersStandardReset(gate: gate, schedule: manager.reminderSchedule) {
+                standardButton
+            }
+            Hairline()
+            behindToggle
+                .padding(.top, 8)
+            Text(behindLine)
+                .cardNote()
+                .padding(.top, 4)
+        }
+        .sheet(item: $editing) { schedule in
+            ReminderScheduleSheet(schedule: schedule)
+        }
+    }
+
+    private var summary: ReminderScheduleSheet.Summary {
+        ReminderScheduleSheet.summary(of: manager.reminderSchedule, strings: strings, locale: locale)
+    }
+
+    private var scheduleRow: some View {
+        Button {
+            if gate == .open {
+                editing = manager.reminderSchedule
+            } else {
+                openPaywall()
+            }
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Schedule", bundle: strings)
+                        .cardTitle()
+                    Text(summary.hours)
+                        .cardNote()
+                    if let quiet = summary.quiet {
+                        Text(quiet)
+                            .cardNote()
+                    }
+                }
+                Spacer(minLength: 8)
+                Image(systemName: gate == .open ? "chevron.right" : "lock.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .accessibilityHidden(true)
+            }
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PressStyle())
+        .accessibilityLabel(Text("Schedule", bundle: strings))
+        .accessibilityValue(spokenValue)
+    }
+
+    /// The schedule in words, its quiet days, and *Premium* while locked — History's switch's convention.
+    private var spokenValue: String {
+        var parts = [summary.spoken]
+        if let quiet = summary.quiet { parts.append(quiet) }
+        if gate == .locked { parts.append(strings.localizedString(forKey: "Premium", value: nil, table: nil)) }
+        return parts.joined(separator: ", ")
+    }
+
+    private var standardButton: some View {
+        Button {
+            manager.reminderSchedule = .standard
+        } label: {
+            Text("Use the standard schedule", bundle: strings)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+                .liquidGlass(in: Capsule(), density: .sheer, elevation: .resting, interactive: true)
+        }
+        .buttonStyle(PressStyle())
+        .padding(.vertical, 8)
+    }
+
+    private var behindToggle: some View {
+        Toggle(isOn: behindBinding) {
+            HStack(spacing: 8) {
+                Text("Only when behind", bundle: strings)
+                    .cardTitle()
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+                if gate == .locked {
+                    Image(systemName: "lock.fill")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .accessibilityHidden(true)
+                }
+            }
+        }
+        .toggleStyle(SwitchToggleStyle(tint: Aurora.cyan))
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text("Only when behind", bundle: strings))
+        .accessibilityHint(SettingsView.behindTapOpensPaywall(gate: gate, isOn: manager.onlyWhenBehind)
+            ? Text("Opens Premium", bundle: strings)
+            : Text(behindLine))
+    }
+
+    /// Off is free for anyone (D2); on is Premium's, and for anyone else opens the paywall and stays off.
+    private var behindBinding: Binding<Bool> {
+        Binding(
+            get: { manager.onlyWhenBehind },
+            set: { wantsIt in
+                if SettingsView.behindTapOpensPaywall(gate: gate, isOn: manager.onlyWhenBehind) {
+                    openPaywall()
+                } else {
+                    manager.onlyWhenBehind = wantsIt
+                }
+            }
+        )
+    }
+
+    private var behindLine: String {
+        strings.localizedString(forKey: "Skips a reminder when you've already drunk your share for its hour.", value: nil, table: nil)
     }
 }
 

@@ -137,6 +137,8 @@ struct DataManagerTests {
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
             manager.healthEnabled = true              // healthEnabled
+            manager.reminderSchedule = ReminderPlan.Schedule.standard.with(every: 3)   // reminderSchedule
+            manager.onlyWhenBehind = true             // onlyWhenBehind
             manager.addLog(amount: 250)               // currentWater
             // Two goal days behind today and the goal reached today: the claim's own moment.
             manager.addLog(amount: 2_500, at: utc(2026, 8, 26))

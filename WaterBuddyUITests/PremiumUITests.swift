@@ -22,6 +22,47 @@ final class PremiumUITests: XCTestCase {
         app.buttons.matching(identifier: label).count + app.links.matching(identifier: label).count
     }
 
+    /// Set B's locked rows (spec `2026-10-30-coaching-design.md` D4): each one element, each opening the
+    /// paywall; turning *Only when behind* on leaves it off.
+    @MainActor
+    func testAFreeUsersCoachingRowsAreLockedAndOpenThePaywall() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-WaterBuddyPremium", "YES"]
+        app.launch()
+        completeWelcomeIfShown(app)
+        app.buttons["Settings"].tap()
+
+        let row = app.buttons["Schedule"]
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "no Schedule row")
+        for _ in 0..<5 where !row.isHittable { app.swipeUp() }
+        XCTAssertEqual(app.buttons.matching(identifier: "Schedule").count, 1)
+        XCTAssertTrue((row.value as? String ?? "").contains("Premium"), "the lock is not spoken")
+        tapWhenReady(row)
+        XCTAssertTrue(app.staticTexts["See how you really drink, and what would help."].waitForExistence(timeout: 5),
+                      "Schedule did not open the paywall")
+        app.buttons["Not now"].tap()
+
+        let behind = app.switches["Only when behind"]
+        XCTAssertTrue(behind.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.switches.matching(identifier: "Only when behind").count, 1)
+        tapWhenReady(behind)
+        XCTAssertTrue(app.staticTexts["See how you really drink, and what would help."].waitForExistence(timeout: 5),
+                      "the switch did not open the paywall")
+        app.buttons["Not now"].tap()
+        XCTAssertEqual(app.switches["Only when behind"].value as? String, "0", "a free user's switch turned on")
+    }
+
+    @MainActor
+    func testAnOrdinaryRunHasNoCoachingRows() throws {
+        let app = XCUIApplication()
+        app.launch()
+        completeWelcomeIfShown(app)
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Schedule"].waitForExistence(timeout: 3),
+                       "a run not offering the paywall drew a locked row")
+    }
+
     @MainActor
     func testAnOrdinaryRunHasNoPremiumCard() throws {
         let app = XCUIApplication()
@@ -64,7 +105,8 @@ final class PremiumUITests: XCTestCase {
         // Each row is one element carrying its title and its line. Counted by the whole row's label:
         // XCUITest also lists the row's own title beneath it, which VoiceOver does not stop on
         // (`tasks/lessons.md`, 2026-10-17; the owner's ruling, 2026-10-22).
-        for title in ["Month view and full history", "Your patterns", "Personal insights", "A monthly recap"] {
+        for title in ["Month view and full history", "Your patterns", "Personal insights", "A monthly recap",
+                      "Your own reminder schedule", "A pace line", "Reminders only when behind"] {
             let row = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", title + ", "))
             XCTAssertEqual(row.count, 1, "\(title) is not one element")
         }

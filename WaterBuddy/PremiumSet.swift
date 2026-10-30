@@ -21,9 +21,14 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
     /// Set A — month view and full history, patterns, personal insights, the monthly recap.
     case understand
 
+    /// Set B — your own reminder schedule, the pace line, reminders only when behind (spec
+    /// `2026-10-30-coaching-design.md`).
+    case coached
+
     /// One thing a set does, as the paywall and the Settings card name it.
     nonisolated enum Feature: CaseIterable, Sendable, Hashable {
         case monthView, patterns, insights, recap
+        case schedule, pace, onlyWhenBehind
 
         /// The paywall row's title.
         func title(in strings: Bundle) -> String {
@@ -48,6 +53,9 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .patterns: "chart.bar.fill"
             case .insights: "sparkles"
             case .recap: "doc.text.image"
+            case .schedule: "calendar.badge.clock"
+            case .pace: "speedometer"
+            case .onlyWhenBehind: "bell.badge"
             }
         }
 
@@ -60,6 +68,9 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             // `2026-10-23-insights-design.md` §3.9, the owner's ruling closing #164's naming half).
             case .insights: "Personal insights"
             case .recap: "A monthly recap"
+            case .schedule: "Your own reminder schedule"
+            case .pace: "A pace line"
+            case .onlyWhenBehind: "Reminders only when behind"
             }
         }
 
@@ -69,6 +80,9 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .patterns: "When you drink, weekdays against weekends"
             case .insights: "Each week, from your own figures, on your iPhone"
             case .recap: "Your month in one card, yours to share"
+            case .schedule: "Your hours, your interval, your quiet days"
+            case .pace: "Where you should be by now, on Home"
+            case .onlyWhenBehind: "A nudge only when you need one"
             }
         }
 
@@ -79,6 +93,9 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             // History's own word for the mode, so the card and the switch name it alike.
             case .insights: "Insights"
             case .recap: nil
+            // D10 (spec `2026-10-30-coaching-design.md`): the card keeps set A's three previews; four abreast
+            // break at the ordinary sizes. The paywall names set B's in full.
+            case .schedule, .pace, .onlyWhenBehind: nil
             }
         }
     }
@@ -87,15 +104,18 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
     var features: [Feature] {
         switch self {
         case .understand: [.monthView, .patterns, .insights, .recap]
+        case .coached: [.schedule, .pace, .onlyWhenBehind]
         }
     }
 
     /// Whether every feature the set lists is built. **Set A went on sale in step 5**, with the recap
     /// (spec `2026-10-24-monthly-recap-design.md` §3.8); a Release build offers it only once the privacy
-    /// policy's address is set (`PaywallView.isOffered(arguments:)`).
+    /// policy's address is set (`PaywallView.isOffered(arguments:)`). **Set B went on sale with the pace
+    /// line**, its last feature (spec `2026-10-30-coaching-design.md`).
     var isOnSale: Bool {
         switch self {
         case .understand: true
+        case .coached: true
         }
     }
 

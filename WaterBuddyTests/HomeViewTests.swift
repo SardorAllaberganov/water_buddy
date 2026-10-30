@@ -72,6 +72,19 @@ private func withTempStore<T>(_ body: (DataManager, UserDefaults) throws -> T) t
 @MainActor
 struct HomeServingTests {
 
+    /// Set B's pace line (spec `2026-10-30-coaching-design.md` §3.4): two glyphs, each proved to draw, and the
+    /// figure spoken in millilitres with its plural form.
+    @Test func thePaceLinesGlyphsResolveAndItsFigureIsSpokenWhole() {
+        #expect(UIImage(systemName: HomeView.paceSymbol(.onTrack)) != nil)
+        #expect(UIImage(systemName: HomeView.paceSymbol(.behind(150))) != nil)
+        #expect(HomeView.paceSymbol(.onTrack) != HomeView.paceSymbol(.behind(150)))
+        let english = AppLanguage.english.bundle
+        let locale = Locale(identifier: "en_US")
+        #expect(english.localized("%1$d millilitres behind", 1, locale: locale) == "1 millilitre behind")
+        #expect(english.localized("%1$d millilitres behind", 150, locale: locale) == "150 millilitres behind")
+        #expect(english.figure("%1$@ ml behind", 1_250, locale: locale) == "1,250 ml behind")
+    }
+
     /// The vessel that crosses the process boundary.
     ///
     /// This used to assert that the row *contained* `defaultServing`, because the widget compiled

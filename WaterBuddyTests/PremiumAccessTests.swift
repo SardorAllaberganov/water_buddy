@@ -46,6 +46,19 @@ struct PremiumAccessTests {
         #expect(PremiumAccess.resolve([]) == .free)
     }
 
+    /// How a Premium extra drawn in place shows (spec `2026-10-30-coaching-design.md` D4): open for Premium,
+    /// locked where the paywall is offered, absent where it is not — locked, too, while the first read is
+    /// still out, so a paying user's rows never flash open then shut.
+    @Test func anExtraIsOpenForPremiumLockedWhereOfferedAndHiddenElsewhere() {
+        let until = Date(timeIntervalSince1970: 2_000_000_000)
+        #expect(PremiumAccess.gate(status: .lifetime, offered: false) == .open)
+        #expect(PremiumAccess.gate(status: .yearly(until: until), offered: true) == .open)
+        #expect(PremiumAccess.gate(status: .free, offered: true) == .locked)
+        #expect(PremiumAccess.gate(status: .free, offered: false) == .hidden)
+        #expect(PremiumAccess.gate(status: nil, offered: true) == .locked)
+        #expect(PremiumAccess.gate(status: nil, offered: false) == .hidden)
+    }
+
     @Test func aYearlyStillRunningIsPaidUntilItsPeriodEnds() {
         #expect(PremiumAccess.resolve([yearly(expires: later)]) == .yearly(until: later))
     }
@@ -344,7 +357,8 @@ struct PaywallOfferTests {
     @Test func setAOnSaleWithoutAPrivacyLinkIsNotOffered() {
         #expect(!PaywallView.isOffered(debug: false, arguments: [], setsOnSale: PremiumSet.onSale.count,
                                        privacyPolicy: URL(string: "OWNER-PRIVACY-URL")))
-        #expect(PaywallView.shownSets(debug: false) == [.understand])
+        // Set B joined set A on sale with the pace line (spec `2026-10-30-coaching-design.md`).
+        #expect(PaywallView.shownSets(debug: false) == [.understand, .coached])
     }
 
     /// The policy's page is the owner's GitHub user site, pinned whole as Apple's terms are: a scheme
