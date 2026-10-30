@@ -12,13 +12,13 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 24 October 2026
+**Last updated:** 29 October 2026
 
 ---
 
 ## In one sentence
 
-WaterBuddy keeps what you log on your own iPhone and Apple Watch: it has no account and no server, and it sends nothing to us — your water travels only between your own iPhone and your own Watch, and anything else that leaves a device does so through Apple (a purchase, a Siri request) or because you chose to share it (a monthly recap image).
+WaterBuddy keeps what you log on your own iPhone and Apple Watch: it has no account and no server, and it sends nothing to us — your water travels only between your own iPhone and your own Watch, and into Apple Health if you turn that on, and anything else that leaves a device does so through Apple (a purchase, a Siri request) or because you chose to share it (a monthly recap image).
 
 ---
 
@@ -28,10 +28,11 @@ Most privacy policies ask you to trust a promise. This one describes how the app
 
 **WaterBuddy has no server, and no networking code.** There is no `URLSession`, no `Network` framework, no web view and no HTTP request of any kind in the app's source. The only web addresses in it are two links — Apple's standard Terms of Use and this page — which open in Safari when you tap them; the app never loads them itself.
 
-The Apple frameworks the app is built from are Foundation, SwiftUI, SwiftData, Observation, WidgetKit, AppIntents, UserNotifications, WatchConnectivity, UIKit, Core Graphics, **StoreKit** and **FoundationModels**. Two of them deserve a sentence each:
+The Apple frameworks the app is built from are Foundation, SwiftUI, SwiftData, Observation, WidgetKit, AppIntents, UserNotifications, WatchConnectivity, UIKit, Core Graphics, **StoreKit**, **FoundationModels** and **HealthKit**. Three of them deserve a sentence each:
 
 - **StoreKit** is Apple's own in-app purchase system. It talks to Apple's App Store — never to us — when you look at or buy Premium, restore a purchase, or when the app asks iOS to show its rating request. See *Premium* and *The rating request* below.
 - **FoundationModels** is Apple's on-device language model. It runs on your iPhone. See *Personal insights* below.
+- **HealthKit** is Apple Health's own framework. WaterBuddy uses it only if you turn on *Apple Health* in Settings, to write your servings there — and it reads nothing from Health. See *Apple Health, if you turn it on* below.
 
 There are **no third-party libraries** in the project: no Swift packages, no CocoaPods, no embedded frameworks. Nothing was added by anyone but the developer, so nothing can report back behind the developer's back.
 
@@ -55,6 +56,7 @@ Everything below lives on your own devices, in WaterBuddy's own storage. None of
 | Your three quick-add amounts | Three amounts in millilitres — the Cup, the Glass and the Bottle. |
 | Your chosen language | English, Russian or Uzbek — or nothing at all, if the app follows your device's language. |
 | Your reminders setting | Whether you turned reminders on. |
+| Your Apple Health setting | Whether you turned Apple Health on. |
 | Two internal flags | Whether you have chosen a goal yet, and whether a one-time move of older settings has already happened. |
 | The rating request | The app version in which WaterBuddy last asked iOS to show its rating request, so it never asks twice in one version. |
 | Which Watch servings are already counted | The identifiers of servings your Watch sent, grouped by day, so one is never counted twice — or brought back after you delete it. Entries older than about 90 days are dropped the next time a Watch serving is recorded. |
@@ -72,7 +74,9 @@ Everything below lives on your own devices, in WaterBuddy's own storage. None of
 
 **Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes — only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); and the recap image (made in memory when you open the recap).
 
-**That is the complete list.** WaterBuddy stores no name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
+**That is the complete list.** WaterBuddy stores no name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record of its own, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
+
+**Copied to Apple Health, only if you turn it on:** each serving's amount and moment, as Water. See *Apple Health, if you turn it on* below.
 
 The app uses no Keychain, no iCloud storage and no CloudKit sync, so it does not back your history up itself. If your device's own backups are on, those are made by Apple under Apple's terms.
 
@@ -135,6 +139,17 @@ The monthly recap (Premium) can be shared as an image, **only when you tap *Shar
 ### 6. Links you tap
 
 *Terms of Use* (Apple's standard licence) and *Privacy Policy* (this page) open in Safari when you tap them. This page is hosted by GitHub Pages, so a visit to it is handled by GitHub under GitHub's privacy statement, which may include your IP address; the app itself sends nothing when you tap.
+
+### 7. Apple Health, if you turn it on
+
+*Apple Health* in Settings is **off until you turn it on**. When you do, iOS asks whether WaterBuddy may write **Water** to Health — and WaterBuddy asks to read nothing.
+
+- **What is written:** each serving you log — its amount in millilitres and the moment you logged it — as a Water entry, with the serving's random identifier, a version number and a mark that you entered it yourself, so that correcting or deleting the serving in WaterBuddy corrects or deletes its entry in Health. Nothing else: no goal, no streak, no name, no language.
+- **Everything you have logged is written once** when you turn it on, and each new serving after that — whichever way you log it. A serving logged from a widget or Control Center reaches Health the next time WaterBuddy opens. Entries WaterBuddy wrote before — from an earlier install, or on another iPhone — are left as they are.
+- **WaterBuddy's log leads.** While it is on, an entry you delete in Health comes back as long as its serving is still in WaterBuddy: to remove water from both, delete the serving in WaterBuddy.
+- **Nothing is read.** WaterBuddy reads back only the entries it wrote itself, to keep them in step. Water other apps write to Health is never read, and no figure WaterBuddy shows comes from Health.
+- **Health is Apple's.** Health keeps its data on your iPhone, encrypted, and syncs it through iCloud only if Health is turned on in your iCloud settings — under Apple's terms, not ours. Nothing is sent to us.
+- **Turning it off** stops the writing. It deletes nothing: what is in Health is yours, and you can delete it in your iPhone's Settings — *Privacy & Security*, then *Health*, then *WaterBuddy*, then *Data from "WaterBuddy"*. Deleting WaterBuddy leaves it in Health too.
 
 ---
 
@@ -211,8 +226,9 @@ WaterBuddy is a hydration tracker for a general audience. It collects no persona
 - **Delete or correct a serving** in History's week view, which shows the last seven days. A serving you have just logged can also be taken back with *Undo* on the Home screen. If a deleted serving came from your Watch and a copy is still queued by iOS, your iPhone discards the copy on arrival. Servings older than the week are shown, read-only, in the month view; they cannot be removed one by one in the app.
 - **Delete everything** by deleting WaterBuddy from your iPhone, and the Watch app from your Apple Watch. iOS removes an app's storage with it — including the container the app shares with its widgets, once no app that uses it is left on the device, and no other app of ours uses it. Your servings, your goal, your settings, the Watch's copies and any pending reminders go with it.
 - The record of which Watch servings are already counted keeps about 90 days and drops older days.
+- **Copies in Apple Health**, if you turned it on, are Health's: deleting WaterBuddy leaves them there. Delete them in your iPhone's Settings — *Privacy & Security*, then *Health*, then *WaterBuddy*, then *Data from "WaterBuddy"*.
 
-Nothing was ever sent anywhere, so deleting the app is the end of it: there is no copy on a server to chase.
+Nothing was ever sent to us, so there is no copy on a server to chase: deleting the app is the end of it, but for any copies in Apple Health you chose to make.
 
 ---
 
