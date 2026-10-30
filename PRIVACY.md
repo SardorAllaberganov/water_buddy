@@ -12,7 +12,7 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 29 October 2026
+**Last updated:** 30 October 2026
 
 ---
 
@@ -55,7 +55,7 @@ Everything below lives on your own devices, in WaterBuddy's own storage. None of
 | The current day | A date marker, used to start a new day at midnight. |
 | Your three quick-add amounts | Three amounts in millilitres — the Cup, the Glass and the Bottle. |
 | Your chosen language | English, Russian or Uzbek — or nothing at all, if the app follows your device's language. |
-| Your reminders setting | Whether you turned reminders on. |
+| Your reminders setting | Whether you turned reminders on, the schedule they follow if you set your own, and whether they come only when you're behind. |
 | Your Apple Health setting | Whether you turned Apple Health on. |
 | Two internal flags | Whether you have chosen a goal yet, and whether a one-time move of older settings has already happened. |
 | The rating request | The app version in which WaterBuddy last asked iOS to show its rating request, so it never asks twice in one version. |
@@ -68,9 +68,9 @@ Everything below lives on your own devices, in WaterBuddy's own storage. None of
 | Servings logged on the Watch that your iPhone has not confirmed yet | The amount, the moment and the identifier of each. Removed as soon as your iPhone confirms it. |
 | A copy of what your iPhone last sent | Today's total, your goal, your three amounts, your language, whether you have chosen a goal, when the copy was made, when your iPhone's day starts and ends, and the identifiers of up to 256 Watch servings your iPhone has already counted — so the Watch and its complications can show the right figures before the next sync. |
 
-**Held by iOS itself, on your iPhone:** up to 28 pending reminder notifications, if you turn reminders on. See *Notifications*.
+**Held by iOS itself, on your iPhone:** up to 64 pending reminder notifications, if you turn reminders on. See *Notifications*.
 
-**Worked out when shown, and stored nowhere:** your streak, your month view, your patterns, your insights and your monthly recap are all computed from your servings on your iPhone each time they are drawn.
+**Worked out when shown, and stored nowhere:** your streak, your month view, your patterns, your insights, your monthly recap and your pace are all computed from your servings on your iPhone each time they are drawn.
 
 **Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes — only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); and the recap image (made in memory when you open the recap).
 
@@ -112,7 +112,7 @@ Your iPhone may also send that same summary straight to your Watch's complicatio
 
 ### 2. Premium, through Apple
 
-WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase — monthly, yearly or once — that adds a month view and full history, patterns, personal insights and a monthly recap.
+WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase — monthly, yearly or once — that adds a month view and full history, patterns, personal insights, a monthly recap, your own reminder schedule, a pace line and reminders only when you're behind.
 
 Premium is sold and paid for entirely through Apple's App Store, under your Apple Account. When you open the Premium screen, the app asks the App Store for the plans and their prices in your country, and whether a free week is open to you; buying, restoring a purchase, asking a parent to approve one (*Ask to Buy*) and managing a subscription all take place in Apple's own sheets. Apple processes the payment, and StoreKit checks the purchase on your iPhone.
 
@@ -180,7 +180,7 @@ Reminders are **optional, and off until you turn them on.**
 
 - They are **local notifications only**: WaterBuddy has no push service and no server that could message you.
 - When you turn them on, the app asks iOS for permission to show alerts and play a sound — nothing else: no badge, no critical alerts, no provisional permission. If you decline, reminders stay off.
-- They follow a fixed daily schedule set on your iPhone; at most 28 are pending at once. A reminder due within an hour of a drink is skipped, and the rest of today's are skipped once you reach your goal.
+- They follow the standard daily schedule, or one you set on your iPhone; at most 64 are pending at once. A reminder due within an hour of a drink is skipped, so is one whose share of your goal you have already drunk if you choose *only when behind*, and the rest of today's are skipped once you reach your goal.
 - **A reminder contains no number and no personal information.** Each uses the same fixed title and line, in your language. Your total, your goal, your amounts and your times never appear in one, because a lock screen can be read by anyone nearby.
 - Each reminder carries a **Log a Glass** button. Pressing it logs your Glass amount without opening the app and without unlocking your iPhone, and shows nothing in return.
 - iOS may group reminders into its Notification Summary, and may mirror them to your Apple Watch; either way the text carries no number.
