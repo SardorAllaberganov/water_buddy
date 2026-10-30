@@ -562,4 +562,6 @@ private struct GlassTabBar: View {
         .environment(PremiumStore(source: .silent()))
         // History reads it; a canvas never reaches Apple's model.
         .environment(InsightWriter(source: .silent()))
+        // Settings reads it; a canvas never reaches Health.
+        .environment(HealthMirror(manager: manager, source: .silent()))
 }

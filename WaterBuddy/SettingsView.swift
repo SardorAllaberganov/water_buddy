@@ -30,6 +30,7 @@ struct SettingsView: View {
     @Environment(\.strings) private var strings
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PremiumStore.self) private var premium
+    @Environment(HealthMirror.self) private var health
 
     /// The paywall, while it is open — its `.sheet(item:)` selection (rule `50-views`).
     @State private var paywall: PaywallView.Entry?
@@ -95,8 +96,10 @@ struct SettingsView: View {
                     GoalCard(currentGoal: manager.dailyGoal).arrives(arrived, order: lead).scrollDepth()
                     ServingsCard(current: manager.servings).arrives(arrived, order: lead + 1).scrollDepth()
                     remindersCard.arrives(arrived, order: lead + 2).scrollDepth()
-                    LanguageCard().arrives(arrived, order: lead + 3).scrollDepth()
-                    privacyPolicyLink.arrives(arrived, order: lead + 4).scrollDepth()
+                    // Under reminders: both are about what happens between pours, and both ask iOS first.
+                    healthCard.arrives(arrived, order: lead + 3).scrollDepth()
+                    LanguageCard().arrives(arrived, order: lead + 4).scrollDepth()
+                    privacyPolicyLink.arrives(arrived, order: lead + 5).scrollDepth()
                     Spacer(minLength: 0)
                 }
                 // The reminders card changes what it says, and with it its height: when
@@ -104,6 +107,7 @@ struct SettingsView: View {
                 // language changes. On the whole stack, so the card below moves with it; on
                 // that card alone it grew over a third of a second while its neighbour jumped.
                 .animation(Motion.settle, value: explanation)
+                .animation(Motion.settle, value: healthExplanation)
                 // Every tab's margin and inset (``ScreenMetrics``).
                 .padding(.horizontal, ScreenMetrics.margin)
                 // Every tab's inset, less the point the reader stands off the safe area (below):
@@ -248,6 +252,56 @@ struct SettingsView: View {
         .buttonStyle(PressStyle())
     }
 
+    // MARK: - Apple Health
+
+    /// The *Smart reminders* row's twin: the switch's label is the card's title, drawn and spoken, and the
+    /// line under it is the switch's hint (spec `2026-10-29-apple-health-design.md` §6). Drawn only where
+    /// the device has Health.
+    @ViewBuilder
+    private var healthCard: some View {
+        if health.isAvailable {
+            VStack(alignment: .leading, spacing: 12) {
+                Toggle(isOn: healthBinding) {
+                    Text("Apple Health", bundle: strings)
+                        .cardTitle()
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.7)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: Aurora.cyan))
+                .frame(minHeight: 44)
+                // On the `Toggle` itself, as the reminders row's are (rule `65-accessibility`).
+                .accessibilityLabel(Text("Apple Health", bundle: strings))
+                .accessibilityHint(Text("Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.", bundle: strings))
+
+                Text(healthExplanation)
+                    .cardNote()
+            }
+            .settingsCard()
+        }
+    }
+
+    /// One call each way into the mirror (rule `50-views`): on asks Health, off only stops the writing.
+    private var healthBinding: Binding<Bool> {
+        Binding(
+            get: { manager.healthEnabled },
+            set: { wantsHealth in
+                guard wantsHealth else {
+                    health.disable()
+                    return
+                }
+                enables += 1
+                Task { await health.enable() }
+            }
+        )
+    }
+
+    private var healthExplanation: String {
+        if health.status == .denied {
+            return strings.localizedString(forKey: "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.", value: nil, table: nil)
+        }
+        return strings.localizedString(forKey: "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.", value: nil, table: nil)
+    }
+
     // MARK: - The privacy policy
 
     /// The owner's privacy policy, for every user. App Review 5.1.1(i) asks for it "within the app in
@@ -288,6 +342,7 @@ struct SettingsView: View {
     /// switch off if it was withdrawn while the app was away — and the notification summary, which
     /// is not a permission and stays this screen's own question.
     private func readSystemState() async {
+        health.readStatus()
         authorization = await ReminderPermission.reconcile(manager, using: scheduler)
 
         deliveryIsBatched = await UNUserNotificationCenter.current()
@@ -1020,5 +1075,5 @@ private struct CheckShape: Shape {
     manager.saveDailyGoal(ml: 2_500)
 
     // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
-    return SettingsView().background { AuroraBackground() }.environment(manager).environment(PremiumStore(source: .silent()))
+    return SettingsView().background { AuroraBackground() }.environment(manager).environment(PremiumStore(source: .silent())).environment(HealthMirror(manager: manager, source: .silent()))
 }

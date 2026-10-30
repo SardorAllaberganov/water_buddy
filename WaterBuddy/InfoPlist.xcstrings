@@ -1,0 +1,41 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "WaterBuddy"
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy saves each serving you log to Apple Health as water. It reads nothing from Health."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy сохраняет каждую порцию в «Здоровье» как воду. Из «Здоровья» приложение ничего не читает."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy har bir porsiyani Apple Health ilovasiga suv sifatida saqlaydi. Health ilovasidan hech narsa o‘qimaydi."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

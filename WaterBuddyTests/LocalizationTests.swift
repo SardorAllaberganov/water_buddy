@@ -291,6 +291,13 @@ private let premiumKeys = [
     "No purchases to restore.",
 ]
 
+/// Settings' *Apple Health* card (spec `2026-10-29-apple-health-design.md` §6).
+private let healthKeys = [
+    "Apple Health",
+    "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.",
+    "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.",
+]
+
 private let reminderCopy = ["Time for water", "A glass now keeps you on track for the day."]
 
 /// The `.lproj` for one language inside one bundle, or `nil` if that language was not shipped.
@@ -910,6 +917,40 @@ struct PremiumStringTests {
                         "\"\(key)\" in \(language) does not carry the same format arguments: \(sentence)")
             }
         }
+    }
+}
+
+struct HealthStringTests {
+
+    @Test(arguments: ["en"] + translated)
+    func everyHealthStringExistsAndCarriesNoDigit(language: String) {
+        for key in healthKeys {
+            let resolved = sentences(appBundle, language, key)
+            #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
+            for sentence in resolved ?? [] {
+                #expect(!sentence.contains { $0.isNumber }, "\"\(key)\" in \(language) carries a digit: \(sentence)")
+            }
+        }
+    }
+}
+
+/// Apple Health's usage description — the sentence Health's sheet shows (spec
+/// `2026-10-29-apple-health-design.md` §3.8). Review Focus 5: the app asks to write and never to read.
+struct HealthPurposeTests {
+
+    @Test func theAppAsksHealthToWriteAndNeverToRead() {
+        #expect(appBundle.object(forInfoDictionaryKey: "NSHealthUpdateUsageDescription") as? String != nil)
+        #expect(appBundle.object(forInfoDictionaryKey: "NSHealthShareUsageDescription") == nil,
+                "a read permission's key — WaterBuddy reads nothing from Health")
+    }
+
+    @Test(arguments: ["en"] + translated)
+    func thePurposeIsInEveryLanguageAndCarriesNoDigit(language: String) throws {
+        let folder = try #require(appBundle.path(forResource: language, ofType: "lproj"))
+        let bundle = try #require(Bundle(path: folder))
+        let purpose = bundle.localizedString(forKey: "NSHealthUpdateUsageDescription", value: nil, table: "InfoPlist")
+        #expect(purpose != "NSHealthUpdateUsageDescription", "\(language) has no usage description")
+        #expect(!purpose.contains { $0.isNumber }, "\(language)'s usage description carries a digit")
     }
 }
 

@@ -28,6 +28,10 @@ struct WaterBuddyApp: App {
     /// only (``InsightWriter``).
     private let writer: InsightWriter
 
+    /// Apple Health's copy of the log — written only while the user's switch is on, and only by this
+    /// process (``HealthMirror``). It never reads what another app wrote.
+    private let health: HealthMirror
+
     init() {
         // Resolve the App Group before anything draws, so the container probe and the one-shot
         // migration out of `UserDefaults.standard` both happen here, in the app, at a moment we
@@ -52,6 +56,8 @@ struct WaterBuddyApp: App {
         #if DEBUG
         if let fresh = Self.freshStartManager(arguments: ProcessInfo.processInfo.arguments) {
             manager = fresh
+            // A fresh start reaches no Health: the switch draws, and nothing is ever written.
+            health = HealthMirror(manager: fresh, source: .silent())
             // No watch link: a paired watch's pours belong to the device's own store, which a
             // fresh start never opens.
             return
@@ -61,6 +67,8 @@ struct WaterBuddyApp: App {
         // Constructing the singleton adopts today, materialises the goal, and rolls the day over
         // if the app was last open yesterday — all against the store resolved on the line above.
         manager = DataManager.shared
+        // After the manager, whose saves it hears; before anything draws, so the first save is heard.
+        health = HealthMirror(manager: manager)
 
         #if canImport(WatchConnectivity)
         // `WristLink.session(_:didReceiveUserInfo:)` posts `didReceiveBatchNotification` rather
@@ -164,6 +172,7 @@ struct WaterBuddyApp: App {
                 .environment(manager)
                 .environment(premium)
                 .environment(writer)
+                .environment(health)
         }
         .onChange(of: scenePhase) { _, phase in
             // Another process may have written while we were away — the widget's `AddWaterIntent`
@@ -180,6 +189,10 @@ struct WaterBuddyApp: App {
                 // #100(d)). The scheduler is built inside the task and never stored
                 // (rule `80-notifications`).
                 Task { await ReminderPermission.reconcile(manager, using: ReminderScheduler.live()) }
+
+                // And Health: a permission withdrawn while the app was away turns the switch off, and a
+                // pass catches up what the widget's button, the control or a locked phone logged.
+                Task { await health.reconcile() }
             }
         }
     }

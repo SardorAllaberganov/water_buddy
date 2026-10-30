@@ -2642,6 +2642,29 @@
         }
       }
     },
+    "Apple Health": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Health"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Здоровье"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Health"
+          }
+        }
+      }
+    },
     "Average": {
       "extractionState": "manual",
       "localizations": {
@@ -3540,6 +3563,29 @@
         }
       }
     },
+    "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступ к «Здоровью» для WaterBuddy выключен. Включите его в Настройках › Конфиденциальность и безопасность › Здоровье › WaterBuddy."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WaterBuddy uchun Health ruxsati o‘chiq. Uni Sozlamalar › Maxfiylik va xavfsizlik › Health › WaterBuddy bo‘limida yoqing."
+          }
+        }
+      }
+    },
     "History": {
       "extractionState": "manual",
       "localizations": {
@@ -4318,6 +4364,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Saqlash"
+          }
+        }
+      }
+    },
+    "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Каждая порция сохраняется в «Здоровье» как вода. WaterBuddy ничего не читает из «Здоровья»."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har bir porsiya Apple Health ilovasiga suv sifatida saqlanadi. WaterBuddy Health ilovasidan hech narsa o‘qimaydi."
           }
         }
       }

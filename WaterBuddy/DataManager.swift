@@ -115,6 +115,10 @@ final class DataManager {
         /// unlike ``dailyGoal``, it is deliberately never materialised: scheduling notifications for
         /// someone who never asked is the wrong default, so "missing" and "off" mean the same thing.
         static let remindersEnabled = prefix + "remindersEnabled"
+        /// The Apple Health switch. Absent until the user turns it on — like ``remindersEnabled``,
+        /// "missing" and "off" mean the same thing, so nothing materialises it. Read and written by the
+        /// app alone: no widget, reminder or watch reads it (spec `2026-10-29-apple-health-design.md`).
+        static let healthEnabled = prefix + "healthEnabled"
         /// The chosen UI language, as a code like `"ru"`. **Absent means follow the device**, which
         /// is the third key whose absence carries meaning — see ``AppLanguage/system``.
         static let language = prefix + "language"
@@ -177,8 +181,8 @@ final class DataManager {
         /// disagree. Production code never reads this — it names the constants directly.
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
-            didMigrateFromStandard, remindersEnabled, language, servings, reviewRequestedVersion, weekTotals,
-            wristOutbox, wristMirror, wristApplied,
+            didMigrateFromStandard, remindersEnabled, healthEnabled, language, servings, reviewRequestedVersion,
+            weekTotals, wristOutbox, wristMirror, wristApplied,
         ]
     }
 
@@ -236,6 +240,7 @@ final class DataManager {
     /// ``ingest(_:)`` — and on every ``dayDidTurn()``; a new day, goal or zone finds the key stale.
     @ObservationIgnored private var closedRun: (day: Int, goal: Int, zone: String, count: Int)?
     @ObservationIgnored private var storedRemindersEnabled: Bool
+    @ObservationIgnored private var storedHealthEnabled: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
     @ObservationIgnored private var storedServings: [Int]
 
@@ -513,6 +518,25 @@ final class DataManager {
         }
     }
 
+    /// Whether servings are copied to Apple Health — Settings' *Apple Health* switch (spec
+    /// `2026-10-29-apple-health-design.md`). A preference like ``remindersEnabled``, and quieter: it rings
+    /// no widget doorbell, re-plans no reminder and reaches no watch, because none of them draws it.
+    /// `HealthMirror`, app-only, is the one thing that acts on it, and the one thing that sets it — after
+    /// asking Health.
+    var healthEnabled: Bool {
+        get {
+            access(keyPath: \.healthEnabled)
+            return storedHealthEnabled
+        }
+        set {
+            guard newValue != storedHealthEnabled else { return }
+            withMutation(keyPath: \.healthEnabled) {
+                storedHealthEnabled = newValue
+                defaults.set(newValue, forKey: Key.healthEnabled)
+            }
+        }
+    }
+
     /// The language every string in the product is resolved through.
     ///
     /// A preference, like ``remindersEnabled`` — settable, write-through, equality-guarded, and
@@ -641,6 +665,7 @@ final class DataManager {
         self.publishWrist = publishWrist
 
         storedRemindersEnabled = defaults.bool(forKey: Key.remindersEnabled)
+        storedHealthEnabled = defaults.bool(forKey: Key.healthEnabled)
         storedLanguage = Self.resolveLanguage(in: defaults)
         storedServings = Self.resolveServings(in: defaults)
         storedDailyGoal = Self.resolveDailyGoal(in: defaults)
@@ -829,7 +854,10 @@ final class DataManager {
     /// day's array only ever holds the ids the watch resent while offline for that long — but a
     /// number here is still safer than none, matching the spirit of the wire protocol's own
     /// construction bounds (`WristBatch.maximumPoursPerChunk`, `WristMirror.maximumAckedIds`).
-    private static let appliedLedgerRetentionDays = 90
+    ///
+    /// Apple Health's recent pass reaches back the same span (`HealthPlan.recentDays`): the latest a
+    /// watch pour can still arrive and be applied.
+    nonisolated static let appliedLedgerRetentionDays = 90
 
     /// `nonisolated static`, not a private instance method, so `requestWristPublish(from:)` —
     /// which composes a `WristMirror`'s `acked` list — can read the same ledger from a context that
@@ -907,6 +935,15 @@ final class DataManager {
     /// this is the whole of it.
     func allLogs() -> [WaterLog] {
         fetch(nil) ?? []
+    }
+
+    /// The servings from `start` on — every serving for `nil` — newest first, as ``allLogs()``; and
+    /// **`nil` when the store cannot be read**, never `[]`. Apple Health's mirror deletes every sample whose
+    /// serving is not among these, so a failed read handed over as nothing would empty Health of the user's
+    /// water (rule `20-state`). A read: it publishes nothing and writes neither store.
+    func logs(since start: Date?) -> [WaterLog]? {
+        guard let start else { return fetch(nil) }
+        return fetch(#Predicate<WaterLog> { $0.timestamp >= start })
     }
 
     /// Removes a serving and recomputes today's total.
@@ -1372,6 +1409,11 @@ final class DataManager {
         if instants.contains(where: { dayOrdinal(for: $0) != today }) { closedRun = nil }
     }
 
+    /// Posted by ``saveAndRecompute()`` once a change to the rows is saved, with the manager as its
+    /// object. App-only `HealthMirror` copies the change to Apple Health; posted in the widget extension
+    /// too, where nothing listens.
+    nonisolated static let logsDidSaveNotification = Notification.Name("sardor.WaterBuddy.dataManager.logsDidSave")
+
     /// - Returns: whether the save actually succeeded. `ingest(_:)` is the one caller that acts on
     ///   this — the applied ledger may only be written once the rows it names are confirmed on
     ///   disk, never before (rule `20-state`; see `ingest(_:)`'s own DocC for what writing it
@@ -1397,6 +1439,9 @@ final class DataManager {
         // insights.
         republishMonth()
         republishInsights()
+        if saved {
+            NotificationCenter.default.post(name: Self.logsDidSaveNotification, object: self)
+        }
         return saved
     }
 

@@ -1273,6 +1273,7 @@ final class GoalSetupUITests: XCTestCase {
             XCTAssertEqual(app.sliders.matching(identifier: name).count, 1, "\(name) is not one slider")
         }
         XCTAssertEqual(app.switches.matching(identifier: "Smart reminders").count, 1, "the reminders switch is not one element")
+        XCTAssertEqual(app.switches.matching(identifier: "Apple Health").count, 1, "the Apple Health switch is not one element")
         for name in ["Follow device", "English", "Русский", "O‘zbekcha"] {
             XCTAssertEqual(app.buttons.matching(identifier: name).count, 1, "the \(name) row is not one button")
         }

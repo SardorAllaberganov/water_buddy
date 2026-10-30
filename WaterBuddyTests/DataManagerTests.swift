@@ -136,6 +136,7 @@ struct DataManagerTests {
             manager.servings = [200, 300, 600]        // servings
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
+            manager.healthEnabled = true              // healthEnabled
             manager.addLog(amount: 250)               // currentWater
             // Two goal days behind today and the goal reached today: the claim's own moment.
             manager.addLog(amount: 2_500, at: utc(2026, 8, 26))
