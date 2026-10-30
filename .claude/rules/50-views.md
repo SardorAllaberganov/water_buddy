@@ -80,6 +80,8 @@ persist anything.
   `minimumScaleFactor` before a view with layout priority
 - On Home the Glass is ranked above Cup and Bottle: it is the screen's primary surface, because
   slot `DataManager.usualSlot` is what every one-tap door logs
+- Home's pace line is the status's middle line, between the figure and the quiet line, for Premium
+  alone — never inside the quiet line, which *Undo* replaces for eight seconds
 - History is one `List`, and everything on the screen is a row of it: the header, the week card,
   the strip and the servings — in Month mode the header, the switch, the month card, an opened day,
   the figures and the patterns — each with the list's own surfaces cleared. Nothing is fixed above
@@ -120,6 +122,10 @@ persist anything.
   first `MonthHistory.recapDays` days — a second way in to one sheet, argued: the turn of the month is
   when the recap is news, and the finished month's own page is where it lives. A lapse clears the
   selection, so the sheet closes
+- The schedule is presented with `.sheet(item:)` bound to an optional `ReminderPlan.Schedule`, from
+  Settings' *Schedule* row, for Premium alone — the row opens the paywall for anyone else. Each change
+  is written through `manager.reminderSchedule` as it is made; the sheet has no *Save*. Set B's rows are
+  drawn where `PremiumAccess.gate(status:offered:)` says, as History's switch is
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen
   whose last card sits under the bar needs its own bottom padding
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the

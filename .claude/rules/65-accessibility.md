@@ -148,6 +148,12 @@ rather than re-deriving it.
   week, its value is the line it draws
 - Settings' *Apple Health* is one switch, its label the title it draws and its hint the line under it, on
   the `Toggle` itself — the *Smart reminders* row's shape
+- Settings' *Schedule* is one button — label *Schedule*, value the schedule in words and its quiet days,
+  *Premium* added while locked; *Only when behind* is one switch, its line the hint (*Opens Premium* while
+  locked). In the schedule sheet each hour is one control, label its row's title and value the hour;
+  each interval one button, `.isSelected` on the chosen; each day one button, label the weekday's full
+  name, `.isSelected` while it keeps its reminders. Home's pace line is one element — label *Pace*, value
+  *On track* or the millilitres behind, from a `%d` key with plural forms, while it draws a `%@` figure
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1

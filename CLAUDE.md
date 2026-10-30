@@ -67,7 +67,7 @@ design:**
 | Store | Holds | Read by |
 |---|---|---|
 | SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared` (which recomputes today and the week from the rows in the same pass); never the widget's draw path |
-| `UserDefaults` — twelve keys | today's total, the goal, the day ordinal, four flags (the fourth the Apple Health switch, since 2026-10-30 on `feature/apple-health`), the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
+| `UserDefaults` — fourteen keys | today's total, the goal, the day ordinal, five flags (the fourth the Apple Health switch, since 2026-10-30 on `feature/apple-health`; the fifth *Only when behind*, set B's, on `feature/coaching`), the reminder schedule (set B's), the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget's draw path never opens
@@ -376,8 +376,8 @@ something to record.
   a Photos usage key, which this one never carries (measured)
   (`docs/superpowers/specs/2026-10-24-monthly-recap-design.md`; rule `70-privacy`'s *The recap's image, on
   the user's own tap*, admitted in `4c76e61`)
-- **Apple Health is a copy, written by the app** (roadmap 1.3.3, staged on `feature/apple-health`,
-  2026-10-30, not merged). Write only, Water only, asked from Settings' *Apple Health* switch alone.
+- **Apple Health is a copy, written by the app** (roadmap 1.3.3, committed on `feature/apple-health` —
+  `e4aebc9`, 2026-10-30 — and pushed; not merged). Write only, Water only, asked from Settings' *Apple Health* switch alone.
   `HealthPlan`, pure, decides from the rows and the samples WaterBuddy already wrote; `HealthMirror`,
   app-only and the one file that imports HealthKit, carries it out through its own `ReconcileQueue` — on
   the switch (the whole history), on every save in the app's process (`logsDidSaveNotification`) and on
@@ -386,7 +386,15 @@ something to record.
   touched; turning off deletes nothing. `DataManager` names no Health type: it gains `Key.healthEnabled`,
   `healthEnabled`, `logs(since:)` and the notification
   (`docs/superpowers/specs/2026-10-29-apple-health-design.md`; rule `70-privacy`'s *HealthKit, for Apple
-  Health*, typed and unstaged for the owner)
+  Health*, committed as `2ee3f39`)
+- **Set B: the schedule is a stored setting, the pace a pure reading of it** (roadmap 1.4.3, 1.4.9,
+  1.4.10, on `feature/coaching`). `ReminderPlan.Schedule`, `ReminderPlan.due` and `ReminderPlan.pace`
+  decide — a grid of whole hours, quiet weekdays, and a share of the goal due at each reminder hour, the
+  one definition *Only when behind* drops slots by and Home's pace line reads. `DataManager` stores the
+  schedule and *Only when behind* in two keys every process reads, so a widget tap files the schedule the
+  app set; Settings edits them for Premium; Home draws the pace for Premium. Nothing about Premium is
+  stored: a lapse locks the editing and keeps what was set
+  (`docs/superpowers/specs/2026-10-30-coaching-design.md`)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

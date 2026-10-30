@@ -28,6 +28,9 @@ changed.
   day boundary
 - Any new day-keyed value reuses `dayOrdinal(for:in:)` with the same calendar.
   `ReminderPlan.Slot.dayOrdinal` is the precedent — do not introduce a second day representation
+- A quiet weekday (set B's schedule) is the planted day's `.weekday` on the injected calendar,
+  1 = Sunday — never stored as a day. The days' order on screen is the app's locale's
+  (`HistoryView.firstWeekday(in:)`), never `Calendar.waterBuddyDay`'s
 
 ## The order of the two writes
 - `applyDailyReset(on:)` writes the zeroed `currentWater` to the suite **before** it stamps

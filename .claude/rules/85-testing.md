@@ -53,7 +53,9 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   only beside `-WaterBuddyFreshStart`: the first logs `StoreSample`'s three months into the fresh
   start's in-memory store through `addLog(amount:at:)`, the second builds the app's `PremiumStore` on
   `PremiumStore.Source.held()`, a lifetime purchase from no store. Alone, either does nothing.
-  `testCaptureAppStoreScreenshots` passes them and no other UI test does; `FreshStartTests` pins both
+  `testCaptureAppStoreScreenshots` passes them and no other UI test does but `CoachingUITests`, which
+  passes `-WaterBuddyPremiumHeld` beside the fresh start to hold Premium for set B's controls (spec
+  `2026-10-30-coaching-design.md` D13); `FreshStartTests` pins both
   (`docs/superpowers/specs/2026-10-25-store-page-design.md`)
 - `AppStoreScreenshotUITests.testBuildTheLivedInWeek` is the one capture that opens a device's own
   App Group: it builds the store set's week through History's sheet for the widgets and the watch, on
@@ -100,7 +102,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`. They are
+  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
@@ -210,7 +212,9 @@ a change to reminders, press a reminder's *Log a Glass* with the
 app not running; after a change to Premium, buy each plan, restore, refund and approve an Ask to Buy
 through the local StoreKit configuration. After a change to Apple Health, turn it on — Water's switch on
 in Health's sheet, then *Allow* — pour, correct, delete and *Undo*, and read the Health app's Water;
-refuse it on a fresh install; withdraw it in Settings › Privacy & Security › Health and come back. The same
+refuse it on a fresh install; withdraw it in Settings › Privacy & Security › Health and come back. After a
+change to set B, set a schedule, a quiet day and *Only when behind*, see *Next reminder* follow, pour from
+the widget and see the schedule kept, and lapse an expired monthly to see the rows lock. The same
 applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face
 by hand, a tinted face among them: no part of the automated gate renders them.
 

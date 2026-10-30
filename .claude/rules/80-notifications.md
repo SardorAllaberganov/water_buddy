@@ -16,31 +16,42 @@ system.
   `NotificationManager`
 - `ReminderPlanTests.swift` deliberately imports neither `UserNotifications` nor `@MainActor` — it
   is a compile-time canary, not an oversight. Do not "fix" it
-- The schedule is a **fixed grid** of hours, not a rolling timer. A slot is only ever **dropped**,
-  never moved: by the goal (today only, below) or by a drink less than `ReminderPlan.quietAfterDrink`
-  before it, the drink clamped to `now`. A rolling "two hours after your last serving" timer moves
+- The schedule is a **fixed grid** of hours — `ReminderPlan.Schedule.standard`, or the user's own
+  (set B, spec `2026-10-30-coaching-design.md`) — not a rolling timer. A slot is only ever
+  **dropped**, never moved: by the goal (today only, below), by a drink less than
+  `ReminderPlan.quietAfterDrink` before it, the drink clamped to `now`, by a quiet weekday, which
+  plants nothing that day, or — with *Only when behind* on, today only — by water that already covers
+  `ReminderPlan.due` at the slot's fire. A rolling "two hours after your last serving" timer moves
   slots, and a moved slot fires outside the window
 - `quietAfterDrink` is one hour — `theQuietHourEndsExactlyAnHourAfterTheDrink` pins it. One drink
   drops at most one slot — `oneDrinkSilencesAtMostOneSlot` pins that, and it holds only while
   `quietAfterDrink` stays within the grid's interval and the clamp stays: a watch pour carries the
   watch's own clock, and one stamped ahead of the phone's would otherwise silence every slot up to
-  an hour past it
+  an hour past it. No interval `Schedule.intervals` offers is shorter than it —
+  `oneDrinkSilencesAtMostOneSlotOnEveryInterval` sweeps each
 - Derive a slot's fire date with `calendar.date(bySettingHour:minute:second:of:)` on a day produced
   by `calendar.date(byAdding: .day, …)`. Never add 86,400 seconds
-- `slots(...)` degrades rather than traps: the loop bound is `0...max(0, horizonDays)`, and both
-  failable calendar computations fall through rather than force-unwrapping
+- `slots(...)` degrades rather than traps: the loop bound is `0...(7 × horizon)`, `horizon` never below
+  zero, and both failable calendar computations fall through rather than force-unwrapping. The horizon
+  counts **reminder days** beyond today — a quiet day uses none of it, so the days after a quiet stretch
+  are still filed (`aQuietStretchDoesNotUseUpTheHorizon`); today always counts, so a horizon of 0 is
+  today alone
 - Goal-reached silencing applies to `offset == 0` only, and a today-slot at exactly `now` is excluded
-  (`fire <= now`). Do not extend the silence to future days or relax the comparison
-- Raising `horizonDays` or lengthening `hours` requires re-checking
-  `hours.count × (horizonDays + 1) ≤ maximumPendingRequests` (64). The code clamps nothing — only
-  `theHorizonStaysWellInsideTheSixtyFourRequestCap` catches an overrun, and it exercises the default
-  horizon, so a caller passing a large `horizonDays` walks past the cap silently
+  (`fire <= now`). Do not extend the silence to future days or relax the comparison. *Only when
+  behind* is today's alone too, and what it drops is a run at the front of today's slots, because
+  `due` never falls through a day
+- A schedule's horizon is `Schedule.horizonDays` — `ReminderPlan.horizonDays`, shortened so
+  `hours.count × (horizon + 1) ≤ maximumPendingRequests` (64).
+  `everyScheduleKeepsThePlanInsideTheCap` sweeps every schedule `Schedule` accepts; raising
+  `horizonDays` or widening `Schedule.earliest...latest` re-runs it. A caller passing its own
+  `horizonDays` still walks past the cap silently
 
 ## Identifiers
 - A reminder identifier is exactly
   `"sardor.WaterBuddy.reminder." + dayOrdinal + "." + String(format: "%02d", hour)` — a pure function
   of day and hour. Never add a timestamp, a UUID, a total, or anything that varies between two
-  computations of the same slot
+  computations of the same slot. A schedule is whole hours, so the identifier keeps this shape
+  whichever schedule planted it
 - Every request identifier is built from the `identifierPrefix` constant. Never hand-write a literal
   identifier at a call site
 - Identifiers must be unique **within one plan**: `add` replaces a request with the same identifier,
@@ -131,9 +142,10 @@ system.
 
 ## Who reschedules
 - Every state change that can move the plan calls `rescheduleRemindersNow()`: the `currentWater`
-  path via `recomputeToday()`, the `dailyGoal` setter, the `remindersEnabled` setter, the `language`
-  setter — which moves no slot, but every pending reminder's wording —, `applyDailyReset(on:)` and
-  `refresh()`. A new mutation path without that call is incomplete
+  path via `recomputeToday()`, the `dailyGoal` setter, the `remindersEnabled` setter, the
+  `reminderSchedule` and `onlyWhenBehind` setters, the `language` setter — which moves no slot, but
+  every pending reminder's wording —, `applyDailyReset(on:)` and `refresh()`. A new mutation path
+  without that call is incomplete
 - Never guard the reschedule on `remindersEnabled` — always call through and let `slots` return `[]`.
   **An empty plan is the instruction to clear the schedule**
 - `DataManager.requestReminderReschedule` keeps its `guard role.mayFileReminders else { return }` —

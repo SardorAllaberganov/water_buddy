@@ -36,6 +36,12 @@ it is the only thing the widget can read.
   code would pin the app to today's system language forever
 - `Key.healthEnabled` is absent until the user turns Apple Health on, as `Key.remindersEnabled` is: absent
   and `false` both mean off. Only the app reads or writes it; no snapshot, mirror or notification carries it
+- Set B's two keys carry meaning in their absence too: `Key.reminderSchedule` absent is the standard
+  schedule — choosing *Standard schedule* removes it — and `Key.onlyWhenBehind` absent is off.
+  `Key.reminderSchedule` is a positional `[Int]` of four — first, last, every, the quiet-weekday mask —
+  read through `ReminderPlan.Schedule(stored:)` and discarded whole on any anomaly, as `servings` is.
+  Only the app writes either; every process that builds a `DataManager` reads both, so a widget tap
+  files the schedule the app set (spec `2026-10-30-coaching-design.md` D7)
 - Validate on the way out, not just on the way in: read the goal with `object(forKey:) as? Int` (not
   `integer(forKey:)`, which reads a missing key as 0), clamp `currentWater` to
   `0...maximumDailyIntake`, and fall back to `.system` for an unrecognised language code

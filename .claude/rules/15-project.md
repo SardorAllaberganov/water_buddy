@@ -126,6 +126,9 @@ from before this design was read, kept deliberately rather than renamed for its 
   recap adds no version check
 - `HealthPlan` and `HealthMirror` are app-only and stay out of every exception set. HealthKit enters by its
   `import` in `HealthMirror.swift` alone, as `FoundationModels` does in `InsightWriter.swift`
+- `ReminderScheduleSheet` — set B's schedule — is app-only and stays out of every exception set;
+  `ReminderPlan.Schedule` lives in `ReminderPlan.swift`, already in all three, because the widget
+  extension plans from it
 - `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
   `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
   `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,

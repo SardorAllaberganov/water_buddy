@@ -37,6 +37,11 @@ after the body above had already conceded it.
 - `healthEnabled` joins that surface. Its setter writes `Key.healthEnabled` and nothing else — no doorbell,
   no reschedule, no wrist publish, since nothing outside Settings draws it — and only `HealthMirror` sets it,
   after asking Health
+- `reminderSchedule` and `onlyWhenBehind` join that surface. Each setter writes its own key and
+  reschedules, and rings no doorbell and publishes nothing to the wrist: nothing outside the app draws
+  them. Setting `.standard` removes `Key.reminderSchedule`. Neither knows Premium — Settings decides who
+  may change them, and what is stored keeps working after a lapse (spec `2026-10-30-coaching-design.md`
+  D2)
 - `addLog(amount:at:)` returns the id of the row it inserted, `nil` for a refused amount. Home's
   *Undo* is the one caller that keeps it. `undoLog(id:)` finds that row among today's, read fresh,
   and deletes it through `deleteLog(_:)`; it does nothing when the row is gone or today's rows
@@ -117,10 +122,11 @@ after the body above had already conceded it.
   a failed read, never `[]`. Apple Health's mirror deletes every sample whose serving it saw earlier in
   the run and no longer finds among these rows, so a failed read returned as nothing would empty Health of
   the user's water
-- `remaining`, `hasReachedGoal`, `lastDrink` and `nextReminder` are computed on read from the
+- `remaining`, `hasReachedGoal`, `lastDrink`, `nextReminder` and `pace` are computed on read from the
   observable state and stored nowhere. `nextReminder` is the first slot of the plan
-  `currentReminderSlots()` files, cut to today. `WaterSnapshot` carries `remaining` and
-  `hasReachedGoal` too, for Siri's answer; `theSnapshotAgreesWithTheManager` pins the two pairs
+  `currentReminderSlots()` files, cut to today. `pace` is `ReminderPlan.pace` over the stored
+  schedule — the one definition *Only when behind* drops slots by. `WaterSnapshot` carries `remaining`
+  and `hasReachedGoal` too, for Siri's answer; `theSnapshotAgreesWithTheManager` pins the two pairs
   together
 - Do **not** add an equality guard to the `todaysLogs`, `historyLogs` or `monthLogs` republish. `WaterLog` is a
   `@Model` class hashed by `persistentModelID`, so the array after an amount edit compares equal to

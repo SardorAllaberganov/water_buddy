@@ -18,7 +18,7 @@ globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch
     ┌─────┴─────────────────┐                                        │
     ▼                       ▼                                        │
 SwiftData                UserDefaults suite  ◄───────────────────────┘
-WaterBuddy.store         12 keys, derived cache
+WaterBuddy.store         14 keys, derived cache
 source of truth          read by the app AND the widget
 app only
 ```
@@ -32,7 +32,8 @@ rule `70-privacy`'s *WatchConnectivity is a ruling, not an omission* and rule `2
 ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
 `Key.reviewRequestedVersion`, the version the app last asked for a rating in, brings it to 10;
 `Key.weekTotals`, the last seven days' totals the week widget draws, brings it to 11.
-`Key.healthEnabled`, the Apple Health switch, brings it to 12.
+`Key.healthEnabled`, the Apple Health switch, brings it to 12. `Key.reminderSchedule` and
+`Key.onlyWhenBehind`, set B's, bring it to 14.
 
 ## The rulings
 - **One writer per store — the one honest weakening.** `DataManager` remains the only writer to
@@ -63,7 +64,9 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
   injected beside `DataManager`. It reads StoreKit and writes neither store: the paid state lives in
   memory and is read again at launch, on every return to the foreground and on every transaction
   update. The widget and the watch never compile it and never ask StoreKit — a later item that needs
-  them to know writes a derived key through `DataManager` (rule `70-privacy`)
+  them to know writes a derived key through `DataManager` (rule `70-privacy`). Set B's settings are
+  ordinary preferences, not such a key: a lapse locks their editing and keeps what was set, so no
+  Premium bit enters the suite (spec `2026-10-30-coaching-design.md` D2)
 
 - **The insights are decided by the app and worded by Apple's model.** `WeekInsights` — a pure value
   in `DataManager.swift`, published like the month — decides what a week says; `InsightCopy` writes it
