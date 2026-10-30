@@ -63,7 +63,8 @@ tasks/                   lessons.md, append-only
 - The stored *day* is a `yyyyMMdd` ordinal; an *instant* is a `Date` (rule `30-rollover`)
 
 # Values
-- **No floating-point millilitres.** Volumes are `Int`; `Double` appears only as a drawing fraction
+- **No floating-point millilitres.** Volumes are `Int`; `Double` appears only as a drawing fraction — or
+  at HealthKit's boundary, in `HealthMirror.Source.live()`, handed an `Int` and rounded back to one
 - Every value is clamped on the way in and validated on the way out of the shared suite
 - No magic numbers in a view — sizes, radii and colours come from the design system
   (rule `60-design-system`)

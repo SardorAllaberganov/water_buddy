@@ -34,6 +34,9 @@ after the body above had already conceded it.
   nothing else: it decides through `mayRequestReview(reachedToday:streak:askedVersion:version:)` and
   writes the version **before** it answers `true`, so nothing can ask without recording it. It
   touches no row, rings no doorbell and reschedules nothing
+- `healthEnabled` joins that surface. Its setter writes `Key.healthEnabled` and nothing else — no doorbell,
+  no reschedule, no wrist publish, since nothing outside Settings draws it — and only `HealthMirror` sets it,
+  after asking Health
 - `addLog(amount:at:)` returns the id of the row it inserted, `nil` for a refused amount. Home's
   *Undo* is the one caller that keeps it. `undoLog(id:)` finds that row among today's, read fresh,
   and deletes it through `deleteLog(_:)`; it does nothing when the row is gone or today's rows
@@ -69,7 +72,9 @@ after the body above had already conceded it.
   can succeed while missing a row the extension just wrote, and re-deriving would overwrite it
 - Every path that changes a `WaterLog` ends in `saveAndRecompute()` — `try modelContext.save()` in
   a `do/catch` that logs inside `#if DEBUG`, then `recomputeToday()`. Never call
-  `modelContext.save()` directly from a mutation method, and never let a save failure crash
+  `modelContext.save()` directly from a mutation method, and never let a save failure crash. It ends by
+  posting `logsDidSaveNotification`, the manager as its object, when the save succeeded — Apple Health's
+  mirror listens; nothing else does
 
 ## A failed read is never written back
 - `fetch(_:)` returns `[WaterLog]?` and returns `nil` from its `catch` — never `[]`. A failed read
@@ -108,6 +113,10 @@ after the body above had already conceded it.
   `MonthHistory` — the same two reads as the month, through `readMonth(_:)` — publishes nothing, writes
   neither store, rings no doorbell and reschedules nothing, behind `role.drawsHistory`; a failed read is
   `nil`. `MonthHistory.recap`, the month a page offers, is a consequence worked out in `make`
+- `logs(since:)` is a read beside `recap(of:)`: the rows from a bound — every row for `nil` — and `nil` on
+  a failed read, never `[]`. Apple Health's mirror deletes every sample whose serving it saw earlier in
+  the run and no longer finds among these rows, so a failed read returned as nothing would empty Health of
+  the user's water
 - `remaining`, `hasReachedGoal`, `lastDrink` and `nextReminder` are computed on read from the
   observable state and stored nowhere. `nextReminder` is the first slot of the plan
   `currentReminderSlots()` files, cut to today. `WaterSnapshot` carries `remaining` and

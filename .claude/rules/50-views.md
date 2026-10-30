@@ -22,6 +22,8 @@ persist anything.
   `Binding` whose setter calls one
 - Premium's state comes from `@Environment(PremiumStore.self)`. A view never imports `StoreKit` and
   never holds a `Product`; it is handed `PremiumAccess.Plan`s
+- Apple Health's switch reads `@Environment(HealthMirror.self)`: its binding calls `enable()` on and
+  `disable()` off — one call each — and Settings draws the card only where `isAvailable`
 
 ## Arithmetic belongs to the model
 - A `body` must not recompute a figure the model already publishes. Take the total and the goal off

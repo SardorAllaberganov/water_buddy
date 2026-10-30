@@ -33,6 +33,10 @@ warning here is a Swift 6 error later.
   `InsightWriter.Source`, main-actor closures built by `static func live()`, each building its
   `LanguageModelSession` in its own body — nothing from `FoundationModels` in a `static let`.
   `WeekInsights` and `InsightCopy` are `nonisolated` and import `Foundation` alone
+- `HealthMirror` is `@MainActor @Observable`, `InsightWriter`'s shape: HealthKit only through
+  `HealthMirror.Source`, built by `static func live()`. Its passes run on a `ReconcileQueue` of its own; it
+  hears its manager's saves through `logsDidSaveNotification`, observed with `object:` that manager,
+  `queue: .main` and `MainActor.assumeIsolated`. `HealthPlan` is `nonisolated` and imports Foundation alone
 
 ## Sendable, and what may cross a process
 - `WaterSnapshot` is the only **state** value handed to a widget process: `Sendable`, `Equatable`,
@@ -148,5 +152,5 @@ warning here is a Swift 6 error later.
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests` or `StoreSampleTests` to make them
+  `MonthRecapTests`, `StoreSampleTests` or `HealthPlanTests` to make them
   compile. They are compile-time canaries: fix the declaration they read instead

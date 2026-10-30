@@ -146,6 +146,8 @@ rather than re-deriving it.
 - The week widget is one element: label *Last 7 days*, value the sentence History's card speaks —
   the average, the best day and the days met. Its bars, letters and figure are hidden. With no
   week, its value is the line it draws
+- Settings' *Apple Health* is one switch, its label the title it draws and its hint the line under it, on
+  the `Toggle` itself — the *Smart reminders* row's shape
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1

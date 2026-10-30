@@ -66,6 +66,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
 - Apple's model is reached in a test only through `InsightWriter.Source`'s closures — never
   `Source.live()`. Its writing, its fixed wording across launches and VoiceOver's reading of an insight
   are proved by hand, on a device with Apple Intelligence on, in English
+- HealthKit is reached in a test only through `HealthMirror.Source`'s closures — never `Source.live()`.
+  Health's sheet, the Health app's Water and a pour on a locked phone are proved by hand
 - Inject the `Calendar` and the `now: () -> Date` clock rather than waiting for a real day
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process
@@ -98,7 +100,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests`, `StoreSampleTests`. They are
+  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
@@ -206,7 +208,9 @@ control in Control Center, put the week widget on the Home Screen and tap it int
 small widget into StandBy on a device, by day and at night, since the simulator has none, and, after
 a change to reminders, press a reminder's *Log a Glass* with the
 app not running; after a change to Premium, buy each plan, restore, refund and approve an Ask to Buy
-through the local StoreKit configuration. The same
+through the local StoreKit configuration. After a change to Apple Health, turn it on — Water's switch on
+in Health's sheet, then *Allow* — pour, correct, delete and *Undo*, and read the Health app's Water;
+refuse it on a fresh install; withdraw it in Settings › Privacy & Security › Health and come back. The same
 applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face
 by hand, a tinted face among them: no part of the automated gate renders them.
 

@@ -34,6 +34,8 @@ it is the only thing the widget can read.
   (never asked) and `Key.weekTotals` (not yet known — the week widget says to open the app): never
   materialise a sentinel for "not chosen". The `language` setter calls `removeObject(forKey:)` for `.system`, because a stored
   code would pin the app to today's system language forever
+- `Key.healthEnabled` is absent until the user turns Apple Health on, as `Key.remindersEnabled` is: absent
+  and `false` both mean off. Only the app reads or writes it; no snapshot, mirror or notification carries it
 - Validate on the way out, not just on the way in: read the goal with `object(forKey:) as? Int` (not
   `integer(forKey:)`, which reads a missing key as 0), clamp `currentWater` to
   `0...maximumDailyIntake`, and fall back to `.system` for an unrecognised language code

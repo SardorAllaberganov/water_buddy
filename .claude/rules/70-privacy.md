@@ -10,13 +10,15 @@ That is a property to defend, not a phase.
 
 ## Nothing leaves the device
 - Import no networking, analytics or sensor framework: `URLSession`, `Network`, `CoreLocation`,
-  `HealthKit`, `CloudKit`, `StoreKit` (two uses, below), `AdSupport`,
+  `HealthKit` (one use, below — the phone only), `CloudKit`, `StoreKit` (two uses, below), `AdSupport`,
   `AppTrackingTransparency` — and no third-party SDK (rule `95-dependencies`). `FoundationModels` is
   permitted in one file, on the conditions below
-- Keep `com.apple.security.application-groups` the only entitlement on either signed target. Adding
-  any other capability requires a written justification in this file first
-- Add no `NS*UsageDescription` key to any Info.plist. The project carries zero, and notification
-  authorization is the only permission this product ever asks for
+- Keep `com.apple.security.application-groups` the only entitlement on every signed target but the app's,
+  which also carries `com.apple.developer.healthkit` (*HealthKit, for Apple Health*, below). Adding any other
+  capability requires a written justification in this file first
+- Add no `NS*UsageDescription` key to any Info.plist but `NSHealthUpdateUsageDescription`, on the app target
+  alone (*HealthKit, for Apple Health*, below). Notification authorization and Health's permission to write
+  Water are the only two permissions this product ever asks for
 - The one thing that leaves on the user's own tap is the recap's image, on the conditions below
 - The app links its privacy policy for every user from Settings, and from the paywall beside the
   *Terms of Use*: `PaywallView.privacyPolicy`, the one spelling of the address, which Settings reads
@@ -64,8 +66,9 @@ Three limits are conditions of the permission:
   of its own. Since the redesign's stage 7 the watch's faces carry the Lock Screen widget's marking:
   every figure `.privacySensitive()`, and a quiet form whenever `redactionReasons` contains
   `.privacy`
-- **No third framework rides in behind it.** `HealthKit`, `CoreLocation` and `CloudKit` remain
-  banned by name, and a watch app is exactly where someone will propose all three.
+- **No third framework rides in behind it.** `CoreLocation` and `CloudKit` remain banned by name, and
+  `HealthKit` is banned on the watch — the phone's one use, below, writes from the phone alone. A watch app
+  is exactly where someone will propose all three.
 
 Approved by the owner: `docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md` §14 records
 the explicit ruling ("§9's `70-privacy` amendment is approved as written") that made this text live
@@ -131,6 +134,40 @@ Six limits are conditions of the permission:
 - **It says who wrote it, and what it is not.** The footer names WaterBuddy or Apple's on-device model
   and says *Not medical advice*. The copy never names *Apple Intelligence* — an Apple mark is never part
   of a feature's name (the owner's ruling on #164) — and the paywall's row names no model at all
+
+## HealthKit, for Apple Health
+
+`HealthKit` may copy the user's servings into Apple Health on the iPhone (roadmap 1.3.3,
+`docs/superpowers/specs/2026-10-29-apple-health-design.md`). Health is Apple's store on the device: no
+server of ours, no account, no third party. Apple syncs it through iCloud only when the user has turned
+that on, under Apple's terms. WaterBuddy's own log stays the source of truth.
+
+Eight limits are conditions of the permission:
+- **One file.** `HealthMirror.swift` alone imports `HealthKit`, and reaches it only through
+  `HealthMirror.Source`. No view, no widget or watch file, not `DataManager.swift`
+- **Write only, Water only.** Authorization asks to share `HKQuantityType(.dietaryWater)` and to read
+  nothing. The only samples read back are WaterBuddy's own, which a write permission allows. A read of
+  anything another source wrote, or any second type — 1.4.11's workouts among them — needs an amendment
+  here first
+- **Only on the user's tap.** Asked from Settings' *Apple Health* switch turning on, through
+  `HealthMirror.enable()` — never at launch, never from the welcome, a widget, the watch, Siri, the control
+  or a notification. A refusal leaves `healthEnabled` false
+- **A copy, never a source.** Nothing read from Health reaches a figure, a widget, the watch, Siri, a
+  notification or the recap. A sample carries a serving's amount, its instant, its id as the sync
+  identifier, the version HealthKit needs to replace it and the mark that the user entered it, and nothing
+  else: no goal, streak, language or device name
+- **Never delete what this log did not hold.** A sample whose serving is gone is deleted only if the
+  mirror saw that serving in the log during this run — a set of ids kept in memory, never stored — because
+  HealthKit reads back an earlier install's samples and another iPhone's under the same source, and those
+  are the user's
+- **One entitlement, one key.** `com.apple.developer.healthkit` on the app target alone, beside the App
+  Group, and `NSHealthUpdateUsageDescription` — the two exceptions above, each for this alone. No
+  `NSHealthShareUsageDescription`: nothing is read
+- **Turning it off deletes nothing.** It stops the writing; what is in Health is the user's, to keep or to
+  delete — Settings › Privacy & Security › Health › WaterBuddy › *Data from "WaterBuddy"* (measured on
+  iOS 27.0; the Health app's own list of apps did not show WaterBuddy there)
+- **No diagnostic carries a sample.** A `#if DEBUG` line names the failing condition only (rule
+  `75-diagnostics`)
 
 ## The recap's image, on the user's own tap
 

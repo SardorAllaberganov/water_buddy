@@ -124,6 +124,8 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `RecapCard` and `RecapSheet` are app-only and stay out of every exception set; the month they read,
   `MonthHistory`, lives in `DataManager.swift`. `ImageRenderer` and `ShareLink` are iOS 16, so the
   recap adds no version check
+- `HealthPlan` and `HealthMirror` are app-only and stay out of every exception set. HealthKit enters by its
+  `import` in `HealthMirror.swift` alone, as `FoundationModels` does in `InsightWriter.swift`
 - `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
   `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
   `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,
@@ -148,11 +150,12 @@ from before this design was read, kept deliberately rather than renamed for its 
   `WaterBuddy.entitlements`, `WaterBuddyWidgetExtension.entitlements`,
   `WaterBuddyWatch.entitlements`, `WaterBuddyWatchWidgetExtension.entitlements` — wired via
   `CODE_SIGN_ENTITLEMENTS` in **both** Debug and Release, each listing `group.sardor.WaterBuddy`
-- All four files are currently byte-identical (same content, re-verified by `shasum`) and nothing
-  enforces that. If one changes, check the other three by hand — and verify the built product with
-  `codesign -d --entitlements - <path>`, because a missing entitlement degrades silently
-  (rule `25-shared-storage`)
-- The App Group is the only entitlement on any of the four targets (rule `70-privacy`).
+- The widget's and the two watch targets' files are byte-identical (re-verified by `shasum`); the app's
+  differs by the HealthKit entitlement alone. Nothing enforces either. If one changes, check the other
+  three by hand — and verify the built product with `codesign -d --entitlements - <path>`, because a
+  missing entitlement degrades silently (rule `25-shared-storage`)
+- The App Group is the only entitlement on the widget and both watch targets; the app's file also
+  carries `com.apple.developer.healthkit` (rule `70-privacy`'s *HealthKit, for Apple Health*).
   `WatchConnectivity` itself needs **no** entitlement — the watch targets carry the identical single
   App Group entitlement as the phone side, nothing more
 
@@ -185,6 +188,9 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   Extensions and the watch app inherit the containing app's declaration; do not duplicate it.
   Verified as `false` in the built `Info.plist`. Without it every upload stalls on a manual
   export-compliance questionnaire
+- **The App ID `sardor.WaterBuddy` carries the HealthKit capability.** Automatic signing adds it when Xcode
+  next signs for a device; check a distribution profile carries it before an archive, or the upload is
+  refused for an entitlement the profile lacks
 - **The app icon is delivered inside the bundle, never uploaded separately.** App Store Connect has
   no icon upload field any more. The 1024² marketing icon comes out of the asset catalog, which is
   why `WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset/Contents.json` must use the modern
@@ -208,3 +214,5 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   (rule `70-privacy`)
 - `WaterBuddy/AppShortcuts.xcstrings` is a fifth catalogue — Siri's phrases only, in `en` and `ru`,
   because Siri has no Uzbek (rule `70-privacy`)
+- `WaterBuddy/InfoPlist.xcstrings` is a sixth catalogue — the Info.plist's one localised string,
+  `NSHealthUpdateUsageDescription`, which Health's sheet shows — in `en`, `ru` and `uz`

@@ -153,7 +153,8 @@ measured.
   canvas's ramp to another
 - Volumes stay `Int` everywhere, including a view's `@State`. A `Double` may exist only as a drawing
   fraction (`progress`, `progressUnclamped`, `WaterSurface.level`) or inside a `Slider` binding that
-  rounds back to `Int` on the way out
+  rounds back to `Int` on the way out — and at HealthKit's boundary, in `HealthMirror.Source.live()`, from
+  an `Int` and rounded back to one
 
 ## Haptics
 - Fire only through `Haptics.confirm`, `Haptics.pour`, `Haptics.goalReached`, `Haptics.select` and

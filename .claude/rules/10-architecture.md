@@ -18,7 +18,7 @@ globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch
     ┌─────┴─────────────────┐                                        │
     ▼                       ▼                                        │
 SwiftData                UserDefaults suite  ◄───────────────────────┘
-WaterBuddy.store         11 keys, derived cache
+WaterBuddy.store         12 keys, derived cache
 source of truth          read by the app AND the widget
 app only
 ```
@@ -32,6 +32,7 @@ rule `70-privacy`'s *WatchConnectivity is a ruling, not an omission* and rule `2
 ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
 `Key.reviewRequestedVersion`, the version the app last asked for a rating in, brings it to 10;
 `Key.weekTotals`, the last seven days' totals the week widget draws, brings it to 11.
+`Key.healthEnabled`, the Apple Health switch, brings it to 12.
 
 ## The rulings
 - **One writer per store — the one honest weakening.** `DataManager` remains the only writer to
@@ -69,6 +70,10 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
   as sentences; `InsightWriter`, app-only and `@MainActor @Observable`, injected beside `PremiumStore`,
   may hand those English sentences to the on-device model and draws its note only if it adds no figure
   (rule `70-privacy`)
+- **Apple Health is a copy, written by the app.** `HealthPlan`, pure, decides from the rows and the samples
+  WaterBuddy already wrote; `HealthMirror`, app-only and the one file importing HealthKit, carries it out
+  through one `ReconcileQueue`. It reads back only WaterBuddy's own samples, and no figure comes from Health
+  (rule `70-privacy`)
 
 ## Import direction
 - The widget may import from the six shared files. **Nothing shared may import from the widget or
@@ -102,3 +107,4 @@ membership* section.
   suite — the one-writer-per-store split is exact, not a shared free-for-all
 - `import StoreKit` outside `HomeView.swift` and `PremiumStore.swift`
 - `import FoundationModels` outside `InsightWriter.swift`, and any model but `SystemLanguageModel.default`
+- `import HealthKit` outside `HealthMirror.swift`, and any read of a type or a source but WaterBuddy's own Water
