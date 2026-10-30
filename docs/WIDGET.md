@@ -3,6 +3,15 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-10-31 (hundred-and-third pass — `/doc_sync` on set B's staged tree, on
+`feature/coaching`). **One contract moved: what `AddWaterIntent` files.** Its reconcile now plans the stored
+schedule and *Only when behind*, read by the extension's `DataManager` — a bullet under *The intent also
+reschedules reminders*. Two of the six shared files changed, `ReminderPlan.swift` and `DataManager.swift`.
+Nothing on the read path moved: no field on `WaterSnapshot`, no file under `WaterBuddyWidget/`, no view. Both
+widget builds succeed on the final code, and a clean build of the index gives the widget scheme the same 17
+warning messages, 29 sites, as a `470a469` export. Nothing placed on a Home Screen: no widget's view tree
+changed.
+
 **Last updated:** 2026-10-23 (set A's step 2's own Task 10 — not a `/doc_sync` pass). **No contract
 here moved.** Step 2 changed one of the six shared files, `DataManager.swift` — `MonthHistory`, a
 `nonisolated` value at file scope, and the app's `month`, `monthLogs` and `showMonth(_:)` behind
@@ -527,6 +536,12 @@ at all:
   same words — `theAppAndTheWidgetFileRemindersInTheSameWords` pins it — so neither re-files the
   other's; *Follow device* is not pinned (`docs/AI_CONTEXT.md` known issue #134). `perform()`'s code
   is unchanged.
+- Since 2026-10-31 (set B, staged on `feature/coaching`) the plan follows the **stored schedule and *Only when
+  behind***. `Key.reminderSchedule` and `Key.onlyWhenBehind` are read by the extension's `DataManager` in `init`
+  and again by the `refresh()` `addWater` starts with, so a press after the user changed the schedule files the
+  new one (`aWidgetTapAfterAChangeFilesTheNewSchedule`). Nothing about Premium reaches the extension, and none
+  is needed: the stored values are what the app plans by too, Premium or lapsed (spec
+  `2026-10-30-coaching-design.md` D2). `perform()`'s code is unchanged, and nothing the widgets draw moved.
 
 **Unverified:** whether WidgetKit's sandbox *permits* the call at runtime. The addressing is proven;
 the permission is not, and sandbox profiles are kernel-compiled. `DataManager.refresh()` reconciles

@@ -457,6 +457,14 @@ Worked out when shown and stored nowhere, as `remaining` is (rule `20-state`).
 covers what 1.4.9's pace asks for by that slot's hour — a third reason beside the goal and a drink
 within the hour. The plan still only drops slots and never moves one, so it stays pure (rule
 `80-notifications`). **Needs a rule change** (§8).
+*(2026-10-30 into the 31st: **set B — 1.4.3, 1.4.9 and 1.4.10 — designed, specified, planned, built
+test-first, walked, gated and reviewed on `feature/coaching` (from `feature/apple-health`), staged; not
+committed — and set B is on sale in code.** The owner's rulings: three items now, **1.4.11 waits for its
+own design** (it needs Health to read workouts); **what the user set keeps working on a lapse** — no
+Premium bit is stored, editing and the pace line lock; **a share per reminder** for the pace; **locked rows
+in Settings** for a free user. Spec `docs/superpowers/specs/2026-10-30-coaching-design.md`, plan
+`docs/superpowers/plans/2026-10-30-coaching.md`. Its rule wording — ten files and `CLAUDE.md` — is typed
+and unstaged for the owner's `/commit`.)*
 
 **1.4.11 — Workout-aware goal.** A workout recorded in Apple Health raises that day's goal; no
 location and no weather (§9). Only if 1.3.3 also *reads* from Health — otherwise it waits. Whether

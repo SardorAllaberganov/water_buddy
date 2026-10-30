@@ -14053,3 +14053,157 @@ was run** — the `/commit` above stopped before its first. On `feature/apple-he
 eleven rule files' wording, `.claude/settings.json`, the two watch schemes and Xcode's three catalogues.
 **No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This supersedes
 the staging block above.
+
+## [2026-10-31] — Set B (1.4.3, 1.4.9, 1.4.10): built test first on `feature/coaching`; the review's two Important fixed
+
+Taken by `/start_task` with no task named, on the owner's "go" to *design set B*, then "go" (the spec), "ok"
+(the plan), "ok" (the rule wording, as typed), and "1" twice (after two denied calls, each a stop: run the UI
+chunks as direct commands; re-walk from a fresh export with a script made by Write). The plan ran inline
+(executing-plans), test first. The branch `feature/coaching` was made from `feature/apple-health` at `470a469`
+(D11). Before this, the records still said Apple Health had not been committed; it was committed and pushed
+at 13:30 on 2026-10-30, and `/doc_sync` is the owner's to record that. Nothing committed; nothing merged.
+
+### What changed
+
+- **The design** — `docs/superpowers/specs/2026-10-30-coaching-design.md`. The owner ruled four: three items
+  now, 1.4.11 later; what the user set keeps working on a lapse, so no Premium bit is stored; a share per
+  reminder for the pace; locked rows in Settings. D5–D13 approved as recommended. §6 records planning's
+  refinements, §7 the walk's and the review's. The plan is `docs/superpowers/plans/2026-10-30-coaching.md`.
+- **The rule wording** — ten rule files and `CLAUDE.md`, typed, approved as typed, unstaged for the owner's
+  `/commit`. `80-notifications`' loop-bound line was re-typed after the review (Important 1).
+- **The code**, each task seen RED, then GREEN:
+  - `ReminderPlan.Schedule`: whole hours 05–23 on a grid, every 1, 2 or 3 hours, quiet weekdays; validated
+    whole; its horizon shortened to stay inside 64.
+  - The plan: quiet days plant nothing, and *Only when behind* drops today's covered slots. `due` and
+    `pace` share one definition.
+  - `DataManager`: `Key.reminderSchedule` and `Key.onlyWhenBehind`, read by every process and re-read on
+    refresh; `pace` is computed on read.
+  - `PremiumSet.coached`, on sale; `PremiumAccess.Gate`.
+  - Settings' *Schedule* row, *Only when behind* and the new `ReminderScheduleSheet`.
+  - Home's pace line.
+  - 29 strings in en, ru and uz — the Russian and Uzbek are drafts.
+  - The privacy policy, both forms.
+- **The walk**, by a scratch XCUITest on the scratchpad's export: held, free and at the largest text size.
+  - **W1:** the pace line repeated *to go* after the last reminder hour. It now hides once every share is due.
+  - **W2:** the sheet's hour rows broke at the accessibility sizes. They now stack, seen fixed.
+  - Contrast: a quiet day's letter measures 5.68:1 on its disc.
+- **The final review** (Opus, fresh, read-only): *With fixes*, 0 Critical, 2 Important, 8 Minor.
+  - **Important 1** — quiet days used up the horizon, so a Thursday plan with Friday to Sunday quiet filed
+    no Monday. The horizon now counts reminder days.
+  - **Important 2** — a lapsed user's switch that was on said *Opens Premium* but turned off. One rule now
+    drives both the hint and the binding.
+  - Each fix was seen RED, then GREEN. The minors are deferred (spec §7).
+- **Tests:** phone `@Test` 1001 → 1055 (54 new); UI `func test` 63 → 67; watch 71, unchanged.
+
+### Rulings (the ledger's, `.superpowers/sdd/2026-10-30-coaching/progress.md`)
+
+- Suites, not files, in `-only-testing`.
+- The UI helpers are `@MainActor`.
+- After the welcome, a test taps the first *Settings* match.
+- The test translation check is stronger than planned.
+- One pinned sale state moved to `[.understand, .coached]`.
+- A new test's `Set<Slot>` was keyed by day and hour, removing two warning sites.
+- The review package was built from the staged diff.
+- W1.
+- The rule's loop-bound line.
+- The reviewer's set-aside items stand.
+- The workspace is kept until `/commit`.
+
+### Gate
+
+On the final code unless said, iOS 27.0 and watchOS 27.0, one simulator at a time:
+
+- Phone unit: **1055 tests in 116 suites passed** after the fix pass; 1051 before it.
+- Phone UI, harness skipped, `test-without-building` in five chunks. The suite was run whole before the fix
+  pass, and set B's UI tests again after it.
+  - **27.0:** 79 executed, 1 skipped, 1 failure. `testUseComesBackWhenTheGoalIsMovedAway` is #140's flake;
+    it passed alone twice.
+  - **26.5:** 79 executed, 1 skipped, 2 failures.
+    - `testAPressDraggedAlongTheBarChangesTheTab` alternated base and index three times: the base failed
+      once; the index passed three times. That is #191.
+    - `testADiscAndUndoAnswerOffTheirGlyphs` passed alone twice.
+  - After the fix pass: `CoachingUITests` 2/2 and `PremiumUITests`' two set B tests passed.
+- Watch unit: **71 in 7 suites passed**.
+- Both widget schemes: **BUILD SUCCEEDED**, on the final code.
+- Warnings: clean builds of a `470a469` export and of the index, after the fixes, into empty DerivedData,
+  compared by file and message and by site count — **unchanged on all four schemes**: 20/36, 17/29, 2/2,
+  17/29.
+
+**Staging.** Read from the commands at 00:39 on 2026-10-31, after this session's `git add` of every path below
+by name, and again of this file once this block was written. **No `git commit` was run.** On
+`feature/coaching` (no upstream), HEAD `470a469`, 224 commits. **25 staged:**
+- **7 added:** the spec, the plan, `ReminderScheduleSheet.swift`, `CoachingModelTests.swift`,
+  `ReminderScheduleSheetTests.swift`, `ReminderScheduleTests.swift` and `CoachingUITests.swift`.
+- **18 modified:** the code, the tests, the catalogue, the policy's two forms, `docs/ROADMAP.md`,
+  `tasks/lessons.md` and this file.
+
+**17 unstaged:**
+- the rule wording in ten files and `CLAUDE.md`, for the owner's `/commit`;
+- `.claude/settings.json`;
+- the two watch schemes;
+- Xcode's three catalogues.
+
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`.
+
+## [2026-10-31] — The hundred-and-third `/doc_sync`: set B recorded on its branch, and Apple Health's commit
+
+Run by the owner on set B's staged tree, on `feature/coaching`. One call in it was denied: a `sed -i` on
+`docs/AI_CONTEXT.md`. That was a stop; on the owner's "1" every later change went through Edit.
+
+### The checks, every figure printed
+
+- 126 `.swift` files by `git` and by `find`, Tools aside — five new, each now with a *Files on disk* row,
+  and every changed row equal to `wc -l`;
+- 1055 phone `@Test`, 71 watch, 67 UI `func test`;
+- 16 keys on `DataManager.Key` and in `Key.all`, the phone's suite 14;
+- three exception sets, unchanged;
+- 263 keys in the app's catalogue, 259 in en/ru/uz;
+- every rule citation resolves; no forbidden doc; no `.swift` change in the working tree.
+
+### Drift, from the change — written
+
+- `docs/AI_CONTEXT.md`:
+  - *Last updated*;
+  - *Current state*: set B's block, and a dated bullet that Apple Health was **committed and pushed on
+    2026-10-30 at 13:30** — `63336c4`, `2ee3f39`, `e4aebc9`, `c446f0a`, `470a469`, read from `git log`,
+    which the records had still said was not;
+  - *Targets*' three test rows;
+  - *Files on disk*: five rows, twelve recounted, the catalogue and the policy;
+  - known issues #199–#208 — set B's eight deferred minors, the drafts, the device-only checks;
+  - the Git block.
+- `docs/STATE.md`: the two keys and their rows, the count 12 → 14 with every present-tense "twelve" given a
+  dated aside, the roster, `pace` among the values computed on read, and a section for the two keys.
+- `docs/WIDGET.md`: the widget's tap files the stored schedule and *Only when behind*.
+- `docs/DESIGN.md`: *Set B, measured* — the rows, the sheet's panes, the pace line, 7.87–8.10:1 and 5.68:1.
+- `CLAUDE.md`: Apple Health committed — `e4aebc9`, its rule wording `2ee3f39`. It stays unstaged, with the
+  owner-approved set B wording it carries.
+- `tasks/lessons.md`: one entry — change a file only with Write or Edit, and run a tool as one direct command.
+
+### Checked and already accurate
+
+`docs/ROADMAP.md` (set B's dated note, written in the build session) and `CLAUDE.md`'s key table, written in
+Task 1 and approved.
+
+### Gate
+
+Not run again: no code changed since the build session's gate, recorded in the checkpoint above.
+
+**Staging.** Read from the commands at 00:57 on 2026-10-31, after this pass's `git add` of `docs/AI_CONTEXT.md`,
+`docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and `tasks/lessons.md` by name, and again of this file and
+`docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On `feature/coaching` (no
+upstream), HEAD `470a469`, 224 commits.
+
+**29 staged:**
+- **7 added:** set B's spec and plan, `ReminderScheduleSheet.swift`, `CoachingModelTests.swift`,
+  `ReminderScheduleSheetTests.swift`, `ReminderScheduleTests.swift` and `CoachingUITests.swift`.
+- **22 modified:** the code, the tests, the catalogue, the policy's two forms, `docs/ROADMAP.md`,
+  `tasks/lessons.md`, this file, `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`.
+
+**17 unstaged:**
+- the rule wording in ten files and `CLAUDE.md`;
+- `.claude/settings.json`;
+- the two watch schemes;
+- Xcode's three catalogues.
+
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This
+supersedes the staging block above.

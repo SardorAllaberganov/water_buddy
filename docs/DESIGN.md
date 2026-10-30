@@ -7,6 +7,11 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-31 (hundred-and-third pass — `/doc_sync` on set B's staged tree, on
+`feature/coaching`). **No token moved.** A section, *Set B, measured*: the reminders card's two new rows, the
+schedule sheet's panes, intervals and day discs, Home's pace line, and two measured pairs — a day that keeps its
+reminders at 7.87–8.10:1, a quiet day's dimmed letter at 5.68:1, both over 4.5.
+
 **Last updated:** 2026-10-30 (hundredth pass — `/doc_sync` run by the owner on Apple Health's staged tree, on
 `feature/apple-health`). **No token moved.** Settings gains a fifth card, *Apple Health*, under *Smart
 reminders*: the reminders card's twin — `.settingsCard()`'s pane (`.frosted` + `.raised`), its title in
@@ -2428,6 +2433,43 @@ The fill moves no pair by more than 0.09. **Not measured:** the fill on iOS 26.5
 **Not measured:** iOS 26.5 and 18.6; Increase Contrast; Uzbek (the same tokens as Russian's, read by eye);
 the largest text sizes' pairs (the layout read by eye — W2's fix); the image under the sender's Reduce
 Transparency, which an `ImageRenderer` does not inherit (inferred, spec §4b).
+
+## Set B, measured
+
+*(2026-10-31, hundred-and-third pass — set B staged on `feature/coaching`;
+`docs/superpowers/specs/2026-10-30-coaching-design.md`.)* No token moved, and no new one.
+
+**Settings' reminders card** gains two rows beneath its sentence, divided by the card's own `Hairline`:
+- *Schedule*: the card title, the schedule and its quiet days as notes, and a trailing glyph — `chevron.right`
+  when open, `lock.fill` when locked — in footnote semibold white, 50 pt at least.
+- *Use the standard schedule*, only after a lapse: the card's sheer capsule.
+- *Only when behind*: the *Smart reminders* toggle's shape, its line as a card note.
+
+**The schedule sheet** stands on `AuroraBackground` with `SheetCloseButton(label: "Done")`. Its parts:
+- **The hour rows** are `.frosted` + `.raised` panes, 56 pt at least — a pair its siblings do not share, with no
+  stated reason (#201).
+- **The intervals** are three `.sheer` + `.resting` interactive panes in `.glassGroup()`, the chosen one marked
+  by `LiquidGlass.Selection`'s fill (0.08) and rim (0.55) and a bold label.
+- **The days** are seven 44-pt `.sheer` discs in `.glassGroup()`, their letter 17 ⁄ 44 of the disc
+  (`SheetCloseButton`'s glyph ratio). A day that keeps its reminders takes the selection mark and a bold white
+  letter; a quiet day, no mark and its letter at `quietOpacity` 0.7.
+- *Standard schedule*: a sheer capsule.
+
+**Home's pace line** is the quiet line's style — footnote medium, full white, `legibleOnBackdrop()` — with a
+glyph before it: `checkmark.circle` on track, `hourglass` behind. It sits between the status and the quiet line.
+
+**Measured** off the re-walk's own screenshot, iPhone 17 (27.0), 1206 × 2622, in sRGB relative luminance — the
+letter's brightest strokes against the disc's glass at its lower quartile:
+
+| Pair | Figure | Floor |
+|---|---|---|
+| A day that keeps its reminders: white letter on its disc (Friday, Sunday) | **7.87:1**, **8.10:1** | 4.5 |
+| A quiet day: its letter at 0.7 on its disc (Saturday) | **5.68:1** | 4.5 |
+
+**Not measured:** the pace line itself, which takes the quiet line's measured style and stands where it does,
+over the same backdrop; the hour rows' and intervals' labels (white on the app's own glass, read by eye); iOS
+26.5 and 18.6; Increase Contrast; Russian and Uzbek; and the largest text sizes' pairs — the layout read by eye,
+W2's fix.
 
 ## The header and a screen arriving
 

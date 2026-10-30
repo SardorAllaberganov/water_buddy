@@ -4,6 +4,14 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-10-31 (hundred-and-third pass — `/doc_sync` run by the owner on set B's staged tree,
+roadmap items 1.4.3, 1.4.9 and 1.4.10, on the branch `feature/coaching`; not committed, not merged). **Two keys
+added:** `sardor.WaterBuddy.reminderSchedule`, a positional `[Int]` of four, absent for the standard schedule,
+and `sardor.WaterBuddy.onlyWhenBehind`, a `Bool`, absent until turned on — **16** on `DataManager.Key` and in
+`Key.all` (counted by script), the phone's suite **14**. Two rows in the table, a dated note above it, every
+present-tense "twelve" moved with a dated aside, and a section, *The thirteenth and fourteenth keys, and set B's
+schedule*. No other key or stored byte moved; `WaterLog` gained no field.
+
 **Last updated:** 2026-10-30, later (hundred-and-first pass — `/doc_sync` run again by the owner; no code
 changed). **Drift, four sentences the hundredth pass left at "eleven":** the two-stores table's *Holds*, the
 watch's "none of the phone's eleven keys", the migration paragraph (which now names `healthEnabled` among
@@ -401,7 +409,7 @@ and which is authoritative matters more than either on its own:
 
 | | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
 |---|---|---|
-| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | twelve keys (below; ten until 2026-10-20, `weekTotals` the eleventh; eleven until 2026-10-30, `healthEnabled` the twelfth, on `feature/apple-health`) |
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | fourteen keys (below; ten until 2026-10-20, `weekTotals` the eleventh; eleven until 2026-10-30, `healthEnabled` the twelfth, on `feature/apple-health`; twelve until 2026-10-31, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, on `feature/coaching`) |
 | Status | **source of truth** | **derived cache** |
 | Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
 | Read by | the app — and the extension's own `DataManager`, inside `AddWaterIntent.perform()` and nowhere else | the app **and the widget** |
@@ -470,6 +478,9 @@ more, all documented" there until the twenty-sixth pass; the table has had nine 
 1.3.1's stage 6c, staged: **thirteen** in `Key.all` — the eleven in this table, `weekTotals` the
 eleventh, and the watch's two.)* *(2026-10-30, hundredth pass, Apple Health staged on its branch:
 **fourteen** in `Key.all` — the twelve in this table, `healthEnabled` the twelfth, and the watch's two.)*
+*(2026-10-31, hundred-and-third pass, set B staged on `feature/coaching`: **sixteen** in `Key.all` — the
+fourteen in this table, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, and the watch's
+two.)*
 
 | Stored key | Type | Range / clamp | Written by | Why it exists |
 |---|---|---|---|---|
@@ -480,6 +491,8 @@ eleventh, and the watch's two.)* *(2026-10-30, hundredth pass, Apple Health stag
 | `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut, the Control Center control and — since 2026-10-15 — a reminder's *Log a Glass* log** — read through `DataManager.usualServing(in:)`, the one definition they all call, at the index `DataManager.usualSlot` names — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
 | `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
 | `sardor.WaterBuddy.healthEnabled` | `Bool` | — (read with `bool(forKey:)`: absent and `false` are both off) | **app only — the `healthEnabled` setter, which only `HealthMirror` calls, after asking Health** | Settings' *Apple Health* switch (2026-10-30, staged on `feature/apple-health`). **Absent until switched on** — see *The twelfth key*. Every process's `DataManager` reads it in `init`; only the app acts on it. |
+| `sardor.WaterBuddy.reminderSchedule` | `[Int]` | exactly 4 — `[first, last, every, quietMask]`: first and last whole hours `5...23` with the last on the grid `first + k × every`, `k ≥ 1`; `every` 1, 2 or 3; the mask's bit `n − 1` for Gregorian weekday `n`, below 127 (never all seven) — validated on the way out by `ReminderPlan.Schedule(stored:)`, the whole value discarded to the standard schedule on any anomaly, never repaired | **app only — the `reminderSchedule` setter, which only Settings' schedule sheet and *Use the standard schedule* call** | Set B's reminder schedule (2026-10-31, on `feature/coaching`). **Absent means the standard schedule** — every two hours, 9 to 9, every day — so it is never materialised, and choosing *Standard schedule* removes it. Every process's `DataManager` reads it in `init` and again in `refresh()`, so the widget's tap files the schedule the app set. See *The thirteenth and fourteenth keys*. |
+| `sardor.WaterBuddy.onlyWhenBehind` | `Bool` | — (read with `bool(forKey:)`: absent and `false` are both off) | **app only — the `onlyWhenBehind` setter, from Settings' switch** | Set B's *Only when behind* (2026-10-31, on `feature/coaching`). **Absent until switched on.** Read by every process's `DataManager`, for the same reason. |
 | `sardor.WaterBuddy.language` | `String` | — | app only — the `language` setter, whose one caller is `SettingsView`. The widget *reads* it, and the watch reads it secondhand, as `WristMirror.languageCode` | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
 | `sardor.WaterBuddy.wristApplied` | `Data` (JSON `[Int: [UUID]]`) | **unbounded per day, until the 90-day trim** — see note below | **app only, via `ingest(_:)`** | The phone's per-day applied ledger for wrist-authored pours — day ordinal → the `WaterLog.id`s already folded in. `nonisolated`, unlike the eight keys above it (and the watch's two), because `readAppliedLedger(from:)`/`writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` and a nested type's members otherwise infer the enclosing `@MainActor` class's isolation. Trimmed to the last `appliedLedgerRetentionDays` (90) real calendar days on every write — never by subtracting a raw integer from the `yyyyMMdd` ordinal, which borrows across the month/day radix incorrectly (a real bug this plan introduced and fixed in its own Task 4, before it shipped). A write also protects any day it just folded into, even one already older than the 90-day cutoff, so the same write that adds an entry can never be the write that trims it (final review, `ingest(_:)`'s cutoff is `min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)`). |
@@ -504,7 +517,7 @@ eleventh, and the watch's two.)* *(2026-10-30, hundredth pass, Apple Health stag
 `WaterBuddyWatch` and `WaterBuddyWatchWidget` resolve the identical App Group *identifier string*,
 `group.sardor.WaterBuddy`, through the same `DataManager.sharedDefaults` accessor the phone uses —
 but the watch is a **different physical device**, so this is a different container on disk, holding
-none of the phone's twelve keys above and read by none of the phone-side code. Never confuse "same
+none of the phone's fourteen keys above *(twelve until 2026-10-31, set B)* and read by none of the phone-side code. Never confuse "same
 identifier" with "same storage": nothing written on one device is visible on the other except
 through an explicit `WatchConnectivity` transfer (rule `70-privacy`).
 
@@ -517,7 +530,7 @@ Both are written **only** by `WristModel`, never by `DataManager` — the one ho
 `20-state` now states plainly: one writer per store, not one writer full stop. `WristModel` never
 opens SwiftData and never touches the phone's own App Group container.
 
-**Of the phone's twelve keys, four are carried by the migration** — `currentWater`, `dailyGoal`,
+**Of the phone's fourteen keys *(twelve until 2026-10-31)*, four are carried by the migration** — `currentWater`, `dailyGoal`,
 `lastActiveDay`, `isGoalSet` (`migrateIfNeeded(from:into:)` names exactly those).
 `didMigrateFromStandardDefaults` is not, because it *is* the bookkeeping; and `language` is not,
 because it did not exist before the App Group did, so there is nothing in a pre-capability
@@ -525,7 +538,8 @@ because it did not exist before the App Group did, so there is nothing in a pre-
 the list either; this sheet has never recorded a reason for those three. `reviewRequestedVersion`
 is not, for `language`'s reason: it was born in the App Group, in 1.2.5 — and `weekTotals` is not,
 for the same reason, born in 1.3.1's 6c (2026-10-20) — and `healthEnabled` is not, born in 1.3.3
-(2026-10-30, on its branch). *(This paragraph is
+(2026-10-30, on its branch) — and neither are `reminderSchedule` and `onlyWhenBehind`, born in set B
+(2026-10-31, on `feature/coaching`). *(This paragraph is
 about the phone's suite and sits under the watch's table; the twenty-seventh pass left it where
 it stood and said so.)*
 
@@ -560,6 +574,8 @@ adopting a new store looks exactly like data loss.
 
 `DataManager.Key.all` lists all twelve keys — the phone's own ten plus the watch's two
 (`wristOutbox`, `wristMirror`) — directly under the declarations it mirrors, below its own DocC.
+*(2026-10-31, set B staged: sixteen — the phone's fourteen, with `healthEnabled`, `reminderSchedule` and
+`onlyWhenBehind`, and the watch's two.)*
 *(2026-10-20, 1.3.1's 6c, staged: thirteen — the phone's eleven with `weekTotals`. Every
 `DataManager` writes it in `init`, so `everyKeyTheProductWritesIsOnTheRoster` reads it back and
 requires it, and `readingACachedWeekLeavesTheStoreUntouched` compares it as one of the roster.)*
@@ -578,9 +594,10 @@ Keeping the roster beside the declarations is what makes the omission hard rathe
 `DataManager`'s real writers and the migration, reads back every `sardor.WaterBuddy.` key that
 landed in the suite, and requires the roster to hold it — and, since 1.2.5, requires the claim's
 own key among them, because its count guard (`>= 8`) cannot see the claim: the other writers meet
-it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's twelve keys and
+it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's fourteen keys and
 not the watch's two** (ten until 2026-10-20; `weekTotals` is written by every `init`, so the test reads
-it back without a change of its own; eleven until 2026-10-30, when the test began setting `healthEnabled`): `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
+it back without a change of its own; eleven until 2026-10-30, when the test began setting `healthEnabled`;
+twelve until 2026-10-31, when it began setting `reminderSchedule` and `onlyWhenBehind`): `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
 target the phone's tests cannot reach, and no watch test reads `Key.all` — so nothing would catch
 either of those two going missing from the roster. `theTripwireHelperEnumeratesEveryStoredKey` does not — the helper
 it checks *is* `Key.all`, so it compares the roster with itself and pins only that the helper is
@@ -988,6 +1005,35 @@ and `HealthPlan` decides what to save and delete. Which samples a pass may delet
 another iPhone's and an emptied store's are never deleted (the final review's Critical, measured on the walk:
 a reinstalled app's own-source query returns the earlier install's samples). Turning the switch off deletes
 nothing. `WaterLog` gained no field and no key records a sample.
+
+## The thirteenth and fourteenth keys, and set B's schedule
+
+*(2026-10-31, hundred-and-third pass — roadmap 1.4.3, 1.4.9 and 1.4.10, staged on `feature/coaching`, not
+merged; `docs/superpowers/specs/2026-10-30-coaching-design.md`.)*
+
+`reminderSchedule` is what `ReminderPlan.Schedule.stored` writes: `[first, last, every, quietMask]`. The setter
+writes it, or **removes the key for the standard schedule**. `onlyWhenBehind` is a `Bool` read with
+`bool(forKey:)`. Each setter writes its own key and re-plans, and does nothing else: no widget doorbell, no
+wrist publish, no Health.
+
+`resolveReminderSchedule(in:)` reads the schedule through `Schedule(stored:)` and **discards it whole on any
+anomaly** — the wrong count, an hour off the grid, all seven days quiet, a value that is not `[Int]` — to the
+standard schedule, `resolveServings`' rule. A `#if DEBUG` note names the failure and no value.
+
+**Every process reads both, because the widget's tap files the plan.** `AddWaterIntent.perform()` files
+`DataManager.shared.currentReminderSlots()` itself. `init` reads both keys, and `loadFromStore()` reads them
+again behind equality guards, so the extension's long-lived instance — refreshed first by `addWater` — plans
+the schedule the app set after it was built (`aWidgetTapAfterAChangeFilesTheNewSchedule`).
+
+**Nothing about Premium is stored** (spec D2). Settings decides who may change the two, through
+`PremiumAccess.gate`. What is stored keeps working after a lapse, and turning either back is free. The pace is
+**computed on read**, `ReminderPlan.pace` over the stored schedule, and stored nowhere.
+
+**The plan's arithmetic.**
+- The horizon counts **reminder days** beyond today, and a quiet day uses none of it; today always counts.
+- `Schedule.horizonDays` shortens `ReminderPlan.horizonDays` so `hours.count × (horizon + 1) ≤ 64`, swept
+  over every schedule the type accepts.
+- Identifiers keep their `dayOrdinal.HH` shape: a schedule is whole hours.
 
 ## The sixth key, and the seam that reads it
 
@@ -1439,7 +1485,8 @@ crosses a process or the wire.**
 | `remaining` | `max(0, dailyGoal - currentWater)` | computed on read |
 | `hasReachedGoal` | `currentWater >= dailyGoal` | computed on read |
 | `lastDrink` | today's latest `timestamp`, never later than `now()` | `todaysLogs`; a watch pour stamped ahead of the phone's clock is clamped, as `ReminderPlan` clamps it |
-| `nextReminder` | the first slot of today's plan, or `nil` | `ReminderPlan.slots(… horizonDays: 0)` over the same inputs `currentReminderSlots()` files — one definition, so the line on Home and the notifications filed cannot disagree. It is the planned time, not a promise of delivery, and not a check of the system's permission |
+| `nextReminder` | the first slot of today's plan, or `nil` | `ReminderPlan.slots(… horizonDays: 0)` over the same inputs `currentReminderSlots()` files — one definition, so the line on Home and the notifications filed cannot disagree. It is the planned time, not a promise of delivery, and not a check of the system's permission. *(2026-10-31, set B: the inputs include the stored schedule and *Only when behind*, so it follows both.)* |
+| `pace` | `.onTrack`, `.behind(ml)`, or `nil` while nothing is due, once the goal is met, and from the last reminder hour on | `ReminderPlan.pace` over the stored schedule — computed on read, the one definition *Only when behind* drops slots by (2026-10-31, set B; Home draws it for Premium alone) |
 | `streak` | days in a row the goal was reached | published, get-only, see below |
 
 **`streak` is observed state with no key.** `republishStreak()` runs first in `republishHistory()`

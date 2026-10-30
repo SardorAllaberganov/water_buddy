@@ -5313,3 +5313,66 @@ paragraph and the roster test's coverage.
 **The rule:** when a count moves, grep for the old number in words and in figures, then sort every hit.
 Present-tense hits change, and each gets a dated aside. Dated or historical hits stay as written. A table and
 a note do not cover the prose around them.
+
+## 2026-10-31 — A test filter that matches nothing reports success
+
+**What happened.** Building set B, three runs said `TEST SUCCEEDED` or `TEST EXECUTE SUCCEEDED` and ran
+nothing they were meant to:
+- The plan named `-only-testing:WaterBuddyTests/HomeModelTests` and `…/HomeViewTests`. Those are files; their
+  suites are `HomeFiguresTests`, `DayTurnTests`, `HomeServingTests` and `HomeLayoutTests`. The run printed
+  three suites where four were asked for.
+- A swift-testing function needs its parentheses: `…/ReminderPlanTests/thePaceIsNothingOnceEveryShareIsDue()`.
+  Without them, nothing ran.
+- In zsh, an unquoted `$ARGS` holding thirteen `-only-testing:` flags is one argument, not thirteen.
+  `Executed 0 tests`. `${=ARGS}` splits it.
+
+**The rule:** read the run's own count — `Test run with N tests in M suites`, `Executed N tests` — against
+what was asked, every time. A green line over the wrong count is no verdict. Name suites, never files, and
+give a swift-testing function its `()`.
+
+## 2026-10-31 — A horizon counted in calendar days is eaten by the days it skips
+
+**What happened.** Set B's plan walked `0...horizonDays` calendar days and `continue`d past quiet weekdays.
+The final review found that a Thursday plan with Friday to Sunday quiet filed nothing for Monday. The user
+who chose quiet days so as to need the app less was the one left without a reminder after them. Every test
+had a horizon that happened to reach past the quiet days.
+
+**The rule:** count a horizon in the units it promises — reminder days planted — not in the loop's own
+steps. When a loop skips, test a case where the skipped run is longer than the horizon.
+
+## 2026-10-31 — A figure beside another is checked where the two meet
+
+**What happened.** Home's pace line was designed for the middle of the day ("150 ml behind" under "1,200 ml
+to go"). The walk ran at 23:34, after the last reminder hour, when every share is due and *behind* equals *to
+go* to the millilitre: two lines saying one thing. Nothing in the tests ran past the last share with water
+short of the goal.
+
+**The rule:** a figure drawn beside another is checked at both ends of the day, and wherever its formula
+makes it equal its neighbour. Walk a screen at the hour its figures meet, not only at noon.
+
+## 2026-10-31 — A warning comparison by message hides a new site
+
+**What happened.** The clean-build comparison against `470a469` was unchanged by message on the app scheme,
+20 to 20. By site it was 36 to 38. Two new uses of `ReminderPlan.Slot`'s main-actor `Hashable` conformance
+had come from a new test's `Set(slots(…))` in a suite that is not `@MainActor`. Keyed by `[dayOrdinal, hour]`,
+they went.
+
+**The rule:** compare a clean build's warnings by message and by site count per message. The message
+comparison is the rule's floor; the site count is how a new occurrence of an old warning is seen.
+
+## 2026-10-31 — Change a file with Write or Edit, and run a command as itself
+
+**What happened.** Set B's run and its `/doc_sync` met three denied calls, and each one stopped the work
+until the owner chose a way on:
+- a script written with a heredoc, made executable, and run;
+- `cp`, `sed -i` and `rm -rf`, all inside the session's scratchpad;
+- one word in `docs/AI_CONTEXT.md` changed with `sed -i`.
+
+Every alternative the owner chose was the plain form:
+- a direct `xcodebuild` command;
+- a fresh export into a new folder, with the walk script written by Write;
+- the word changed by Edit.
+
+**The rule:** change a file only through Write or Edit — a new file through Write, a change through Edit —
+and run a tool as one direct command. Put no script in between, no in-place `sed`, no delete. Make a fresh
+folder rather than empty an old one. A denied call is still a stop; this keeps the work from reaching one.
