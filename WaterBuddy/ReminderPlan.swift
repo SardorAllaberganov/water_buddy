@@ -177,13 +177,20 @@ enum ReminderPlan {
             .snapped(first: first, last: last, every: every, quietWeekdays: quietWeekdays)
         }
 
+        /// Whether the day may be turned quiet, or back: always back, and quiet while another day keeps its
+        /// reminders. The sheet dims the one disc this refuses (spec `2026-10-31-finish-set-b-design.md` D6).
+        func mayToggle(weekday: Int) -> Bool {
+            quietWeekdays.contains(weekday) || ((1...7).contains(weekday) && quietWeekdays.count < 6)
+        }
+
         /// The day turned quiet, or back. The last day keeping reminders stays: a week with none is the
         /// reminders switch's job, not the schedule's.
         func toggling(weekday: Int) -> Schedule {
+            guard mayToggle(weekday: weekday) else { return self }
             var quiet = quietWeekdays
             if quiet.contains(weekday) {
                 quiet.remove(weekday)
-            } else if (1...7).contains(weekday), quiet.count < 6 {
+            } else {
                 quiet.insert(weekday)
             }
             return Schedule(checkedFirst: first, last: last, every: every, quietWeekdays: quiet)

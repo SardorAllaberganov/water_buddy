@@ -489,8 +489,20 @@ struct HomeView: View {
     // MARK: - Status
 
     /// What is left, and under it one quiet line — or, straight after a pour, the way to take it
-    /// back.
+    /// back. For Premium, the pace between them.
+    ///
+    /// **One clock for the whole status**, re-read every minute: a share falls due on the hour, and
+    /// nothing else would say so. Around the stack and not around the pace line, because an empty
+    /// `TimelineView` is still a child of the stack and takes its spacing — 8 pt too many on a Premium
+    /// Home with nothing to pace (measured, spec `2026-10-31-finish-set-b-design.md` D7). Here, nothing
+    /// to say is no child at all.
     private var status: some View {
+        TimelineView(.everyMinute) { _ in
+            statusStack
+        }
+    }
+
+    private var statusStack: some View {
         VStack(spacing: 8) {
             Text(statusText)
                 .font(.title2.weight(.bold))
@@ -505,7 +517,9 @@ struct HomeView: View {
                 // The figure is drawn grouped and spoken as a number of millilitres.
                 .accessibilityLabel(spokenStatus)
 
-            paceLine
+            if premium.state.status?.isPremium == true, let pace = manager.pace {
+                paceLine(pace)
+            }
 
             quietLine
                 // One height for both of its states at the ordinary text sizes, so the row below
@@ -525,32 +539,24 @@ struct HomeView: View {
     }
 
     /// Set B's pace line (spec `2026-10-30-coaching-design.md` §3.4, D9): *On track*, or how far behind, for
-    /// Premium alone, while something is due and the goal is not met. Its own line — never inside the quiet
-    /// line, which *Undo* replaces for eight seconds. Nothing to say is nothing drawn.
-    @ViewBuilder
-    private var paceLine: some View {
-        if premium.state.status?.isPremium == true {
-            // Re-read every minute: a share falls due on the hour, and nothing else would say so.
-            TimelineView(.everyMinute) { _ in
-                if let pace = manager.pace {
-                    HStack(spacing: 6) {
-                        Image(systemName: Self.paceSymbol(pace))
-                            .accessibilityHidden(true)
-                        Text(drawnPace(pace))
-                    }
-                    .font(.footnote.weight(.medium))
-                    // The quiet line's measured style: full white, the screen's smallest text.
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                    .legibleOnBackdrop()
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text("Pace", bundle: strings))
-                    .accessibilityValue(spokenPace(pace))
-                }
-            }
-            .transition(.opacity)
+    /// Premium alone, while a share is due, the goal is not met and a share is still to come. Its own line —
+    /// never inside the quiet line, which *Undo* replaces for eight seconds. It comes and goes with the
+    /// figure above it, which changes in place: no transition of its own.
+    private func paceLine(_ pace: ReminderPlan.Pace) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: Self.paceSymbol(pace))
+                .accessibilityHidden(true)
+            Text(drawnPace(pace))
         }
+        .font(.footnote.weight(.medium))
+        // The quiet line's measured style: full white, the screen's smallest text.
+        .foregroundStyle(.white)
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+        .legibleOnBackdrop()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Pace", bundle: strings))
+        .accessibilityValue(spokenPace(pace))
     }
 
     private func drawnPace(_ pace: ReminderPlan.Pace) -> String {

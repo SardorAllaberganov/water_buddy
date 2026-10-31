@@ -410,6 +410,31 @@ struct FreshStartTests {
         #expect(manager.isGoalSet == false, "the seed finished the welcome")
     }
 
+    /// Set B's seed (spec `2026-10-31-finish-set-b-design.md` D8): a holder's settings — or, without the held
+    /// purchase, a lapsed holder's — set through the one writer in the fresh start's own suite, and nowhere
+    /// without it. `CoachingUITests` reads the pace in its window and Saturday in its row.
+    @Test func theCoachingSeedLandsOnlyBesideTheFreshStart() throws {
+        defer { UserDefaults(suiteName: WaterBuddyApp.freshStartSuite)?.removePersistentDomain(forName: WaterBuddyApp.freshStartSuite) }
+        #expect(WaterBuddyApp.freshStartManager(arguments: ["WaterBuddy", WaterBuddyApp.coachingSeedArgument, "YES"]) == nil)
+
+        let plain = try #require(WaterBuddyApp.freshStartManager(arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES"]))
+        #expect(plain.reminderSchedule == .standard)
+        #expect(plain.onlyWhenBehind == false)
+
+        let seeded = try #require(WaterBuddyApp.freshStartManager(
+            arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES", WaterBuddyApp.coachingSeedArgument, "YES"]
+        ))
+        #expect(seeded.reminderSchedule == WaterBuddyApp.coachingSeed)
+        #expect(WaterBuddyApp.coachingSeed.hours.first == 5 && WaterBuddyApp.coachingSeed.hours.last == 23)
+        #expect(WaterBuddyApp.coachingSeed.quietWeekdays == [7], "Saturday")
+        #expect(seeded.onlyWhenBehind)
+        #expect(seeded.isGoalSet == false, "the seed finished the welcome")
+
+        let next = try #require(WaterBuddyApp.freshStartManager(arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES"]))
+        #expect(next.reminderSchedule == .standard, "the seed outlived its launch")
+        #expect(next.onlyWhenBehind == false)
+    }
+
     @Test func theHeldPremiumNeedsTheFreshStart() {
         #expect(WaterBuddyApp.premiumSource(arguments: ["WaterBuddy", WaterBuddyApp.premiumHeldArgument, "YES"]) == nil)
         #expect(WaterBuddyApp.premiumSource(arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES"]) == nil)

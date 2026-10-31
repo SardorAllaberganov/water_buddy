@@ -95,6 +95,17 @@ struct ReminderScheduleTests {
         #expect(Schedule.standard.toggling(weekday: 9) == .standard, "not a weekday")
     }
 
+    /// The sheet's one disc that may not be tapped — the last day keeping reminders — is decided by the rule
+    /// ``ReminderPlan/Schedule/toggling(weekday:)`` follows (spec `2026-10-31-finish-set-b-design.md` D6).
+    @Test func aDayMayBeToggledUnlessItIsTheLastKeepingReminders() throws {
+        #expect((1...7).allSatisfy { Schedule.standard.mayToggle(weekday: $0) })
+        let sixQuiet = try #require(Schedule(first: 9, last: 21, every: 2, quietWeekdays: [1, 2, 3, 4, 5, 6]))
+        #expect(!sixQuiet.mayToggle(weekday: 7), "the last day keeping reminders")
+        #expect((1...6).allSatisfy { sixQuiet.mayToggle(weekday: $0) }, "a quiet day may always come back")
+        #expect(!Schedule.standard.mayToggle(weekday: 9), "not a weekday")
+        #expect(!Schedule.standard.mayToggle(weekday: 0), "not a weekday")
+    }
+
     /// D6: iOS keeps 64 pending requests and drops the rest silently. Every schedule `Schedule` accepts — not
     /// a sample — keeps today and at least two more days inside it.
     @Test func everyScheduleKeepsThePlanInsideTheCap() {

@@ -7198,6 +7198,29 @@
         }
       }
     },
+    "One day always keeps its reminders.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One day always keeps its reminders."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Хотя бы один день остаётся с напоминаниями."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamida bitta kun eslatmalar bilan qoladi."
+          }
+        }
+      }
+    },
     "Reminds you to drink at the hours of your schedule": {
       "extractionState": "manual",
       "localizations": {

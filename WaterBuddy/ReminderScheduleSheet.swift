@@ -65,6 +65,11 @@ struct ReminderScheduleSheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(Haptics.select, trigger: picks)
+        // Seeded through `init`, re-read from the model (rule `50-views`). Today only the sheet writes the
+        // schedule while it is open, so its own write comes back equal to `draft` and changes nothing.
+        .onChange(of: manager.reminderSchedule) { _, schedule in
+            draft = schedule
+        }
     }
 
     private func commit(_ schedule: ReminderPlan.Schedule) {
@@ -138,7 +143,9 @@ struct ReminderScheduleSheet: View {
             .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .liquidGlass(cornerRadius: LiquidGlass.cornerRadius, density: .frosted, elevation: .raised)
+        // The intervals' and the days' pair: sibling panes on one screen share one (rule `60-design-system`).
+        // Interactive, because the row is the menu's pressable surface.
+        .liquidGlass(cornerRadius: LiquidGlass.cornerRadius, density: .sheer, elevation: .resting, interactive: true)
         .accessibilityLabel(Text(title, bundle: strings))
         .accessibilityValue(Self.hourLabel(hour, locale: locale))
     }
@@ -192,7 +199,10 @@ struct ReminderScheduleSheet: View {
         }
     }
 
-    /// The seven days in the locale's order, each a disc: lit while it keeps its reminders.
+    /// The seven days in the locale's order, each a disc: lit while it keeps its reminders. Across the row
+    /// where it fits; where it does not — seven 44-pt discs need 308 pt, and a 320-pt Display Zoom screen
+    /// leaves 272 inside the margins — the discs scroll rather than shrink below the floor (rule
+    /// `65-accessibility`). Under the row, while one day is left, why it will not turn off.
     private var days: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Days", bundle: strings)
@@ -200,18 +210,45 @@ struct ReminderScheduleSheet: View {
                 .foregroundStyle(.white)
                 .legibleOnBackdrop()
                 .accessibilityHidden(true)
-            HStack(spacing: 0) {
-                ForEach(Self.weekdays(in: locale), id: \.self) { weekday in
-                    dayDisc(weekday)
-                        .frame(maxWidth: .infinity)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 0) {
+                    ForEach(Self.weekdays(in: locale), id: \.self) { weekday in
+                        dayDisc(weekday)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
+                ScrollView(.horizontal) {
+                    // Apart, so no two glass discs share an edge.
+                    HStack(spacing: Self.discGap) {
+                        ForEach(Self.weekdays(in: locale), id: \.self) { weekday in
+                            dayDisc(weekday)
+                        }
+                    }
+                }
+                // The discs' glass is not cut square at the margins as they scroll.
+                .scrollClipDisabled()
             }
             .glassGroup()
+            if lastDayKept != nil {
+                // Drawn for the eye; the disc's hint says it to VoiceOver (rule `65-accessibility`).
+                Text("One day always keeps its reminders.", bundle: strings)
+                    .font(.footnote)
+                    .foregroundStyle(.white)
+                    .legibleOnBackdrop()
+                    .accessibilityHidden(true)
+            }
         }
+        .animation(.smooth(duration: 0.3), value: lastDayKept)
+    }
+
+    /// The one day the schedule will not let go of — the last keeping reminders — or `nil` while any may.
+    private var lastDayKept: Int? {
+        (1...7).first { !draft.mayToggle(weekday: $0) }
     }
 
     private func dayDisc(_ weekday: Int) -> some View {
         let keeps = !draft.quietWeekdays.contains(weekday)
+        let mayToggle = draft.mayToggle(weekday: weekday)
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = locale
         return Button {
@@ -226,7 +263,10 @@ struct ReminderScheduleSheet: View {
                 .liquidGlass(in: Circle(), density: .sheer, elevation: .resting, interactive: true)
         }
         .buttonStyle(PressStyle())
+        // The last day keeping reminders: VoiceOver says *dimmed*, and the hint says why (D6).
+        .disabled(!mayToggle)
         .accessibilityLabel(calendar.standaloneWeekdaySymbols[weekday - 1])
+        .accessibilityHint(mayToggle ? Text(verbatim: "") : Text("One day always keeps its reminders.", bundle: strings))
         .accessibilityAddTraits(keeps ? [.isSelected] : [])
     }
 
@@ -256,8 +296,11 @@ struct ReminderScheduleSheet: View {
 
     private static let gap: CGFloat = 16
     private static let verticalInset: CGFloat = 24
-    /// A day's disc: the 44-pt floor (rule `65-accessibility`). Seven fit the narrowest iPhone's 327 pt.
+    /// A day's disc: the 44-pt floor (rule `65-accessibility`). Seven fit inside the margins of a 375-pt
+    /// iPhone's 327; on a 320-pt Display Zoom screen they scroll.
     private static let disc: CGFloat = 44
+    /// Between two discs where they scroll: the intervals' gap.
+    private static let discGap: CGFloat = 8
     /// The letter's share of its disc: 17 pt in 44, `SheetCloseButton`'s glyph.
     private static let letter: CGFloat = 17.0 / 44.0
     /// A quiet day's letter — still 4.5:1 on its glass, to be measured on the walk.
@@ -296,11 +339,13 @@ struct ReminderScheduleSheet: View {
             : strings.localized("Every %1$d hours", every, locale: locale)
     }
 
-    /// Settings' row: the hours drawn, the same spoken, and the quiet days, if any.
+    /// Settings' row: the hours drawn, the same spoken, and the quiet days, if any — drawn short, spoken in
+    /// full, as the sheet's discs speak them (spec `2026-10-31-finish-set-b-design.md` D5).
     struct Summary: Equatable {
         let hours: String
         let spoken: String
         let quiet: String?
+        let spokenQuiet: String?
     }
 
     static func summary(of schedule: ReminderPlan.Schedule, strings: Bundle, locale: Locale,
@@ -310,19 +355,19 @@ struct ReminderScheduleSheet: View {
             : strings.localized("every %1$d hours", schedule.every, locale: locale)
         let from = hourLabel(schedule.first, locale: locale, calendar: calendar)
         let to = hourLabel(schedule.last, locale: locale, calendar: calendar)
-        var quiet: String?
-        if !schedule.quietWeekdays.isEmpty {
-            var named = Calendar(identifier: .gregorian)
-            named.locale = locale
-            let names = weekdays(in: locale)
-                .filter(schedule.quietWeekdays.contains)
-                .map { named.shortStandaloneWeekdaySymbols[$0 - 1] }
-            quiet = strings.localized("Not on %1$@", names.formatted(.list(type: .and).locale(locale)), locale: locale)
+        var named = Calendar(identifier: .gregorian)
+        named.locale = locale
+        // One key for both forms: every translation takes the days as a list, never declined.
+        let quiet = { (symbols: [String]) -> String? in
+            guard !schedule.quietWeekdays.isEmpty else { return nil }
+            let names = weekdays(in: locale).filter(schedule.quietWeekdays.contains).map { symbols[$0 - 1] }
+            return strings.localized("Not on %1$@", names.formatted(.list(type: .and).locale(locale)), locale: locale)
         }
         return Summary(
             hours: strings.localized("%1$@ – %2$@, %3$@", from, to, every, locale: locale),
             spoken: strings.localized("From %1$@ to %2$@, %3$@", from, to, every, locale: locale),
-            quiet: quiet
+            quiet: quiet(named.shortStandaloneWeekdaySymbols),
+            spokenQuiet: quiet(named.standaloneWeekdaySymbols)
         )
     }
 }

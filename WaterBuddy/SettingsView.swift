@@ -564,10 +564,11 @@ private struct CoachingRows: View {
         .accessibilityValue(spokenValue)
     }
 
-    /// The schedule in words, its quiet days, and *Premium* while locked — History's switch's convention.
+    /// The schedule in words, its quiet days named in full, and *Premium* while locked — History's switch's
+    /// convention.
     private var spokenValue: String {
         var parts = [summary.spoken]
-        if let quiet = summary.quiet { parts.append(quiet) }
+        if let quiet = summary.spokenQuiet { parts.append(quiet) }
         if gate == .locked { parts.append(strings.localizedString(forKey: "Premium", value: nil, table: nil)) }
         return parts.joined(separator: ", ")
     }

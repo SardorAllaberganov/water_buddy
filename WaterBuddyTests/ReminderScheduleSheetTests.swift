@@ -54,11 +54,14 @@ struct ReminderScheduleSheetTests {
         #expect(standard.hours == "\(nine) – \(twentyOne), every 2 hours")
         #expect(standard.spoken == "From \(nine) to \(twentyOne), every 2 hours")
         #expect(standard.quiet == nil)
+        #expect(standard.spokenQuiet == nil)
 
         let hourly = try #require(ReminderPlan.Schedule(first: 9, last: 21, every: 1, quietWeekdays: [7, 1]))
         let summary = ReminderScheduleSheet.summary(of: hourly, strings: strings, locale: english, calendar: utc)
         #expect(summary.hours.hasSuffix(", every hour"))
         #expect(summary.quiet == "Not on Sun and Sat", "Sunday first, as the en_US week runs")
+        // Spoken in full, as the sheet's discs are (spec `2026-10-31-finish-set-b-design.md` D5).
+        #expect(summary.spokenQuiet == "Not on Sunday and Saturday")
     }
 
     /// The final review's Important 2: a tap on *Only when behind* opens the paywall only where it would turn

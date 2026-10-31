@@ -107,6 +107,19 @@ struct WaterBuddyApp: App {
     /// screens (spec `2026-10-25-store-page-design.md` §3.2). Alone it does nothing.
     static let premiumHeldArgument = "-WaterBuddyPremiumHeld"
 
+    /// The argument `CoachingUITests` adds beside ``freshStartArgument`` to open with set B's settings
+    /// already chosen — a holder's beside ``premiumHeldArgument``, a lapsed holder's without it (spec
+    /// `2026-10-31-finish-set-b-design.md` D8). Alone it does nothing.
+    static let coachingSeedArgument = "-WaterBuddyCoachingSeed"
+
+    /// The seed's schedule: shares due from 05:00 to 23:00, so its pace runs as much of the day as any
+    /// schedule can, and Saturday quiet, so Settings' row has a quiet day to name. Built by the sheet's own
+    /// moves, so it is one the plan accepts.
+    static let coachingSeed = ReminderPlan.Schedule.standard
+        .with(first: ReminderPlan.Schedule.earliest)
+        .with(last: ReminderPlan.Schedule.latest)
+        .toggling(weekday: 7)
+
     /// The held source, given both arguments; otherwise `nil`, and the app reads StoreKit as a Release
     /// build does. Nothing is bought, verified against the App Store or stored — the state is read
     /// from the source, in memory, as every run reads it (rule `70-privacy`).
@@ -130,7 +143,8 @@ struct WaterBuddyApp: App {
     /// Given ``storeSampleArgument`` too, ``StoreSample``'s servings are logged through
     /// ``DataManager/addLog(amount:at:)``, the one writer, before the manager is handed back — only
     /// here, so a seed can only ever land in this in-memory store. `now` is the manager's clock and
-    /// the seed's; the app passes none.
+    /// the seed's; the app passes none. Given ``coachingSeedArgument``, ``coachingSeed`` and *Only when
+    /// behind* are set through their setters, in this run's own suite, which the next launch clears.
     ///
     /// `nil`, said aloud, if the throwaway cannot be made. The run then opens on the device's own
     /// state, and the welcome's tests fail on their first look rather than writing anywhere they
@@ -161,6 +175,10 @@ struct WaterBuddyApp: App {
             for serving in StoreSample.servings(endingAt: now(), calendar: .waterBuddyDay) {
                 manager.addLog(amount: serving.amount, at: serving.at)
             }
+        }
+        if arguments.contains(coachingSeedArgument) {
+            manager.reminderSchedule = coachingSeed
+            manager.onlyWhenBehind = true
         }
         return manager
     }
