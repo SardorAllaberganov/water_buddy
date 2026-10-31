@@ -70,7 +70,9 @@ on sale with three features.
 - **Only when behind** — a switch, its line: *Skips a reminder when you've already drunk your share for its hour.*
 
 On Home, between *1,200 ml to go* and the quiet line, **the pace line**: *On track*, or *150 ml behind*. It is
-drawn while something is due and the goal is not reached; it moves on the hour, when a new share falls due.
+drawn while something is due and the goal is not reached, and a share is still to come; it moves on the hour,
+when a new share falls due. *(Amended 2026-10-31, §7 W1: from the last share on, *behind* is the *to go* above
+it.)*
 
 **A free user** sees the same two rows, each with a lock. *Schedule* opens the paywall; turning *Only when
 behind* on opens the paywall. Home is unchanged. The paywall lists set B's three features after set A's four.
@@ -156,7 +158,8 @@ slot, because no interval on the menu is shorter than `quietAfterDrink`.
 instant's day whose fire is at or before it, `k`, and `(goal × k + n ÷ 2) ÷ n` — rounded to the nearest
 millilitre in `Int`, and exactly the goal when `k = n`. The plan calls it at each slot's fire; Home calls it
 now. `ReminderPlan.pace(water:goal:schedule:now:calendar:) -> Pace?` wraps it for a screen: `nil` while nothing
-is due or the goal is reached, `.onTrack` when the water covers the due amount, `.behind(Int)` otherwise. The
+is due, once the goal is reached, or once every share is due *(amended 2026-10-31, §7 W1)*, `.onTrack` when the
+water covers the due amount, `.behind(Int)` otherwise. The
 pace runs every day, quiet ones included: quiet days silence reminders, not the goal.
 
 **`DataManager`** — stores and serves the two settings; decides nothing about Premium.
