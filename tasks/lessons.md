@@ -5376,3 +5376,72 @@ Every alternative the owner chose was the plain form:
 **The rule:** change a file only through Write or Edit — a new file through Write, a change through Edit —
 and run a tool as one direct command. Put no script in between, no in-place `sed`, no delete. Make a fresh
 folder rather than empty an old one. A denied call is still a stop; this keeps the work from reaching one.
+
+## 2026-10-31 — `ImageRenderer` draws nothing inside a `ScrollView`
+
+**What happened.** Finishing set B needed the schedule sheet drawn 320 pt wide, to see its days row choose
+the scrolling form. No simulator here is that narrow. An `ImageRenderer` render of the sheet came back as the
+aurora alone: the sheet's content sits in a `ScrollView`, and the renderer drew none of it. The same sheet
+hosted in a `UIHostingController` in a real `UIWindow` of the test app, 320 pt wide, and snapshotted with
+`drawHierarchy(in:afterScreenUpdates:)`, drew everything — the row scrolling, Saturday past the edge.
+
+**The rule:** to see a layout at a width no simulator has, host the view in a `UIWindow` of that width inside
+the test app and snapshot the hierarchy. Use `ImageRenderer` only for a view with no scroll view in it — the
+recap's card, a close button.
+
+## 2026-10-31 — Read a difference in an Apple header's warning from a second clean build
+
+**What happened.** The warnings comparison for finishing set B built `HEAD`'s export first, then the change.
+The change had one line more: `StoreKitTest`'s `SKTestTransaction.h` deprecation, #160's known line, in every
+earlier baseline. A second clean build of `HEAD` into a new folder printed it too, and then the two agreed
+site for site. The first clean build of the morning had not printed a warning from Apple's own header.
+
+**The rule:** a line that differs only in an SDK header is read again from a second clean build of the base
+before it is counted as new or gone. Our own files' lines are compared as they come.
+
+## 2026-10-31 — Another session's simulator is on this Mac too
+
+**What happened.** During finishing set B another Claude session, WareStack, asked twice for the simulators
+for its own gate. The gate here begins with `xcrun simctl shutdown all`, which would have stopped its device
+mid-run. Each time the work here held all `simctl` and `xcodebuild` until it said it was done — 02:55 to 03:22, and
+03:24 to 03:47 — and used the wait for records and for preparing the walk.
+
+**The rule:** before `simctl shutdown all`, list the booted devices. A device that is not ours means another
+session is running: ask it, and wait.
+
+## 2026-10-31 — "No other test passes it" missed the harness the gate skips
+
+**What happened.** CLAUDE.md called `PremiumUITests` "the one class launched with DEBUG's `-WaterBuddyPremium`",
+and rule `85-testing` said "no other UI test does". Finishing set B added `CoachingUITests` to that line, and I
+typed it as "`PremiumUITests` passes it, and `CoachingUITests` …; no other UI test does". The hundred-and-fourth
+`/doc_sync` grepped the UI target's `launchArguments`. `AppStoreScreenshotUITests`' free launch has passed it since
+`ca81940`, 2026-10-25. The gate skips that class, so nothing ever ran against the sentence. This repeats the
+2026-10-12 rule — grep the readers before writing "only" — with the exception in a class the gate never runs.
+
+**The rule:** before writing that only some tests pass a launch argument, grep every file in the test target
+for it, the skipped harness included, and name each caller.
+
+## 2026-11-01 — One quick run does not clear another session's CPU load
+
+**What happened.** During the gate re-run another session asked to start a soak, eight test processes at
+`nice 10`. One 38-second test passed in its usual time at a load of 158, so I told it to carry on. Ten minutes
+later the load was 409 and the next iOS 26.5 chunk failed two tab-bar tests. Both passed alone once the soak was
+paused. `nice` kept the soak's processes behind ours in the queue, but it did not keep them off the cores.
+
+**The rule:** a UI chunk runs with no other session's sustained CPU job beside it. Ask for that before the
+gate's UI steps, not after a failure. A second session's simulator, run with the owner's leave, is a different
+case: watch its load, and re-run a failure alone before calling it anything.
+
+## 2026-11-01 — A flaky tap had two causes, and my first guess was neither
+
+**What happened.** I recorded #209's guess — the test taps the switch row's centre, the label — and offered it
+as the fix. A throwaway probe lost no tap in 30 at the centre, and the trace showed XCUITest taps a switch at
+its control (x 328.5). The two failures had different causes:
+- In one, the switch stood at y 781–809 under the floating tab bar from y 791. XCUITest judged it hittable
+  (no *Scroll element to visible* step) and tapped (328.5, 795.3), in the corner of the bar's frame.
+- The other was #191's lost touch, which no change to a test prevents. Only a log line added to the app in a
+  scratch copy could tell the two apart, by showing whether the switch's binding ran at all.
+
+**The rule:** a guess about a flaky tap is not written as its fix. Read where XCUITest says it tapped, check
+that point against everything floating over the page, and log at the app's end in a scratch copy before
+changing the test.

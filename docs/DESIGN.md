@@ -7,6 +7,11 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-10-31, early morning (finishing set B's own records — not a `/doc_sync` pass). **No token
+moved.** *Set B, measured* gains a dated note: the schedule sheet's hour rows take their siblings' pair,
+`.sheer` + `.resting`, measured at 7.60–7.93:1 (#201); the days row scrolls where it does not fit (#200); the
+last day keeping reminders has a line (#204).
+
 **Last updated:** 2026-10-31 (hundred-and-third pass — `/doc_sync` on set B's staged tree, on
 `feature/coaching`). **No token moved.** A section, *Set B, measured*: the reminders card's two new rows, the
 schedule sheet's panes, intervals and day discs, Home's pace line, and two measured pairs — a day that keeps its
@@ -2470,6 +2475,24 @@ letter's brightest strokes against the disc's glass at its lower quartile:
 over the same backdrop; the hour rows' and intervals' labels (white on the app's own glass, read by eye); iOS
 26.5 and 18.6; Increase Contrast; Russian and Uzbek; and the largest text sizes' pairs — the layout read by eye,
 W2's fix.
+
+*(2026-10-31, early morning — finishing set B, `docs/superpowers/specs/2026-10-31-finish-set-b-design.md`.)*
+- **The hour rows take their siblings' pair** (#201, D3): `.sheer` + `.resting`, `interactive: true` — the
+  intervals' own call. On iOS 26 and later a sheer interactive pane is Apple's regular glass at the same tint as
+  a frosted one, and elevation draws nothing there, so the 27.0 rows barely move. **Measured** off the walk's
+  screenshot, iPhone 17 (27.0), 1206 × 2622: the white title and hour (their brightest 5 %, pure white) against
+  the bare glass between them — *First reminder* **7.93:1** against its brightest pixel (9.27 at the median),
+  *Last reminder* **7.60:1** (8.81). Floor 4.5. The intervals' labels stay read by eye.
+- **The days row scrolls where it does not fit** (#200, D2): seven 44-pt discs need 308 pt; a 320-pt Display Zoom
+  screen leaves 272 inside the 24-pt margins, and there the discs stand `discGap` (8 pt) apart in a horizontal
+  scroll whose clip is disabled. Seen in a 320-pt window hosted in the test app; at 402 pt the row stands across.
+- **The last day keeping reminders** (#204, D6): its disc is disabled — no press, still selected — and *One day
+  always keeps its reminders.* is drawn under the row in the *Days* label's style (footnote, white,
+  `legibleOnBackdrop()`), hidden from VoiceOver, which hears it as the disc's hint. Its contrast is not measured:
+  it stands where the *Days* label does, over the same aurora.
+- **Home's status** (#205, D7): the pace line is no longer wrapped in its own `TimelineView`. An empty one took the
+  stack's 8-pt spacing, so a Premium Home with nothing to pace drew *Goal reached* 30.17 pt above the quiet line;
+  now 22.17 pt (read from the elements' frames on the walk, the same steps on `HEAD`'s code and on this change's).
 
 ## The header and a screen arriving
 

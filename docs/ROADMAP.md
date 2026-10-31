@@ -466,6 +466,11 @@ in Settings** for a free user. Spec `docs/superpowers/specs/2026-10-30-coaching-
 `docs/superpowers/plans/2026-10-30-coaching.md`. Its rule wording — ten files and `CLAUDE.md` — is typed
 and unstaged for the owner's `/commit`.)*
 
+*(2026-10-31, read from `git log` by the hundred-and-fourth pass: **set B committed and pushed** on
+`feature/coaching` at 01:46–01:47, `55b841e` to `3ca73e5`; not merged. Its review's eight deferred minors,
+known issues #199–#206, were finished the same morning — staged, not committed — under
+`docs/superpowers/specs/2026-10-31-finish-set-b-design.md`; 1.4.11 still waits.)*
+
 **1.4.11 — Workout-aware goal.** A workout recorded in Apple Health raises that day's goal; no
 location and no weather (§9). Only if 1.3.3 also *reads* from Health — otherwise it waits. Whether
 the widget and the watch draw the raised goal is its design's question. **Needs rule changes** (§8).

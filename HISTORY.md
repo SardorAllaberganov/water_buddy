@@ -14207,3 +14207,282 @@ upstream), HEAD `470a469`, 224 commits.
 
 **No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This
 supersedes the staging block above.
+
+## [2026-10-31] — Finishing set B: its eight deferred minors, #199–#206
+
+Taken by `/start_task` with no task named, on the owner's choice "Finish set B" over export, set C and the
+workout-aware goal. Spec `docs/superpowers/specs/2026-10-31-finish-set-b-design.md`, approved "ok", D1–D8 as
+recommended; no plan document, as for finishing set A. On `feature/coaching`, from `3ca73e5` (set B committed
+and pushed). The ledger is `.superpowers/sdd/2026-10-31-finish-set-b/progress.md` (git-ignored scratch).
+
+### What changed
+
+- **D1, #199:** the pace line hiding from the last reminder hour (W1) stands; set B's spec §3.1 and §3.4 now say
+  so, marked as amended. No code.
+- **D2, #200:** the schedule sheet's days row is a `ViewThatFits` of the row across and a horizontal scroll of
+  discs 8 pt apart, its clip disabled — for a 320-pt Display Zoom screen.
+- **D3, #201:** the hour rows take their siblings' pair, `.sheer` + `.resting`, interactive.
+- **D4, #202:** the sheet re-reads `manager.reminderSchedule` into its draft (`.onChange`).
+- **D5, #203:** Settings' *Schedule* row speaks its quiet days in full — `Summary.spokenQuiet`, the same key.
+- **D6, #204:** `ReminderPlan.Schedule.mayToggle(weekday:)`, the rule `toggling(weekday:)` follows; the last day
+  keeping reminders is disabled, still selected, its hint and a line under the row *One day always keeps its
+  reminders.* — one new key, en with ru and uz drafts (#207).
+- **D7, #205:** Home's status reads the clock in one `TimelineView` around its stack; the pace line is a plain
+  child, and its inert transition is gone. A throwaway probe had shown an empty `TimelineView` takes a stack's
+  8-pt spacing.
+- **D8, #206:** DEBUG's `-WaterBuddyCoachingSeed`, beside the fresh start alone, sets a custom schedule and *Only
+  when behind*; `CoachingUITests` gains a lapsed holder's test and the pace line's.
+
+### Rulings (the ledger's, each the recommended option)
+
+- R1 — the lapsed test does not look for a pace line on Home; `testThePaceLineIsPremiums` does, beside its
+  positive control (spec §3.8 had it in both).
+- R2 — the UI test reads "9:00" for the standard hours in either clock: the simulator writes 24-hour times.
+- R3 — the new key's Russian and Uzbek are drafts.
+- Twice the simulators were held for another session's gate (02:55–03:22, 03:24–03:47) at its request.
+
+### Files
+
+`WaterBuddy/ReminderPlan.swift`, `ReminderScheduleSheet.swift`, `SettingsView.swift`, `HomeView.swift`,
+`WaterBuddyApp.swift`, `Localizable.xcstrings` (264 keys); `WaterBuddyTests/ReminderScheduleTests.swift`,
+`ReminderScheduleSheetTests.swift`, `WelcomeTests.swift`; `WaterBuddyUITests/CoachingUITests.swift`; both specs;
+`docs/DESIGN.md`, `docs/AI_CONTEXT.md` (#199–#206 retired, #207 noted), `tasks/lessons.md` (three entries) and
+this file. Rule wording, typed and unstaged for the owner: `85-testing` (the seed; `-WaterBuddyPremium` for
+`CoachingUITests`' lapsed holder) and `65-accessibility` (quiet days in full; the dimmed last day).
+
+### Verification, all run this session
+
+- **RED first:** the unit suites' build stopped on `spokenQuiet` (02:43); the UI tests, on a `HEAD` export with
+  the new `CoachingUITests` written in, failed 3 of 5 for the expected reasons, the pace test skipped (02:4x).
+- **GREEN:** `ReminderScheduleTests`, `ReminderScheduleSheetTests`, `FreshStartTests` 25 of 25;
+  `CoachingUITests` 4 passed, 1 skipped (before 05:00).
+- **The walk**, scratch tests on index copies, iPhone 17 (27.0):
+  - Home held with nothing to pace: *Goal reached* 30.17 pt above the quiet line on `HEAD`, 22.17 pt now.
+  - The hour rows' white labels on their glass: 7.93:1 and 7.60:1 against its brightest pixel.
+  - The sheet whole at AXXXL.
+  - The last day dimmed and kept.
+  - A 320-pt window scrolling the days, a 402-pt one not — hosted in a `UIWindow`, since `ImageRenderer` drew
+    nothing inside the sheet's `ScrollView` (lesson).
+- **The gate**, on a `git checkout-index` copy identical to the index:
+  - Phone unit **1057 tests in 116 suites passed**.
+  - Phone UI 27.0, harness skipped, five `test-without-building` chunks: **82 executed, 2 skipped, 0 failures**.
+  - Phone UI 26.5, the same: **82 executed, 2 skipped, 0 failures**.
+  - Watch **71 in 7 suites passed**.
+  - Both widget schemes **BUILD SUCCEEDED**.
+  - The two skips: `testTheBarsCaptionsShareALine` (Apple's bar) and `testThePaceLineIsPremiums` (before 05:00),
+    which then **passed at 05:01 on 27.0 and on 26.5**, and **failed on a scratch copy with Home's Premium check
+    removed** — "a lapsed holder has a pace line".
+- **Warnings**, clean builds into empty DerivedData of a `3ca73e5` export and of the copy, by file and message and
+  by site: **unchanged on all four schemes — 20/36, 17/29, 2/2, 17/29**, every site identical. The base's first
+  build lacked Apple's `SKTestTransaction.h` line; a second clean build printed it (lesson).
+- **Not proved:** VoiceOver's speech (the tree is read, not heard), a real 320-pt device, the line under the days'
+  contrast.
+
+**Staging.** Read from the commands at 05:06 on 2026-10-31, after this session's `git add` of every path below by
+name, and again of this file once this block was written. **No `git commit` was run.** On `feature/coaching`
+(upstream `origin/feature/coaching`), HEAD `3ca73e5`, 229 commits.
+
+**16 staged:**
+- **1 added:** this change's spec.
+- **15 modified:** the six app files, the three unit test files, `CoachingUITests.swift`, set B's spec,
+  `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `tasks/lessons.md` and this file.
+
+**8 unstaged:**
+- the rule wording, `85-testing` and `65-accessibility`, for the owner's `/commit`;
+- `.claude/settings.json`;
+- the two watch schemes;
+- Xcode's three catalogues.
+
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This
+supersedes the staging block above.
+
+## [2026-10-31] — The hundred-and-fourth `/doc_sync`: finishing set B recorded, set B's commit, and an "only class" that wasn't
+
+Run by the owner on finishing set B's staged tree, on `feature/coaching`, HEAD `3ca73e5`. No call was denied.
+No simulator was used: another session on this Mac, WareStack, asked for them during the pass and was told to
+go ahead.
+
+### The checks, every figure printed
+
+- 126 `.swift` files by `find`, Tools aside — none new, none without a *Files on disk* row;
+- 127 fixed-width rows — 125 target files and two in `Tools/` — equal to `wc -l` by script once nine were
+  recounted, and `WaterBuddyWatchWidgetBundle.swift`'s by hand (9);
+- 1057 phone `@Test`, 71 watch, 70 UI `func test`;
+- 16 keys on `DataManager.Key` and in `Key.all`, the phone's suite 14;
+- three exception sets, unchanged;
+- 264 keys in the app's catalogue, 260 in en/ru/uz, by script;
+- every rule citation resolves; no forbidden doc; no `.swift` change outside the index.
+
+### Drift, from the change — written
+
+- `docs/AI_CONTEXT.md`:
+  - *Last updated*;
+  - *Current state*: finishing set B's block — D1–D8, the walk, rulings R1–R3, the gate, what is not
+    proved;
+  - set B's block: a dated bullet that set B was **committed and pushed on 2026-10-31 at 01:46–01:47** —
+    `55b841e`, `d31ef75`, `1629d06`, `5e58863`, `3ca73e5`, read from `git log`. The block had still said it
+    was not;
+  - *Targets*' three test rows; *Files on disk*' nine rows and the catalogue's;
+  - the Git block.
+- `docs/STATE.md`: no key moved. Dated asides: the DEBUG seed writes the two keys' setters on the fresh
+  start's throwaway suite; the UI suites' launch paragraph names `CoachingUITests`, which set B's pass had left
+  out.
+- `docs/ROADMAP.md`: set B committed and pushed; its eight minors finished, staged.
+- `CLAUDE.md`: the UI target's row names `CoachingUITests`. Set B's bullet records `1629d06`, as the last pass
+  did Apple Health's.
+- `tasks/lessons.md`: one entry.
+
+### Drift older than the change — written
+
+- **`CLAUDE.md` called `PremiumUITests` "the one class launched with DEBUG's `-WaterBuddyPremium`".**
+  `AppStoreScreenshotUITests`' free launch has passed it since `ca81940`, 2026-10-25, and the gate skips that
+  class. The row now names all three callers.
+- **The same claim in rule `85-testing` is not this pass's to change** (rule `99-docs-cascade`). The line
+  finishing set B typed, unstaged, repeats it: "`PremiumUITests` passes it, and `CoachingUITests` …; no other
+  UI test does". It needs the store capture named before the owner's `/commit`. Its *fresh start* bullet's "No
+  other UI test passes it" has been wrong the same way since set B: `CoachingUITests` passes
+  `-WaterBuddyFreshStart`.
+
+### Checked and already accurate
+
+- `docs/DESIGN.md`: the change's own records carry the four notes — the hour rows, the scroll, the last day's
+  line, Home's gap.
+- `docs/WIDGET.md`: no extension calls the new `mayToggle(weekday:)`, and the widget's tap files the stored
+  schedule as before.
+- Known issues #199–#206, retired by the change's records with the fixes on disk, and #207's note.
+- `CLAUDE.md`'s warnings paragraph still states today's figures. Its trail of comparisons ends at the store
+  page's and was not extended by the Apple Health or set B passes either; not extended here.
+
+### Gate
+
+Not run again: no code changed since this session's gate, recorded in the checkpoint above.
+
+**Staging.** Read from the commands at 15:32 on 2026-10-31, after this pass's `git add` of `CLAUDE.md`, this
+file, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `docs/STATE.md` and `tasks/lessons.md` by name, and again of this
+file, `docs/AI_CONTEXT.md` and `docs/STATE.md` once their blocks were written. **No `git commit` was run.** On
+`feature/coaching` (upstream `origin/feature/coaching`, level), HEAD `3ca73e5`, 229 commits.
+
+**19 staged:**
+- **1 added:** finishing set B's spec.
+- **18 modified:** the six app files, the three unit test files, `CoachingUITests.swift`, set B's spec,
+  `CLAUDE.md`, this file, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, `docs/STATE.md` and
+  `tasks/lessons.md`.
+
+**8 unstaged:**
+- the rule wording, `85-testing` and `65-accessibility`, for the owner's `/commit`;
+- `.claude/settings.json`;
+- the two watch schemes;
+- Xcode's three catalogues.
+
+**No untracked file.** None in both; `git diff --cached --check` clean; one stash, `stash@{0}`. This
+supersedes the staging block above.
+
+*(2026-10-31, 23:27, on the owner's "go": the two `85-testing` lines retyped, unstaged with the rest of the
+rule wording. `-WaterBuddyFreshStart` is passed by the welcome's tests, the store capture and
+`CoachingUITests`. `-WaterBuddyPremium` is passed by `PremiumUITests`, `CoachingUITests`' lapsed holder and
+the store capture's free launch. Each caller was read by grep over `WaterBuddyUITests/`, the skipped harness
+included. The file's other "no other UI test" lines agree with the grep: `-WaterBuddyStoreSample`,
+`-WaterBuddyPremiumHeld`, `-WaterBuddyCoachingSeed`, and `-WaterBuddyReviewPrompt`, which no UI test passes.
+The staging counts above stand: the rule file was already unstaged.)*
+
+## [2026-11-01] — The gate run again on finishing set B's staged copy: green but for one flaky new test (#209)
+
+Asked by the owner ("can you run the tests in the another session?"). Every session on this Mac shares its
+simulators, so the gate ran here, on a `git checkout-index` copy of the index (`gate2`), identical by `cmp` for
+every staged code file. No code changed since the 2026-10-31 gate.
+
+### The owner's ruling, and the other sessions
+
+AvtoLog asked, once its runs began, that no one run `xcrun simctl shutdown all` for some hours. Rule
+`85-testing` and `CLAUDE.md` both say to run it first. Asked, the owner chose **"Run beside AvtoLog"**:
+WaterBuddy's own simulators were shut down by ID — iPhone 17 (27.0) `41FBB1D3`, iPhone 17 (26.5) `EE56B958`,
+Apple Watch Series 12 (46mm) (27.0) `00849A95` — one of ours at a time, never a parallel run. The last
+`shutdown all` was at 23:49, before that request, with nothing booted. WareStack paused its CPU soak at 00:49 on
+this session's ask; the icon-animation session held its own. A request to stop this session's own hung
+xcodebuild (pid 98881, sitting after its tear-down, #180's shape) was denied. That was a stop and was reported;
+xcodebuild exited by itself at 01:11:52, and the gate went on.
+
+### Results
+
+- **Phone unit (27.0):** 1057 passed in 116 suites (23:49–23:52).
+- **Phone widget, watch widget:** BUILD SUCCEEDED, both. The first compiled all four targets, the watch widget's
+  sources among them, so the second found nothing to build.
+- **Phone UI, 27.0**, `build-for-testing` then the 2026-10-31 gate's five chunks, read from its logs: **82
+  executed, 2 skipped, 1 failure** — `CoachingUITests.testALapsedHoldersSettingsKeepWorkingAndTurnOffForFree`
+  (`:138`). Alone, three times: passed, failed (`:136`), passed. **#209 opened.**
+- **Phone UI, 26.5**, the same chunks: **82 executed, 2 skipped, 4 failures**, none in this change's code:
+  - `testAPressDraggedAlongTheBarChangesTheTab` (an XCUITest `kAXErrorServerNotFound`) and
+    `testTheTabBarSwitchesBetweenHomeAndHistory` (`:112`, a 5-second wait for History), both at load 409 during
+    WareStack's soak — passed alone at load 29;
+  - `testADiscAndUndoAnswerOffTheirGlyphs` (`:1101`, the one set B's gate also met) and
+    `PremiumUITests.testAnOrdinaryRunsHistoryHasNoMonthSwitch` (`:130`, a 5-second wait for History) — passed
+    alone together.
+
+  The lapsed-holder test passed in this run. Skipped on both runtimes: `testTheBarsCaptionsShareALine` (Apple's
+  bar) and `testThePaceLineIsPremiums` (it was past 23:00).
+- **Watch (27.0):** 71 passed in 7 suites.
+
+### Written
+
+- `docs/AI_CONTEXT.md`: known issue #209, the lapsed-holder test's flaky tap, with what the recording showed.
+- `tasks/lessons.md`: one entry — one quick run does not clear another session's CPU load.
+
+Warnings were not compared again: no code changed since the 2026-10-31 comparison.
+
+**Staging.** Read from the commands at 01:26 on 2026-11-01, after this run's `git add` of this file,
+`docs/AI_CONTEXT.md` and `tasks/lessons.md` by name, and again of this file once this block was written. **No
+`git commit` was run.** On `feature/coaching`, HEAD `3ca73e5`, 229 commits. The same paths as the block above:
+**19 staged** — 1 added, 18 modified — **8 unstaged**, no untracked file, none in both; `git diff --cached
+--check` clean; one stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-11-01] — #209: the lapsed holder's flaky tap, one cause fixed, the other #191's
+
+On the owner's "yes" to fixing the flaky test. Investigated with throwaway probes in a scratch copy of the
+index (`probe-tap`). Its app carried two `NSLog` lines, in the switch's binding and in `openPaywall`, read back
+with `simctl spawn … log show`. Nothing of the probes is in the repository.
+
+### What was measured
+
+- **The recorded guess was wrong.** Thirty taps at the row's centre and thirty on the control, one holder's
+  launch, 1.5 s apart: none lost. The trace shows XCUITest taps a switch at its control, hit point x 328.5.
+- **Cause 1, the tab bar.** The run that failed at `:136` left the switch at y 781–809 under the floating bar
+  from y 791. Its trace has no *Scroll element to visible*, while a probe with the switch deeper under the bar
+  shows XCUITest scrolling first. So XCUITest judged it hittable and tapped (328.5, 795.3), in the corner of the
+  bar's frame. Only the lapsed holder's page is long enough: a free user's switch is at y 682–710 at its
+  lowest, so `PremiumUITests` cannot meet it.
+- **Cause 2, a lost touch (#191).** The app's log shows no binding call for the lost taps:
+  - 1 first tap in 15 fresh launches;
+  - 3 of 40 leave-and-return cycles, all in the two minutes another session's renders ran (load 64);
+  - 1 of 2 taps made straight after a slow drag, at load 6.
+
+  Not the scroll coasting: the lost taps came 4.7–5.5 s after their swipes, the rest 4.0–6.0.
+
+### The change — staged
+
+`CoachingUITests.behindSwitch(in:)` scrolls until *Only when behind* is hittable and clear of the tab bar's
+whole frame, before the lapsed holder's first tap. No assertion changed. No retry was added, since a retry would
+hide a tap the app ignores.
+
+### Verification
+
+On a `git checkout-index` copy of the index with the change staged:
+- `CoachingUITests` on *iPhone 17* (27.0) and (26.5): 4 passed and 1 skipped (the pace test, outside its
+  hours) on each;
+- the lapsed test alone on 27.0: 3 of 3. Each needed only `scheduleRow`'s one swipe, so the new scroll had
+  nothing to do in those runs;
+- warnings, a clean `build-for-testing` on 27.0: 36 sites, identical line for line to the 2026-10-31 gate's.
+
+Not re-run: the rest of the gate, since nothing else changed.
+
+### Records
+
+`docs/AI_CONTEXT.md`: #209's and #191's dated notes, and `CoachingUITests.swift`'s row (185 lines).
+`tasks/lessons.md`: one entry. WaterBuddy's simulators were shut down by ID; the other sessions held for the
+measurements and were released at 03:14.
+
+**Staging.** Read from the commands at 03:15 on 2026-11-01, after the `git add` of
+`WaterBuddyUITests/CoachingUITests.swift`, this file, `docs/AI_CONTEXT.md` and `tasks/lessons.md` by name, and
+again of this file once this block was written. **No `git commit` was run.** On `feature/coaching`, HEAD
+`3ca73e5`, 229 commits. The same paths as the block above, `CoachingUITests.swift` among the 18 modified:
+**19 staged** — 1 added, 18 modified — **8 unstaged**, no untracked file, none in both; `git diff --cached
+--check` clean; one stash, `stash@{0}`. This supersedes the staging block above.

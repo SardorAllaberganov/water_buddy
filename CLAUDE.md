@@ -9,7 +9,7 @@
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: three `StaticConfiguration`s over one provider — the Home Screen widget, the week widget (`WeekWidget`, medium, a tap opens History) and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights — the one class launched with DEBUG's `-WaterBuddyPremium`) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights, launched with DEBUG's `-WaterBuddyPremium`), `CoachingUITests` (set B's, on `feature/coaching`: the schedule sheet, a lapsed holder's settings and Home's pace line, on a DEBUG fresh start — Premium held through `-WaterBuddyPremiumHeld`, or lapsed through `-WaterBuddyPremium` with `-WaterBuddyCoachingSeed`'s settings left behind) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips, whose free launch passes `-WaterBuddyPremium` too |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
@@ -388,7 +388,7 @@ something to record.
   (`docs/superpowers/specs/2026-10-29-apple-health-design.md`; rule `70-privacy`'s *HealthKit, for Apple
   Health*, committed as `2ee3f39`)
 - **Set B: the schedule is a stored setting, the pace a pure reading of it** (roadmap 1.4.3, 1.4.9,
-  1.4.10, on `feature/coaching`). `ReminderPlan.Schedule`, `ReminderPlan.due` and `ReminderPlan.pace`
+  1.4.10, committed on `feature/coaching` — `1629d06`, 2026-10-31 — and pushed; not merged). `ReminderPlan.Schedule`, `ReminderPlan.due` and `ReminderPlan.pace`
   decide — a grid of whole hours, quiet weekdays, and a share of the goal due at each reminder hour, the
   one definition *Only when behind* drops slots by and Home's pace line reads. `DataManager` stores the
   schedule and *Only when behind* in two keys every process reads, so a widget tap files the schedule the
