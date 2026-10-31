@@ -32,8 +32,9 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
 - The welcome's UI tests launch with `-WaterBuddyFreshStart`, which only a DEBUG build reads, in
   `WaterBuddyApp.init()`: the manager is built on a throwaway suite, cleared at launch, and an
   in-memory store, with no widget, reminder or watch side effects. So does the store capture,
-  `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run.
-  No other UI test passes it.
+  `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run,
+  and so does `CoachingUITests`, for set B's controls with Premium held or lapsed. No other UI test
+  passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
   test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not
@@ -46,9 +47,11 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   UI test passes it. The request itself has no automated coverage: prove it by hand on a simulator
   launched with the argument
 - `-WaterBuddyPremium` is DEBUG's opt-in to the paywall, read through
-  `PaywallView.isOffered(arguments:)`. `PremiumUITests` passes it and no other UI test does, so no
-  other run meets the Premium card. A purchase through the sheet has no automated coverage: prove it
-  by hand on a simulator, with the scheme's local StoreKit configuration
+  `PaywallView.isOffered(arguments:)`. `PremiumUITests` passes it; so do `CoachingUITests`, for a lapsed
+  holder beside the fresh start, and the store capture's free launch in
+  `testCaptureAppStoreScreenshots`. No other UI test does, so no other run meets the Premium card. A
+  purchase through the sheet has no automated coverage: prove it by hand on a simulator, with the
+  scheme's local StoreKit configuration
 - `-WaterBuddyStoreSample` and `-WaterBuddyPremiumHeld` are DEBUG's store-capture arguments, and act
   only beside `-WaterBuddyFreshStart`: the first logs `StoreSample`'s three months into the fresh
   start's in-memory store through `addLog(amount:at:)`, the second builds the app's `PremiumStore` on
@@ -57,6 +60,11 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   passes `-WaterBuddyPremiumHeld` beside the fresh start to hold Premium for set B's controls (spec
   `2026-10-30-coaching-design.md` D13); `FreshStartTests` pins both
   (`docs/superpowers/specs/2026-10-25-store-page-design.md`)
+- `-WaterBuddyCoachingSeed` is DEBUG's set B seed, and acts only beside `-WaterBuddyFreshStart`: it sets
+  `WaterBuddyApp.coachingSeed` and *Only when behind* through their setters, in the fresh start's own suite.
+  Beside `-WaterBuddyPremiumHeld` it is a holder's settings; beside `-WaterBuddyPremium` alone, a lapsed
+  holder's. `CoachingUITests` passes it and no other UI test does. `FreshStartTests` pins it
+  (`docs/superpowers/specs/2026-10-31-finish-set-b-design.md` D8)
 - `AppStoreScreenshotUITests.testBuildTheLivedInWeek` is the one capture that opens a device's own
   App Group: it builds the store set's week through History's sheet for the widgets and the watch, on
   the new phone `Tools/CapturePairScreenshots.sh setup` makes — the pair it deletes and makes again by
