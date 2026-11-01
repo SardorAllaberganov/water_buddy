@@ -61,4 +61,13 @@ struct MotionTests {
         #expect(Motion.settleDuration > 0)
         #expect(Motion.settleDuration < Motion.pageDuration)
     }
+
+    /// A ring's sweep and a figure's roll are seen, and a month is done before anyone waits for it: thirty-one days, each
+    /// after the last.
+    @Test func dataDrawsLongEnoughToBeSeenAndNoLonger() {
+        #expect(Motion.drawDuration >= 0.4)
+        #expect(Motion.rollDuration >= 0.4)
+        #expect(Motion.drawDuration + 31 * Motion.drawStagger <= 1.5)
+        #expect(Motion.landResponse + 31 * Motion.popStagger <= 1.5)
+    }
 }

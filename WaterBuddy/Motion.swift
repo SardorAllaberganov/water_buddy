@@ -73,6 +73,36 @@ nonisolated enum Motion {
     /// animation: the vessel's swell.
     static var landSpring: Spring { Spring(response: landResponse, dampingRatio: landDamping) }
 
+    // MARK: Data drawing itself
+
+    /// How long a ring takes to sweep to its value, a bar to grow.
+    static let drawDuration: Double = 0.6
+
+    /// How long each of a run of data waits for the one before: a month reads as a wave.
+    static let drawStagger: Double = 0.018
+
+    /// The same for what pops into place, which is seen one by one.
+    static let popStagger: Double = 0.022
+
+    /// How long a figure takes to roll to its value.
+    static let rollDuration: Double = 0.8
+
+    /// Data arriving. No overshoot, as a figure's: a ring past its value would show a wrong value.
+    static var draw: Animation { .smooth(duration: drawDuration) }
+
+    /// ``draw``, `index` places along a run.
+    static func drawn(at index: Int) -> Animation {
+        draw.delay(Double(max(index, 0)) * drawStagger)
+    }
+
+    /// ``land``, `index` places along a run of what pops: a dot has no value to overshoot.
+    static func popped(at index: Int) -> Animation {
+        land.delay(Double(max(index, 0)) * popStagger)
+    }
+
+    /// A figure rolling to its value.
+    static var roll: Animation { .smooth(duration: rollDuration) }
+
     // MARK: Water
 
     /// The response and damping of ``water``: slower and a little looser than ``land``. A level
