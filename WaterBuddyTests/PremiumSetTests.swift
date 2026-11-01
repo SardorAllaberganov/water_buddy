@@ -15,7 +15,7 @@ import UIKit
 struct PremiumSetTests {
 
     @Test func setAListsItsFourFeaturesInOrder() {
-        #expect(PremiumSet.allCases == [.understand, .coached])
+        #expect(PremiumSet.allCases == [.understand, .coached, .portable])
         #expect(PremiumSet.understand.features == [.monthView, .patterns, .insights, .recap])
     }
 
@@ -26,10 +26,11 @@ struct PremiumSetTests {
 
     /// Set A went on sale with the recap (spec `2026-10-24-monthly-recap-design.md` §3.8), set B with its last
     /// feature (spec `2026-10-30-coaching-design.md`).
-    @Test func bothSetsAreOnSaleNowEveryFeatureIsBuilt() {
+    @Test func everySetIsOnSaleNowEveryFeatureIsBuilt() {
         #expect(PremiumSet.understand.isOnSale)
         #expect(PremiumSet.coached.isOnSale)
-        #expect(PremiumSet.onSale == [.understand, .coached])
+        #expect(PremiumSet.portable.isOnSale)
+        #expect(PremiumSet.onSale == [.understand, .coached, .portable])
     }
 
     /// D10: Settings' Premium card keeps its three previews — four abreast break at the ordinary sizes.
@@ -52,6 +53,25 @@ struct PremiumSetTests {
             }
         }
         #expect(PremiumSet.Feature.schedule.title(in: AppLanguage.english.bundle) == "Your own reminder schedule")
+    }
+
+    /// Sold beside the sets (`docs/ROADMAP.md` §5; spec `2026-11-01-export-design.md` D11).
+    @Test func exportStandsAloneOnTheList() {
+        #expect(PremiumSet.portable.features == [.export])
+        #expect(PremiumSet.Feature.export.caption(in: Bundle.main) == nil, "it would join the card's previews")
+        #expect(PremiumSet.Feature.export.symbol == "square.and.arrow.up")
+    }
+
+    @Test func exportsRowIsWordedInEveryLanguage() {
+        for language in [AppLanguage.english, .russian, .uzbek] {
+            let strings = language.bundle
+            #expect(strings.bundleURL.lastPathComponent == "\(language.code ?? "").lproj")
+            let title = PremiumSet.Feature.export.title(in: strings), line = PremiumSet.Feature.export.line(in: strings)
+            #expect(!title.isEmpty && !line.isEmpty)
+            #expect(language == .english || title != PremiumSet.Feature.export.title(in: AppLanguage.english.bundle),
+                    "\(language.code ?? ""): \(title) was not translated")
+        }
+        #expect(PremiumSet.Feature.export.title(in: AppLanguage.english.bundle) == "Export your servings")
     }
 
     /// An unknown symbol draws nothing at all (rule `65-accessibility`).

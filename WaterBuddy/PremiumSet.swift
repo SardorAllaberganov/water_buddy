@@ -25,10 +25,14 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
     /// `2026-10-30-coaching-design.md`).
     case coached
 
+    /// Export, sold beside the sets (`docs/ROADMAP.md` §5; spec `2026-11-01-export-design.md` D11).
+    case portable
+
     /// One thing a set does, as the paywall and the Settings card name it.
     nonisolated enum Feature: CaseIterable, Sendable, Hashable {
         case monthView, patterns, insights, recap
         case schedule, pace, onlyWhenBehind
+        case export
 
         /// The paywall row's title.
         func title(in strings: Bundle) -> String {
@@ -56,6 +60,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .schedule: "calendar.badge.clock"
             case .pace: "speedometer"
             case .onlyWhenBehind: "bell.badge"
+            case .export: "square.and.arrow.up"
             }
         }
 
@@ -71,6 +76,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .schedule: "Your own reminder schedule"
             case .pace: "A pace line"
             case .onlyWhenBehind: "Reminders only when behind"
+            case .export: "Export your servings"
             }
         }
 
@@ -83,6 +89,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .schedule: "Your hours, your interval, your quiet days"
             case .pace: "Where you should be by now, on Home"
             case .onlyWhenBehind: "A nudge only when you need one"
+            case .export: "Every serving as a CSV file, yours to keep"
             }
         }
 
@@ -95,7 +102,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .recap: nil
             // D10 (spec `2026-10-30-coaching-design.md`): the card keeps set A's three previews; four abreast
             // break at the ordinary sizes. The paywall names set B's in full.
-            case .schedule, .pace, .onlyWhenBehind: nil
+            case .schedule, .pace, .onlyWhenBehind, .export: nil
             }
         }
     }
@@ -105,17 +112,19 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
         switch self {
         case .understand: [.monthView, .patterns, .insights, .recap]
         case .coached: [.schedule, .pace, .onlyWhenBehind]
+        case .portable: [.export]
         }
     }
 
     /// Whether every feature the set lists is built. **Set A went on sale in step 5**, with the recap
     /// (spec `2026-10-24-monthly-recap-design.md` §3.8); a Release build offers it only once the privacy
     /// policy's address is set (`PaywallView.isOffered(arguments:)`). **Set B went on sale with the pace
-    /// line**, its last feature (spec `2026-10-30-coaching-design.md`).
+    /// line**, its last feature (spec `2026-10-30-coaching-design.md`). Export went on sale as it was built.
     var isOnSale: Bool {
         switch self {
         case .understand: true
         case .coached: true
+        case .portable: true
         }
     }
 

@@ -7417,6 +7417,144 @@
           }
         }
       }
+    },
+    "Export your servings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export your servings"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Экспорт порций"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porsiyalarni eksport qilish"
+          }
+        }
+      }
+    },
+    "Every serving as a CSV file, yours to keep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every serving as a CSV file, yours to keep"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все порции в файле CSV, он останется у вас"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barcha porsiyalar CSV faylida, u sizniki"
+          }
+        }
+      }
+    },
+    "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дата, время и объём в миллилитрах, больше ничего. Файл покинет телефон, только когда вы его отправите."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sana, vaqt va millilitrdagi miqdor, boshqa hech narsa yo‘q. Fayl telefoningizdan faqat siz yuborganingizda chiqadi."
+          }
+        }
+      }
+    },
+    "Share as a CSV file": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share as a CSV file"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поделиться файлом CSV"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV fayl sifatida ulashish"
+          }
+        }
+      }
+    },
+    "Nothing to export yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to export yet."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока нечего экспортировать."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hozircha eksport qiladigan narsa yo‘q."
+          }
+        }
+      }
+    },
+    "Your servings could not be read. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your servings could not be read. Try again."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось прочитать порции. Попробуйте ещё раз."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porsiyalarni o‘qib bo‘lmadi. Qayta urinib ko‘ring."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

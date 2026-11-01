@@ -63,6 +63,43 @@ final class PremiumUITests: XCTestCase {
                        "a run not offering the paywall drew a locked row")
     }
 
+    /// The export card for a free user (spec `2026-11-01-export-design.md` D10): one element, locked, opening the
+    /// paywall, which lists it. XCUITest lists the row's two texts on their own and the card's beneath the sheet, so
+    /// the count is of the label that joins them, and of what the sheet adds (rule `65-accessibility`).
+    @MainActor
+    func testAFreeUsersExportIsLockedAndTheOfferListsIt() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-WaterBuddyPremium", "YES"]
+        app.launch()
+        completeWelcomeIfShown(app)
+        app.buttons["Settings"].tap()
+
+        let card = app.buttons["Export your servings"]
+        XCTAssertTrue(card.waitForExistence(timeout: 10), "no export card")
+        let bar = app.tabBars.firstMatch
+        for _ in 0..<6 where !card.isHittable || (bar.exists && card.frame.maxY > bar.frame.minY) { app.swipeUp() }
+        XCTAssertEqual(app.buttons.matching(identifier: "Export your servings").count, 1)
+        XCTAssertEqual(card.value as? String, "Premium", "the lock is not spoken")
+        let row = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@", "Export your servings, Every serving as a CSV file, yours to keep"))
+        XCTAssertEqual(row.count, 0, "the row is already on screen")
+        tapWhenReady(card)
+        XCTAssertTrue(app.staticTexts["See how you really drink, and what would help."].waitForExistence(timeout: 5),
+                      "the card did not open the paywall")
+        XCTAssertEqual(row.count, 1, "the paywall does not list export once")
+    }
+
+    @MainActor
+    func testAnOrdinaryRunHasNoExportCard() throws {
+        let app = XCUIApplication()
+        app.launch()
+        completeWelcomeIfShown(app)
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Export your servings"].waitForExistence(timeout: 3),
+                       "a run not offering the paywall drew a locked row")
+    }
+
     @MainActor
     func testAnOrdinaryRunHasNoPremiumCard() throws {
         let app = XCUIApplication()

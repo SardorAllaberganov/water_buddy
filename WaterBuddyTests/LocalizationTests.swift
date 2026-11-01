@@ -289,6 +289,13 @@ private let premiumKeys = [
     "Insights",
     "Done",
     "No purchases to restore.",
+    // Export (spec `2026-11-01-export-design.md` §3.9).
+    "Export your servings",
+    "Every serving as a CSV file, yours to keep",
+    "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+    "Share as a CSV file",
+    "Nothing to export yet.",
+    "Your servings could not be read. Try again.",
 ]
 
 /// Settings' *Apple Health* card (spec `2026-10-29-apple-health-design.md` §6).

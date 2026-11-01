@@ -35,6 +35,15 @@ struct SettingsView: View {
     /// The paywall, while it is open — its `.sheet(item:)` selection (rule `50-views`).
     @State private var paywall: PaywallView.Entry?
 
+    /// The export, while its sheet is open — its `.sheet(item:)` selection, read once by the card's tap
+    /// (rule `50-views`).
+    @State private var exporting: ServingsExport?
+
+    /// What the card's tap found instead of a file. Here and not on the card: the card changes height with it,
+    /// and only the stack's animation moves the card below with it. It goes with the page, which `RootTabView`
+    /// builds again each time the tab is shown, so a pour on another tab cannot leave it standing.
+    @State private var exportProblem: ExportProblem?
+
     /// Premium's card shows where the paywall is offered, once the first read has answered — so a
     /// paying user never sees the free card flash (plan S13).
     private var showsPremium: Bool {
@@ -98,8 +107,14 @@ struct SettingsView: View {
                     remindersCard.arrives(arrived, order: lead + 2).scrollDepth()
                     // Under reminders: both are about what happens between pours, and both ask iOS first.
                     healthCard.arrives(arrived, order: lead + 3).scrollDepth()
-                    LanguageCard().arrives(arrived, order: lead + 4).scrollDepth()
-                    privacyPolicyLink.arrives(arrived, order: lead + 5).scrollDepth()
+                    // Under Apple Health: both are your water leaving the app, and neither moves until you ask.
+                    if premiumGate != .hidden {
+                        ExportCard(gate: premiumGate, problem: exportProblem?.line(in: strings), action: startExport)
+                            .arrives(arrived, order: lead + 4)
+                            .scrollDepth()
+                    }
+                    LanguageCard().arrives(arrived, order: lead + 5).scrollDepth()
+                    privacyPolicyLink.arrives(arrived, order: lead + 6).scrollDepth()
                     Spacer(minLength: 0)
                 }
                 // The reminders card changes what it says, and with it its height: when
@@ -108,6 +123,7 @@ struct SettingsView: View {
                 // that card alone it grew over a third of a second while its neighbour jumped.
                 .animation(Motion.settle, value: explanation)
                 .animation(Motion.settle, value: healthExplanation)
+                .animation(Motion.settle, value: exportProblem)
                 // Every tab's margin and inset (``ScreenMetrics``).
                 .padding(.horizontal, ScreenMetrics.margin)
                 // Every tab's inset, less the point the reader stands off the safe area (below):
@@ -143,6 +159,11 @@ struct SettingsView: View {
         .tracksArrival($arrived)
         .task { await readSystemState() }
         .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
+        .sheet(item: $exporting) { export in ExportSheet(export: export) }
+        // A lapse closes the sheet: the file is a holder's (rule `50-views`).
+        .onChange(of: premiumGate) { _, gate in
+            if gate != .open { exporting = nil }
+        }
         .onChange(of: scenePhase) { _, phase in
             // Returning from the Settings app is the whole reason this is here.
             if phase == .active {
@@ -184,8 +205,8 @@ struct SettingsView: View {
                     .transition(.opacity)
             }
 
-            if coachingGate != .hidden {
-                CoachingRows(gate: coachingGate) { paywall = .settings }
+            if premiumGate != .hidden {
+                CoachingRows(gate: premiumGate) { paywall = .settings }
             }
         }
         // `.frosted`, not `.sheer`: this pane carries sentence-length text, and the density scale
@@ -193,8 +214,9 @@ struct SettingsView: View {
         .settingsCard()
     }
 
-    /// Set B's rows on this card: open, locked or absent (spec `2026-10-30-coaching-design.md` D4).
-    private var coachingGate: PremiumAccess.Gate {
+    /// Premium's extras on this screen, set B's rows and the export card: open, locked or absent (spec
+    /// `2026-10-30-coaching-design.md` D4).
+    private var premiumGate: PremiumAccess.Gate {
         PremiumAccess.gate(status: premium.state.status, offered: PaywallView.isOfferedHere)
     }
 
@@ -333,6 +355,24 @@ struct SettingsView: View {
             return strings.localizedString(forKey: "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.", value: nil, table: nil)
         }
         return strings.localizedString(forKey: "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.", value: nil, table: nil)
+    }
+
+    // MARK: - Export
+
+    /// One read, on the tap and never before it: Settings would otherwise read the whole history each time it
+    /// appeared (spec `2026-11-01-export-design.md` D1). A free user's tap opens the paywall, as set B's rows do.
+    private func startExport() {
+        guard premiumGate == .open else {
+            paywall = .settings
+            return
+        }
+        exportProblem = nil
+        let rows = manager.logs(since: nil)?.map { ServingsExport.Serving(amount: $0.amount, timestamp: $0.timestamp) }
+        switch ServingsExport.outcome(of: rows, today: premium.now(), calendar: .waterBuddyDay) {
+        case .file(let file): exporting = file
+        case .nothing: exportProblem = .nothing
+        case .unreadable: exportProblem = .unreadable
+        }
     }
 
     // MARK: - The privacy policy
@@ -627,6 +667,64 @@ private struct CoachingRows: View {
 
     private var behindLine: String {
         strings.localizedString(forKey: "Skips a reminder when you've already drunk your share for its hour.", value: nil, table: nil)
+    }
+}
+
+/// Why the card's tap opened no sheet (spec `2026-11-01-export-design.md` D12).
+private enum ExportProblem {
+    case nothing, unreadable
+
+    func line(in strings: Bundle) -> String {
+        let key = switch self {
+        case .nothing: "Nothing to export yet."
+        case .unreadable: "Your servings could not be read. Try again."
+        }
+        return strings.localizedString(forKey: key, value: nil, table: nil)
+    }
+}
+
+/// *Export your servings* — open for Premium, locked where the paywall is offered
+/// (``PremiumAccess/gate(status:offered:)``). The pane is the control, so the press and the target are its whole
+/// shape. Why nothing opened is drawn in its line's place and spoken as the value, since a hint can go unheard.
+private struct ExportCard: View {
+
+    let gate: PremiumAccess.Gate
+    let problem: String?
+    let action: () -> Void
+
+    @Environment(\.strings) private var strings
+
+    private var line: String {
+        strings.localizedString(forKey: "Every serving as a CSV file, yours to keep", value: nil, table: nil)
+    }
+
+    private var spokenValue: String {
+        if let problem { return problem }
+        return gate == .locked ? strings.localizedString(forKey: "Premium", value: nil, table: nil) : ""
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Export your servings", bundle: strings)
+                        .cardTitle()
+                    Text(problem ?? line)
+                        .cardNote()
+                }
+                Spacer(minLength: 8)
+                Image(systemName: gate == .open ? "chevron.right" : "lock.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .accessibilityHidden(true)
+            }
+            .frame(minHeight: 50)
+            .settingsCard(interactive: true)
+        }
+        .buttonStyle(PressStyle())
+        .accessibilityLabel(Text("Export your servings", bundle: strings))
+        .accessibilityHint(Text(line))
+        .accessibilityValue(spokenValue)
     }
 }
 
@@ -1127,10 +1225,10 @@ private extension View {
     /// A card: the canvas's padding, the full width, and the screen's one glass —
     /// `.frosted` + `.raised` on every card, since siblings on one screen share a pair
     /// (rule `60-design-system`) and every card carries sentence-length text.
-    func settingsCard() -> some View {
+    func settingsCard(interactive: Bool = false) -> some View {
         padding(SettingsStyle.cardPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .liquidGlass(density: .frosted, elevation: .raised)
+            .liquidGlass(density: .frosted, elevation: .raised, interactive: interactive)
     }
 }
 
