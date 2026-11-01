@@ -12,13 +12,13 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 30 October 2026
+**Last updated:** 1 November 2026
 
 ---
 
 ## In one sentence
 
-WaterBuddy keeps what you log on your own iPhone and Apple Watch: it has no account and no server, and it sends nothing to us — your water travels only between your own iPhone and your own Watch, and into Apple Health if you turn that on, and anything else that leaves a device does so through Apple (a purchase, a Siri request) or because you chose to share it (a monthly recap image).
+WaterBuddy keeps what you log on your own iPhone and Apple Watch: it has no account and no server, and it sends nothing to us — your water travels only between your own iPhone and your own Watch, and into Apple Health if you turn that on, and anything else that leaves a device does so through Apple (a purchase, a Siri request) or because you chose to share it (a monthly recap image, or a file of your servings).
 
 ---
 
@@ -72,7 +72,7 @@ Everything below lives on your own devices, in WaterBuddy's own storage. None of
 
 **Worked out when shown, and stored nowhere:** your streak, your month view, your patterns, your insights, your monthly recap and your pace are all computed from your servings on your iPhone each time they are drawn.
 
-**Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes — only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); and the recap image (made in memory when you open the recap).
+**Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes — only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); the recap image (made in memory when you open the recap); and the export file (made in memory when you tap *Export your servings*).
 
 **That is the complete list.** WaterBuddy stores no name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record of its own, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
 
@@ -112,7 +112,7 @@ Your iPhone may also send that same summary straight to your Watch's complicatio
 
 ### 2. Premium, through Apple
 
-WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase — monthly, yearly or once — that adds a month view and full history, patterns, personal insights, a monthly recap, your own reminder schedule, a pace line and reminders only when you're behind.
+WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase — monthly, yearly or once — that adds a month view and full history, patterns, personal insights, a monthly recap, your own reminder schedule, a pace line, reminders only when you're behind and a file of your servings.
 
 Premium is sold and paid for entirely through Apple's App Store, under your Apple Account. When you open the Premium screen, the app asks the App Store for the plans and their prices in your country, and whether a free week is open to you; buying, restoring a purchase, asking a parent to approve one (*Ask to Buy*) and managing a subscription all take place in Apple's own sheets. Apple processes the payment, and StoreKit checks the purchase on your iPhone.
 
@@ -150,6 +150,10 @@ The monthly recap (Premium) can be shared as an image, **only when you tap *Shar
 - **Nothing is read.** WaterBuddy reads back only the entries it wrote itself, to keep them in step. Water other apps write to Health is never read, and no figure WaterBuddy shows comes from Health.
 - **Health is Apple's.** Health keeps its data on your iPhone, encrypted, and syncs it through iCloud only if Health is turned on in your iCloud settings — under Apple's terms, not ours. Nothing is sent to us.
 - **Turning it off** stops the writing. It deletes nothing: what is in Health is yours, and you can delete it in your iPhone's Settings — *Privacy & Security*, then *Health*, then *WaterBuddy*, then *Data from "WaterBuddy"*. Deleting WaterBuddy leaves it in Health too.
+
+### 8. A file of your servings you choose to share
+
+*Export your servings* (Premium) makes a CSV file of every serving you have logged, **only when you tap it**, and it leaves your iPhone **only when you tap *Share as a CSV file*** and choose where it goes. For each serving the file holds the date, the time and the amount in millilitres, and nothing else: no goal, no streak, no identifier, no time zone and no device name. Times are read in the time zone your iPhone is in when you export. The app keeps no copy: the file is made in memory, and iOS writes whatever copy your destination asks for. Where it goes is your choice in iOS's share sheet, and once it arrives there it is governed by whatever app or person you sent it to. WaterBuddy does not learn where it went, or that you sent it.
 
 ---
 
@@ -227,8 +231,9 @@ WaterBuddy is a hydration tracker for a general audience. It collects no persona
 - **Delete everything** by deleting WaterBuddy from your iPhone, and the Watch app from your Apple Watch. iOS removes an app's storage with it — including the container the app shares with its widgets, once no app that uses it is left on the device, and no other app of ours uses it. Your servings, your goal, your settings, the Watch's copies and any pending reminders go with it.
 - The record of which Watch servings are already counted keeps about 90 days and drops older days.
 - **Copies in Apple Health**, if you turned it on, are Health's: deleting WaterBuddy leaves them there. Delete them in your iPhone's Settings — *Privacy & Security*, then *Health*, then *WaterBuddy*, then *Data from "WaterBuddy"*.
+- **A file you exported** is yours, wherever you saved or sent it. Deleting WaterBuddy does not touch it, and WaterBuddy cannot reach it: delete it where it is.
 
-Nothing was ever sent to us, so there is no copy on a server to chase: deleting the app is the end of it, but for any copies in Apple Health you chose to make.
+Nothing was ever sent to us, so there is no copy on a server to chase: deleting the app is the end of it, but for any copies in Apple Health you chose to make and any file you exported.
 
 ---
 
@@ -238,9 +243,9 @@ These laws give you rights over personal information that a company **collects, 
 
 **WaterBuddy's developer collects, processes and holds none of your personal information.** There is no server, no account, no database and no code that could send us your data. So:
 
-- **Access and portability:** there is nothing on our side to give you. What the app knows is shown in the app, on your device.
+- **Access and portability:** there is nothing on our side to give you. What the app knows is shown in the app, on your device, and Premium can export every serving as a file.
 - **Correction:** correct a serving in History's week view, and your goal and amounts in Settings.
-- **Deletion:** delete a serving, or delete the app — see above. There is no other copy to erase.
+- **Deletion:** delete a serving, or delete the app — see above. We hold no other copy to erase; a file you exported is yours to delete.
 - **Sale or sharing:** your personal information has never been sold or shared, for any purpose including cross-context behavioural advertising, because we never receive it. There is nothing to opt out of.
 - **Objection and restriction:** there is no processing by us to object to.
 - **Non-discrimination:** logging water is free for everyone, and nothing you do about your privacy changes what you get.
