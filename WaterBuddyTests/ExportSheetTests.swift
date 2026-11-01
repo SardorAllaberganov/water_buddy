@@ -61,6 +61,23 @@ struct ExportSheetTests {
         #expect(!line.hasPrefix("1204"), "the figure was not grouped")
     }
 
+    /// `@MainActor` for `AppLanguage.locale` alone; the function it pins is `nonisolated`.
+    @Test @MainActor func theMoreLineGroupsItsFigureInEveryLanguage() {
+        let english = AppLanguage.english, russian = AppLanguage.russian
+        #expect(ExportSheet.more(1_199, strings: english.bundle, locale: english.locale) == "and 1,199 more")
+        let line = ExportSheet.more(1_199, strings: russian.bundle, locale: russian.locale)
+        #expect(line.filter(\.isNumber) == "1199")
+        #expect(!line.contains("1199"), "the figure was not grouped")
+    }
+
+    /// A lock never stands over a line about a file only a holder could have asked for, and VoiceOver says *Premium*.
+    @Test func aLapsedCardDrawsNoProblem() {
+        #expect(SettingsView.exportLine("Nothing to export yet.", gate: .open) == "Nothing to export yet.")
+        #expect(SettingsView.exportLine("Nothing to export yet.", gate: .locked) == nil)
+        #expect(SettingsView.exportLine("Nothing to export yet.", gate: .hidden) == nil)
+        #expect(SettingsView.exportLine(nil, gate: .open) == nil)
+    }
+
     /// The name a destination files it under (D9). `suggestedFilename` is iOS 18.2 and later, as `exported(as:)` is;
     /// that the name survives *Save to Files* was measured on 27.0, 26.5 and 18.6 (plan Task 0).
     @Test func theSharedFileCarriesItsName() throws {

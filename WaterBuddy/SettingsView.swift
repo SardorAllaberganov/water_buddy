@@ -44,6 +44,10 @@ struct SettingsView: View {
     /// builds again each time the tab is shown, so a pour on another tab cannot leave it standing.
     @State private var exportProblem: ExportProblem?
 
+    /// Bumped each time the card's tap opens the sheet, for its tick and its glyph's bounce. A refusal is silent: the
+    /// haptic vocabulary has no refusal.
+    @State private var exportOpens = 0
+
     /// Premium's card shows where the paywall is offered, once the first read has answered — so a
     /// paying user never sees the free card flash (plan S13).
     private var showsPremium: Bool {
@@ -109,7 +113,12 @@ struct SettingsView: View {
                     healthCard.arrives(arrived, order: lead + 3).scrollDepth()
                     // Under Apple Health: both are your water leaving the app, and neither moves until you ask.
                     if premiumGate != .hidden {
-                        ExportCard(gate: premiumGate, problem: exportProblem?.line(in: strings), action: startExport)
+                        ExportCard(
+                            gate: premiumGate,
+                            problem: Self.exportLine(exportProblem?.line(in: strings), gate: premiumGate),
+                            opens: exportOpens,
+                            action: startExport
+                        )
                             .arrives(arrived, order: lead + 4)
                             .scrollDepth()
                     }
@@ -156,6 +165,7 @@ struct SettingsView: View {
         // declared once on `RootTabView`, which owns the hosting controller all three tabs share —
         // the same move `HistoryView` made when the log stopped being a sheet.
         .sensoryFeedback(Haptics.confirm, trigger: enables)
+        .sensoryFeedback(Haptics.select, trigger: exportOpens)
         .tracksArrival($arrived)
         .task { await readSystemState() }
         .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
@@ -164,6 +174,9 @@ struct SettingsView: View {
         .onChange(of: premiumGate) { _, gate in
             if gate != .open { exporting = nil }
         }
+        // A watch pour, or a widget tap read on coming forward: the line that said there was nothing goes with the
+        // nothing. Nothing in the suite can drive either (spec `2026-11-01-finish-export-design.md` D11).
+        .onChange(of: manager.currentWater) { exportProblem = nil }
         .onChange(of: scenePhase) { _, phase in
             // Returning from the Settings app is the whole reason this is here.
             if phase == .active {
@@ -231,6 +244,12 @@ struct SettingsView: View {
     /// what it does, not *Opens Premium* (the final review's Important 2).
     nonisolated static func behindTapOpensPaywall(gate: PremiumAccess.Gate, isOn: Bool) -> Bool {
         gate != .open && !isOn
+    }
+
+    /// Why the export card's tap opened nothing, while the card is open. The line outlives a lapse otherwise: a lock over
+    /// it, and VoiceOver speaking it in place of *Premium*.
+    nonisolated static func exportLine(_ problem: String?, gate: PremiumAccess.Gate) -> String? {
+        gate == .open ? problem : nil
     }
 
     private var toggleRow: some View {
@@ -369,7 +388,9 @@ struct SettingsView: View {
         exportProblem = nil
         let rows = manager.logs(since: nil)?.map { ServingsExport.Serving(amount: $0.amount, timestamp: $0.timestamp) }
         switch ServingsExport.outcome(of: rows, today: premium.now(), calendar: .waterBuddyDay) {
-        case .file(let file): exporting = file
+        case .file(let file):
+            exportOpens += 1
+            exporting = file
         case .nothing: exportProblem = .nothing
         case .unreadable: exportProblem = .unreadable
         }
@@ -690,12 +711,23 @@ private struct ExportCard: View {
 
     let gate: PremiumAccess.Gate
     let problem: String?
+    /// How many times the tap has opened the sheet: the glyph answers each.
+    let opens: Int
     let action: () -> Void
 
     @Environment(\.strings) private var strings
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var line: String {
         strings.localizedString(forKey: "Every serving as a CSV file, yours to keep", value: nil, table: nil)
+    }
+
+    /// The glyph beside the words, and above them at the accessibility sizes: beside them it took the width the title
+    /// needed, and hyphenated it *serv-ings* (the render, Task 9).
+    private var lockup: AnyLayout {
+        typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(spacing: 12))
     }
 
     private var spokenValue: String {
@@ -706,11 +738,21 @@ private struct ExportCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Export your servings", bundle: strings)
-                        .cardTitle()
-                    Text(problem ?? line)
-                        .cardNote()
+                lockup {
+                    // Premium's card's own kind of glyph, bare: a filled square would be a hand-rolled pane
+                    // (rule `60-design-system`).
+                    Image(systemName: "doc.text")
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .symbolEffect(.bounce, value: opens)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Export your servings", bundle: strings)
+                            .cardTitle()
+                        Text(problem ?? line)
+                            .cardNote()
+                            .contentTransition(.opacity)
+                    }
                 }
                 Spacer(minLength: 8)
                 Image(systemName: gate == .open ? "chevron.right" : "lock.fill")
@@ -1192,9 +1234,6 @@ private enum SettingsStyle {
     /// From the title to the first card.
     static let headerGap: CGFloat = 20
 
-    /// The rule between the language rows and above the vessels note.
-    static let hairlineOpacity = 0.16
-
     /// The privacy policy's link, on the aurora under the cards: the paywall's footer link — a
     /// semibold footnote — at the notes' opacity, with the backdrop's halo.
     static let link: Font = .footnote.weight(.semibold)
@@ -1229,17 +1268,6 @@ private extension View {
         padding(SettingsStyle.cardPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .liquidGlass(density: .frosted, elevation: .raised, interactive: interactive)
-    }
-}
-
-/// A one-point rule across a card. Decoration: what it separates is already separate to VoiceOver.
-private struct Hairline: View {
-
-    var body: some View {
-        Rectangle()
-            .fill(.white.opacity(SettingsStyle.hairlineOpacity))
-            .frame(height: 1)
-            .accessibilityHidden(true)
     }
 }
 

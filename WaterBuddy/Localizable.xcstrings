@@ -7510,6 +7510,52 @@
         }
       }
     },
+    "Servings in this file": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Servings in this file"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Порций в файле"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fayldagi porsiyalar"
+          }
+        }
+      }
+    },
+    "and %1$d more": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "and %1$d more"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "и ещё %1$d"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yana %1$d ta"
+          }
+        }
+      }
+    },
     "Nothing to export yet.": {
       "extractionState": "manual",
       "localizations": {

@@ -107,9 +107,10 @@ final class ExportUITests: XCTestCase {
         let share = shareButton(in: app)
         XCTAssertTrue(share.waitForExistence(timeout: 5), "the sheet did not open")
         XCTAssertEqual(headings.count, headingsBefore + 1, "the sheet's heading is not one element")
-        // XCUITest lists a combined element's children too, so the count is of the label that joins them.
+        // The card is one element, so the count is of the label that joins what it says.
         let summary = app.descendants(matching: .any)
-            .matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "1 serving,", "nothing else"))
+            .matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@ AND label CONTAINS %@",
+                                  "1 serving,", "WaterBuddy-", "nothing else"))
         XCTAssertEqual(summary.count, 1, "the summary is not one element")
         XCTAssertEqual(app.buttons.matching(identifier: "Done").count, 1, "no single close button")
         XCTAssertEqual(app.buttons.matching(identifier: Self.share).count, 1)

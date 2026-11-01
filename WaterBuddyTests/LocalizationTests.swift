@@ -296,6 +296,8 @@ private let premiumKeys = [
     "Share as a CSV file",
     "Nothing to export yet.",
     "Your servings could not be read. Try again.",
+    "Servings in this file",
+    "and %1$d more",
 ]
 
 /// Settings' *Apple Health* card (spec `2026-10-29-apple-health-design.md` §6).

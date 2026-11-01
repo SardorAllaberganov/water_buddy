@@ -189,4 +189,40 @@ struct ServingsExportTests {
         #expect(lines[1] == "2021-01-01,08:00,250")
         #expect(lines[15_000] == "2026-02-19,05:00,250")
     }
+
+    private func previewed(servings: Int) throws -> ServingsExport {
+        let utc = try calendar("UTC")
+        let start = try instant(utc, 2026, 6, 3, 8)
+        let rows = (0..<servings).map {
+            ServingsExport.Serving(amount: 250 + $0, timestamp: start.addingTimeInterval(Double($0) * 3_600))
+        }
+        return try file(rows, today: start, calendar: utc)
+    }
+
+    /// The sheet says it shows what will leave, so what it shows is cut from the bytes, not written beside them.
+    @Test func thePreviewIsTheFilesOwnFirstLines() throws {
+        let export = try previewed(servings: 40)
+        let text = try #require(String(data: export.data, encoding: .utf8))
+        #expect(export.preview == Array(text.components(separatedBy: "\r\n").prefix(6)))
+        #expect(export.preview == [
+            "date,time,amount_ml",
+            "2026-06-03,08:00,250",
+            "2026-06-03,09:00,251",
+            "2026-06-03,10:00,252",
+            "2026-06-03,11:00,253",
+            "2026-06-03,12:00,254"
+        ])
+    }
+
+    @Test func aShortFileIsPreviewedWhole() throws {
+        let export = try previewed(servings: 3)
+        #expect(export.preview.count == 4)
+        #expect(export.moreServings == 0)
+    }
+
+    @Test func theMoreCountIsWhatThePreviewLeavesOut() throws {
+        #expect(try previewed(servings: 5).moreServings == 0)
+        #expect(try previewed(servings: 6).moreServings == 1)
+        #expect(try previewed(servings: 1_204).moreServings == 1_199)
+    }
 }

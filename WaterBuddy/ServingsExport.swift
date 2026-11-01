@@ -48,8 +48,17 @@ nonisolated struct ServingsExport: Identifiable, Sendable, Equatable {
     let first: Date
     /// The newest serving's instant.
     let last: Date
+    /// The file's first lines, headings first, as they are in the file: what the sheet shows of what will leave. Cut from
+    /// the same lines as ``data``, so it cannot say anything the file does not.
+    let preview: [String]
 
     var id: String { "\(name).\(count)" }
+
+    /// How many servings ``preview`` leaves out.
+    var moreServings: Int { count - (preview.count - 1) }
+
+    /// How many servings the sheet shows.
+    private static let previewServings = 5
 
     private static let headings = "date,time,amount_ml"
     /// RFC 4180's line ending.
@@ -67,7 +76,8 @@ nonisolated struct ServingsExport: Identifiable, Sendable, Equatable {
             data: Data((lines.joined(separator: lineEnding) + lineEnding).utf8),
             count: ordered.count,
             first: first.timestamp,
-            last: last.timestamp
+            last: last.timestamp,
+            preview: Array(lines.prefix(previewServings + 1))
         ))
     }
 

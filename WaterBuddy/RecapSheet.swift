@@ -29,6 +29,9 @@ struct RecapSheet: View {
     /// The card, rendered — presentation state, gone with the sheet.
     @State private var image: UIImage?
 
+    /// Bumped by the share button's press, for its haptic alone (rule `60-design-system`).
+    @State private var shares = 0
+
     var body: some View {
         ZStack {
             AuroraBackground()
@@ -55,6 +58,7 @@ struct RecapSheet: View {
         .preferredColorScheme(.dark)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        .sensoryFeedback(Haptics.confirm, trigger: shares)
         .task { image = RecapCard.image(of: month, strings: strings, locale: locale) }
     }
 
@@ -133,6 +137,9 @@ struct RecapSheet: View {
                 shareLabel
             }
             .buttonStyle(PressStyle())
+            // A press, not a share: `ShareLink` reports nothing, and rule `70-privacy` forbids asking. Presentation state,
+            // gone with the sheet.
+            .simultaneousGesture(TapGesture().onEnded { shares += 1 })
         } else {
             shareLabel
                 .opacity(Self.pending)
