@@ -4,6 +4,26 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-01, afternoon (hundred-and-fifth pass — `/doc_sync` run by the owner on the branch as
+pushed, on `feature/coaching`, HEAD `e9a920c`). No code changed since `/commit`, and the one code change since
+the last pass is `CoachingUITests.swift`'s helper for #209. Read-only checks, every figure printed:
+- 126 `.swift` files by `find`, 128 tracked with the two in `Tools/`, none without a row; 127 fixed-width rows
+  checked by script against `wc -l`, none differing;
+- 1057 phone `@Test`, 71 watch, 70 UI `func test`;
+- 16 keys on `DataManager.Key`; the app catalogue at `HEAD` 264 keys by script, 260 of them in en/ru/uz;
+- three six-file exception sets, unchanged; every rule citation resolves; no forbidden doc; `StoreKit`,
+  `FoundationModels` and `HealthKit` in their named files alone, no `SwiftData` under `WaterBuddyWidget/`.
+
+**Drift found, two:**
+- Finishing set B's records said "staged, not committed" and "typed and unstaged", overtaken by `/commit`'s four
+  commits. Written: a new *Current state* block, a sentence atop *Files on disk*, #209's note, a dated note on
+  `docs/ROADMAP.md`, and the Git block.
+- `/commit`'s whole UI run on 27.0 had no record anywhere, and the gate re-run before it stood only in
+  `HISTORY.md`. Both are now in *Current state*, read again from their logs.
+
+`CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: checked for the subject, nothing in them moved,
+*Last updated* kept. `tasks/lessons.md`: one entry. Gate: not run again, since no code changed after `/commit`'s.
+
 **Last updated:** 2026-10-31, afternoon (hundred-and-fourth pass — `/doc_sync` run by the owner on finishing set
 B's staged tree, on `feature/coaching`, HEAD `3ca73e5`). Read-only checks, every figure printed:
 - 126 `.swift` files by `find`, Tools aside, none new and none without a row; 127 fixed-width rows — 125 target files and
@@ -2133,6 +2153,9 @@ seventh means editing that list.
 
 ## Files on disk
 
+*(2026-11-01, hundred-and-fifth pass: every row tagged "finishing set B, staged" or "2026-11-01, staged" was
+committed in `d680719`, and the tags stay as written. All 127 rows read again against `wc -l`, none differing.)*
+
 *Line counts re-derived with `wc -l` on 2026-10-14 (fifty-eighth pass), every row against its file
 by a script: none stale — the three stage 4 moved had been re-counted by its own session. In the
 notes below, "staged 2026-10-11, the redesign's stage 3" was committed on 2026-10-13 as `e0762ab`;
@@ -2640,6 +2663,30 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Finishing set B is committed and pushed, not merged** (2026-11-01, on the owner's `/commit` and "ok"). Four
+commits at 03:56:52, pushed at 03:57:15: `3ca73e5..e9a920c` on `feature/coaching`, 233 commits, 14 ahead of `main`.
+Read from `git log` and the remote branch's reflog. Every "staged" and "typed and unstaged" for this work, in the
+block below, in *Targets*, in *Files on disk* and in the retired issues, means these commits; the words stay as
+written.
+
+- **The commits:** `e7b7bcc` the spec; `e86487d` the rule wording in `85-testing` and `65-accessibility`;
+  `d680719` the code and tests, #209's fix among them; `e9a920c` the records.
+- **The whole gate, re-run before #209's fix**, on a copy of the index, 23:49–01:25 (`HISTORY.md` has the detail):
+  - Phone unit: **1057 passed in 116 suites**. Watch: **71 passed in 7 suites**. Both widget schemes built.
+  - UI 27.0: **82 executed, 2 skipped, 1 failure**, #209's test.
+  - UI 26.5: **82 executed, 2 skipped, 4 failures**. All four passed alone afterwards, and two of them had failed
+    at a load of 409 during another session's soak.
+- **After #209's fix**, on a copy byte-identical to `HEAD`'s seven target folders and project file (151 files
+  compared by this pass):
+  - `CoachingUITests` on 27.0 and on 26.5: 4 passed and the pace test skipped, on each.
+  - **`/commit`'s UI run on 27.0, 03:18–03:53, in five chunks: 82 executed, 2 skipped, 0 failures.** The two
+    skipped were `testTheBarsCaptionsShareALine` and `testThePaceLineIsPremiums`, outside its hours. #209's test
+    passed, in 51.5 s.
+- **Not run after the fix:** the whole UI suite on 26.5, whose last whole run is the four failures above. The fix
+  changed one UI test file, so nothing else was re-run. `testThePaceLineIsPremiums` last ran in its window at 05:01
+  on 2026-10-31.
+- **Still open from this work:** #207, #208 and #209. What is left of #209 is #191's lost touch, which has no fix.
 
 **Finishing set B — its eight deferred minors, known issues #199–#206 — is built: staged on `feature/coaching`,
 not committed** (2026-10-31, from `3ca73e5`, set B committed and pushed). Taken by `/start_task` with no task
@@ -6041,6 +6088,16 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 14:11 on 2026-11-01, in the hundred-and-fifth pass, after its `git add` of four paths by name —
+`HISTORY.md`, this file, `docs/ROADMAP.md`, `tasks/lessons.md`: on `feature/coaching`, level with
+`origin/feature/coaching` — HEAD `e9a920c`, 233 commits, finishing set B's four commits made at 03:56:52 and pushed
+at 03:57:15; 4 staged, all modified — 6 unstaged, no untracked entry, none in both; `git diff --cached --check`
+clean; one stash.**
+- **Staged:** those four records, this pass's alone.
+- **Unstaged:** `.claude/settings.json` (the owner's), the two watch schemes and Xcode's three catalogues.
+
+This file and `HISTORY.md` are added again once their blocks are written. No `git commit`.
 
 **Read at 15:32 on 2026-10-31, in the hundred-and-fourth pass, after its `git add` of six paths by name —
 `CLAUDE.md`, `HISTORY.md`, this file, `docs/ROADMAP.md`, `docs/STATE.md`, `tasks/lessons.md`: on
@@ -10692,7 +10749,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     #191's, now seen on 27.0** (its note). No change to the test can prevent it, and a retry would hide a
     tap the app ignores, so none was added. After the fix: the class on 27.0 and 26.5, 4 passed and the pace
     test skipped on each; the test alone on 27.0, 3 of 3; warnings 36 sites, identical to the 2026-10-31
-    gate's.)*
+    gate's.)* *(2026-11-01, hundred-and-fifth pass: the fix is committed, `d680719`. In `/commit`'s whole UI run
+    on 27.0 the test passed, in 51.5 s. One clean run does not show either cause gone, and 26.5 has not run the
+    whole suite since the fix. **Left open:** the test can still fail through #191's lost touch, which has no
+    fix.)*
 
 ## Where the rest is written down
 

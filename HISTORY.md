@@ -14486,3 +14486,56 @@ again of this file once this block was written. **No `git commit` was run.** On 
 `3ca73e5`, 229 commits. The same paths as the block above, `CoachingUITests.swift` among the 18 modified:
 **19 staged** — 1 added, 18 modified — **8 unstaged**, no untracked file, none in both; `git diff --cached
 --check` clean; one stash, `stash@{0}`. This supersedes the staging block above.
+
+## [2026-11-01] — The hundred-and-fifth `/doc_sync`: finishing set B's commits and its clean UI run recorded
+
+Run by the owner on the branch as pushed, on `feature/coaching`, HEAD `e9a920c`. No code changed since `/commit`.
+No gate was run in this pass.
+
+### Drift found and fixed
+
+- **"Staged" overtaken.** Finishing set B's records said "staged, not committed" and "typed and unstaged".
+  `/commit` made four commits at 03:56:52 and pushed them at 03:57:15, `3ca73e5..e9a920c`: `e7b7bcc` the spec,
+  `e86487d` the rule wording, `d680719` the code and tests, `e9a920c` the records. The tags stay as written, and
+  a new *Current state* block and a sentence atop *Files on disk* say what they became.
+- **A gate with no record.** `/commit`'s whole UI run was reported to the owner and written nowhere, and the gate
+  re-run before it stood only in this file. Both are now in *Current state*, read again from their logs.
+
+### The gate, as recorded
+
+Read from the logs of the runs made earlier this session. None was run again.
+
+- **`/commit`'s UI run on *iPhone 17* (27.0), 03:18–03:53, five chunks:** 13, 13, 13, 13 and 30 tests, **82
+  executed, 2 skipped, 0 failures**. Skipped: `testTheBarsCaptionsShareALine` and `testThePaceLineIsPremiums`.
+  `testALapsedHoldersSettingsKeepWorkingAndTurnOffForFree` passed, in 51.5 s.
+- **The copy it ran on** was compared with `HEAD` by this pass: 151 files in the seven target folders and
+  `project.pbxproj`, all byte-identical.
+- **Not run after #209's fix:** the whole UI suite on 26.5. Its last whole run, before the fix, had 4 failures, each
+  passing alone afterwards. Only one UI test file changed after the whole gate, so nothing else was re-run.
+
+### What stays open
+
+#209 stays open, though its tab-bar cause is fixed and committed: the test can still fail through #191's lost
+touch, which has no fix, and one clean run does not show either cause gone. #207 and #208 stay open too.
+
+### Checked and already accurate
+
+- 126 `.swift` files by `find`, 128 tracked with the two in `Tools/`, none without a row.
+- 127 fixed-width rows against `wc -l`, none differing, and `WaterBuddyWatchWidgetBundle.swift`'s by hand (9).
+- 1057 phone `@Test`, 71 watch, 70 UI `func test`, as *Targets* states them.
+- 16 keys on `DataManager.Key`; the app catalogue at `HEAD` 264 keys, 260 in en/ru/uz.
+- Three six-file exception sets; every rule citation resolves; no forbidden doc.
+- `StoreKit` in `HomeView.swift` and `PremiumStore.swift`, `FoundationModels` in `InsightWriter.swift`, `HealthKit`
+  in `HealthMirror.swift`, none of them elsewhere in the shipping targets; no `SwiftData` under `WaterBuddyWidget/`.
+- `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: nothing in their subjects moved, so *Last
+  updated* is kept.
+
+### Files touched
+
+`docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` (one entry: a pause only my message can end can outlast
+the work), and this file.
+
+**Staging.** Read from the commands at 14:11 on 2026-11-01, after the `git add` of these four paths by name, and
+again of this file and `docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On
+`feature/coaching`, level with `origin/feature/coaching`, HEAD `e9a920c`, 233 commits: **4 staged**, all modified
+— **6 unstaged**, no untracked file, none in both; `git diff --cached --check` clean; one stash, `stash@{0}`.

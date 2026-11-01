@@ -5445,3 +5445,15 @@ its control (x 328.5). The two failures had different causes:
 **The rule:** a guess about a flaky tap is not written as its fix. Read where XCUITest says it tapped, check
 that point against everything floating over the page, and log at the app's end in a scratch copy before
 changing the test.
+
+## 2026-11-01 — A pause only my message can end can outlast the work
+
+**What happened.** WareStack's session suspended its soak for `/commit`'s UI run, to resume on my "done". The
+"done" went out at 03:53. The tool's first answer said it was in that session's inbox, but the notice after it
+said it was held and not delivered, usually because the two sessions run in different permission modes. Nothing
+else could release the soak. It stayed suspended until its session was restarted, the suspended run was dropped,
+and the soak began again from the start at 14:08.
+
+**The rule:** a pause asked of another session gets an end of its own, a time after which it may resume unasked.
+"In that session's inbox" is not delivery, so read the notice that follows. While a message is held, do not resend
+it: tell the owner what it is holding up.

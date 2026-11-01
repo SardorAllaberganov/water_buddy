@@ -471,6 +471,10 @@ and unstaged for the owner's `/commit`.)*
 known issues #199–#206, were finished the same morning — staged, not committed — under
 `docs/superpowers/specs/2026-10-31-finish-set-b-design.md`; 1.4.11 still waits.)*
 
+*(2026-11-01, read from `git log` by the hundred-and-fifth pass: **finishing set B committed and pushed** on
+`feature/coaching` at 03:56–03:57, `e7b7bcc` to `e9a920c`; not merged. #199–#206 are closed. #207, #208 and
+#209 stay open, and 1.4.11 still waits.)*
+
 **1.4.11 — Workout-aware goal.** A workout recorded in Apple Health raises that day's goal; no
 location and no weather (§9). Only if 1.3.3 also *reads* from Health — otherwise it waits. Whether
 the widget and the watch draw the raised goal is its design's question. **Needs rule changes** (§8).
