@@ -7,6 +7,12 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-02, just after midnight (hundred-and-eighth pass — `/doc_sync` run by the owner after *One finish*'s
+stage 2). *One finish* gains the held card's figures and `heldInset`. No colour moved.
+
+**Last updated:** 2026-11-01, night (hundred-and-seventh pass — `/doc_sync` run by the owner part-way through *One finish*).
+*Export* is measured, its sheet now `.large`, and *One finish* records the new motion numbers. No colour moved.
+
 **Last updated:** 2026-11-01, evening (hundred-and-sixth pass — `/doc_sync` run by the owner on export's staged tree). One
 section, *Export*, which records what was not measured. No token moved.
 
@@ -2499,12 +2505,54 @@ W2's fix.
 
 ## Export
 
-No token moved, and **nothing here is measured yet** (known issue #213). The card is a Settings card, `.frosted` + `.raised`,
-its pane the control, so it alone passes `interactive: true`, with `PressStyle`; its chevron and lock are `CoachingRows`'
-white. The sheet's pane is the recap's, `.frosted` + `.raised`, with white text; its one primary surface is *Share as a CSV
-file*. Its recipe is measured elsewhere, its ground is not: `.presentationDetents([.medium, .large])` makes it the app's first
-medium sheet, and `AuroraBackground`'s lights are absolute offsets from the centre, so on a canvas of about 440 pt they sit
-at the edges. Measure the heading and the pane off a render at the medium detent, through a full drift period.
+*(2026-11-01, *One finish*'s stage 1: the sheet is `.large`, so the medium ground below is gone, and #213 is closed.)* The sheet
+holds one card, `.frosted` + `.raised` with `.premiumRim(lit:)`: the figure at 52 pt heavy rounded, capped at 76, the label, the
+dates, a `Hairline`, the file's name and its first lines in monospaced footnote, capped at `.accessibility1`, a `Hairline`, the note.
+Settings' card gains `doc.text`, white, `.title2` semibold, bare as Premium's `sparkles`, above the words at the accessibility sizes.
+
+**Measured on iOS 27.0's iPhone 17, 22 frames over a minute, in English:** white's worst pixel on clean ground beside each part,
+no shadow counted.
+
+| Part | Worst | Floor |
+|---|---|---|
+| The figure, on the card's lit corner | **4.92:1** | 3 |
+| *Servings in this file* | **5.79:1** | 4.5 |
+| The dates | **6.56:1** | 4.5 |
+| The rows | **8.39:1** | 4.5 |
+| *and N more* | **9.10:1** | 4.5 |
+| The note | **9.41:1** | 4.5 |
+| The heading, on the aurora | **9.99:1** | 3 |
+
+Not measured: the rim beside the pane, a mark and not a carrier of text; Settings' card's glyph, white on a pane whose note holds at
+0.92. The heading's ground was sampled beside it and not under its first letters.
+
+*Superseded, as written before stage 1:* No token moved, and **nothing here is measured yet** (known issue #213). The card is a
+Settings card, `.frosted` + `.raised`, its pane the control, so it alone passes `interactive: true`, with `PressStyle`; its chevron
+and lock are `CoachingRows`' white. The sheet's pane is the recap's, `.frosted` + `.raised`, with white text; its one primary surface
+is *Share as a CSV file*. Its recipe is measured elsewhere, its ground is not: `.presentationDetents([.medium, .large])` makes it the
+app's first medium sheet, and `AuroraBackground`'s lights are absolute offsets from the centre, so on a canvas of about 440 pt they
+sit at the edges. Measure the heading and the pane off a render at the medium detent, through a full drift period.
+
+## One finish
+
+*Added 2026-11-01, stages 0 and 1 (spec `2026-11-01-premium-look-design.md`).* Sizes, because under about 20 pt or a fifth of a second
+motion reads as nothing (`tasks/lessons.md`, 2026-10-12). None of it is felt yet: the owner's iPhone judges it.
+
+| Token | Value | What it is |
+|---|---|---|
+| `Landing.wait` | 350 ms | how long a sheet is given to land before what is inside moves |
+| `Landing.rise` | 28 pt | how far a part rises; `Arrival.rise`, a tab's, stays 14 |
+| `Landing.stagger` / `longestDelay` | 0.07 s / 0.42 s | each part after the one above, and the ceiling |
+| `Motion.drawDuration` / `drawStagger` | 0.6 s / 0.018 s | a ring's sweep, and each day after the last: 1.16 s for 31 |
+| `Motion.popStagger` | 0.022 s | what pops in, on `Motion.land` |
+| `Motion.rollDuration` | 0.8 s | a figure rolling once, by `numericText()` |
+| `PremiumRim.lapDuration` / `purchaseLaps` | 1.5 s / 2 | one lap of white light, 2.4 pt wide over the 1.5 pt rim, gone at both ends |
+| `PaywallStyle.heldInset` | 28 pt | above and below the words on the held card |
+| a chosen plan's tile | 1.03, on `Motion.land` | it stands forward; 3% of about 110 pt is 3 pt, and it is the tile's rim and fill that say *chosen* |
+
+**The paywall's held card, stage 2:** `.frosted` + `.raised` with the rim, `.largeTitle` heavy over the plan's line at white 0.92. White's
+worst pixel on clean ground, **two frames only, not a minute:** 7.43 above the words, 6.61 beside the title, 9.50 beside the line. At
+0.92 the line stays over 4.5. The card stands inside the region of the sheet the export card measured over a full minute.
 
 ## The header and a screen arriving
 

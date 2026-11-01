@@ -4,6 +4,13 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-11-02, just after midnight (hundred-and-eighth pass — `/doc_sync` run by the owner after *One finish*'s
+stage 2). **No key and no stored byte moved:** a purchase is still read from StoreKit, and the moment's counter is presentation state.
+
+**Last updated:** 2026-11-01, night (hundred-and-seventh pass — `/doc_sync` run by the owner part-way through *One finish*, on
+`feature/premium-look`). **No key and no stored byte moved:** 16 on `DataManager.Key`, the phone's suite 14. `ServingsExport.preview`
+is cut from the file's lines and held in memory with it; every flag that drives motion is presentation state.
+
 **Last updated:** 2026-11-01, evening (hundred-and-sixth pass — `/doc_sync` run by the owner on export's staged tree, on
 `feature/export`). **No key and no stored byte moved:** 16 on `DataManager.Key`, the phone's suite 14. Export stores nothing:
 the file is in memory while its sheet is open, and `logs(since:)`, a read, gains the export card as its second caller.

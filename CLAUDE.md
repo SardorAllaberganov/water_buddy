@@ -395,13 +395,18 @@ something to record.
   app set; Settings edits them for Premium; Home draws the pace for Premium. Nothing about Premium is
   stored: a lapse locks the editing and keeps what was set
   (`docs/superpowers/specs/2026-10-30-coaching-design.md`)
-- **Export: every serving, on the user's tap** (roadmap 1.4.4, staged on `feature/export`, not committed). `ServingsExport`, pure,
+- **Export: every serving, on the user's tap** (roadmap 1.4.4, committed on `feature/export` — `9086f06`, 2026-11-01 — and pushed; not merged). `ServingsExport`, pure,
   app-only and Foundation alone, turns plain rows into the CSV and a summary, and keeps *nothing to export* apart from *the
   read failed*. Settings' card reads `manager.logs(since: nil)` once, on the tap, for Premium; anyone else's tap opens the
   paywall. `ExportSheet` says what will leave, then hands the bytes to `ShareLink` in memory: `date,time,amount_ml`, fixed
   English in every language, oldest first, named `WaterBuddy-yyyy-MM-dd.csv`, with no id, goal, streak or time zone. Nothing
   is stored, and `DataManager` does not change (`docs/superpowers/specs/2026-11-01-export-design.md`; rule `70-privacy`'s *The
-  export file, on the user's own tap*, typed and unstaged)
+  export file, on the user's own tap*, committed)
+- **One finish: motion is one language, driven by presentation flags** (the premium look, stages 0, 1 and 2 of six staged on
+  `feature/premium-look`, not committed). `Landing` brings a sheet's content in once the sheet has landed, `RollingFigure` rolls a hero
+  figure once, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s `draw`, `drawn(at:)` and `popped(at:)` draw data. Each plays
+  once per arrival, stands final under Reduce Motion, and no spoken value reads its flag. The rim stays Premium's; the rest reaches
+  free screens too (`docs/superpowers/specs/2026-11-01-premium-look-design.md`; rule `60-design-system`, typed and unstaged)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

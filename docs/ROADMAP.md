@@ -409,6 +409,9 @@ serving, three columns, held in memory; sold beside the sets as a third `Premium
 code. A lapse locks it and stores nothing. Its rule wording — `70-privacy`'s *The export file* among eight files — is typed
 and unstaged for the owner. iOS 26.5's UI run is partial on the owner's word (#212). The build is on the owner's iPhone; that
 check is the next step, and it stands in for the plan's simulator walk.)*
+*(2026-11-01, night, read from `git log` by the hundred-and-seventh pass: **committed and pushed** on `feature/export` at 18:54,
+`3ec547b` to `9086f06`; not merged. The owner held it and judged it not premium; its sheet is rebuilt as stage 1 of *One finish*,
+end of this section.)*
 
 **1.4.5 — Themes and app icons.** Alternative aurora palettes and app icons. Every colour comes
 from `Aurora` today (rule `60-design-system`), so a theme is a second set of those colours, and each
@@ -506,6 +509,16 @@ against the week before; the model's words **kept in memory, with fixed wording*
 *FoundationModels, for the insights* among ten files — is typed and unstaged for the owner. The model has
 not yet been seen writing: this Mac's was not ready (#178). Nobody meets it until step 5 puts set A on
 sale.)*
+
+**One finish — the premium look, across the app.** *(Added 2026-11-01, on the owner's words after holding export: "make the premium
+look for whole app".)* Every screen of the iPhone app gets one set of moves: data that draws itself, figures that roll, sheets that
+land, a lap of light on Premium's rim, a touch that always answers, and a moment for buying. The motion reaches free screens; the
+rim stays Premium's; widgets and the watch are out. Six stages, each on the owner's iPhone before the next. Spec
+`docs/superpowers/specs/2026-11-01-premium-look-design.md`, plan `docs/superpowers/plans/2026-11-01-premium-look.md`.
+*(2026-11-01, night: **stages 0 and 1 built and staged on `feature/premium-look`, not committed**; the owner's check of stage 1 is
+next. Stages 2–5 — the paywall, the recap, History, the rest — not begun.)*
+*(2026-11-02: **stage 2, the paywall and the purchase moment, built and staged, not committed.** The owner had me walk stage 1 and
+said "go". Stages 3–5 not begun. Not done: a real purchase through StoreKit, the haptics, and the full gate.)*
 
 ## 6. Release 1.5 — more to log, more people
 
