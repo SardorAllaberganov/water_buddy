@@ -121,7 +121,7 @@ after the body above had already conceded it.
 - `logs(since:)` is a read beside `recap(of:)`: the rows from a bound — every row for `nil` — and `nil` on
   a failed read, never `[]`. Apple Health's mirror deletes every sample whose serving it saw earlier in
   the run and no longer finds among these rows, so a failed read returned as nothing would empty Health of
-  the user's water
+  the user's water. Export's card reads it too, and says so on a failed read rather than sending an empty file
 - `remaining`, `hasReachedGoal`, `lastDrink`, `nextReminder` and `pace` are computed on read from the
   observable state and stored nowhere. `nextReminder` is the first slot of the plan
   `currentReminderSlots()` files, cut to today. `pace` is `ReminderPlan.pace` over the stored

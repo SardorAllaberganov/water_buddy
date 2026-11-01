@@ -19,7 +19,7 @@ That is a property to defend, not a phase.
 - Add no `NS*UsageDescription` key to any Info.plist but `NSHealthUpdateUsageDescription`, on the app target
   alone (*HealthKit, for Apple Health*, below). Notification authorization and Health's permission to write
   Water are the only two permissions this product ever asks for
-- The one thing that leaves on the user's own tap is the recap's image, on the conditions below
+- Two things leave on the user's own tap, each on the conditions below: the recap's image and the export file
 - The app links its privacy policy for every user from Settings, and from the paywall beside the
   *Terms of Use*: `PaywallView.privacyPolicy`, the one spelling of the address, which Settings reads
   too. Both open Safari through `Link` on the user's tap; the app fetches no page itself. The policy's
@@ -190,6 +190,25 @@ Five limits are conditions of the permission:
   that carries `NSPhotoLibraryAddUsageDescription` (measured on iOS 27.0, 26.5 and 18.6, the spec's §4a),
   so the share sheet leaves Photos out on its own — never add the key to bring it back
 - **Nothing recorded.** No completion handler, no count of shares, no diagnostic of the destination
+
+## The export file, on the user's own tap
+
+Premium may export every serving as a CSV file (roadmap 1.4.4,
+`docs/superpowers/specs/2026-11-01-export-design.md`). It leaves the phone the way a document the user sends does:
+the system's share sheet, on their tap, to a destination they choose. The app sends nothing on its own and learns
+nothing of where it went.
+
+Five limits are conditions of the permission:
+- **One way out.** Only through the system share sheet, from *Share as a CSV file* in the export sheet — `ShareLink`
+  in `ExportSheet.swift`. Never from the widget, the watch, Siri, the control, a notification or a reminder's button,
+  and never without the tap
+- **Three columns, and nothing else.** `date`, `time`, `amount_ml`, the headings fixed and in English in every
+  language: a format, not copy. Never a serving's id, the goal, the streak, a total, a time zone, the language or
+  the device's name
+- **In memory only.** Built when the row is tapped, held in the sheet's state, written to no file and to neither
+  store. iOS may write the copy a destination asks for; the app does not
+- **No usage key.** *Add no `NS*UsageDescription` key* stands. *Save to Files* needs none
+- **Nothing recorded.** No completion handler, no count of exports, no diagnostic of the destination
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

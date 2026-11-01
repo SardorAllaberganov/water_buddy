@@ -37,6 +37,7 @@ warning here is a Swift 6 error later.
   `HealthMirror.Source`, built by `static func live()`. Its passes run on a `ReconcileQueue` of its own; it
   hears its manager's saves through `logsDidSaveNotification`, observed with `object:` that manager,
   `queue: .main` and `MainActor.assumeIsolated`. `HealthPlan` is `nonisolated` and imports Foundation alone
+- `ServingsExport` is `nonisolated` and imports `Foundation` alone
 
 ## Sendable, and what may cross a process
 - `WaterSnapshot` is the only **state** value handed to a widget process: `Sendable`, `Equatable`,
@@ -152,5 +153,5 @@ warning here is a Swift 6 error later.
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests` or `ReminderScheduleTests` to make them
+  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests` or `ServingsExportTests` to make them
   compile. They are compile-time canaries: fix the declaration they read instead

@@ -82,7 +82,8 @@ measured.
 ## The primary surface
 - A screen's one main action is drawn with `.primarySurface(in:)`: solid white, `Aurora.top` content.
   It is the only control that is not glass — the recap's card, a rendered picture, is the one other
-  surface that is not — and a screen carries at most one. The recap sheet's is *Share as an image*
+  surface that is not — and a screen carries at most one. The recap sheet's is *Share as an image*, the export
+  sheet's *Share as a CSV file*
 - In the Home Screen widget the pour button is the primary surface in `.fullColor` —
   `.primarySurface(in:ring: false)`, so it stays exactly its 44-pt target and the vessel's clearance
   holds (rule `40-widget`). Outside `.fullColor` it is white content in the lit rim, as every pane

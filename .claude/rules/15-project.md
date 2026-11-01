@@ -129,6 +129,9 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `ReminderScheduleSheet` — set B's schedule — is app-only and stays out of every exception set;
   `ReminderPlan.Schedule` lives in `ReminderPlan.swift`, already in all three, because the widget
   extension plans from it
+- `ServingsExport` and `ExportSheet` are app-only and stay out of every exception set; the read they need,
+  `logs(since:)`, is already in `DataManager.swift`. The closure form of `suggestedFileName` is iOS 17.0, the floor, so
+  export adds no version check
 - `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
   `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
   `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,

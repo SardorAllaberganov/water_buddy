@@ -126,6 +126,10 @@ persist anything.
   Settings' *Schedule* row, for Premium alone — the row opens the paywall for anyone else. Each change
   is written through `manager.reminderSchedule` as it is made; the sheet has no *Save*. Set B's rows are
   drawn where `PremiumAccess.gate(status:offered:)` says, as History's switch is
+- The export sheet is presented with `.sheet(item:)` bound to an optional `ServingsExport`, read once by the card's
+  tap and handed to `ExportSheet` through `init`, for Premium alone — the card opens the paywall for anyone else.
+  With no servings, or a failed read, the sheet does not open and the card says so. A lapse clears the selection, so
+  the sheet closes
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen
   whose last card sits under the bar needs its own bottom padding
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the

@@ -155,6 +155,9 @@ rather than re-deriving it.
   full name, `.isSelected` while it keeps its reminders. The last day keeping its reminders is dimmed, its
   hint the reason, and the line drawn under the days says it too, hidden from VoiceOver. Home's pace line is one element — label *Pace*, value
   *On track* or the millilitres behind, from a `%d` key with plural forms, while it draws a `%@` figure
+- Settings' *Export your servings* is one button — label the title it draws, its line the hint, value *Premium* while
+  locked, or the line saying why nothing opened. The export sheet's heading carries the header trait and its close
+  button is *Done*. Its pane is one element, and *Share as a CSV file* is one button whose label is the words it draws
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1

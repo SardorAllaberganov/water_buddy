@@ -9,7 +9,7 @@
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: three `StaticConfiguration`s over one provider — the Home Screen widget, the week widget (`WeekWidget`, medium, a tap opens History) and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights, launched with DEBUG's `-WaterBuddyPremium`), `CoachingUITests` (set B's, on `feature/coaching`: the schedule sheet, a lapsed holder's settings and Home's pace line, on a DEBUG fresh start — Premium held through `-WaterBuddyPremiumHeld`, or lapsed through `-WaterBuddyPremium` with `-WaterBuddyCoachingSeed`'s settings left behind) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips, whose free launch passes `-WaterBuddyPremium` too |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights, launched with DEBUG's `-WaterBuddyPremium`), `CoachingUITests` (set B's, on `feature/coaching`: the schedule sheet, a lapsed holder's settings and Home's pace line, on a DEBUG fresh start — Premium held through `-WaterBuddyPremiumHeld`, or lapsed through `-WaterBuddyPremium` with `-WaterBuddyCoachingSeed`'s settings left behind), `ExportUITests` (export's card and sheet, on `feature/export`, on a DEBUG fresh start with Premium held) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips, whose free launch passes `-WaterBuddyPremium` too |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
@@ -395,6 +395,13 @@ something to record.
   app set; Settings edits them for Premium; Home draws the pace for Premium. Nothing about Premium is
   stored: a lapse locks the editing and keeps what was set
   (`docs/superpowers/specs/2026-10-30-coaching-design.md`)
+- **Export: every serving, on the user's tap** (roadmap 1.4.4, staged on `feature/export`, not committed). `ServingsExport`, pure,
+  app-only and Foundation alone, turns plain rows into the CSV and a summary, and keeps *nothing to export* apart from *the
+  read failed*. Settings' card reads `manager.logs(since: nil)` once, on the tap, for Premium; anyone else's tap opens the
+  paywall. `ExportSheet` says what will leave, then hands the bytes to `ShareLink` in memory: `date,time,amount_ml`, fixed
+  English in every language, oldest first, named `WaterBuddy-yyyy-MM-dd.csv`, with no id, goal, streak or time zone. Nothing
+  is stored, and `DataManager` does not change (`docs/superpowers/specs/2026-11-01-export-design.md`; rule `70-privacy`'s *The
+  export file, on the user's own tap*, typed and unstaged)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

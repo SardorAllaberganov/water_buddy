@@ -33,8 +33,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `WaterBuddyApp.init()`: the manager is built on a throwaway suite, cleared at launch, and an
   in-memory store, with no widget, reminder or watch side effects. So does the store capture,
   `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run,
-  and so does `CoachingUITests`, for set B's controls with Premium held or lapsed. No other UI test
-  passes it.
+  and so does `CoachingUITests`, for set B's controls with Premium held or lapsed, and so does
+  `ExportUITests`, for a holder's export. No other UI test passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
   test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not
@@ -58,7 +58,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `PremiumStore.Source.held()`, a lifetime purchase from no store. Alone, either does nothing.
   `testCaptureAppStoreScreenshots` passes them and no other UI test does but `CoachingUITests`, which
   passes `-WaterBuddyPremiumHeld` beside the fresh start to hold Premium for set B's controls (spec
-  `2026-10-30-coaching-design.md` D13); `FreshStartTests` pins both
+  `2026-10-30-coaching-design.md` D13), and `ExportUITests`, which passes it to hold Premium for the export card;
+  `FreshStartTests` pins both
   (`docs/superpowers/specs/2026-10-25-store-page-design.md`)
 - `-WaterBuddyCoachingSeed` is DEBUG's set B seed, and acts only beside `-WaterBuddyFreshStart`: it sets
   `WaterBuddyApp.coachingSeed` and *Only when behind* through their setters, in the fresh start's own suite.
@@ -110,7 +111,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`. They are
+  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`. They are
   compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
@@ -222,7 +223,8 @@ through the local StoreKit configuration. After a change to Apple Health, turn i
 in Health's sheet, then *Allow* — pour, correct, delete and *Undo*, and read the Health app's Water;
 refuse it on a fresh install; withdraw it in Settings › Privacy & Security › Health and come back. After a
 change to set B, set a schedule, a quiet day and *Only when behind*, see *Next reminder* follow, pour from
-the widget and see the schedule kept, and lapse an expired monthly to see the rows lock. The same
+the widget and see the schedule kept, and lapse an expired monthly to see the rows lock. After a change to
+export, share to *Save to Files* and open the file. The same
 applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face
 by hand, a tinted face among them: no part of the automated gate renders them.
 
