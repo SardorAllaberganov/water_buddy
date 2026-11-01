@@ -43,9 +43,12 @@ measured.
   ring **and** disc behind its number, the number heavier; today's number is heavier and takes no
   disc. Each mark is present at zero opacity when nothing is selected. Never a fill, a rim, a ring
   or a disc written as a literal in a view
-- Premium's Settings card, History's locked month and the recap's card are marked with
-  `.premiumRim()` — `Aurora.cyan`, `Aurora.magenta` and `Aurora.blue` stroked around a standard pane —
-  and nothing else is. Never a gradient stroke written in a view
+- Premium's Settings card, in both its forms, History's locked month, the recap's card, the export
+  sheet's card, Insights' lead pane and the paywall's held card are marked with `.premiumRim()` —
+  `Aurora.cyan`, `Aurora.magenta` and `Aurora.blue` stroked around a standard pane — and nothing else
+  is. Never a gradient stroke written in a view
+- A rim runs one lap of light as it arrives, through `PremiumRim`, and two at a purchase. Never a lap
+  on a loop
 - The recap's card is rendered into the image the user may share, so it is drawn flat: its canvas is
   `Aurora.gradient` in a `LiquidGlass.cornerRadius` shape, not glass, and its tiles take
   `RecapCard.tileBase` — a `.flat` base, for the widget's reason: an `ImageRenderer`, like a widget
@@ -115,6 +118,10 @@ measured.
 - The press curve is `.spring(response: 0.28, dampingFraction: 0.62)` and stays identical in
   `PressStyle` and `LiquidGlassModifier`. State changes use `.smooth(duration:)` scoped with
   `.animation(_:value:)` — never a bare `withAnimation`
+- A sheet's content arrives through `Landing`, after the sheet has landed: the sheet comes whole, then
+  what is inside moves. A data surface draws from one flag on its screen. Each plays once per arrival:
+  on opening a sheet, entering Month or Insights, or turning a month's page, never on a re-read, a
+  return from the background or a row scrolled back into view
 
 ## Colour
 - Every colour comes from `Aurora` — `top`, `bottom`, `blue`, `magenta`, `cyan`, `gradient`. The
@@ -163,6 +170,7 @@ measured.
   day, a vessel, a slider's step; `remove` is a light impact, for something taken away. Never spell
   `.impact(weight:intensity:)` or `.selection` at a call site, and never play one from the widget
   extension
+- `goalReached` also marks a purchase landing: the two largest moments the app has
 - Trigger `.sensoryFeedback` from a counter bumped by the user's own action (`pours`, `commits`,
   `enables`, `switches`, `steps`) — never directly from a model value such as `manager.currentWater`
 

@@ -205,10 +205,11 @@ Five limits are conditions of the permission:
 - **Three columns, and nothing else.** `date`, `time`, `amount_ml`, the headings fixed and in English in every
   language: a format, not copy. Never a serving's id, the goal, the streak, a total, a time zone, the language or
   the device's name
-- **In memory only.** Built when the row is tapped, held in the sheet's state, written to no file and to neither
+- **In memory only.** Built when the card is tapped, held in Settings' state, written to no file and to neither
   store. iOS may write the copy a destination asks for; the app does not
 - **No usage key.** *Add no `NS*UsageDescription` key* stands. *Save to Files* needs none
-- **Nothing recorded.** No completion handler, no count of exports, no diagnostic of the destination
+- **Nothing recorded.** No completion handler, no count of exports, no diagnostic of the destination. The press's
+  haptic is presentation state, gone with the sheet
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

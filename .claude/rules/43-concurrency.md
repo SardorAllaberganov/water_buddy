@@ -153,5 +153,5 @@ warning here is a Swift 6 error later.
   `WelcomeStepTests`, `GoalSuggestionTests`, `TodaysWaterAnswerTests`, `PremiumAccessTests`,
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
-  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests` or `ServingsExportTests` to make them
-  compile. They are compile-time canaries: fix the declaration they read instead
+  `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
+  `ExportSheetTests`, `LandingTests`, `RollingFigureTests` or `PremiumRimTests` to make them compile. They are compile-time canaries: fix the declaration they read instead

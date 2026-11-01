@@ -23,6 +23,8 @@ rather than re-deriving it.
   editing the aurora's lights, keep the values the resting-lights test pins
 - `ConfettiOverlay` renders nothing at all under Reduce Motion, and the celebration stays announced
   through a non-motion channel — `Haptics.goalReached` plus the vessel's own arrival
+- Under Reduce Motion data stands drawn, figures stand final, a sheet's content fades in where it
+  stands and the rim runs no lap. Haptics stay. No spoken value reads a flag that drives motion
 
 ## Reduce Transparency
 - Every glass surface goes through `liquidGlass(…)`, whose pane replaces base + scrim + tint +
@@ -157,7 +159,8 @@ rather than re-deriving it.
   *On track* or the millilitres behind, from a `%d` key with plural forms, while it draws a `%@` figure
 - Settings' *Export your servings* is one button — label the title it draws, its line the hint, value *Premium* while
   locked, or the line saying why nothing opened. The export sheet's heading carries the header trait and its close
-  button is *Done*. Its pane is one element, and *Share as a CSV file* is one button whose label is the words it draws
+  button is *Done*. Its card is one element, its label the count, the dates, the file's name and the note; the drawn
+  figure, the rows and the line under them are hidden. *Share as a CSV file* is one button whose label is the words it draws
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1
