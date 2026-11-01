@@ -103,6 +103,7 @@ struct PaywallView: View {
     @Environment(\.locale) private var locale
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// The plan picked — the yearly when the sheet opens.
     @State private var chosen: PremiumAccess.Plan.Kind = .yearly
@@ -110,8 +111,17 @@ struct PaywallView: View {
     /// Bumped by a pick, so the selection tick fires on the tap (rule `60-design-system`).
     @State private var picks = 0
 
-    /// Bumped when the user's own purchase lands.
-    @State private var purchases = 0
+    /// Bumped by the buy button's press.
+    @State private var presses = 0
+
+    /// Bumped once, as *Thank you* appears: the card is what fills, so the confetti and the laps belong to it.
+    @State private var moments = 0
+
+    /// Whether the sheet has landed (``Landing``). Presentation state, gone with the sheet.
+    @State private var landed = false
+
+    /// Whether the preview has drawn. At once under Reduce Motion (rule `65-accessibility`).
+    private var drawn: Bool { landed || reduceMotion }
 
     /// A feature's glyph box, growing with the row's type up to a ceiling — it is decorative — with
     /// its glyph sized from it, never from a text style of its own: at the largest sizes a fixed
@@ -157,7 +167,9 @@ struct PaywallView: View {
         // The close button stays, so a purchase that never answers cannot trap the user.
         .interactiveDismissDisabled(premium.purchase == .buying)
         .sensoryFeedback(Haptics.select, trigger: picks)
-        .sensoryFeedback(Haptics.confirm, trigger: purchases)
+        .sensoryFeedback(Haptics.confirm, trigger: presses)
+        .sensoryFeedback(Haptics.goalReached, trigger: moments)
+        .tracksLanding($landed)
         .animation(Motion.settle, value: premium.plans)
         .animation(Motion.settle, value: premium.purchase)
         .animation(Motion.settle, value: premium.restoring)
@@ -215,6 +227,8 @@ struct PaywallView: View {
                     Circle()
                         .fill(PaywallStyle.quietDays.contains(day) ? .white.opacity(PaywallStyle.restOpacity) : Aurora.cyan)
                         .frame(width: PaywallStyle.dot, height: PaywallStyle.dot)
+                        .scaleEffect(drawn ? 1 : 0)
+                        .animation(drawn ? Motion.popped(at: day) : nil, value: drawn)
                 }
             }
             .fixedSize()
@@ -224,6 +238,8 @@ struct PaywallView: View {
                     Capsule()
                         .fill(index == PaywallStyle.tallestBar ? Aurora.cyan : .white.opacity(PaywallStyle.barOpacity))
                         .frame(height: PaywallStyle.barHeight * PaywallStyle.bars[index])
+                        .scaleEffect(y: drawn ? 1 : 0, anchor: .bottom)
+                        .animation(drawn ? Motion.drawn(at: index * 4) : nil, value: drawn)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: PaywallStyle.barHeight, alignment: .bottom)
@@ -259,8 +275,9 @@ struct PaywallView: View {
             Text("See how you really drink, and what would help.", bundle: strings)
                 .font(.body)
                 .foregroundStyle(.white)
-            ForEach(Self.shownSets(debug: Self.isDebug).flatMap(\.features), id: \.self) { feature in
+            ForEach(Array(Self.shownSets(debug: Self.isDebug).flatMap(\.features).enumerated()), id: \.element) { index, feature in
                 featureRow(feature)
+                    .lands(landed, order: index)
             }
             Text("New Premium features arrive in updates, included.", bundle: strings)
                 .font(.footnote.weight(.semibold))
@@ -417,6 +434,9 @@ struct PaywallView: View {
             .frame(maxWidth: .infinity, minHeight: PaywallStyle.tileHeight, maxHeight: .infinity, alignment: .topLeading)
             .background { selectionMark(isSelected, in: shape) }
             .liquidGlass(in: shape, density: .frosted, elevation: .resting, interactive: true)
+            // Chosen, it stands forward: this is the screen's one decision, and it is felt as well as marked.
+            .scaleEffect(isSelected ? 1.03 : 1)
+            .animation(Motion.land, value: isSelected)
         }
         .buttonStyle(PressStyle())
         .accessibilityLabel(plan.name(in: strings))
@@ -462,10 +482,8 @@ struct PaywallView: View {
     /// thank-you does, on the user's own *Done* (the final review's minors 1 and 2).
     private func buyButton(_ plan: PremiumAccess.Plan) -> some View {
         Button {
-            Task {
-                await premium.buy(plan)
-                if premium.purchase == .bought { purchases += 1 }
-            }
+            presses += 1
+            Task { await premium.buy(plan) }
         } label: {
             ZStack {
                 Text(plan.action(in: strings))
@@ -485,16 +503,18 @@ struct PaywallView: View {
     // MARK: - Held
 
     /// *Thank you* after the user's own purchase, *You have Premium.* otherwise; the plan's line;
-    /// *Done* on the primary surface.
+    /// *Done* on the primary surface. **A purchase landing is the app's largest moment, beside the goal:** two laps of the
+    /// rim, the confetti from the card that filled, and the goal's haptic. Only ``Screen/thanks`` reaches it, so a restore
+    /// or a purchase made earlier stays quiet.
     private func held(thanks: Bool) -> some View {
         VStack(spacing: 14) {
             VStack(spacing: 6) {
                 if thanks {
                     Text("Thank you", bundle: strings)
-                        .font(.title2.weight(.bold))
+                        .font(.largeTitle.weight(.heavy))
                 } else {
                     Text("You have Premium.", bundle: strings)
-                        .font(.title2.weight(.bold))
+                        .font(.largeTitle.weight(.heavy))
                 }
                 if let line = premium.state.status?.line(in: strings, locale: locale, now: premium.now()) {
                     Text(line)
@@ -505,9 +525,16 @@ struct PaywallView: View {
             .foregroundStyle(.white)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
-            .legibleOnBackdrop()
+            .padding(.vertical, PaywallStyle.heldInset)
+            .padding(.horizontal, PaywallStyle.cardInset)
             .frame(maxWidth: .infinity)
+            .liquidGlass(density: .frosted, elevation: .raised)
+            .premiumRim(lit: moments > 0, laps: PremiumRim.purchaseLaps)
+            .overlay { ConfettiOverlay(burst: moments) }
             .accessibilityElement(children: .combine)
+            .task(id: thanks) {
+                if thanks { moments += 1 }
+            }
 
             Button {
                 dismiss()
@@ -631,6 +658,8 @@ private enum PaywallStyle {
     static let linkHeight: CGFloat = 44
     /// Where the plans stand while they load, or when they cannot.
     static let quietHeight: CGFloat = 150
+    /// Above and below the words on the held card, which the rim's laps run around.
+    static let heldInset: CGFloat = 28
     static let textOpacity = 0.92
     static let footnoteOpacity = 0.88
 }
