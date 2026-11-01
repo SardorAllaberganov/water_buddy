@@ -47,16 +47,23 @@ struct PremiumAccessTests {
     }
 
     /// How a Premium extra drawn in place shows (spec `2026-10-30-coaching-design.md` D4): open for Premium,
-    /// locked where the paywall is offered, absent where it is not — locked, too, while the first read is
-    /// still out, so a paying user's rows never flash open then shut.
+    /// locked where the paywall is offered, absent where it is not — absent, too, while the first read is
+    /// still out (spec `2026-11-01-finish-export-design.md` D14), so a paying user's rows never flash locked.
     @Test func anExtraIsOpenForPremiumLockedWhereOfferedAndHiddenElsewhere() {
         let until = Date(timeIntervalSince1970: 2_000_000_000)
         #expect(PremiumAccess.gate(status: .lifetime, offered: false) == .open)
         #expect(PremiumAccess.gate(status: .yearly(until: until), offered: true) == .open)
         #expect(PremiumAccess.gate(status: .free, offered: true) == .locked)
         #expect(PremiumAccess.gate(status: .free, offered: false) == .hidden)
-        #expect(PremiumAccess.gate(status: nil, offered: true) == .locked)
+        #expect(PremiumAccess.gate(status: nil, offered: true) == .hidden)
         #expect(PremiumAccess.gate(status: nil, offered: false) == .hidden)
+    }
+
+    /// Every extra drawn in place waits for the first read together, so a holder's rows, month and card arrive at once, and
+    /// no holder's tap in that window reaches the paywall.
+    @Test func theGateAgreesWithTheMonthWhileTheFirstReadIsOut() {
+        #expect(PremiumAccess.gate(status: nil, offered: true) == .hidden)
+        #expect(!HistoryView.offersMonth(status: nil, offered: true))
     }
 
     @Test func aYearlyStillRunningIsPaidUntilItsPeriodEnds() {
@@ -398,5 +405,14 @@ struct PaywallScreenTests {
     @Test func aSubscriberSeesWhatTheyHold() {
         #expect(PaywallView.screen(status: .monthly(until: later), purchase: .idle) == .held)
         #expect(PaywallView.screen(status: .lifetime, purchase: .pending) == .held)
+    }
+
+    /// A restore, a purchase made earlier and an Ask to Buy approved later are all *held*, never thanked: the moment is the
+    /// user's own purchase landing here, and a re-read must not set it off.
+    @Test func onlyAPurchaseLandingHereIsThanked() {
+        #expect(PaywallView.screen(status: .lifetime, purchase: .idle) == .held)
+        #expect(PaywallView.screen(status: .lifetime, purchase: .pending) == .held)
+        #expect(PaywallView.screen(status: .lifetime, purchase: .buying) == .held)
+        #expect(PaywallView.screen(status: .lifetime, purchase: .failed) == .held)
     }
 }
