@@ -402,6 +402,13 @@ iOS's 64 pending requests (`ReminderPlan.maximumPendingRequests`, rule `80-notif
 
 **1.4.4 — Export.** Every serving as a CSV file, through the share sheet. The file stays on the
 phone until the user sends it.
+*(2026-11-01: **built, walked by no one yet, gated in part and staged on `feature/export`; not committed.** Spec
+`docs/superpowers/specs/2026-11-01-export-design.md`, plan `docs/superpowers/plans/2026-11-01-export.md`. The owner's rulings: a
+summary sheet before the share sheet, a card of its own in Settings under *Apple Health*, and fixed English headings. Every
+serving, three columns, held in memory; sold beside the sets as a third `PremiumSet`, the paywall's eighth row, on sale in
+code. A lapse locks it and stores nothing. Its rule wording — `70-privacy`'s *The export file* among eight files — is typed
+and unstaged for the owner. iOS 26.5's UI run is partial on the owner's word (#212). The build is on the owner's iPhone; that
+check is the next step, and it stands in for the plan's simulator walk.)*
 
 **1.4.5 — Themes and app icons.** Alternative aurora palettes and app icons. Every colour comes
 from `Aurora` today (rule `60-design-system`), so a theme is a second set of those colours, and each

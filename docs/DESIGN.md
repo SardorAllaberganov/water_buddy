@@ -7,6 +7,9 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-01, evening (hundred-and-sixth pass — `/doc_sync` run by the owner on export's staged tree). One
+section, *Export*, which records what was not measured. No token moved.
+
 **Last updated:** 2026-10-31, early morning (finishing set B's own records — not a `/doc_sync` pass). **No token
 moved.** *Set B, measured* gains a dated note: the schedule sheet's hour rows take their siblings' pair,
 `.sheer` + `.resting`, measured at 7.60–7.93:1 (#201); the days row scrolls where it does not fit (#200); the
@@ -2493,6 +2496,15 @@ W2's fix.
 - **Home's status** (#205, D7): the pace line is no longer wrapped in its own `TimelineView`. An empty one took the
   stack's 8-pt spacing, so a Premium Home with nothing to pace drew *Goal reached* 30.17 pt above the quiet line;
   now 22.17 pt (read from the elements' frames on the walk, the same steps on `HEAD`'s code and on this change's).
+
+## Export
+
+No token moved, and **nothing here is measured yet** (known issue #213). The card is a Settings card, `.frosted` + `.raised`,
+its pane the control, so it alone passes `interactive: true`, with `PressStyle`; its chevron and lock are `CoachingRows`'
+white. The sheet's pane is the recap's, `.frosted` + `.raised`, with white text; its one primary surface is *Share as a CSV
+file*. Its recipe is measured elsewhere, its ground is not: `.presentationDetents([.medium, .large])` makes it the app's first
+medium sheet, and `AuroraBackground`'s lights are absolute offsets from the centre, so on a canvas of about 440 pt they sit
+at the edges. Measure the heading and the pane off a render at the medium detent, through a full drift period.
 
 ## The header and a screen arriving
 

@@ -4,6 +4,10 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-11-01, evening (hundred-and-sixth pass — `/doc_sync` run by the owner on export's staged tree, on
+`feature/export`). **No key and no stored byte moved:** 16 on `DataManager.Key`, the phone's suite 14. Export stores nothing:
+the file is in memory while its sheet is open, and `logs(since:)`, a read, gains the export card as its second caller.
+
 **Last updated:** 2026-10-31, afternoon (hundred-and-fourth pass — `/doc_sync` run by the owner on finishing set
 B's staged tree, on `feature/coaching`). **No key and no stored byte moved:** 16 on `DataManager.Key`, the
 phone's suite 14. Two dated asides: the DEBUG seed, `-WaterBuddyCoachingSeed`, writes the schedule's and *Only
