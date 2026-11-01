@@ -204,7 +204,7 @@ already says *what would help*; its decorative preview stays set A's.
   (rule `75-diagnostics`), and covered by a test.
 - A failed log read changes nothing here: the plan's water is today's cached total, as now.
 - Premium still *checking* at launch draws the rows locked and Home without a pace line — never a flash of
-  either the other way.
+  either the other way. *(Amended 2026-11-01: hidden, not locked, by `2026-11-01-finish-export-design.md` D14.)*
 
 ### 3.6 Concurrency
 
