@@ -14746,3 +14746,67 @@ or the widget's or watch's views. Every rule citation resolves; no forbidden doc
 `docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On `feature/premium-look`, local, HEAD `9086f06`, 239
 commits: **32 staged** — 9 added, 23 modified — **11 unstaged**, five rule files and the six the tree already carried; no untracked
 file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-03] — One finish's stages 3 and 4: the recap draws itself, and History's month, patterns and Insights arrive
+
+Stages 0–2 were committed and pushed at 03:36 on 2026-11-02, `1acfbd4` to `a40dfef`, read from `git log`. Stage 3 began on the
+owner's "go", stage 4 on their "ok go". Both are staged and not committed.
+
+### What changed
+
+- **Stage 3, the recap.** `RecapSheet` lands whole, then `RecapCard` draws: the hero and the tiles roll at their final width, the dots
+  pop on a new `Motion.pop` (0.38 s, damping 0.43), the rim laps, the best streak rises last, and the note and the button stand at
+  the foot. The shared image is `RecapCard.Rendered`, which asks for no motion, so *Share* sends the whole card from the first frame.
+  The recap row's glyph bounces and ticks, from `HistoryView`'s `recapOpens`. Tests: `MotionTests` +2, `RecapImageTests` +1
+  (`theImageIsNeverHalfDrawn`, by pixels).
+- **Stage 4, History.** Month's rings draw day by day on entering Month and on a page turn; its three figures roll at their final
+  width; only the chevron pressed bounces. The patterns draw when their row is first reached, and not on a return. Insights' lead
+  pane takes the rim, a `.title2` heavy headline and a sparkle that bounces, and the parts under it rise after it. The flags are
+  `HistoryView`'s; `drawsMonth(raised:month:reduceMotion:)` decides, and `aMonthDrawsOncePerArrival` holds it.
+
+### The rulings
+
+The plan's refinements P10 to P18 hold them: `Motion.pop` for the dots (approved); `theImageIsNeverHalfDrawn` by pixels; the tiles'
+fixed width, in the recap and the month; the recap's counter left on `HistoryView`, measured; the per-arrow bounce; the patterns let go
+with the month; `WeekSplit`'s draw on its fill; Insights' flag raised by the lead row after `insightsWait`; no sparkle bounce under
+Reduce Motion. #215 left as it is, its own change.
+
+### Verification, as actually run
+
+- **Stage 3:** phone unit **1103 passed in 121 suites**, on the second run — the first, on a just-booted simulator, failed the eight
+  of `StoreKitSessionTests`, #158's cold start. `MotionTests` 9 and `RecapImageTests` 7, RED seen on each. `PremiumUITests` 8 of 9, the
+  ninth #215's. Recorded and read; rendered in English, Russian, at the largest size and under Reduce Motion; the note measured, 5.18
+  or better. The first opening costs 0.5–0.8 s once on a brand-new simulator, found by alternating builds (#219). Installed on the
+  owner's iPhone, locked, not launched.
+- **Stage 4:** `MonthLayoutTests` RED as a build failure on the missing `drawsMonth`, then 14 passed, on the final code too.
+  `PremiumUITests` 9 of 9 twice, then 8 of 9 on the final code, the ninth #215's. Recorded at 60 fps and read frame by frame: Insights'
+  parts came in whole. Temporary marks and three recordings found why, and a fourth showed the fix (#220); the marks are gone. Renders
+  read at the default size, the largest and under Reduce Motion. Insights' lead pane measured over 30 frames: none under its floor. A
+  device build of a copy of the index, 1.4 (4); **not installed**, the iPhone unavailable (CoreDevice 4016).
+- **Blocked:** for most of 2026-11-02 every simulator test hung at `_dyld_start` on Xcode's `DTServiceHub` arbitration failure, here
+  and in two other projects. My `kill` of the stale helper was refused and I stopped; the owner ended it. During Task 16 a `sed -i`
+  edit was refused; I stopped and reported, and on the owner's "ok" made the change with Edit.
+- **Not run:** the five-invocation gate; the whole phone unit suite after stage 4; the UI suite on 26.5; the warnings comparison; both
+  widget builds; the watch's tests.
+
+### Drift found and fixed by the sync
+
+- `docs/AI_CONTEXT.md` and `docs/ROADMAP.md` held stages 0–2 as staged: true when written, overtaken by the commits.
+- `CLAUDE.md`'s *One finish* bullet said the same, and that the rule wording was typed and unstaged; it is `aa2f7ce`.
+- `docs/DESIGN.md` said a pop runs on `Motion.land`.
+- The plan's Task 16 raised Insights' flag 50 ms after the switch and Task 14 bounced both chevrons on `steps`: P15 to P18.
+
+### Checked and already accurate
+
+137 `.swift` files by `find`, 139 in the index, none new, nothing untracked; 71 watch `@Test`, 75 UI `func test`; `DataManager.swift`,
+`project.pbxproj` and the widget's and the watch's sources unchanged against `HEAD`; three exception sets of six; every rule citation
+resolves; no forbidden doc. `docs/WIDGET.md`: *Last updated* kept.
+
+### Files touched by the sync
+
+`CLAUDE.md`, `HISTORY.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, `docs/STATE.md`, `tasks/lessons.md`, the plan.
+
+**Staging.** Read from the commands at 00:48 on 2026-11-03, after the `git add` of eight paths by name, and again of this file and
+`docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On `feature/premium-look`, level with
+`origin/feature/premium-look`, HEAD `a40dfef`, 246 commits: **15 staged**, all modified — stages 3 and 4's seven code files and the
+eight records — **6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.

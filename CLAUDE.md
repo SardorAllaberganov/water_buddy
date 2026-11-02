@@ -402,11 +402,14 @@ something to record.
   English in every language, oldest first, named `WaterBuddy-yyyy-MM-dd.csv`, with no id, goal, streak or time zone. Nothing
   is stored, and `DataManager` does not change (`docs/superpowers/specs/2026-11-01-export-design.md`; rule `70-privacy`'s *The
   export file, on the user's own tap*, committed)
-- **One finish: motion is one language, driven by presentation flags** (the premium look, stages 0, 1 and 2 of six staged on
-  `feature/premium-look`, not committed). `Landing` brings a sheet's content in once the sheet has landed, `RollingFigure` rolls a hero
-  figure once, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s `draw`, `drawn(at:)` and `popped(at:)` draw data. Each plays
-  once per arrival, stands final under Reduce Motion, and no spoken value reads its flag. The rim stays Premium's; the rest reaches
-  free screens too (`docs/superpowers/specs/2026-11-01-premium-look-design.md`; rule `60-design-system`, typed and unstaged)
+- **One finish: motion is one language, driven by presentation flags** (the premium look: stages 0–2 of six committed and pushed on
+  `feature/premium-look`, not merged; stages 3 and 4, the recap and History, staged, not committed). `Landing` brings a sheet's content
+  in once the sheet has landed, `RollingFigure` rolls a hero figure once, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s
+  `draw`, `drawn(at:)` and `popped(at:)` draw data — a pop on `Motion.pop`. Each plays once per arrival, stands final under Reduce
+  Motion, and no spoken value reads its flag. History's flags live on `HistoryView`, never on a row the `List` recycles; a flag for
+  rows the switch's cross-fade inserts waits out that fade from the row's own arrival (`HistoryView.insightsWait`): raised inside it,
+  `.lands` puts its parts in place whole. The rim stays Premium's; the rest reaches free screens too
+  (`docs/superpowers/specs/2026-11-01-premium-look-design.md`; rule `60-design-system`, committed in `aa2f7ce`)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 

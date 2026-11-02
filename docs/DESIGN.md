@@ -7,6 +7,10 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-03, after midnight (hundred-and-ninth pass — `/doc_sync` run by the owner after *One finish*'s stages 3
+and 4). *One finish* gains `Motion.pop`, `HistoryView.insightsWait`, the recap's note and Insights' lead pane, measured; *Insights,
+measured* and *The recap, measured* each gain a dated note. No colour moved.
+
 **Last updated:** 2026-11-02, just after midnight (hundred-and-eighth pass — `/doc_sync` run by the owner after *One finish*'s
 stage 2). *One finish* gains the held card's figures and `heldInset`. No colour moved.
 
@@ -2368,6 +2372,9 @@ read as a two-segment switch (the eighty-seventh pass, 2026-10-24).
 `.title3` bold or larger on the aurora is large text. Its 3.37 passes, by 0.37; the table's floor of 4.5
 is kept as the step held it. Clean ground, #95's other yardstick, is still not measured for it.)*
 
+*(2026-11-03, *One finish*'s stage 4: the lead pane takes `.premiumRim(lit:)` and its headline `.title2` heavy. Its pairs are read
+again, by clean ground, in *One finish*, below; none is under its floor. The heading *Insights* did not change and was not read.)*
+
 ## The recap, measured
 
 *Added 2026-10-24, set A's step 5 (spec `docs/superpowers/specs/2026-10-24-monthly-recap-design.md`, §4b).*
@@ -2447,6 +2454,9 @@ The fill moves no pair by more than 0.09. **Not measured:** the fill on iOS 26.5
 **Not measured:** iOS 26.5 and 18.6; Increase Contrast; Uzbek (the same tokens as Russian's, read by eye);
 the largest text sizes' pairs (the layout read by eye — W2's fix); the image under the sender's Reduce
 Transparency, which an `ImageRenderer` does not inherit (inferred, spec §4b).
+
+*(2026-11-02, *One finish*'s stage 3: the note stands at the sheet's foot now, and its pair is read again where it stands in *One
+finish*, below: 5.18 or better. The card draws itself in the sheet and never in the image.)*
 
 ## Set B, measured
 
@@ -2544,15 +2554,41 @@ motion reads as nothing (`tasks/lessons.md`, 2026-10-12). None of it is felt yet
 | `Landing.rise` | 28 pt | how far a part rises; `Arrival.rise`, a tab's, stays 14 |
 | `Landing.stagger` / `longestDelay` | 0.07 s / 0.42 s | each part after the one above, and the ceiling |
 | `Motion.drawDuration` / `drawStagger` | 0.6 s / 0.018 s | a ring's sweep, and each day after the last: 1.16 s for 31 |
-| `Motion.popStagger` | 0.022 s | what pops in, on `Motion.land` |
+| `Motion.popStagger` | 0.022 s | what pops in, on `Motion.pop` since stage 3 (on `Motion.land` before it) |
+| `Motion.popResponse` / `popDamping` | 0.38 s / 0.43 | a dot's pop: past its size by 22%, `exp(−πζ/√(1−ζ²))`, then back; `land` overshoots 5.4%, 1.4 pt on a 25.6 pt dot, which reads as nothing |
 | `Motion.rollDuration` | 0.8 s | a figure rolling once, by `numericText()` |
 | `PremiumRim.lapDuration` / `purchaseLaps` | 1.5 s / 2 | one lap of white light, 2.4 pt wide over the 1.5 pt rim, gone at both ends |
 | `PaywallStyle.heldInset` | 28 pt | above and below the words on the held card |
+| `HistoryView.insightsWait` | 600 ms | from Insights' lead pane's row arriving to its lap and the rise under it: measured, below |
 | a chosen plan's tile | 1.03, on `Motion.land` | it stands forward; 3% of about 110 pt is 3 pt, and it is the tile's rim and fill that say *chosen* |
 
 **The paywall's held card, stage 2:** `.frosted` + `.raised` with the rim, `.largeTitle` heavy over the plan's line at white 0.92. White's
 worst pixel on clean ground, **two frames only, not a minute:** 7.43 above the words, 6.61 beside the title, 9.50 beside the line. At
 0.92 the line stays over 4.5. The card stands inside the region of the sheet the export card measured over a full minute.
+
+**The recap's sheet, stage 3:** the note moved to the foot, above the button, on its `.frosted` + `.raised` pane. White on that pane,
+read where it now stands, **5.18 to 5.37 over 22 frames across a minute** in English, and 5.28 in Russian on one frame; a first
+Russian reading of 3.94 was the pane's lit rim, found by profiling the render, not the ground under the words. Floor 4.5. The button is
+the primary surface, derived, not measured. The card's own pairs were not read again: drawn, it is the card *The recap, measured*
+read, and the image is always drawn whole.
+
+**Insights' lead pane, stage 4:** the rim, and the headline at `.title2` heavy, up from `.title3` bold. *iPhone 17* (27.0), the store
+sample's week, 30 frames two seconds apart, clean ground beside each ink, white composited at its own opacity over each pixel, the
+worst pixel:
+
+| Pair | Floor | Worst reading |
+|---|---|---|
+| *The one thing* (0.9) | 4.5 | 4.66 above it, 4.86 below, 6.44 beside |
+| The week's range (0.9) | 4.5 | 7.42 |
+| The sparkle (0.9) | 3 | 4.26 on the pane's left margin, 4.51 below |
+| The headline (1.0), large | 3 | 5.16 on the left margin, 8.38 beside its lines' ends |
+| The detail (1.0) | 4.5 | 6.09 on the left margin, 8.46 beside |
+
+The brightest ground is the glass's own top-left light, not the rim: the label's 4.66 stands where *Insights, measured* read 4.60 by
+step 2's ring-around-ink tool. **Timing:** the flag that laps the rim and raises the parts waits `insightsWait` from the lead row's
+arrival. On iOS 27.0 a flag raised 0.10 s or 0.35 s after the rows arrived put the parts in place whole, and one at 0.48 s let them
+rise; the fade that inserts the rows is a spring that settles after its 0.35 s. Read off recordings at 60 fps. Not on the iPhone
+(`docs/AI_CONTEXT.md` #220).
 
 ## The header and a screen arriving
 

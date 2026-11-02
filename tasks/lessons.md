@@ -5544,3 +5544,67 @@ screenshot lands seconds late, and that nearly read as a missing moment.
 **The rule:** never delete a recording in the command that first cuts it. Map the changes to the test's steps from the end: the last
 big change is usually the last step. Under load, only a recording shows a short animation; a screenshot proves nothing about one.
 Remove a temporary patch with `git restore` before anything else, and confirm with `git status`.
+
+## 2026-11-02 — A swift-testing filter without `()` runs nothing and says it succeeded
+
+**What happened.** `-only-testing:…/theImageIsNeverHalfDrawn` matched no test, and `xcodebuild` printed `TEST SUCCEEDED`. The only sign
+was the missing `Test run with N tests` line. Separately, after a real failure `xcodebuild` spent over ten minutes in
+`collectSimulatorDiagnostics`, which pushed a foreground run past its 600 s limit with a temporary edit still in the tree.
+
+**The rule:** name a swift-testing function with its `()`, or filter by suite, and read the `Test run with N tests` line before
+believing a pass. Before a run that may fail, take temporary edits out of the tree's way: work on a scratch export.
+
+## 2026-11-02 — A slowdown seen under load is a hypothesis: compare builds in turn, then cold
+
+**What happened.** The recap sheet's first opening took 3 to 12 s on a machine another session was loading, and one run each put the
+old code at 0.19 s and mine at 3.14 s. I held a theory about a counter and a fix ready to go. Alternating three runs of each build on
+scratch exports showed the two equal once a device had drawn the card, and four brand-new simulators in the order work, head, head,
+work showed the real cost: 0.5 to 0.8 s, once, in the card's first layout. The counter was innocent, and the fix would have been an edit
+with nothing behind it.
+
+**The rule:** before changing code for speed, build both sides into their own DerivedData and run them in turn, `test-without-building`,
+with marks that cover each step. A first run after an install is its own condition, so test it on new simulators in a balanced order.
+Waiting for a quiet machine does not work: the runs themselves take the load to 80 or more, and alternation is the control.
+
+## 2026-11-03 — A rise raised while the List inserts its row is put in place whole
+
+**What happened.** Insights' three parts under the lead pane were to rise after it, through `.lands`, from a flag raised 50 ms after
+the switch. Recorded at 60 fps, they came in whole on one frame. Temporary marks showed the parts existed and saw the flag go true: the
+rise was lost because the flag rose while the `List` was still cross-fading in the rows the switch had inserted. Raised 0.10 s and
+0.35 s after the rows arrived, the parts snapped; at 0.48 s they rose in their stagger. Month's rings, its rolling figures and the
+patterns' bars draw through the same fade, so a flag that works for one modifier says nothing about another.
+
+**The rule:** in a `List`, a flag for rows that arrive by an animated insertion waits out that animation, counted from the row's own
+arrival (its `.task`), never from the press: a slow first draw puts the row later than the tap. Prove the motion off a recording read
+frame by frame, because a still taken after the fact shows the end state either way.
+
+## 2026-11-03 — An animation's completion waits for everything its transaction started
+
+**What happened.** To raise Insights' flag when the switch's fade was over, I added `Transaction.addAnimationCompletion` to the change
+of mode. With `.removed` the parts rose 1.7 s after the tap, with `.logicallyComplete` 1.4 s: the completion counted the switch's own
+selection spring, `Motion.land`, which settles slowly, as well as the list's fade.
+
+**The rule:** a completion added to a transaction covers every animation that transaction starts in the subtree it is added to, not
+the one meant. Before reaching for it, list what else animates on the same change; where something slower does, wait a measured time
+from the right moment instead.
+
+## 2026-11-03 — When every simulator test hangs, read the system log before suspecting the code
+
+**What happened.** For most of a day every `xcodebuild test` here, and in two other projects' sessions, built and then sat: the test
+host stopped at `_dyld_start` and never ran. The system log showed Xcode's `DTServiceHub` failing *critical arbitration* every 10 s,
+from a stray helper started hours before. Two traps cost time first: in zsh a bare `log` is the shell's own builtin and printed
+nothing, and `pgrep -f` matched its own command line. My `kill` of the helper was refused, and I stopped there; the owner ended it, and
+the next run passed.
+
+**The rule:** when runs hang across projects, read `/usr/bin/log show` for `DTServiceHub` and `testmanagerd` before touching the code,
+and list processes with `ps … | grep -v grep`. A process another workload may own is the owner's to end.
+
+## 2026-11-03 — A screenshot burst cannot see what draws during a scroll
+
+**What happened.** The patterns' bars draw when their row is first reached. A burst of screenshots taken once the scroll had settled
+showed them already drawn in every frame, which proved nothing either way. The screen recording showed them rising as the row came
+up. `simctl io recordVideo` exits 1 when stopped with SIGINT, and the file was whole every time.
+
+**The rule:** for anything that moves while the screen does, record the simulator and read the frames, and check their real times —
+`AVAssetReader`'s sample times — before calling two frames a jump; a gap in a loaded recording looks like a snap. Line screenshots and
+video up by their timestamps against the file's birth time, to within a second.

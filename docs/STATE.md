@@ -4,6 +4,10 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-11-03, after midnight (hundred-and-ninth pass — `/doc_sync` run by the owner after *One finish*'s stages 3
+and 4). **No key and no stored byte moved:** `DataManager.swift` is unchanged against `HEAD`; the recap's and History's flags —
+`landed`, `recapOpens`, `raisedMonth`, `raisedPatterns`, `insightsLanded` — are presentation state, gone with their screens.
+
 **Last updated:** 2026-11-02, just after midnight (hundred-and-eighth pass — `/doc_sync` run by the owner after *One finish*'s
 stage 2). **No key and no stored byte moved:** a purchase is still read from StoreKit, and the moment's counter is presentation state.
 

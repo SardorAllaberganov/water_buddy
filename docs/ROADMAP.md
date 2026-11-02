@@ -519,6 +519,10 @@ rim stays Premium's; widgets and the watch are out. Six stages, each on the owne
 next. Stages 2–5 — the paywall, the recap, History, the rest — not begun.)*
 *(2026-11-02: **stage 2, the paywall and the purchase moment, built and staged, not committed.** The owner had me walk stage 1 and
 said "go". Stages 3–5 not begun. Not done: a real purchase through StoreKit, the haptics, and the full gate.)*
+*(2026-11-03: **stages 0–2 committed and pushed** on `feature/premium-look`, `1acfbd4` to `a40dfef`, not merged; **stages 3 and 4,
+the recap and History, built and staged, not committed.** Stage 3 is installed on the owner's iPhone and not walked there; stage 4 is
+built for it and not installed, the phone out of reach. Stage 5, the rest, not begun. Not done: the walks on the iPhone, the
+haptics, and the full gate.)*
 
 ## 6. Release 1.5 — more to log, more people
 

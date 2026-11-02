@@ -30,6 +30,24 @@ flag that a screen owns, so nothing replays on a re-read and no spoken value dep
   says nothing, so only their bars draw (Task 15).
 - P9. Task 11, Step 5 says no automated run reaches *Thank you*. One can, for its look: a temporary fake `PremiumStore.Source`, never
   staged, reached it on the simulator, recorded. A real purchase through StoreKit still takes a run from Xcode.
+- P10. Task 12's dots pop on a new `Motion.pop` (response 0.38 s, damping 0.43, a 22% overshoot), not `Motion.land`, which overshoots
+  5.4%: spec M1 says 0 to 1.22 to 1 in 0.38 s. The paywall's dots share `popped(at:)`, so they pop harder too (the owner's "go").
+- P11. `theImageIsNeverHalfDrawn` compares pixels, as spec §5 asks, not the flag's default as Task 12 wrote; the fixture is `september()`.
+- P12. A recap tile's figure stands at its final width from the first frame, through a hidden `Text`, so a roll cannot flip the tiles
+  from a row to a column.
+- P13. No gate test reaches the recap sheet. `PremiumUITests` stays Task 13's regression run for `HistoryView`, and the sheet is walked
+  by a throwaway test, because the sheet's month needs the store sample that rule `85-testing` keeps off the other UI tests.
+- P14. Task 13's counter stays on `HistoryView`. Measured, build against build: first opening equal once a device has drawn the card;
+  on a brand-new simulator 0.76 to 1.01 s against 0.23 s, all of it the card's first layout, once. The iPhone's reading decides.
+- P15. Task 14's chevrons bounce on their own counts in `MonthCard`, so only the one pressed answers; the tick stays `steps`. The month's
+  three tiles stand at their final width, as P12's.
+- P16. Task 15's `raisedPatterns` is let go with `raisedMonth` when Month is left, so entering it again draws the patterns again (spec
+  §2). `WeekSplit`'s draw sits on the fill, inside the bar's own `.animation(value: side)`, so a turned page's fill drops at once.
+- P17. Task 16's flag is not raised 50 ms after the switch. Raised inside the `List`'s cross-fade, it put the three parts in place
+  whole on one frame (at 0.10 s and 0.35 s after their rows arrived; they rose at 0.48 s), and the fade's own completion also waits on
+  the switch's spring, 1.4 s. The lead pane's row raises it, `HistoryView.insightsWait` (600 ms) after it arrives; leaving lowers it.
+  "Its heading" is the pane's headline sentence.
+- P18. Task 16's sparkle does not bounce under Reduce Motion: it marks an arrival. The chevrons' bounce answers a tap and stays.
 
 ## Global Constraints
 
