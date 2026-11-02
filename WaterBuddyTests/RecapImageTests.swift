@@ -113,6 +113,20 @@ struct RecapImageTests {
         #expect(image.size.height > thirty.size.height, "the 31st day's row is missing")
     }
 
+    /// One view is both the card on screen and the image that leaves the phone, so the image's state must be the card's defaults
+    /// and never the sheet's: a tap on *Share* in the first second must not send a half-drawn month (spec
+    /// `2026-11-01-premium-look-design.md` §5). The half-drawn card is rendered too, so the comparison is seen able to fail.
+    @Test func theImageIsNeverHalfDrawn() throws {
+        let month = try #require(september())
+        let strings = AppLanguage.english.bundle
+        let image = try #require(render(RecapCard.Rendered(month: month).environment(\.strings, strings)))
+        let whole = try #require(render(RecapCard.framed(RecapCard(month: month, drawn: true)).environment(\.strings, strings)))
+        let halfDrawn = try #require(render(RecapCard.framed(RecapCard(month: month, drawn: false)).environment(\.strings, strings)))
+        #expect(image.pngData() == whole.pngData())
+        #expect(image.pngData() != halfDrawn.pngData())
+        #expect(!RecapCard(month: month).lit)
+    }
+
     /// The final review's I1: what `ShareLink` hands the share sheet is the item's exported PNG, not the
     /// `UIImage` in memory — and a picture exported in points would reach a recipient at 360 px.
     @Test func theSharedPictureKeepsItsPixels() async throws {

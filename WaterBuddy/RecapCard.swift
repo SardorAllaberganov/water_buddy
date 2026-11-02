@@ -20,12 +20,23 @@ import SwiftUI
 ///
 /// **No streak, no goal, no serving, no time of day.** The streak never leaves the app (rule
 /// `20-state`): the sheet draws it beside the card, never on it.
+///
+/// **It draws itself in its sheet, and never in the image** (spec `2026-11-01-premium-look-design.md` §5). The motion is the
+/// sheet's to ask for, through ``drawn`` and ``lit``, and ``Rendered`` asks for none of it, so a tap on *Share* in the first
+/// second sends the whole month.
 struct RecapCard: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
 
     let month: MonthHistory
+
+    /// Whether the month has drawn. **`true` unless the sheet says otherwise:** ``Rendered`` passes nothing, so the image is
+    /// always the whole card.
+    var drawn = true
+
+    /// Whether the rim runs its lap. The image never does.
+    var lit = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Self.gap) {
@@ -44,7 +55,7 @@ struct RecapCard: View {
             RoundedRectangle(cornerRadius: LiquidGlass.cornerRadius, style: .continuous)
                 .fill(Aurora.gradient)
         )
-        .premiumRim()
+        .premiumRim(lit: lit)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Monthly recap", bundle: strings))
         .accessibilityValue(spokenFigures)
@@ -98,7 +109,11 @@ struct RecapCard: View {
 
     private var hero: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(strings.figure("%1$@/%2$@", month.daysMet, month.daysCounted, locale: locale))
+            RollingFigure(
+                start: strings.figure("%1$@/%2$@", 0, month.daysCounted, locale: locale),
+                final: strings.figure("%1$@/%2$@", month.daysMet, month.daysCounted, locale: locale),
+                rolled: drawn
+            )
                 .font(.largeTitle.weight(.heavy))
                 .fontDesign(.rounded)
                 .monospacedDigit()
@@ -124,6 +139,8 @@ struct RecapCard: View {
                         dot(for: day)
                             .frame(maxWidth: .infinity)
                             .aspectRatio(1, contentMode: .fit)
+                            .scaleEffect(drawn ? 1 : 0)
+                            .animation(drawn ? Motion.popped(at: day.summary.dayOrdinal % 100 - 1) : nil, value: drawn)
                     }
                 }
             }
@@ -157,16 +174,27 @@ struct RecapCard: View {
     private var tileViews: some View {
         tile(
             strings.localized("%1$@ L", HistoryView.litres(month.total, locale: locale), locale: locale),
+            from: strings.localized("%1$@ L", HistoryView.litres(0, locale: locale), locale: locale),
             label: Text("This month", bundle: strings)
         )
         if let average = month.average {
-            tile(strings.figure("%1$@ ml", average, locale: locale), label: Text("A day, on average", bundle: strings))
+            tile(
+                strings.figure("%1$@ ml", average, locale: locale),
+                from: strings.figure("%1$@ ml", 0, locale: locale),
+                label: Text("A day, on average", bundle: strings)
+            )
         }
     }
 
-    private func tile(_ figure: String, label: Text) -> some View {
+    /// The figure is laid out at its final width from the first frame: ``tiles`` chooses a row or a column by measuring, and a
+    /// roll must not flip it.
+    private func tile(_ figure: String, from start: String, label: Text) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(figure)
+                .hidden()
+                .overlay(alignment: .leading) {
+                    RollingFigure(start: start, final: figure, rolled: drawn)
+                }
                 .font(.title3.weight(.heavy))
                 .fontDesign(.rounded)
                 .monospacedDigit()
@@ -277,16 +305,22 @@ extension RecapCard {
         let month: MonthHistory
 
         var body: some View {
-            RecapCard(month: month)
-                .padding(RecapCard.imageMargin)
-                .frame(width: RecapCard.imageWidth)
-                .background(Aurora.top)
-                // The picture never depends on the sender's text size (spec §3.4).
-                .dynamicTypeSize(.large)
-                // A renderer has no hosting controller for `.preferredColorScheme` to reach — the app's
-                // one use of the widget's spelling (spec §3.11).
-                .environment(\.colorScheme, .dark)
+            RecapCard.framed(RecapCard(month: month))
         }
+    }
+
+    /// What stands around a card in the image. ``Rendered`` hands it a card that asks for no motion, and only
+    /// `theImageIsNeverHalfDrawn` hands it any other.
+    static func framed(_ card: RecapCard) -> some View {
+        card
+            .padding(imageMargin)
+            .frame(width: imageWidth)
+            .background(Aurora.top)
+            // The picture never depends on the sender's text size (spec §3.4).
+            .dynamicTypeSize(.large)
+            // A renderer has no hosting controller for `.preferredColorScheme` to reach — the app's
+            // one use of the widget's spelling (spec §3.11).
+            .environment(\.colorScheme, .dark)
     }
 }
 

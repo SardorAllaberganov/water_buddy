@@ -68,6 +68,21 @@ struct MotionTests {
         #expect(Motion.drawDuration >= 0.4)
         #expect(Motion.rollDuration >= 0.4)
         #expect(Motion.drawDuration + 31 * Motion.drawStagger <= 1.5)
-        #expect(Motion.landResponse + 31 * Motion.popStagger <= 1.5)
+        #expect(Motion.popResponse + 31 * Motion.popStagger <= 1.5)
+    }
+
+    /// A dot passes its size by about a fifth and comes back, inside about a third of a second (spec
+    /// `2026-11-01-premium-look-design.md`, M1). ``Motion/land``'s 5% is under 1.5 pt on the recap's 26 pt dot, which reads as a dot
+    /// appearing and not as a pop (`tasks/lessons.md`, 2026-10-12). A spring's overshoot is `exp(-pi z / sqrt(1 - z^2))`.
+    @Test func aDotPopsPastItsSizeByAFifth() {
+        let damping = Motion.popDamping
+        let overshoot = exp(-Double.pi * damping / (1 - damping * damping).squareRoot())
+        #expect((0.18...0.26).contains(overshoot))
+        #expect(Motion.popResponse <= 0.4)
+    }
+
+    /// What pops does so on ``Motion/pop``, each after the last. A dot has no value, so nothing it passes is wrong.
+    @Test func whatPopsTakesThePopsSpring() {
+        #expect(Motion.popped(at: 3) == Motion.pop.delay(3 * Motion.popStagger))
     }
 }

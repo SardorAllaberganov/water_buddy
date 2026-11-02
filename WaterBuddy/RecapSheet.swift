@@ -19,18 +19,27 @@ import SwiftUI
 /// (spec §4a) — so the share sheet leaves Photos out on its own, and notifications stay the one
 /// permission the app asks for. Everything else the sheet offers, *Save to Files* included, is the
 /// user's own tap.
+///
+/// **The sheet lands whole, then the month draws itself** (spec `2026-11-01-premium-look-design.md`, D7). The flags are this
+/// view's, and the image never reads them: it is rendered from ``RecapCard/Rendered``, so *Share* works from the first frame and
+/// sends the whole card, however early it is tapped. The note and the button stand at the foot, so a `.large` sheet is not left
+/// with a third of it empty.
 struct RecapSheet: View {
 
     let month: MonthHistory
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// The card, rendered — presentation state, gone with the sheet.
     @State private var image: UIImage?
 
     /// Bumped by the share button's press, for its haptic alone (rule `60-design-system`).
     @State private var shares = 0
+
+    /// Whether the sheet has landed: what the month's draw, the rim's lap and the streak all wait for.
+    @State private var landed = false
 
     var body: some View {
         ZStack {
@@ -42,10 +51,12 @@ struct RecapSheet: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Self.gap) {
                         topBar
-                        RecapCard(month: month)
+                        RecapCard(month: month, drawn: landed || reduceMotion, lit: landed)
                         streak
-                        shareButton
+                            .lands(landed, order: Self.streakOrder)
+                        Spacer(minLength: Self.gap)
                         footnote
+                        shareButton
                     }
                     .padding(.horizontal, ScreenMetrics.margin)
                     .padding(.vertical, Self.verticalInset)
@@ -59,6 +70,7 @@ struct RecapSheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(Haptics.confirm, trigger: shares)
+        .tracksLanding($landed)
         .task { image = RecapCard.image(of: month, strings: strings, locale: locale) }
     }
 
@@ -156,6 +168,8 @@ struct RecapSheet: View {
 
     private static let gap: CGFloat = 16
     private static let verticalInset: CGFloat = 24
+    /// Last of what arrives, once the month has begun to draw above it.
+    private static let streakOrder = 6
     /// The share button before its image exists — a few milliseconds, at most.
     private static let pending: Double = 0.5
 }

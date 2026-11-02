@@ -84,6 +84,11 @@ nonisolated enum Motion {
     /// The same for what pops into place, which is seen one by one.
     static let popStagger: Double = 0.022
 
+    /// The response and damping of ``pop``. Far looser than ``land``: 5% of a 26 pt dot is under 1.5 pt, which reads as a dot
+    /// appearing, and this passes its size by a fifth (`aDotPopsPastItsSizeByAFifth`).
+    static let popResponse: Double = 0.38
+    static let popDamping: Double = 0.43
+
     /// How long a figure takes to roll to its value.
     static let rollDuration: Double = 0.8
 
@@ -95,9 +100,12 @@ nonisolated enum Motion {
         draw.delay(Double(max(index, 0)) * drawStagger)
     }
 
-    /// ``land``, `index` places along a run of what pops: a dot has no value to overshoot.
+    /// Something small popping into place. Only for what has no value to pass: a figure or a ring takes ``draw``.
+    static var pop: Animation { .spring(response: popResponse, dampingFraction: popDamping) }
+
+    /// ``pop``, `index` places along a run of what pops.
     static func popped(at index: Int) -> Animation {
-        land.delay(Double(max(index, 0)) * popStagger)
+        pop.delay(Double(max(index, 0)) * popStagger)
     }
 
     /// A figure rolling to its value.
