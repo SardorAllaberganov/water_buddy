@@ -195,6 +195,13 @@ struct HistoryView: View {
         return status.isPremium || offered
     }
 
+    /// Whether `month`'s data has drawn: once `raised` has caught up with it, and at once under Reduce Motion (spec
+    /// `2026-11-01-premium-look-design.md` D5). Keyed on the month, so a re-read of the same month leaves it standing and the
+    /// next month starts from nothing.
+    nonisolated static func drawsMonth(raised: Int?, month: Int?, reduceMotion: Bool) -> Bool {
+        reduceMotion || (month != nil && raised == month)
+    }
+
     /// The month's days laid into weeks of seven, `nil` where a week runs past either end: the 1st
     /// under its own weekday, counted from the locale's first (§3.3). The entries index
     /// ``MonthHistory/days``. `weekdayOfFirst` comes from the model's calendar, `firstWeekday` from the
@@ -296,6 +303,7 @@ struct HistoryView: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(PremiumStore.self) private var premium
     @Environment(InsightWriter.self) private var writer
 
@@ -332,10 +340,37 @@ struct HistoryView: View {
     /// `2026-10-24-monthly-recap-design.md` §3.7; rule `50-views`).
     @State private var recap: MonthHistory?
 
+    /// Bumped when the recap's row opens the sheet, for its tick and its glyph's bounce: a read that fails opens nothing and
+    /// answers with neither.
+    @State private var recapOpens = 0
+
     /// Bumped by the user's own taps on the switch and on a month's arrows, as ``picks`` is by a day
     /// (rule `60-design-system`).
     @State private var switches = 0
     @State private var steps = 0
+
+    /// The month whose rings have been let draw: a turn behind the shown month whenever that changes, which is the moment they
+    /// stand at nothing. On the screen, not the card, so a row the `List` recycles never replays them (spec
+    /// `2026-11-01-premium-look-design.md` D5).
+    @State private var raisedMonth: Int?
+
+    /// The month whose patterns have been reached. They stand below the fold, so they draw the first time their row appears,
+    /// and on the screen, so scrolling back never replays them. Let go with the rings when Month is left.
+    @State private var raisedPatterns: Int?
+
+    /// Whether Insights has arrived: down each time it is left, so entering it plays once (spec D6).
+    ///
+    /// **Raised by the lead pane's row, ``insightsWait`` after it arrives, not as the switch is pressed.** The switch
+    /// cross-fades the list, and a part set rising before that fade has settled is put in place whole: measured on iOS 27.0
+    /// on 2026-11-02, where the three under the lead pane came in on one frame, risen and lit, with no stagger, when raised
+    /// 0.1 s and again 0.35 s after their rows arrived, and rose when raised 0.48 s after. Counted from the row, because a
+    /// slow first draw puts it later than the press. Not the fade's completion, which also waits on the switch's own spring
+    /// and came 1.4 s late. The rings, the bars and the figures draw through the fade, so Month does not wait.
+    @State private var insightsLanded = false
+
+    /// How long Insights' lead pane stands before it laps and the panes under it rise: the 0.48 s they were measured
+    /// rising at, with a margin (``insightsLanded``).
+    private static let insightsWait: Duration = .milliseconds(600)
 
     /// The `+`'s diameter, a real magnitude scaled with the header's own text (rule
     /// `65-accessibility`), bounded at its use site.
@@ -428,11 +463,29 @@ struct HistoryView: View {
         // sheet over this screen does not rebuild it, so the day a serving was just saved to
         // stays shown.
         .tracksArrival($arrived)
+        // The month draws once per arrival: on entering Month and on turning its page, never on a re-read of the month
+        // on screen (spec `2026-11-01-premium-look-design.md` §2).
+        .task(id: shownMonth) {
+            guard let shownMonth else {
+                raisedMonth = nil
+                raisedPatterns = nil
+                return
+            }
+            // A frame at nothing first, so there is something to draw from (``Arrival/hiddenFirst``).
+            do { try await Task.sleep(for: Arrival.hiddenFirst) } catch { return }
+            guard !Task.isCancelled else { return }
+            raisedMonth = shownMonth
+        }
+        // Insights arrives once per entry: raised by its lead pane (``insightsLanded``), let go when it is left.
+        .onChange(of: showsInsights) { _, shows in
+            if !shows { insightsLanded = false }
+        }
         // A tick for a day picked, a light tap for a serving taken away.
         .sensoryFeedback(Haptics.select, trigger: picks)
         .sensoryFeedback(Haptics.remove, trigger: removals)
         .sensoryFeedback(Haptics.select, trigger: switches)
         .sensoryFeedback(Haptics.select, trigger: steps)
+        .sensoryFeedback(Haptics.select, trigger: recapOpens)
         // A selection the card can no longer show is dropped, so it cannot resurface on a later
         // serving and take the screen back to a day the user had left.
         .onChange(of: hasSomethingToShow) { _, isShowing in
@@ -552,6 +605,16 @@ struct HistoryView: View {
         drawsSwitch && mode == .insights
     }
 
+    /// The month on screen, once read — `nil` in Week and Insights, and before the first read answers.
+    private var shownMonth: Int? {
+        showsMonth ? manager.month?.firstDay : nil
+    }
+
+    /// Whether the shown month's rings and figures have drawn (``drawsMonth(raised:month:reduceMotion:)``).
+    private var monthDrawn: Bool {
+        Self.drawsMonth(raised: raisedMonth, month: shownMonth, reduceMotion: reduceMotion)
+    }
+
     /// The week Insights asks for: the app's locale's first weekday and weekend, as the month's grid and
     /// patterns take them — never `Calendar.waterBuddyDay`'s, which is fixed to `en_US_POSIX` (spec
     /// `2026-10-23-insights-design.md` §3.1).
@@ -569,7 +632,7 @@ struct HistoryView: View {
     @ViewBuilder
     private var monthRows: some View {
         if holdsPremium {
-            MonthCard(month: manager.month, opened: openedDay, open: { open($0) }, move: { move(to: $0) })
+            MonthCard(month: manager.month, opened: openedDay, drawn: monthDrawn, open: { open($0) }, move: { move(to: $0) })
                 .historyRow()
 
             if let day = openedMonthDay {
@@ -591,14 +654,14 @@ struct HistoryView: View {
             }
 
             if let month = manager.month, month.daysCounted > 0 {
-                MonthFigures(month: month)
+                MonthFigures(month: month, drawn: monthDrawn)
                     .historyRow(top: 8)
             }
 
             // The month's recap — a finished month's own, or in the month's first days the month
             // before's (spec `2026-10-24-monthly-recap-design.md` §3.1).
             if let offered = manager.month?.recap {
-                RecapRow(offered: offered) { openRecap(offered) }
+                RecapRow(offered: offered, opens: recapOpens) { openRecap(offered) }
                     .historyRow(top: 8)
             }
 
@@ -609,11 +672,18 @@ struct HistoryView: View {
                     .historyRow(top: 14, bottom: 2)
 
                 if let patterns = month.patterns {
-                    HoursChart(patterns: patterns)
+                    let drawn = Self.drawsMonth(raised: raisedPatterns, month: month.firstDay, reduceMotion: reduceMotion)
+                    HoursChart(patterns: patterns, drawn: drawn)
                         .historyRow()
+                        // Reached: the bars draw, once for this month (the plan's P4).
+                        .task(id: month.firstDay) {
+                            do { try await Task.sleep(for: Arrival.hiddenFirst) } catch { return }
+                            guard !Task.isCancelled else { return }
+                            raisedPatterns = month.firstDay
+                        }
                     // The week split at the app's locale's weekend, as the grid starts on its first
                     // day (spec §3.4).
-                    WeekSplit(split: patterns.split(weekend: Self.weekend(in: locale)))
+                    WeekSplit(split: patterns.split(weekend: Self.weekend(in: locale)), drawn: drawn)
                         .historyRow()
                     UsualTimes(patterns: patterns)
                         .historyRow(bottom: 24)
@@ -669,7 +739,8 @@ struct HistoryView: View {
             range: Self.weekRange(from: insights.firstDay, to: insights.lastDay, locale: locale),
             headline: shown.oneThing,
             detail: shown.detail,
-            glyph: glyph
+            glyph: glyph,
+            lit: insightsLanded
         )
             .historyRow()
             // The model's words arrive in place of the app's, once — scoped to who wrote them, never a
@@ -680,17 +751,26 @@ struct HistoryView: View {
             .task(id: english ? page : nil) {
                 await writer.write(page, language: manager.language)
             }
+            // The flag stays on the screen, so a row the list brings back never replays it (``insightsLanded``).
+            .task {
+                do { try await Task.sleep(for: Self.insightsWait) } catch { return }
+                guard !Task.isCancelled else { return }
+                insightsLanded = true
+            }
         if let working = shown.working {
             InsightPane(kind: .working, text: working)
+                .lands(insightsLanded, order: 2)
                 .historyRow()
                 .animation(.smooth(duration: 0.35), value: footer)
         }
         if let worthKnowing = shown.worthKnowing {
             InsightPane(kind: .worthKnowing, text: worthKnowing)
+                .lands(insightsLanded, order: 3)
                 .historyRow()
                 .animation(.smooth(duration: 0.35), value: footer)
         }
         InsightFooter(source: footer)
+            .lands(insightsLanded, order: 4)
             .historyRow(bottom: 24)
             .animation(.smooth(duration: 0.35), value: footer)
     }
@@ -710,6 +790,7 @@ struct HistoryView: View {
     /// `2026-10-24-monthly-recap-design.md` §3.2).
     private func openRecap(_ offered: MonthHistory.Neighbour) {
         recap = manager.recap(of: offered.firstDay)
+        if recap != nil { recapOpens += 1 }
     }
 
     /// An arrow: the month it names, which the shown month says exists.
@@ -1533,8 +1614,15 @@ private struct MonthCard: View {
     /// The opened day's ordinal, marked and announced as selected.
     let opened: Int?
 
+    /// Whether the rings have drawn — the screen's flag, never the card's, so a row the `List` recycles does not replay them.
+    let drawn: Bool
+
     let open: (Int) -> Void
     let move: (Int?) -> Void
+
+    /// Bumped by a tap on each arrow, for its own glyph's bounce, so only the arrow pressed answers. The tick is the screen's.
+    @State private var earlierTaps = 0
+    @State private var laterTaps = 0
 
     /// A ring's diameter: a real magnitude scaled with the text, capped at its use site inside the
     /// 44-pt slot with room for the opened day's ring round it (rule `65-accessibility`).
@@ -1580,7 +1668,7 @@ private struct MonthCard: View {
 
     private func titleRow(_ month: MonthHistory) -> some View {
         HStack(spacing: 8) {
-            arrow(to: month.earlier, systemName: "chevron.left")
+            arrow(to: month.earlier, systemName: "chevron.left", taps: $earlierTaps)
             Spacer(minLength: 0)
             if let first = month.days.first {
                 // Formatted in the app's language, never keyed (spec §3.11).
@@ -1596,19 +1684,21 @@ private struct MonthCard: View {
                     .accessibilityValue(strings.localized("%1$d of %2$d days on goal", month.daysMet, month.daysCounted, locale: locale))
             }
             Spacer(minLength: 0)
-            arrow(to: month.later, systemName: "chevron.right")
+            arrow(to: month.later, systemName: "chevron.right", taps: $laterTaps)
         }
     }
 
     /// ‹ or ›: a chevron with a 44-pt target, labelled with the month it goes to (plan M8). At a bound
     /// it is drawn quieter, does nothing, and VoiceOver does not stop on it — there is no month to name.
-    private func arrow(to neighbour: MonthHistory.Neighbour?, systemName: String) -> some View {
+    private func arrow(to neighbour: MonthHistory.Neighbour?, systemName: String, taps: Binding<Int>) -> some View {
         Button {
+            taps.wrappedValue += 1
             move(neighbour?.firstDay)
         } label: {
             Image(systemName: systemName)
                 // A ratio of its target, never a text style of its own (rule `65-accessibility`).
                 .font(.system(size: HistoryView.dayTapFloor * 0.4, weight: .semibold))
+                .symbolEffect(.bounce, value: taps.wrappedValue)
                 .frame(width: HistoryView.dayTapFloor, height: HistoryView.dayTapFloor)
                 .contentShape(Rectangle())
         }
@@ -1679,9 +1769,12 @@ private struct MonthCard: View {
                     .stroke(.white.opacity(0.14), lineWidth: arc)
                 Circle()
                     .inset(by: arc / 2)
-                    .trim(from: 0, to: day.fraction)
+                    .trim(from: 0, to: drawn ? day.fraction : 0)
                     .stroke(day.isMet ? Aurora.cyan : Color.white, style: StrokeStyle(lineWidth: arc, lineCap: .round))
                     .rotationEffect(.degrees(-90))
+                    // A wave across the month, a day behind the day before. Inside the card's own animation, so a turned
+                    // page's rings drop to nothing at once rather than sweeping back (spec M1).
+                    .animation(drawn ? Motion.drawn(at: ordinal % 100 - 1) : nil, value: drawn)
                 // The opened day's ring and disc, at zero opacity on every other day, so what animates
                 // is a mark and not a layer (rule `60-design-system`, plan M7).
                 Circle()
@@ -1822,6 +1915,9 @@ private struct MonthFigures: View {
 
     let month: MonthHistory
 
+    /// Whether the month has drawn: each figure rolls up from nothing once, with the rings (spec M2).
+    let drawn: Bool
+
     var body: some View {
         VStack(spacing: 10) {
             // Offered the row's whole width; it chooses among whole layouts (`tasks/lessons.md`).
@@ -1842,12 +1938,14 @@ private struct MonthFigures: View {
     private func tiles(fixed: Bool) -> some View {
         tile(
             strings.figure("%1$@/%2$@", month.daysMet, month.daysCounted, locale: locale),
+            from: strings.figure("%1$@/%2$@", 0, month.daysCounted, locale: locale),
             label: Text("Days on goal", bundle: strings),
             spoken: strings.localized("%1$d of %2$d days", month.daysMet, month.daysCounted, locale: locale),
             fixed: fixed
         )
         tile(
             strings.localized("%1$d days", month.bestRun, locale: locale),
+            from: strings.localized("%1$d days", 0, locale: locale),
             label: Text("Best streak", bundle: strings),
             spoken: strings.localized("%1$d days", month.bestRun, locale: locale),
             fixed: fixed
@@ -1855,15 +1953,22 @@ private struct MonthFigures: View {
         // Litres drawn, millilitres spoken, as the sliders speak them (spec §3.9).
         tile(
             strings.localized("%1$@ L", HistoryView.litres(month.total, locale: locale), locale: locale),
+            from: strings.localized("%1$@ L", HistoryView.litres(0, locale: locale), locale: locale),
             label: Text("This month", bundle: strings),
             spoken: strings.localized("%1$d millilitres", month.total, locale: locale),
             fixed: fixed
         )
     }
 
-    private func tile(_ figure: String, label: Text, spoken: String, fixed: Bool) -> some View {
+    /// The figure is laid out at its final width from the first frame: ``body`` chooses a row or a column by measuring, and a
+    /// roll must not flip it, as the recap's tiles (`RecapCard`).
+    private func tile(_ figure: String, from start: String, label: Text, spoken: String, fixed: Bool) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(figure)
+                .hidden()
+                .overlay(alignment: .leading) {
+                    RollingFigure(start: start, final: figure, rolled: drawn)
+                }
                 .font(.title3.weight(.bold))
                 .fontDesign(.rounded)
                 .monospacedDigit()
@@ -1928,6 +2033,7 @@ private struct RecapRow: View {
     @Environment(\.strings) private var strings
 
     let offered: MonthHistory.Neighbour
+    let opens: Int
     let open: () -> Void
 
     var body: some View {
@@ -1938,6 +2044,7 @@ private struct RecapRow: View {
                 Image(systemName: PremiumSet.Feature.recap.symbol)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.white)
+                    .symbolEffect(.bounce, value: opens)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Monthly recap", bundle: strings)
@@ -2002,6 +2109,9 @@ private struct HoursChart: View {
     @Environment(\.locale) private var locale
 
     let patterns: MonthPatterns
+
+    /// Whether the bars have drawn — the screen's flag, set when this row is first reached.
+    let drawn: Bool
 
     /// The strip's measures, capped at its use site (rule `65-accessibility`).
     @ScaledMetric(relativeTo: .footnote) private var scaledPlotHeight: CGFloat = 64
@@ -2097,8 +2207,11 @@ private struct HoursChart: View {
                 ForEach(bars.indices, id: \.self) { hour in
                     Capsule()
                         .fill(hour == patterns.busiestHour ? Aurora.cyan : Color.white.opacity(0.7))
-                        .frame(width: barWidth, height: bars[hour] > 0 ? max(proxy.size.height * bars[hour], barWidth) : 0)
+                        .frame(width: barWidth, height: drawn && bars[hour] > 0 ? max(proxy.size.height * bars[hour], barWidth) : 0)
                         .offset(x: travel * HistoryView.hourPosition(hour))
+                        // Across the day, an hour behind the hour before; inside the plot's own animation, so a turned
+                        // page's bars drop to nothing at once (spec M1).
+                        .animation(drawn ? Motion.drawn(at: hour) : nil, value: drawn)
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .bottomLeading)
@@ -2136,6 +2249,9 @@ private struct WeekSplit: View {
     @Environment(\.locale) private var locale
 
     let split: MonthPatterns.Split
+
+    /// Whether the bars have drawn, with the hours above them.
+    let drawn: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -2200,7 +2316,9 @@ private struct WeekSplit: View {
                     .fill(.white.opacity(0.10))
                 shape
                     .fill(side.isMet ? Aurora.cyan : Color.white)
-                    .frame(width: side.fraction > 0 ? max(proxy.size.width * side.fraction, proxy.size.height) : 0)
+                    .frame(width: drawn && side.fraction > 0 ? max(proxy.size.width * side.fraction, proxy.size.height) : 0)
+                    // Inside the bar's own animation, so a turned page's fill drops to nothing at once.
+                    .animation(drawn ? Motion.draw : nil, value: drawn)
             }
             .overlay(alignment: .trailing) {
                 Capsule()
@@ -2322,11 +2440,16 @@ private struct InsightsHeading: View {
 private struct OneThingPane: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let range: String
     let headline: String
     let detail: String?
     let glyph: String?
+
+    /// Whether the page has arrived: the rim runs its lap and the sparkle bounces, once per entry (spec D6). Under Reduce
+    /// Motion neither moves: an arrival, not an answer to a tap (rule `65-accessibility`).
+    let lit: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -2351,7 +2474,7 @@ private struct OneThingPane: View {
             .foregroundStyle(.white.opacity(0.9))
 
             Text(verbatim: headline)
-                .font(.title3.weight(.bold))
+                .font(.title2.weight(.heavy))
                 .fixedSize(horizontal: false, vertical: true)
 
             if let detail {
@@ -2370,6 +2493,8 @@ private struct OneThingPane: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
         .liquidGlass(density: .frosted, elevation: .raised)
+        // Premium's mark: Insights is paid for (rule `60-design-system`).
+        .premiumRim(lit: lit)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("The one thing", bundle: strings))
         .accessibilityValue(Text(verbatim: ([range, headline] + [detail].compactMap { $0 }).joined(separator: " ")))
@@ -2380,6 +2505,7 @@ private struct OneThingPane: View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             // The paywall's glyph for the feature, white (step 1's R4).
             Image(systemName: PremiumSet.Feature.insights.symbol)
+                .symbolEffect(.bounce, value: lit && !reduceMotion)
                 .accessibilityHidden(true)
             Text("The one thing", bundle: strings)
         }
@@ -3517,7 +3643,7 @@ private enum RecapRowPreview {
         return ZStack {
             AuroraBackground()
             if let offered {
-                RecapRow(offered: offered) {}
+                RecapRow(offered: offered, opens: 0) {}
             }
         }
         .environment(\.strings, AppLanguage.english.bundle)

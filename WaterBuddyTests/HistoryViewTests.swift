@@ -380,6 +380,16 @@ struct MonthLayoutTests {
         #expect(HistoryView.litres(1_234_500, locale: Locale(identifier: "en")) == "1,234.5")
     }
 
+    /// A re-read republishes the same month, and the rings stand. The next month draws from nothing, whatever the last was
+    /// doing, and a month not yet read draws nothing (spec `2026-11-01-premium-look-design.md` D5).
+    @Test func aMonthDrawsOncePerArrival() {
+        #expect(HistoryView.drawsMonth(raised: 20261001, month: 20261001, reduceMotion: false))
+        #expect(!HistoryView.drawsMonth(raised: 20261001, month: 20260901, reduceMotion: false))
+        #expect(!HistoryView.drawsMonth(raised: nil, month: 20261001, reduceMotion: false))
+        #expect(!HistoryView.drawsMonth(raised: nil, month: nil, reduceMotion: false))
+        #expect(HistoryView.drawsMonth(raised: nil, month: 20261001, reduceMotion: true))
+    }
+
     // MARK: Patterns (spec `2026-10-23-patterns-design.md` §3.4, §3.7)
 
     /// The weekend is the app's locale's, as its first weekday is: Saturday and Sunday in all three of
