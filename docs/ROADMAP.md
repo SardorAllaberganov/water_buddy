@@ -523,6 +523,7 @@ said "go". Stages 3–5 not begun. Not done: a real purchase through StoreKit, t
 the recap and History, built and staged, not committed.** Stage 3 is installed on the owner's iPhone and not walked there; stage 4 is
 built for it and not installed, the phone out of reach. Stage 5, the rest, not begun. Not done: the walks on the iPhone, the
 haptics, and the full gate.)*
+*(2026-11-03, night: **stages 3 and 4 committed and pushed**, `77573e0` to `9bdfb54`, not merged. Stage 5 waits for the owner's word.)*
 
 ## 6. Release 1.5 — more to log, more people
 

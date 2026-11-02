@@ -5608,3 +5608,24 @@ up. `simctl io recordVideo` exits 1 when stopped with SIGINT, and the file was w
 **The rule:** for anything that moves while the screen does, record the simulator and read the frames, and check their real times —
 `AVAssetReader`'s sample times — before calling two frames a jump; a gap in a loaded recording looks like a snap. Line screenshots and
 video up by their timestamps against the file's birth time, to within a second.
+
+## 2026-11-03 — I wrote a runner script for a gate again, against a lesson two days old
+
+**What happened.** For `/commit`'s UI gate in chunks I wrote a small zsh runner with a heredoc and ran it. It was refused. The lesson
+of 2026-11-01, *A refused script is not an invitation to write a tidier one*, already said to run `xcodebuild` plain, one per call; I
+had not read it before the gate. I stopped and reported, and on the owner's "yes go" ran each chunk as a plain command. They took no
+longer that way.
+
+**The rule:** before a gate, read the lessons on how gates are run here, not only on what fails. A chunked run is plain `xcodebuild`
+calls, one per chunk, with the test list built in the same command; never a script file written for it.
+
+## 2026-11-03 — Two stages in one file cannot become two commits afterwards
+
+**What happened.** Stage 3 staged its change to `HistoryView.swift`, the recap row's bounce; stage 4 then edited the same file and
+staged it over the top. At `/commit` the plan wanted a commit per stage, but the index no longer held stage 3's version of the file,
+and splitting hunks needs `git add -p`, which this environment cannot run. The bounce went into History's commit, said so in its
+message. `git commit -- <paths>` did commit each group's other files while the rest stayed staged.
+
+**The rule:** when the next stage will edit a file the last one staged, keep the last stage's version first, for instance its
+`git diff --cached` saved to the ledger as a patch, or ask the owner whether to commit before starting. Otherwise say at once that the
+two stages will share a commit.

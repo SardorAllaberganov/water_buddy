@@ -14810,3 +14810,51 @@ resolves; no forbidden doc. `docs/WIDGET.md`: *Last updated* kept.
 `docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On `feature/premium-look`, level with
 `origin/feature/premium-look`, HEAD `a40dfef`, 246 commits: **15 staged**, all modified — stages 3 and 4's seven code files and the
 eight records — **6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-03] — One finish's stages 3 and 4 committed and pushed, after an 18.6 gate
+
+The owner ran `/commit` and answered "yes go".
+
+### What changed
+
+Three commits, pushed as `a40dfef..9bdfb54` on `feature/premium-look`: `77573e0` the recap draws itself (5 files), `9604d5e` History's
+month, patterns and Insights (2 files), `9bdfb54` the sync (8 files). The recap row's bounce, stage 3's, is in `9604d5e`: it lives in
+`HistoryView.swift`, which stage 4 had staged over, and splitting the file's hunks needs an interactive add. No code changed after
+the commits.
+
+### Verification, as actually run
+
+On a `git checkout-index` copy of the index, built clean into its own DerivedData, *iPhone 16* (18.6), the destination `/commit`
+names:
+
+- **Phone unit:** 1104 in 121 suites, **one failure**, `theGlyphDoesNotGrowWithTheTextSize`, `SheetCloseButtonTests.swift:24`. The same
+  test fails on a clean `HEAD` `a40dfef` export, the same issue, so it predates this work (#221).
+- **Phone UI**, by class in seven foreground chunks, the store capture skipped: **87 executed, 2 skipped by design, 0 failures**.
+  `PremiumUITests` 9; `CoachingUITests` and `ExportUITests` 8, the pace line skipped at 01:4x; the template's and the launch tests 18;
+  `WelcomeUITests` 13; `GoalSetupUITests` 39, the bar drag skipped by its bar.
+- **Warnings**, by file and message against the clean `HEAD` build: 20 and 20, 36 sites each, none new and none gone.
+- **Not run:** either widget build — no widget or shared file changed, and `/commit` asks for none then — the watch's tests, and the
+  UI suite on 26.5 or 27.0 whole.
+- **Refused:** a heredoc-written runner script for the UI chunks. I stopped and reported; on the owner's "yes go" each chunk ran as a
+  plain `xcodebuild`. WareStack paused its soak for the UI run at my ask, and was told when it was done.
+
+### Drift found and fixed by the sync
+
+`docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and `CLAUDE.md` held stages 3 and 4 as staged, and listed the warnings comparison and the whole
+unit suite as not run: overtaken by the commits and their gate. The 18.6 failure had been seen at two commit gates and recorded in
+neither doc: #221.
+
+### Checked and already accurate
+
+137 `.swift` files by `find`, 139 in the index, nothing untracked; 1104 phone `@Test`, 71 watch, 75 UI `func test`; `DataManager.swift`,
+`project.pbxproj` and the widget's and the watch's sources unchanged since `a40dfef`; every rule citation resolves; no forbidden doc.
+`docs/DESIGN.md`, `docs/STATE.md` and `docs/WIDGET.md`: *Last updated* kept, their subjects unmoved.
+
+### Files touched by the sync
+
+`CLAUDE.md`, `HISTORY.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md`.
+
+**Staging.** Read from the commands at 02:25 on 2026-11-03, after the `git add` of five paths by name, and again of this file and
+`docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run by the sync.** On `feature/premium-look`, level with
+`origin/feature/premium-look`, HEAD `9bdfb54`, 249 commits: **5 staged**, all modified, the five records — **6 unstaged**, the six the
+tree already carried; no untracked file, none in both; one stash, `stash@{0}`.
