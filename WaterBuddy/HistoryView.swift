@@ -1960,15 +1960,11 @@ private struct MonthFigures: View {
         )
     }
 
-    /// The figure is laid out at its final width from the first frame: ``body`` chooses a row or a column by measuring, and a
-    /// roll must not flip it, as the recap's tiles (`RecapCard`).
+    /// The figure holds one width from the first frame (``RollingFigure``): ``body`` chooses a row or a column by measuring,
+    /// and a roll must not flip it, as the recap's tiles (`RecapCard`).
     private func tile(_ figure: String, from start: String, label: Text, spoken: String, fixed: Bool) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(figure)
-                .hidden()
-                .overlay(alignment: .leading) {
-                    RollingFigure(start: start, final: figure, rolled: drawn)
-                }
+            RollingFigure(start: start, final: figure, rolled: drawn)
                 .font(.title3.weight(.bold))
                 .fontDesign(.rounded)
                 .monospacedDigit()

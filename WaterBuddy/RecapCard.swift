@@ -186,15 +186,11 @@ struct RecapCard: View {
         }
     }
 
-    /// The figure is laid out at its final width from the first frame: ``tiles`` chooses a row or a column by measuring, and a
-    /// roll must not flip it.
+    /// The figure holds one width from the first frame (``RollingFigure``): ``tiles`` chooses a row or a column by measuring,
+    /// and a roll must not flip it.
     private func tile(_ figure: String, from start: String, label: Text) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(figure)
-                .hidden()
-                .overlay(alignment: .leading) {
-                    RollingFigure(start: start, final: figure, rolled: drawn)
-                }
+            RollingFigure(start: start, final: figure, rolled: drawn)
                 .font(.title3.weight(.heavy))
                 .fontDesign(.rounded)
                 .monospacedDigit()
