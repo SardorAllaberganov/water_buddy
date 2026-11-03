@@ -403,12 +403,14 @@ something to record.
   is stored, and `DataManager` does not change (`docs/superpowers/specs/2026-11-01-export-design.md`; rule `70-privacy`'s *The
   export file, on the user's own tap*, committed)
 - **One finish: motion is one language, driven by presentation flags** (the premium look: stages 0–4 of six committed and pushed on
-  `feature/premium-look`, not merged — the parts, export, the paywall, the recap and History; stage 5 not begun). `Landing` brings a sheet's content
-  in once the sheet has landed, `RollingFigure` rolls a hero figure once, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s
+  `feature/premium-look`, not merged — the parts, export, the paywall, the recap and History; stage 5 — Settings' Premium lap, the
+  schedule sheet's landing, Home's water rising as the app opens — staged with the final review's two fixes, not committed). `Landing` brings a sheet's content
+  in once the sheet has landed, `RollingFigure` rolls a hero figure once at the wider of its two ends' widths, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s
   `draw`, `drawn(at:)` and `popped(at:)` draw data — a pop on `Motion.pop`. Each plays once per arrival, stands final under Reduce
   Motion, and no spoken value reads its flag. History's flags live on `HistoryView`, never on a row the `List` recycles; a flag for
   rows the switch's cross-fade inserts waits out that fade from the row's own arrival (`HistoryView.insightsWait`): raised inside it,
-  `.lands` puts its parts in place whole. The rim stays Premium's; the rest reaches free screens too
+  `.lands` puts its parts in place whole. Home's water rises only on the page the app opens on, after its vessel has stood
+  (`HomeView.openingLevel`, `waterWait`); a tab turn and a return come whole. The rim stays Premium's; the rest reaches free screens too
   (`docs/superpowers/specs/2026-11-01-premium-look-design.md`; rule `60-design-system`, committed in `aa2f7ce`)
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`

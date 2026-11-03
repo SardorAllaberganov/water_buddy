@@ -14858,3 +14858,108 @@ neither doc: #221.
 `docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run by the sync.** On `feature/premium-look`, level with
 `origin/feature/premium-look`, HEAD `9bdfb54`, 249 commits: **5 staged**, all modified, the five records — **6 unstaged**, the six the
 tree already carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-03] — One finish's stage 5, the final review and its two fixes, and the hundred-and-eleventh `/doc_sync`
+
+Taken by `/start_task` with no task named: the plan's stage 5, proposed with refinements P19–P22, begun on the owner's "go and my
+iphone is connected also". Staged, not committed.
+
+### What changed
+
+- **Task 17.** Settings' Premium card carries the rim in both its forms, the held one new, and runs its lap from a landing flag kept by
+  `.tracksLanding`, 350 ms after the page is built, not from `arrived`. The schedule sheet lands: its hour rows, intervals, days and
+  *Standard schedule* rise in order under a whole heading.
+- **Task 18.** Home's water rises from empty to today's level once, as the app opens, through
+  `HomeView.openingLevel(_:stood:settles:reduceMotion:)`. Never on a tab turn, a return from the background or under Reduce Motion. The
+  readouts and VoiceOver read today's figure from the first frame.
+- **Task 19.** Step 1, a sleep inside the store capture's `capture(_:)`, was not made (P23). The gate ran, then a fresh reviewer read
+  the whole branch from `9086f06`. It found no Critical issue, one Important and seven Minor, and the plan's five Review Focus items
+  held in the code.
+- **The fix pass**, each fix seen RED:
+  - Home's water now waits `HomeView.waterWait`, 0.4 s, after the page arrives, so it no longer rises through a vessel still fading in
+    (spec M1).
+  - `RollingFigure` holds the wider of its two ends. A month's best streak no longer draws *0 d…* while rolling to *1 day*.
+  - Six minors are recorded and not fixed: #222–#224, the A/B re-run, and these records.
+
+### The rulings
+
+P19 (approved with the proposal), P20–P24 in the plan; the final review's item 2 re-graded from Minor to Important; #191's drag, #209
+and the Undo offer's speed guard ruled not this stage's, each on a run of `HEAD`'s build. Every ruling is in the ledger with its cost.
+
+### Verification, as actually run
+
+- **Recorded on *iPhone 17* (27.0) and read frame by frame**, with tools of mine in the scratchpad: the offer card's slide and lap, the
+  held card, the sheet's landing, a cold launch, a tab turn, a return, a pour, Reduce Motion, the largest text size. The final code's
+  cold launch again: the water starts as the vessel finishes fading in, at a load near 45.
+- **The gate on the final code**, a `git checkout-index` copy built clean, on 27.0:
+  - **Unit:** 1107 passed in 122 suites.
+  - **UI:** 87 executed, 1 skipped, 3 failures — #215, #209 and the Undo offer's speed guard. `HEAD`'s build fails the last two alone.
+  - **Warnings:** 20 and 20 messages, 36 sites each, against a clean build of `9086f06`.
+- **Before the fix pass, which touched no shared, widget or watch file:**
+  - UI on 27.0: 87 executed, 2 skipped, 0 failures.
+  - Watch: 71 passed. Both widget schemes built.
+  - **The whole UI suite on 26.5:** 87 executed, 2 skipped, 4 failures, each passing alone. #212 retired.
+- **#191's bar drag, alone on 26.5, alternating builds:** this work failed 2 of 10, `HEAD` 0 of 10. The failing run's recording shows
+  the movement of a press lost with Home at rest.
+- **Installed** on the owner's iPhone from the final staged tree, 1.4 (4), stages 4 and 5. Not launched.
+- **Not run:** a real purchase, the haptics, D9 and P19 on the iPhone, the 26.5 suite on the final code but for the drag test.
+- **Refused:** a `sed -i` edit. Reported, then made with Edit after saying so.
+
+### Drift found and fixed by the sync
+
+- `docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and `CLAUDE.md` said stage 5 was not begun.
+- `SettingsView.swift` cites "plan P19", which the plan lacked until this pass.
+- `docs/DESIGN.md` first said the water rose inside a vessel that had stood. That came from the recording before the fix; a new
+  recording of the final code corrected it in this pass.
+
+### Checked and already accurate
+
+137 `.swift` files by `find`, 139 in the index, nothing untracked; 1107 phone `@Test`, 71 watch, 75 UI `func test`. `DataManager.swift`,
+`project.pbxproj` and the widget's and the watch's sources are unchanged since `8208c8d`. There are three exception sets, every rule
+citation resolves, and no forbidden doc exists. `docs/STATE.md` and `docs/WIDGET.md` keep their *Last updated*.
+
+### Files touched by the sync
+
+`CLAUDE.md`, `HISTORY.md`, `docs/AI_CONTEXT.md`, `docs/DESIGN.md`, `docs/ROADMAP.md`, `tasks/lessons.md`, the plan.
+
+**Staging.** Read from the commands at 07:55 on 2026-11-03, after the `git add` of seven paths by name, and again of this file and
+`docs/AI_CONTEXT.md` once their blocks were written. **No `git commit` was run.** On `feature/premium-look`, level with
+`origin/feature/premium-look`, HEAD `8208c8d`, 250 commits: **15 staged**, all modified — stage 5's four code files, the fix's four
+and the seven records — **6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-03] — The hundred-and-twelfth `/doc_sync`: no drift; no code changed since the hundred-and-eleventh
+
+The owner ran `/doc_sync` again on the tree the last pass left. Nothing in code had moved since: every staged file equals the working
+tree, and the only unstaged changes are the six the tree already carried.
+
+### Checked and already accurate
+
+- 137 `.swift` files by `find`, 139 in the index with the two in `Tools/`, nothing untracked. Every Swift file has a row in
+  `docs/AI_CONTEXT.md`'s *Files on disk*, and all 137 fixed-width rows equal `wc -l`; `WaterBuddyWatchWidgetBundle.swift`'s row ends at
+  its count and was read by hand (9). The names the documented list carries without a file are historical mentions only.
+- 1107 phone `@Test` in 122 suites, 71 watch, 75 UI `func test`, as the records say.
+- `DataManager.swift`, `project.pbxproj`, `Entitlements/` and the widget's and the watch's sources unchanged since `8208c8d`, the
+  watch's two carried catalogues aside. `Key.all` holds 16, the phone's suite fourteen, as `CLAUDE.md` and `docs/STATE.md` say. The
+  three exception sets are six files each and agree with `CLAUDE.md`.
+- All 18 rule citations resolve; `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and `docs/dependencies.md` do not exist.
+- The symbols *One finish*'s records cite are in the staged code: `HomeView.openingLevel`, `waterWait`, `vesselOrder` and
+  `vesselStood`; Settings' `PremiumCard(lit: landed)`; the schedule sheet's five `.lands`; `RollingFigure`'s two hidden ends.
+- `docs/AI_CONTEXT.md`'s Git block still matched the tree before this pass's own `git add`.
+
+### Drift found and fixed
+
+None.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (a *Last updated* block and the Git block) and this file. `CLAUDE.md`, `docs/DESIGN.md`, `docs/STATE.md`,
+`docs/WIDGET.md`, `docs/ROADMAP.md` and `tasks/lessons.md`: nothing moved, nothing written.
+
+### Gate
+
+Not run again: no code changed since this session's gate, recorded in the checkpoint above.
+
+**Staging.** Read from the commands at 18:19 on 2026-11-03, after the `git add` of this file and `docs/AI_CONTEXT.md` by name, and
+again once their blocks were written. **No `git commit` was run.** On `feature/premium-look`, level with
+`origin/feature/premium-look`, HEAD `8208c8d`, 250 commits: **15 staged**, all modified — the same fifteen as the checkpoint above —
+**6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.

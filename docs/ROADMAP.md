@@ -524,6 +524,10 @@ the recap and History, built and staged, not committed.** Stage 3 is installed o
 built for it and not installed, the phone out of reach. Stage 5, the rest, not begun. Not done: the walks on the iPhone, the
 haptics, and the full gate.)*
 *(2026-11-03, night: **stages 3 and 4 committed and pushed**, `77573e0` to `9bdfb54`, not merged. Stage 5 waits for the owner's word.)*
+*(2026-11-03, morning: **stage 5, the rest, built and staged, not committed, with the final review's two fixes** — Settings' Premium
+lap in both forms, the schedule sheet's landing, Home's water rising as the app opens, and a rolling figure that never cuts its start.
+Every task of the plan is done; the full gate ran on 27.0 and the UI suite whole on 26.5. Stages 4 and 5 are on the owner's iPhone;
+D9, the water, is theirs to keep or strike.)*
 
 ## 6. Release 1.5 — more to log, more people
 

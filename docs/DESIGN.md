@@ -7,6 +7,10 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-03, morning (hundred-and-eleventh pass — `/doc_sync` run in Task 19 of *One finish*, after stage 5 and the
+final review's fixes). *One finish* gains Settings' lap, `HomeView.waterWait` and a rolling figure's width, and a note on stage 5. No
+colour moved and no pair was measured.
+
 **Last updated:** 2026-11-03, after midnight (hundred-and-ninth pass — `/doc_sync` run by the owner after *One finish*'s stages 3
 and 4). *One finish* gains `Motion.pop`, `HistoryView.insightsWait`, the recap's note and Insights' lead pane, measured; *Insights,
 measured* and *The recap, measured* each gain a dated note. No colour moved.
@@ -2561,6 +2565,9 @@ motion reads as nothing (`tasks/lessons.md`, 2026-10-12). None of it is felt yet
 | `PaywallStyle.heldInset` | 28 pt | above and below the words on the held card |
 | `HistoryView.insightsWait` | 600 ms | from Insights' lead pane's row arriving to its lap and the rise under it: measured, below |
 | a chosen plan's tile | 1.03, on `Motion.land` | it stands forward; 3% of about 110 pt is 3 pt, and it is the tile's rim and fill that say *chosen* |
+| Settings' Premium lap | `Landing.wait`, 350 ms | after the page is built, not `Arrival.hiddenFirst`'s 50 ms: the slide takes `Motion.pageDuration`, 450 ms (#223) |
+| `HomeView.waterWait` | 0.4 s | `Arrival.delay(order: 0) + Arrival.duration`, after the page arrives: the vessel stands whole, then its water rises from empty on `Motion.water`, about 80 pt at 38% on an *iPhone 17* |
+| a rolling figure's width | the wider of its two ends | from the first frame, so *0 days* rolling to *1 day* is never cut and a row never flips |
 
 **The paywall's held card, stage 2:** `.frosted` + `.raised` with the rim, `.largeTitle` heavy over the plan's line at white 0.92. White's
 worst pixel on clean ground, **two frames only, not a minute:** 7.43 above the words, 6.61 beside the title, 9.50 beside the line. At
@@ -2589,6 +2596,13 @@ step 2's ring-around-ink tool. **Timing:** the flag that laps the rim and raises
 arrival. On iOS 27.0 a flag raised 0.10 s or 0.35 s after the rows arrived put the parts in place whole, and one at 0.48 s let them
 rise; the fade that inserts the rows is a spring that settles after its 0.35 s. Read off recordings at 60 fps. Not on the iPhone
 (`docs/AI_CONTEXT.md` #220).
+
+**Stage 5, 2026-11-03:** Settings' Premium card carries the rim in both its forms, and the schedule sheet lands as the other sheets do.
+**No pair was measured, and none moved:** the rim is stroked at the pane's edge, outside its padding, and the held card's words keep
+their place and colour; the sheet's parts move and fade on `Landing` and stand where they stood. Read off recordings on *iPhone 17*
+(27.0): the offer card's light faint over the slide's last 20 pt at a load near 78, clear once the card stopped; Home's water, before
+`waterWait`, rising about 80 pt through a vessel still fading in, and after it, waiting while the vessel arrived empty and starting as
+it finished, at a load near 45 — both waits count from the page's build, so a late first frame shortens them. Not on the iPhone.
 
 ## The header and a screen arriving
 

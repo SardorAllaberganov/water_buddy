@@ -48,6 +48,19 @@ flag that a screen owns, so nothing replays on a re-read and no spoken value dep
   the switch's spring, 1.4 s. The lead pane's row raises it, `HistoryView.insightsWait` (600 ms) after it arrives; leaving lowers it.
   "Its heading" is the pane's headline sentence.
 - P18. Task 16's sparkle does not bounce under Reduce Motion: it marks an arrival. The chevrons' bounce answers a tap and stays.
+- P19. Task 17's card is lit from a landing flag kept by `.tracksLanding` (350 ms), not from `arrived`: Settings is always a page
+  that slid in, `arrived` rises 50 ms after it is built, and the slide takes 450 ms, so the light ran across a moving page (approved
+  with stage 5's proposal). The final review would rather it waited `Motion.pageDuration` or a flag from `turn.settle`
+  (`docs/AI_CONTEXT.md` #223).
+- P20. Task 17 has no unit test: it wires parts `PremiumRimTests` and `LandingTests` hold. `CoachingUITests`, `PremiumUITests` and a
+  recording read frame by frame prove it.
+- P21. Task 18's water rises under a still surface: the waves' clock runs only after a pour. Left for the owner's call on D9.
+- P22. Task 19's step 6: #213 and #214 were retired in stage 1; only #212 closes.
+- P23. Task 19's step 1 is not made. The store method already waits `settle`, 3 s, after each of its eight screens, longer than any
+  draw, and `capture(_:)` is shared with the census, whose confetti shot is timed 0.55 s after a pour.
+- P24. The final review's fixes: Task 18's water waits `HomeView.waterWait` (0.4 s) after the page arrives, so the vessel stands
+  before it rises (spec M1) — `openingLevel` takes `stood:`, not `arrived:`; and `RollingFigure` holds the wider of its two ends, so a
+  start wider than its value (*0 days* → *1 day*) is never cut and P12's hidden `Text` in the tiles is gone.
 
 ## Global Constraints
 
