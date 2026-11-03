@@ -28,6 +28,9 @@ struct ReminderScheduleSheet: View {
     /// Bumped by every choice, for the selection tick (rule `60-design-system`).
     @State private var picks = 0
 
+    /// Whether the sheet has landed (``Landing``). Presentation state, gone with the sheet.
+    @State private var landed = false
+
     init(schedule: ReminderPlan.Schedule) {
         _draft = State(initialValue: schedule)
     }
@@ -39,18 +42,22 @@ struct ReminderScheduleSheet: View {
             // Whole at every ordinary size, scrolling once the type outgrows the sheet (rule `65-accessibility`).
             GeometryReader { proxy in
                 ScrollView {
+                    // The heading comes whole with the sheet; what it edits rises in under it once it has landed.
+                    // *Standard schedule*, shown later by a change, simply appears: the sheet has long landed.
                     VStack(alignment: .leading, spacing: Self.gap) {
                         topBar
                         hourRow("First reminder", hour: draft.first, choices: Self.firstHours(every: draft.every)) {
                             commit(draft.with(first: $0))
                         }
+                        .lands(landed, order: 0)
                         hourRow("Last reminder", hour: draft.last, choices: Self.lastHours(for: draft)) {
                             commit(draft.with(last: $0))
                         }
-                        intervals
-                        days
+                        .lands(landed, order: 1)
+                        intervals.lands(landed, order: 2)
+                        days.lands(landed, order: 3)
                         if draft != .standard {
-                            standardButton
+                            standardButton.lands(landed, order: 4)
                         }
                     }
                     .padding(.horizontal, ScreenMetrics.margin)
@@ -65,6 +72,7 @@ struct ReminderScheduleSheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(Haptics.select, trigger: picks)
+        .tracksLanding($landed)
         // Seeded through `init`, re-read from the model (rule `50-views`). Today only the sheet writes the
         // schedule while it is open, so its own write comes back equal to `draft` and changes nothing.
         .onChange(of: manager.reminderSchedule) { _, schedule in

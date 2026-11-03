@@ -79,4 +79,21 @@ struct ArrivalTests {
         #expect(Arrival.opacity(arrived: false, settles: true) == Arrival.hiddenOpacity)
         #expect(Arrival.lift(arrived: false, settles: true, reduceMotion: true) == 0)
     }
+
+    // MARK: Home's water
+
+    /// The app opens with its water rising, once. A tab's turn comes whole, as a return from the background does, because
+    /// neither builds an opening page, and Reduce Motion stands it at today's level.
+    @Test func theWaterRisesOnlyAsTheAppOpens() {
+        #expect(HomeView.openingLevel(0.65, stood: false, settles: true, reduceMotion: false) == 0)
+        #expect(HomeView.openingLevel(0.65, stood: true, settles: true, reduceMotion: false) == 0.65)
+        #expect(HomeView.openingLevel(0.65, stood: false, settles: false, reduceMotion: false) == 0.65)
+        #expect(HomeView.openingLevel(0.65, stood: false, settles: true, reduceMotion: true) == 0.65)
+    }
+
+    /// **The vessel comes whole, then its water rises** (spec M1). Raised with the vessel's own arrival, the water rose
+    /// through a vessel still fading in, and was most of the way up before the glass was there to see (the final review).
+    @Test func theWaterWaitsForItsVesselToArrive() {
+        #expect(HomeView.waterWait >= .seconds(Arrival.delay(order: HomeView.vesselOrder) + Arrival.duration))
+    }
 }

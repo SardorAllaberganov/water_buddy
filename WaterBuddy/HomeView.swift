@@ -192,6 +192,21 @@ struct HomeView: View {
         pace == .onTrack ? "checkmark.circle" : "hourglass"
     }
 
+    /// The level the vessel draws: nothing until the vessel of the page the app opens on has stood whole, then today's, on
+    /// ``Motion/water`` (spec `2026-11-01-premium-look-design.md` D9). A page a turn brings in is whole as it comes
+    /// (``Arrival``), as is one back from the background, which keeps its flag; under Reduce Motion the water stands at
+    /// today's level. The readouts never read this: they say today's figure from the first frame, drawn and spoken.
+    nonisolated static func openingLevel(_ progress: Double, stood: Bool, settles: Bool, reduceMotion: Bool) -> Double {
+        stood || !settles || reduceMotion ? progress : 0
+    }
+
+    /// The vessel's place in the page's arrival: the first section under the header.
+    nonisolated static let vesselOrder = 0
+
+    /// How long after the page has arrived its vessel stands whole, and its water may rise: **the vessel comes whole, then
+    /// the water** (spec M1). Raised with the vessel's own arrival, the water rose through a vessel still fading in.
+    nonisolated static let waterWait: Duration = .seconds(Arrival.delay(order: vesselOrder) + Arrival.duration)
+
     @Environment(DataManager.self) private var manager
     @Environment(PremiumStore.self) private var premium
     @Environment(\.strings) private var strings
@@ -201,6 +216,9 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     /// Whether Home is the page shown, and not the one sliding out after a change of tab.
     @Environment(\.pageIsShown) private var pageIsShown
+    /// Whether Home is the page the app opened on: it settles in, and its water rises
+    /// (``openingLevel(_:stood:settles:reduceMotion:)``).
+    @Environment(\.pageSettlesIn) private var settles
     /// StoreKit's rating request — one of StoreKit's two uses in the product (rule `70-privacy`).
     @Environment(\.requestReview) private var requestReview
 
@@ -237,6 +255,8 @@ struct HomeView: View {
     @State private var undoOffer: UndoOffer?
     /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
     @State private var arrived = false
+    /// Whether the vessel has stood whole since: its water rises after it (``waterWait``).
+    @State private var vesselStood = false
 
     /// Real magnitudes, never a unitless `1`: `@ScaledMetric` resolves through `UIFontMetrics`,
     /// which rounds to the nearest third of a point (rule `65-accessibility`).
@@ -261,7 +281,7 @@ struct HomeView: View {
                     // When the app opens, everything under the header settles in; a page that
                     // slides in is whole as it comes (``Arrival``).
                     header
-                    vessel.arrives(arrived, order: 0)
+                    vessel.arrives(arrived, order: Self.vesselOrder)
                     status.arrives(arrived, order: 1)
                     quickAddRow.arrives(arrived, order: 2)
                 }
@@ -320,6 +340,13 @@ struct HomeView: View {
         // The one page that is not is one returned to before it had finished sliding out — it
         // never left, and its offer is still its own.
         .tracksArrival($arrived)
+        // Cancelled, and so never set, if the page is gone first (rule `43-concurrency`).
+        .task(id: arrived) {
+            guard arrived else { return }
+            do { try await Task.sleep(for: Self.waterWait) } catch { return }
+            guard !Task.isCancelled else { return }
+            vesselStood = true
+        }
     }
 
     private var percentage: Int {
@@ -439,7 +466,7 @@ struct HomeView: View {
     private var vessel: some View {
         GeometryReader { slot in
             WaterVessel(
-                level: manager.progress,
+                level: Self.openingLevel(manager.progress, stood: vesselStood, settles: settles, reduceMotion: reduceMotion),
                 percentage: percentage,
                 volume: manager.currentWater,
                 goal: manager.dailyGoal,

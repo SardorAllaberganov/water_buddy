@@ -74,6 +74,10 @@ struct SettingsView: View {
     /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
     @State private var arrived = false
 
+    /// Whether the page has landed, as a sheet does (``Landing``): what Premium's card waits for to run its lap. Not
+    /// ``arrived``, which rises while the page is still sliding in, so the light ran across a moving page (plan P19).
+    @State private var landed = false
+
     private let scheduler = ReminderScheduler.live()
 
     /// `true` when iOS will not deliver anything, whatever the stored flag says.
@@ -100,7 +104,7 @@ struct SettingsView: View {
                     // `2026-10-21-premium-paywall-and-monthly-design.md` §3.5), which reverses *the
                     // goal leads*.
                     if showsPremium {
-                        PremiumCard { paywall = .settings }
+                        PremiumCard(lit: landed) { paywall = .settings }
                             .arrives(arrived, order: 0)
                             .scrollDepth()
                     }
@@ -167,6 +171,7 @@ struct SettingsView: View {
         .sensoryFeedback(Haptics.confirm, trigger: enables)
         .sensoryFeedback(Haptics.select, trigger: exportOpens)
         .tracksArrival($arrived)
+        .tracksLanding($landed)
         .task { await readSystemState() }
         .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
         .sheet(item: $exporting) { export in ExportSheet(export: export) }
@@ -775,13 +780,17 @@ private struct ExportCard: View {
 /// Premium's card, first on the screen where the paywall is offered (spec
 /// `2026-10-21-premium-paywall-and-monthly-design.md` §3.5). While nothing is held: what Premium adds
 /// and the way in, on the screen's one primary surface, with Premium's rim. Once something is: the
-/// plan held, and Apple's manage sheet for a subscription.
+/// plan held, and Apple's manage sheet for a subscription. Both forms carry the rim: the held one is the card that was
+/// paid for (plan P5).
 private struct PremiumCard: View {
 
     @Environment(PremiumStore.self) private var premium
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Once up, the rim runs its lap (``PremiumRim``).
+    let lit: Bool
 
     /// Opens the paywall.
     let open: () -> Void
@@ -820,7 +829,7 @@ private struct PremiumCard: View {
         }
         // `.frosted` and `.raised`, matching every sibling on this screen, and Premium's rim.
         .settingsCard()
-        .premiumRim()
+        .premiumRim(lit: lit)
     }
 
     /// The card's name. At the accessibility sizes it is a lockup of two lines, each kept whole and
@@ -893,8 +902,9 @@ private struct PremiumCard: View {
                 }
             }
         }
-        // `.frosted` and `.raised`, matching every sibling on this screen.
+        // `.frosted` and `.raised`, matching every sibling on this screen, and Premium's rim.
         .settingsCard()
+        .premiumRim(lit: lit)
     }
 
     /// The reminders card's capsule — glass: managing is not the screen's main action.
