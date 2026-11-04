@@ -538,6 +538,10 @@ word. Spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`, plan `docs
 *(2026-11-04, evening: **phase 1 staged on `release/1.4`, not committed** — the text, `README.md`, the support page, the harness's two
 new shots and build 5, gated on 27.0 and 26.5. Phase 2, the capture, waits for 8 November: the store method refuses a run before the
 8th. Upload stays the owner's: the live pages, App Store Connect's products, a real purchase and the HealthKit capability.)*
+*(2026-11-05, read from `git log` by the hundred-and-fifteenth pass: **phase 1 committed and pushed**, five commits at 22:14 on
+2026-11-04, `bd1d7eb` to `ea67781`. Before the capture, *One finish*'s four minors are polished on the same branch, on the owner's
+choice *Polish 1.4 before Sunday* — #221–#224, spec `docs/superpowers/specs/2026-11-04-polish-1-4-design.md`, plan
+`docs/superpowers/plans/2026-11-04-polish-1-4.md` — staged, not committed, its gate part-run.)*
 
 ## 6. Release 1.5 — more to log, more people
 

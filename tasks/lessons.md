@@ -5725,3 +5725,61 @@ bound to 127.0.0.1, the page opened in the simulator's Safari, and `simctl ui �
 **The rule:** render a page for a phone in a simulator's Safari over a server bound to 127.0.0.1, and stop the server and the device
 when done. And a command wrapped in `bash -c` is refused by the built-in removal check, which cannot read the script: pass plain
 commands.
+
+## 2026-11-04 — A pixel comparison proves its render repeats before it compares
+
+**What happened.** `theGlyphDoesNotGrowWithTheTextSize` failed on iOS 18.6 for a release, recorded as "18.6 draws the glyph
+differently" (#221). It compared two PNGs, `.large` against `.accessibility5`. A probe rendered the same button twice at `.large`: 13,399
+pixels apart. Below iOS 26 the pane is the hand-made stack over a `Material`, which an `ImageRenderer` cannot draw; it came back a
+grey of a different shade each time. The ✕, the test's subject, never moved. The test's message blamed the text size for what the
+renderer did.
+
+**The rule:** a test that compares two renders first asserts that two renders of the same input are equal, with a message that names
+the renderer, as a suite that reads a bundle first proves it resolved. Anything an `ImageRenderer` draws must stay off a `Material`:
+`.flat`, or the opaque fill under Reduce Transparency.
+
+## 2026-11-04 — An issue read in the code is a hypothesis until a recording reads it
+
+**What happened.** #224 said a month's page turn would fade a few old rings out, reading positional cells and the card's
+`.smooth(0.3)`. It said so itself: "read in the code, not off a recording". Recorded on three systems and read frame by frame, every
+turn swapped the whole month between two frames. The fix it proposed, `.transition(.identity)`, would have been a change no recording
+could show working.
+
+**The rule:** before fixing an issue written from the code, record the case it names. If it does not reproduce, retire it with the
+recording, and say what the recording did not cover, here a six-week month.
+
+## 2026-11-04 — BSD sed has no `\s`, so the gate's first chunk ran nothing
+
+**What happened.** The UI chunks' test lists were cut from the sources with `sed -E 's/^\s*func (test…).*/\1/'`. macOS's `sed` does
+not read `\s`, so each line kept `func … throws {`, and `xcodebuild` stopped at *Unknown build action 'func'*. Nothing ran;
+`[[:space:]]` fixed it.
+
+**The rule:** in `grep -E` and `sed -E` on this Mac, write `[[:space:]]`, never `\s`, and read a generated list, or check it with a
+pattern for a well-formed line, before a gate runs from it.
+
+## 2026-11-04 — A gate chunk that fails sits in `simctl diagnose` too
+
+**What happened.** The first UI chunk finished its seven tests in six minutes, one a known flake, and then held its call past 600 s
+collecting diagnostics. The lesson of 2026-11-04 names `-collect-test-diagnostics never` for alone and A/B runs; a chunk is neither,
+so the plan left it out. I stopped my own run once its results were in the log.
+
+**The rule:** pass `-collect-test-diagnostics never` to every gate chunk too. The result is in the log; the diagnostics of a recorded
+flake are ten minutes of load bought for nothing.
+
+## 2026-11-04 — A probe's late answer was spent before the moment it was for
+
+**What happened.** To show a Premium card arriving after its page had landed, a scratch copy held StoreKit's first read back 30 s. The
+welcome took about 70 s under load, so the read had answered before Settings opened, and the recording showed an ordinary turn. A
+150 s hold, and a probe that asserted the card was absent when Settings opened, showed the case.
+
+**The rule:** a probe that delays something to reach a state asserts the state before it records, and makes the delay outlast the
+slowest thing before it, here the welcome under load.
+
+## 2026-11-05 — A row inserted into a table took its neighbour's notes
+
+**What happened.** The *Files on disk* row for `PremiumRimTests.swift`, written on 2026-11-01 and committed in `a40dfef`, had been
+inserted inside
+`PremiumAccessTests.swift`'s row, after its newest note: the older notes, back to 2026-10-21, ran on after the rim's row, so it read as
+the history of a file it was not. The hundred-and-fifteenth pass moved them back.
+
+**The rule:** insert a row at a line boundary, and read the two rows on either side once it is written.

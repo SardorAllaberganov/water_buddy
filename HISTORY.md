@@ -15053,3 +15053,78 @@ Not run again: no code changed since this session's gate, recorded in the checkp
 again once their blocks were written. **No `git commit` was run.** On `release/1.4`, not pushed, HEAD `27aa510`, 253 commits:
 **19 staged**, 2 added and 17 modified — the same nineteen as the checkpoint above — **6 unstaged**, the six the tree already
 carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-05] — Release 1.4 polished before the capture: #221–#224 closed and staged; the hundred-and-fifteenth `/doc_sync`, mid-gate
+
+Taken by `/start_task` with no task named, on the owner's choice *Polish 1.4 before Sunday* (2026-11-04): *One finish*'s four minors,
+closed on `release/1.4` before phase 2's capture. Spec `docs/superpowers/specs/2026-11-04-polish-1-4-design.md`, approved ("ok"); plan
+`docs/superpowers/plans/2026-11-04-polish-1-4.md`, approved ("go"), run inline. The owner ran `/doc_sync` while the gate was held for
+another session, so this checkpoint records a gate part-run.
+
+### The rulings
+
+The owner's: the task, the spec, the plan. Mine, in the spec: D1 fix #221 in the test, by Reduce Transparency; D2 the spec's 1.9 s; D3
+the slide's own end, from `PageTurn`; D4 retire #224 with no code; D5 three commits by subject. In the run, each in the ledger with its
+cost: no worktree (D7 of the release spec makes `release/1.4` the branch); completion lines by hand, since `task-done` wraps
+`xcodebuild` in a script; staging for the plan's commit steps; no Reduce Motion recording, the gate on the light being unchanged; the
+chunk lists regenerated after `\s`; chunk 1's diagnostics stopped; and a quiet window granted to WareStack's session at 23:41, its
+gate having lost two tests to load — all simulator, UI and build work held until its word or 00:31.
+
+### What was found, before any fix
+
+In `git checkout-index` copies of `ea67781` in the scratchpad, never in the tree:
+- **#221:** on *iPhone 16* (18.6), the ✕ alone and the ✕ in its button were the same pixels at every size and on every render; the
+  glass alone differed by 13,912 pixels **between two `.large` renders**. An `ImageRenderer` cannot draw the hand-made stack's
+  `Material`; it drew a grey of a new shade each time. The test was comparing noise.
+- **#222:** `lapDuration × laps`, 3.0 s, against spec M6's 1.9 s.
+- **#223:** read in the code — the lap waited 350 ms from the build against a 450 ms slide, and a card inserted after the flag had no
+  change to animate.
+- **#224:** recorded on 18.6, 26.5 and 27.0, November ↔ October and once 0.25 s into the draw, and read frame by frame: the old month
+  is gone between two frames 15–46 ms apart on every turn. It does not happen.
+
+### What changed
+
+- `WaterBuddyTests/SheetCloseButtonTests.swift` — two `.large` renders must match first; both render under
+  `_accessibilityReduceTransparency` (#221).
+- `WaterBuddy/PremiumRim.swift`, `WaterBuddyTests/PremiumRimTests.swift` — `purchaseDuration` 1.9 and `duration(laps:)`;
+  `aPurchasesLapsTakeTheSpecsTime` (#222).
+- `WaterBuddy/PageTurn.swift`, `WaterBuddy/RootTabView.swift`, `WaterBuddy/SettingsView.swift`, `WaterBuddyTests/PageTurnTests.swift` —
+  `hasLanded(_:)`, `pageHasLanded`, Settings reading it, `PremiumCard` keeping its own `lit` raised on landing or on its own arrival;
+  four tests (#223).
+
+### Verification, as actually run
+
+- **RED, then GREEN, each seen:** #221 failed on 18.6 at the new determinism line, then passed on 18.6, 26.5 and 27.0; #222 failed at
+  `3.0 == 1.9`, then `PremiumRimTests` 5 of 5; #223's two landing tests failed on a `tab == shown` stub, then `PageTurnTests` 17 of
+  17; `PremiumUITests`' card tests 2 of 2.
+- **Recordings, *iPhone 17* (27.0), read frame by frame:** `ea67781`'s light on the card's right edge with the card about 20 pt short
+  of its place; this build's first light as the page comes within a point of rest; a card held back 150 s (scratch only) lapping as
+  it appears.
+- **The gate**, on a `git checkout-index` copy of the index, built clean: **phone unit 27.0, 1112 passed in 122 suites**; **UI 27.0,
+  chunk 1 of 13**, 7 executed, 1 skipped by design, 1 failure — #209's lapsed holder's test, not yet run alone.
+- **Not run yet:** UI chunks 2–13 on 27.0, the watch tests, both widget builds, UI on 26.5, phone unit on 18.6, and the warnings
+  against `ea67781`. A device: not this work's.
+
+### Drift found and fixed by the sync
+
+- `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`: phase 1 said *staged, not committed*; `git log` reads it committed and pushed at 22:14 on
+  2026-11-04, five commits, `bd1d7eb` to `ea67781`.
+- `docs/AI_CONTEXT.md`: `PremiumRimTests.swift`'s *Files on disk* row carried `PremiumAccessTests.swift`'s notes from 2026-10-31 back
+  to 2026-10-21, split off when the rim's row was inserted (`a40dfef`); moved back.
+
+### Checked and already accurate
+
+137 `.swift` files by `find`, each with a row, every Swift row's count matching `wc -l`; 1112 phone `@Test`, 71 watch, 75 UI
+`func test`; three exception sets; 16 keys on `DataManager.Key`; every rule citation resolves; `docs/ARCHITECTURE.md`,
+`docs/CAPABILITIES.md` and `docs/dependencies.md` do not exist. `CLAUDE.md` names nothing this work moved.
+
+### Files touched by the sync
+
+`docs/AI_CONTEXT.md` (*Current state*, seven *Files on disk* rows and the split one, #221–#224 retired, the Git block), `docs/DESIGN.md`
+(two rows), `docs/ROADMAP.md` (a note), `tasks/lessons.md` (six entries), this file. `docs/STATE.md`, `docs/WIDGET.md`: nothing in their
+subjects moved, *Last updated* kept.
+
+**Staging.** Read from the commands at 00:03 on 2026-11-05, after the `git add` of seven paths by name, and again once this file's and
+`docs/AI_CONTEXT.md`'s blocks were written. **No `git commit` was run.** On `release/1.4`, level with `origin/release/1.4`, HEAD
+`ea67781`, 258 commits: **14 staged**, 2 added (the spec and the plan) and 12 modified — the seven code files and five records —
+**6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.

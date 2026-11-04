@@ -7,6 +7,10 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-05, after midnight (hundred-and-fifteenth pass — `/doc_sync` run by the owner during the polish of 1.4's
+gate). *One finish*'s table: a purchase's laps take 1.9 s (#222), and Settings' lap waits for the slide's end (#223). No colour moved
+and no pair was measured.
+
 **Last updated:** 2026-11-03, morning (hundred-and-eleventh pass — `/doc_sync` run in Task 19 of *One finish*, after stage 5 and the
 final review's fixes). *One finish* gains Settings' lap, `HomeView.waterWait` and a rolling figure's width, and a note on stage 5. No
 colour moved and no pair was measured.
@@ -2561,11 +2565,11 @@ motion reads as nothing (`tasks/lessons.md`, 2026-10-12). None of it is felt yet
 | `Motion.popStagger` | 0.022 s | what pops in, on `Motion.pop` since stage 3 (on `Motion.land` before it) |
 | `Motion.popResponse` / `popDamping` | 0.38 s / 0.43 | a dot's pop: past its size by 22%, `exp(−πζ/√(1−ζ²))`, then back; `land` overshoots 5.4%, 1.4 pt on a 25.6 pt dot, which reads as nothing |
 | `Motion.rollDuration` | 0.8 s | a figure rolling once, by `numericText()` |
-| `PremiumRim.lapDuration` / `purchaseLaps` | 1.5 s / 2 | one lap of white light, 2.4 pt wide over the 1.5 pt rim, gone at both ends |
+| `PremiumRim.lapDuration` / `purchaseLaps` / `purchaseDuration` | 1.5 s / 2 / 1.9 s | one lap of white light, 2.4 pt wide over the 1.5 pt rim, gone at both ends; a purchase's two laps together in spec M6's 1.9 s, 0.95 s a lap, ending 0.4 s after its 1.5 s of confetti (`duration(laps:)`, #222, 2026-11-04; 3.0 s before) |
 | `PaywallStyle.heldInset` | 28 pt | above and below the words on the held card |
 | `HistoryView.insightsWait` | 600 ms | from Insights' lead pane's row arriving to its lap and the rise under it: measured, below |
 | a chosen plan's tile | 1.03, on `Motion.land` | it stands forward; 3% of about 110 pt is 3 pt, and it is the tile's rim and fill that say *chosen* |
-| Settings' Premium lap | `Landing.wait`, 350 ms | after the page is built, not `Arrival.hiddenFirst`'s 50 ms: the slide takes `Motion.pageDuration`, 450 ms (#223) |
+| Settings' Premium lap | the slide's end | `pageHasLanded`, from `PageTurn.hasLanded(_:)`: no page still leaving, which `settle(_:)` decides from the slide's own completion. Read on *iPhone 17* (27.0): the first light as the page comes within a point of rest, about 0.8 s after the turn; a card StoreKit's late read inserts laps as it appears (#223, 2026-11-04). It waited `Landing.wait`, 350 ms from the build, until then, and came up over the slide's last 20 pt |
 | `HomeView.waterWait` | 0.4 s | `Arrival.delay(order: 0) + Arrival.duration`, after the page arrives: the vessel stands whole, then its water rises from empty on `Motion.water`, about 80 pt at 38% on an *iPhone 17* |
 | a rolling figure's width | the wider of its two ends | from the first frame, so *0 days* rolling to *1 day* is never cut and a row never flips |
 
