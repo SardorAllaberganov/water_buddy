@@ -34,4 +34,12 @@ struct PremiumRimTests {
         #expect(PremiumRim.lapDuration >= 1)
         #expect(PremiumRim.purchaseLaps > 1)
     }
+
+    /// A purchase's two laps take spec M6's 1.9 s, ending with its 1.5 s of confetti, and still run longer than a
+    /// pane's one lap, which keeps its pace (known issue #222).
+    @Test func aPurchasesLapsTakeTheSpecsTime() {
+        #expect(PremiumRim.duration(laps: PremiumRim.purchaseLaps) == 1.9)
+        #expect(PremiumRim.duration(laps: PremiumRim.purchaseLaps) > PremiumRim.lapDuration)
+        #expect(PremiumRim.duration(laps: 1) == PremiumRim.lapDuration)
+    }
 }

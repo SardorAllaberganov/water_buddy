@@ -27,6 +27,15 @@ struct PremiumRim: ViewModifier {
     /// A purchase's laps: the largest moment the app has.
     nonisolated static let purchaseLaps = 2
 
+    /// How long a purchase's laps take together: quicker than a pane's pace, so the light ends with the
+    /// purchase's 1.5 s of confetti (spec `2026-11-01-premium-look-design.md`, M6; known issue #222).
+    nonisolated static let purchaseDuration: Double = 1.9
+
+    /// How long `laps` of light take: a purchase's in their own time, any other count at a lap's pace.
+    nonisolated static func duration(laps: Int) -> Double {
+        laps == purchaseLaps ? purchaseDuration : lapDuration * Double(laps)
+    }
+
     /// The share of a lap the light takes to come up, and to go.
     nonisolated private static let fade: Double = 0.12
 
@@ -58,7 +67,7 @@ struct PremiumRim: ViewModifier {
             .overlay {
                 // Present at nothing while the flag is down, so what animates is a light and not a layer (rule `50-views`).
                 RimLight(turn: lit && !reduceMotion ? Double(laps) : 0, laps: laps)
-                    .animation(lit ? .easeInOut(duration: Self.lapDuration * Double(laps)) : nil, value: lit)
+                    .animation(lit ? .easeInOut(duration: Self.duration(laps: laps)) : nil, value: lit)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
             }
