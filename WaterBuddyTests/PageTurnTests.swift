@@ -149,6 +149,55 @@ struct PageTurnTests {
         #expect(turn.leaving == nil)
     }
 
+    /// The page the app opens on stands from the first frame: no slide brought it.
+    @Test func thePageTheAppOpensOnHasLanded() {
+        let turn = PageTurn()
+        #expect(turn.hasLanded(.home))
+        #expect(!turn.hasLanded(.settings))
+    }
+
+    /// A page turned to lands when its slide has ended, never as it is built: Settings' Premium lap waits for this, and
+    /// a wait counted from the build came up over the slide's last 20 pt (known issue #223).
+    @Test func aPageTurnedToLandsWhenItsSlideEnds() {
+        var turn = PageTurn()
+        turn.turn(to: .settings)
+        #expect(!turn.hasLanded(.settings), "the page landed while it was still sliding in")
+        #expect(!turn.hasLanded(.home))
+
+        turn.settle(turn.turns)
+        #expect(turn.hasLanded(.settings))
+        #expect(!turn.hasLanded(.home))
+    }
+
+    /// An older slide's end does not land the page a newer turn is still bringing in.
+    @Test func anOlderSlidesEndDoesNotLandANewerPage() {
+        var turn = PageTurn()
+        turn.turn(to: .history)
+        let first = turn.turns
+        turn.turn(to: .settings)
+
+        turn.settle(first)
+        #expect(!turn.hasLanded(.settings))
+
+        turn.settle(turn.turns)
+        #expect(turn.hasLanded(.settings))
+    }
+
+    /// Turned to and left inside one slide: the page leaving never lands, so nothing on it starts.
+    @Test func aPageLeftBeforeItsSlideEndsNeverLands() {
+        var turn = PageTurn()
+        turn.turn(to: .settings)
+        let first = turn.turns
+        turn.turn(to: .home)
+
+        turn.settle(first)
+        #expect(!turn.hasLanded(.settings))
+
+        turn.settle(turn.turns)
+        #expect(!turn.hasLanded(.settings))
+        #expect(turn.hasLanded(.home))
+    }
+
     /// Whichever way the turn went, the pages are listed as the bar lists them. The order is
     /// the views' identity order; one that flipped with the direction would rebuild both.
     @Test func thePagesAreMountedInTheBarsOrder() {

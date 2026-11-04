@@ -61,6 +61,16 @@ nonisolated struct PageTurn: Equatable, Sendable {
         leaving = nil
     }
 
+    /// Whether `tab` has landed: it is the page shown, and no page is still leaving — its slide has ended
+    /// (``settle(_:)``). The page the app opens on has landed at once.
+    ///
+    /// What waits for a page to stand still reads this rather than a time counted from the page's build, which load
+    /// makes late (`tasks/lessons.md`, 2026-11-03): Settings' Premium lap ran over the slide's last 20 pt on
+    /// `Landing.wait` (known issue #223).
+    func hasLanded(_ tab: AppTab) -> Bool {
+        tab == shown && leaving == nil
+    }
+
     /// The pages that exist, in the bar's order whichever way the turn went. The order is the
     /// views' identity order; one that flipped with the direction would rebuild both.
     var mounted: [AppTab] {

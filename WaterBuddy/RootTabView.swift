@@ -153,6 +153,7 @@ struct RootTabView: View {
                         // slides in is whole as it comes (``Arrival``).
                         .environment(\.pageSettlesIn, turn.turns == 0)
                         .environment(\.pageIsShown, tab == turn.shown)
+                        .environment(\.pageHasLanded, turn.hasLanded(tab))
                         // The page shown stands in place; the one leaving is moved a whole width
                         // out the far side, by the same animation that brings the other in.
                         .offset(x: turn.offset(of: tab, across: width, slides: slides))
@@ -308,6 +309,24 @@ extension EnvironmentValues {
     var pageIsShown: Bool {
         get { self[PageIsShownKey.self] }
         set { self[PageIsShownKey.self] = newValue }
+    }
+}
+
+// MARK: - Whether a page has landed
+
+private struct PageHasLandedKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+
+    /// Whether this page has landed: the one shown, once its slide has ended (``PageTurn/hasLanded(_:)``).
+    ///
+    /// For what starts only once the page stands still — Settings' Premium lap, which ran over a page still sliding
+    /// when it waited a sheet's time from the build (known issue #223). `true` for a screen standing alone.
+    var pageHasLanded: Bool {
+        get { self[PageHasLandedKey.self] }
+        set { self[PageHasLandedKey.self] = newValue }
     }
 }
 

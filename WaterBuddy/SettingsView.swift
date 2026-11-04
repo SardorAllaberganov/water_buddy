@@ -74,9 +74,10 @@ struct SettingsView: View {
     /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
     @State private var arrived = false
 
-    /// Whether the page has landed, as a sheet does (``Landing``): what Premium's card waits for to run its lap. Not
-    /// ``arrived``, which rises while the page is still sliding in, so the light ran across a moving page (plan P19).
-    @State private var landed = false
+    /// Whether the page has landed — its slide has ended (``EnvironmentValues/pageHasLanded``): what Premium's card waits
+    /// for to run its lap. Not ``arrived``, which rises while the page is still sliding in, so the light ran across a
+    /// moving page (plan P19), and not a sheet's ``Landing/wait`` from the build, which load shortens (#223).
+    @Environment(\.pageHasLanded) private var landed
 
     private let scheduler = ReminderScheduler.live()
 
@@ -104,7 +105,7 @@ struct SettingsView: View {
                     // `2026-10-21-premium-paywall-and-monthly-design.md` §3.5), which reverses *the
                     // goal leads*.
                     if showsPremium {
-                        PremiumCard(lit: landed) { paywall = .settings }
+                        PremiumCard(landed: landed) { paywall = .settings }
                             .arrives(arrived, order: 0)
                             .scrollDepth()
                     }
@@ -171,7 +172,6 @@ struct SettingsView: View {
         .sensoryFeedback(Haptics.confirm, trigger: enables)
         .sensoryFeedback(Haptics.select, trigger: exportOpens)
         .tracksArrival($arrived)
-        .tracksLanding($landed)
         .task { await readSystemState() }
         .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
         .sheet(item: $exporting) { export in ExportSheet(export: export) }
@@ -789,17 +789,27 @@ private struct PremiumCard: View {
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// Once up, the rim runs its lap (``PremiumRim``).
-    let lit: Bool
+    /// Whether the page has landed. The card runs its lap once it has, or as it appears after that: it is drawn only
+    /// once StoreKit's first read has answered, and a card inserted with its flag already up saw no change to animate,
+    /// so it lost its lap (known issue #223).
+    let landed: Bool
 
     /// Opens the paywall.
     let open: () -> Void
 
+    /// Once up, the rim runs its lap (``PremiumRim``). The card's own, so the lap belongs to its arrival.
+    @State private var lit = false
+
     var body: some View {
-        if let status = premium.state.status, status.isPremium {
-            held(status)
-        } else {
-            offer
+        Group {
+            if let status = premium.state.status, status.isPremium {
+                held(status)
+            } else {
+                offer
+            }
+        }
+        .onChange(of: landed, initial: true) { _, landed in
+            if landed { lit = true }
         }
     }
 
