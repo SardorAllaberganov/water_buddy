@@ -20,9 +20,9 @@ private func listed(_ figure: Int) -> String {
     figure.formatted(.number.locale(Locale(identifier: "en_US")))
 }
 
-/// The eight of the store set's ten iPhone screenshots that the app's own screens make, and the
-/// lived-in week the other two and the watch's three stand on, captured by driving the real app
-/// (spec `2026-10-25-store-page-design.md` §1).
+/// The ten iPhone screenshots the app's own screens make for the store set, and the lived-in week the
+/// pair script's shots stand on, captured by driving the real app (specs
+/// `2026-10-25-store-page-design.md` §1 and `2026-11-04-release-1-4-design.md` §6).
 ///
 /// **This is not a test.** It asserts only what a wrong picture would get wrong and proves nothing
 /// about the product; it is a capture harness that happens to need XCUITest's ability to tap. It
@@ -48,7 +48,7 @@ private func listed(_ figure: Int) -> String {
 /// ## Why it is excluded from the gate
 ///
 /// The store method runs for minutes, and is driven only by `Tools/CaptureScreenshots.sh`, which
-/// pins the status bar and writes its eight PNGs into `Screenshots/`; the lived-in method only by
+/// pins the status bar and writes its ten PNGs into `Screenshots/`; the lived-in method only by
 /// `Tools/CapturePairScreenshots.sh`, on a phone that script made. Rule `85-testing`'s gate carries
 /// `-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` to keep both, and the census below,
 /// out of the ordinary run.
@@ -73,7 +73,8 @@ private func listed(_ figure: Int) -> String {
 /// The free shots are a Release build's free user: the paywall offered (`-WaterBuddyPremium`), so
 /// History draws its *Week · Month · Insights* switch and Settings its Premium card. The Premium
 /// shots are a holder's (`-WaterBuddyPremiumHeld`, a lifetime purchase held by a DEBUG source that
-/// reaches no store). The seed is logged at each launch, so both see the same history; one method,
+/// reaches no store). The holder's launch ends in Settings, on the schedule sheet and the export sheet,
+/// which only a holder opens. The seed is logged at each launch, so both see the same history; one method,
 /// because XCTest gives no ordering guarantee across methods and the welcome's shot must come first.
 ///
 /// ## Why the lived-in week is a method of its own
@@ -278,6 +279,39 @@ final class AppStoreScreenshotUITests: XCTestCase {
         XCTAssertTrue(firstPane.waitForExistence(timeout: 10), "Insights drew no week — the seed's last week holds too little")
         Thread.sleep(forTimeInterval: settle)
         capture("06-insights")
+
+        // ── 11 · the schedule sheet, a quiet day ─────────────────────────────────────────────────
+        // A holder's Schedule row opens the sheet. Sunday is tapped once, so the days show a quiet one —
+        // the holder's own move, written to the fresh start's throwaway suite (spec
+        // `2026-11-04-release-1-4-design.md` D4).
+        held.buttons["Settings"].firstMatch.tap()
+        let schedule = held.buttons["Schedule"]
+        XCTAssertTrue(schedule.waitForExistence(timeout: 10), "Settings draws no Schedule row for a holder")
+        clearOfTheBar(schedule, in: held)
+        tapWhenReady(schedule)
+        XCTAssertTrue(held.buttons["Every 2 hours"].waitForExistence(timeout: 10), "the schedule sheet did not open")
+        tapWhenReady(held.buttons["Sunday"])
+        XCTAssertFalse(held.buttons["Sunday"].isSelected, "Sunday kept its reminders")
+        Thread.sleep(forTimeInterval: settle)
+        capture("11-schedule")
+        let closeSchedule = held.buttons["Done"]
+        closeSchedule.tap()
+        XCTAssertTrue(closeSchedule.waitForNonExistence(timeout: 5), "the schedule sheet did not close")
+
+        // ── 12 · the export sheet ────────────────────────────────────────────────────────────────
+        let export = held.buttons["Export your servings"]
+        XCTAssertTrue(export.waitForExistence(timeout: 10), "Settings draws no export card for a holder")
+        clearOfTheBar(export, in: held)
+        tapWhenReady(export)
+        XCTAssertTrue(
+            held.buttons["Share as a CSV file"].waitForExistence(timeout: 10),
+            "the export sheet did not open — the seed's servings were not read"
+        )
+        Thread.sleep(forTimeInterval: settle)
+        capture("12-export")
+        let closeExport = held.buttons["Done"]
+        closeExport.tap()
+        XCTAssertTrue(closeExport.waitForNonExistence(timeout: 5), "the export sheet did not close")
     }
 
     /// Builds the set's week through History's sheet into the device's own stores, for the widgets and
@@ -807,6 +841,17 @@ extension AppStoreScreenshotUITests {
         app.buttons[tab].tap()
         XCTAssertTrue(proof.waitForExistence(timeout: 5), "\(tab) did not redraw at the top")
         Thread.sleep(forTimeInterval: 0.6)
+    }
+
+    /// Scrolls a Settings control clear of the floating bar's whole frame before it is tapped: XCUITest
+    /// reads a control under the bar's frame as hittable, and the touch goes to the bar
+    /// (`docs/AI_CONTEXT.md` #209) — `ExportUITests` and `CoachingUITests` scroll the same way.
+    @MainActor
+    private func clearOfTheBar(_ element: XCUIElement, in app: XCUIApplication) {
+        let bar = app.tabBars.firstMatch
+        for _ in 0..<6 where !element.isHittable || (bar.exists && element.frame.maxY > bar.frame.minY) {
+            app.swipeUp()
+        }
     }
 
     /// Reveals the swipe action **without** tripping the full swipe, which would delete the serving

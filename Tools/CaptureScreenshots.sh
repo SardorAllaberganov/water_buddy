@@ -1,8 +1,9 @@
 #!/bin/bash
 #
-#  Tools/CaptureScreenshots.sh — eight of the ten iPhone App Store screenshots, English only: the
-#  app's own screens (spec `docs/superpowers/specs/2026-10-25-store-page-design.md` §1). Shots 02 and
-#  04 — the Home Screen and the Lock Screen — and the watch's three are `Tools/CapturePairScreenshots.sh`'s.
+#  Tools/CaptureScreenshots.sh — the ten iPhone App Store screenshots the app's own screens make,
+#  English only (specs `docs/superpowers/specs/2026-10-25-store-page-design.md` §1 and
+#  `2026-11-04-release-1-4-design.md` §6). Shots 02 and 04 — the Home Screen and the Lock Screen — and
+#  the watch's three are `Tools/CapturePairScreenshots.sh`'s; 1.4's set carries none of 02 and 04.
 #
 #  Lives in `Tools/` because that directory sits outside every PBXFileSystemSynchronizedRootGroup
 #  and therefore belongs to no build target (rule `15-project`). It drives
@@ -106,7 +107,7 @@ xcrun simctl ui "$PHONE" appearance dark
 xcrun simctl ui "$PHONE" content_size large
 
 echo "── 3. freeze the status bar ─────────────────────────────────────────────────"
-# The clock is frozen at the time read and checked at the top, so the eight shots read one time, and
+# The clock is frozen at the time read and checked at the top, so the ten shots read one time, and
 # every row under it — the last is at 1:30 PM, and the run starts after 1:45 — is earlier. From
 # 2026-10-09 to 2026-10-18 it was left live, after a 12-hour string drawn over 24-hour rows had
 # contradicted them.
@@ -145,16 +146,16 @@ xcrun xcresulttool export attachments \
   --output-path "$WORK/attachments"
 
 echo "── 6. rename UUID → slot ────────────────────────────────────────────────────"
-# The eight slugs are named explicitly so a partial run fails loudly; 02 and 04 are the pair
+# The ten slugs are named explicitly so a partial run fails loudly; 02 and 04 are the pair
 # script's, and this list leaves them alone. The full census (Tools/CaptureFullCensus.sh)
 # deliberately omits this list, because several of its shots are conditional and a missing one there
 # is a recorded outcome rather than a failure.
 python3 "$ROOT/Tools/RenameScreenshots.py" "$WORK/attachments" "$OUT" \
-  01-home,03-history,05-month,06-insights,07-patterns,08-recap,09-goal-setup,10-settings
+  01-home,03-history,05-month,06-insights,07-patterns,08-recap,09-goal-setup,10-settings,11-schedule,12-export
 
 echo "── 7. verify ────────────────────────────────────────────────────────────────"
 bash "$ROOT/Tools/VerifyScreenshots.sh"
 
 echo
-echo "Done. Eight iPhone screenshots in $OUT"
+echo "Done. Ten iPhone screenshots in $OUT"
 echo "Shots 02 and 04 and the watch's three are a separate, human-driven run: bash Tools/CapturePairScreenshots.sh"
