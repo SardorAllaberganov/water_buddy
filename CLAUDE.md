@@ -402,9 +402,10 @@ something to record.
   English in every language, oldest first, named `WaterBuddy-yyyy-MM-dd.csv`, with no id, goal, streak or time zone. Nothing
   is stored, and `DataManager` does not change (`docs/superpowers/specs/2026-11-01-export-design.md`; rule `70-privacy`'s *The
   export file, on the user's own tap*, committed)
-- **One finish: motion is one language, driven by presentation flags** (the premium look: stages 0–4 of six committed and pushed on
-  `feature/premium-look`, not merged — the parts, export, the paywall, the recap and History; stage 5 — Settings' Premium lap, the
-  schedule sheet's landing, Home's water rising as the app opens — staged with the final review's two fixes, not committed). `Landing` brings a sheet's content
+- **One finish: motion is one language, driven by presentation flags** (the premium look: all six stages committed and pushed on
+  `feature/premium-look`, not merged — the parts, export, the paywall, the recap and History, and stage 5's Settings' Premium lap, the
+  schedule sheet's landing and Home's water rising as the app opens, with the final review's two fixes, `cde7828` and `6924bf1`;
+  release 1.4, everything on that branch, is made ready on `release/1.4`, spec `2026-11-04-release-1-4-design.md`). `Landing` brings a sheet's content
   in once the sheet has landed, `RollingFigure` rolls a hero figure once at the wider of its two ends' widths, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s
   `draw`, `drawn(at:)` and `popped(at:)` draw data — a pop on `Motion.pop`. Each plays once per arrival, stands final under Reduce
   Motion, and no spoken value reads its flag. History's flags live on `HistoryView`, never on a row the `List` recycles; a flag for

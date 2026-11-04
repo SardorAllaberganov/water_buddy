@@ -14963,3 +14963,93 @@ Not run again: no code changed since this session's gate, recorded in the checkp
 again once their blocks were written. **No `git commit` was run.** On `feature/premium-look`, level with
 `origin/feature/premium-look`, HEAD `8208c8d`, 250 commits: **15 staged**, all modified — the same fifteen as the checkpoint above —
 **6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-04] — Release 1.4 made ready, phase 1: the store text, the support page, two new shots and build 5
+
+Taken by `/start_task` with no task named, on the owner's choice *Prepare 1.4 to ship*. Staged on `release/1.4`, not committed.
+
+### The rulings
+
+The owner's, asked up front: **1.4 carries everything on `feature/premium-look`** — Apple Health, set B, export and *One finish*
+beside set A — superseding #193's ruling that `main`'s policy was the 1.4 upload's; and **the store set is retaken, eight shots and two
+new ones**, the schedule sheet and the export sheet. The spec's D3–D9 were mine, approved with it ("ok"); the plan on "yes go". Mine
+during the run, each in the ledger with its cost: two stale README sentences and its layout's entitlement line corrected beyond the
+plan; the support page's lapse sentence made true to the code (going back to the standard schedule stays free); the page rendered in
+the simulator's Safari; `simctl shutdown all` not run, three other projects' simulators being live; and #225 recorded, not a stop.
+
+### What changed
+
+- **The store text** — `README.md`'s *App Store Connect* and `AppStore/1.4/`: promotional text 161/170, keywords 98/100 (`health` for
+  `thirst`), a description of 3987/4000 with an *APPLE HEALTH* section, set B and export, What's New 1060/4000, review notes 2446/4000
+  with a Health paragraph, the in-app purchases' note of 217. App Privacy stays *Data Not Collected*, Health and the export file named.
+- **`README.md`'s product sections**: *What it does*, *Privacy* (HealthKit and the app's second entitlement), *Before you submit* (the
+  HealthKit capability, #192; the policy to publish; the shots to wait for).
+- **`Tools/Support.html`**: the schedule, an *Apple Health* section of four answers, export, the Premium list, deleting data.
+- **The harness**: the held launch ends on `11-schedule` (*Sunday* tapped quiet) and `12-export`; `CaptureScreenshots.sh` names ten.
+- **Build 5** on fourteen sites.
+
+### Verification, as actually run
+
+- **The text:** a checker held every field to the spec's blocks, the README and the file — RED first, then GREEN. Each new claim read
+  against the code (`HealthMirror.swift:225`, `ReminderPlan.swift:283`, `ServingsExport.headings`, `SettingsView`'s paywall routes).
+- **The page:** in the iPhone 17 (26.5) simulator's Safari, light and dark, wrapping at its width; it fetches nothing.
+- **Build 5:** `1.4 (4)` read from the four built products, then `1.4 (5)` from all four.
+- **The gate**, on a `git checkout-index` copy of the index, WareStack's soak paused for the tests:
+  - phone unit **1107 passed in 122 suites**; watch **71 in 7**; both widget schemes built;
+  - UI 27.0 **87 executed, 1 skipped, 3 failures** — #215 and the *Undo* pair's speed guards — each passed alone;
+  - UI 26.5 **87 executed, 1 skipped, 6 failures** — five lost taps (#191) and new #225 — each passed alone; #225 also failed alone
+    once, and `27aa510`'s build passed it 3 of 3, alternating;
+  - warnings **20, 17, 2 and 17**, by file and message, unchanged against clean builds of `27aa510`.
+- **Not run:** the store capture, which refuses before the 8th; the 18.6 runtime; a device.
+
+### Drift found and fixed by the sync
+
+`CLAUDE.md`, `docs/ROADMAP.md` and `docs/AI_CONTEXT.md`'s *Current state* said *One finish*'s stage 5 was staged and not committed;
+`git log` reads it committed and pushed at 00:41 today (`cde7828`, `6924bf1`, `27aa510`).
+
+### Found about my own work
+
+I did not read `tasks/lessons.md` at the start. Most edits went through Python replace scripts rather than Edit, and five commands
+wrapped `xcodebuild` in a `for` loop — both against the lessons of 2026-11-01 and 2026-11-03. Nothing was refused and every change is
+in the diff; the lesson is written, and the rest of the work uses Edit and one `xcodebuild` to a call. A `bash -c` wrapper was refused
+by the built-in removal check; I reported it and passed plain commands.
+
+### Files touched by the sync
+
+`CLAUDE.md`, `HISTORY.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md`. `docs/STATE.md`, `docs/WIDGET.md` and
+`docs/DESIGN.md`: nothing in their subjects moved, *Last updated* kept.
+
+**Staging.** Read from the commands at 21:50 on 2026-11-04, after the `git add` of five records by name, and again once this file's
+and `docs/AI_CONTEXT.md`'s blocks were written. **No `git commit` was run.** On `release/1.4`, not pushed, HEAD `27aa510`, 253
+commits: **19 staged**, 2 added (the spec and the plan) and 17 modified — **6 unstaged**, the six the tree already carried; no
+untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-04] — The hundred-and-fourteenth `/doc_sync`: no drift; nothing moved since the hundred-and-thirteenth
+
+The owner ran `/doc_sync` again on the tree the last pass left, two minutes after it. No commit since, and every staged file equals the
+working tree.
+
+### Checked and already accurate
+
+- 137 `.swift` files by `find`, 139 in the index with the two in `Tools/`, nothing untracked; every Swift file has a *Files on disk* row,
+  and `AppStoreScreenshotUITests.swift`'s count, 866, is current.
+- 1107 phone `@Test`, 71 watch, 75 UI `func test`, as the records say.
+- Three exception sets of six files each in `project.pbxproj`; 16 keys on `DataManager.Key`; every rule citation resolves;
+  `docs/ARCHITECTURE.md`, `docs/CAPABILITIES.md` and `docs/dependencies.md` do not exist.
+
+### Drift found and fixed
+
+None.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (a *Last updated* block and the Git block) and this file.
+
+### Gate
+
+Not run again: no code changed since this session's gate, recorded in the checkpoint above.
+
+**Staging.** Read from the commands at 21:53 on 2026-11-04, after the `git add` of this file and `docs/AI_CONTEXT.md` by name, and
+again once their blocks were written. **No `git commit` was run.** On `release/1.4`, not pushed, HEAD `27aa510`, 253 commits:
+**19 staged**, 2 added and 17 modified — the same nineteen as the checkpoint above — **6 unstaged**, the six the tree already
+carried; no untracked file, none in both; one stash, `stash@{0}`.

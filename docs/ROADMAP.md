@@ -528,6 +528,16 @@ haptics, and the full gate.)*
 lap in both forms, the schedule sheet's landing, Home's water rising as the app opens, and a rolling figure that never cuts its start.
 Every task of the plan is done; the full gate ran on 27.0 and the UI suite whole on 26.5. Stages 4 and 5 are on the owner's iPhone;
 D9, the water, is theirs to keep or strike.)*
+*(2026-11-04, read from `git log` by the hundred-and-thirteenth pass: **stage 5 and the final review's two fixes committed and pushed**,
+`cde7828` and `6924bf1`, with the sync `27aa510`, at 00:41; not merged. *One finish* is complete.)*
+
+**Release 1.4, made ready to ship.** *(Added 2026-11-04, on the owner's choice *Prepare 1.4 to ship*.)* 1.4 carries everything on
+`feature/premium-look` — 1.3.3, set A, set B, 1.4.4 and *One finish* — and the store page is brought up to it: the text, the support
+page, ten fresh iPhone shots with the schedule and export sheets added, and build 5; then `main` fast-forwards to it on the owner's
+word. Spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`, plan `docs/superpowers/plans/2026-11-04-release-1-4.md`.
+*(2026-11-04, evening: **phase 1 staged on `release/1.4`, not committed** — the text, `README.md`, the support page, the harness's two
+new shots and build 5, gated on 27.0 and 26.5. Phase 2, the capture, waits for 8 November: the store method refuses a run before the
+8th. Upload stays the owner's: the live pages, App Store Connect's products, a real purchase and the HealthKit capability.)*
 
 ## 6. Release 1.5 — more to log, more people
 

@@ -5678,3 +5678,50 @@ Before running it I read the callers: the store method already waits 3 s before 
 shares the helper, times its confetti shot 0.55 s after a pour. The sleep would have shot the confetti after the burst.
 
 **The rule:** before changing a shared helper on a plan's word, grep its callers and read what each already does around the call.
+
+## 2026-11-04 — I edited through Python scripts and looped `xcodebuild`, against three lessons I had not read
+
+**What happened.** Release 1.4's phase 1. I did not read this file at the session's start, as `CLAUDE.md` asks, and wrote a plan
+whose first task copied the store blocks into their files with a Python heredoc. I then made most of the session's edits the same way:
+`README.md`, `AppStore/1.4/`, the support page, the harness, `CaptureScreenshots.sh`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and
+`CLAUDE.md`, each through a Python replace with an exactly-once check, not Edit. And I wrapped `xcodebuild` in `for` loops: the base's
+two watch builds, two GoalSetup chunks (which together ran past 600 s), the A/B alternation and two alone runs. Nothing was refused.
+Each is what the lessons of 2026-11-01 and 2026-11-03 ask against; I found them at the doc sync, after the work.
+
+**The rule:** before writing a plan, read every `**The rule:**` line here (`grep -n '^\*\*The rule' tasks/lessons.md`), and write the
+plan's steps in the tools they name: Write for a new file or one whose bytes must be exact (Write adds no newline of its own), Edit for
+every change, one `xcodebuild` per call.
+
+## 2026-11-04 — zsh does not split an unquoted variable, so a chunk ran no tests
+
+**What happened.** A GoalSetup chunk built its `-only-testing:` list into `$ARGS` and printed *Executed 0 tests*: zsh passed the seven
+flags to `xcodebuild` as one argument. `${=ARGS}` splits it.
+
+**The rule:** in zsh, expand a built argument list as `${=ARGS}`, and read *Executed N tests* against the chunk's size before reading its
+result.
+
+## 2026-11-04 — Nine UI tests overran a 600-second call; seven fit
+
+**What happened.** At 25–110 s a test, at loads of 10–110, `WelcomeUITests`' thirteen and `PremiumUITests`' nine each ran past 600 s
+and were moved to the background. Seven tests took 80–310 s.
+
+**The rule:** a UI chunk on this machine is at most seven tests, one chunk to a call.
+
+## 2026-11-04 — A run past 600 s after a failure was `simctl diagnose`, not a hang
+
+**What happened.** A single failing UI test, run alone, held its call past 600 s. `pgrep` showed `xcodebuild` running
+`simctl diagnose`, collecting diagnostics for about ten minutes. The 2026-11-03 lesson already says to pass
+`-collect-test-diagnostics never` to runs measuring a flake.
+
+**The rule:** pass `-collect-test-diagnostics never` to every alone run and A/B run, and `pgrep -fl xcodebuild` before calling a long
+run hung.
+
+## 2026-11-04 — A web page at a phone's width: the simulator's Safari, over 127.0.0.1
+
+**What happened.** The support page had to be seen at about 390 pt. Headless Chrome cut every line, old and new, at its minimum window
+width of about 500 px, and `simctl openurl` with a `file://` URL opened *Save to Files*, not Safari. Served by `python3 -m http.server`
+bound to 127.0.0.1, the page opened in the simulator's Safari, and `simctl ui … appearance` gave light and dark.
+
+**The rule:** render a page for a phone in a simulator's Safari over a server bound to 127.0.0.1, and stop the server and the device
+when done. And a command wrapped in `bash -c` is refused by the built-in removal check, which cannot read the script: pass plain
+commands.
