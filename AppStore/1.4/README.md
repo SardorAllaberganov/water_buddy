@@ -1,4 +1,4 @@
-# WaterBuddy 1.4 (build 4) — the App Store upload
+# WaterBuddy 1.4 (build 5) — the App Store upload
 
 Everything the 1.4 version page asks for, in one place. Copied on **2026-10-28** from the main
 `README.md`'s *App Store Connect* section and from `Screenshots/en-US/` (the store set retaken on
@@ -12,34 +12,41 @@ without a newline, so the paste is exact. Every count below was computed from th
 - [ ] **The privacy policy is live** (#159). Its contact address is filled in (2026-10-29). Publish
       `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your
       `SardorAllaberganov.github.io` repository, and open
-      `https://sardorallaberganov.github.io/waterbuddy/privacy/` to see it load.
+      `https://sardorallaberganov.github.io/waterbuddy/privacy/` to see it load — the branch's policy,
+      which describes Apple Health.
 - [ ] **Premium exists in App Store Connect** (#155): the Paid Apps Agreement with banking and tax,
       then the three products — step by step in [`in-app-purchases.md`](in-app-purchases.md).
 - [ ] **One real purchase** (#156): a sandbox purchase, a restore and a refund on a real iPhone.
 - [ ] **The support page is live.** Written as `Tools/Support.html` (2026-10-29): publish it as
       `waterbuddy/support/index.html` in the same repository, and open
       `https://sardorallaberganov.github.io/waterbuddy/support/` to see it load.
+- [ ] **The HealthKit capability on the App ID** (#192): `sardor.WaterBuddy` needs it in the developer
+      portal — automatic signing adds it when Xcode next signs for a device — and the distribution
+      profile must carry it before an archive, or the upload is refused.
 
 ## 2. The version page
 
 | Field | File | Count |
 |---|---|---|
-| What's New in This Version | [`whats-new.txt`](whats-new.txt) | 830 / 4000 |
-| Promotional Text | [`promotional-text.txt`](promotional-text.txt) | 164 / 170 |
-| Description | [`description.txt`](description.txt) | 3992 / 4000 |
+| What's New in This Version | [`whats-new.txt`](whats-new.txt) | 1060 / 4000 |
+| Promotional Text | [`promotional-text.txt`](promotional-text.txt) | 161 / 170 |
+| Description | [`description.txt`](description.txt) | 3987 / 4000 |
 | Keywords | [`keywords.txt`](keywords.txt) | 98 / 100 |
 | Support URL | `https://sardorallaberganov.github.io/waterbuddy/support/` — live first (section 1) | |
 | Marketing URL | optional | |
 | Copyright | `2026 Sardor Allaberganov` | |
-| Build | **1.4 (4)** | |
+| Build | **1.4 (5)** | |
 | In-App Purchases and Subscriptions | select **all three** products | |
-| App Review notes | [`review-notes.txt`](review-notes.txt) — sign-in **not** required, no demo account | 1998 / 4000 |
+| App Review notes | [`review-notes.txt`](review-notes.txt) — sign-in **not** required, no demo account | 2446 / 4000 |
 | App Review contact | Sardor Allaberganov, `sardorallaberganov96@gmail.com`, 🔴 your phone | |
 
 What's New is written against **1.1**, which is live. Promotional Text can be changed later
 without a new build.
 
 ## 3. Screenshots — delete the old ones first, then drag these in name order
+
+**The ten shots below are taken from 8 November; until then this folder holds the 2026-10-26 eight —
+do not upload them.**
 
 Delete every shot already in Connect — 1.1's, and any 6.5″ ones left from 1.0 — since they show the
 old app. Fill **only the 6.9″ well**: Connect scales it down for the smaller iPhones. Only the first

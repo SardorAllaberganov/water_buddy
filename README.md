@@ -30,11 +30,15 @@ No account. No server. No analytics. No third-party dependencies of any kind.
 - **Siri** — *Log water in WaterBuddy* and *How much water today in WaterBuddy*, English and Russian.
 - **Apple Watch app** — Cup, Glass and Bottle on the wrist; works offline and syncs when the phone is
   in range. Three complications: circular, rectangular and corner.
-- **Optional reminders** — every two hours from 9 AM to 9 PM, skipped if you drank in the hour
-  before one, silenced for the rest of the day once the goal is reached, with a *Log a Glass* button.
+- **Optional reminders** — every two hours from 9 AM to 9 PM, or on Premium's own schedule, skipped if
+  you drank in the hour before one, silenced for the rest of the day once the goal is reached, with a
+  *Log a Glass* button.
+- **Apple Health** (optional, off until turned on in Settings) — every serving written to Health as
+  Water, corrected and deleted with it. Nothing is read from Health.
 - **WaterBuddy Premium** (optional; monthly, yearly or lifetime through StoreKit) — month view and full
   history, patterns, weekly personal insights (worded on the device by Apple's on-device model where
-  it is available), and a monthly recap to share as an image. Logging is never locked.
+  it is available), a monthly recap to share as an image, your own reminder schedule, a pace line,
+  reminders only when behind, and every serving exported as a CSV file. Logging is never locked.
 - **English, Russian and Uzbek**, switchable in-app, applied immediately.
 
 ## Requirements
@@ -175,7 +179,7 @@ baseline*; closing it is tracked as known issue #29.
 `Tools/` holds a capture harness. Nothing in it is compiled into any target.
 
 ```bash
-bash Tools/CaptureScreenshots.sh                      # the 8 iPhone shots, 6.9" (1:45–11:45 PM, from the 8th)
+bash Tools/CaptureScreenshots.sh                      # the 10 iPhone shots, 6.9" (1:45–11:45 PM, from the 8th)
 bash Tools/CapturePairScreenshots.sh setup            # a new phone + watch pair, a lived-in week on it
 bash Tools/CapturePairScreenshots.sh shoot <name>     # 01-wrist; also 02-widgets, 04-lock-screen and the two
                                                       #   faces, once a person has placed each in DeviceHub —
@@ -202,11 +206,15 @@ the pair script deletes and remakes only the two simulators it names.
 
 - No account, no sign-up, no server, no cloud.
 - No analytics, no tracking, no ads, no third-party SDKs. There is **no networking code in the app at
-  all** — `URLSession`, `Network`, `CloudKit`, `HealthKit`, `CoreLocation` and every third-party SDK
-  are banned by rule and absent in fact.
-- The only entitlement on any target is the App Group. `WatchConnectivity` needs none.
-- Data leaves the device only between the user's own paired iPhone and Apple Watch — and a monthly
-  recap image, only when the user shares it through the system share sheet.
+  all** — `URLSession`, `Network`, `CloudKit`, `CoreLocation` and every third-party SDK are banned by
+  rule and absent in fact.
+- **Apple Health** is the one framework of that kind admitted: `HealthKit`, imported in one file of the
+  app, writes Water when the user turns *Apple Health* on, and reads nothing (rule `70-privacy`).
+- The App Group is the only entitlement on the widget and the watch; the app's also carries
+  `com.apple.developer.healthkit`. `WatchConnectivity` needs none.
+- Data leaves the device only between the user's own paired iPhone and Apple Watch, into Apple Health
+  on the user's switch, and as a monthly recap image or a CSV export, only when the user shares it
+  through the system share sheet.
 - **Premium** is bought from Apple through StoreKit; the paid state is read from StoreKit and kept in
   memory, never stored or sent. **Insights** are decided by the app; where Apple's on-device model
   words them, it runs on the iPhone (`FoundationModels`, `SystemLanguageModel.default` only).
@@ -224,7 +232,7 @@ WaterBuddyWidget/        the Home Screen widget — StaticConfiguration + AddWat
 WaterBuddyWatch/         the watch app — WristView over its own local suite
 WaterBuddyWatchWidget/   the complication — .accessoryCircular
 WaterBuddy*Tests/        three test targets, two platforms
-Entitlements/            one App Group entitlement per signed target
+Entitlements/            one entitlements file per signed target: the App Group; the app's adds HealthKit
 Tools/                   standalone scripts, in no build target
 Screenshots/             App Store assets
 AppStore/                the upload folder per version — the listing's text and the store set, copied
@@ -242,8 +250,9 @@ Not yet chosen. All rights reserved until one is added.
 
 # App Store Connect
 
-Everything needed to fill in the listing for **version 1.4 (build 4)** — rewritten on 2026-10-25 from
-the 1.0 listing, against the app as built. **Character counts were verified programmatically**, not
+Everything needed to fill in the listing for **version 1.4 (build 5)** — rewritten on 2026-10-25 from
+the 1.0 listing, against the app as built, and again on 2026-11-04 for Apple Health, set B and export.
+**Character counts were verified programmatically**, not
 estimated — every field is inside Apple's limit, and two are exactly at it.
 
 Fields marked 🔴 **you must supply**; nothing in the repo can answer them.
@@ -252,8 +261,9 @@ Fields marked 🔴 **you must supply**; nothing in the repo can answer them.
 and the store set copied and renamed into upload order, with a start-here checklist. Copied on
 2026-10-28; this section stays the master copy, so a change here is made there too.
 
-1.4 carries everything since 1.1: the redesign (roadmap release 1.2), every surface (1.3) and
-WaterBuddy Premium's first set (1.4). Apple Health (1.3.3) is **not** in it — it was never built.
+1.4 carries everything since 1.1: the redesign (roadmap release 1.2), every surface (1.3) — Apple Health
+(1.3.3) among it — and WaterBuddy Premium: set A, set B and export (1.4), with the finish across the app
+(spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`).
 
 ## App Information
 
@@ -281,31 +291,31 @@ WaterBuddy Premium's first set (1.4). Apple Health (1.3.3) is **not** in it — 
 | **Marketing URL** | optional |
 | **Terms of Use (EULA)** | Apple's standard licence — leave App Store Connect's EULA field at its default. The description links it, as guideline 3.1.2 asks of an app with subscriptions |
 
-## Promotional text (≤170) — **164/170**
+## Promotional text (≤170) — **161/170**
 
 Editable any time without submitting a new build.
 
 ```
-One tap logs a glass from your widget, Lock Screen, Control Center or Apple Watch. New: a week widget, three watch faces and Premium insights. No account, no cloud.
+One tap logs a glass from your widget, Lock Screen, Control Center or Apple Watch. New: Apple Health, a week widget and WaterBuddy Premium. No account, no cloud.
 ```
 
 ## Keywords (≤100) — **98/100**
 
 No spaces after the commas — a space costs a character. No token repeats the app name or subtitle,
 because Apple already indexes those. Against 1.0's list: `ml`, `offline` and `sip` out, `watch` and
-`streak` in.
+`streak` in; against 1.4's first text, `thirst` out and `health` in (spec D5).
 
 ```
-drink,intake,reminder,goal,daily,glass,bottle,cup,log,widget,watch,streak,private,h2o,thirst,habit
+drink,intake,reminder,goal,daily,glass,bottle,cup,log,widget,watch,streak,private,h2o,health,habit
 ```
 
 > If you change the **name** or the **subtitle**, re-check this list for overlap and re-count.
 
-## Description (≤4000) — **3992/4000**
+## Description (≤4000) — **3987/4000**
 
 The first ~170 characters are all that show before the "more" link, so the opening sentence carries
 the whole pitch on its own (it is 170). The *WaterBuddy Premium* paragraph is what guideline 2.3.2
-asks for — four of the eight iPhone screenshots show Premium's screens — and its closing sentence is
+asks for — six of the ten iPhone screenshots show Premium's screens — and its closing sentence is
 the store page spec's (§3.7). The renewal sentence and the Terms of Use link are guideline 3.1.2's.
 
 ```
@@ -314,17 +324,17 @@ One tap logs a glass - from your Home Screen, your Lock Screen, Control Center o
 A water tracker only earns its place if you are still using it in week three, and the surest way to keep using one is never having to stop what you are doing.
 
 LOGGING
-- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml. Each is editable from 50 to 1,000 ml, so they match the glass on your desk and the bottle in your bag.
-- A daily goal from 1,000 to 4,000 ml in 100 ml steps - or let WaterBuddy suggest one from your weight and how active you are. It keeps neither.
+- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml, each editable from 50 to 1,000 ml.
+- A daily goal from 1,000 to 4,000 ml - or let WaterBuddy suggest one from your weight and how active you are. It keeps neither.
 - A vessel of moving water shows today's percentage and the exact millilitres.
-- Undo a pour with one tap. Reach your goal and the screen celebrates; keep reaching it and a day streak counts along.
+- Undo a pour with one tap. Reach your goal and the screen celebrates, and a day streak counts along.
 
 WITHOUT OPENING THE APP
-- Home Screen widgets: small and medium, with a button that logs your Glass right there, and a week widget with your last seven days against your goal. The small one also works in StandBy.
+- Home Screen widgets: small and medium, with a button that logs your Glass, and a week widget of your last seven days. The small one also works in StandBy.
 - Lock Screen widgets: a ring, a line, and a rectangle with its own button.
 - A Log Water control for Control Center, the Lock Screen and the Action Button (iOS 18 and later).
 - Siri: say "Log water in WaterBuddy", or ask "How much water today in WaterBuddy". In English and Russian.
-- Reminders carry a Log a Glass button, so you can log from the notification itself.
+- Log a Glass straight from a reminder, without opening the app.
 
 APPLE WATCH
 - Cup, Glass and Bottle on your wrist. It works with your iPhone out of range and syncs when it is back.
@@ -335,19 +345,24 @@ LOOKING BACK
 - Every serving with its time. Change an amount or a time, delete a mistap, or add one you forgot.
 
 REMINDERS THAT KNOW WHEN TO STOP
-Optional, and off until you turn them on: a nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reach your goal and the rest of the day stays quiet. Reminder text contains no numbers at all: a lock screen is a public surface, and what you have drunk today is nobody else's business.
+Optional, and off until you turn them on: a nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it, and quiet once you reach your goal. Reminder text contains no numbers: a lock screen is a public surface.
+
+APPLE HEALTH
+Optional, and off until you turn it on in Settings: each serving is written to Apple Health as Water, and corrected or deleted there when you change it here. WaterBuddy reads nothing from Health.
 
 WATERBUDDY PREMIUM
-Optional, for seeing how you really drink:
-- Month view and full history: every day you have logged, a month at a glance.
+Optional extras:
+- Month view: every day you have logged, a month at a glance.
 - Your patterns: when in the day you drink, weekdays against weekends, your usual first and last drink.
-- Personal insights: each week, the one thing that stands out, what is working and what is worth knowing, worked out from your own figures on your iPhone. Where Apple's on-device model is available, it can word them, in English. Not medical advice.
+- Personal insights each week, worked out from your own figures on your iPhone. Where Apple's on-device model is available, it can word them, in English. Not medical advice.
 - A monthly recap: your month in one card, yours to share as an image.
+- Your own reminder schedule: hours, interval and quiet days.
+- A pace line on Home, and reminders only when you are behind.
+- Export every serving as a CSV file.
 Premium is a monthly or yearly subscription - the yearly plan starts with a free week - or a one-time lifetime purchase. Logging water is always free.
 
 PRIVATE BY CONSTRUCTION
-No account. No sign-up. No email address. No server, and no cloud.
-No analytics, no tracking, no ads and no third-party code: every framework in WaterBuddy is Apple's own, and there is no networking code in it, so what you log has no way to leave your device. It travels only between your own iPhone and Apple Watch, and a recap image leaves only when you share it.
+No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads and no third-party code: every framework in WaterBuddy is Apple's own, and there is no networking code in it. What you log travels only between your own iPhone and Apple Watch, into Apple Health if you turn it on, and out as a recap image or an export file only when you share one.
 
 MADE TO LIVE WITH
 - A dark liquid-glass design over a slowly moving aurora.
@@ -355,30 +370,31 @@ MADE TO LIVE WITH
 - VoiceOver, Dynamic Type, Reduce Motion and Reduce Transparency.
 
 WHAT IT IS NOT
-It is not a medical app and makes no health claims. No Apple Health. No friends, no feeds, no leaderboards. Water, and nothing else.
+It is not a medical app and makes no health claims. No friends, no feeds, no leaderboards. Water, and nothing else.
 
 Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period, in your Apple Account settings. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
-Requires iOS 17.0 or later on iPhone. The Log Water control needs iOS 18, and the Apple Watch app watchOS 26.0.
+Requires iOS 17 or later on iPhone; the Log Water control needs iOS 18, and the Apple Watch app watchOS 26.
 ```
 
-## What's New — version 1.4 — **830/4000**
+## What's New — version 1.4 — **1060/4000**
 
 Written against **1.1**, which already brought the Lock Screen widget, the Control Center control,
 the *Log water* Siri phrase and adding a serving at an earlier time. 1.1's App Review outcome is not
 recorded here: if it never reached the store, add a line for those four before the last one.
 
 ```
-WaterBuddy 1.4 - a new look, more ways in, and Premium.
+WaterBuddy 1.4 - a new look, more ways in, Apple Health and Premium.
 
-- Redesigned throughout: liquid glass over a moving aurora, a calmer Home, History rebuilt around your week, and a new Settings.
+- Redesigned throughout: liquid glass over a moving aurora, a calmer Home, History rebuilt around your week, and a new Settings - where figures roll and charts draw themselves.
 - A first-run welcome that can suggest a goal from your weight and how active you are - and keeps neither.
 - Undo a pour with one tap, and a day streak for the days you reach your goal.
 - A week widget for the Home Screen, and the small widget now works in StandBy.
 - Three Apple Watch complications - circular, rectangular and corner - and a redesigned watch app.
 - Log a Glass straight from a reminder, without opening the app.
 - Ask Siri "How much water today in WaterBuddy".
-- WaterBuddy Premium, optional: month view and full history, your patterns, weekly personal insights and a monthly recap you can share. Logging water is always free.
+- Apple Health, optional: your servings written to Health as Water.
+- WaterBuddy Premium, optional: month view and full history, your patterns, weekly personal insights, a monthly recap to share, your own reminder schedule, a pace line, reminders only when you are behind, and an export of every serving. Logging water is always free.
 ```
 
 ## In-App Purchases — WaterBuddy Premium 🔴
@@ -404,8 +420,7 @@ auto-renewable subscriptions, plus one non-consumable:
   on for a product cannot be undone — decide before you save.
 - **Review information**, for each product: a screenshot of the paywall (Settings → *See Premium*),
   taken from a run of the `WaterBuddy` scheme in Xcode — that run buys from the local StoreKit
-  configuration, so its prices draw. Review note: *Unlocks Month view, Patterns, Insights and the
-  Monthly recap in History. Logging water is never locked.* A debug run offers the paywall only with
+  configuration, so its prices draw, and the review note below. A debug run offers the paywall only with
   `-WaterBuddyPremium` among the Run action's arguments, which the checked-in scheme does not carry —
   add it for the shot and take it out after (#163). Check the yearly tile's saving reads 44 %: on
   this Mac's `en_UZ` simulators it reads 20 % (#162). Step by step in
@@ -416,6 +431,12 @@ auto-renewable subscriptions, plus one non-consumable:
 - Before uploading, make one sandbox purchase, a restore and a refund on a real iPhone (#156): the
   local configuration is all that has ever been bought from.
 
+Review note, the same for all three products:
+
+```
+Unlocks Month view, Patterns, Insights and the Monthly recap in History; a custom reminder schedule, "Only when behind" and "Export your servings" in Settings; and the pace line on Home. Logging water is never locked.
+```
+
 ## App Privacy
 
 This is the questionnaire in the sidebar, and it is **separate from** the `PrivacyInfo.xcprivacy`
@@ -424,7 +445,7 @@ files in the repo. Those declare *API usage*; this declares *data collection*.
 > **Answer: "Data Not Collected"** — select it and you are done. Do not tick a single data type.
 
 Every category is answered by the same fact: there is no networking code in the app, so there is no
-mechanism by which data could be collected. 1.4 changes none of it:
+mechanism by which data could be collected. 1.4 changes none of it — Apple Health and export included:
 
 - **Premium purchases** are made and held by Apple under the user's own Apple Account; StoreKit
   verifies them on the device, and the app stores nothing about a purchase and sends nothing anywhere.
@@ -432,6 +453,13 @@ mechanism by which data could be collected. 1.4 changes none of it:
   the iPhone too — never Private Cloud Compute (rule `70-privacy`).
 - **The recap image** leaves only through the system share sheet, on the user's tap, to a
   destination the app never learns.
+- **Apple Health**, when the user turns it on, is written on the iPhone into Apple's own store. Health
+  syncs it only under the user's own iCloud settings, and nothing reaches us.
+- **The export file** leaves only through the system share sheet, on the user's tap, to a destination
+  the app never learns.
+
+The questionnaire's *Health* row stays **None**: it asks what is collected, not what is written on the
+device.
 
 The privacy policy (`PRIVACY.md`, published as `Tools/PrivacyPolicy.html`) says the same and gives the
 label as *Data Not Collected*.
@@ -500,13 +528,15 @@ needed for it, since the watch opens on WaterBuddy.
 ```
 No account or login is required. On first launch a short welcome asks for a daily goal (it can suggest one from weight and activity level, which it does not keep); the app is fully usable straight after. No demo credentials are needed.
 
-WaterBuddy Premium unlocks Month view, Patterns, Insights and the Monthly recap, all in the History tab. It is sold through StoreKit as a monthly or yearly auto-renewable subscription (the yearly with a one-week free trial) or a one-time lifetime purchase. Open the paywall from Settings > See Premium, or from History's locked Month or Insights; Restore Purchases is on the same screen. Logging water is free and never locked.
+WaterBuddy Premium unlocks Month view, Patterns, Insights and the Monthly recap in the History tab; a custom reminder schedule, "Only when behind" and "Export your servings" in Settings; and a pace line on Home. It is sold through StoreKit as a monthly or yearly auto-renewable subscription (the yearly with a one-week free trial) or a one-time lifetime purchase. Open the paywall from Settings > See Premium, from any locked Premium row in Settings, or from History's locked Month or Insights; Restore Purchases is on the same screen. Logging water is free and never locked.
 
 Premium's screens need some history before they show content. Month view shows at once; Insights and Patterns each say how many days of water they need until they have them. Servings can be added to today and the six days before it with the + in History. Insights appear once the last finished week holds four days with water, Patterns once the month holds seven finished days with water (today is not counted), and the Monthly recap for a finished month with seven days of water - so a new install shows no recap.
 
+Apple Health is optional and off until the user turns on Settings > Apple Health; only then does iOS ask. The app asks to write Water and to read nothing. Each serving is written as a Water sample and corrected or deleted with the serving. No figure the app shows comes from Health.
+
 Insights are decided by the app from the user's own weekly figures. Where Apple's on-device model is available and the app is in English, the model may reword them on the iPhone; otherwise the app's own sentences are shown. Nothing is sent off the device.
 
-The app collects no data and contains no networking code. Everything is stored locally in an App Group container shared by the app and its widgets; the Apple Watch app syncs over WatchConnectivity between the user's own paired devices only. A recap image leaves the device only when the user shares it through the system share sheet.
+The app collects no data and contains no networking code. Everything is stored locally in an App Group container shared by the app and its widgets; the Apple Watch app syncs over WatchConnectivity between the user's own paired devices only. A recap image or a CSV export leaves the device only when the user shares it through the system share sheet.
 
 Notification permission is requested only when the user turns on reminders (in Settings, or on the welcome's last step), never at launch.
 
@@ -521,7 +551,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ---
 
-## Before you submit — outstanding (1.4, read 2026-10-26)
+## Before you submit — outstanding (1.4, read 2026-11-04)
 
 **Blocking — the upload or the review fails without these, and each is yours:**
 
@@ -529,7 +559,8 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   (2026-10-29); publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your
   `SardorAllaberganov.github.io` repository, and open
   `https://sardorallaberganov.github.io/waterbuddy/privacy/` to see it load. Both the app (Settings,
-  the paywall) and the listing link it; guideline 5.1.1(i).
+  the paywall) and the listing link it; guideline 5.1.1(i). The policy on this branch describes Apple
+  Health, set B and export; publish it, not `main`'s older copy (#193's ruling superseded on 2026-11-04).
 - 🔴 **Premium in App Store Connect** (#155): the Paid Apps Agreement with banking and tax, the
   *WaterBuddy Premium* group and its three products as listed above, each with its review screenshot,
   and all three selected on the 1.4 version page.
@@ -540,30 +571,35 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 - 🔴 **The support page must be live.** `Tools/Support.html` (2026-10-29), published as
   `waterbuddy/support/index.html` in the same repository; the field's value is
   `https://sardorallaberganov.github.io/waterbuddy/support/`.
+- 🔴 **The HealthKit capability on the App ID** (#192). The app's entitlements carry
+  `com.apple.developer.healthkit`: `sardor.WaterBuddy` needs the capability in the developer portal
+  — automatic signing adds it when Xcode next signs for a device — and the distribution profile must
+  carry it before an archive, or the upload is refused.
 
 **Done in the repository:**
 
-- **The screenshots**: eight iPhone and one Apple Watch, retaken on 2026-10-26, each read by eye and
-  passed by `VerifyScreenshots.sh` — upload them in the order under *Screenshots* above, and delete
-  the older ones in Connect.
+- **The screenshots are retaken from 8 November** (spec §6): ten iPhone shots, the schedule and export
+  sheets added. Until then the folder holds the 2026-10-26 set, which predates the finish and set B —
+  do not upload it.
 
-- **Version 1.4, build 4**, on all fourteen sites in `project.pbxproj`; read back as `1.4 (4)` from
+- **Version 1.4, build 5**, on all fourteen sites in `project.pbxproj`; read back as `1.4 (5)` from
   the built app, its widget extension, the watch app and the watch widget.
 - **Privacy manifests**: all four declare `UserDefaults` (`1C8F.1`, `CA92.1`) and the system boot time
   (`35F9.1`), and `PrivacyManifestTests` pins them. No check sees a *new* required-reason API (#190) —
   search the code for one before each upload.
 - **Export compliance** is answered in the build (`ITSAppUsesNonExemptEncryption = NO`).
 - **Distribution signing and the App Group registration**: 1.1 reached App Review on 2026-10-09, so
-  both were in place then — inferred from that, not re-checked — and 1.4 adds no target and no
-  entitlement.
+  both were in place then — inferred from that, not re-checked. 1.4 adds no target; it adds the
+  HealthKit entitlement to the app, above.
 
 **Your call before shipping — not checked by anything automated:**
 
 - **Russian and Uzbek on Premium's screens are drafts** that no native speaker has read: the month
-  view, Patterns, Insights and the recap (#170, #175, #179, #185).
+  view, Patterns, Insights and the recap (#170, #175, #179, #185), set B (#207) and export (#210).
 - **Nothing has been tried on a real iPhone or Apple Watch** — the roadmap's device sweep (1.2.7) has
   never run: the widgets and StandBy, the Lock Screen widget, the control, the reminder's *Log a
-  Glass*, Siri, the watch's faces and pour row, and Insights worded by Apple's on-device model (#178).
+  Glass*, Siri, the watch's faces and pour row, Insights worded by Apple's on-device model (#178), and
+  Apple Health from the app, a widget and the watch, refusing it and turning it off (#194, #195).
 - **Premium's colour pairs are measured on iOS 27.0 only** (#165, #169, #174, #181, #186); their
   records ask for iOS 26.5 and 18.6 too.
 - **Whether deleting the app removes its data on a device** (#188) — the policy and a code comment
@@ -572,7 +608,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   string catalogues — `AppShortcuts.xcstrings` among them, its Siri phrases marked `stale` — are in
   `git stash` (`stash@{0}`, 2026-10-26). Read them before any `git stash pop`. Xcode rewrote the two
   schemes again at 22:53 that night, while it was open — each loses its `BlueprintName` line, which
-  changes nothing an archive builds; the three catalogues stayed as HEAD has them. `.claude/settings.json`
-  is still modified; it is in no target and never reaches an archive.
+  changes nothing an archive builds. By 2026-11-04 Xcode had rewritten the three catalogues again too;
+  the working tree carries all five and `.claude/settings.json` unstaged, and none is part of 1.4.
 - **The app icon appears only after a build is processed.** The 1024² marketing icon ships *inside*
   the binary's asset catalog — App Store Connect has no icon upload field.

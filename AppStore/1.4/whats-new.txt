@@ -1,10 +1,11 @@
-WaterBuddy 1.4 - a new look, more ways in, and Premium.
+WaterBuddy 1.4 - a new look, more ways in, Apple Health and Premium.
 
-- Redesigned throughout: liquid glass over a moving aurora, a calmer Home, History rebuilt around your week, and a new Settings.
+- Redesigned throughout: liquid glass over a moving aurora, a calmer Home, History rebuilt around your week, and a new Settings - where figures roll and charts draw themselves.
 - A first-run welcome that can suggest a goal from your weight and how active you are - and keeps neither.
 - Undo a pour with one tap, and a day streak for the days you reach your goal.
 - A week widget for the Home Screen, and the small widget now works in StandBy.
 - Three Apple Watch complications - circular, rectangular and corner - and a redesigned watch app.
 - Log a Glass straight from a reminder, without opening the app.
 - Ask Siri "How much water today in WaterBuddy".
-- WaterBuddy Premium, optional: month view and full history, your patterns, weekly personal insights and a monthly recap you can share. Logging water is always free.
+- Apple Health, optional: your servings written to Health as Water.
+- WaterBuddy Premium, optional: month view and full history, your patterns, weekly personal insights, a monthly recap to share, your own reminder schedule, a pace line, reminders only when you are behind, and an export of every serving. Logging water is always free.

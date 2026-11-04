@@ -10,9 +10,10 @@
   https://sardorallaberganov.github.io/waterbuddy/support/, beside the privacy policy at
   `waterbuddy/privacy/` (`Tools/PrivacyPolicy.html`).
 
-  Every answer here is read from the code as it stood on 2026-10-29 (1.4, build 4): the Siri phrases
-  from `WaterBuddyShortcuts`, the reminder hours from `ReminderPlan.hours`, the labels from the
-  English catalogue. A change to any of those changes this page too.
+  Every answer here is read from the code as it stood on 2026-11-04 (1.4, build 5): the Siri phrases
+  from `WaterBuddyShortcuts`, the reminder hours from `ReminderPlan.hours`, the schedule from
+  `ReminderPlan.Schedule`, Apple Health from `HealthMirror` and `PRIVACY.md` §7, export from
+  `ServingsExport`, the labels from the English catalogue. A change to any of those changes this page too.
 
   One self-contained page, the privacy policy's shape and colours: no script, no web font, no image,
   nothing fetched. The contact address is the owner's, chosen on 2026-10-29.
@@ -162,24 +163,38 @@
 <h2 id="reminders">Reminders</h2>
 <h3>How do reminders work?</h3>
 <p>Turn on <em>Smart reminders</em> in Settings. They come every two hours between 9 AM and 9 PM. A reminder due within an hour after you drink is skipped, and the rest of the day’s are skipped once you reach your goal. Each reminder has a <em>Log a Glass</em> button: touch and hold the notification to log your Glass without opening the app.</p>
+<h3>Can I choose when reminders come?</h3>
+<p>With Premium, tap <em>Schedule</em> in Settings to choose the first and last hour, whether they come every hour, two or three, and the days that stay quiet. Turn on <em>Only when behind</em>, and a reminder is skipped when you have already drunk the share of your goal due by then. If Premium ends, your schedule keeps working: you can go back to the standard schedule or turn <em>Only when behind</em> off, and any other change needs Premium again.</p>
 <h3>I am not getting reminders.</h3>
 <p>In iOS Settings, open <em>Notifications</em>, then <em>WaterBuddy</em>, and check that <em>Allow Notifications</em> is on. A Focus, or iOS’s Notification Summary, can also hold reminders back to deliver them later.</p>
 
+<h2 id="health">Apple Health</h2>
+<h3>How do I copy my water to Apple Health?</h3>
+<p>In Settings, turn on <em>Apple Health</em>. iOS asks whether WaterBuddy may write <em>Water</em> — WaterBuddy asks to read nothing. From then on each serving is written to Health, and every serving you logged before is written once.</p>
+<h3>A water entry I deleted in Health came back.</h3>
+<p>While <em>Apple Health</em> is on, WaterBuddy’s log leads: an entry comes back as long as its serving is still in WaterBuddy. To remove water from both, delete the serving in WaterBuddy’s History.</p>
+<h3>Water I logged from a widget is not in Health yet.</h3>
+<p>A serving logged from a widget or Control Center reaches Health the next time WaterBuddy opens.</p>
+<h3>How do I remove WaterBuddy’s water from Health?</h3>
+<p>Turning <em>Apple Health</em> off stops the writing and deletes nothing. To delete what is there, open your iPhone’s Settings, then <em>Privacy &amp; Security</em>, <em>Health</em>, <em>WaterBuddy</em> and <em>Data from “WaterBuddy”</em>.</p>
+
 <h2 id="premium">Premium</h2>
 <h3>What is Premium?</h3>
-<p>An optional purchase that adds a month view with your full history, patterns, personal insights and a monthly recap. <strong>Logging water is free for everyone, always</strong>, and nothing you can do for free today is taken away. Premium is monthly, yearly — its first week free, where the App Store offers that to you — or a one-time purchase; the app shows the prices in your currency. It can be shared with your Family Sharing group.</p>
+<p>An optional purchase that adds a month view with your full history, patterns, personal insights, a monthly recap, your own reminder schedule, a pace line on Home, reminders only when you are behind, and an export of every serving. <strong>Logging water is free for everyone, always</strong>, and nothing you can do for free today is taken away. Premium is monthly, yearly — its first week free, where the App Store offers that to you — or a one-time purchase; the app shows the prices in your currency. It can be shared with your Family Sharing group.</p>
 <h3>I bought Premium but the app does not show it.</h3>
 <p>Make sure you are signed in to the App Store with the Apple Account you bought it with. Then in Settings tap <em>See Premium</em>, then <em>Restore Purchases</em>.</p>
 <h3>How do I cancel a subscription?</h3>
 <p>In Settings, tap <em>Manage Subscription</em> — or in iOS Settings, tap your name, then <em>Subscriptions</em>. Cancel at least 24 hours before it renews to avoid the next charge. If a subscription ends, the extras go quiet: no serving, setting or figure is lost.</p>
 <h3>How do I get a refund?</h3>
 <p>Purchases are made through Apple, and Apple handles refunds: request one at <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>. We cannot issue refunds ourselves, because we never receive your payment details.</p>
+<h3>How do I export my servings?</h3>
+<p>With Premium, tap <em>Export your servings</em> in Settings. WaterBuddy shows what the file holds — the date, the time and the millilitres of every serving, and nothing else — and <em>Share as a CSV file</em> sends it where you choose: Files, Mail, or any app that opens a spreadsheet.</p>
 
 <h2 id="data">Your data</h2>
 <h3>Where is my data kept?</h3>
 <p>On your own iPhone and Apple Watch. WaterBuddy has no account and no server, and sends nothing to us. The <a href="../privacy/">Privacy Policy</a> lists everything it stores.</p>
 <h3>How do I delete my data?</h3>
-<p>Delete a single serving in History. To delete everything, delete WaterBuddy from your iPhone, and the Watch app from your Apple Watch.</p>
+<p>Delete a single serving in History. To delete everything, delete WaterBuddy from your iPhone, and the Watch app from your Apple Watch. Copies in Apple Health stay there until you delete them in Health (see <a href="#health">Apple Health</a>), and a file you exported is yours to delete where you saved it.</p>
 
 <h2 id="requirements">What WaterBuddy needs</h2>
 <ul>
@@ -191,7 +206,7 @@
 </main>
 
 <footer>
-  <p>WaterBuddy · Sardor Allaberganov · Last updated 29 October 2026</p>
+  <p>WaterBuddy · Sardor Allaberganov · Last updated 4 November 2026</p>
 </footer>
 
 </body>

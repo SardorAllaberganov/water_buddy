@@ -112,10 +112,10 @@ Your app → **Monetization → In-App Purchases → Create**.
 
 ## Step 6 — the review screenshot and note
 
-**The note**, the same for all three products (103 characters):
+**The note**, the same for all three products (217 characters):
 
 ```
-Unlocks Month view, Patterns, Insights and the Monthly recap in History. Logging water is never locked.
+Unlocks Month view, Patterns, Insights and the Monthly recap in History; a custom reminder schedule, "Only when behind" and "Export your servings" in Settings; and the pace line on Home. Logging water is never locked.
 ```
 
 **The screenshot** is seen only by App Review. One picture of the paywall, used for all three products,
