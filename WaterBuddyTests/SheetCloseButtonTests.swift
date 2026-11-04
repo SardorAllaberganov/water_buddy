@@ -16,11 +16,19 @@ struct SheetCloseButtonTests {
 
     /// At the accessibility sizes a glyph set in a text style outgrew its fixed circle. Sized as a share
     /// of the circle, it draws the same pixels at every text size.
+    ///
+    /// **Rendered with Reduce Transparency on.** Below iOS 26 the pane is the hand-made stack over a
+    /// `Material`, which an `ImageRenderer` cannot draw — rule `40-widget`'s reason for `Base.archived`.
+    /// On iOS 18.6 it came back a grey of another shade on every render, some 13,400 pixels apart at one
+    /// text size, while the ✕ itself never moved (known issue #221). Under Reduce Transparency the pane is
+    /// its opaque fill, the same on every system, and the whole button is still what is drawn.
     @Test func theGlyphDoesNotGrowWithTheTextSize() throws {
         let plain = try #require(Self.render(at: .large))
+        let again = try #require(Self.render(at: .large))
         let huge = try #require(Self.render(at: .accessibility5))
         let brightest = try #require(Self.brightestAtTheCentre(of: plain))
         #expect(brightest > 0.9, "no white ✕ was drawn, so the comparison below would prove nothing")
+        #expect(plain.pngData() == again.pngData(), "two renders at one text size differ, so the comparison below would prove nothing")
         #expect(plain.pngData() == huge.pngData(), "the ✕ drew differently at the largest text size")
     }
 
@@ -28,6 +36,8 @@ struct SheetCloseButtonTests {
         let renderer = ImageRenderer(content: SheetCloseButton(label: "Not now")
             .environment(\.strings, AppLanguage.english.bundle)
             .environment(\.dynamicTypeSize, size)
+            // SwiftUI's own setter for what `accessibilityReduceTransparency` reads.
+            .environment(\._accessibilityReduceTransparency, true)
             .padding(8)
             .background(Aurora.top))
         renderer.scale = 3
