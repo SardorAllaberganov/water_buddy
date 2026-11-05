@@ -115,34 +115,6 @@ final class GoalSetupUITests: XCTestCase {
         XCTAssertTrue(vessel.waitForExistence(timeout: 5), "the Home tab did not come back")
     }
 
-    /// The share of an element's own picture that is near white. What tells a control that is
-    /// drawn from one that is only present: the Glass's disc is a white surface, and a disc that
-    /// has not been drawn is a patch of the aurora with no white in it at all.
-    @MainActor
-    private func whiteShare(of element: XCUIElement) -> Double {
-        guard let image = element.screenshot().image.cgImage else { return 0 }
-        let width = image.width
-        let height = image.height
-        var pixels = [UInt8](repeating: 0, count: width * height * 4)
-        guard let context = CGContext(
-            data: &pixels,
-            width: width,
-            height: height,
-            bitsPerComponent: 8,
-            bytesPerRow: width * 4,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        ) else { return 0 }
-        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
-
-        var white = 0
-        for index in stride(from: 0, to: pixels.count, by: 4)
-        where pixels[index] > 215 && pixels[index + 1] > 215 && pixels[index + 2] > 215 {
-            white += 1
-        }
-        return Double(white) / Double(max(width * height, 1))
-    }
-
     /// Every screen is drawn whole when its tab is shown — the first time, and when it comes back.
     ///
     /// A screen's content is drawn as nothing until it has arrived, and it arrives when its tab

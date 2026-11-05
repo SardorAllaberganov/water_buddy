@@ -44,6 +44,60 @@ func completeWelcomeIfShown(_ app: XCUIApplication) {
     tapWhenReady(notNow)
 }
 
+/// The share of an element's own picture that is near white. What tells a control that is
+/// drawn from one that is only present: the Glass's disc is a white surface, and a disc that
+/// has not been drawn is a patch of the aurora with no white in it at all.
+@MainActor
+func whiteShare(of element: XCUIElement) -> Double {
+    guard let image = element.screenshot().image.cgImage else { return 0 }
+    let width = image.width
+    let height = image.height
+    var pixels = [UInt8](repeating: 0, count: width * height * 4)
+    guard let context = CGContext(
+        data: &pixels,
+        width: width,
+        height: height,
+        bitsPerComponent: 8,
+        bytesPerRow: width * 4,
+        space: CGColorSpaceCreateDeviceRGB(),
+        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+    ) else { return 0 }
+    context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+    var white = 0
+    for index in stride(from: 0, to: pixels.count, by: 4)
+    where pixels[index] > 215 && pixels[index + 1] > 215 && pixels[index + 2] > 215 {
+        white += 1
+    }
+    return Double(white) / Double(max(width * height, 1))
+}
+
+/// Waits until a control is drawn and has stopped moving, so a tap made next can reach it.
+///
+/// The tree is no evidence of either. A control in a pane that is still opening is present, placed
+/// where it will come to rest and reported hittable — but a pane on Apple's glass answers a touch
+/// only inside its own shape (`LiquidGlassModifier`'s `.contentShape(shape)`), and while the pane
+/// grows, a tap at the control's resting place reaches nothing. Under load the opening runs late
+/// and a test's next tap lands inside it: the touch reached the app with no SwiftUI gesture on it
+/// (#140). So this looks at the picture: white in it, and the white and the frame the same on two
+/// reads in a row, which they are not while the pane's edge crosses the control.
+@MainActor
+func waitUntilDrawn(_ element: XCUIElement, timeout: TimeInterval = 5) -> Bool {
+    let deadline = Date().addingTimeInterval(timeout)
+    var last: (share: Double, frame: CGRect)?
+    while Date() < deadline {
+        let share = whiteShare(of: element)
+        let frame = element.frame
+        // A tolerance, not equality: the label's soft edge sits over the moving aurora.
+        if share > 0, let last, frame == last.frame, abs(share - last.share) <= last.share * 0.05 {
+            return true
+        }
+        last = (share, frame)
+        Thread.sleep(forTimeInterval: 0.1)
+    }
+    return false
+}
+
 /// A volume as the welcome speaks it: *2,000 millilitres* — grouped by the device's own region, as
 /// the app groups it on *Follow device*, the language a fresh start has (spec 2026-10-16 §6.3). The
 /// gate devices are in `en_UZ`, which groups with a space: a figure written with a comma here would
@@ -285,7 +339,10 @@ final class WelcomeUITests: XCTestCase {
 
     // MARK: The calculator
 
-    /// On the goal step, the calculator open.
+    /// On the goal step, the calculator open — and done opening. *Use*, its last control, is drawn
+    /// where it will stay before anything in the panel is tapped (`waitUntilDrawn(_:timeout:)`): the
+    /// card grows to it, and a tap that came first was lost on *Use* and on *Active* alike (#140).
+    /// At the starting 70 kg or 155 lb and *Moderate*, both units suggest 2,500.
     @MainActor
     private func calculatorOpen() -> XCUIApplication {
         let app = launchedFresh()
@@ -294,6 +351,9 @@ final class WelcomeUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout: 5), "the goal step has no calculator")
         XCTAssertEqual(app.buttons.matching(identifier: "Work it out for me").count, 1)
         row.tap()
+        let use = app.buttons["Use \(spoken(2_500))"]
+        XCTAssertTrue(use.waitForExistence(timeout: 5), "the calculator did not suggest 2,500 at its starting weight")
+        XCTAssertTrue(waitUntilDrawn(use), "the calculator never finished opening")
         return app
     }
 
