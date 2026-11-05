@@ -4,6 +4,15 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-05, evening (hundred-and-sixteenth pass — `/doc_sync` after #140's welcome test was fixed, on
+`release/1.4`, HEAD `7d449f9`, level with `origin`; the fix staged, not committed). What it checked and wrote, every figure printed:
+- 137 `.swift` files by `find`, each with a row; 1112 phone `@Test`, 71 watch, 75 UI `func test` — all unchanged; three exception
+  sets; every rule citation resolves; no forbidden doc;
+- *Current state*'s headline for the fix and its full gate; two *Files on disk* rows recounted (`WelcomeUITests.swift` 438,
+  `GoalSetupUITests.swift` 1295); notes on #140, #191 and #209;
+- **drift found and fixed:** the polish of 1.4 was committed and pushed at 03:54–03:55 (`a17b526` to `7d449f9`), which *Current
+  state* and `docs/ROADMAP.md` called staged; #191's 2026-11-04 note sat under the next section's heading, and is moved back.
+
 **Last updated:** 2026-11-05, 00:03 (hundred-and-fifteenth pass — `/doc_sync` run by the owner mid-gate, while the polish of 1.4
 waited out WareStack's quiet window, on `release/1.4`, HEAD `ea67781`). What it wrote, every figure printed:
 - *Current state*'s headline for the polish — #221–#224 closed and staged, the gate part-run (phone unit 27.0 1112 in 122; UI 27.0 one
@@ -2435,11 +2444,11 @@ WaterBuddyTests/WristSyncTests.swift            1011   (2026-10-25, finishing se
 WaterBuddyUITests/AppStoreScreenshotUITests.swift  866   *(2026-11-04, release 1.4's phase 1, staged: the held launch ends on `11-schedule` and `12-export`, with `clearOfTheBar(_:in:)`; compiled, not run before the 8th.)* (2026-10-25, afternoon, unstaged: step 06 returns to the top before it taps *Insights* — three lines — after the store method's first run could not find the switch below the recap's scrolled page; the second run passed, all eight shots (#82). Staged at 14:14, by name.) (2026-10-25, the store page, staged: the store method takes eight of the ten shots in two launches — a free user with the paywall offered (`09-goal-setup`, `01-home`, `03-history`, `10-settings`), then a holder on the seed (`05-month`, `07-patterns`, `08-recap`, `06-insights`) — and refuses a run before the 8th; the wheel table and `setTime` are gone; `testBuildTheLivedInWeek` (new) builds the set's week through History's sheet into a device's own stores, for the pair script; never run, the store method; the lived-in method passed once, 849 s; 717 lines before) (2026-10-18, #144, DocC only, staged with 1.2.8: *Why it starts clean* says the launch still resolves the App Group suite and runs the migration, and the run's figures live only in the throwaway; setTime's afternoon failure is the request and the read-back, the snap-back inferred; 714 lines before) (2026-10-18, roadmap item 1.2.8, staged: the store method rewritten — launched with -WaterBuddyFreshStart and en_US, refuses to start outside 1:45–11:45 PM, builds a lived-in week through History's + and wheel (today's five at set times, six earlier days from the sheet's shortcuts), asserts Home at 65 % with a 5 days chip; run three times, the last two passing — the store method is no longer non-idempotent, the census still is, still not run; 559 lines before) (2026-10-17, 1.2.6: its spoken figures through a private grouped(_:), the capture device's own grouping — it is en_UZ; not run.) (stage 5, compiled and not run: both methods tap Get Started, shoot the goal step, and walk on with Continue, Continue and Not now through tapWhenReady; 540 lines before) NOT a test — the App Store capture harness. Two methods, both deliberately non-idempotent and both SKIPPED by the gate (`-skip-testing:`): the 4-shot store set (run 2026-10-09, after its stale *Last 7 days* query was fixed — committed in `12ddfc4`) and the 25-shot full census (same fix, not run). 2026-10-11, `1ced514`, compiled and not run: its six waits for History look for the `+` button, *Add a serving*, where they looked for a static text *Today* — which is now Home's heading as well. Unstaged 2026-10-12, stage 3b's second pass: its `returnToTop` works again on every system — a page is rebuilt when its tab is shown — and the comment on it says what the container is now; still not run (#82)
 WaterBuddyUITests/CoachingUITests.swift          185   (2026-11-01, staged: `behindSwitch(in:)` — *Only when behind* scrolled clear of the tab bar's whole frame before the lapsed holder's first tap (#209); 171 lines before) (2026-10-31, finishing set B, staged: 5 — +3: the last day keeping its reminders cannot be turned off; a lapsed holder's settings, on `-WaterBuddyCoachingSeed` beside `-WaterBuddyPremium`, keep working and turn off for free; the pace line is Premium's, held then lapsed, skipped outside 05:00–22:59; `launch(_:toSettings:)` takes the arguments; 80 lines before) new 2026-10-31 (set B, staged): 2, launched with the fresh start and `-WaterBuddyPremiumHeld` — the sheet's controls one element each; a change shows in the row
 WaterBuddyUITests/ExportUITests.swift            133   (2026-11-01, *One finish*'s stage 1, staged: the card's one label also names the file; still 3; 132 lines before) new 2026-11-01 (export, staged): `ExportUITests` (3), a holder on the fresh start with `-WaterBuddyPremiumHeld`: told so with no servings, until a pour; the summary, one element, and iOS's share sheet (`ActivityListView`); Share reachable at the largest text size.
-WaterBuddyUITests/GoalSetupUITests.swift        1323   (2026-10-29, Apple Health, staged on its branch: `testEverySettingsControlIsOneElement` counts one switch labelled *Apple Health*) (2026-10-24, the privacy policy, staged: +1, `testSettingsLinksThePrivacyPolicyForEveryone` — one link or button, a tap that brings Safari forward; 39 tests) (2026-10-17, 1.2.6: 38 tests — total(in:), waitForTotal and millilitres(on:) read grouped figures, as do the Undo and the sheet's-shortcut sites; the chip's and the strip's spoken values checked, and testTheChipSpeaksItsNounAtTheLargestTextSize and testTheStripSpeaksItsCountAtTheLargestTextSize added; the strip's "second element" check dropped by the owner's decision, #139.) (stage 5: eleven Get Started preambles are now completeWelcomeIfShown(app), the class's DocC says the welcome; still 36 tests; 1236 lines before) (stage 4, staged 2026-10-13, 36 tests: testSettingsSaysWhichVesselTheOneTapDoorsLog — the new note drawn, the old one not; testEverySettingsControlIsOneElement — the goal slider, three vessel sliders, the switch and four language rows one element each, a guard green before and after; 1196 lines before) (2026-10-13, stage 3c, staged, 34 tests: testEveryDayOnTheWeekCardIsATapTarget — every day button at least 44 × 44, which bites on a 375-pt phone) (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
+WaterBuddyUITests/GoalSetupUITests.swift        1295   (2026-11-05, #140, staged: its private `whiteShare(of:)` moved to file scope in `WelcomeUITests.swift`, one definition both suites read; its four call sites unchanged) (2026-10-29, Apple Health, staged on its branch: `testEverySettingsControlIsOneElement` counts one switch labelled *Apple Health*) (2026-10-24, the privacy policy, staged: +1, `testSettingsLinksThePrivacyPolicyForEveryone` — one link or button, a tap that brings Safari forward; 39 tests) (2026-10-17, 1.2.6: 38 tests — total(in:), waitForTotal and millilitres(on:) read grouped figures, as do the Undo and the sheet's-shortcut sites; the chip's and the strip's spoken values checked, and testTheChipSpeaksItsNounAtTheLargestTextSize and testTheStripSpeaksItsCountAtTheLargestTextSize added; the strip's "second element" check dropped by the owner's decision, #139.) (stage 5: eleven Get Started preambles are now completeWelcomeIfShown(app), the class's DocC says the welcome; still 36 tests; 1236 lines before) (stage 4, staged 2026-10-13, 36 tests: testSettingsSaysWhichVesselTheOneTapDoorsLog — the new note drawn, the old one not; testEverySettingsControlIsOneElement — the goal slider, three vessel sliders, the switch and four language rows one element each, a guard green before and after; 1196 lines before) (2026-10-13, stage 3c, staged, 34 tests: testEveryDayOnTheWeekCardIsATapTarget — every day button at least 44 × 44, which bites on a 375-pt phone) (second pass of stage 3b, unstaged 2026-10-12, 33 tests: one more — once a change of tab has ended only the page shown is in the tree — and `testAKeptScreenAnswersATapWhenItIsShownAgain` is `testAScreenAnswersATapWhenItIsShownAgain`) (unstaged 2026-10-12, stage 3b, seven tests: the title holds its place on every tab, and where its accessory is taller; a screen comes back whole, read off the picture of all three; a kept screen answers a tap; a press dragged along Apple's bar; the app's own bar's captions share a line; History returns to today) setup, the a11y tree, the tab swap, the Settings tab, the week card (one summary, one button per day), a serving row tapped on its bare glass; staged 2026-10-11, the redesign's stage 3, History: a serving added to yesterday (read off the day's total, and listed as one button in its row), the strip's one heading, the sheet's three shortcuts (one button each, the shown amount's selected, a tap sets the amount), and three at the largest text size — the shortcuts' figures whole, a row's amount whole, a past day's heading not squeezed and one element; 2026-10-11, `1ced514`, Home: one heading, the status line and the title never squeezed, Undo (takes back the last pour only, expires, does not outlive its tab or the app leaving the screen, an older pour's timer does not end a newer offer, its amount drawn whole at the largest text size), a disc and Undo tapped off their glyphs
 WaterBuddyUITests/PremiumUITests.swift           246   (2026-11-01, export, staged: +2 — a free user's card, locked, and the paywall's row, counted as what the sheet adds; an ordinary run draws no card.) (2026-10-31, set B, staged on `feature/coaching`: +2 — a free user's locked rows open the paywall; an ordinary run draws none —; the paywall's rows seven; 167 lines before) (2026-10-24, the privacy policy, staged: the paywall's footer counted as what the sheet adds, Settings' own count read first — the owner's ruling) (2026-10-24, set A's step 4, staged: +1, `testAFreeUsersInsightsAreLockedAndOpenThePaywall`; the paywall's row is *Personal insights*) (2026-10-23, set A's step 2, staged: +2 — `testAnOrdinaryRunsHistoryHasNoMonthSwitch`, `testAFreeUsersMonthIsLockedAndOpensThePaywall`) (2026-10-22, step 1's Task 7, staged: both tests rewritten — `testAnOrdinaryRunHasNoPremiumCard` waits three seconds for a card that must not come; `testTheCardLeadsSettingsAndOpensThePaywall` — the card one element and above the goal, the sheet's line and promise, each feature row one element counted by its whole label (`"<title>, "`, the owner's ruling — XCUITest also lists the row's own title, `tasks/lessons.md` 2026-10-17 and 2026-10-22), the four links and *Not now* one element each, *Not now* closing it; 64 lines before) new 2026-10-21 (1.4.1's Task 6, staged; superseded by the above): the only class launched with `-WaterBuddyPremium` — `testAnOrdinaryRunHasNoPremiumCard` and `testTheCardOpensThePaywall` (the card one element, the sheet's title, promise, *Restore Purchases*, both links and *Not now* one element each, *Not now* closing it); asserts nothing that needs products to load
 WaterBuddyUITests/WaterBuddyUITests.swift         41   template
 WaterBuddyUITests/WaterBuddyUITestsLaunchTests.swift   33   template
-WaterBuddyUITests/WelcomeUITests.swift           378   (2026-10-17, 1.2.6: its 18 spoken figures through a private spoken(_:), the device's grouping.) stage 5 — 13 tests, each launched with -WaterBuddyFreshStart: the welcome walked forward and back, every control one element, walkable at the largest text size, the shared walk lands on Home, a vessel set in the welcome is the one Home pours, a vessel edited in Settings saved as before, a step's title where a tab's stands, a double tap moves one step; the calculator — Use sets the goal it suggests, the activity moves only the suggestion, the unit switch converts the weight, Use comes back when the goal moves away, a step is as it was left when Back returns. At file scope: tapWhenReady(_:) (waits for the button to exist and be enabled, then taps — the capture harness uses it too) and completeWelcomeIfShown(_:), which GoalSetupUITests calls eleven times
+WaterBuddyUITests/WelcomeUITests.swift           438   (2026-11-05, #140, staged: `whiteShare(of:)` at file scope, from `GoalSetupUITests`, and `waitUntilDrawn(_:timeout:)` — white in a control's picture, and that and its frame unchanged on two reads; `calculatorOpen()` waits on *Use* before it returns, so no tap lands inside the card's opening) (2026-10-17, 1.2.6: its 18 spoken figures through a private spoken(_:), the device's grouping.) stage 5 — 13 tests, each launched with -WaterBuddyFreshStart: the welcome walked forward and back, every control one element, walkable at the largest text size, the shared walk lands on Home, a vessel set in the welcome is the one Home pours, a vessel edited in Settings saved as before, a step's title where a tab's stands, a double tap moves one step; the calculator — Use sets the goal it suggests, the activity moves only the suggestion, the unit switch converts the weight, Use comes back when the goal moves away, a step is as it was left when Back returns. At file scope: tapWhenReady(_:) (waits for the button to exist and be enabled, then taps — the capture harness uses it too) and completeWelcomeIfShown(_:), which GoalSetupUITests calls eleven times
 WaterBuddyWidget/AddWaterIntent.swift            148   writes: runs DataManager in the extension — for both widgets' + and the Control Center control; authenticationPolicy written out, .alwaysAllowed
 WaterBuddyWidget/LockScreenWidget.swift          346   (2026-10-17, 1.2.6: four sentences through localized — the .privacy branch's Log Water untouched; spokenFigures(in:locale:); LockScreenCard and LockScreenPourButton read the locale.) the Lock Screen widget (kind "WaterBuddyLockScreen"): circle, rectangle with the + (AddWaterIntent(amount: serving), the serving handed down from entry.snapshot), line — over the same HydrationProvider; every figure privacySensitive, a quiet form under .privacy; strings read only in child views
 WaterBuddyWidget/LogWaterControl.swift            83   the Control Center control (kind "WaterBuddyLogWater", iOS 18): ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving)), titled Log Water in the snapshot's language, the glyph at DataManager.usualSlot, no figure; LogWaterControlProvider reads DataManager.snapshot(now:)
@@ -2813,6 +2822,37 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**#140's welcome test: the cause found, the fix staged on `release/1.4`, not committed; the full gate run** (2026-11-05). Taken
+by `/start_task` with no task named, on the owner's choice *Fix #140's welcome test*: `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway`
+had failed at `:355` alone, on 27.0, on two builds. Each step after the first was the owner's word: *Find where the tap is lost*,
+*Load the machine, catch it*, then "Go" on the fix. No spec or plan document; the investigation's logs, recordings and scratch copies
+live in this session's scratchpad.
+- **The cause:** the test taps *Use* as the calculator opens. The tree places *Use* at rest and calls it hittable from the moment it
+  is inserted, but the card that holds it grows over `Motion.settle`, and on Apple's glass a pane answers a touch only inside its
+  shape. Caught at real speed under made load (80 busy loops, loads 87–232) by a scratch copy logging `UIApplication.sendEvent`: the
+  touch reached the app at *Use*'s resting centre with no SwiftUI recognizer on it, during the card's last instant of growth (#140's
+  note of today).
+- **The fix, test-only:** `whiteShare(of:)` moved from `GoalSetupUITests` to file scope in `WelcomeUITests.swift`; a new
+  `waitUntilDrawn(_:timeout:)` there — white in the control's picture, and that and its frame unchanged on two reads;
+  `calculatorOpen()` waits on *Use* before it returns. No assertion changed. RED on a copy with the opening slowed to 3 s
+  (`:355`, and *Active*'s tap in `testAStepIsAsItWasLeftWhenBackReturnsToIt`), GREEN there; under the same made load, the fixed
+  copy of `:353–355` 12 of 12 (loads 56–298), where the unfixed one failed its first iteration.
+- **Found on the way, not fixed — #191's note:** on 26.5 the simulator itself loses some taps. `backboardd` splits a synthesized touch
+  between two states, skips the lift and cancels the touch; the simulator's log shows `skipping event` and a cancel holding a contact.
+- **The gate**, on a `git checkout-index` copy of the index, each scheme into its own empty DerivedData; AvtoLog's and Overlane
+  Drive's sessions given their windows between runs:
+  - **Phone unit, 27.0:** **1112 passed in 122 suites.**
+  - **Phone UI, 27.0**, eleven chunks: **87 executed, 1 skipped by design, 1 failure** — #209's lapsed holder, which passed alone.
+  - **Watch unit, 27.0:** **71 passed in 7 suites.** **Both widget schemes:** `BUILD SUCCEEDED`.
+  - **Phone UI, 26.5**, eleven chunks: **87 executed, 1 skipped by design, 0 failures**, at one-minute loads of 6–13.
+  - **Warnings**, primary lines by file and message: `-scheme WaterBuddy` 20 messages and 36 sites on both a clean `HEAD` `7d449f9`
+    export and the gate copy, identical by message and by site; the widget, watch and watch-widget gate builds 17, 2 and 17 (29, 2
+    and 29 sites), the baseline, from sources byte-identical to `HEAD`'s.
+  - **Not run:** the phone unit suite on 18.6, the store capture, any device.
+- **The polish of 1.4 is committed and pushed** — five commits, `a17b526` to `7d449f9`, at 03:54–03:55 on 2026-11-05, level with
+  `origin/release/1.4` — which the block below still calls staged. Its ledger, `.superpowers/sdd/2026-11-04-polish-1-4/progress.md`,
+  records its gate's remaining steps finished before the commit; those runs were not made in this session.
 
 **Release 1.4, polished before the capture: #221–#224 closed, staged on `release/1.4`, not committed; the gate part-run**
 (2026-11-04, into the 5th). Taken by `/start_task` with no task named, on the owner's choice *Polish 1.4 before Sunday*. Spec
@@ -6457,6 +6497,16 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 17:28 on 2026-11-05, in the hundred-and-sixteenth pass, after its `git add` of four records by name: on `release/1.4`,
+level with `origin/release/1.4` — HEAD `7d449f9`, 263 commits, the polish committed and pushed; 6 staged, all modified — 6 unstaged,
+the six the tree already carried; no untracked entry, none in both; `git diff --cached --check` clean; one stash, `stash@{0}`.**
+- **Staged, the fix:** `WaterBuddyUITests/WelcomeUITests.swift` and `WaterBuddyUITests/GoalSetupUITests.swift`.
+- **Staged, the records:** `HISTORY.md`, this file, `docs/ROADMAP.md` and `tasks/lessons.md`.
+- **Unstaged, the six the tree already carried:** `.claude/settings.json`, the two watch schemes, `AppShortcuts.xcstrings` and the
+  watch's two catalogues.
+
+This file and `HISTORY.md` are added again once their blocks are written. No `git commit`.
 
 **Read at 00:03 on 2026-11-05, in the hundred-and-fifteenth pass, after its `git add` of seven paths by name: on `release/1.4`, level
 with `origin/release/1.4` — HEAD `ea67781`, 258 commits, phase 1 committed and pushed; 14 staged, 2 added and 12 modified — 6 unstaged,
@@ -10518,6 +10568,18 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     failed 1 at `:358`. Every failure came under a load spike that rose during the run — macOS's
     storage extensions at 180 % CPU, another project's `swiftpm-testing` at 760 % — and the class
     passed 13 of 13 on *Gate 26.5*. A comparison on a quiet machine was not possible that evening.)*
+    *(2026-11-05, chasing `:355` with a scratch copy that logged every touch at `UIApplication.sendEvent`, each `PressStyle` press
+    and the welcome's actions — **the calculator's half found and fixed, staged.** *Use* had failed at `:355` alone on 27.0, on two
+    builds, the night before, at loads of 70–148. Under 80 busy loops (loads 87–232) the copy caught it on its first iteration: the
+    touch reached the app at *Use*'s resting centre, (201, 673), with no `UIKitResponderGestureRecognizer` on it — every tap that
+    worked carried two — so no press and no action, 0.5 s after the card began to open; the recording shows the card in the last
+    instant of its growth. On Apple's glass a pane answers a touch only inside its own shape (`LiquidGlassModifier`'s
+    `.contentShape(shape)`), while the tree places *Use* at rest and reports it hittable from the moment it is inserted. A copy with
+    the opening slowed to 3 s failed `:355`, and *Active*'s tap in `testAStepIsAsItWasLeftWhenBackReturnsToIt` (this entry's
+    2026-10-18 failure), every time. The fix: `WelcomeUITests.calculatorOpen()` waits on *Use* through `waitUntilDrawn(_:timeout:)`
+    before it returns — RED then GREEN on the slowed copy, and 12 of 12 under the same load (56–298), each *Use* touch 2.2–2.5 s after
+    the open with SwiftUI's recognizer on it. Not this fix: the slider's `:358` above — a drag under load arrived in bunches and was
+    released at once, iOS 26's glass thumb trailing the finger, and read *3 600* — and 26.5's lost taps, #191's note of today.)*
 
 141. **What the lag fix measured and left.** Simulator, Debug, `XCTCPUMetric`, throwaway probes not
     in the tree. Fixed: Home idle 17 % → 4 % of a core, the welcome 22 % → 3.5 % (0.176 s per 5 s), a pour and its five
@@ -11133,13 +11195,24 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `HEAD` `8208c8d`, the work failed 2 of 10 and `HEAD` 0 of 10 (p ≈ 0.23, and the final code passed 3 of 3); the failing run's own
     recording shows the lens rising on Home at the press and never following the drag, with Home at rest for 8 s — a press received
     and its movement lost. Not this work's on that evidence, and no mechanism found.)*
-
-**Opened 2026-10-30 by Apple Health (roadmap 1.3.3, staged on `feature/apple-health`, not merged):**
-
     *(2026-11-04, release 1.4's phase 1 gate, *iPhone 17* (26.5), a copy of the index, loads 8–100: five lost taps in five tests —
     `CoachingUITests`' lapsed holder in the welcome walk (*the welcome's last step did not appear*), `GoalSetupUITests.swift:718`
     (*the Glass was not poured*), `:681` (History's *Add a serving* not shown), `:1069` (no *Undo* after the Glass) and `:1294`
-    (*Settings did not appear*) — each passed alone.)*
+    (*Settings did not appear*) — each passed alone.)* *(2026-11-05, the hundred-and-sixteenth pass: this note had been written
+    under the next section's heading; moved back, unchanged.)*
+    *(2026-11-05, #140's chase — **one cause found on 26.5, outside the app.** A scratch copy logging every touch at
+    `UIApplication.sendEvent` caught a lost *Get Started* at a load of about 50–60: pressed (`pressed=true`), then the touch
+    **cancelled** (`phase=4`), and no action. The simulator's own log (`xcrun simctl spawn <device> log show`) says why: `backboardd`
+    registered `testmanagerd`'s per-tap virtual digitizer twice, on two threads, sent the lift to the touch state that had not seen the
+    touch go down — `didn't see a previous touch down or range-in event for pathIndex:2; skipping event`, six times — and cancelled the
+    held contact when the digitizer went away (`cancel -- digitizer did disappear`, `contacts: [… touching; locked …]`). In that
+    simulator's log from 12:20 to 12:44, 169 digitizers, only this tap shows either line. The 27.0 failure of the night before shows
+    neither: `backboardd` delivered it whole (`down: 1, up: 1`), and the app did not take it — #140's note of today. Nothing in the app
+    or the test can mend this one; a failed tap is now told apart by those two lines in the simulator's log (`tasks/lessons.md`,
+    2026-11-05).)*
+
+**Opened 2026-10-30 by Apple Health (roadmap 1.3.3, staged on `feature/apple-health`, not merged):**
+
 192. **The HealthKit capability on the App ID.** The app's entitlements now carry
     `com.apple.developer.healthkit`; `sardor.WaterBuddy` needs the capability in the developer portal —
     automatic signing adds it when Xcode next signs for a device — and a distribution profile must carry it
@@ -11252,7 +11325,10 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     whole suite since the fix. **Left open:** the test can still fail through #191's lost touch, which has no
     fix.)* *(2026-11-01, export's gate: passed in its chunk on 27.0, 42.0 s, and on 26.5.)* *(2026-11-03, *One finish*'s final gate,
     27.0, load 42–69: failed in its chunk at `:152` and alone at `:150` — one tap on *Only when behind* with no effect each time — and
-    a build of `HEAD` `8208c8d`, without stage 5's change to Settings, failed it alone at `:150` too.)*
+    a build of `HEAD` `8208c8d`, without stage 5's change to Settings, failed it alone at `:150` too.)* *(2026-11-05, #140's gate,
+    27.0, a one-minute load falling from 33 to 16: failed in its chunk at `:150`, then passed alone; on 26.5 it passed in its chunk. Whether its lost tap is #191's
+    cancelled touch or one the app did not take is unread — the simulator's log for that moment would say, `tasks/lessons.md`
+    2026-11-05.)*
 210. **Export's Russian and Uzbek are drafts:** the six strings of spec §3.9, for the owner's sweep. *(2026-11-01, *One finish*'s
     stage 1: two more, *Servings in this file* — ru *Порций в файле*, uz *Fayldagi porsiyalar* — and *and %1$d more* — ru *и ещё
     %1$d*, uz *yana %1$d ta*.)*

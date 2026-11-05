@@ -542,6 +542,10 @@ new shots and build 5, gated on 27.0 and 26.5. Phase 2, the capture, waits for 8
 2026-11-04, `bd1d7eb` to `ea67781`. Before the capture, *One finish*'s four minors are polished on the same branch, on the owner's
 choice *Polish 1.4 before Sunday* — #221–#224, spec `docs/superpowers/specs/2026-11-04-polish-1-4-design.md`, plan
 `docs/superpowers/plans/2026-11-04-polish-1-4.md` — staged, not committed, its gate part-run.)*
+*(2026-11-05, read from `git log` by the hundred-and-sixteenth pass: **the polish committed and pushed**, `a17b526` to `7d449f9`, at
+03:54–03:55. Later the same day, on the owner's choice *Fix #140's welcome test*: the calculator's lost first tap traced to the card
+still growing under it, and the welcome's tests now wait for *Use* to be drawn before tapping — test-only, staged, not committed,
+the full gate run on 27.0 and the UI suite on 26.5. Phase 2 still waits for Sunday.)*
 
 ## 6. Release 1.5 — more to log, more people
 

@@ -15128,3 +15128,80 @@ subjects moved, *Last updated* kept.
 `docs/AI_CONTEXT.md`'s blocks were written. **No `git commit` was run.** On `release/1.4`, level with `origin/release/1.4`, HEAD
 `ea67781`, 258 commits: **14 staged**, 2 added (the spec and the plan) and 12 modified — the seven code files and five records —
 **6 unstaged**, the six the tree already carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-05] — #140's welcome test: the calculator's lost tap traced and fixed in the test; the hundred-and-sixteenth `/doc_sync`
+
+Taken by `/start_task` with no task named, on the owner's choice *Fix #140's welcome test*:
+`WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway` had failed at `:355` — *Use* still offered after its tap — alone, on 27.0, on
+the polish's build and on `ea67781`'s, the night before. Run as a bug (systematic debugging), on `release/1.4`. No spec or plan
+document; the scratch copies, logs and recordings are in the session's scratchpad.
+
+### The rulings
+
+The owner's, each asked when the evidence turned: *Fix #140's welcome test*; *Find where the tap is lost* (after my first hypothesis
+fell at real speed); *Load the machine, catch it* (80 self-ending busy loops, knowing it slowed the other sessions); "Go" on the
+fix and its verification. Mine: test-only, no assertion changed; `whiteShare(of:)` moved rather than copied; the gate on a
+`git checkout-index` copy; AvtoLog's and Overlane Drive's sessions given their quiet windows, and no `simctl shutdown all`.
+
+### What was found
+
+- **First hypothesis, the card's opening — proved as a mechanism, not yet as the cause.** A copy with the opening slowed to 3 s
+  failed `:355` every time; the tap landed where *Use* was heading from, the card not yet grown to it. On iOS 26 and later a pane on
+  Apple's glass answers a touch only inside its shape (`LiquidGlassModifier`'s `.contentShape(shape)`). A probe read `isHittable`
+  true while *Use* was not drawn. But at real speed *Use* stood at rest 0.3 s after the open, before any tap, and twelve runs on 26.5
+  passed.
+- **Where taps are lost**, from a scratch copy logging `UIApplication.sendEvent`, each `PressStyle` press and the welcome's actions:
+  - On 26.5, a lost *Get Started*: pressed, then the touch **cancelled**. The simulator's log: `backboardd` registered
+    `testmanagerd`'s per-tap virtual digitizer twice, skipped the lift (`skipping event`), and cancelled the held contact when the
+    digitizer went away. Outside the app (#191's note).
+  - On 27.0, last night's `:355`: `backboardd` delivered the tap whole (`down: 1, up: 1`) at *Use*'s resting centre, and the app,
+    starved, did not take it.
+- **The cause, at real speed:** under made load (loads 87–232) the instrumented copy failed on its first iteration. The touch
+  reached the app at (201, 673) with no `UIKitResponderGestureRecognizer` on it — every working tap carried two — 0.5 s after the
+  card began to open; the recording shows the card's last instant of growth. The test taps *Use* before the card has grown to it.
+- **Also seen:** under load a slider drag arrives in bunches and is released at once, and iOS 26's glass thumb, trailing the finger,
+  read *3 600* for an asked 4,000 (#140's `:358`, unchanged).
+
+### What changed
+
+- `WaterBuddyUITests/WelcomeUITests.swift` — `whiteShare(of:)` at file scope; `waitUntilDrawn(_:timeout:)`, white in the control's
+  picture and that and its frame unchanged on two reads; `calculatorOpen()` waits on *Use* before returning.
+- `WaterBuddyUITests/GoalSetupUITests.swift` — its private `whiteShare(of:)` removed; its four call sites read the shared one.
+
+### Verification, as actually run
+
+- **RED, then GREEN:** on the slowed copy, `:355` and *Active*'s tap in `testAStepIsAsItWasLeftWhenBackReturnsToIt` failed unfixed
+  (27.0), then both passed fixed. Under made load on 27.0 the fixed copy of `:353–355` passed 12 of 12 (loads 56–298), each *Use*
+  touch 2.2–2.5 s after the open with SwiftUI's recognizer on it; the unfixed one had failed its first iteration.
+- **The gate**, on a `git checkout-index` copy of the index, each scheme built into an empty DerivedData folder:
+  - **Phone unit, 27.0:** **1112 passed in 122 suites.**
+  - **Phone UI, 27.0**, eleven chunks of at most seven: **87 executed, 1 skipped by design, 1 failure** — #209's lapsed holder at
+    `CoachingUITests.swift:150`, passed alone.
+  - **Watch unit, 27.0:** **71 passed in 7 suites.** **`WaterBuddyWidgetExtension` and `WaterBuddyWatchWidget`:** `BUILD SUCCEEDED`.
+  - **Phone UI, 26.5**, eleven chunks: **87 executed, 1 skipped by design, 0 failures**.
+  - **Warnings**, primary lines by file and message: `-scheme WaterBuddy` 20 and 36 sites on a clean `HEAD` `7d449f9` export and on
+    the gate copy, identical by message and by site; the other three gate builds 17, 2 and 17, the baseline, their sources
+    byte-identical to `HEAD`'s.
+- **Not run:** the phone unit suite on 18.6, the store capture, any device.
+
+### Drift found and fixed by the sync
+
+- `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`: the polish called staged; `git log` reads it committed and pushed at 03:54–03:55,
+  `a17b526` to `7d449f9`.
+- `docs/AI_CONTEXT.md`: #191's 2026-11-04 note sat under the next section's heading; moved back, unchanged.
+
+### Checked and already accurate
+
+137 `.swift` files by `find`, each with a row; 1112 phone `@Test`, 71 watch, 75 UI `func test`; three exception sets; every rule
+citation resolves; no forbidden doc. `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: nothing in their subjects
+moved, *Last updated* kept.
+
+### Files touched by the sync
+
+`docs/AI_CONTEXT.md` (the pass's block, *Current state*, two *Files on disk* rows, #140, #191 and #209, the Git block),
+`docs/ROADMAP.md` (a note), `tasks/lessons.md` (six entries), this file.
+
+**Staging.** Read from the commands at 17:28 on 2026-11-05, after the `git add` of four records by name, and again once this file's
+and `docs/AI_CONTEXT.md`'s blocks were written. **No `git commit` was run.** On `release/1.4`, level with `origin/release/1.4`, HEAD
+`7d449f9`, 263 commits: **6 staged**, all modified — the two test files and four records — **6 unstaged**, the six the tree already
+carried; no untracked file, none in both; one stash, `stash@{0}`.
