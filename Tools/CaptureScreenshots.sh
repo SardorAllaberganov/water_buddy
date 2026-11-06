@@ -18,10 +18,10 @@
 #  Nothing else may hold a simulator while this runs — CLAUDE.md's hard limits allow one at a time,
 #  and a cloned parallel run writes into a container that cannot be read back.
 #
-#  Run it between 1:45 PM and 11:45 PM, from the 8th of a month. The app logs the harness's history
-#  as it launches (`-WaterBuddyStoreSample`), today's last serving at 1:30 PM and none later than now;
-#  Patterns need seven finished days of the month holding today, and the recap is then on the month
-#  before's page. Outside either window it fails at once, saying so.
+#  Run it between 1:45 PM and 11:45 PM, on any day. The app logs the harness's history as it launches
+#  (`-WaterBuddyStoreSample`), today's last serving at 1:30 PM and none later than now; outside the
+#  window it fails at once, saying so. The month, Patterns and the recap are shot on the month before's
+#  page, which the seed fills whole (since 2026-11-06; the run once refused a day before the 8th).
 #
 #  THIS SCRIPT NEVER ERASES ANYTHING, and since 2026-10-18 it no longer needs to. The harness
 #  launches the app with `-WaterBuddyFreshStart`: a throwaway suite cleared at launch and an
@@ -43,11 +43,6 @@ NOW="$(date '+%H:%M')"
 CLOCK=$((10#${NOW/:/}))
 if (( CLOCK < 1345 || CLOCK >= 2345 )); then
   echo "it is $NOW: the store capture runs between 1:45 PM and 11:45 PM — today's last serving is at 1:30 PM, and a run across midnight would split the history it shows" >&2
-  exit 1
-fi
-DAY=$((10#$(date '+%d')))
-if (( DAY < 8 )); then
-  echo "it is the $DAY of the month: the store capture runs from the 8th — Patterns need seven finished days of the month holding today, and the recap is then on the month before's page" >&2
   exit 1
 fi
 
@@ -85,7 +80,9 @@ fi
 # screenshots for 6.9\" display aren't provided"), so a 6.5" set is only needed when uploading into
 # that well specifically. Pair it with WATERBUDDY_SCREENSHOT_PHONE pointing at a device of that size.
 SLOT="${WATERBUDDY_SCREENSHOT_SLOT:-iPhone-6.9}"
-OUT="$ROOT/Screenshots/en-US/$SLOT"
+# The raw captures, kept as the framing's input (`Tools/FrameScreenshots.sh` writes the upload set beside
+# them, in `AppStore/screenshots/$SLOT/`). `AppStore/` holds the current version only (2026-11-06).
+OUT="$ROOT/AppStore/screenshots/captures/$SLOT"
 WORK="$ROOT/build/screenshots"          # build/ is already gitignored
 RESULT="$WORK/iPhone.xcresult"
 DD="$WORK/DerivedData"
@@ -157,5 +154,5 @@ echo "── 7. verify ───────────────────
 bash "$ROOT/Tools/VerifyScreenshots.sh"
 
 echo
-echo "Done. Ten iPhone screenshots in $OUT"
+echo "Done. Ten raw iPhone screenshots in $OUT; frame them with: bash Tools/FrameScreenshots.sh"
 echo "Shots 02 and 04 and the watch's three are a separate, human-driven run: bash Tools/CapturePairScreenshots.sh"

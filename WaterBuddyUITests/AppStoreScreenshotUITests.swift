@@ -48,15 +48,15 @@ private func listed(_ figure: Int) -> String {
 /// ## Why it is excluded from the gate
 ///
 /// The store method runs for minutes, and is driven only by `Tools/CaptureScreenshots.sh`, which
-/// pins the status bar and writes its ten PNGs into `Screenshots/`; the lived-in method only by
-/// `Tools/CapturePairScreenshots.sh`, on a phone that script made. Rule `85-testing`'s gate carries
+/// pins the status bar and writes its ten PNGs into `AppStore/screenshots/captures/`; the lived-in
+/// method only by `Tools/CapturePairScreenshots.sh`, on a phone that script made. Rule `85-testing`'s gate carries
 /// `-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` to keep both, and the census below,
 /// out of the ordinary run.
 ///
 /// ## Why a seed, and not History's sheet
 ///
-/// History's sheet offers seven days, and the month, Patterns and the recap need more: seven finished
-/// days of the month holding today, and a finished month with water on seven days. So the store
+/// History's sheet offers seven days, and the month, Patterns and the recap need more: a finished month
+/// with water on every day it shows, on the month before's page. So the store
 /// method launches with `-WaterBuddyStoreSample` beside the fresh start, and the app logs
 /// `StoreSample`'s three months — today's five at set times, the 2026-10-18 set's week, and the
 /// months before — into the fresh start's in-memory store as it launches, never a device's App
@@ -65,8 +65,9 @@ private func listed(_ figure: Int) -> String {
 ///
 /// Today's last serving is at 1:30 PM, so the run refuses to start before 1:45 PM — a launch drops
 /// any serving later than now — and after 11:45 PM, where its two launches could fall either side
-/// of midnight. It also refuses a run before the 8th of a month, when the month holding today has
-/// fewer than seven finished days for Patterns and the recap is not on the month before's page.
+/// of midnight. The month, Patterns and the recap are all shot on the month before's page, a month
+/// the seed fills whole, so the run needs no particular day of the month (since 2026-11-06: the run
+/// once refused a day before the 8th, when this month's page held too few days for Patterns).
 ///
 /// ## Why two launches in one method
 ///
@@ -104,10 +105,6 @@ final class AppStoreScreenshotUITests: XCTestCase {
         "-AppleLanguages", "(en)",
         "-AppleLocale", "en_US",
     ]
-
-    /// The first day of a month the store capture runs on: Patterns need seven finished days of the
-    /// month holding today, and the recap is then drawn on the month before's page.
-    private let earliestDay = 8
 
     /// The lived-in week's today, by vessel: 1,300 ml, 65 % of the default 2,000 — short of the goal,
     /// so no confetti. Logged at the time the sheet opens on: no shot the pair script makes draws a
@@ -151,19 +148,12 @@ final class AppStoreScreenshotUITests: XCTestCase {
     func testCaptureAppStoreScreenshots() throws {
         // Before anything launches: a run outside the window would shoot a history short of its
         // servings, or one split across midnight between its two launches.
-        let clock = Calendar.current.dateComponents([.day, .hour, .minute], from: Date())
+        let clock = Calendar.current.dateComponents([.hour, .minute], from: Date())
         let minutes = (clock.hour ?? 0) * 60 + (clock.minute ?? 0)
         guard (13 * 60 + 45)..<(23 * 60 + 45) ~= minutes else {
             XCTFail(
                 "the store capture runs between 1:45 PM and 11:45 PM: today's last serving is at "
                     + "1:30 PM, and a run across midnight would split the history it shows"
-            )
-            return
-        }
-        guard (clock.day ?? 0) >= earliestDay else {
-            XCTFail(
-                "the store capture runs from the \(earliestDay)th of a month: Patterns need seven finished "
-                    + "days of the month holding today, and the recap is then on the month before's page"
             )
             return
         }
@@ -237,16 +227,20 @@ final class AppStoreScreenshotUITests: XCTestCase {
         XCTAssertTrue(month.waitForExistence(timeout: 10), "History draws no switch for a holder")
         month.tap()
 
-        // ── 05 · this month ──────────────────────────────────────────────────────────────────────
-        // The arrow to the month before is drawn because the seed opens two months back.
+        // ── 05 · the month before, a whole month ─────────────────────────────────────────────────
+        // The arrow to the month before is drawn because the seed opens two months back. Its page is a
+        // finished month the seed filled, where this month's holds only the days so far.
         let earlier = held.buttons[monthName(movedBy: -1)]
         XCTAssertTrue(earlier.waitForExistence(timeout: 10), "Month mode did not draw this month's page")
+        earlier.tap()
+        let later = held.buttons[monthName(movedBy: 0)]
+        XCTAssertTrue(later.waitForExistence(timeout: 10), "the month before's page did not draw")
         Thread.sleep(forTimeInterval: settle)
         capture("05-month")
 
-        // ── 07 · Patterns, further down this month's page, lifted to the top ─────────────────────
+        // ── 07 · Patterns, further down the month before's page, lifted to the top ───────────────
         let patterns = held.staticTexts["Patterns"]
-        scroll(held, from: earlier, until: patterns, step: 400, maxDrags: 8)
+        scroll(held, from: later, until: patterns, step: 400, maxDrags: 8)
         let lift = patterns.frame.minY - 120
         if lift > 40 { scrollDown(from: patterns, byPoints: lift) }
         Thread.sleep(forTimeInterval: settle)
@@ -258,8 +252,7 @@ final class AppStoreScreenshotUITests: XCTestCase {
         month.tap()
         XCTAssertTrue(earlier.waitForExistence(timeout: 10), "Month mode did not draw this month's page again")
         earlier.tap()
-        let later = held.buttons[monthName(movedBy: 0)]
-        XCTAssertTrue(later.waitForExistence(timeout: 10), "the month before's page did not draw")
+        XCTAssertTrue(later.waitForExistence(timeout: 10), "the month before's page did not draw again")
         let recap = held.buttons["Monthly recap"]
         scroll(held, from: later, until: recap, step: 400, maxDrags: 8)
         recap.tap()
@@ -277,6 +270,10 @@ final class AppStoreScreenshotUITests: XCTestCase {
         held.buttons["Insights"].tap()
         let firstPane = held.descendants(matching: .any).matching(identifier: "The one thing").firstMatch
         XCTAssertTrue(firstPane.waitForExistence(timeout: 10), "Insights drew no week — the seed's last week holds too little")
+        // Apple's on-device model may still be wording the week: its footer says *Writing…* until it has
+        // finished, and a shot taken then carries the word (2026-11-06). Where no model writes, it never shows.
+        let writing = held.descendants(matching: .any).matching(identifier: "Writing…").firstMatch
+        XCTAssertTrue(writing.waitForNonExistence(timeout: 30), "the on-device model was still writing after 30 s")
         Thread.sleep(forTimeInterval: settle)
         capture("06-insights")
 

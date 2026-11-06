@@ -4,7 +4,8 @@
 #
 #  Run:  bash Tools/VerifyScreenshots.sh
 #
-#  Checks each file under Screenshots/ against the three rules that actually reject an upload:
+#  Checks each file under AppStore/screenshots/ (the raw captures and the upload set alike) against
+#  the three rules that actually reject an upload:
 #    · pixel size is one of the accepted pairs for its slot
 #    · no alpha channel  ("Images can't include alpha channels or transparencies")
 #    · format is PNG
@@ -18,7 +19,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SHOTS="$ROOT/Screenshots"
+SHOTS="$ROOT/AppStore/screenshots"
 
 IPHONE_69="1260x2736 1290x2796 1320x2868"
 IPHONE_65="1242x2688 1284x2778"
@@ -29,7 +30,7 @@ fail=0
 count=0
 
 if [ ! -d "$SHOTS" ]; then
-  echo "no Screenshots/ directory — nothing to verify"
+  echo "no AppStore/screenshots/ directory — nothing to verify"
   exit 0
 fi
 
@@ -43,13 +44,9 @@ while IFS= read -r file; do
   fmt=$(sips -g format "$file" 2>/dev/null | awk '/format:/{print $2}')
   size="${w}x${h}"
 
-  # Screenshots/census/** is a COVERAGE run — it exists to be looked at, and deliberately includes
-  # sizes App Store Connect does not accept (the 42mm at 374x446 and the SE 3 40mm at 324x394 are
-  # captured precisely to show how the layout degrades on the small watches). Size is therefore not
-  # checked there. The alpha and format rules still are: those are correctness, not slot-fitting,
-  # and a census shot may well be promoted into the store set later.
+  # The census, a coverage run that deliberately includes sizes Connect does not accept, writes
+  # under the ignored build/census/ since 2026-11-06, so nothing here is exempt from the size check.
   case "$file" in
-    */Screenshots/census/*) accepted=""; slot="census (size unchecked)" ;;
     *"/iPhone-6.9/"*)       accepted="$IPHONE_69"; slot="iPhone 6.9\"" ;;
     *"/iPhone-6.5/"*)       accepted="$IPHONE_65"; slot="iPhone 6.5\"" ;;
     *"/iPad-13/"*)          accepted="$IPAD_13";   slot="iPad 13\""    ;;
@@ -74,7 +71,7 @@ done < <(find "$SHOTS" -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpe
 
 echo
 if [ "$count" -eq 0 ]; then
-  echo "no screenshots found under Screenshots/"
+  echo "no screenshots found under AppStore/screenshots/"
   exit 0
 fi
 if [ "$fail" -ne 0 ]; then

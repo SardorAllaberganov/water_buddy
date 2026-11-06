@@ -24,7 +24,8 @@ cd "$ROOT"
 
 PHONE="${WATERBUDDY_SCREENSHOT_PHONE:-EDF19A71-1CA8-4D79-A5B6-06340C4560E8}"
 
-OUT="$ROOT/Screenshots/census/iPhone-6.9"
+# Under the ignored `build/`: a census is for looking at, never for the store folder (2026-11-06).
+OUT="$ROOT/build/census/iPhone-6.9"
 WORK="$ROOT/build/census"
 RESULT="$WORK/census.xcresult"
 DD="$WORK/DerivedData"

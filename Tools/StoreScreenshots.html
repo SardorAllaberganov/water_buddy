@@ -1,0 +1,496 @@
+<!doctype html>
+<!--
+  StoreScreenshots.html
+  Tools
+
+  The App Store's iPhone shots, framed: one scene along a strip ten shots wide (phones, cut-outs of the screens,
+  drops, sparkles and hand-drawn notes) under a two-line headline per shot. Each shot is a 660-px window onto the
+  strip, so a piece near a seam is drawn in both neighbours and a swipe through the ten reads as one picture.
+  Spec: docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md, §4 and §11.
+
+  Render the ten with `bash Tools/FrameScreenshots.sh`. One shot by hand, from the repository root (the
+  throwaway profile keeps a headless run off the owner's own Chrome profile):
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+      --hide-scrollbars --force-device-scale-factor=2 --window-size=660,1434 \
+      --allow-file-access-from-files --user-data-dir="$(mktemp -d)" --virtual-time-budget=3000 \
+      --screenshot=out.png "file://$PWD/Tools/StoreScreenshots.html?shot=01-home"
+
+  THE QUERY. shot=<slug>: draw that shot. measure=<slug>: draw that capture at 0.5, filling the canvas, with every
+  rectangle the scene cuts from it outlined and named, and rect=x,y,w,h outlined in yellow beside them.
+  in=<directory>, percent-encoded: where the captures are, AppStore/screenshots/captures/iPhone-6.9 by default.
+  set=<cut>.<field>:<value>, repeatable: try a rectangle (rect:x,y,w,h), a scale, a position (x, y) or a turn
+  (rot) before it goes in the scene. preview: draw a dashed placeholder where a capture or a rectangle is
+  missing. font=, hand=, l1=, l2=: another face, another hand, other words. The script passes only shot and in.
+
+  THE STATUS. <body data-status> reads "ready" only once every capture the shot's window needs has decoded at
+  1320 x 2868, both faces have loaded, each headline line fits on one line, every rectangle lies inside its
+  capture, no cut-out is drawn past 0.5 CSS px a capture pixel (one capture pixel per output pixel at 2x, so a
+  cut-out is never upscaled), no cut-out leaves its own shot unless the scene marks it flow, and no cut-out or
+  phone covers the headline. Otherwise "error: <what>". The script reads it before it takes the shot.
+
+  HONESTY. A cut-out is the capture's own pixels; nothing is redrawn. Drops, sparkles and notes are decoration
+  and carry no figure. The six Premium shots carry the Premium tag (App Review Guideline 2.3.2). No price, no
+  "Free", no award, no "AI".
+
+  THE LOOK. The app's Aurora tokens (WaterSurface.swift), copied as the header copies them; the two waves keep
+  the app's two frequencies, 1.1 and 1.7, as periods 260 and 168. The rounded face is SF Pro Rounded, the hand
+  Bradley Hand Bold, both loaded from macOS's own files.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Store Screenshots</title>
+<style>
+:root { --top: #0A2185; --bottom: #5C1A9E; --blue: #008CFF; --magenta: #C740FA; --cyan: #00D9D9; }
+html, body { margin: 0; padding: 0; width: 660px; height: 1434px; overflow: hidden; background: var(--top); }
+#canvas { position: relative; width: 660px; height: 1434px; overflow: hidden; color: #fff;
+  font-family: "WB Rounded", ui-rounded, -apple-system, sans-serif; }
+#world { position: absolute; top: 0; width: 6600px; height: 1434px;
+  background: linear-gradient(180deg, var(--top) 0%, #1A1F92 45%, var(--bottom) 100%); }
+#world .light { position: absolute; border-radius: 50%; opacity: .5; }
+#world svg.waves { position: absolute; left: 0; bottom: 0; }
+.item { position: absolute; transform-origin: center; }
+.phone { box-sizing: border-box; padding: 12px; border-radius: 74px;
+  background: linear-gradient(160deg, #3A3E50 0%, #15171F 50%, #2C3040 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 0 0 4px rgba(0, 0, 0, .55),
+              0 70px 120px rgba(4, 6, 40, .6), 0 16px 34px rgba(4, 6, 40, .5); }
+.phone .screen { position: relative; border-radius: 62px; overflow: hidden; background: #000; }
+.phone .screen img { display: block; width: 100%; }
+.phone .screen .dim { position: absolute; inset: 0; background: rgba(6, 8, 44, .26); }
+.phone .island { position: absolute; left: 50%; top: 3%; width: 28.5%; height: 3.9%; transform: translateX(-50%);
+  border-radius: 999px; background: #000; }
+.cut { background-repeat: no-repeat;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .42), 0 0 26px rgba(127, 246, 246, .22),
+              0 44px 80px rgba(4, 6, 40, .62), 0 12px 24px rgba(4, 6, 40, .48); }
+.note { font-family: "WB Hand", "Bradley Hand", cursive; white-space: nowrap; color: #fff;
+  text-shadow: 0 2px 14px rgba(6, 10, 60, .55); }
+.placeholder { box-sizing: border-box; border: 3px dashed rgba(255, 255, 255, .55); border-radius: 40px;
+  display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 650;
+  color: rgba(255, 255, 255, .8); background: rgba(255, 255, 255, .06); }
+#head { position: absolute; left: 0; top: 0; width: 660px; height: 392px; box-sizing: border-box; padding: 0 40px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; z-index: 10; }
+#head > * { flex: none; }
+h1 { margin: 0; width: 580px; font-weight: 750; font-size: 60px; line-height: 66px; letter-spacing: -1.2px;
+  text-align: center; text-shadow: 0 2px 18px rgba(6, 10, 60, .35); }
+h1 .line { display: block; white-space: nowrap; overflow: hidden; }
+h1 em { font-style: normal; background: linear-gradient(90deg, #7FF6F6 0%, #5EF0F0 40%, #8FD0FF 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; }
+.pill { display: none; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 999px;
+  font-weight: 650; font-size: 22px; line-height: 28px; }
+.pill.on { display: inline-flex; }
+#premium { border: 2px solid transparent;
+  background: linear-gradient(rgba(20, 24, 110, .85), rgba(20, 24, 110, .85)) padding-box,
+              linear-gradient(90deg, var(--cyan), var(--magenta), var(--blue)) border-box; }
+#premium svg { width: 20px; height: 20px; fill: #7FF6F6; }
+#note { background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .28); font-size: 21px; }
+.outline { position: absolute; outline: 2px dashed #7FF6F6; font: 600 12px -apple-system, sans-serif; color: #7FF6F6;
+  padding: 2px 4px; box-sizing: border-box; }
+.outline.try { outline-color: #FFD60A; color: #FFD60A; }
+</style>
+</head>
+<body data-status="loading">
+<div id="canvas">
+  <div id="world"></div>
+  <div id="head">
+    <div id="premium" class="pill"><svg viewBox="0 0 24 24"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>Premium</div>
+    <h1 id="headline"></h1>
+    <div id="note" class="pill"></div>
+  </div>
+</div>
+<script>
+// The ten, in upload order: shot i is the strip's i-th window.
+const SHOTS = ['01-home', '03-history', '05-month', '06-insights', '07-patterns', '08-recap',
+               '11-schedule', '12-export', '09-goal-setup', '10-settings'];
+
+const COPY = {
+  '01-home':       { lines: ['One tap.', 'Watch it <em>fill.</em>'], pill: 'No account · No cloud' },
+  '03-history':    { lines: ['Your <em>week,</em>', 'day by day'] },
+  '05-month':      { lines: ['A whole <em>month</em>', 'on one page'], premium: true },
+  '06-insights':   { lines: ['<em>Insights</em> from', 'your own week'], premium: true },
+  '07-patterns':   { lines: ['Learn <em>when</em>', 'you drink'], premium: true },
+  '08-recap':      { lines: ['<em>Share</em>', 'your month'], premium: true },
+  '11-schedule':   { lines: ['Reminders on', '<em>your hours</em>'], premium: true },
+  '12-export':     { lines: ['Your servings,', 'as a <em>CSV file</em>'], premium: true },
+  '09-goal-setup': { lines: ['A goal that', '<em>fits</em> you'] },
+  '10-settings':   { lines: ['Set your own', '<em>serving sizes</em>'] },
+};
+
+// The scene. Every item names its shot. A phone's x, y is its centre in that shot's own CSS px. A cut-out's rect
+// is in its capture's pixels, measured on the pane's lit rim with 4 px kept round it (refine with measure=), and
+// its scale is CSS px a capture pixel. A cut-out marked on is lifted out of its own place on its shot's phone: the
+// page finds where the rect sits on the turned phone, so the copy covers its original, and dx, dy move it off it
+// and rot turns it on top of the phone's own turn. Any other cut-out stands at x, y. flow lets a cut-out cross into
+// a neighbour, where it is drawn too. rect: null is a cut still to be measured, on Sunday's capture. A note points
+// its arrow at a cut-out (to), from its own centre plus from, to the cut-out's centre plus at.
+const SCENE = [
+  // 1 · Home: the vessel and the Glass lifted out of a phone turned left, the Glass tapped.
+  { kind: 'phone', shot: 0, src: '01-home', x: 300, y: 960, width: 440, rot: -7 },
+  { kind: 'cut', name: 'home.vessel', shot: 0, src: '01-home', rect: [199, 660, 920, 920], shape: 'circle', scale: 0.45, on: true, rot: 5 },
+  { kind: 'cut', name: 'home.streak', shot: 0, src: '01-home', rect: [964, 242, 282, 115], shape: 'capsule', scale: 0.5, on: true, dx: 40, dy: -10, rot: -3 },
+  { kind: 'ripple', shot: 0, at: 'home.glass', r: 70 },
+  { kind: 'cut', name: 'home.glass', shot: 0, src: '01-home', rect: [520, 2133, 280, 280], shape: 'circle', scale: 0.5, on: true, dy: -26, rot: 7 },
+  { kind: 'note', shot: 0, x: 548, y: 1176, rot: -8, size: 40, text: 'one tap', arrow: { from: [-20, 26], to: 'home.glass', at: [62, -18], bend: [10, 26] } },
+  // 2 · History: the week lifted out; one serving row floats on into Month.
+  { kind: 'phone', shot: 1, src: '03-history', x: 360, y: 960, width: 420, rot: 5 },
+  { kind: 'cut', name: 'week.card', shot: 1, src: '03-history', rect: [68, 657, 1184, 825], scale: 0.46, on: true, dx: -30, rot: -6 },
+  { kind: 'cut', name: 'week.row', shot: 1, src: '03-history', rect: [68, 2235, 1184, 176], shape: 'capsule', scale: 0.46, on: true, away: [660, 1300], rot: -4, flow: true },
+  { kind: 'note', shot: 1, x: 120, y: 1205, rot: -8, size: 36, text: 'every glass', arrow: { from: [60, 26], to: 'week.row', at: [-252, -10], bend: [-10, 30] } },
+  // 3 · Month, no phone: the calendar and its three figures afloat.
+  { kind: 'cut', name: 'month.calendar', shot: 2, src: '05-month', rect: [68, 657, 1184, 1212], scale: 0.5, x: 340, y: 735, rot: 2 },
+  { kind: 'cut', name: 'month.days', shot: 2, src: '05-month', rect: [68, 1910, 379, 222], scale: 0.5, x: 150, y: 1112, rot: -6 },
+  { kind: 'cut', name: 'month.streak', shot: 2, src: '05-month', rect: [471, 1910, 379, 222], scale: 0.5, x: 345, y: 1150, rot: 3 },
+  { kind: 'cut', name: 'month.litres', shot: 2, src: '05-month', rect: [874, 1910, 379, 222], scale: 0.5, x: 540, y: 1105, rot: -3 },
+  { kind: 'note', shot: 2, x: 470, y: 1300, rot: -5, size: 36, text: 'a full ring: goal met', arrow: { from: [130, -30], to: 'month.calendar', at: [250, 250], bend: [30, 0] } },
+  // 4 · Insights: the lead pane lifted out of the phone; Worth knowing floats on into Patterns.
+  { kind: 'phone', shot: 3, src: '06-insights', x: 300, y: 1040, width: 400, rot: -6 },
+  { kind: 'cut', name: 'insights.lead', shot: 3, src: '06-insights', rect: [68, 813, 1184, 425], scale: 0.45, on: true, dx: 40, rot: 4 },
+  { kind: 'cut', name: 'insights.knowing', shot: 3, src: '06-insights', rect: [70, 1286, 1179, 225], scale: 0.45, on: true, away: [660, 470], rot: -3, flow: true },
+  { kind: 'note', shot: 3, x: 430, y: 1250, rot: -6, size: 36, text: 'from your own figures', arrow: { from: [70, -30], to: 'insights.lead', at: [190, 98], bend: [60, 10] } },
+  // 5 · Patterns: the chart and the first and last drinks lifted out of a phone turned right.
+  { kind: 'phone', shot: 4, src: '07-patterns', x: 360, y: 960, width: 400, rot: 6 },
+  { kind: 'cut', name: 'patterns.chart', shot: 4, src: '07-patterns', rect: [68, 1293, 1184, 477], scale: 0.46, on: true, dx: -40, rot: -8 },
+  { kind: 'cut', name: 'patterns.first', shot: 4, src: '07-patterns', rect: [68, 2328, 580, 222], scale: 0.46, on: true, dx: -40, rot: -10 },
+  { kind: 'cut', name: 'patterns.last', shot: 4, src: '07-patterns', rect: [672, 2328, 580, 222], scale: 0.46, on: true, dx: 40, rot: -2 },
+  // 6 · The recap, no phone: the card turned, the button and the promise under it.
+  { kind: 'cut', name: 'recap.card', shot: 5, src: '08-recap', rect: [70, 434, 1178, 1254], scale: 0.5, x: 330, y: 755, rot: -5 },
+  { kind: 'cut', name: 'recap.share', shot: 5, src: '08-recap', rect: [68, 2524, 1184, 176], shape: 'capsule', scale: 0.44, x: 350, y: 1160, rot: 2 },
+  { kind: 'cut', name: 'recap.private', shot: 5, src: '08-recap', rect: [75, 2355, 1172, 124], shape: 'capsule', scale: 0.42, x: 330, y: 1262, rot: -1 },
+  // 7 · The schedule: its two hours, its interval and its days lifted out, Sunday quiet.
+  { kind: 'phone', shot: 6, src: '11-schedule', x: 300, y: 1040, width: 400, rot: -6 },
+  { kind: 'cut', name: 'schedule.first', shot: 6, src: '11-schedule', rect: [70, 434, 1172, 175], shape: 'capsule', scale: 0.46, on: true, dx: 40, rot: 4 },
+  { kind: 'cut', name: 'schedule.last', shot: 6, src: '11-schedule', rect: [70, 650, 1172, 175], shape: 'capsule', scale: 0.46, on: true, dx: 60, rot: 8 },
+  { kind: 'cut', name: 'schedule.every', shot: 6, src: '11-schedule', rect: [470, 867, 379, 173], shape: 'capsule', scale: 0.5, on: true, dx: 24, dy: 4, rot: 2 },
+  { kind: 'cut', name: 'schedule.days', shot: 6, src: '11-schedule', rect: [80, 1140, 1160, 170], scale: 0.46, on: true, dx: 50, dy: 20, rot: 9 },
+  { kind: 'note', shot: 6, x: 190, y: 1250, rot: -7, size: 36, text: 'Sundays off', arrow: { from: [-40, -30], to: 'schedule.days', at: [-230, 30], bend: [-30, -10] } },
+  // 8 · Export: the file, shown before it is sent, and its button.
+  { kind: 'phone', shot: 7, src: '12-export', x: 360, y: 990, width: 400, rot: 6 },
+  { kind: 'cut', name: 'export.card', shot: 7, src: '12-export', rect: [69, 434, 1182, 1149], scale: 0.46, on: true, dx: -40, rot: -8 },
+  { kind: 'cut', name: 'export.share', shot: 7, src: '12-export', rect: [68, 2524, 1184, 176], shape: 'capsule', scale: 0.44, on: true, dx: -10, dy: -4, rot: -4 },
+  { kind: 'note', shot: 7, x: 470, y: 1215, rot: -6, size: 36, text: 'you choose where', arrow: { from: [-60, 24], to: 'export.share', at: [150, -36], bend: [0, 20] } },
+  // 9 · The goal: its card and the calculator's pill lifted out of the phone.
+  { kind: 'phone', shot: 8, src: '09-goal-setup', x: 360, y: 1020, width: 400, rot: 6 },
+  { kind: 'cut', name: 'goal.card', shot: 8, src: '09-goal-setup', rect: [68, 416, 1184, 729], scale: 0.46, on: true, dx: -40, rot: -8 },
+  { kind: 'cut', name: 'goal.suggest', shot: 8, src: '09-goal-setup', rect: [68, 1263, 1184, 175], shape: 'capsule', scale: 0.42, on: true, dx: -30, dy: 30, rot: -3 },
+  { kind: 'note', shot: 8, x: 220, y: 1185, rot: -6, size: 36, text: 'or let it suggest one', arrow: { from: [-70, -26], to: 'goal.suggest', at: [-150, 34], bend: [-30, -10] } },
+  // 10 · Settings: the three vessels lifted out, each on its own.
+  { kind: 'phone', shot: 9, src: '10-settings', x: 300, y: 820, width: 400, rot: -6 },
+  { kind: 'cut', name: 'vessel.cup', shot: 9, src: '10-settings', rect: [92, 1850, 1136, 220], scale: 0.42, on: true, dx: 40, rot: 3 },
+  { kind: 'cut', name: 'vessel.glass', shot: 9, src: '10-settings', rect: [92, 2105, 1136, 220], scale: 0.42, on: true, dx: 70, rot: 8 },
+  { kind: 'cut', name: 'vessel.bottle', shot: 9, src: '10-settings', rect: [92, 2370, 1136, 220], scale: 0.42, on: true, dx: 50, rot: 5 },
+  { kind: 'note', shot: 9, x: 330, y: 1290, rot: -6, size: 36, text: 'yours to change', arrow: { from: [110, -20], to: 'vessel.bottle', at: [160, 44], bend: [30, 0] } },
+];
+
+// Drops and sparkles, in strip px, so they may sit on a seam. [x, y, size, blur] / [x, y, size].
+const DROPS = [
+  [600, 1120, 46, 0], [700, 1040, 26, 0], [655, 1250, 18, 2], [760, 1190, 34, 0], [40, 380, 22, 2], [590, 470, 30, 0],
+  [1310, 470, 22, 2], [1980, 1240, 40, 0], [1930, 1330, 20, 2], [2010, 450, 24, 0],
+  [2620, 470, 30, 0], [3290, 1180, 22, 2], [3330, 450, 34, 0], [3980, 1140, 44, 0], [4030, 1240, 22, 2],
+  [4600, 460, 26, 0], [5270, 1190, 40, 0], [5320, 1290, 20, 2], [5950, 470, 30, 0], [6560, 1210, 30, 0],
+];
+const SPARKS = [
+  [560, 420, 22], [1040, 430, 18], [1880, 420, 26], [2040, 1210, 18], [2470, 700, 20], [3600, 430, 22],
+  [3560, 1220, 24], [3800, 410, 16], [4480, 1100, 20], [4560, 520, 24], [5140, 450, 18], [6590, 360, 22],
+];
+
+const LIGHTS = [
+  [560, 260, 300, 'var(--blue)'], [120, 1100, 260, 'var(--magenta)'], [1250, 900, 320, 'var(--cyan)'],
+  [1900, 300, 300, 'var(--magenta)'], [2600, 1150, 320, 'var(--blue)'], [3300, 500, 300, 'var(--cyan)'],
+  [3950, 1000, 320, 'var(--magenta)'], [4620, 280, 300, 'var(--blue)'], [5300, 1100, 320, 'var(--cyan)'],
+  [5940, 420, 300, 'var(--magenta)'], [6500, 1200, 260, 'var(--blue)'],
+];
+
+const CAPTURE = { w: 1320, h: 2868 };
+const CRISP = 0.5;          // CSS px a capture pixel: one capture pixel per output pixel at 2x
+const RADIUS = 88;          // LiquidGlass.cornerRadius, 28 pt = 84 px, plus the 4-px margin kept round the rim
+const BEZEL = 12;
+
+const P = new URLSearchParams(location.search);
+const $ = id => document.getElementById(id);
+class Refusal extends Error {}
+function fail(what) { throw new Refusal(what); }
+function fileURL(path) { return 'file://' + path.split('/').map(encodeURIComponent).join('/'); }
+function captureURL(slug) {
+  const dir = P.get('in');
+  return dir ? fileURL(dir + '/' + slug + '.png') : '../AppStore/screenshots/captures/iPhone-6.9/' + slug + '.png';
+}
+
+// Width and height an item takes before its turn, in CSS px.
+function size(item) {
+  if (item.kind === 'phone') { const h = item.width * CAPTURE.h / CAPTURE.w; return [item.width + 2 * BEZEL, h + 2 * BEZEL]; }
+  if (item.kind === 'cut') { const r = item.rect ?? [0, 0, 1000, 400]; return [r[2] * item.scale, r[3] * item.scale]; }
+  if (item.kind === 'ripple') return [item.r * 3, item.r * 3];
+  return [0, 0];
+}
+const phoneOf = item => SCENE.find(i => i.kind === 'phone' && i.shot === item.shot);
+// An item's centre in strip px and its turn. A cut-out on its phone takes the place its rect has on the screen,
+// turned with the phone, then its own dx, dy and rot.
+function place(item) {
+  if (item.kind === 'ripple') return place(SCENE.find(i => i.name === item.at));
+  if (item.kind === 'cut' && item.away) return { x: 660 * item.shot + item.away[0], y: item.away[1], rot: item.rot ?? 0 };
+  return origin(item, true);
+}
+// Where a cut-out's rect sits on its phone's turned screen; with lifted, its own dx, dy and rot added.
+function origin(item, lifted) {
+  if (item.kind === 'cut' && item.on && item.rect) {
+    const p = phoneOf(item), s = p.width / CAPTURE.w, t = p.rot * Math.PI / 180;
+    const [x, y, w, h] = item.rect;
+    const ox = (x + w / 2 - CAPTURE.w / 2) * s, oy = (y + h / 2 - CAPTURE.h / 2) * s;
+    const k = lifted ? 1 : 0;
+    return { x: 660 * p.shot + p.x + ox * Math.cos(t) - oy * Math.sin(t) + k * (item.dx ?? 0),
+             y: p.y + ox * Math.sin(t) + oy * Math.cos(t) + k * (item.dy ?? 0), rot: p.rot + k * (item.rot ?? 0) };
+  }
+  return { x: 660 * item.shot + item.x, y: item.y, rot: item.rot ?? 0 };
+}
+function box(item) {
+  const [w, h] = size(item), c = place(item), a = Math.abs(c.rot * Math.PI / 180);
+  const bw = w * Math.cos(a) + h * Math.sin(a), bh = w * Math.sin(a) + h * Math.cos(a);
+  return { left: c.x - bw / 2, right: c.x + bw / 2, top: c.y - bh / 2, bottom: c.y + bh / 2 };
+}
+
+function applySets() {
+  for (const set of P.getAll('set')) {
+    const m = set.match(/^([a-z]+\.[a-z]+)\.(rect|scale|x|y|rot):(.+)$/);
+    if (!m) fail('set= wants name.field:value');
+    const item = SCENE.find(i => i.name === m[1]);
+    if (!item) fail('set= names no cut-out ' + m[1]);
+    const v = m[3].split(',').map(Number);
+    if (v.some(Number.isNaN) || (m[2] === 'rect' ? v.length !== 4 : v.length !== 1)) fail('set= wants name.field:value');
+    item[m[2]] = m[2] === 'rect' ? v : v[0];
+  }
+}
+
+function drawWorld(index, visible, loaded) {
+  const world = $('world');
+  world.style.left = (-660 * index) + 'px';
+  for (const [x, y, r, colour] of LIGHTS) {
+    const light = document.createElement('div');
+    light.className = 'light';
+    Object.assign(light.style, { left: (x - r) + 'px', top: (y - r) + 'px', width: 2 * r + 'px', height: 2 * r + 'px',
+      background: `radial-gradient(circle, ${colour} 0%, transparent 70%)` });
+    world.appendChild(light);
+  }
+  const wave = (base, amp, period, phase) => {
+    let d = `M ${-phase} ${base}`;
+    for (let x = -phase; x < 6600 + period; x += period) d += ` q ${period / 4} ${-amp} ${period / 2} 0 t ${period / 2} 0`;
+    return d + ` V 260 H ${-phase} Z`;
+  };
+  world.insertAdjacentHTML('beforeend', `
+    <svg class="waves" width="6600" height="260" viewBox="0 0 6600 260">
+      <defs><linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3D9BFF"/><stop offset=".46" stop-color="#1667EA"/><stop offset="1" stop-color="#0B46C9"/>
+      </linearGradient></defs>
+      <path d="${wave(50, 12, 260, 0)}" fill="url(#water)" opacity=".45"/>
+      <path d="${wave(74, 9, 168, 60)}" fill="url(#water)" opacity=".9"/>
+    </svg>`);
+  for (const [x, y, s, blur] of DROPS) world.appendChild(drop(x, y, s, blur));
+  for (const [x, y, s] of SPARKS) world.appendChild(spark(x, y, s));
+  for (const item of visible) {
+    if (item.kind === 'note') { world.appendChild(note(item)); continue; }
+    if (item.kind === 'cut' && item.away && item.rect && loaded.has(item.src)) world.appendChild(slot(item));
+    const el = item.kind === 'phone' ? phone(item, loaded) : item.kind === 'cut' ? cut(item, loaded) : ripple();
+    const [w, h] = size(item), c = place(item);
+    Object.assign(el.style, { left: (c.x - w / 2) + 'px', top: (c.y - h / 2) + 'px', width: w + 'px', height: h + 'px',
+      transform: `rotate(${c.rot}deg)`, zIndex: { phone: 1, ripple: 2, cut: 3 }[item.kind] });
+    world.appendChild(el);
+  }
+}
+
+// The place a cut-out that flies away was cut from: a soft dark slot on its phone, so nothing shows twice.
+function slot(item) {
+  const p = phoneOf(item), s = p.width / CAPTURE.w, c = origin(item, false);
+  const [w, h] = [item.rect[2] * s, item.rect[3] * s];
+  const el = document.createElement('div');
+  el.className = 'item';
+  Object.assign(el.style, { left: (c.x - w / 2) + 'px', top: (c.y - h / 2) + 'px', width: w + 'px', height: h + 'px',
+    transform: `rotate(${c.rot}deg)`, zIndex: 2, borderRadius: item.shape === 'capsule' ? '999px' : RADIUS * s + 'px',
+    background: 'rgba(5, 7, 36, .9)', boxShadow: 'inset 0 6px 14px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .12)' });
+  return el;
+}
+
+function placeholder(label) {
+  const el = document.createElement('div');
+  el.className = 'item placeholder';
+  el.textContent = label;
+  return el;
+}
+
+function phone(item, loaded) {
+  if (!loaded.has(item.src)) return placeholder('8 November');
+  const el = document.createElement('div');
+  el.className = 'item phone';
+  el.innerHTML = `<div class="screen"><img src="${captureURL(item.src)}" alt=""><div class="dim"></div><div class="island"></div></div>`;
+  return el;
+}
+
+function cut(item, loaded) {
+  if (!item.rect || !loaded.has(item.src)) return placeholder('8 November');
+  const [x, y] = item.rect, s = item.scale;
+  const el = document.createElement('div');
+  el.className = 'item cut';
+  Object.assign(el.style, {
+    backgroundImage: `url("${captureURL(item.src)}")`, backgroundSize: `${CAPTURE.w * s}px ${CAPTURE.h * s}px`,
+    backgroundPosition: `${-x * s}px ${-y * s}px`,
+    borderRadius: item.shape === 'circle' ? '50%' : item.shape === 'capsule' ? '999px' : RADIUS * s + 'px',
+  });
+  return el;
+}
+
+function ripple() {
+  const el = document.createElement('div');
+  el.className = 'item';
+  el.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 300 300" style="overflow: visible">
+    <circle cx="150" cy="150" r="72" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3"/>
+    <circle cx="150" cy="150" r="104" fill="none" stroke="rgba(127,246,246,.38)" stroke-width="2.5"/>
+    <circle cx="150" cy="150" r="138" fill="none" stroke="rgba(127,246,246,.18)" stroke-width="2"/></svg>`;
+  return el;
+}
+
+function note(item) {
+  const wrap = document.createElement('div');
+  const text = document.createElement('div');
+  text.className = 'item note';
+  text.textContent = item.text;
+  Object.assign(text.style, { left: (660 * item.shot + item.x) + 'px', top: item.y + 'px', fontSize: item.size + 'px',
+    transform: `translate(-50%, -50%) rotate(${item.rot}deg)`, zIndex: 5 });
+  wrap.appendChild(text);
+  if (item.arrow) {
+    const o = 660 * item.shot, a = item.arrow, target = place(SCENE.find(i => i.name === a.to));
+    const sx = item.x + a.from[0], sy = item.y + a.from[1];
+    const ex = target.x - o + a.at[0], ey = target.y + a.at[1];
+    const cx = (sx + ex) / 2 + a.bend[0], cy = (sy + ey) / 2 + a.bend[1];
+    const ang = Math.atan2(ey - cy, ex - cx), k = 16;
+    const h1 = [ex - k * Math.cos(ang - 0.5), ey - k * Math.sin(ang - 0.5)];
+    const h2 = [ex - k * Math.cos(ang + 0.5), ey - k * Math.sin(ang + 0.5)];
+    wrap.insertAdjacentHTML('beforeend', `<svg class="item" style="left:${o}px;top:0;z-index:5;overflow:visible" width="660" height="1434">
+      <path d="M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey} M ${h1[0]} ${h1[1]} L ${ex} ${ey} L ${h2[0]} ${h2[1]}"
+        fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
+        style="filter: drop-shadow(0 2px 6px rgba(6,10,60,.5))"/></svg>`);
+  }
+  return wrap;
+}
+
+function drop(x, y, s, blur) {
+  const el = document.createElement('div');
+  el.className = 'item';
+  const h = s * 1.18;
+  Object.assign(el.style, { left: (x - s / 2) + 'px', top: (y - h / 2) + 'px', width: s + 'px', height: h + 'px', zIndex: 4,
+    filter: `${blur ? `blur(${blur}px) ` : ''}drop-shadow(0 ${s / 6}px ${s / 4}px rgba(4,6,40,.45))`, opacity: blur ? .75 : 1 });
+  const id = 'd' + x + '_' + y;
+  el.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 118">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#D4FBFF"/><stop offset=".45" stop-color="#3D9BFF"/><stop offset="1" stop-color="#0B46C9"/></linearGradient></defs>
+    <path d="M50 2 C50 2 92 52 92 76 A42 42 0 0 1 8 76 C8 52 50 2 50 2 Z" fill="url(#${id})" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+    <ellipse cx="34" cy="74" rx="9" ry="16" fill="rgba(255,255,255,.6)" transform="rotate(18 34 74)"/></svg>`;
+  return el;
+}
+
+function spark(x, y, s) {
+  const el = document.createElement('div');
+  el.className = 'item';
+  Object.assign(el.style, { left: (x - s / 2) + 'px', top: (y - s / 2) + 'px', width: s + 'px', height: s + 'px', zIndex: 4,
+    filter: 'drop-shadow(0 0 8px rgba(127,246,246,.85))' });
+  el.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 24 24"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z" fill="#E8FFFF"/></svg>`;
+  return el;
+}
+
+function loadFace(family, path) {
+  const face = new FontFace(family, `url("${fileURL(path)}")`, { weight: '100 1000' });
+  return face.load().then(f => { document.fonts.add(f); return f; });
+}
+
+async function shot(slug) {
+  const index = SHOTS.indexOf(slug);
+  if (index < 0) fail('unknown shot ' + slug);
+  applySets();
+  const lo = 660 * index, hi = lo + 660;
+  const visible = SCENE.filter(i => { const b = box(i); return b.right > lo && b.left < hi; });
+  const preview = P.has('preview');
+  for (const item of visible) {
+    if (item.kind !== 'cut') continue;
+    if (!item.rect && !preview) fail(`${item.name} is not measured yet`);
+    if (item.rect) {
+      const [x, y, w, h] = item.rect;
+      if (x < 0 || y < 0 || x + w > CAPTURE.w || y + h > CAPTURE.h) fail(`${item.name} runs outside its capture`);
+    }
+    if (item.scale > CRISP) fail(`${item.name} is drawn at ${item.scale}, past one capture pixel per output pixel (${CRISP})`);
+  }
+  // Every load starts before the first await: headless Chrome's virtual clock waits only for loads the page
+  // began while it was loading (measured: a capture asked for after an await was never waited for).
+  const sources = [...new Set(visible.filter(i => i.src).map(i => i.src))];
+  const loads = sources.map(src => new Promise((ok, no) => {
+    const img = new Image(); img.onload = () => ok([src, img]); img.onerror = () => no(src); img.src = captureURL(src);
+  }));
+  const faces = [loadFace('WB Rounded', P.get('font') ?? '/System/Library/Fonts/SFNSRounded.ttf'),
+                 loadFace('WB Hand', P.get('hand') ?? '/System/Library/Fonts/Supplemental/Bradley Hand Bold.ttf')];
+  loads.forEach(l => l.catch(() => {})); faces.forEach(f => f.catch(() => {}));
+
+  try { await faces[0]; } catch { fail('the rounded face did not load'); }
+  try { await faces[1]; } catch { fail('the hand face did not load'); }
+  const loaded = new Set();
+  for (const l of loads) {
+    try {
+      const [src, img] = await l;
+      if (img.naturalWidth !== CAPTURE.w || img.naturalHeight !== CAPTURE.h)
+        fail(`capture is ${img.naturalWidth} x ${img.naturalHeight}, not ${CAPTURE.w} x ${CAPTURE.h}`);
+      loaded.add(src);
+    } catch (e) {
+      if (e instanceof Refusal) throw e;
+      if (!preview) fail('capture did not load: ' + e + '.png');
+    }
+  }
+
+  const copy = COPY[slug];
+  const lines = [P.get('l1') ?? copy.lines[0], P.get('l2') ?? copy.lines[1]];
+  $('headline').innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
+  $('premium').classList.toggle('on', !!copy.premium);
+  if (copy.pill) { $('note').textContent = copy.pill; $('note').classList.add('on'); }
+  drawWorld(index, visible, loaded);
+  await document.fonts.ready;
+  [...$('headline').children].forEach((line, i) => {
+    if (line.scrollWidth > line.clientWidth + 0.5) fail(`headline line ${i + 1} is too wide`);
+  });
+
+  const visibleHead = [...$('head').children].filter(el => getComputedStyle(el).display !== 'none');
+  const headBottom = Math.max(...visibleHead.map(el => el.getBoundingClientRect().bottom));
+  for (const item of SCENE.filter(i => i.shot === index && (i.kind === 'cut' || i.kind === 'phone'))) {
+    const b = box(item);
+    if (b.top < headBottom + 6) fail(`${item.name ?? 'the phone'} covers the headline`);
+    if (item.kind === 'cut' && !item.flow && (b.left < lo || b.right > hi || b.bottom > 1434))
+      fail(`${item.name} runs out of its shot`);
+    // A phone may be cropped by the canvas's foot, never by a seam it was not meant to cross.
+    if (item.kind === 'phone' && !item.flow && (b.left < lo - 1 || b.right > hi + 1))
+      fail(`the phone of ${item.src} runs out of its shot`);
+  }
+  document.body.dataset.status = 'ready';
+}
+
+async function measure(slug) {
+  if (!SHOTS.includes(slug)) fail('unknown shot ' + slug);
+  applySets();
+  const img = new Image();
+  const loaded = new Promise((ok, no) => { img.onload = ok; img.onerror = no; });
+  img.src = captureURL(slug);
+  try { await loaded; } catch { fail('capture did not load: ' + slug + '.png'); }
+  $('head').style.display = 'none';
+  $('world').style.display = 'none';
+  Object.assign(img.style, { position: 'absolute', left: 0, top: 0, width: '660px', height: '1434px' });
+  $('canvas').appendChild(img);
+  const outline = (rect, label, extra) => {
+    const el = document.createElement('div');
+    el.className = 'outline' + (extra ? ' ' + extra : '');
+    const [x, y, w, h] = rect.map(v => v / 2);
+    Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+    el.textContent = label;
+    $('canvas').appendChild(el);
+  };
+  for (const item of SCENE.filter(i => i.kind === 'cut' && i.src === slug && i.rect)) outline(item.rect, item.name);
+  if (P.has('rect')) outline(P.get('rect').split(',').map(Number), 'rect', 'try');
+  document.body.dataset.status = 'ready';
+}
+
+(P.has('measure') ? measure(P.get('measure')) : shot(P.get('shot')))
+  .catch(e => { document.body.dataset.status = 'error: ' + (e instanceof Refusal ? e.message : 'the page failed: ' + e.message); });
+</script>
+</body>
+</html>

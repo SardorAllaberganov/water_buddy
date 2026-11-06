@@ -43,8 +43,10 @@ WATCH_TYPE="com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-12-46mm"
 PHONE_RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-27-0"
 WATCH_RUNTIME="com.apple.CoreSimulator.SimRuntime.watchOS-27-0"
 
-OUT_PHONE="$ROOT/Screenshots/en-US/iPhone-6.9"
-OUT_WATCH="$ROOT/Screenshots/en-US/AppleWatch"
+# Raw, beside the store capture's (`AppStore/` holds the current version only, 2026-11-06). The watch's
+# shot is uploaded as it is: copy `01-wrist.png` to `AppStore/screenshots/AppleWatch/1-wrist.png`.
+OUT_PHONE="$ROOT/AppStore/screenshots/captures/iPhone-6.9"
+OUT_WATCH="$ROOT/AppStore/screenshots/captures/AppleWatch"
 WORK="$ROOT/build/screenshots-pair"     # build/ is already gitignored
 DD="$WORK/DerivedData"
 RESULT="$WORK/LivedIn.xcresult"

@@ -6,10 +6,10 @@ log again — without opening the app.
 No account. No server. No analytics. No third-party dependencies of any kind.
 
 <p align="center">
-  <img src="Screenshots/en-US/iPhone-6.9/01-home.png" width="24%" alt="Home — the vessel at 65%">
-  <img src="Screenshots/en-US/iPhone-6.9/03-history.png" width="24%" alt="History — the week card and today's servings">
-  <img src="Screenshots/en-US/iPhone-6.9/05-month.png" width="24%" alt="Premium — the month view">
-  <img src="Screenshots/en-US/iPhone-6.9/08-recap.png" width="24%" alt="Premium — the monthly recap">
+  <img src="AppStore/screenshots/iPhone-6.9/1-home.png" width="24%" alt="Home — the vessel at 65%">
+  <img src="AppStore/screenshots/iPhone-6.9/2-history.png" width="24%" alt="History — the week card and today's servings">
+  <img src="AppStore/screenshots/iPhone-6.9/3-month.png" width="24%" alt="Premium — the month view">
+  <img src="AppStore/screenshots/iPhone-6.9/6-recap.png" width="24%" alt="Premium — the monthly recap">
 </p>
 
 ---
@@ -179,7 +179,8 @@ baseline*; closing it is tracked as known issue #29.
 `Tools/` holds a capture harness. Nothing in it is compiled into any target.
 
 ```bash
-bash Tools/CaptureScreenshots.sh                      # the 10 iPhone shots, 6.9" (1:45–11:45 PM, from the 8th)
+bash Tools/CaptureScreenshots.sh                      # the 10 raw iPhone shots, 6.9" (1:45–11:45 PM)
+bash Tools/FrameScreenshots.sh                        # frames them into the upload set
 bash Tools/CapturePairScreenshots.sh setup            # a new phone + watch pair, a lived-in week on it
 bash Tools/CapturePairScreenshots.sh shoot <name>     # 01-wrist; also 02-widgets, 04-lock-screen and the two
                                                       #   faces, once a person has placed each in DeviceHub —
@@ -234,8 +235,8 @@ WaterBuddyWatchWidget/   the complication — .accessoryCircular
 WaterBuddy*Tests/        three test targets, two platforms
 Entitlements/            one entitlements file per signed target: the App Group; the app's adds HealthKit
 Tools/                   standalone scripts, in no build target
-Screenshots/             App Store assets
-AppStore/                the upload folder per version — the listing's text and the store set, copied
+AppStore/                the current version's store page: the listing's text, one file per field, and
+                         every screenshot — raw captures and the framed upload set
 docs/                    AI_CONTEXT · STATE · WIDGET · DESIGN
 .claude/rules/           the engineering rules this codebase is held to
 ```
@@ -257,9 +258,9 @@ estimated — every field is inside Apple's limit, and two are exactly at it.
 
 Fields marked 🔴 **you must supply**; nothing in the repo can answer them.
 
-**The upload folder is [`AppStore/1.4/`](AppStore/1.4)** — this section's text one file per field,
-and the store set copied and renamed into upload order, with a start-here checklist. Copied on
-2026-10-28; this section stays the master copy, so a change here is made there too.
+**The upload folder is [`AppStore/`](AppStore)** — this section's text one file per field, and every
+screenshot in upload order, with a start-here checklist. It holds the current version only (the owner's
+ruling, 2026-11-06); this section stays the master copy, so a change here is made there too.
 
 1.4 carries everything since 1.1: the redesign (roadmap release 1.2), every surface (1.3) — Apple Health
 (1.3.3) among it — and WaterBuddy Premium: set A, set B and export (1.4), with the finish across the app
@@ -424,7 +425,7 @@ auto-renewable subscriptions, plus one non-consumable:
   `-WaterBuddyPremium` among the Run action's arguments, which the checked-in scheme does not carry —
   add it for the shot and take it out after (#163). Check the yearly tile's saving reads 44 %: on
   this Mac's `en_UZ` simulators it reads 20 % (#162). Step by step in
-  [`AppStore/1.4/in-app-purchases.md`](AppStore/1.4/in-app-purchases.md).
+  [`AppStore/in-app-purchases.md`](AppStore/in-app-purchases.md).
 - **First submission:** new in-app purchases go to App Review **with a new app version**. On the 1.4
   version page, under *In-App Purchases and Subscriptions*, select all three before you submit.
 - **Localizations:** English is enough to submit; Russian and Uzbek display names are optional.
@@ -483,45 +484,41 @@ Store Connect should not prompt. If it does:
 
 ## Screenshots
 
-In [`Screenshots/en-US/`](Screenshots/en-US), English only, raw — no frame, no headline — and every
-file checked by `bash Tools/VerifyScreenshots.sh`. **Only the 6.9″ well is filled**: Apple's spec makes
-6.5″ *"required if screenshots for 6.9″ display aren't provided"*, and Connect scales the 6.9″ set
-down for the smaller phones. Delete any 6.5″ shots left from 1.0 in Connect, since they show the old
-app.
+In [`AppStore/screenshots/`](AppStore/screenshots), English only, every file checked by
+`bash Tools/VerifyScreenshots.sh`. **Only the 6.9″ well is filled**: Apple's spec makes 6.5″ *"required if
+screenshots for 6.9″ display aren't provided"*, and Connect scales the 6.9″ set down for the smaller phones.
+Delete every older shot already in Connect — 1.1's, and any 6.5″ ones from 1.0 — since they show the old app.
 
 | Slot | Size | Files |
 |---|---|---|
-| iPhone 6.9″ | 1320 × 2868 (iPhone 18 Pro Max, iOS 27.0) | 8 |
-| Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | 1 — **required**, because the app embeds a watchOS app; one meets it |
-| Product page header | 3840 × 1646 | 1 — `ProductPageHeader/01-one-tap.png`, *One tap. Watch it fill.* |
+| iPhone 6.9″ | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**, from 1.4's capture of 2026-11-06 |
+| Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | `AppleWatch/1-wrist.png` — **required**, because the app embeds a watchOS app; one meets it |
+| Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.png`, *One tap. Watch it fill.* |
 
-All nine were retaken on **2026-10-26** — the eight at 21:59, `01-wrist` at 22:39 — on Monday 26
-October's figures. **No shot of a system surface is in 1.4's set** — the Home Screen widgets, the Lock
-Screen and the two watch faces (the owner's ruling, 2026-10-26): each needs a person to place it in
-DeviceHub, and nothing automated can. The file names keep the capture harness's slots, so the iPhone
-numbers skip 02 and 04; App Store Connect shows no file name. Delete every older shot already in
-Connect — 1.1's, and any 6.5″ ones from 1.0 — since they show the old app.
+**The iPhone set is framed** (`docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md`): a
+two-line headline, the screen in a drawn phone and one of its panes lifted out, over the aurora running across
+the ten; the six Premium shots carry a *Premium* tag. `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM, from
+any day) writes the raw screens into `captures/iPhone-6.9/`, kept as the input, and
+`bash Tools/FrameScreenshots.sh` frames them into `iPhone-6.9/` under their upload names. **No shot of a system
+surface is in 1.4's set** (the owner's ruling, 2026-10-26).
 
 Upload in this order — only the **first three** appear on search results and install cards:
 
-| # | iPhone | Shows |
-|---|---|---|
-| 1 | `01-home.png` | Home at 65 %, *1,300 of 2,000 ml*, a five-day streak |
-| 2 | `03-history.png` | History's week, today shown, *Month* and *Insights* locked for a free user |
-| 3 | `05-month.png` | Premium: October's calendar and figures — 20 of 25 days on goal |
-| 4 | `06-insights.png` | Premium: last week's insights, 18–24 October |
-| 5 | `07-patterns.png` | Premium: the month's patterns |
-| 6 | `08-recap.png` | Premium: September's recap card |
-| 7 | `09-goal-setup.png` | the welcome's goal step |
-| 8 | `10-settings.png` | Settings, the Premium card first |
+| # | File | Headline | Shows |
+|---|---|---|---|
+| 1 | `1-home.png` | One tap. Watch it fill. | Home at 65 %, *1,300 of 2,000 ml*, a five-day streak |
+| 2 | `2-history.png` | Your week, day by day | History's week, *Month* and *Insights* locked for a free user |
+| 3 | `3-month.png` | A whole month on one page | Premium: the month before's calendar and figures, a whole month |
+| 4 | `4-insights.png` | Insights from your own week | Premium: last week's insights |
+| 5 | `5-patterns.png` | Learn when you drink | Premium: the month's patterns |
+| 6 | `6-recap.png` | Share your month | Premium: the month before's recap card |
+| 7 | `7-schedule.png` | Reminders on your hours | Premium: your own reminder schedule, a quiet day |
+| 8 | `8-export.png` | Your servings, as a CSV file | Premium: export, the file shown before it is sent |
+| 9 | `9-goal-setup.png` | A goal that fits you | the welcome's goal step |
+| 10 | `10-settings.png` | Set your own serving sizes | Settings, the quick-add vessels lifted out |
 
-| # | Apple Watch | Shows |
-|---|---|---|
-| 1 | `01-wrist.png` | the watch app, synced from the phone, at 65 % |
-
-The eight come from `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM, from the 8th of a month);
-`01-wrist` from `bash Tools/CapturePairScreenshots.sh setup`, then `shoot 01-wrist` — no person is
-needed for it, since the watch opens on WaterBuddy.
+`1-wrist.png` is the watch app, synced from the phone, at 65 %, taken on 2026-10-26 by
+`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4 keeps it, as it keeps the header.
 
 ## Review notes
 
@@ -555,32 +552,41 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 **Blocking — the upload or the review fails without these, and each is yours:**
 
-- 🔴 **The privacy policy must be live** (known issue #159). Its contact address is filled in
-  (2026-10-29); publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your
-  `SardorAllaberganov.github.io` repository, and open
-  `https://sardorallaberganov.github.io/waterbuddy/privacy/` to see it load. Both the app (Settings,
-  the paywall) and the listing link it; guideline 5.1.1(i). The policy on this branch describes Apple
-  Health, set B and export; publish it, not `main`'s older copy (#193's ruling superseded on 2026-11-04).
+- ✅ **The privacy policy is live** (known issue #159, 2026-11-06): `Tools/PrivacyPolicy.html` is
+  published as `waterbuddy/privacy/index.html` in the `SardorAllaberganov.github.io` repository, and
+  `https://sardorallaberganov.github.io/waterbuddy/privacy/` answers with it, byte for byte. Both the
+  app (Settings, the paywall) and the listing link it; guideline 5.1.1(i). It is this branch's policy,
+  which describes Apple Health, set B and export. Publish it again whenever `Tools/PrivacyPolicy.html`
+  changes.
 - 🔴 **Premium in App Store Connect** (#155): the Paid Apps Agreement with banking and tax, the
   *WaterBuddy Premium* group and its three products as listed above, each with its review screenshot,
-  and all three selected on the 1.4 version page.
+  and all three selected on the 1.4 version page. *(2026-11-06: the agreement, banking and tax read
+  Active; the group and the three products are made, priced, available in 175 countries, Family
+  Sharing on, each with its en-US name, description and review note — `AppStore/README.md`
+  section 1. Still missing: each product's review screenshot, then selecting all three on the 1.4
+  version page.)*
+- 🔴 **Connect's Privacy Policy URL and Support URL** still name 1.1's Notion page and a Telegram link
+  (read 2026-11-06). On the 1.4 version, set them to `https://sardorallaberganov.github.io/waterbuddy/privacy/`
+  and `…/waterbuddy/support/`; Connect changes the policy's address only with a new version.
 - 🔴 **One real purchase first** (#156, #187). A Release build offers the paywall, so before uploading
   make a sandbox purchase, a restore and a refund on a real iPhone. Nothing but the local StoreKit
   configuration has ever been bought from, and a comma-decimal region's yearly saving is unchecked
   there (#162).
-- 🔴 **The support page must be live.** `Tools/Support.html` (2026-10-29), published as
+- ✅ **The support page is live** (2026-11-06): `Tools/Support.html`, published as
   `waterbuddy/support/index.html` in the same repository; the field's value is
-  `https://sardorallaberganov.github.io/waterbuddy/support/`.
+  `https://sardorallaberganov.github.io/waterbuddy/support/`, which answers with it, byte for byte.
 - 🔴 **The HealthKit capability on the App ID** (#192). The app's entitlements carry
   `com.apple.developer.healthkit`: `sardor.WaterBuddy` needs the capability in the developer portal
   — automatic signing adds it when Xcode next signs for a device — and the distribution profile must
-  carry it before an archive, or the upload is refused.
+  carry it before an archive, or the upload is refused. *(2026-11-06: the App ID has it — the
+  development profile carries it. The App Store profile on this Mac predates it; check the archive's
+  entitlements before the upload.)*
 
 **Done in the repository:**
 
-- **The screenshots are retaken from 8 November** (spec §6): ten iPhone shots, the schedule and export
-  sheets added. Until then the folder holds the 2026-10-26 set, which predates the finish and set B —
-  do not upload it.
+- **The screenshots are taken and framed** (2026-11-06, 22:14, from this branch's tree): ten iPhone shots, the
+  schedule and export sheets among them, in `AppStore/screenshots/iPhone-6.9/`. The month, Patterns and the recap
+  are October's page, a whole month.
 
 - **Version 1.4, build 5**, on all fourteen sites in `project.pbxproj`; read back as `1.4 (5)` from
   the built app, its widget extension, the watch app and the watch widget.
