@@ -15,8 +15,7 @@
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
 > | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets); the app's alone also carries `com.apple.developer.healthkit` (2026-10-30, on `feature/apple-health`), so its file is no longer byte-identical to the other three |
 > | `Tools/` | standalone scripts and pages, in **no** build target — the icon generator, the screenshot harness, and the two pages for the owner's user site: the privacy policy and the support page (`Support.html`, the *Support URL*) |
-> | `Screenshots/` | the App Store assets (`en-US/`), in no target; the coverage run writes `census/` beside them when it is run — deleted 2026-10-29, untracked |
-> | `AppStore/` | the upload folder, one per version (`1.4/`): `README.md`'s *App Store Connect* text one file per field, and `Screenshots/en-US/` copied and renamed into upload order — a copy, in no target; `README.md` stays the master |
+> | `AppStore/` | the current version's store page, in no target, and nothing older (the owner's ruling, 2026-11-06, when `AppStore/1.4/` and `Screenshots/` became one folder): `README.md`'s *App Store Connect* text one file per field, and `screenshots/` — the raw captures in `captures/`, the framed upload set in `iPhone-6.9/`, the watch shot and the header; `README.md` stays the master of the text. The coverage run writes its census under the ignored `build/census/` |
 >
 > **Every shipping bundle also carries its own `PrivacyInfo.xcprivacy`** — four of them, byte-identical,
 > one beside each target's sources. `UserDefaults` is a required-reason API, and since 1 May 2024 an
@@ -148,8 +147,8 @@ something to record.
      -skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` — phone UI tests. The skip is
      **mandatory**: `AppStoreScreenshotUITests` is the App Store capture harness. Its store method
      starts clean on its own through the fresh start, but runs for minutes, fails as it starts
-     outside 1:45–11:45 PM or before the 8th of a month, and is driven only by
-     `Tools/CaptureScreenshots.sh`, which writes the PNGs into `Screenshots/`; its lived-in method
+     outside 1:45–11:45 PM, and is driven only by
+     `Tools/CaptureScreenshots.sh`, which writes the PNGs into `AppStore/screenshots/captures/`; its lived-in method
      fails on any phone that has finished its welcome, and is driven only by
      `Tools/CapturePairScreenshots.sh setup`, on a phone that script makes; its census method is
      still deliberately non-idempotent, and fails on any device where setup has already been

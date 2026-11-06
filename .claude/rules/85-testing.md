@@ -158,8 +158,8 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
 - **`-skip-testing:WaterBuddyUITests/AppStoreScreenshotUITests` on the UI-test invocation is
   mandatory, not an optimisation.** `AppStoreScreenshotUITests` is a capture harness, not a test.
   Its store method, `testCaptureAppStoreScreenshots`, starts clean on its own through the fresh
-  start, but it runs for minutes, refuses a run outside 1:45–11:45 PM or before the 8th of a month,
-  and is driven only by `bash Tools/CaptureScreenshots.sh`, which writes into `Screenshots/`. Its
+  start, but it runs for minutes, refuses a run outside 1:45–11:45 PM (any day of the month since 2026-11-06),
+  and is driven only by `bash Tools/CaptureScreenshots.sh`, which writes into `AppStore/screenshots/captures/`. Its
   lived-in method, `testBuildTheLivedInWeek`, fails on any phone that has finished its welcome and is
   driven only by `bash Tools/CapturePairScreenshots.sh setup`. Its census method, `testCaptureFullScreenCensus`, is still
   **deliberately non-idempotent** — it asserts *Get Started* exists, so it fails on any device where
