@@ -546,6 +546,9 @@ choice *Polish 1.4 before Sunday* — #221–#224, spec `docs/superpowers/specs/
 03:54–03:55. Later the same day, on the owner's choice *Fix #140's welcome test*: the calculator's lost first tap traced to the card
 still growing under it, and the welcome's tests now wait for *Use* to be drawn before tapping — test-only, staged, not committed,
 the full gate run on 27.0 and the UI suite on 26.5. Phase 2 still waits for Sunday.)*
+*(2026-11-06: **the fix committed and pushed** on the owner's `/commit`, `7f7a6ca` and `a8f4168`, at 03:21, after its gate on 18.6.
+No code is left for 1.4. Phase 2 waits for Sunday 8 November from 1:45 PM; the upload waits as well on the owner's steps of the
+release spec's §8, of which the privacy and support pages still answer 404.)*
 
 ## 6. Release 1.5 — more to log, more people
 

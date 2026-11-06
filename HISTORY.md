@@ -15205,3 +15205,328 @@ moved, *Last updated* kept.
 and `docs/AI_CONTEXT.md`'s blocks were written. **No `git commit` was run.** On `release/1.4`, level with `origin/release/1.4`, HEAD
 `7d449f9`, 263 commits: **6 staged**, all modified — the two test files and four records — **6 unstaged**, the six the tree already
 carried; no untracked file, none in both; one stash, `stash@{0}`.
+
+## [2026-11-06] — #140's fix committed and pushed; its 18.6 gate's one failure recorded as #226; the owner's steps read; the hundred-and-seventeenth `/doc_sync`
+
+The owner ran `/commit` on the tree the 2026-11-05 checkpoint left, approved its two groups ("ok"), and, asked whether 1.4 could ship,
+chose to have everything that was not theirs done now. No code changed in this checkpoint.
+
+### What changed
+
+- **Committed and pushed** at 03:21: `7f7a6ca` *test(tests): wait for the calculator to finish opening before tapping* (the two test
+  files) and `a8f4168` *docs: sync after fixing #140's welcome test* (the four records), `7d449f9..a8f4168` on `origin/release/1.4`.
+- **`/commit`'s gate**, on a `git checkout-index` copy of the index, built clean into its own DerivedData, iPhone 16, iOS 18.6, each
+  run `test-without-building` in the foreground, between other sessions' windows: `-scheme WaterBuddy` 20 unique warnings, identical
+  by file and message to a clean build of `HEAD` `7d449f9`; phone unit 1112 passed in 122 suites; phone UI in eleven chunks, 72
+  methods, 69 passed, 2 skipped by design, 1 failure. The widget builds were not run: no widget or shared file changed.
+- **The failure, #226:** `GoalSetupUITests.testUndoAfterTwoPoursTakesBackOnlyTheLast` at `:962`, *Undo* not drawn within 5 s of
+  the Glass tap, at a load of 98. Re-run alone at 03:02, it passed — under a load of 67 rising to 97, from a Glazzy session's
+  captures that began as it started. **`7f7a6ca`'s body says it "passed alone on a quiet machine"; that is wrong.** The commit is
+  pushed and is not amended; this checkpoint and #226 are the correction. The cause is unproven.
+- **The owner's steps, read where a read could tell:** the privacy and support addresses, the site's root and the GitHub API's entry
+  for `SardorAllaberganov.github.io` all answer 404 (#159). The development profile for `sardor.WaterBuddy` carries
+  `com.apple.developer.healthkit`, so the App ID has it; the App Store profile on this Mac, expiring 2027-09-02, predates it (#192).
+- **Phase 2's phone, read:** two *iPhone 18 Pro Max* on iOS 27.0, both without an app; `Tools/CaptureScreenshots.sh` erases neither
+  (no `erase` in it) and uses the first listed. Its step 1 runs `xcrun simctl shutdown all`, so Sunday's run waits for a window agreed with the other
+  sessions on this Mac.
+- **Cross-session:** the "WaterBuddy done" promised to Roadster Drive and Glazzy, and the word promised to AvtoLog, went out at 17:01,
+  not at 03:20 when the runs ended. Glazzy held its captures to its own 03:35 limit; Overlane Drive started at 03:31 on the fallback
+  it had been given.
+
+### Drift found and fixed
+
+`docs/AI_CONTEXT.md`'s 2026-11-05 blocks and `docs/ROADMAP.md`'s note called the fix staged; it is committed and pushed. Written
+above them, not over them.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (a *Last updated* block, *Current state*'s headline, notes on #159 and #192, new #226, the Git block),
+`docs/ROADMAP.md` (a dated note under release 1.4), `tasks/lessons.md` (two entries), this file. `CLAUDE.md`, `docs/STATE.md`,
+`docs/WIDGET.md` and `docs/DESIGN.md`: nothing in their subjects moved, nothing written.
+
+### Verification
+
+Counted in this pass: 137 `.swift` files by `find`; 1112 phone `@Test`, 71 watch, 75 UI `func test`, all as before. Gate: none
+run in this pass — docs only; the 18.6 runs above are `/commit`'s, made in this session.
+
+## [2026-11-06] — The privacy policy and the support page published; #159 retired
+
+Asked what was left of 1.4, the owner had the pages published for them: GitHub through their Chrome (their choice of three), no
+Support link added to the app ("No, as it is"), and App Store Connect next, through their Chrome once they are signed in.
+
+### What changed
+
+- **A new public repository, `SardorAllaberganov.github.io`**, made in the owner's Chrome — signed in as them, empty, no README,
+  licence or `.gitignore`. Its one commit, `e9c1263` *Publish WaterBuddy's privacy policy and support pages*, made in the
+  scratchpad and pushed from this Mac with its existing GitHub login: `waterbuddy/privacy/index.html` and
+  `waterbuddy/support/index.html`, copies of `Tools/PrivacyPolicy.html` and `Tools/Support.html`, and an empty `.nojekyll`.
+- **GitHub Pages** deployed it from `main` on its own (run #1); at 17:25 both addresses answered 200, each byte for byte its file in
+  `Tools/` by `shasum`. Read in Chrome: both render, and the support page's *Privacy Policy* link opens the policy.
+- **Nothing in the app changed**: `PaywallView.privacyPolicy` already names
+  `https://sardorallaberganov.github.io/waterbuddy/privacy/`, which Settings and the paywall link.
+- `README.md`'s *Before you submit* and `AppStore/1.4/README.md`'s section 1 mark both pages done and carry #192's read;
+  `docs/AI_CONTEXT.md` retires #159.
+
+### Still the owner's, before the upload
+
+Premium in App Store Connect (#155), a real purchase (#156, #162), an App Store profile carrying HealthKit (#192), Health on a device
+(#194, #195). Phase 2 from Sunday 8 November, 1:45 PM.
+
+### Verification
+
+Both addresses read with `curl` and in Chrome, as above. No gate: no code changed.
+
+## [2026-11-06] — The privacy policy and the support page reworded through the owner's `humanize` skill, and republished
+
+The owner handed over a writing skill (`~/Desktop/SKILL.md`, *humanize*: signs of machine-written text, from Wikipedia's
+essay) to install, and asked for both published pages to be improved by it. Installed as a personal skill,
+`~/.claude/skills/humanize/SKILL.md`, byte for byte; nothing under `.claude/` in this repository changed.
+
+### What changed
+
+- **The skill's audit, before any edit:** mixed. The facts are concrete and come from the code; the wording carried 41 dashes used
+  as all-purpose joints in the policy's body and ten in the support page's, 68 bold runs in the policy, a slogan heading ("Why we
+  can say 'we collect nothing' and mean it"), a 70-word opening sentence, a "trust a promise" set-up, and a few flourishes ("a
+  qualification we would rather state than hide", "behind the developer's back", "the extras go quiet", "a straight answer",
+  "bear in mind"). No machine traces (citation residue, placeholders, invisible characters).
+- **The rewrite, wording only:** every claim, list, table row, anchor and link kept. The policy's body went from 4,183 words to
+  4,116, 41 dashes to 0, 68 bold runs to 44; *In one sentence* became *In short*, in four sentences, and its heading *Why nothing is
+  collected*; one cross-reference gained a link (`#notifications`). `PRIVACY.md` was rewritten to the same text: stripped of markup,
+  the two differ only where they already did (a colon after a table's heading, the Apple link's and the email's display). The
+  support page kept its 1,321 words (1,318) and lost its ten dashes; "the extras go quiet" became "Premium's extras are locked
+  again" there and in the policy.
+- **Dates:** the policy's *Last updated* and both footers read 6 November 2026; the policy's *Effective* date stays 24 October.
+- **Republished:** the site's commit `0da147b`, pushed from this Mac; at 17:40 both addresses served the new files byte for byte
+  (`shasum`), and both were read in Chrome.
+
+### Rulings
+
+The owner's: install the skill, apply it to both pages. Mine: wording only, never a claim; the policy's two forms kept word for word
+alike (rule `70-privacy`); republished on the standing word to publish these pages.
+
+### Files touched
+
+`PRIVACY.md`, `Tools/PrivacyPolicy.html`, `Tools/Support.html`, `docs/AI_CONTEXT.md`, this file.
+
+### Verification
+
+The skill's own self-check on all three files: none of its markers, no dash in the shown text, no invisible character, no script or
+`src`; both pages' tags balance. No gate: no code changed.
+
+## [2026-11-06] — Premium made in App Store Connect, all but the review screenshots
+
+The owner signed in to App Store Connect in their Chrome and had the products made there, on their earlier choice (*Your Chrome,
+you sign in*): the agreement, banking and tax theirs, the products mine, nothing submitted.
+
+### What changed, in Connect
+
+- **Read first:** the Paid Apps Agreement, the bank account and both tax forms already **Active**; no subscription group and no
+  in-app purchase existed. The three IDs, prices, periods, levels and the free week read from `PremiumAccess.swift` and
+  `WaterBuddyTests/WaterBuddy.storekit`, and agreeing with `AppStore/1.4/in-app-purchases.md`, before any product was made — an
+  ID can never be used again.
+- **Made, as `in-app-purchases.md` gives them:** the group *WaterBuddy Premium*, its en-US display name and *Use App Name*;
+  *Premium Yearly* (`sardor.WaterBuddy.premium.yearly`, 1 year, *1 Year Upfront* in all 175 countries or regions, $19.99 US with
+  Connect's prices elsewhere, an introductory offer free for one week in all 175 from 6 November 2026 with no end date);
+  *Premium Monthly* (`sardor.WaterBuddy.premium.monthly`, 1 month, 175, $2.99 US); *Premium Lifetime*
+  (`sardor.WaterBuddy.premium.lifetime`, non-consumable, 175, $39.99 US). Each: en-US display name and description at the doc's
+  counts, Family Sharing on (irreversible, the 2026-10-22 ruling the pages state), and Step 6's 217-character review note. The
+  group's levels read Yearly 1, Monthly 2. Each product re-read after a reload.
+- **Left as Connect set them, none in the doc:** *Monthly with a 12-Month Commitment* not set up; *Multiseat Purchases* allowed;
+  tax category matched to the app.
+- **Still missing:** the paywall's review screenshot on all three (Step 6), so none is *Ready to Submit*; selecting the three on
+  the 1.4 version page waits for that version.
+- **Found:** App Privacy reads *Data Not Collected*; its *Privacy Policy URL* is still 1.1's Notion page, and the live version's
+  *Support URL* a Telegram link. Connect changes the policy's address only with a new version, so both move on 1.4.
+
+### Files touched
+
+`AppStore/1.4/README.md` and `README.md` (the checklists), `docs/AI_CONTEXT.md`, this file.
+
+### Verification
+
+Each product's page read back after a reload (price, availability, name, Family Sharing, note). No gate: no code changed.
+
+## [2026-11-06] — The framed store shots designed; everything not 1.4 removed
+
+### What changed
+
+- **The framed store shots, designed and planned, not built.** The owner asked for App Store screenshots in the style of three
+  Dribbble sets. Two rulings were theirs (the aurora, flowing across the set; shot 1 *One tap. Watch it fill.*), and the rest
+  were taken as recommended and ledgered in the spec as F3–F9. Spec
+  `docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md`; plan
+  `docs/superpowers/plans/2026-11-06-framed-store-screenshots.md`, its crop rectangles measured from the 26 October captures
+  before those were deleted. The plan awaits the owner's review, and every task runs after Sunday's capture. This supersedes the
+  store page's spec §1, *raw*, for the iPhone set; that spec is not rewritten.
+- **Removed, on the owner's word: everything that is not 1.4.** They chose all four places, 1.1 (3) included, and the repo's
+  shots deleted now rather than replaced on Sunday:
+  - the repository: the eight 26 October iPhone shots, `git rm`'d from `Screenshots/en-US/iPhone-6.9/` and
+    `AppStore/1.4/screenshots/iPhone-6.9/`. The watch shot and the product page header stay, since 1.4 keeps them;
+  - this Mac: the five WaterBuddy `.xcarchive`s and eleven `DerivedData/WaterBuddy-*` folders moved to the Trash, and three empty
+    date folders removed. Glazzy's two archives are untouched;
+  - TestFlight: 1.1 (3), (2), (1) and 1.0 (2), (1) expired, each confirmed in Connect's own dialog. The live version still reads
+    *Ready for Distribution*;
+  - left: Connect's 1.4 page, which does not exist yet. When it is made, the 1.1 screenshots and text Connect copies in go
+    before 1.4's go in.
+
+### Files touched
+
+The spec and the plan (added); 16 PNGs (deleted); `README.md` and `AppStore/1.4/README.md` (the shots' sections say the folder is
+empty until 8 November); `docs/AI_CONTEXT.md`; this file.
+
+### Verification
+
+`git diff --cached --name-status` shows the 16 deletions. `ls` shows the archives folder holding only Glazzy's, and no
+`WaterBuddy-*` in DerivedData. TestFlight's list, re-read, shows all five builds *Expired*. No `xcodebuild` was running when the
+build caches went. No gate: no code changed.
+
+## [2026-11-06] — One store folder; the framing built and previewed on the old captures
+
+### What changed
+
+- **`AppStore/1.4/` and `Screenshots/` are one folder, `AppStore/`** (the owner's request; their choices were one
+  folder with no version level, the raw captures kept, and a preview tonight). The text moved up a level by
+  `git mv`. The images are now in `AppStore/screenshots/`: `iPhone-6.9/` is the framed upload set, `AppleWatch/` and
+  `ProductPageHeader/` keep their upload names, and `captures/` holds the raw screens. `Screenshots/en-US/`'s watch
+  shot and header were byte-identical to the upload copies (`shasum`), so they were `git rm`'d and `Screenshots/` is
+  gone. The census, which is not store material, now writes under the ignored `build/census/`.
+- **Repointed:** `Tools/CaptureScreenshots.sh` and `Tools/CapturePairScreenshots.sh` (to `captures/`),
+  `Tools/CaptureFullCensus.sh` (to `build/census/`), `Tools/VerifyScreenshots.sh` (it scans `AppStore/screenshots/`,
+  and its census exemption is gone), `Tools/ProductPageHeader.html`'s render line, and the capture harness's DocC
+  (a comment in a test file). `CLAUDE.md`'s target table and gate note, and one sentence in rule `85-testing`, now
+  name the new path, on the owner's decision to merge. Both READMEs' screenshot sections are rewritten for the ten
+  framed shots and their headlines.
+- **The framing, built (the plan's Tasks 1–3):** `Tools/StoreScreenshots.html` and `Tools/FrameScreenshots.sh`.
+  The script writes the upload names straight into `AppStore/screenshots/iPhone-6.9/`, so phase 2 has no copy
+  step.
+  - **One fix the tests forced:** with the capture's load started after the face's `await`, headless Chrome's
+    virtual clock never waited for it, and every shot whose capture loaded stayed `loading`. Starting both loads
+    before the first `await` made all ten checks read as the plan expects.
+  - **One fix the eye forced:** Home's lifted vessel covered *700 ml to go*, so it is raised 30 px.
+- **Previewed, not for upload:** the eight 26 October captures, restored from `HEAD` into the scratchpad, framed
+  and shown to the owner as a contact sheet. The final ten wait for Sunday's capture (the harness refuses before
+  the 8th and outside 1:45–11:45 PM).
+
+### Verification
+
+- The page's ten status checks, each the plan's expected string: `ready`, an unknown shot, an unmeasured lift, a
+  missing capture, a 322 × 700 capture, a missing face, a too-wide line, a rectangle outside the capture, a piece
+  off the canvas, and a malformed `lift=`.
+- The eight measured shots all read `ready`.
+- The script's three cases: an empty folder gave ten `missing` and exit 1; a folder whose path holds an `&` gave
+  eight `ok`, two `missing` and exit 1, every output 1320 × 2868 with no alpha; `--bogus` gave exit 2.
+- `bash Tools/VerifyScreenshots.sh` on the new folder: 2 files, both acceptable.
+- The eight framed shots read by eye, and a contact sheet of them.
+- No gate: the one Swift change is a comment in the capture harness, which Sunday's final gate compiles.
+
+### Files touched
+
+The `AppStore/` moves and the two `Screenshots/` deletions; `Tools/StoreScreenshots.html` and
+`Tools/FrameScreenshots.sh` (added); the five scripts and the page named above;
+`WaterBuddyUITests/AppStoreScreenshotUITests.swift` (comment); `CLAUDE.md`; `.claude/rules/85-testing.md`; both
+READMEs; the framing spec and plan; `docs/AI_CONTEXT.md`; this file.
+
+## [2026-11-06] — The framing's creative pass: one scene across the ten
+
+### What changed
+
+The owner sent the first preview back: *"make them more creative as like as given references, more clear cut outs of elements
+in screenshot, flowless design of the screens"*. They chose shots that flow across their seams, all four of the references'
+moves (several cut-outs a shot, varied phones, hand-drawn notes, floating drops and sparkles), and the phone on some shots
+only. The spec gained §11 (F10–F16). `Tools/StoreScreenshots.html` was rebuilt around one scene along the strip:
+
+- **Cut-outs are anchored.** A cut-out marked `on` is lifted from its own place on its turned phone, larger (at most 0.5 CSS px
+  a capture pixel, so never upscaled at 2×) and slightly offset, so it covers its original. Before this, copies placed away
+  from their origins showed twice: Home's vessel, History's week card, Settings' rows.
+- **Flow across seams.** History's *250 ml Glass* row floats on into Month, and Insights' *Worth knowing* pane above Patterns'
+  phone. Each leaves a dark slot where it was cut.
+- **Frameless Month and recap**, with the calendar, its three tiles, the recap card and its button afloat.
+- **Hand-drawn notes** in Bradley Hand Bold (a macOS font), each with an arrow: *one tap*, *every glass*, *a full ring: goal
+  met*, *from your own figures*, *or let it suggest one*, *yours to change*.
+- **Drops and sparkles** drawn in SVG, and a ripple round the tapped Glass.
+- **A measuring mode** (`measure=<slug>`) and a preview mode (`preview`, placeholders for what Sunday supplies), plus
+  `set=<cut>.<field>:<value>` to try a rectangle before writing it. Every new rectangle was set on the pane's rim with a
+  throwaway rim finder and checked by eye in the measuring mode.
+
+### Verification
+
+- Fourteen refusals, each the expected string: unknown shot, unmeasured cut, missing capture, wrong-size capture, missing
+  rounded face, missing hand, too-wide headline, a rectangle outside its capture, a scale past 0.5, a cut out of its shot, a
+  cut over the headline, two malformed `set=`s, and the measuring mode ready.
+- All eight measured shots `ready`, and the two Sunday shots `ready` in preview.
+- `bash Tools/FrameScreenshots.sh --in` the restored 26 October captures: eight `ok`, two `missing`, exit 1, every file 1320 ×
+  2868 with no alpha.
+- Every shot read by eye at 430–560 px wide, and the contact sheet shown to the owner.
+- No gate: no product file changed.
+
+### Files touched
+
+`Tools/StoreScreenshots.html`, the spec (§11) and the plan (a note), `tasks/lessons.md`, `docs/AI_CONTEXT.md`, this file.
+
+## [2026-11-06] — Release 1.4's ten store shots taken and framed, the night of the 6th
+
+### What changed
+
+The owner asked for the final screenshots now, not on Sunday.
+
+- **The capture needs no day of the month.** `testCaptureAppStoreScreenshots` shoots Month (`05`) and Patterns (`07`) on the
+  month before's page, a month `StoreSample` fills whole, as it already did for the recap. Its guard against a day before the
+  8th, and `Tools/CaptureScreenshots.sh`'s own copy of it, are gone. The 1:45–11:45 PM window stays.
+- **Insights waits for the model.** The first run's `06` carried *Writing…*, Apple's on-device model still wording the week,
+  so the capture now waits up to 30 s for that footer to go, failing loudly otherwise. The second run's footer reads *Written
+  by WaterBuddy from your own figures, on your iPhone. Not medical advice.*
+- **Run by hand, not by the script, for one reason.** A watchOS 11.5 simulator belonging to another session was running, and
+  the script's step 1 is `xcrun simctl shutdown all`. The script's steps 2–7 were run one by one on the first *iPhone 18 Pro
+  Max* (iOS 27.0), with the status bar pinned at 22:08 and then 22:14. `build-for-testing` ran first, in the foreground, into
+  the capture's own DerivedData.
+- **The ten rectangles measured again on the new captures** (the plan's Task 4). History, Month, Patterns, Goal and Settings
+  matched 26 October's. On Insights this week has two panes, so its lead is lifted and *Worth knowing* flies on into Patterns.
+  The recap's card is taller and its button now sits at the foot. Schedule (both hours, *Every 2 hours*, the days with
+  Sunday quiet, the note *Sundays off*) and Export (the file card and its button, the note *you choose where*) are new. Two
+  lifted copies left their originals showing, the interval chip and Export's button, and were moved back over them.
+
+### Verification
+
+- Both capture runs: `** TEST SUCCEEDED **`, 209 s and 163 s.
+- `RenameScreenshots.py` wrote all ten slugs.
+- `bash Tools/FrameScreenshots.sh`: 10 of 10 framed into `AppStore/screenshots/iPhone-6.9/`, exit 0.
+- `bash Tools/VerifyScreenshots.sh`: 22 files, all acceptable.
+- Every raw capture and every framed shot read by eye, and every rectangle checked in `measure=`.
+- No new warning in the harness: the build's warnings grep for `AppStoreScreenshotUITests` printed nothing.
+- The gate was not run tonight; the final gate runs on the tree before the owner's `/commit`.
+
+### Files touched
+
+`WaterBuddyUITests/AppStoreScreenshotUITests.swift`, `Tools/CaptureScreenshots.sh`, `Tools/StoreScreenshots.html`;
+`AppStore/screenshots/captures/iPhone-6.9/` (ten added) and `AppStore/screenshots/iPhone-6.9/` (ten added); both READMEs;
+`CLAUDE.md`; `.claude/rules/85-testing.md` (the capture's window, on the owner's request); `tasks/lessons.md`;
+`docs/AI_CONTEXT.md`; this file.
+
+## [2026-11-07] — Release 1.4's final gate, green on the staged tree
+
+### What was run
+
+On the owner's *go*, after a window agreed with the two other sessions using simulators: AvtoLog paused, and Overlane Drive
+finished its own run and shut its simulators down first. Everything ran in the foreground, one simulator at a time,
+`-parallel-testing-enabled NO`, `xcrun simctl shutdown all` first. The load average was 4–16 throughout, against 46 earlier
+in the evening.
+
+- **4 · `WaterBuddyWidgetExtension` build** (iPhone 17, iOS 27.0): `** BUILD SUCCEEDED **`, 29 warning sites, 17 messages:
+  the baseline, with none in the changed harness.
+- **5 · `WaterBuddyWatchWidget` build** (Apple Watch Series 12 46mm, watchOS 27.0): `** BUILD SUCCEEDED **` with nothing to
+  compile. Step 4's build had already compiled the watch widget's twelve sources for the watch simulator, through the
+  app it embeds, and no source changed between the two.
+- **`-scheme WaterBuddy` build-for-testing** (iPhone 17, iOS 27.0, its own DerivedData): `** TEST BUILD SUCCEEDED **`, 36
+  sites, 20 messages: the baseline, with none in `AppStoreScreenshotUITests.swift`.
+- **1 · phone unit tests:** `✔ Test run with 1112 tests in 122 suites passed`.
+- **2 · phone UI tests, iOS 27.0,** skipping `AppStoreScreenshotUITests`, in seven chunks: 72 methods (87 runs, the
+  launch test once per configuration), **0 failures**, 2 skipped by design (`testTheBarsCaptionsShareALine`,
+  `testThePaceLineIsPremiums`). #226's `testUndoAfterTwoPoursTakesBackOnlyTheLast` passed.
+- **2b · the same on iOS 26.5:** 72 methods, **0 failures**, the same 2 skipped.
+  `testAServingRowOpensItsSheetWhereverItIsTapped` passed.
+- **3 · watch unit tests** (watchOS 27.0): `✔ Test run with 71 tests in 7 suites passed`, 2 warning messages, the baseline.
+
+Not run: a device-signed build, and the widgets, control and faces placed by hand. The staged change touched none of them.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` and this file.

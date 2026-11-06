@@ -4,6 +4,14 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-06, evening (hundred-and-seventeenth pass — `/doc_sync` after the owner's `/commit` of #140's fix, on
+`release/1.4`, HEAD `a8f4168`, level with `origin`; docs only). What it checked and wrote, every figure printed:
+- 137 `.swift` files by `find`; 1112 phone `@Test`, 71 watch, 75 UI `func test` — all unchanged; no code changed since `a8f4168`;
+- *Current state*'s headline for the commit and its 18.6 gate, and what the release still waits for; new #226; notes on #159 and
+  #192 from read-only checks of the owner's items;
+- **drift found and fixed:** the hundred-and-sixteenth pass's blocks call the fix staged; it was committed and pushed at 03:21 on
+  2026-11-06 (`7f7a6ca`, `a8f4168`). `7f7a6ca`'s body says an *Undo* test "passed alone on a quiet machine"; it did not — #226.
+
 **Last updated:** 2026-11-05, evening (hundred-and-sixteenth pass — `/doc_sync` after #140's welcome test was fixed, on
 `release/1.4`, HEAD `7d449f9`, level with `origin`; the fix staged, not committed). What it checked and wrote, every figure printed:
 - 137 `.swift` files by `find`, each with a row; 1112 phone `@Test`, 71 watch, 75 UI `func test` — all unchanged; three exception
@@ -2822,6 +2830,95 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**#140's fix committed and pushed; release 1.4 waits for phase 2 and the owner's steps** (2026-11-06). The owner's `/commit`
+made two commits, `7f7a6ca` (the two test files) and `a8f4168` (the records), and pushed `7d449f9..a8f4168` to
+`origin/release/1.4` at 03:21; the block below still calls the fix staged.
+- **`/commit`'s gate**, on a `git checkout-index` copy of the index, built clean into its own DerivedData, iPhone 16, iOS 18.6:
+  `-scheme WaterBuddy` 20 unique warnings, identical by file and message to a clean build of `HEAD` `7d449f9`; **phone unit
+  1112 passed in 122 suites**; **phone UI** in eleven chunks, 72 methods: **69 passed, 2 skipped by design, 1 failure** —
+  `GoalSetupUITests.testUndoAfterTwoPoursTakesBackOnlyTheLast` at `:962`, which passed alone (#226). The widget builds were not
+  run (no widget or shared file changed); the 27.0 and 26.5 runs are the block below's.
+- **No code is left for 1.4.** Phase 2 of the release spec (§6.3, §7.2) waits for its window, from Sunday 8 November at 1:45 PM:
+  the capture, read by eye and copied into `AppStore/1.4/`, the gate on the final tree, the owner's `/commit`, then `main`'s
+  fast-forward on their word. `Tools/CaptureScreenshots.sh`'s phone is installed (two *iPhone 18 Pro Max* on iOS 27.0, both with
+  no app on them); its step 1 runs `xcrun simctl shutdown all`, so the run needs a window agreed with the other sessions on this Mac
+  first.
+- **The privacy and support pages are live** (2026-11-06, 17:25, #159 retired): the owner chose to have them published through
+  their Chrome; the repository `SardorAllaberganov.github.io` was made there, the two pages pushed from this Mac, and both
+  addresses answer 200 with their `Tools/` files byte for byte. The read below is from before.
+- **Both pages reworded, the same day** (the owner's request, through their `humanize` skill, installed at
+  `~/.claude/skills/humanize/`): `PRIVACY.md`, `Tools/PrivacyPolicy.html` and `Tools/Support.html` keep every claim, list,
+  table, anchor and link, in plainer English — 41 dashes and 24 bold runs gone from the policy's body, "In one sentence" now *In
+  short*, "Why we can say … and mean it" now *Why nothing is collected*; the policy's *Last updated* and the support page's
+  footer read 6 November 2026, the *Effective* date unchanged. `PRIVACY.md` and the page agree word for word. Republished as the
+  site's `0da147b`.
+- **Premium made in App Store Connect, all but its screenshots** (2026-11-06, in the owner's Chrome, signed in by them; #155):
+  the Paid Apps Agreement, the bank account and the tax forms already read Active. The group *WaterBuddy Premium* and its three
+  products, each ID read first from `PremiumAccess` and the local StoreKit configuration: *Premium Yearly* (level 1, 1 year
+  upfront, $19.99 US, a free week from 6 November with no end), *Premium Monthly* (level 2, $2.99 US), *Premium Lifetime*
+  (non-consumable, $39.99 US) — 175 countries each, Family Sharing on, en-US names and descriptions, `in-app-purchases.md`'s
+  Step 6 note; each re-read after a reload. Missing: the paywall's review screenshot on all three. **Found:** App Privacy reads
+  *Data Not Collected*, but its *Privacy Policy URL* is 1.1's Notion page and the live version's *Support URL* a Telegram link;
+  both move to the GitHub pages on the 1.4 version.
+- **The store's iPhone shots are to be framed** (2026-11-06, the owner's request, with three Dribbble sets as the model): spec
+  `docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md`, approved, and plan
+  `docs/superpowers/plans/2026-11-06-framed-store-screenshots.md`, written and awaiting the owner's review. The design: the
+  aurora running across the ten, a two-line headline, the capture in a drawn phone and one pane lifted out at 1.2×, *Premium* on
+  shots 3–8, rendered by `Tools/StoreScreenshots.html` and `Tools/FrameScreenshots.sh` (neither written yet). This supersedes the
+  store page's *raw* ruling for the iPhone set. Every task runs after Sunday's capture.
+- **Everything not 1.4 removed, on the owner's word** (2026-11-06, evening):
+  - the eight 26 October iPhone shots, `git rm`'d from `Screenshots/en-US/iPhone-6.9/` and
+    `AppStore/1.4/screenshots/iPhone-6.9/` (staged; both folders are empty until Sunday's capture; the watch shot and the header
+    stay, since 1.4 keeps them). `README.md`'s top four `<img>` tags point at `Screenshots/en-US/iPhone-6.9/` and show nothing
+    until the capture writes those names again;
+  - on this Mac, the five WaterBuddy archives (1.0 (1), 1.1 (1), 1.1 (2), 1.1 (3) twice) and the eleven WaterBuddy DerivedData
+    folders moved to the Trash, recoverable until the owner empties it. The two *Glazzy* archives were left. 1.1's debug symbols
+    went with its archives, the owner's choice;
+  - in TestFlight, all five builds expired, the owner's choice including 1.1 (3), the live build: 1.1 (3), (2), (1), 1.0 (2),
+    (1). Expiry is permanent; the live version still reads *Ready for Distribution*;
+  - **left for when the 1.4 version is made in Connect:** removing the 1.1 screenshots and text Connect copies into it, before
+    1.4's go in.
+- **One store folder, and the framing built** (2026-11-06, late evening, the owner's request):
+  - `AppStore/1.4/` and `Screenshots/` are now one `AppStore/` for the current version only: the text at its top, and
+    `screenshots/` holding `iPhone-6.9/` (the framed upload set, empty until Sunday), `AppleWatch/1-wrist.png`,
+    `ProductPageHeader/1-one-tap.png` and `captures/` (the raw screens, kept as the framing's input).
+  - The capture scripts, `VerifyScreenshots.sh`, the header's render line, `CLAUDE.md` and rule `85-testing` name the new
+    path; the census writes under the ignored `build/census/`. The owner's `.claude/settings.json` still allows
+    `Write(Screenshots/**)`: a permission, theirs to change.
+  - `Tools/StoreScreenshots.html` and `Tools/FrameScreenshots.sh` are built and tested (the plan's Tasks 1–3). Eight framed
+    previews from the 26 October captures, restored from git into the scratchpad, were shown to the owner as a contact sheet.
+  - **The creative pass, the same night** (the owner sent the first preview back; spec §11, F10–F16): the page is one scene
+    across the ten. Cut-outs are lifted from their own place on turned phones, never past 0.5 CSS px a capture pixel. Two
+    pieces flow across seams, leaving dark slots where they were cut. Month and the recap are frameless. There are
+    hand-drawn notes in Bradley Hand Bold, and drops and sparkles. `measure=`, `preview` and `set=` replace `&guide` and
+    `lift=`. Fourteen refusals checked. The eight preview shots and their contact sheet are in the scratchpad, shown to the
+    owner.
+  - **The final ten are taken and framed** (2026-11-06, 22:14, the owner's request not to wait for Sunday):
+    - the capture now shoots Month and Patterns on the month before's page, so it runs on any day (the 1:45–11:45 PM
+      window stays);
+    - it waits for Insights' *Writing…* to clear;
+    - it was run step by step, without the script's `simctl shutdown all`, because another session's watch simulator was
+      running.
+    - `AppStore/screenshots/iPhone-6.9/1-home.png` … `10-settings.png` are the upload set, framed from
+      `captures/iPhone-6.9/`. `VerifyScreenshots.sh` reads all 22 files acceptable. The superseded line below is kept as
+      it was written.
+  - **The final gate is green on the staged tree** (2026-11-07, 00:12; `HISTORY.md` has every figure):
+    - phone unit tests: 1112 tests in 122 suites;
+    - phone UI tests: 72 methods on iOS 27.0 and again on 26.5, 0 failures, 2 skipped by design;
+    - watch unit tests: 71;
+    - both widget builds succeeded.
+    - Warnings are the baseline on every scheme (36 sites and 20 messages on `WaterBuddy`, 29 and 17 on the widget, 2 on
+      the watch), none in the changed harness.
+    - Next: the owner's `/commit`, then the upload.
+  - **Sunday's phase 2 is now:** the capture, then the plan's Task 4 (measure `11-schedule`'s and `12-export`'s rectangles,
+    check all ten with `?guide`, `bash Tools/FrameScreenshots.sh`, read by eye, the owner's go). The release plan's copy of
+    raw shots into `AppStore/1.4/` is superseded. The capture harness's DocC changed (a comment), so the final gate compiles it.
+- **The owner's steps, read where a read could tell** (2026-11-06, read-only): the privacy and support addresses both answer 404,
+  and so do `https://sardorallaberganov.github.io/` and the API's `repos/SardorAllaberganov/SardorAllaberganov.github.io` — the
+  site's repository is not public, or does not exist (#159). The development profile for `sardor.WaterBuddy` carries
+  `com.apple.developer.healthkit`, so the App ID has the capability; the App Store profile on this Mac predates it (#192). Premium
+  in App Store Connect (#155), a real purchase (#156, #162) and Health on a device (#194, #195) cannot be read from here.
 
 **#140's welcome test: the cause found, the fix staged on `release/1.4`, not committed; the full gate run** (2026-11-05). Taken
 by `/start_task` with no task named, on the owner's choice *Fix #140's welcome test*: `WelcomeUITests.testUseComesBackWhenTheGoalIsMovedAway`
@@ -6497,6 +6594,73 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 00:12 on 2026-11-07, after the final gate, its records added by name: HEAD `a8f4168`, level with
+`origin/release/1.4`; the same 67 staged as the block below (9 renamed, 18 deleted, 24 added, 16 modified; the gate added
+only to `HISTORY.md` and this file); 6 unstaged, the six the tree already carried; `git diff --cached --check` clean.** This
+file is added again once this block is written. No `git commit`.
+
+**Read at 22:22 on 2026-11-06, after the final ten were taken and framed, every path added by name: HEAD `a8f4168`, level
+with `origin/release/1.4`; 67 staged — 9 renamed, 18 deleted, 24 added (the block below's 4, plus the ten raw captures in
+`AppStore/screenshots/captures/iPhone-6.9/` and the ten framed shots in `AppStore/screenshots/iPhone-6.9/`), 16 modified (the
+same 16; tonight's harness, script, page, both READMEs, `CLAUDE.md`, rule `85-testing`, `tasks/lessons.md`, `HISTORY.md` and
+this file were already among them); 6 unstaged, the six the tree already carried; `git diff --cached --check` clean.** This
+file is added again once this block is written. No `git commit`.
+
+**Read at 21:57 on 2026-11-06, after the creative pass, its files added by name: HEAD `a8f4168`, level with
+`origin/release/1.4`; the same 47 staged as the block below (9 renamed, 18 deleted, 4 added, 16 modified). The pass changed
+only files already among them: the page, the spec, the plan, `tasks/lessons.md`, `HISTORY.md` and this file. 6 unstaged, the
+six the tree already carried; `git diff --cached --check` clean.** This file is added again once this block is written. No
+`git commit`.
+
+**Read at 21:40 on 2026-11-06, after the store folder was merged and the framing built, every path added by name: HEAD
+`a8f4168`, level with `origin/release/1.4`; 47 staged:**
+- **9 renamed:** `AppStore/1.4/*` up to `AppStore/`, the text and the watch and header shots.
+- **18 deleted:** the 16 PNGs below, and `Screenshots/en-US/`'s watch and header duplicates.
+- **4 added:** the framing's spec and plan, `Tools/StoreScreenshots.html` and `Tools/FrameScreenshots.sh`.
+- **16 modified:** 8 of the 9 below (the ninth, `AppStore/1.4/README.md`, is now one of the renames), the four repointed
+  scripts, the header page, the harness's DocC, `CLAUDE.md` and rule `85-testing`.
+
+6 unstaged, the six the tree already carried; `git diff --cached --check` clean. This file is added again once this block is
+written. No `git commit`.
+
+**Read at 21:12 on 2026-11-06, after the framing's spec and plan were added and the old shots removed, every path by name: HEAD
+`a8f4168`, level with `origin/release/1.4`; 27 staged — 9 modified (the 9 below), 16 deleted (the eight 26 October PNGs in
+`Screenshots/en-US/iPhone-6.9/` and the eight in `AppStore/1.4/screenshots/iPhone-6.9/`), 2 added (the spec and the plan); 6
+unstaged, the six the tree already carried; `git diff --cached --check` clean.** This file is added again once this block is
+written. No `git commit`.
+
+**Read at 18:08 on 2026-11-06, after Premium was made in App Store Connect and its records added by name: HEAD `a8f4168`, level
+with `origin/release/1.4`; the same 9 paths staged as the block below, all modified — 6 unstaged, the six the tree already
+carried; `git diff --cached --check` clean.** This file is added again once this block is written. No `git commit`.
+
+**Read at 17:40 on 2026-11-06, after the pages were reworded and republished and their files added by name: on `release/1.4`,
+level with `origin/release/1.4` — HEAD `a8f4168`; 9 staged, all modified — 6 unstaged, the six the tree already carried;
+`git diff --cached --check` clean.**
+- **Staged, the pages:** `PRIVACY.md`, `Tools/PrivacyPolicy.html` and `Tools/Support.html`.
+- **Staged, the records:** `HISTORY.md`, this file, `docs/ROADMAP.md`, `tasks/lessons.md`, `README.md` and
+  `AppStore/1.4/README.md`.
+
+This file is added again once this block is written. No `git commit`.
+
+**Read at 17:27 on 2026-11-06, after the pages were published and their records added by name: on `release/1.4`, level with
+`origin/release/1.4` — HEAD `a8f4168`; 6 staged, all modified — 6 unstaged, the six the tree already carried; `git diff --cached
+--check` clean.**
+- **Staged, the records:** `HISTORY.md`, this file, `docs/ROADMAP.md`, `tasks/lessons.md`, `README.md` and
+  `AppStore/1.4/README.md`.
+- **Unstaged, the six the tree already carried**, as below.
+
+This file is added again once this block is written. No `git commit`. The pages themselves live in their own repository,
+`SardorAllaberganov.github.io`, outside this tree.
+
+**Read at 17:12 on 2026-11-06, in the hundred-and-seventeenth pass, after its `git add` of four records by name: on `release/1.4`,
+level with `origin/release/1.4` — HEAD `a8f4168`, 265 commits, #140's fix committed and pushed; 4 staged, all modified — 6 unstaged,
+the six the tree already carried; no untracked entry, none in both; `git diff --cached --check` clean; one stash, `stash@{0}`.**
+- **Staged, the records:** `HISTORY.md`, this file, `docs/ROADMAP.md` and `tasks/lessons.md`.
+- **Unstaged, the six the tree already carried:** `.claude/settings.json`, the two watch schemes, `AppShortcuts.xcstrings` and the
+  watch's two catalogues.
+
+This file is added again once this block is written. No `git commit`.
 
 **Read at 17:28 on 2026-11-05, in the hundred-and-sixteenth pass, after its `git add` of four records by name: on `release/1.4`,
 level with `origin/release/1.4` — HEAD `7d449f9`, 263 commits, the polish committed and pushed; 6 staged, all modified — 6 unstaged,
@@ -10858,7 +11022,11 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `test-without-building`: the suite alone 10 passed and 1 skipped, then the whole target green. Two of
     the last three gates met it — finishing set A's and this one, each on a simulator just booted by its
     run; the store page's, run `test-without-building` after one `build-for-testing`, did not.)*
-159. **No privacy policy link in the app, and 1.4.1 waits for one** (spec O1). App Review 5.1.1(i)
+159. ~~**No privacy policy link in the app, and 1.4.1 waits for one**~~ **Retired 2026-11-06: the policy answers at
+    `https://sardorallaberganov.github.io/waterbuddy/privacy/`**, and the support page at `…/waterbuddy/support/`, each byte for
+    byte its file in `Tools/` (`shasum`), from the new public repository `SardorAllaberganov.github.io` — made in the owner's
+    Chrome on their word, pushed from this Mac (`e9c1263`), deployed by GitHub Pages from `main` at 17:25. The app's link,
+    `PaywallView.privacyPolicy`, is that address; nothing in the app changed. The issue as opened (spec O1). App Review 5.1.1(i)
     asks every app to link its privacy policy from inside the app; WaterBuddy has none today, Premium
     or not. The paywall's link will answer it where the paywall is offered; whether Settings carries
     it for everyone is the owner's ruling. 1.4.1 is paused at Task 6 for the URL.
@@ -10891,6 +11059,9 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `Tools/PrivacyPolicy.html` alike. Beside it, `Tools/Support.html`, the page the *Support URL* names,
     for `waterbuddy/support/` on the same site. **Still open, and the owner's:** the repository and its
     push of both pages, and opening both addresses. Open until the policy answers.)*
+    *(2026-11-06, read-only: `…/waterbuddy/privacy/`, `…/waterbuddy/support/` and the site's root all answer 404, and so does
+    `api.github.com/repos/SardorAllaberganov/SardorAllaberganov.github.io` — the repository is not public, or does not exist.
+    Still the owner's, and blocking the 1.4 upload.)*
 160. **One new warning line, from Apple's `StoreKitTest` header** (1.4.1's Task 4, found in Task 6's
     gate). `StoreKitTest.framework/Headers/SKTestTransaction.h:34:32: 'SKPaymentTransactionState' is
     deprecated: first deprecated in iOS 18.0`, emitted when the explicit module for the SDK's
@@ -11217,6 +11388,12 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `com.apple.developer.healthkit`; `sardor.WaterBuddy` needs the capability in the developer portal —
     automatic signing adds it when Xcode next signs for a device — and a distribution profile must carry it
     before an archive, or the upload is refused (rule `15-project`'s *Submission*, typed). The owner's.
+    *(2026-11-06, read-only, from the profiles in `~/Library/Developer/Xcode/UserData/Provisioning Profiles`: **the App ID has
+    the capability** — *iOS Team Provisioning Profile: sardor.WaterBuddy*, one device, expiring 2027-10-29, carries
+    `com.apple.developer.healthkit = true`, which a profile can carry only from its App ID. *iOS Team Store Provisioning Profile:
+    sardor.WaterBuddy*, expiring 2027-09-02, does not: it predates the capability. Still open: an App Store profile that carries it
+    — automatic signing should make one when the archive is distributed — read on the archive with
+    `codesign -d --entitlements -` before the upload.)*
 193. **The policy ships with Health, never before it.** `PRIVACY.md` and `Tools/PrivacyPolicy.html` on the
     branch describe Apple Health; they are published only with the release that carries it, and `main`'s
     copies stay the 1.4 upload's. The listing names the integration (guideline 2.5.1) in that release's
@@ -11444,6 +11621,17 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     alternating with it (21:10, 21:13, 21:15). The two app binaries differ only in `CFBundleVersion`, and both failures fell in one
     six-minute window after the Coaching chunk's lost tap, so it is read as a 26.5 flake in #191's company — unproven: a tap on the
     card that never reached the app would leave the line unset, and the failure's screen was not read. On 27.0 the test passed.
+
+**Opened 2026-11-06 by the owner's `/commit` of #140's fix:**
+
+226. **`GoalSetupUITests.testUndoAfterTwoPoursTakesBackOnlyTheLast` failed once on iOS 18.6, under load** (2026-11-06, `/commit`'s
+    gate, iPhone 16). At `GoalSetupUITests.swift:962`, after the first tap on the *Glass,* button, *Undo* did not appear within 5 s:
+    in its chunk at 01:16, at a one-minute load of 98 from another session's runs. It passed alone at 03:02–03:03 (19.0 s) — but
+    not on a quiet machine: the load read 3 just before, then a Glazzy session's splash captures on its own simulator took it to 67
+    as the run began and 97 as it ended. So it failed and passed at much the same load, and the cause is unproven: a Glass tap the
+    app did not take, as #140's was, or an *Undo* drawn late. The failure's screen was not kept (`-collect-test-diagnostics
+    never`). `7f7a6ca`'s body says it "passed alone on a quiet machine" — wrong, and pushed, so this entry is the correction. Not in
+    the release spec's §7.2 list; it passed alone, so by §7.2 it does not stop the merge.
 
 ## Where the rest is written down
 
