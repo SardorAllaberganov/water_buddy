@@ -15530,3 +15530,49 @@ Not run: a device-signed build, and the widgets, control and faces placed by han
 ### Files touched
 
 `docs/AI_CONTEXT.md` and this file.
+
+## [2026-11-07] — 1.4 committed and `main` moved; the first Release archive failed on two DEBUG-only previews, fixed and staged
+
+### What happened
+
+- **The owner's `/commit`** made five commits from the 67 staged paths, `41af5d9` (the privacy and support pages), `e48dfa1`
+  (the framing's spec and plan), `01cbe67` (the ten framed shots in one `AppStore/` folder), `df97ff8` (the rules) and
+  `745823d` (the records), and pushed `a8f4168..745823d` to `origin/release/1.4`. The six unstaged files stayed out.
+- **On the owner's *go, move main and upload 1.4*:** `main` fast-forwarded `8e2f0b5..745823d` and pushed. The two other
+  sessions on this Mac were told before the archive and told *done* after it; Overlane Drive had nothing running.
+- **The archive failed.** `xcodebuild archive`, Release, `generic/platform=iOS`, from a clean `git worktree` of `745823d` (so
+  the six files Xcode rewrote stay out of the upload), into Xcode's Archives folder: exit 65 after 31 s, *failed to produce
+  diagnostic for expression* at `HistoryView.swift:3600:1` and `HomeView.swift:1288:1`.
+
+### The cause
+
+Both lines open a `#Preview`, and both previews build `PremiumStore(source: .held())`. `PremiumStore.Source.held()` is
+declared inside `#if DEBUG` (`PremiumStore.swift:329–337`); a `#Preview` body is compiled in every configuration, so in Release
+the call names nothing, and inside the macro Swift crashed rather than say so. History's came with `c823594` (2026-10-25),
+Home's with `1629d06` (2026-10-31). Every gate since builds Debug for the simulator, and nothing was archived after 1.1, so
+it was on `main` unseen. The app's own call, `WaterBuddyApp.premiumSource(arguments:)`, is already DEBUG's and compiled.
+
+### The fix, staged
+
+The two previews inside `#if DEBUG`, each with a two-line comment naming #227 — eight lines, no other change.
+
+### Verification
+
+- **RED:** the archive above.
+- **GREEN:** the same worktree with the fix applied: `** ARCHIVE SUCCEEDED **`. All four bundles read `1.4 (5)`; each carries
+  `group.sardor.WaterBuddy`, the app alone `com.apple.developer.healthkit`; four `PrivacyInfo.xcprivacy`; `nm` finds no
+  `held` or `StoreSample` symbol in the Release binary. Warnings: 17 unique by file and message, the same 17 the failed run
+  printed.
+- **Debug:** a clean `build-for-testing` of the same tree into its own DerivedData, iPhone 17, iOS 27.0, booting no
+  simulator: `** TEST BUILD SUCCEEDED **`, 36 sites and 20 messages — the baseline — none in the two files. In Debug the
+  guard compiles the same code, so the gate at 00:12 stands; no test was run again.
+- **#192, met:** a local export of the archive (`app-store-connect`, `destination` *export*,
+  `manageAppVersionAndBuildNumber` false, `-allowProvisioningUpdates`) made *iOS Team Store Provisioning Profile:
+  sardor.WaterBuddy* anew at 01:33:50 with `com.apple.developer.healthkit = true`, and the exported app is signed with it.
+- **Nothing was uploaded.** The archive holds a fix not yet committed, and a build number is spent by its upload, so the
+  upload waits for the owner's `/commit`.
+
+### Files touched
+
+`WaterBuddy/HistoryView.swift`, `WaterBuddy/HomeView.swift`, `docs/AI_CONTEXT.md` (*Current state*, two *Files on disk*
+rows, #192's note, new #227), `tasks/lessons.md` and this file.

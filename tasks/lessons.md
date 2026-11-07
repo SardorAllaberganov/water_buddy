@@ -5886,3 +5886,17 @@ the rule, and the final set was taken that night.
 
 **The rule.** Before telling the owner a step must wait for a guard, read what the guard protects, and ask whether that
 need can be met now some other way. Say which way, and what it changes in the result.
+
+## 2026-11-07 — I moved `main` before the release had ever been built in Release, and the archive failed
+
+**What happened.** On the owner's *go*, I fast-forwarded and pushed `main`, then archived. The archive failed: two
+`#Preview`s call `PremiumStore.Source.held()`, which exists only in DEBUG, and a `#Preview` is compiled in Release too. Both
+had been on the branch since October. `main` now points at a tree that does not archive until the fix is committed.
+
+**Why.** Every gate this project runs builds Debug for the simulator. A call to DEBUG-only code outside a guard passes all
+of them, and I took a green gate as proof the tree would ship. The release spec's D8 even said "`main` moves after phase 2",
+and I read that as the only condition.
+
+**The rule.** Before moving `main` for a release, or calling a tree ready to upload, archive it — Release, `generic/platform=iOS`,
+from a clean worktree of the commit, uploading nothing — and only then move `main` and upload. A symbol under `#if DEBUG`
+is called only from code under `#if DEBUG`, `#Preview` bodies included.
