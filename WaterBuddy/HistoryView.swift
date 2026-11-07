@@ -3597,6 +3597,9 @@ private func previewManager(named name: String) -> DataManager {
         .environment(InsightWriter(source: .silent()))
 }
 
+// DEBUG's alone, as `.held()` is: a `#Preview` is compiled into a Release build too, and unguarded this
+// one failed the 1.4 archive with a compiler crash rather than a diagnostic (`docs/AI_CONTEXT.md` #227).
+#if DEBUG
 #Preview("Month, held") {
     let manager = previewManager(named: "preview.waterbuddy.history.month")
 
@@ -3615,6 +3618,7 @@ private func previewManager(named name: String) -> DataManager {
         .environment(PremiumStore(source: .held()))
         .environment(InsightWriter(source: .silent()))
 }
+#endif
 
 #Preview("The recap row, in a month's first week") {
     RecapRowPreview.row

@@ -1285,6 +1285,9 @@ private struct WaterVessel: View {
 
 // MARK: - Preview
 
+// DEBUG's alone, as `.held()` is: a `#Preview` is compiled into a Release build too, and unguarded this
+// one failed the 1.4 archive with a compiler crash rather than a diagnostic (`docs/AI_CONTEXT.md` #227).
+#if DEBUG
 #Preview {
     // A throwaway suite *and* an in-memory store, so previewing — and tapping + in the canvas —
     // never writes into the real store.
@@ -1318,3 +1321,4 @@ private struct WaterVessel: View {
         // Held, so the canvas shows the pace line (set B).
         .environment(PremiumStore(source: .held()))
 }
+#endif
