@@ -5931,3 +5931,40 @@ same command ran and passed.
 
 **The rule:** when a runner is refused as *Busy* or fails *preflight checks*, boot that device with `simctl bootstatus <id> -b`
 and run the same command again. Never read the refusal as a test result.
+
+## 2026-11-13 — I wrote "the refused upload spent build 5" from the record, and Connect had no build 5
+
+**What happened.** I moved 1.4 to build 6 because "an upload spends its number", and wrote that the refused upload had spent build 5
+into the records and into `cf29e8b`'s body. That evening TestFlight's *Build Uploads* listed 1.4 (6) and nothing from 1.4 (5): the
+refusal had come before Connect recorded a build. Build 6 did no harm, but the sentence is pushed and wrong.
+
+**The rule:** before writing what App Store Connect holds — a build spent, a status, a field's value — read it in Connect, and say
+"not checked in Connect" where it was not read.
+
+## 2026-11-13 — The store's screenshot wells changed, and the verifier passed a folder it did not know
+
+**What happened.** The owner's upload of the 1320 × 2868 set "did not fit". Apple's specification still lists 1320 × 2868, but on the
+1.4 version page the first well, and the only *required* iPhone one, was now the medium Dynamic Island display, which takes 1206 × 2622
+or 1179 × 2556. The 6.9″ well had moved under *View All Sizes in Media Manager*. And `Tools/VerifyScreenshots.sh` reported a new
+`iPhone-6.3/` folder as *(unknown slot)* and passed it without checking its size.
+
+**The rule:** before preparing store pictures, read the wells and the size line under each in Media Manager itself, and size for the one
+marked *Required*. A verifier fails, never passes, a file whose slot it does not know.
+
+## 2026-11-13 — An element that exists is not an element on screen
+
+**What happened.** The first paywall screenshot waited for a dollar price with `waitForExistence`, which found one, and the picture showed
+only the feature list: the three plans were below the fold, present in the accessibility tree and not on screen.
+
+**The rule:** a screenshot meant to show something checks that it is on screen — `isHittable`, or scroll it into view first — and is
+read by eye before it is used.
+
+## 2026-11-13 — StoreKit's price follows the device's region, which `-AppleLocale` does not reach
+
+**What happened.** The paywall's yearly tile read *save 20%* from the App Store sandbox as it had from StoreKit testing (#162): on the
+simulator's `en_UZ`, StoreKit hands the app $2 and $19. Launching the app with `-AppleLocale en_US` changed nothing. Only the simulator's
+own `AppleLocale`, set to `en_US` through `simctl spawn … defaults write` on the owner's one-time permission (the deny list refuses
+`defaults write`), gave *save 44%*; the region was put back after.
+
+**The rule:** a picture or a check that depends on StoreKit's prices runs on a device whose region is the one meant, set and restored
+with the owner's permission. A launch argument sets the app's locale, not StoreKit's.

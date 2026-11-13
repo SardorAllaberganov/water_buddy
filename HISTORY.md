@@ -15678,3 +15678,60 @@ Not run: docs only, and the gate above stands for the staged code.
 
 `docs/AI_CONTEXT.md` (the header, *Git*), `docs/superpowers/specs/2026-10-29-apple-health-design.md`,
 `docs/superpowers/specs/2026-10-30-coaching-design.md` and this file.
+
+## [2026-11-13] — 1.4 (6) committed, archived, uploaded and submitted to App Review with Premium
+
+### What happened, in order
+
+- **`/commit`** (the owner's): `c74bb3d` *chore(claude): admit Health's share purpose string in the rules*, `cf29e8b` *fix(app): add
+  Health's share purpose string; build 6*, `40743f2` *docs: record 1.4 (5)'s refusal and the second Health key*; pushed
+  `b77bcb7..40743f2` to `origin/release/1.4`. The gate was not run again: the staged code files were byte-identical to the copy it ran on.
+- **`main`**, on the owner's *move main*: fast-forwarded `b77bcb7..40743f2` and pushed.
+- **The archive**, from a `git archive` export of `40743f2`: Release, `generic/platform=iOS`, `** ARCHIVE SUCCEEDED **` at 22:19 into
+  Xcode's Archives folder. Read from it: the four bundles `1.4 (6)`; both Health keys in the Info.plist and in the en, ru and uz
+  `InfoPlist.strings`; the App Group on all four, HealthKit on the app alone; one privacy-manifest hash on all four; no `held` or
+  `StoreSample` symbol; 29 warning sites and 17 messages, the same messages as the staged tree's archive.
+- **The upload**, on the owner's *do it by yourself*: `xcodebuild -exportArchive` with `method` *app-store-connect*, `destination`
+  *upload*, automatic signing and `manageAppVersionAndBuildNumber` false, 22:22:30–22:25:16, *Upload succeeded*, no warning line in the
+  log. Read in the owner's Chrome: *Processing*, then *Ready to Submit* under *Version 1.4*, sent to the internal group. **Connect's
+  list holds no 1.4 (5).**
+- **The screenshots.** The owner's upload of the 1320 × 2868 set did not fit: Media Manager's required iPhone well is now *iPhone with
+  Dynamic Island (medium display)*, which takes 1206 × 2622 or 1179 × 2556. On the owner's choice, the framed ten were scaled evenly to
+  1207 × 2622 and trimmed one column to 1206 × 2622 (`sips -z`, then `sips -c`) into `AppStore/screenshots/iPhone-6.3/`, read by eye
+  (home and settings); `AppStore/README.md` §3 gives the wells in order (and gets back the sentence `01cbe67` broke), `README.md`'s
+  table gains the row, and `Tools/VerifyScreenshots.sh` an `iPhone-6.3/` slot — it had passed the folder unchecked as *(unknown
+  slot)*; `bash Tools/VerifyScreenshots.sh`: *32 file(s) checked — all acceptable*. In Connect, on the owner's *upload them* and *yes,
+  remove both*: the 6.5″ well's four 1.0/1.1 shots and the watch's four 1.1 shots removed (Connect: they stay in the Asset Library), the
+  6.3″ ten into the required well, the 6.9″ ten into the large well, `1-wrist.png` into *Apple Watch Series 12* — each count read back
+  (10, 10, 1).
+- **The version page**, on the owner's *fill the other data … and press submit*: Promotional Text, Description, What's New, Keywords
+  and the App Review notes set from `AppStore/`'s files and read back after a reload, each SHA-256 equal to its file's (161, 3987, 1060,
+  98 and 2446 characters); Support URL the GitHub support page; Copyright `2026 Sardor Allaberganov`; build 6 added and saved. App
+  Privacy's Privacy Policy URL from the Notion page to the GitHub page; *Data Not Collected* kept. Read and left: the App Review contact
+  (name, phone and email were there), sign-in off, *Automatically release this version*, and *App Information* — name, subtitle, Health &
+  Fitness with Lifestyle, 4+, no third-party content, Apple's licence.
+- **The purchases' review screenshot.** All three products lacked it. A throwaway UI test, written only into a scratch `git archive`
+  export, opened *Settings › See Premium* with `-WaterBuddyPremium` on *iPhone 17* (27.0), each run arranged with the Overlane Drive
+  session. Its first picture showed the feature list only (the price it waited for existed off screen); with three swipes the plans drew
+  — $2.99, $19.99 and $39.99 from the App Store sandbox — and **save 20%** (#162). `-AppleLocale en_US` for the app: still 20%. On the
+  owner's one-time permission, the simulator's `AppleLocale` was read (`en_UZ`), set to `en_US` with `simctl spawn … defaults write`,
+  the shot taken — **save 44%** — and the region written back to `en_UZ` and read back, `AppleLanguages` untouched. That 1206 × 2622
+  picture went onto Premium Lifetime, Yearly and Monthly, each read back after a reload.
+- **The submission.** iOS 1.4 added for review (Connect listed one change to shared information, the Privacy Policy URL); Premium Yearly
+  added to the same draft, which Connect then refused to submit until the group *WaterBuddy Premium* joined it; the group, Premium
+  Monthly and Premium Lifetime added. *Submit for Review* at about 23:33: *"5 Items Submitted"*; the version reads **Waiting for
+  Review**. A purchase on a real iPhone (#156) was not made first — the owner's *go submit for review if all configs are done*.
+
+### The records (hundred-and-twentieth pass)
+
+`docs/AI_CONTEXT.md`: the header; *Current state*'s new headline, with the build 5 correction; *Files on disk*'s store row (**drift:** it
+named `AppStore/1.4/` with 17 files; now `AppStore/`, 39) and the verifier's row; notes on #155, #156 and #162; *Git*. `CLAUDE.md`: the
+`AppStore/` row names `iPhone-6.3/`. `docs/ROADMAP.md`: a note on release 1.4. `tasks/lessons.md`: four entries. Checked and accurate: 137
+`.swift` files, 1112 / 71 / 75 tests, every rule citation, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`. Not run: the gate — no
+source changed. Left for the owner: `AppStore/README.md`'s title and *Build* row and `README.md`'s line 254 say build 5;
+`AppStore/README.md` has a stray fragment from `01cbe67`.
+
+### Files touched
+
+Staged before this pass: `AppStore/screenshots/iPhone-6.3/` (10 new), `AppStore/README.md`, `README.md`, `Tools/VerifyScreenshots.sh`.
+This pass: `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file.

@@ -4,6 +4,26 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-13, 23:40 (hundred-and-twentieth pass — `/doc_sync` after 1.4 (6) was uploaded and **submitted to App
+Review**, on `release/1.4`, HEAD `40743f2`, level with `origin`, and `main` at `40743f2` too; docs only). What it checked and wrote,
+every figure printed:
+- 137 `.swift` files in the seven targets, none added; 1112 phone `@Test`, 71 watch, 75 UI `func test` — unchanged; no source file
+  changed since `40743f2`. Staged before this pass: `AppStore/screenshots/iPhone-6.3/` (10 PNGs, new), `AppStore/README.md`,
+  `README.md` and `Tools/VerifyScreenshots.sh` (85 lines, 81 at `HEAD`);
+- *Current state*'s new headline: the owner's `/commit` (`c74bb3d`, `cf29e8b`, `40743f2`), `main` moved, the 1.4 (6) archive, upload
+  and processing, App Store Connect's new required screenshot well and the 6.3″ set, the version page filled, the purchases' review
+  screenshot, and the submission; **a correction**: build 5 was never recorded by Connect, so "the refused upload spent build 5" in the
+  pass below and in `cf29e8b`'s body is not borne out;
+- notes on #155 (done and submitted), #156 (still open, the owner's choice to submit without it) and #162 (**the sandbox does it
+  too**, and a US system region fixes it — measured);
+- **drift found and fixed:** *Files on disk* still named `AppStore/1.4/` (17 files), gone since `01cbe67` made it `AppStore/`; the row
+  now names `AppStore/` and its 39 files. `CLAUDE.md`'s `AppStore/` row gains `iPhone-6.3/`;
+- **checked and already accurate:** every `rule nn-name` cited in `CLAUDE.md`, `docs/` and `tasks/` has its file; `docs/STATE.md`,
+  `docs/WIDGET.md` and `docs/DESIGN.md` unchanged;
+- **left for the owner, outside this sync's scope:** `AppStore/README.md`'s title and *Build* row and `README.md`'s line 254 still say
+  build 5; `AppStore/README.md` carries a stray fragment (*"heir own names (`01-home`, `03-history` … `10-settings`)."*) left by
+  `01cbe67`.
+
 **Last updated:** 2026-11-13, 21:30 (hundred-and-nineteenth pass — `/doc_sync` run by the owner on the tree the hundred-and-eighteenth
 staged, HEAD `b77bcb7`; docs only, no code changed between them). What it checked and wrote, every figure printed:
 - the tree since 21:03: the same 10 staged and the same 6 unstaged, no untracked file;
@@ -2569,7 +2589,7 @@ Tools/FlattenPNG.swift                            99   re-encodes a PNG to colou
 Tools/CaptureScreenshots.sh                        —   *(2026-11-04, staged: ten slugs, `11-schedule` and `12-export` added.)* the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5. Its default device is gone — known issue #45. It no longer overrides the status bar's clock (2026-10-09, committed in `12ddfc4`). *(2026-10-18, 1.2.8, staged: it finds the phone by name and runtime — iPhone 18 Pro Max, iOS 27.0, the first of two; WATERBUDDY_SCREENSHOT_PHONE still takes a UDID — so its half of #45 is fixed; no dirty-device gate, since the harness starts clean; the clock frozen again, at the run's start, in 24-hour form, the owner's ruling; DerivedData kept between runs. Run end to end twice.)* *(2026-10-18, #144, staged with 1.2.8: the clock is read once at the top and a run outside 1:45–11:45 PM is refused there, before the boot and the build — the harness keeps its own check — and the time checked is the time frozen; its header and `--time` comment say what the code and the 1.2.8 transcript show. Proved by fake-clock runs against a device name nothing matches; not run end to end since.)* *(2026-10-25, the store page, staged: eight of the ten iPhone shots — `01-home`, `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` — in the harness's two launches; it refuses a run before the 8th of a month beside its clock check, because Patterns need seven finished days of the month holding today. Not run since.)*
 Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position. Its default device is gone — #45
 Tools/CapturePairScreenshots.sh                    —   new 2026-10-25 (the store page, staged): the other five shots — the iPhone's Home Screen widgets and Lock Screen (`02-widgets`, `04-lock-screen`) and the watch's three (`01-wrist`, `02-face-modular`, `03-face-infograph`). `setup` deletes and makes again, by name, a *WaterBuddy Store iPhone* (iPhone 18 Pro Max, iOS 27.0) paired with a *WaterBuddy Store Watch* (Series 12 46mm, watchOS 27.0), runs `testBuildTheLivedInWeek` on the phone, installs the phone app through `simctl` and then the watch app embedded in it, launches both and freezes the clock; a person arranges each surface in DeviceHub; `shoot <name>` takes it, flattens it and verifies it. Replaces `Tools/CaptureWatchScreenshot.sh`, deleted the same day. `setup` ran once before its install step took its present order; not run since
-Tools/VerifyScreenshots.sh                         —   proves each capture's size/alpha/format against the slot it will be uploaded to
+Tools/VerifyScreenshots.sh                         —   *(2026-11-13, staged: an `iPhone-6.3/` slot — 1179 × 2556 and 1206 × 2622 — where a folder it did not know was passed unchecked as *(unknown slot)*, and a header line on Connect's required well; 32 files pass; 85 lines, 81 before.)* proves each capture's size/alpha/format against the slot it will be uploaded to
 Tools/RenameScreenshots.py                         —   xcresult attachment UUIDs → slot names, via manifest.json
 Tools/PrivacyPolicy.html                         —   the privacy policy as published *(2026-11-01, export, staged on `feature/export`, with `PRIVACY.md`, the two changed together: section 8, *A file of your servings you choose to share*, a retention bullet, and five statements a file in the user's hands made stale; *Last updated* 1 November 2026.)* *(2026-10-31, set B, staged on `feature/coaching`, with `PRIVACY.md`, the two changed together: the reminders row adds the schedule and *only when behind*; up to 64 pending reminders, not 28; *the standard daily schedule, or one you set*, and the share skipped *only when behind*; the pace among what is worked out when shown; Premium's list adds set B's three; *Last updated* 30 October 2026. To be published with the release that carries set B)* *(2026-10-30, hundredth pass — Apple Health, staged on its branch, with `PRIVACY.md`, the two changed together: HealthKit among the frameworks; *Copied to Apple Health, only if you turn it on*; *Your Apple Health setting* in the complete list; section 7, *Apple Health, if you turn it on* — what is written (amount, moment, the serving's id, a version, the user-entered mark), the whole history once, earlier entries left as they are, the log leads (D6), nothing read, Health's iCloud under the user's iCloud settings, turning off deletes nothing and where to delete — Settings › Privacy & Security › Health › WaterBuddy › Data from "WaterBuddy"; the one-sentence summary and the deletion section say the same; *Last updated* 29 October 2026. **To be published with the release that carries Health, never before** — `main`'s copy stays the 1.4 upload's)* (new 2026-10-24, staged): one self-contained page, PRIVACY.md's published form — they change together — for the owner's user site at waterbuddy/privacy/index.html; light and dark, 390 pt and up; CONTACT-EMAIL still a token *(2026-10-29, staged: the contact is filled — the owner's account email, chosen that day, superseding 2026-10-24's "an address other than the account's" — four times, as `mailto:` links, in both forms; `.band a { color: inherit; }` keeps the band's address white; 313 lines. Not yet published, #159)*
 Tools/Support.html                               —   *(2026-11-04, staged: read from the code again — the schedule, an Apple Health section, export, the Premium list, deleting data; build 5.)* new 2026-10-29, staged: the page App Store Connect's Support URL names, for waterbuddy/support/index.html on the same site — contact, logging, widgets and Siri, the Watch, reminders, Premium (restore, cancel, refunds through Apple), your data, what it needs; every answer read from the code (the Siri phrases, `ReminderPlan.hours`, the catalogue's labels, the widgets' names, Family Sharing). The policy's shape and colours, nothing fetched; 198 lines. Not yet published
@@ -2589,7 +2609,7 @@ WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with
 Screenshots/en-US/iPhone-6.9/*.png                8    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)* *(2026-10-25, 13:00, the capture under way: a fifth file, `02-widgets.png`, untracked — **a wrong shot, not of the widgets**: it was taken on a person's "widgets ready" while the pair's phone still had WaterBuddy in the foreground, and draws the app's Home tab. It is to be shot again; the other four are as above.)* *(2026-10-25, 13:57: **nine files** — the store capture's eight, `01-home` (retaken, modified), `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` (new, untracked), at 13:54, iPhone 18 Pro Max, iOS 27.0; `02-history`, `03-settings` and `04-goal-setup` removed with `git rm`, staged; and the wrong `02-widgets`. `04-lock-screen` and a right `02-widgets` are a person's to place.)* *(Ninety-fourth pass, 19:50: the eight staged at 14:14, by name, beside the three removals; the wrong `02-widgets` left untracked. The count column said 4 until this pass — nine files on disk, and the ten-shot set short of `02-widgets` and `04-lock-screen`.)* *(2026-10-26, night: **eight files, the whole iPhone set** — all eight retaken at 21:59 by `CaptureScreenshots.sh`, modified and unstaged; the wrong `02-widgets.png` moved out of the tree. `02-widgets` and `04-lock-screen` are out of 1.4's set by the owner's ruling (#88, retired), so the numbers skip 02 and 04. The count column said 9 until today.)*
 Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)* *(14:14: staged, by name. Still not taken at 19:50: the two faces.)* *(2026-10-26, 22:39: **retaken** by `shoot 01-wrist` on a new pair — 65 %, *1,300 of 2,000 ml*, *Synced just now*, the watch's clock 22:38; modified, unstaged. It is 1.4's only watch shot: the two faces are out of the set by the owner's ruling (#88, retired).)*
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
-AppStore/1.4/                                    17    *(2026-11-04, staged: the five field files, the in-app purchases' note and the start-here README brought up to Apple Health, set B, export and build 5; the screenshots wait for phase 2.)* new 2026-10-28, staged: the 1.4 upload folder — README.md (start here: the blocking items, the version page's fields, the upload order, the unchanged fields, Premium's three products in short); in-app-purchases.md (Premium in App Store Connect field by field — the agreement, the group, the three products, the free week, the levels, the review screenshot with the run argument it needs (#163) and the saving to check (#162), the purchase on a device (#156), attaching them to 1.4); whats-new.txt 830, promotional-text.txt 164, description.txt 3992, keywords.txt 98, review-notes.txt 1998 characters, each the main README's code block exactly, no trailing newline; screenshots/ the ten store PNGs, byte-identical copies (sha256) renamed into upload order — iPhone-6.9/1-home … 8-settings, AppleWatch/1-wrist, ProductPageHeader/1-one-tap. A copy: the main README and Screenshots/en-US/ stay the masters
+AppStore/                                        39    *(2026-11-13, hundred-and-twentieth pass: **the folder is `AppStore/`** — `01cbe67` (2026-11-06) moved `AppStore/1.4/` up and merged `Screenshots/` into `AppStore/screenshots/`, and this row kept the old path and count until now. 39 files: the seven text and guide files, and `screenshots/` — `AppleWatch/` 1, `captures/` 10, `iPhone-6.9/` 10, `iPhone-6.3/` 10 (new, staged: the framed ten at 1206 × 2622 for the iPhone well Connect requires), `ProductPageHeader/` 1. `README.md` §3 gives Media Manager's wells in order.)* *(2026-11-04, staged: the five field files, the in-app purchases' note and the start-here README brought up to Apple Health, set B, export and build 5; the screenshots wait for phase 2.)* new 2026-10-28, staged: the 1.4 upload folder — README.md (start here: the blocking items, the version page's fields, the upload order, the unchanged fields, Premium's three products in short); in-app-purchases.md (Premium in App Store Connect field by field — the agreement, the group, the three products, the free week, the levels, the review screenshot with the run argument it needs (#163) and the saving to check (#162), the purchase on a device (#156), attaching them to 1.4); whats-new.txt 830, promotional-text.txt 164, description.txt 3992, keywords.txt 98, review-notes.txt 1998 characters, each the main README's code block exactly, no trailing newline; screenshots/ the ten store PNGs, byte-identical copies (sha256) renamed into upload order — iPhone-6.9/1-home … 8-settings, AppleWatch/1-wrist, ProductPageHeader/1-one-tap. A copy: the main README and Screenshots/en-US/ stay the masters
 ```
 
 *(2026-10-21, 1.4.1, staged.)* And one file that is neither Swift nor shipped:
@@ -2862,6 +2882,42 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**1.4 (6) uploaded, processed and submitted to App Review with Premium; Waiting for Review** (2026-11-13, evening).
+- **Committed and pushed** on the owner's `/commit`: `c74bb3d` (the rules), `cf29e8b` (the key and build 6, with the test), `40743f2`
+  (the records), `b77bcb7..40743f2` on `origin/release/1.4`; the gate was not run again, since it had run on those exact files. On the
+  owner's word, `main` fast-forwarded `b77bcb7..40743f2` and pushed.
+- **Archived** from a clean `git archive` export of `40743f2`, Release, `generic/platform=iOS`, into Xcode's Archives folder
+  (`WaterBuddy 13-11-26, 22.19.xcarchive`): the four bundles `1.4 (6)`, both Health keys in en, ru and uz, the App Group on all four,
+  HealthKit on the app alone, one privacy-manifest hash, no `held` or `StoreSample` symbol, 17 warning messages.
+- **Uploaded** on the owner's word with `xcodebuild -exportArchive` (`app-store-connect`, `destination` *upload*, automatic signing,
+  `manageAppVersionAndBuildNumber` false), 22:22–22:25, *Upload succeeded*, no warning line. **Processing passed**: TestFlight lists
+  1.4 (6) *Ready to Submit*, sent to the internal group.
+- **A correction:** Connect's build list holds no 1.4 (5). The refusal of 2026-11-07 came before Connect recorded a build, so build 5
+  was most likely never spent; "the refused upload spent build 5", in the block below and in `cf29e8b`'s body, is not borne out. Build
+  6 is valid either way.
+- **Screenshots** (read in Media Manager, 2026-11-13): the iPhone well Connect now **requires** is *iPhone with Dynamic Island (medium
+  display)*, 1206 × 2622 or 1179 × 2556, which refuses a 6.9″ shot. A 6.3″ set was made from the framed ten (evenly scaled, one column
+  trimmed) into `AppStore/screenshots/iPhone-6.3/`, staged, with `AppStore/README.md` §3, `README.md`'s table and
+  `Tools/VerifyScreenshots.sh` brought up to it (32 files pass). In Connect, on the owner's word: the 6.5″ well's four 1.0/1.1 shots
+  and the watch's four 1.1 shots removed (kept in the Asset Library), the 6.3″ ten and the 6.9″ ten uploaded, `1-wrist.png` uploaded.
+- **The version page**, filled from `AppStore/`'s files through the page and read back after a reload, each field's SHA-256 equal to
+  its file's: Promotional Text, Description, What's New, Keywords, App Review notes; Support URL the GitHub page; Copyright `2026 Sardor
+  Allaberganov`; build 6. App Privacy's Privacy Policy URL set to the GitHub page; *Data Not Collected* kept. Left as Connect held them:
+  the App Review contact (the phone was there), sign-in off, *Automatically release this version*, and *App Information* (name,
+  subtitle, categories, 4+, content rights, licence).
+- **The purchases' review screenshot**, missing on all three: taken by a throwaway UI test in a scratch export (never in the
+  repository) that opens the paywall with `-WaterBuddyPremium` on *iPhone 17* (27.0), prices from the App Store sandbox. On the
+  simulator's `en_UZ` it read **save 20%** (#162); `-AppleLocale en_US` for the app alone did not change it; with the owner's one-time
+  permission the simulator's `AppleLocale` was set to `en_US` with `simctl spawn … defaults write`, the shot read **save 44%**, and the
+  region was put back to `en_UZ` (read back; `AppleLanguages` never touched). The same 1206 × 2622 picture is on Premium Yearly,
+  Monthly and Lifetime, each read back after a reload.
+- **Submitted** at about 23:33: one review submission of five items — iOS App 1.4 (6), the group *WaterBuddy Premium* (Connect refused
+  the subscriptions without it), Premium Yearly, Premium Monthly, Premium Lifetime. Connect: *"5 Items Submitted"*; the version reads
+  **Waiting for Review**. Not done first: a purchase on a real iPhone (#156), the owner's choice.
+- **Simulators:** every run was arranged with the Overlane Drive session, and nothing of WaterBuddy's is booted.
+- **Next:** App Review's answer, by email. Then, if wanted: #162's fix and #156 on a device; `/commit` of the staged screenshot set and
+  docs.
 
 **1.4 (5) was refused for a missing Health purpose string; the second key and build 6 are staged, gated and archived** (2026-11-13).
 - **Since the block below:** the archive's fix was committed as `3de68a2`, its records as `b77bcb7`; `main` and `release/1.4` both
@@ -6683,6 +6739,13 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 23:38 on 2026-11-13, after the hundred-and-twentieth pass's files were added by name: HEAD `40743f2`, level with
+`origin/release/1.4`, and `main` at `40743f2` on `origin` too; 18 staged — 10 added (`AppStore/screenshots/iPhone-6.3/`'s ten PNGs)
+and 8 modified (`AppStore/README.md`, `README.md`, `Tools/VerifyScreenshots.sh`, `CLAUDE.md`, `HISTORY.md`, `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `tasks/lessons.md`); 6 unstaged, the six the tree already carried; `git diff --cached --check` clean.** This file is
+added again once this block is written. No `git commit`. The blocks below are from before the owner's `/commit` of `c74bb3d`,
+`cf29e8b` and `40743f2`.
 
 **Read at 21:30 on 2026-11-13, after the hundred-and-nineteenth pass's files were added by name: HEAD `b77bcb7`, level with
 `origin/release/1.4`, and `main` at `b77bcb7` on `origin` too; 11 staged, all modified — the 10 of the block below and
@@ -11097,9 +11160,14 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     spec and not yet on disk; App Store Connect gains it with the rest.)*
     *(2026-10-22: the monthly is in the local configuration, staged (step 1's Task 5), and still only
     there; Family Sharing on all three.)*
+    *(2026-11-13: **done in Connect, and submitted.** The paywall's review screenshot — 1206 × 2622, *save 44%* — went onto all
+    three products, and the group *WaterBuddy Premium*, both subscriptions and the lifetime purchase were submitted with iOS 1.4 (6)
+    in one review submission; they wait for App Review with the version. Retire this issue when App Review approves them.)*
 156. **No purchase has been made on a device** (1.4.1, spec §7.4, item 6). A sandbox purchase,
     restore and refund on a real iPhone before the first Premium set ships — beside 1.2.7's sweep.
     Every purchase so far is the local StoreKit configuration's, on the simulator.
+    *(2026-11-13: still open. The owner chose to submit 1.4 without it. Build 6 is in TestFlight, *Ready to Submit*, so the
+    sandbox purchase can be made from TestFlight now; it also answers #162 on a device.)*
 157. **`anExpiredYearlyReadsFree` is disabled, for the owner to rule on** (1.4.1, Task 4).
     StoreKit testing cannot end a free trial early: after `expireSubscription` on a trial,
     `Transaction.currentEntitlements` still answered the trial's transaction with its first expiry
@@ -11218,6 +11286,14 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     `Product.price`, as the spec says ("go"); App Store prices do not come from this file. The
     alternative, held in reserve: parse `displayPrice` with `priceFormatStyle`, falling back to
     `price`. To confirm with a sandbox purchase on a device (#156).
+    *(2026-11-13, taking the review screenshot — **the App Store sandbox does it too, and the device's region is the cause,
+    measured.** A test run with no StoreKit configuration loads the three products from the sandbox (Connect's, since 2026-11-06).
+    On *iPhone 17* (27.0) at `AppleLocale en_UZ` the paywall drew $2.99, $19.99 and $39.99 and **save 20%**; launched with
+    `-AppleLocale en_US` — the app's locale alone — still 20%; with the simulator's own `AppleLocale` set to `en_US` (the owner's
+    one-time permission, put back after) **save 44%**. So StoreKit reads the price under the device's region, outside the app's
+    process, and "App Store prices do not come from this file" does not save production: an iPhone whose region writes a decimal comma —
+    Uzbek, Russian and most of Europe among them — is likely to show the yearly saving as 20 %, understated, until the reserve fix is
+    made. Unproven on a device (#156). The review screenshot App Review holds reads 44%.)*
 163. ~~**The owner's unstaged scheme edit launches every unit-test run with `-WaterBuddyPremium`**~~
     **Retired 2026-10-22, step 1's Task 9:** both stray entries removed with `Edit`, Xcode closed, the
     local StoreKit configuration kept, the scheme staged alone; `theTestRunItselfIsNotOfferedThePaywall`

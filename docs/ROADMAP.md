@@ -555,6 +555,11 @@ release spec's §8, of which the privacy and support pages still answer 404.)*
 `3de68a2`, with the records in `b77bcb7`, where `main` and `release/1.4` now stand. 1.4 (5) was uploaded and refused by App Store
 Connect for a missing `NSHealthShareUsageDescription`. **The second Health key and build 6 are staged, gated and archived, not
 committed**; the upload of 1.4 (6) follows the owner's `/commit`.)*
+*(2026-11-13, evening, the hundred-and-twentieth pass: **1.4 is submitted.** The fix committed as `c74bb3d`–`40743f2`, `main` moved to
+`40743f2`, 1.4 (6) archived, uploaded and through processing; the version page, screenshots (with a new 6.3″ set for the iPhone well
+Connect now requires) and Premium's review screenshot filled in App Store Connect; iOS 1.4 (6), the group *WaterBuddy Premium* and its
+three products submitted together, *Waiting for Review*. Open: #156, a purchase on a device, and #162, the yearly saving under a
+decimal-comma region.)*
 
 ## 6. Release 1.5 — more to log, more people
 
