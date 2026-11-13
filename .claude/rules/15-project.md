@@ -197,6 +197,11 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
 - **The App ID `sardor.WaterBuddy` carries the HealthKit capability.** Automatic signing adds it when Xcode
   next signs for a device; check a distribution profile carries it before an archive, or the upload is
   refused for an entitlement the profile lacks
+- **`INFOPLIST_KEY_NSHealthShareUsageDescription` on the app target's two configurations**, beside the
+  update key, although the app asks to read nothing. App Store Connect refused 1.4 (5) without it
+  (2026-11-07, "Missing purpose string in Info.plist"). Apple's check names the code's APIs or the
+  entitlement, not what authorization asks for, and `HealthMirror` reads back WaterBuddy's own samples.
+  `HealthPurposeTests` pins both keys in every language
 - **The app icon is delivered inside the bundle, never uploaded separately.** App Store Connect has
   no icon upload field any more. The 1024² marketing icon comes out of the asset catalog, which is
   why `WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset/Contents.json` must use the modern
@@ -220,5 +225,6 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   (rule `70-privacy`)
 - `WaterBuddy/AppShortcuts.xcstrings` is a fifth catalogue — Siri's phrases only, in `en` and `ru`,
   because Siri has no Uzbek (rule `70-privacy`)
-- `WaterBuddy/InfoPlist.xcstrings` is a sixth catalogue — the Info.plist's one localised string,
-  `NSHealthUpdateUsageDescription`, which Health's sheet shows — in `en`, `ru` and `uz`
+- `WaterBuddy/InfoPlist.xcstrings` is a sixth catalogue — the Info.plist's two localised strings,
+  `NSHealthUpdateUsageDescription`, which Health's sheet shows, and `NSHealthShareUsageDescription`, which
+  App Store Connect demands (*Submission*) — in `en`, `ru` and `uz`

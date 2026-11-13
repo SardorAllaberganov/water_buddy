@@ -16,9 +16,10 @@ That is a property to defend, not a phase.
 - Keep `com.apple.security.application-groups` the only entitlement on every signed target but the app's,
   which also carries `com.apple.developer.healthkit` (*HealthKit, for Apple Health*, below). Adding any other
   capability requires a written justification in this file first
-- Add no `NS*UsageDescription` key to any Info.plist but `NSHealthUpdateUsageDescription`, on the app target
-  alone (*HealthKit, for Apple Health*, below). Notification authorization and Health's permission to write
-  Water are the only two permissions this product ever asks for
+- Add no `NS*UsageDescription` key to any Info.plist but Apple Health's two, `NSHealthUpdateUsageDescription`
+  and `NSHealthShareUsageDescription`, on the app target alone (*HealthKit, for Apple Health*, below).
+  Notification authorization and Health's permission to write Water are the only two permissions this
+  product ever asks for
 - Two things leave on the user's own tap, each on the conditions below: the recap's image and the export file
 - The app links its privacy policy for every user from Settings, and from the paywall beside the
   *Terms of Use*: `PaywallView.privacyPolicy`, the one spelling of the address, which Settings reads
@@ -160,9 +161,11 @@ Eight limits are conditions of the permission:
   mirror saw that serving in the log during this run — a set of ids kept in memory, never stored — because
   HealthKit reads back an earlier install's samples and another iPhone's under the same source, and those
   are the user's
-- **One entitlement, one key.** `com.apple.developer.healthkit` on the app target alone, beside the App
-  Group, and `NSHealthUpdateUsageDescription` — the two exceptions above, each for this alone. No
-  `NSHealthShareUsageDescription`: nothing is read
+- **One entitlement, two keys.** `com.apple.developer.healthkit` on the app target alone, beside the App
+  Group, and `NSHealthUpdateUsageDescription` and `NSHealthShareUsageDescription` — the exceptions above,
+  each for this alone. The second asks for nothing: authorization still asks to read nothing. It is there
+  because App Store Connect refused 1.4 (5) without it (2026-11-07), and its sentence says what is true:
+  WaterBuddy reads back only the water it saved itself (the owner's ruling, the same day)
 - **Turning it off deletes nothing.** It stops the writing; what is in Health is the user's, to keep or to
   delete — Settings › Privacy & Security › Health › WaterBuddy › *Data from "WaterBuddy"* (measured on
   iOS 27.0; the Health app's own list of apps did not show WaterBuddy there)
