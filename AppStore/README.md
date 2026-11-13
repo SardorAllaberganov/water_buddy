@@ -53,17 +53,38 @@ without a newline, so the paste is exact. Every count below was computed from th
 | App Review notes | [`review-notes.txt`](review-notes.txt) — sign-in **not** required, no demo account | 2446 / 4000 |
 | App Review contact | Sardor Allaberganov, `sardorallaberganov96@gmail.com`, 🔴 your phone | |
 
-What's New is written against **1.1**, which is live. P## 3. Screenshots — delete the old ones first, then drag these in name order
+What's New is written against **1.1**, which is live. Promotional Text can be changed later
+without a new build.
 
-Delete every shot already in Connect — 1.1's, and any 6.5″ ones left from 1.0 — since they show the
-old app. Fill **only the 6.9″ well**: Connect scales it down for the smaller iPhones. Only the first
-three show on search results.
+## 3. Screenshots — delete the old ones first, then drag these in name order
+
+Open **View All Sizes in Media Manager** from the version page. As read on 2026-11-13, the iPhone well
+Connect **requires** is *iPhone with Dynamic Island (medium display)*, the 6.1″ and 6.3″ phones, and it
+takes only 1206 × 2622 or 1179 × 2556: a 6.9″ shot is refused there. The 6.9″ well, *iPhone with Dynamic
+Island (large display)*, is under *Optional*. So, in this order:
+
+1. *iPhone with Face ID (large display)* — **Remove All**. Its four shots are from 1.0 and 1.1 and show the
+   old app; the required well has been borrowing them.
+2. *iPhone with Dynamic Island (medium display)*, required — drag in `screenshots/iPhone-6.3/`'s ten.
+3. *iPhone with Dynamic Island (large display)* — drag in `screenshots/iPhone-6.9/`'s ten.
+4. *Apple Watch Series 12* — **Remove All** (1.1's four), then drag in `screenshots/AppleWatch/1-wrist.png`.
+
+Only the first three show on search results. *iPad 13″ display* read *Required* while no build was chosen;
+WaterBuddy is iPhone-only, so choosing build 6 is expected to clear it. If it does not, ask before making
+iPad shots.
 
 **iPhone 6.9″** — `screenshots/iPhone-6.9/`, 1320 × 2868, PNG, no alpha, **framed**: a headline, the screen
 in a drawn phone, one pane lifted out, the six Premium shots tagged *Premium*
 (`docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md`). **The ten are in** (2026-11-06):
 `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM) wrote the raw screens into `screenshots/captures/iPhone-6.9/`,
 and `bash Tools/FrameScreenshots.sh` framed them in here. Upload these, not the captures.
+
+**iPhone 6.3″** — `screenshots/iPhone-6.3/`, 1206 × 2622, PNG, no alpha: the same ten, with the same names
+and order as the table below, scaled evenly from the 6.9″ set to a height of 2622 (1207 wide) and trimmed by
+one pixel column (2026-11-13). `Tools/FrameScreenshots.sh` writes only the 6.9″ set, so whenever it runs
+again, make this set again from `screenshots/`:
+`sips -z 2622 1207 iPhone-6.9/*.png --out <an empty scratch folder>`, then
+`sips -c 2622 1206 <that folder>/*.png --out iPhone-6.3/`.
 
 | # | File | Headline | Shows |
 |---|---|---|---|
@@ -79,7 +100,8 @@ and `bash Tools/FrameScreenshots.sh` framed them in here. Upload these, not the 
 | 10 | `10-settings.png` | Set your own serving sizes | Settings, the quick-add vessels lifted out |
 
 **Apple Watch** — `screenshots/AppleWatch/1-wrist.png`, 416 × 496: the watch app, synced, at 65 %.
-Required, because the app embeds a watch app; one shot meets it.
+Required, because the app embeds a watch app; one shot meets it. Connect's well is *Apple Watch Series 12*,
+which takes 416 × 496.
 
 **Product page header** — `screenshots/ProductPageHeader/1-one-tap.png`, 3840 × 1646:
 *One tap. Watch it fill.*

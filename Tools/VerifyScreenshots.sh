@@ -14,7 +14,9 @@
 #  three pairs, not one — a pipeline that hard-codes 1320x2868 would wrongly reject a perfectly valid
 #  iPhone Air capture at 1260x2736. The Apple Watch slot accepts six; note that two *installed*
 #  simulators (Series 11 42mm at 374x446, SE 3 40mm at 324x394) produce sizes that are NOT on the
-#  list, which is why the watch script pins the 46mm.
+#  list, which is why the watch script pins the 46mm. Re-read 2026-11-13: the iPhone well App Store
+#  Connect requires is now the medium Dynamic Island display (6.1"/6.3"), which refuses a 6.9" shot,
+#  so the upload set carries an iPhone-6.3/ folder too.
 #
 set -uo pipefail
 
@@ -22,6 +24,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SHOTS="$ROOT/AppStore/screenshots"
 
 IPHONE_69="1260x2736 1290x2796 1320x2868"
+IPHONE_63="1179x2556 1206x2622"
 IPHONE_65="1242x2688 1284x2778"
 IPAD_13="2064x2752 2048x2732"
 WATCH="422x514 410x502 416x496 396x484 368x448 312x390"
@@ -48,6 +51,7 @@ while IFS= read -r file; do
   # under the ignored build/census/ since 2026-11-06, so nothing here is exempt from the size check.
   case "$file" in
     *"/iPhone-6.9/"*)       accepted="$IPHONE_69"; slot="iPhone 6.9\"" ;;
+    *"/iPhone-6.3/"*)       accepted="$IPHONE_63"; slot="iPhone 6.3\"" ;;
     *"/iPhone-6.5/"*)       accepted="$IPHONE_65"; slot="iPhone 6.5\"" ;;
     *"/iPad-13/"*)          accepted="$IPAD_13";   slot="iPad 13\""    ;;
     *"/AppleWatch/"*)       accepted="$WATCH";     slot="Apple Watch"  ;;

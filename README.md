@@ -485,13 +485,16 @@ Store Connect should not prompt. If it does:
 ## Screenshots
 
 In [`AppStore/screenshots/`](AppStore/screenshots), English only, every file checked by
-`bash Tools/VerifyScreenshots.sh`. **Only the 6.9″ well is filled**: Apple's spec makes 6.5″ *"required if
-screenshots for 6.9″ display aren't provided"*, and Connect scales the 6.9″ set down for the smaller phones.
-Delete every older shot already in Connect — 1.1's, and any 6.5″ ones from 1.0 — since they show the old app.
+`bash Tools/VerifyScreenshots.sh`. **Two iPhone wells are filled** (read in Media Manager on 2026-11-13): the
+one Connect requires is *iPhone with Dynamic Island (medium display)*, the 6.1″ and 6.3″ phones, which refuses
+a 6.9″ shot, and the 6.9″ well is optional. Delete every older shot already in Connect — 1.1's four on the
+watch, and the four 6.5″ ones from 1.0 and 1.1 — since they show the old app. `AppStore/README.md` §3 has the
+steps in order.
 
 | Slot | Size | Files |
 |---|---|---|
-| iPhone 6.9″ | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**, from 1.4's capture of 2026-11-06 |
+| iPhone 6.3″ (Dynamic Island, medium) — **required** | 1206 × 2622 | `iPhone-6.3/` — the same ten, scaled evenly from `iPhone-6.9/` and trimmed by one pixel column |
+| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**, from 1.4's capture of 2026-11-06 |
 | Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | `AppleWatch/1-wrist.png` — **required**, because the app embeds a watchOS app; one meets it |
 | Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.png`, *One tap. Watch it fill.* |
 
