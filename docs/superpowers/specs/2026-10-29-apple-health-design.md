@@ -238,6 +238,11 @@ localised through a new `WaterBuddy/InfoPlist.xcstrings` in `en`, `ru` and `uz`.
 - The app target's two configurations gain `INFOPLIST_KEY_NSHealthUpdateUsageDescription`.
   `NSHealthShareUsageDescription` is added **only** if Task 0 measures that iOS or the upload demands it of
   an app that reads nothing, with wording that says so.
+  *(2026-11-13: **the upload demanded it.** Task 0 measured iOS, which never asked for the key; App Store Connect refused
+  1.4 (5) with "Missing purpose string in Info.plist" (2026-11-07). On the owner's ruling the same day, both configurations
+  carry it, in `InfoPlist.xcstrings` in en, ru and uz: *WaterBuddy reads back only the water it saved to Health itself, so it
+  can correct or delete it when you change a serving.* Authorization still asks to read nothing. Rules `15-project` and
+  `70-privacy` record it.)*
 - `HealthPlan.swift` and `HealthMirror.swift` are app-only: in no exception set. HealthKit is linked by its
   `import` alone (rule `95-dependencies`).
 - **The owner's, outside the repository:** the HealthKit capability on the App ID `sardor.WaterBuddy` in the
@@ -366,6 +371,7 @@ Group was touched. **(a) and (c) hold, so the plan goes on.**
   - There is no read section. Its accessibility tree names `UIA.Health.Write.Water.SwitchCell.Switch` and no
     read identifier.
   - There is no *Turn On All*. No `NSHealthShareUsageDescription` is needed.
+    *(2026-11-13: needed by iOS, no; by App Store Connect, yes — it refused 1.4 (5) without the key. See §3.9's note.)*
 - **c. Holds for approach A, with one difference from the plan's guess.** One sync identifier, saved in turn:
   - v1 250 gave one sample, 250 v1.
   - v2 300 **replaced** it: 300 v2.

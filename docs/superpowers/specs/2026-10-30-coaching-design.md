@@ -23,7 +23,10 @@ other work over it. Nothing a free user can do today moves behind it (*The Premi
 
 **1.4.11 is not in this spec (D1).** It needs Apple Health to *read* workouts — a second HealthKit permission
 and `NSHealthShareUsageDescription`, on a branch that is write-only by design — and a per-day goal that the
-widget, the watch, the streak and History would all have to agree on. It gets its own design later; set B goes
+widget, the watch, the streak and History would all have to agree on. *(2026-11-13: the app now carries
+`NSHealthShareUsageDescription` — App Store Connect refused 1.4 (5) without it — and its sentence names only the water WaterBuddy
+saved itself. Reading workouts would still need its own read permission, a new sentence in en, ru and uz, and rule `70-privacy`'s
+amendment first.)* It gets its own design later; set B goes
 on sale with three features.
 
 ## 2. What exists today (measured)

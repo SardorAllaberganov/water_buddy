@@ -5900,3 +5900,34 @@ and I read that as the only condition.
 **The rule.** Before moving `main` for a release, or calling a tree ready to upload, archive it — Release, `generic/platform=iOS`,
 from a clean worktree of the commit, uploading nothing — and only then move `main` and upload. A symbol under `#if DEBUG`
 is called only from code under `#if DEBUG`, `#Preview` bodies included.
+
+## 2026-11-13 — "Not needed" was measured on iOS, and the upload was what decided it
+
+**What happened.** The Apple Health spec's §3.9 said `NSHealthShareUsageDescription` would be added only if Task 0 measured that
+iOS or the upload demanded it. Task 0 measured iOS: Health's sheet opened without it. From then on, rule `70-privacy` said "No
+`NSHealthShareUsageDescription`: nothing is read", and `HealthPurposeTests` asserted that the key was absent. App Store Connect
+refused 1.4 (5) on 2026-11-07, "Missing purpose string in Info.plist". Its check names the code's APIs or the entitlement, not
+what authorization asks for, and no simulator run here ever makes it.
+
+**Why.** The spec named two judges, and only one of them could be consulted before an upload. The answer from that one was
+recorded as the whole answer, and a test then pinned it.
+
+**The rule.** When a decision rests on what App Store Connect accepts, record it as unmeasured until an upload answers. Never pin
+it with a test that asserts an absence the upload has not yet accepted.
+
+## 2026-11-13 — `Executed [0-9]+ tests` does not match "Executed 1 test"
+
+**What happened.** A single UI test rerun alone printed no result line through my filter, and for a moment read like a run that
+executed nothing. XCTest writes the singular, *Executed 1 test*. The log showed it had passed.
+
+**The rule:** match a run's count as `Executed [0-9]+ tests?`, and read the log before calling a run empty.
+
+## 2026-11-13 — A just-booted simulator can refuse the test runner as "Busy"
+
+**What happened.** On iOS 26.5, two `test-without-building` calls in a row stopped within seconds: SpringBoard denied the launch
+of `sardor.WaterBuddyUITests.xctrunner`, *Busy ("Application failed preflight checks")*, on a device `xcodebuild` had just
+booted. No test ran. After `xcrun simctl bootstatus <id> -b`, which boots the device and returns once booting has finished, the
+same command ran and passed.
+
+**The rule:** when a runner is refused as *Busy* or fails *preflight checks*, boot that device with `simctl bootstatus <id> -b`
+and run the same command again. Never read the refusal as a test result.

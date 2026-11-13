@@ -15576,3 +15576,105 @@ The two previews inside `#if DEBUG`, each with a two-line comment naming #227 �
 
 `WaterBuddy/HistoryView.swift`, `WaterBuddy/HomeView.swift`, `docs/AI_CONTEXT.md` (*Current state*, two *Files on disk*
 rows, #192's note, new #227), `tasks/lessons.md` and this file.
+
+## [2026-11-13] — 1.4 (5) refused for a missing Health purpose string; the second key and build 6 staged, gated and archived
+
+### What changed
+
+- **The refusal.** After `3de68a2` and `b77bcb7` were committed and `main` moved to `b77bcb7`, App Store Connect refused 1.4 (5)
+  with *"Missing purpose string in Info.plist"*: `NSHealthShareUsageDescription`. The app asks Health to read nothing, but Apple's
+  check names the code's APIs or the entitlement, not what authorization asks for.
+- **The owner's ruling, 2026-11-07,** written into rules `15-project` (*Submission*, *Localization*) and `70-privacy` (*Nothing
+  leaves the device*, *One entitlement, two keys*): add the key; its sentence says what is true, that WaterBuddy reads back only the
+  water it saved itself. On 2026-11-13 the owner approved this session's plan and its three drafts, and ruled that "reads nothing" is
+  left as it stands everywhere else: the update key, Settings' hint, `PRIVACY.md` and its page, the support page,
+  `review-notes.txt` and the store description.
+- **The change, staged:**
+  - `WaterBuddy.xcodeproj/project.pbxproj`: `INFOPLIST_KEY_NSHealthShareUsageDescription` on the app target's Debug and Release,
+    above the update key; `CURRENT_PROJECT_VERSION` 5 → 6 on all fourteen sites, since the refused upload spent build 5.
+  - `WaterBuddy/InfoPlist.xcstrings`: the key in en, ru and uz:
+    - en: *WaterBuddy reads back only the water it saved to Health itself, so it can correct or delete it when you change a serving.*
+    - ru: *WaterBuddy читает из «Здоровья» только ту воду, которую сохранил сам, — чтобы исправить или удалить её, когда вы меняете порцию.*
+    - uz: *WaterBuddy Health ilovasidan faqat o‘zi saqlagan suvni o‘qiydi — porsiyani o‘zgartirsangiz, uni tuzatish yoki o‘chirish uchun.*
+  - `WaterBuddyTests/LocalizationTests.swift`: `healthPurposeKeys`. `HealthPurposeTests` requires both keys in the built Info.plist,
+    each resolving digit-free from `InfoPlist` in every language, where it had required the share key's absence. Written before this
+    session, with the two rules.
+
+### Verification
+
+Run between 19:38 and 20:56, after Roadster Drive's *done*. One simulator at a time, `-parallel-testing-enabled NO`,
+`-collect-test-diagnostics never`, one `xcodebuild` per call. The gate ran on a `git checkout-index` copy of the index, with
+`xcrun simctl shutdown all` once, when no device was booted. Load was 3–106, and AvtoLog and Roadster Drive held their simulators until
+told.
+
+- **RED:** on a copy of the index holding the test and the rules without the key, `HealthPurposeTests` failed with 4 issues, each
+  naming `NSHealthShareUsageDescription`: the Info.plist, then en, ru and uz. The first attempt never started: the simulator failed
+  to launch the app, *No such process*.
+- **GREEN:** on the staged tree, 2 passed. The built app reads `1.4 (6)`, with both keys in its Info.plist and in each `InfoPlist.strings`.
+- **1 · phone unit**, iOS 27.0: the first run met #158. StoreKit logged `environment: Optional("Sandbox")`; the yearly's free week read
+  `Period(value: 7, unit: .day)`, from the products now in App Store Connect; `aBoughtMonthlyReadsMonthly` hit its minute, and the
+  test process restarted. `StoreKitSessionTests` alone then passed 11, `XcodeTest`. The whole target in one launch:
+  **`✔ Test run with 1112 tests in 122 suites passed`**.
+- **2 · phone UI**, skipping `AppStoreScreenshotUITests`, eleven chunks of at most seven, on iOS 27.0 and again on 26.5. On each,
+  **72 methods: 70 passed, 1 skipped** (`testTheBarsCaptionsShareALine`), and **1 failed, then passed alone**:
+  `PremiumUITests.testAFreeUsersCoachingRowsAreLockedAndOpenThePaywall`. Two *Settings* buttons were in the tab bar's tree when it
+  tapped 0.3–0.6 s after walking the welcome. `HEAD`'s build failed it the same way on a fresh 26.5 simulator, *iPhone 17 (spare)*,
+  shut down by id afterwards (new #228). On 26.5 its first two alone runs were refused by SpringBoard, *Busy ("Application failed
+  preflight checks")*; after `simctl bootstatus -b` it passed. `testThePaceLineIsPremiums` ran and passed (it skips only outside
+  05:00–23:00); `testAServingRowOpensItsSheetWhereverItIsTapped` passed on 26.5.
+- **3 · watch unit**, watchOS 27.0: **`✔ Test run with 71 tests in 7 suites passed`**.
+- **4 · `WaterBuddyWidgetExtension`** and **5 · `WaterBuddyWatchWidget`** builds: `** BUILD SUCCEEDED **`, each clean into its own
+  DerivedData.
+- **Warnings**, clean builds of the copy and of a `HEAD` `b77bcb7` export, by file and message and by site: 36 / 20, 29 / 17, 2 / 2,
+  29 / 17 on the four schemes, identical site for site.
+- **Release archive**, `generic/platform=iOS`, from a fresh copy of the index, into the session's scratchpad: `** ARCHIVE SUCCEEDED **`.
+  All four bundles `1.4 (6)`; both Health keys in the app's Info.plist and its en, ru and uz `InfoPlist.strings`; the App Group on all
+  four, HealthKit on the app alone; one privacy-manifest hash on all four; no `held` or `StoreSample` symbol; 29 warning sites and
+  17 messages, in the three baseline files. **Nothing uploaded.**
+- **Not run:** a device-signed export; the widgets, control and faces placed by hand (no view, widget or storage file changed); Health's
+  sheet with both keys present.
+
+### The doc sync (hundred-and-eighteenth pass)
+
+`docs/AI_CONTEXT.md`: the header; *Current state*'s new headline; the targets table's `WaterBuddyTests` figure (**drift:** 1107 → 1112,
+the attribute grep's count); the `LocalizationTests.swift` row (1342 lines); the Info.plist note; `InfoPlist.xcstrings`'s row; notes
+on #158 and #227; new #228; *Git*. `docs/ROADMAP.md`: a dated note on release 1.4. The Apple Health spec: a dated note under §3.9.
+`tasks/lessons.md`: three entries. Checked and accurate: 137 `.swift` files, 1112 / 71 / 75 tests, three exception sets, every rule
+citation, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md`. Left for the owner, outside the sync's scope:
+`AppStore/README.md` and `README.md` still say build 5.
+
+### Files touched
+
+`WaterBuddy.xcodeproj/project.pbxproj`, `WaterBuddy/InfoPlist.xcstrings`, and, written before this session, `.claude/rules/15-project.md`,
+`.claude/rules/70-privacy.md` and `WaterBuddyTests/LocalizationTests.swift`; `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`,
+`docs/superpowers/specs/2026-10-29-apple-health-design.md`, `tasks/lessons.md` and this file.
+
+## [2026-11-13] — `/doc_sync`, the hundred-and-nineteenth pass: the staged tree checked again; two spec lines noted
+
+### What was checked
+
+Run by the owner at 21:28, on the tree the pass above staged; no code changed between them.
+- **The tree:** the same 10 staged and 6 unstaged; no untracked file.
+- **Swift files:** 139 on disk (137 in the seven targets, 2 in `Tools/`), each named in `docs/AI_CONTEXT.md`.
+- **Tests:** 1112 phone `@Test`, 71 watch, 75 UI `func test`.
+- **Keys:** `DataManager.Key`'s 14 phone keys and the watch's 2 agree with `CLAUDE.md` and with `docs/STATE.md`'s four statements.
+- **The shared-file contract:** the three exception sets, printed from `project.pbxproj`, match `CLAUDE.md`.
+- **Rule citations:** every one resolves, across `CLAUDE.md`, `docs/`, `tasks/` and all seven source folders.
+- **Unchanged docs:** `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md` did not change, so their *Last updated* stand.
+
+### Drift found and fixed
+
+Two spec lines read as present claims against the share key the pass above added. Each gains a dated note:
+- the Apple Health spec's Task 0 result, *"No `NSHealthShareUsageDescription` is needed"*: true of iOS, not of App Store Connect;
+- the coaching spec's D1, where reading workouts "needs" the key: the key now ships, for WaterBuddy's own water only.
+
+The Apple Health plan's lines stand as the record of what was planned and built.
+
+### Gate
+
+Not run: docs only, and the gate above stands for the staged code.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the header, *Git*), `docs/superpowers/specs/2026-10-29-apple-health-design.md`,
+`docs/superpowers/specs/2026-10-30-coaching-design.md` and this file.

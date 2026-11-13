@@ -549,6 +549,12 @@ the full gate run on 27.0 and the UI suite on 26.5. Phase 2 still waits for Sund
 *(2026-11-06: **the fix committed and pushed** on the owner's `/commit`, `7f7a6ca` and `a8f4168`, at 03:21, after its gate on 18.6.
 No code is left for 1.4. Phase 2 waits for Sunday 8 November from 1:45 PM; the upload waits as well on the owner's steps of the
 release spec's §8, of which the privacy and support pages still answer 404.)*
+*(2026-11-13, read from `git log` and the records by the hundred-and-eighteenth pass: the privacy and support pages went live on
+2026-11-06; the ten shots were taken and framed that night, and the final gate run on 2026-11-07. The owner's `/commit` made
+`41af5d9` to `745823d`, and `main` moved to it. The first Release archive failed on two DEBUG-only previews (#227), fixed in
+`3de68a2`, with the records in `b77bcb7`, where `main` and `release/1.4` now stand. 1.4 (5) was uploaded and refused by App Store
+Connect for a missing `NSHealthShareUsageDescription`. **The second Health key and build 6 are staged, gated and archived, not
+committed**; the upload of 1.4 (6) follows the owner's `/commit`.)*
 
 ## 6. Release 1.5 — more to log, more people
 
