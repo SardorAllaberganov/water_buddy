@@ -307,6 +307,9 @@ private let healthKeys = [
     "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.",
 ]
 
+/// The app's Info.plist keys for Apple Health, localised in `InfoPlist.xcstrings` (`HealthPurposeTests`).
+private let healthPurposeKeys = ["NSHealthUpdateUsageDescription", "NSHealthShareUsageDescription"]
+
 private let reminderCopy = ["Time for water", "A glass now keeps you on track for the day."]
 
 /// The `.lproj` for one language inside one bundle, or `nil` if that language was not shipped.
@@ -943,23 +946,26 @@ struct HealthStringTests {
     }
 }
 
-/// Apple Health's usage description — the sentence Health's sheet shows (spec
-/// `2026-10-29-apple-health-design.md` §3.8). Review Focus 5: the app asks to write and never to read.
+/// Apple Health's two usage descriptions (spec `2026-10-29-apple-health-design.md` §3.8, §3.9). The app
+/// asks to write and never to read, so Health's sheet shows the first. The second is there because App
+/// Store Connect refused 1.4 (5) without it (2026-11-07), and says WaterBuddy reads back only its own water.
 struct HealthPurposeTests {
 
-    @Test func theAppAsksHealthToWriteAndNeverToRead() {
-        #expect(appBundle.object(forInfoDictionaryKey: "NSHealthUpdateUsageDescription") as? String != nil)
-        #expect(appBundle.object(forInfoDictionaryKey: "NSHealthShareUsageDescription") == nil,
-                "a read permission's key — WaterBuddy reads nothing from Health")
+    @Test func theAppCarriesBothHealthPurposes() {
+        for key in healthPurposeKeys {
+            #expect(appBundle.object(forInfoDictionaryKey: key) as? String != nil, "the app's Info.plist has no \(key)")
+        }
     }
 
     @Test(arguments: ["en"] + translated)
-    func thePurposeIsInEveryLanguageAndCarriesNoDigit(language: String) throws {
+    func thePurposesAreInEveryLanguageAndCarryNoDigit(language: String) throws {
         let folder = try #require(appBundle.path(forResource: language, ofType: "lproj"))
         let bundle = try #require(Bundle(path: folder))
-        let purpose = bundle.localizedString(forKey: "NSHealthUpdateUsageDescription", value: nil, table: "InfoPlist")
-        #expect(purpose != "NSHealthUpdateUsageDescription", "\(language) has no usage description")
-        #expect(!purpose.contains { $0.isNumber }, "\(language)'s usage description carries a digit")
+        for key in healthPurposeKeys {
+            let purpose = bundle.localizedString(forKey: key, value: nil, table: "InfoPlist")
+            #expect(purpose != key, "\(language) has no \(key)")
+            #expect(!purpose.contains { $0.isNumber }, "\(language)'s \(key) carries a digit")
+        }
     }
 }
 

@@ -13,6 +13,29 @@
         }
       }
     },
+    "NSHealthShareUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy reads back only the water it saved to Health itself, so it can correct or delete it when you change a serving."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy читает из «Здоровья» только ту воду, которую сохранил сам, — чтобы исправить или удалить её, когда вы меняете порцию."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy Health ilovasidan faqat o‘zi saqlagan suvni o‘qiydi — porsiyani o‘zgartirsangiz, uni tuzatish yoki o‘chirish uchun."
+          }
+        }
+      }
+    },
     "NSHealthUpdateUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {
