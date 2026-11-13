@@ -5968,3 +5968,12 @@ own `AppleLocale`, set to `en_US` through `simctl spawn … defaults write` on t
 
 **The rule:** a picture or a check that depends on StoreKit's prices runs on a device whose region is the one meant, set and restored
 with the owner's permission. A launch argument sets the app's locale, not StoreKit's.
+
+## 2026-11-13 — `grep` in this shell is `ugrep`, and it refuses a wide context pattern
+
+**What happened.** Three searches built as `grep -o -E '.{0,60}word.{0,40}'` over the docs and the logs stopped with *"exceeds complexity
+limits"* and printed nothing. In the session's shell `grep` is a function that runs `ugrep`, and bounded repeats around a match, over
+UTF-8 text, are past its limit.
+
+**The rule:** to print a match with its context, use `awk` with `index()` and `substr()`, or `grep -n` and then `sed -n`, never
+`.{0,N}` on both sides of the term. Read an empty result after a `grep` error as no search, not as no match.

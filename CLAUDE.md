@@ -9,11 +9,11 @@
 > | `WaterBuddy/` | **LIVE** — the app: SwiftUI, iOS 17.0 and later (Apple's glass and Apple's tab bar from iOS 26), `@Observable` `DataManager` over SwiftData |
 > | `WaterBuddyWidget/` | **LIVE** — WidgetKit extension: three `StaticConfiguration`s over one provider — the Home Screen widget, the week widget (`WeekWidget`, medium, a tap opens History) and the Lock Screen widget (`LockScreenWidget`) — + interactive `AddWaterIntent`, + from iOS 18 the Control Center control (`LogWaterControl`), listed inside the codebase's first `if #available` |
 > | `WaterBuddyTests/` | **LIVE** — swift-testing (`@Test` / `#expect`), run in parallel, own suite per test |
-> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights, launched with DEBUG's `-WaterBuddyPremium`), `CoachingUITests` (set B's, on `feature/coaching`: the schedule sheet, a lapsed holder's settings and Home's pace line, on a DEBUG fresh start — Premium held through `-WaterBuddyPremiumHeld`, or lapsed through `-WaterBuddyPremium` with `-WaterBuddyCoachingSeed`'s settings left behind), `ExportUITests` (export's card and sheet, on `feature/export`, on a DEBUG fresh start with Premium held) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips, whose free launch passes `-WaterBuddyPremium` too |
+> | `WaterBuddyUITests/` | **LIVE** — `GoalSetupUITests` (real coverage), `WelcomeUITests` (the first-run welcome, on a DEBUG fresh start), `PremiumUITests` (Settings' Premium card and the paywall, and History's *Week · Month · Insights* switch, its locked month and its locked Insights, launched with DEBUG's `-WaterBuddyPremium`), `CoachingUITests` (set B's: the schedule sheet, a lapsed holder's settings and Home's pace line, on a DEBUG fresh start — Premium held through `-WaterBuddyPremiumHeld`, or lapsed through `-WaterBuddyPremium` with `-WaterBuddyCoachingSeed`'s settings left behind), `ExportUITests` (export's card and sheet, on a DEBUG fresh start with Premium held) plus the Xcode template's launch tests, and `AppStoreScreenshotUITests`, the store capture harness the gate skips, whose free launch passes `-WaterBuddyPremium` too |
 > | `WaterBuddyWatch/` | **LIVE** — the watch app: `WristView`, `@Observable` `WristModel` over its own local App Group suite (no SwiftData) |
 > | `WaterBuddyWatchWidget/` | **LIVE** — the complication's three display-only faces, `.accessoryCircular`, `.accessoryRectangular` and `.accessoryCorner` (`WristFaceView`), each drawing `WristPlan.Face` — the screen's own figures — in the phone's chosen language, with a quiet form when watchOS redacts; reads the watch's own suite directly, never `WristModel.shared` |
 > | `WaterBuddyWatchTests/` | **LIVE** — swift-testing, watch side |
-> | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets); the app's alone also carries `com.apple.developer.healthkit` (2026-10-30, on `feature/apple-health`), so its file is no longer byte-identical to the other three |
+> | `Entitlements/` | the App Group entitlement, one file per signed target (four signed targets); the app's alone also carries `com.apple.developer.healthkit` (2026-10-30, with Apple Health), so its file is no longer byte-identical to the other three |
 > | `Tools/` | standalone scripts and pages, in **no** build target — the icon generator, the screenshot harness, and the two pages for the owner's user site: the privacy policy and the support page (`Support.html`, the *Support URL*) |
 > | `AppStore/` | the current version's store page, in no target, and nothing older (the owner's ruling, 2026-11-06, when `AppStore/1.4/` and `Screenshots/` became one folder): `README.md`'s *App Store Connect* text one file per field, and `screenshots/` — the raw captures in `captures/`, the framed upload set in `iPhone-6.9/` and the same ten scaled to 1206 × 2622 in `iPhone-6.3/` — the iPhone well App Store Connect requires since it was read on 2026-11-13, which refuses a 6.9″ shot — the watch shot and the header; `README.md` stays the master of the text. The coverage run writes its census under the ignored `build/census/` |
 >
@@ -66,7 +66,7 @@ design:**
 | Store | Holds | Read by |
 |---|---|---|
 | SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared` (which recomputes today and the week from the rows in the same pass); never the widget's draw path |
-| `UserDefaults` — fourteen keys | today's total, the goal, the day ordinal, five flags (the fourth the Apple Health switch, since 2026-10-30 on `feature/apple-health`; the fifth *Only when behind*, set B's, on `feature/coaching`), the reminder schedule (set B's), the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
+| `UserDefaults` — fourteen keys | today's total, the goal, the day ordinal, five flags (the fourth the Apple Health switch, since 2026-10-30; the fifth *Only when behind*, set B's), the reminder schedule (set B's), the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget's draw path never opens
@@ -375,8 +375,8 @@ something to record.
   a Photos usage key, which this one never carries (measured)
   (`docs/superpowers/specs/2026-10-24-monthly-recap-design.md`; rule `70-privacy`'s *The recap's image, on
   the user's own tap*, admitted in `4c76e61`)
-- **Apple Health is a copy, written by the app** (roadmap 1.3.3, committed on `feature/apple-health` —
-  `e4aebc9`, 2026-10-30 — and pushed; not merged). Write only, Water only, asked from Settings' *Apple Health* switch alone.
+- **Apple Health is a copy, written by the app** (roadmap 1.3.3, `e4aebc9`, 2026-10-30; on `main` since
+  release 1.4, `745823d`). Write only, Water only, asked from Settings' *Apple Health* switch alone.
   `HealthPlan`, pure, decides from the rows and the samples WaterBuddy already wrote; `HealthMirror`,
   app-only and the one file that imports HealthKit, carries it out through its own `ReconcileQueue` — on
   the switch (the whole history), on every save in the app's process (`logsDidSaveNotification`) and on
@@ -387,24 +387,24 @@ something to record.
   (`docs/superpowers/specs/2026-10-29-apple-health-design.md`; rule `70-privacy`'s *HealthKit, for Apple
   Health*, committed as `2ee3f39`)
 - **Set B: the schedule is a stored setting, the pace a pure reading of it** (roadmap 1.4.3, 1.4.9,
-  1.4.10, committed on `feature/coaching` — `1629d06`, 2026-10-31 — and pushed; not merged). `ReminderPlan.Schedule`, `ReminderPlan.due` and `ReminderPlan.pace`
+  1.4.10, `1629d06`, 2026-10-31; on `main` since release 1.4). `ReminderPlan.Schedule`, `ReminderPlan.due` and `ReminderPlan.pace`
   decide — a grid of whole hours, quiet weekdays, and a share of the goal due at each reminder hour, the
   one definition *Only when behind* drops slots by and Home's pace line reads. `DataManager` stores the
   schedule and *Only when behind* in two keys every process reads, so a widget tap files the schedule the
   app set; Settings edits them for Premium; Home draws the pace for Premium. Nothing about Premium is
   stored: a lapse locks the editing and keeps what was set
   (`docs/superpowers/specs/2026-10-30-coaching-design.md`)
-- **Export: every serving, on the user's tap** (roadmap 1.4.4, committed on `feature/export` — `9086f06`, 2026-11-01 — and pushed; not merged). `ServingsExport`, pure,
+- **Export: every serving, on the user's tap** (roadmap 1.4.4, `9086f06`, 2026-11-01; on `main` since release 1.4). `ServingsExport`, pure,
   app-only and Foundation alone, turns plain rows into the CSV and a summary, and keeps *nothing to export* apart from *the
   read failed*. Settings' card reads `manager.logs(since: nil)` once, on the tap, for Premium; anyone else's tap opens the
   paywall. `ExportSheet` says what will leave, then hands the bytes to `ShareLink` in memory: `date,time,amount_ml`, fixed
   English in every language, oldest first, named `WaterBuddy-yyyy-MM-dd.csv`, with no id, goal, streak or time zone. Nothing
   is stored, and `DataManager` does not change (`docs/superpowers/specs/2026-11-01-export-design.md`; rule `70-privacy`'s *The
   export file, on the user's own tap*, committed)
-- **One finish: motion is one language, driven by presentation flags** (the premium look: all six stages committed and pushed on
-  `feature/premium-look`, not merged — the parts, export, the paywall, the recap and History, and stage 5's Settings' Premium lap, the
-  schedule sheet's landing and Home's water rising as the app opens, with the final review's two fixes, `cde7828` and `6924bf1`;
-  release 1.4, everything on that branch, is made ready on `release/1.4`, spec `2026-11-04-release-1-4-design.md`). `Landing` brings a sheet's content
+- **One finish: motion is one language, driven by presentation flags** (the premium look: all six stages — the parts, export, the
+  paywall, the recap and History, and stage 5's Settings' Premium lap, the schedule sheet's landing and Home's water rising as the app
+  opens, with the final review's two fixes, `cde7828` and `6924bf1`; in release 1.4, spec `2026-11-04-release-1-4-design.md`, on
+  `main` since `745823d`). `Landing` brings a sheet's content
   in once the sheet has landed, `RollingFigure` rolls a hero figure once at the wider of its two ends' widths, `.premiumRim(lit:laps:)` runs a lap of light, and `Motion`'s
   `draw`, `drawn(at:)` and `popped(at:)` draw data — a pop on `Motion.pop`. Each plays once per arrival, stands final under Reduce
   Motion, and no spoken value reads its flag. History's flags live on `HistoryView`, never on a row the `List` recycles; a flag for

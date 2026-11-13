@@ -4,6 +4,21 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-14, 00:25 (hundred-and-twenty-first pass — `/doc_sync` after `main` took every change and the other branches
+were deleted; on `main`, HEAD `ddb5d78`, level with `origin/main`, the only branch left; docs only). What it checked and wrote, every
+figure printed:
+- 137 `.swift` files in the seven targets, none added; 1112 phone `@Test`, 71 watch, 75 UI `func test` — unchanged; no source file
+  changed since `40743f2`;
+- *Current state*'s new headline: the owner's `/commit` (`ec1eda2`, `ddb5d78`), `main` moved to `ddb5d78`, and the five branches
+  deleted here and on `origin`, each first proved contained in `ddb5d78` — their tips are written down there;
+- **drift found and fixed:** `CLAUDE.md` said four pieces of work were "pushed; not merged" on their feature branches and that release
+  1.4 was made ready on `release/1.4`; all of it has been on `main` since `745823d` (2026-11-07), and the branches are gone. The four
+  *Architecture* bullets now say so, and the target and storage tables' three branch names are dropped — `CLAUDE.md` names no branch
+  now;
+- **checked and left as written:** the "not merged" and branch names in this file's older *Current state* blocks and dated notes, and
+  in `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md` — each inside a dated note, so history; every `rule nn-name` cited resolves;
+  no file under `.claude/rules/` names a deleted branch (`grep -l`: none).
+
 **Last updated:** 2026-11-13, 23:40 (hundred-and-twentieth pass — `/doc_sync` after 1.4 (6) was uploaded and **submitted to App
 Review**, on `release/1.4`, HEAD `40743f2`, level with `origin`, and `main` at `40743f2` too; docs only). What it checked and wrote,
 every figure printed:
@@ -2882,6 +2897,25 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**`main` holds every change, and it is the only branch** (2026-11-14, just after midnight).
+- **Committed and pushed** on the owner's `/commit`: `ec1eda2` (the 6.3″ store shots, both READMEs and the verifier) and `ddb5d78` (the
+  records), `40743f2..ddb5d78` on `origin/release/1.4`.
+- **`main`**, on the owner's word: fast-forwarded `40743f2..ddb5d78`, pushed, and checked out.
+- **The other branches deleted**, on the owner's *remove other branches*: each tip was first proved an ancestor of `ddb5d78`, then
+  deleted here with `git branch -d` and on `origin` with `git push origin --delete`; `origin` now holds `main` alone. Their tips, should
+  one be wanted again (`git branch <name> <sha>`):
+
+  | Branch | Tip |
+  |---|---|
+  | `feature/apple-health` | `470a469` |
+  | `feature/coaching` | `5c2bc7f` |
+  | `feature/export` | `9086f06` |
+  | `feature/premium-look` | `27aa510` |
+  | `release/1.4` | `ddb5d78` |
+- **Left as they were:** `stash@{0}` (*Xcode rewrite outside any task*, 2026-10-26); a worktree entry Git marks *prunable*, for a
+  scratch folder that no longer exists (`745823d`, detached); the six unstaged files.
+- **1.4** read *Waiting for Review* at 23:33 on 2026-11-13; not read again since.
 
 **1.4 (6) uploaded, processed and submitted to App Review with Premium; Waiting for Review** (2026-11-13, evening).
 - **Committed and pushed** on the owner's `/commit`: `c74bb3d` (the rules), `cf29e8b` (the key and build 6, with the test), `40743f2`
@@ -6739,6 +6773,12 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 00:22 on 2026-11-14, after the hundred-and-twenty-first pass's files were added by name: on `main`, HEAD `ddb5d78`, level
+with `origin/main`; no other branch, here or on `origin`; 4 staged, all modified — `CLAUDE.md`, `HISTORY.md`, `docs/AI_CONTEXT.md` and
+`tasks/lessons.md`; 6 unstaged, the six the tree already carried; `git diff --cached --check` clean.** This file is added again once
+this block is written. No `git commit`. The blocks below are from before the owner's `/commit` of `ec1eda2` and `ddb5d78`, and name
+branches since deleted.
 
 **Read at 23:38 on 2026-11-13, after the hundred-and-twentieth pass's files were added by name: HEAD `40743f2`, level with
 `origin/release/1.4`, and `main` at `40743f2` on `origin` too; 18 staged — 10 added (`AppStore/screenshots/iPhone-6.3/`'s ten PNGs)

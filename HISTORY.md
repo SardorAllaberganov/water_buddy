@@ -15735,3 +15735,33 @@ source changed. Left for the owner: `AppStore/README.md`'s title and *Build* row
 
 Staged before this pass: `AppStore/screenshots/iPhone-6.3/` (10 new), `AppStore/README.md`, `README.md`, `Tools/VerifyScreenshots.sh`.
 This pass: `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file.
+
+## [2026-11-14] — `main` takes every change and becomes the only branch
+
+### What happened
+
+- **`/commit`** (the owner's): `ec1eda2` *chore: add the 6.3-inch store shots Connect now requires* and `ddb5d78` *docs: record 1.4's
+  upload and its submission for review*, pushed `40743f2..ddb5d78` to `origin/release/1.4`. No gate: no Swift file changed;
+  `bash Tools/VerifyScreenshots.sh` had passed all 32 files after its edit.
+- **`main`**, on the owner's *move main too all changes*: fast-forwarded `40743f2..ddb5d78`, pushed, and checked out. The six unstaged
+  files came across untouched.
+- **The other branches**, on the owner's *remove other branches*. Each tip was proved an ancestor of `ddb5d78`
+  (`git merge-base --is-ancestor`): `feature/apple-health` `470a469`, `feature/coaching` `5c2bc7f`, `feature/export` `9086f06`,
+  `feature/premium-look` `27aa510`, `release/1.4` `ddb5d78`. Then `git branch -d` here and `git push origin --delete` on GitHub, and a
+  pruning fetch; `git branch -a` lists `main` and `origin/main` alone. Left: `stash@{0}` from 2026-10-26 and a prunable worktree entry
+  whose folder is gone.
+
+### The records (hundred-and-twenty-first pass)
+
+- **Drift fixed in `CLAUDE.md`:** four *Architecture* bullets said Apple Health, set B, export and *One finish* were "pushed; not merged"
+  on their branches, and that release 1.4 was made ready on `release/1.4`. All four have been on `main` since `745823d` (2026-11-07),
+  and the branches are gone; the bullets say so. Three branch names in the target and storage tables are dropped.
+- **`docs/AI_CONTEXT.md`:** the header and a new *Current state* headline with the five tips.
+- **`tasks/lessons.md`:** one entry, on `ugrep`'s complexity limit.
+- **Checked and left:** the branch names in older dated blocks and notes in `docs/AI_CONTEXT.md`, `docs/STATE.md`, `docs/WIDGET.md` and
+  `docs/DESIGN.md` are history. No rule file names a deleted branch; every rule citation resolves. 137 `.swift` files, 1112 / 71 / 75
+  tests. Not run: the gate — no source changed.
+
+### Files touched
+
+`CLAUDE.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.
