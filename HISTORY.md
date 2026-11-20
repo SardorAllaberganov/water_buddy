@@ -15765,3 +15765,69 @@ This pass: `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.
 ### Files touched
 
 `CLAUDE.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.
+
+## [2026-11-21] — Release 1.4.1 staged: the yearly saving in every region, the rating on the first goal day, three listings
+
+### What changed (staged on `release/1.4.1`, not committed)
+
+- **#162:** the yearly plan's saving is worked out from the price StoreKit shows, read back with the product's own format
+  (`PremiumAccess.amount(shown:format:otherwise:)`, called from `PremiumStore`), so a device whose region writes a decimal comma reads
+  *save 44 %*, not 20 %. The final review's guard trusts a read only where it shares StoreKit's whole number. `PremiumAccessTests` +4
+  (twelve storefronts' formats), `StoreKitSessionTests` +1.
+- **The rating's moment (R1):** `DataManager.reviewStreak` 3 → 1, the first pour on Home that reaches the goal, once per version;
+  `ReviewRequestTests` rewritten for it; `PRIVACY.md` and `Tools/PrivacyPolicy.html` §3 (*Last updated 20 November 2026*); the
+  2026-10-15 rating spec's note that R1 supersedes its D1. Rule `70-privacy`'s wording and its *Named calls* are left unstaged for the
+  owner.
+- **Version 1.4.1, build 7**, on fourteen sites.
+- **The listing**, from the `aso` playbook's research (`AppStore/research/2026-11-20/`): the en-US name, subtitle, keywords,
+  promotional text and What's New; new English (U.K.) and Russian listings; `Tools/VerifyListing.sh`; `README.md`'s *App Store Connect*
+  section, `AppStore/README.md` rewritten, `AppStore/in-app-purchases.md` brought up to 1.4.1.
+- **The screenshots' new order**, in `Tools/StoreScreenshots.html` (unstaged, waiting for its two captures): the widgets and the Lock
+  Screen at 2 and 3; the goal step and export out.
+
+### The rulings it rests on
+
+- The owner's R1–R4 (2026-11-20, spec §12): the rating on the first goal reached by a pour on Home; en-GB keywords in English; the
+  Russian listing showing the English screenshots; Home Screen widget and Lock Screen shots in, the goal step and export out. The owner
+  kept R1 after the final review set out what it allows: "Keep as ruled" (2026-11-21).
+- The executor's rulings, each in the ledger (`.superpowers/sdd/2026-11-20-release-1-4-1/progress.md`) with its cost if wrong: the
+  gate stands over two iOS 27.0 failures that fail on `752a0a3` too; UI chunks of four on 26.5; the captures and the framing moved to
+  the next capture window; the review package built from the index; the fix's code run in another session's window.
+
+### Verification run
+
+- **The gate** (2026-11-20, on a copy of the index; Xcode 27.0 `27A266a`, iOS 27.0 `24A434`): phone unit `✔ Test run with 1116 tests
+  in 122 suites passed`; UI on iOS 27.0, 72 methods in 13 chunks — 69 passed (4 only on a rerun), 1 skipped by design, 2 failed as on
+  `752a0a3`'s own build (#229); UI on iOS 26.5, 70 of 72 — 69 passed (4 only on a rerun), 1 skipped by design, the two launch tests not
+  run once the runtime had left the Mac (#230); watch unit `✔ Test run with 71 tests in 7 suites passed`; both widget builds `** BUILD
+  SUCCEEDED **`; warnings 20 / 17 / 2 / 17 messages, unchanged against clean builds of `752a0a3`.
+- **After the review's fix** (2026-11-21): `aShownPriceMisreadInAnotherLocaleNeverInventsASaving` failing, then passing; phone unit
+  `✔ Test run with 1117 tests in 122 suites passed` (the second run; the first met #158); `PremiumAccessTests` 28/28 on iOS 18.6; from
+  a fresh copy of the index, watch unit 71 passed, both widgets built, warnings unchanged on all four schemes.
+- **The Release archive** of that index: `1.4.1 (7)` on all four bundles, the App Group on all four, HealthKit on the app alone, one
+  manifest hash, both Health keys, no DEBUG-only symbol. Not uploaded.
+- **The final review** (a fresh reviewer, `opus`): *With fixes*, no Critical; what it found and what became of each is in the ledger.
+- **Not run:** the UI suite after the fix (the guard keeps every read its paywall makes); the three hand checks (#162's tile, the
+  rating's moment with an *Undo*, *Only when behind* on iOS 27), which `AppStore/README.md` §1 puts before the submission; any device.
+
+### Not done
+
+- The captures `02-widgets` and `04-lock-screen`, the framed ten and the 6.3″ set. Then the owner's: the policy published, App Store
+  Connect, the prices on release day.
+
+### The records (hundred-and-twenty-second pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*, six *Files on disk* rows, `Tools/VerifyListing.sh` and `Tools/PrivacyPolicy.html`,
+  #162 retired, notes on #138 and #228, #229–#231 opened, the *Git* block. `docs/STATE.md`: a header line and a dated note under
+  roadmap 1.2.5's tests. `tasks/lessons.md`: four entries. `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md`: checked, no change.
+
+### Files touched
+
+The code: `WaterBuddy/DataManager.swift`, `WaterBuddy/PremiumAccess.swift`, `WaterBuddy/PremiumStore.swift`,
+`WaterBuddy.xcodeproj/project.pbxproj`; the tests: `WaterBuddyTests/PremiumAccessTests.swift`, `WaterBuddyTests/PremiumStoreTests.swift`,
+`WaterBuddyTests/ReviewRequestTests.swift`; the policy: `PRIVACY.md`, `Tools/PrivacyPolicy.html`; `Tools/VerifyListing.sh` (new); the
+store: `AppStore/README.md`, `AppStore/in-app-purchases.md`, `AppStore/keywords.txt`, `AppStore/promotional-text.txt`,
+`AppStore/whats-new.txt`, `AppStore/name.txt` and `AppStore/subtitle.txt` (new), `AppStore/en-GB/` and `AppStore/ru/` (six files each,
+new), `AppStore/research/2026-11-20/` (five files, new); `README.md`; the spec and the plan (new) and
+`docs/superpowers/specs/2026-10-15-rating-prompt-design.md`; the records: `docs/AI_CONTEXT.md`, `docs/STATE.md`, `tasks/lessons.md` and
+this file. Unstaged on purpose: `.claude/rules/70-privacy.md` and `Tools/StoreScreenshots.html`.

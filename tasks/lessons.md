@@ -5977,3 +5977,59 @@ UTF-8 text, are past its limit.
 
 **The rule:** to print a match with its context, use `awk` with `index()` and `substr()`, or `grep -n` and then `sed -n`, never
 `.{0,N}` on both sides of the term. Read an empty result after a `grep` error as no search, not as no match.
+
+## 2026-11-20 — A test that fails on the change may fail on the code before it
+
+**What happened.** In 1.4.1's gate, two UI tests that tap Settings' *Only when behind* failed on iOS 27.0, once in their chunks and
+again alone. 1.4.1 changes nothing in Settings. A fresh export of `HEAD` `752a0a3`, built and run on the same simulator minutes later,
+failed both identically, and both passed on iOS 26.5. In 1.4's gate a week before they had passed, on a runtime of the same name whose
+build nobody wrote down.
+
+**The rule:** before blaming the change for a failure, run the same test on a build of the code before it, on the same device, and on
+the other runtime. Write the toolchain's and the runtime's build numbers into every gate record (`xcodebuild -version`,
+`xcrun simctl list runtimes`), so "it passed last week on 27.0" can be compared at all.
+
+## 2026-11-20 — A simulator runtime can leave the Mac in the middle of a gate
+
+**What happened.** At about 23:26, with WaterBuddy's UI suite two chunks from the end of its iOS 26.5 run, the iOS 26.5, iOS 18.6
+and watchOS 11.5 runtime images disappeared from `xcrun simctl runtime list`. Nothing in the three sessions on the Mac ran a
+`simctl runtime` command. The next chunk failed with "Unable to boot device because we cannot determine the runtime bundle", and the
+one after with "Unable to find a device matching the provided destination specifier". Another session, on its owner's word,
+registered 18.6 and watchOS 11.5 again from the MobileAsset images; 26.5's was not among them.
+
+**The rule:** read `xcrun simctl runtime list` before each platform's leg of a gate, and read a destination error as a missing runtime
+before reading it as a broken test. Reinstalling a runtime is a download and a change to the Mac: the owner's to approve.
+
+## 2026-11-20 — Seven UI tests to a run no longer fit the foreground limit
+
+**What happened.** At a load of 13–34, chunks of seven UI tests took 7–11 minutes on iOS 27.0, past the tool's 600-second limit, and
+the harness moved them to the background. On iOS 26.5 the same methods in chunks of four took 1–3 minutes each and every run finished
+in the foreground.
+
+**The rule:** cut UI runs to four tests each while the Mac is loaded, so every `xcodebuild` is watched to its end, as `CLAUDE.md`
+asks. Put a test with a time window, like `testThePaceLineIsPremiums` before 23:00, in the first chunk.
+
+## 2026-11-20 — The capture window and the other sessions' runs decide when a store shot can be taken
+
+**What happened.** The two new store screenshots needed `CapturePairScreenshots.sh setup`, which refuses after 11:45 PM and starts
+with `xcrun simctl shutdown all`. When the gate finished at 23:36, the window had nine minutes left, two other sessions had just
+started hour-long simulator runs on WaterBuddy's word, and placing the widgets needed the simulator tool's access, which the owner had
+not yet given. The captures moved to the next day.
+
+**The rule:** plan a capture into the afternoon, before the evening's gate. Tell the other sessions its time when the day starts, and
+ask for the tool's device access while the owner is there.
+
+## 2026-11-21 — A lost UI-test tap is caught only while the simulator's log is being streamed
+
+**What happened.** Chasing #229, the simulator's own log of the evening's failed taps was gone by the next morning (`log show`
+returned nothing for those minutes), and a freshly booted phone passed. Streaming the log during the runs (`xcrun simctl spawn
+<device> log stream --level debug --predicate 'process == "backboardd" OR process == "testmanagerd" OR process == "<App>"'`)
+caught two failures in eight runs, and comparing them with two passes found the cause: a tap delivered through the app's touch
+stream (`touchStream|filterDetachedTouches`) and read by the app after XCUITest's per-tap digitizer had gone
+(`cancel -- digitizer did disappear`) is filtered and never ends; one delivered by hit test, or read in time, works. A probe that
+pressed the control at ten durations showed the control itself was fine.
+
+**The rule:** chase a lost tap with the log streaming from the first run, and keep the failing run's log beside its test log.
+Compare a failure with a pass on four lines: the destination at the down, when `backboardd` sent the up, when the digitizer
+disappeared, and when the app sent the up to its window. A tap the app reads after its digitizer has gone is the harness's,
+not the product's.

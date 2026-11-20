@@ -4,6 +4,11 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-11-21 (hundred-and-twenty-second pass — `/doc_sync` on release 1.4.1's staged tree). **No key and no stored
+byte moved:** `DataManager.swift` changes one constant, `reviewStreak` 3 → 1 (the owner's R1), and DocC; `reviewRequestedVersion` keeps
+its type, its absence and its one writer, `claimReviewRequest(version:)`. A dated note under roadmap 1.2.5's tests says which three
+tests changed with it.
+
 **Last updated:** 2026-11-03, after midnight (hundred-and-ninth pass — `/doc_sync` run by the owner after *One finish*'s stages 3
 and 4). **No key and no stored byte moved:** `DataManager.swift` is unchanged against `HEAD`; the recap's and History's flags —
 `landed`, `recapOpens`, `raisedMonth`, `raisedPatterns`, `insightsLanded` — are presentation state, gone with their screens.
@@ -1583,6 +1588,12 @@ launch argument, the gate's own run is not launched to ask, the pause outlasts t
 version is the bundle's. `everyKeyTheProductWritesIsOnTheRoster` drives the claim and requires
 `reviewRequestedVersion` among the keys it reads back. Not pinned: that the claim rings no doorbell
 and reschedules nothing (the final review's Minor 6, deferred).
+*(2026-11-20, release 1.4.1, staged — **the moment moved, the key did not.** The owner's ruling R1 asks on
+the first goal day, not the third in a row: `DataManager.reviewStreak` is 1, and three of the eight
+decision and claim tests were rewritten for it — `theRequestComesOnTheFirstGoalDay` (a run of 0 refused,
+1 and 40 asked), `aClaimOnTheFirstGoalDayRecordsTheVersionBeforeAnswering` and
+`aLaterGoalDayInAnAskedVersionWritesNothingNew`; the file still holds 12 `@Test`. `reviewRequestedVersion`
+keeps its type, its absence and its one writer.)*
 
 **Stage 5 adds three suites that pin stored state, 15 `@Test`** (counted per suite by the attribute
 grep on 2026-10-14, the fifty-ninth pass of `docs/AI_CONTEXT.md`), all in `WelcomeTests.swift`:
