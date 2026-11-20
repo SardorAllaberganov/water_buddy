@@ -127,11 +127,11 @@ at least 640 × 920 pixels — a simulator screenshot is larger than that. To ta
 2. Run the `WaterBuddy` scheme on an iPhone simulator. The run buys from the local StoreKit
    configuration, so the three prices draw.
 3. Finish the welcome, then open **Settings → See Premium**, and save the screen with **⌘S**.
-4. **Check the yearly plan's saving before you use the picture.** At these prices it is **44 %**. The
-   simulators on this Mac are set to the Uzbekistan region (`en_UZ`), and there StoreKit testing reads
-   the prices as whole numbers: the tile says **20 %** (#162). If it does, set the simulator's region to
-   United States in its own *Settings → General → Language & Region*, and open the paywall again. That
-   this fixes it is inferred, never tried.
+4. **Check the yearly plan's saving before you use the picture.** At these prices it is **44 %**. Builds
+   before 1.4.1 read **20 %** on the simulators on this Mac, which are set to the Uzbekistan region
+   (`en_UZ`), where StoreKit hands back the prices as whole numbers (#162). 1.4.1 reads the price StoreKit
+   shows instead, so its tile says 44 % there too — proved by the unit tests, not yet seen on a screen
+   (2026-11-20). A picture that says 20 % is taken again.
 5. Remove the `-WaterBuddyPremium` argument afterwards, and don't commit the scheme with it. The test
    action reuses the run arguments, and one unit test fails while the argument is there (#163).
 
@@ -141,7 +141,7 @@ Once a product has its localization, price and screenshot, its status reads **Re
 
 Nothing but the local configuration has ever been bought from. Before you submit, on a real iPhone:
 
-- Install the 1.4 build from **TestFlight**. TestFlight purchases use Apple's sandbox, and you are not
+- Install the newest build — 1.4.1, build 7 — from **TestFlight**. TestFlight purchases use Apple's sandbox, and you are not
   charged. Alternatively, make a sandbox account (**Users and Access → Sandbox → Test Accounts**) and
   sign in with it in the iPhone's sandbox account setting. Where that setting lives (*Developer*, or
   *App Store*) depends on the iOS version.
@@ -153,13 +153,16 @@ Nothing but the local configuration has ever been bought from. Before you submit
 - **Lifetime**: buy it with a second sandbox account, which has no subscription.
 - **A refund**, or a lapse: the app must drop Premium when StoreKit no longer lists the purchase. How
   to refund a sandbox purchase is not written down here; this session did not check it.
-- **The yearly saving reads 44 %** at the US prices (#162). In another storefront it is whatever that
-  storefront's two prices give.
+- **The yearly saving reads 44 %** at the US prices, in any region since 1.4.1 (#162). In another
+  storefront it is whatever that storefront's two prices give.
 
 ## Step 8 — attach them to 1.4
 
 On the **1.4 version page**, under **In-App Purchases and Subscriptions**, select **all three**, then
 submit the version. Apple reviews first-time in-app purchases only together with a new app version.
+
+*(Done: 1.4 went to review with all three and is live since 2026-11-13. From 1.4.1 on there is nothing to
+attach — check on the version page that they read *Approved*; one that does not is selected there.)*
 
 ## Leave alone
 

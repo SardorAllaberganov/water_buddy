@@ -1,0 +1,1 @@
+The yearly plan now shows the right saving in every region. It used to read too low wherever prices are written with a decimal comma.

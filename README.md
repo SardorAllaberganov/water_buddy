@@ -182,11 +182,12 @@ baseline*; closing it is tracked as known issue #29.
 bash Tools/CaptureScreenshots.sh                      # the 10 raw iPhone shots, 6.9" (1:45–11:45 PM)
 bash Tools/FrameScreenshots.sh                        # frames them into the upload set
 bash Tools/CapturePairScreenshots.sh setup            # a new phone + watch pair, a lived-in week on it
-bash Tools/CapturePairScreenshots.sh shoot <name>     # 01-wrist; also 02-widgets, 04-lock-screen and the two
-                                                      #   faces, once a person has placed each in DeviceHub —
-                                                      #   1.4's store page carries none of those four
+bash Tools/CapturePairScreenshots.sh shoot <name>     # 01-wrist, 02-widgets and 04-lock-screen (1.4.1's set),
+                                                      #   and the two faces — each once placed, by the
+                                                      #   simulator tool or a person in DeviceHub
 bash Tools/CaptureFullCensus.sh                       # every screen, state, scroll position (stale, #45)
 bash Tools/VerifyScreenshots.sh                       # size / alpha / format, per App Store slot
+bash Tools/VerifyListing.sh                           # every store text field, counted, per language
 ```
 
 Two traps these encode, both of which cause an upload rejection rather than a visible failure:
@@ -251,10 +252,13 @@ Not yet chosen. All rights reserved until one is added.
 
 # App Store Connect
 
-Everything needed to fill in the listing for **version 1.4 (build 5)** — rewritten on 2026-10-25 from
-the 1.0 listing, against the app as built, and again on 2026-11-04 for Apple Health, set B and export.
+Everything needed to fill in the listing for **version 1.4.1 (build 7)** — rewritten on 2026-10-25 from
+the 1.0 listing, against the app as built, again on 2026-11-04 for Apple Health, set B and export, and on
+2026-11-20 for search: the name, the subtitle and the keywords, with English (U.K.) and Russian listings
+beside the en-US one (spec `docs/superpowers/specs/2026-11-20-release-1-4-1-design.md`).
 **Character counts were verified programmatically**, not
-estimated — every field is inside Apple's limit, and two are exactly at it.
+estimated (`bash Tools/VerifyListing.sh`): every field is inside Apple's limit, and one, the subtitle, is
+exactly at it.
 
 Fields marked 🔴 **you must supply**; nothing in the repo can answer them.
 
@@ -264,19 +268,22 @@ ruling, 2026-11-06); this section stays the master copy, so a change here is mad
 
 1.4 carries everything since 1.1: the redesign (roadmap release 1.2), every surface (1.3) — Apple Health
 (1.3.3) among it — and WaterBuddy Premium: set A, set B and export (1.4), with the finish across the app
-(spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`).
+(spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`). 1.4 is live since 2026-11-13. 1.4.1 fixes
+the yearly saving where prices are written with a decimal comma (#162), and asks for a rating on the first
+goal day.
 
 ## App Information
 
 | Field | Value |
 |---|---|
-| **Name** (≤30) | `WaterBuddy - Hydration Tracker` — **30/30**, unchanged |
-| **Subtitle** (≤30) | `One tap. No account. No cloud.` — **30/30**, unchanged, and still true |
+| **Name** (≤30) | `Water Tracker - WaterBuddy` — **26/30**: the main keyword first, then the brand (1.4.1, spec §5.1) |
+| **Subtitle** (≤30) | `Stay Hydrated: Reminder Widget` — **30/30**: two lightly held phrases, never a slogan (1.4.1, spec §5.1) |
 | **Bundle ID** | `sardor.WaterBuddy` |
 | **SKU** | already set at 1.0's submission — it cannot change |
 | **Primary category** | Health & Fitness |
 | **Secondary category** | Lifestyle *(optional; may be left empty)* |
 | **Primary language** | English (U.S.) |
+| **Other listings** | English (U.K.) and Russian, new in 1.4.1 — [`AppStore/en-GB/`](AppStore/en-GB) and [`AppStore/ru/`](AppStore/ru), one file per field |
 | **Content rights** | Contains no third-party content |
 | **Age rating** | **4+.** No violence, mature themes, gambling, user-generated content, messaging, web browsing or ads. Apple revised the questionnaire in 2025; answer any new question on the same facts — the app gives no medical or treatment advice, and its goal calculator and insights each say *not medical advice* |
 | **Price** | **Free, with in-app purchases** — WaterBuddy Premium, below |
@@ -287,36 +294,38 @@ ruling, 2026-11-06); this section stays the master copy, so a change here is mad
 
 | Field | |
 |---|---|
-| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). 🔴 **Not yet live**: it returned 404 on 2026-10-24. Its contact address is filled in (2026-10-29); publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159) |
-| **Support URL** | `https://sardorallaberganov.github.io/waterbuddy/support/` — 🔴 **not yet live**. The page is `Tools/Support.html` (2026-10-29), read from the code: contact, logging, widgets and Siri, the Watch, reminders, Premium, your data. Publish it as `waterbuddy/support/index.html` in the same repository |
+| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). 🔴 **Publish it again before 1.4.1 is submitted**: its §3, on the rating request, changed. If Connect asks for the address in English (U.K.) or Russian, it is the same |
+| **Support URL** | `https://sardorallaberganov.github.io/waterbuddy/support/` — live since 2026-11-06: `Tools/Support.html`, read from the code (contact, logging, widgets and Siri, the Watch, reminders, Premium, your data), published as `waterbuddy/support/index.html` in the same repository. The same address in every language |
 | **Marketing URL** | optional |
 | **Terms of Use (EULA)** | Apple's standard licence — leave App Store Connect's EULA field at its default. The description links it, as guideline 3.1.2 asks of an app with subscriptions |
 
-## Promotional text (≤170) — **161/170**
+## Promotional text (≤170) — **136/170**
 
 Editable any time without submitting a new build.
 
 ```
-One tap logs a glass from your widget, Lock Screen, Control Center or Apple Watch. New: Apple Health, a week widget and WaterBuddy Premium. No account, no cloud.
+One tap logs a glass from your widget, Lock Screen, Control Center or Apple Watch. Logging is always free: no ads, no account, no cloud.
 ```
 
-## Keywords (≤100) — **98/100**
+## Keywords (≤100) — **99/100**
 
-No spaces after the commas — a space costs a character. No token repeats the app name or subtitle,
-because Apple already indexes those. Against 1.0's list: `ml`, `offline` and `sip` out, `watch` and
-`streak` in; against 1.4's first text, `thirst` out and `health` in (spec D5).
+No spaces after the commas — a space costs a byte. No word repeats the name or subtitle, because Apple
+already indexes those. Against 1.4's list (spec §5.1): `reminder` and `widget` out, now in the subtitle;
+`glass`, `private` and `health` out; `hydration`, `diary`, `fluid`, `counter` and `balance` in. The
+measurements behind each word are in [`AppStore/research/2026-11-20/`](AppStore/research/2026-11-20).
 
 ```
-drink,intake,reminder,goal,daily,glass,bottle,cup,log,widget,watch,streak,private,h2o,health,habit
+drink,hydration,intake,watch,daily,diary,log,fluid,habit,h2o,goal,streak,bottle,counter,balance,cup
 ```
 
-> If you change the **name** or the **subtitle**, re-check this list for overlap and re-count.
+> If you change the **name** or the **subtitle**, run `bash Tools/VerifyListing.sh`: it checks this list for
+> overlap and counts every field.
 
 ## Description (≤4000) — **3987/4000**
 
 The first ~170 characters are all that show before the "more" link, so the opening sentence carries
 the whole pitch on its own (it is 170). The *WaterBuddy Premium* paragraph is what guideline 2.3.2
-asks for — six of the ten iPhone screenshots show Premium's screens — and its closing sentence is
+asks for — five of the ten iPhone screenshots show Premium's screens — and its closing sentence is
 the store page spec's (§3.7). The renewal sentence and the Terms of Use link are guideline 3.1.2's.
 
 ```
@@ -378,32 +387,22 @@ Subscriptions renew automatically unless cancelled at least 24 hours before the 
 Requires iOS 17 or later on iPhone; the Log Water control needs iOS 18, and the Apple Watch app watchOS 26.
 ```
 
-## What's New — version 1.4 — **1060/4000**
+## What's New — version 1.4.1 — **133/4000**
 
-Written against **1.1**, which already brought the Lock Screen widget, the Control Center control,
-the *Log water* Siri phrase and adding a serving at an earlier time. 1.1's App Review outcome is not
-recorded here: if it never reached the store, add a line for those four before the last one.
+Written against **1.4**, which is live (Apple's Lookup API, 2026-11-20). The rating request's new moment is
+not named here: it is how the app asks, not something a person uses.
 
 ```
-WaterBuddy 1.4 - a new look, more ways in, Apple Health and Premium.
-
-- Redesigned throughout: liquid glass over a moving aurora, a calmer Home, History rebuilt around your week, and a new Settings - where figures roll and charts draw themselves.
-- A first-run welcome that can suggest a goal from your weight and how active you are - and keeps neither.
-- Undo a pour with one tap, and a day streak for the days you reach your goal.
-- A week widget for the Home Screen, and the small widget now works in StandBy.
-- Three Apple Watch complications - circular, rectangular and corner - and a redesigned watch app.
-- Log a Glass straight from a reminder, without opening the app.
-- Ask Siri "How much water today in WaterBuddy".
-- Apple Health, optional: your servings written to Health as Water.
-- WaterBuddy Premium, optional: month view and full history, your patterns, weekly personal insights, a monthly recap to share, your own reminder schedule, a pace line, reminders only when you are behind, and an export of every serving. Logging water is always free.
+The yearly plan now shows the right saving in every region. It used to read too low wherever prices are written with a decimal comma.
 ```
 
-## In-App Purchases — WaterBuddy Premium 🔴
+## In-App Purchases — WaterBuddy Premium
 
-Nothing here exists in App Store Connect yet (known issue #155); the app reads these three product
-IDs and nothing else (`PremiumAccess.productIDs`). The names, descriptions, prices and trial below
-are the local StoreKit configuration's (`WaterBuddyTests/WaterBuddy.storekit`) — the prices are a
-recommendation, yours to change.
+All three exist in App Store Connect (known issue #155) and went to review with 1.4, which is live:
+on 1.4.1's page, check that they read *Approved*. The app reads these three product IDs and nothing
+else (`PremiumAccess.productIDs`). The names, descriptions, prices and trial below are the local
+StoreKit configuration's (`WaterBuddyTests/WaterBuddy.storekit`); Connect's were made from them for 1.4
+(2026-11-06). Prices by country go in on the day 1.4.1 is released: `AppStore/README.md` §5.
 
 **First:** Agreements, Tax and Banking → the **Paid Apps Agreement**, with banking and tax completed.
 Without it no product can be sold.
@@ -487,41 +486,41 @@ Store Connect should not prompt. If it does:
 In [`AppStore/screenshots/`](AppStore/screenshots), English only, every file checked by
 `bash Tools/VerifyScreenshots.sh`. **Two iPhone wells are filled** (read in Media Manager on 2026-11-13): the
 one Connect requires is *iPhone with Dynamic Island (medium display)*, the 6.1″ and 6.3″ phones, which refuses
-a 6.9″ shot, and the 6.9″ well is optional. Delete every older shot already in Connect — 1.1's four on the
-watch, and the four 6.5″ ones from 1.0 and 1.1 — since they show the old app. `AppStore/README.md` §3 has the
-steps in order.
+a 6.9″ shot, and the 6.9″ well is optional. For 1.4.1, remove 1.4's ten from each iPhone well, then drag in the
+new ten in name order; `AppStore/README.md` §3 has the steps in order.
 
 | Slot | Size | Files |
 |---|---|---|
 | iPhone 6.3″ (Dynamic Island, medium) — **required** | 1206 × 2622 | `iPhone-6.3/` — the same ten, scaled evenly from `iPhone-6.9/` and trimmed by one pixel column |
-| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**, from 1.4's capture of 2026-11-06 |
+| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**: eight from 1.4's capture of 2026-11-06, two from the capture pair's (not yet taken, 2026-11-20) |
 | Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | `AppleWatch/1-wrist.png` — **required**, because the app embeds a watchOS app; one meets it |
 | Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.png`, *One tap. Watch it fill.* |
 
 **The iPhone set is framed** (`docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md`): a
 two-line headline, the screen in a drawn phone and one of its panes lifted out, over the aurora running across
-the ten; the six Premium shots carry a *Premium* tag. `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM, from
+the ten; the five Premium shots carry a *Premium* tag. `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM, from
 any day) writes the raw screens into `captures/iPhone-6.9/`, kept as the input, and
-`bash Tools/FrameScreenshots.sh` frames them into `iPhone-6.9/` under their upload names. **No shot of a system
-surface is in 1.4's set** (the owner's ruling, 2026-10-26).
+`bash Tools/FrameScreenshots.sh` frames them into `iPhone-6.9/` under their upload names. **1.4.1 adds two shots
+of the system's own surfaces**, the Home Screen's widgets and the Lock Screen, taken on the capture pair, and
+drops the goal step and export (`docs/superpowers/specs/2026-11-20-release-1-4-1-design.md` §6, R4).
 
 Upload in this order — only the **first three** appear on search results and install cards:
 
 | # | File | Headline | Shows |
 |---|---|---|---|
 | 1 | `1-home.png` | One tap. Watch it fill. | Home at 65 %, *1,300 of 2,000 ml*, a five-day streak |
-| 2 | `2-history.png` | Your week, day by day | History's week, *Month* and *Insights* locked for a free user |
-| 3 | `3-month.png` | A whole month on one page | Premium: the month before's calendar and figures, a whole month |
-| 4 | `4-insights.png` | Insights from your own week | Premium: last week's insights |
-| 5 | `5-patterns.png` | Learn when you drink | Premium: the month's patterns |
-| 6 | `6-recap.png` | Share your month | Premium: the month before's recap card |
-| 7 | `7-schedule.png` | Reminders on your hours | Premium: your own reminder schedule, a quiet day |
-| 8 | `8-export.png` | Your servings, as a CSV file | Premium: export, the file shown before it is sent |
-| 9 | `9-goal-setup.png` | A goal that fits you | the welcome's goal step |
-| 10 | `10-settings.png` | Set your own serving sizes | Settings, the quick-add vessels lifted out |
+| 2 | `2-widgets.png` | Log without opening the app | the Home Screen: WaterBuddy's small widget and the week widget |
+| 3 | `3-lock-screen.png` | Right on your Lock Screen | the Lock Screen: the line, the ring, the rectangle, *Log Water* |
+| 4 | `4-history.png` | Your week, day by day | History's week, *Month* and *Insights* locked for a free user |
+| 5 | `5-settings.png` | Set your own serving sizes | Settings, the quick-add vessels lifted out |
+| 6 | `6-schedule.png` | Reminders on your hours | Premium: your own reminder schedule, a quiet day |
+| 7 | `7-month.png` | A whole month on one page | Premium: the month before's calendar and figures |
+| 8 | `8-insights.png` | Insights from your own week | Premium: last week's insights |
+| 9 | `9-patterns.png` | Learn when you drink | Premium: the month's patterns |
+| 10 | `10-recap.png` | Share your month | Premium: the month before's recap card |
 
 `1-wrist.png` is the watch app, synced from the phone, at 65 %, taken on 2026-10-26 by
-`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4 keeps it, as it keeps the header.
+`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.1 keeps it, as it keeps the header.
 
 ## Review notes
 
@@ -551,57 +550,75 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ---
 
-## Before you submit — outstanding (1.4, read 2026-11-04)
+## Before you submit — outstanding (1.4.1, read 2026-11-20)
 
-**Blocking — the upload or the review fails without these, and each is yours:**
+**Blocking — each is yours, or done in your Chrome on your word:**
 
-- ✅ **The privacy policy is live** (known issue #159, 2026-11-06): `Tools/PrivacyPolicy.html` is
-  published as `waterbuddy/privacy/index.html` in the `SardorAllaberganov.github.io` repository, and
-  `https://sardorallaberganov.github.io/waterbuddy/privacy/` answers with it, byte for byte. Both the
-  app (Settings, the paywall) and the listing link it; guideline 5.1.1(i). It is this branch's policy,
-  which describes Apple Health, set B and export. Publish it again whenever `Tools/PrivacyPolicy.html`
-  changes.
-- 🔴 **Premium in App Store Connect** (#155): the Paid Apps Agreement with banking and tax, the
-  *WaterBuddy Premium* group and its three products as listed above, each with its review screenshot,
-  and all three selected on the 1.4 version page. *(2026-11-06: the agreement, banking and tax read
-  Active; the group and the three products are made, priced, available in 175 countries, Family
-  Sharing on, each with its en-US name, description and review note — `AppStore/README.md`
-  section 1. Still missing: each product's review screenshot, then selecting all three on the 1.4
-  version page.)*
-- 🔴 **Connect's Privacy Policy URL and Support URL** still name 1.1's Notion page and a Telegram link
-  (read 2026-11-06). On the 1.4 version, set them to `https://sardorallaberganov.github.io/waterbuddy/privacy/`
-  and `…/waterbuddy/support/`; Connect changes the policy's address only with a new version.
-- 🔴 **One real purchase first** (#156, #187). A Release build offers the paywall, so before uploading
-  make a sandbox purchase, a restore and a refund on a real iPhone. Nothing but the local StoreKit
-  configuration has ever been bought from, and a comma-decimal region's yearly saving is unchecked
-  there (#162).
-- ✅ **The support page is live** (2026-11-06): `Tools/Support.html`, published as
-  `waterbuddy/support/index.html` in the same repository; the field's value is
-  `https://sardorallaberganov.github.io/waterbuddy/support/`, which answers with it, byte for byte.
-- 🔴 **The HealthKit capability on the App ID** (#192). The app's entitlements carry
-  `com.apple.developer.healthkit`: `sardor.WaterBuddy` needs the capability in the developer portal
-  — automatic signing adds it when Xcode next signs for a device — and the distribution profile must
-  carry it before an archive, or the upload is refused. *(2026-11-06: the App ID has it — the
-  development profile carries it. The App Store profile on this Mac predates it; check the archive's
-  entitlements before the upload.)*
+- 🔴 **Publish the privacy policy again, before the submission.** 1.4.1 changes when the app asks for a
+  rating, and the policy's §3 says so: publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html`
+  in the `SardorAllaberganov.github.io` repository, then check that
+  `https://sardorallaberganov.github.io/waterbuddy/privacy/` reads *after a pour on the Home screen reaches
+  your daily goal* and *Last updated 20 November 2026*. The app and the listing both link it; guideline
+  5.1.1(i). The policy promises it changes before or with the app.
+- 🔴 **App Store Connect, in `AppStore/README.md` §1's order:** + Version 1.4.1; the en-US name and subtitle
+  on *App Information*, and English (U.K.) and Russian added with theirs; each language's version fields from
+  its files; the screenshots; build 7; *Submit for Review*.
+- 🔴 **The two new screenshots and the framed ten** (spec §6): `02-widgets` and `04-lock-screen` are taken on
+  the capture pair, once a person in DeviceHub or the simulator tool has placed the widgets and the Lock
+  Screen; then the ten are framed and the 6.3″ set made. Not done on 2026-11-20: the capture builds only
+  before 11:45 PM. Until then `AppStore/screenshots/iPhone-6.9/` and `iPhone-6.3/` hold 1.4's ten.
+- 🔴 **Three checks by hand on an iOS 27 simulator**, which nothing automated sees (`AppStore/README.md` §1,
+  step 8): the paywall in a decimal-comma region says *save 44%* (#162); the rating request comes after the first
+  pour on Home that reaches the goal, and not after an *Undo* inside its pause (`-WaterBuddyReviewPrompt`); and
+  Settings' *Only when behind* opens the paywall for a free user and turns on and off with Premium held. App
+  Review's notes send reviewers to that row. Two UI tests sometimes lose their tap on it under load; on 2026-11-21
+  that was traced to XCUITest's own touch pipeline, not the app, and a probe turned the switch with every one of
+  ten presses (#229), so this check is insurance.
+- 🔴 **One real purchase** (#156, #187), still open from 1.4: a sandbox purchase, a restore and a refund on a
+  real iPhone. Nothing but the local StoreKit configuration has ever been bought from.
+- **The prices by country** (`AppStore/README.md` §5) don't block the submission: they go in on the day
+  1.4.1 is released.
 
 **Done in the repository:**
 
-- **The screenshots are taken and framed** (2026-11-06, 22:14, from this branch's tree): ten iPhone shots, the
-  schedule and export sheets among them, in `AppStore/screenshots/iPhone-6.9/`. The month, Patterns and the recap
-  are October's page, a whole month.
-
-- **Version 1.4, build 5**, on all fourteen sites in `project.pbxproj`; read back as `1.4 (5)` from
-  the built app, its widget extension, the watch app and the watch widget.
+- **#162 is fixed:** the yearly plan's saving is worked out from the price StoreKit shows, read back with the
+  product's own format, so a region that writes prices with a decimal comma reads *save 44 %*, not 20 %
+  (`PremiumAccess.amount(shown:format:otherwise:)`). Twelve price formats pin it, and so do the local StoreKit
+  configuration's three products. A read is trusted only where it shares StoreKit's whole number, so a price
+  read another locale's way can never claim a saving like *save 99%* (the final review's Important 1, fixed
+  2026-11-21 and run on iOS 27.0 and 18.6).
+- **The rating moment (R1):** asked after the first pour on Home that reaches the day's goal, once per version
+  (`DataManager.reviewStreak` is 1). Rule `70-privacy`'s wording and the policy's §3 say the same.
+- **Three listings**, en-US, English (U.K.) and Russian, from the research in `AppStore/research/2026-11-20/`.
+  `bash Tools/VerifyListing.sh` counts every field and checks every keyword rule.
+- **Version 1.4.1, build 7**, on all fourteen sites in `project.pbxproj`; read back as `1.4.1 (7)` from the
+  built app, its widget extension, the watch app and the watch widget.
+- **The gate** (2026-11-20): phone unit, 1116 passed. Phone UI on iOS 27.0, 72 methods: 69 passed, 1 skipped by
+  design, and 2 failed on 1.4.1 and on 1.4's own build alike (below). Phone UI on iOS 26.5: 70 methods run, all
+  passed or skipped by design; the two launch tests could not run once the 26.5 runtime had left this Mac.
+  Watch unit, 71 passed. Both widgets built. Warnings unchanged against 1.4 on all four schemes. **After the
+  review's fix** (2026-11-21): phone unit 1117 passed, watch unit 71 passed, both widgets built, and warnings
+  unchanged again on all four schemes, from a fresh copy of the index. The UI suite was not run again: the
+  guard keeps every read the suite's paywall makes, so no screen it draws changes.
 - **Privacy manifests**: all four declare `UserDefaults` (`1C8F.1`, `CA92.1`) and the system boot time
-  (`35F9.1`), and `PrivacyManifestTests` pins them. No check sees a *new* required-reason API (#190) —
-  search the code for one before each upload.
+  (`35F9.1`), and `PrivacyManifestTests` pins them. No check sees a *new* required-reason API (#190); 1.4.1's
+  code adds none.
 - **Export compliance** is answered in the build (`ITSAppUsesNonExemptEncryption = NO`).
-- **Distribution signing and the App Group registration**: 1.1 reached App Review on 2026-10-09, so
-  both were in place then — inferred from that, not re-checked. 1.4 adds no target; it adds the
-  HealthKit entitlement to the app, above.
+- **Signing:** 1.4 was signed, reviewed and released (2026-11-13) with distribution signing, the App Group and
+  the HealthKit capability. 1.4.1 adds no target and no entitlement.
+- **The Release archive** (made again on 2026-11-21, 00:43, from a copy of the index with the review's fix):
+  `** ARCHIVE SUCCEEDED **`; `1.4.1 (7)`
+  on all four bundles, the App Group on all four and HealthKit on the app alone, one privacy manifest four times,
+  both Health keys, and no DEBUG-only symbol (`StoreSample`, `Source.held`) in its dSYM. Not uploaded: the upload
+  is made again from the commit, once the screenshots are in.
 
 **Your call before shipping — not checked by anything automated:**
+
+- **The rating request can now come in a new user's first session**, and after a mistaken pour that crosses the
+  goal and is undone more than 2.2 s later (known issue #138, rarer under 1.4's three days in a row). Both follow
+  from the ruling R1, kept as ruled; the final review of 2026-11-20 put them to you.
+- **The Russian listing** was checked against the app's own strings and passed through `humanize`, but no
+  native speaker has read it as a page.
 
 - **Russian and Uzbek on Premium's screens are drafts** that no native speaker has read: the month
   view, Patterns, Insights and the recap (#170, #175, #179, #185), set B (#207) and export (#210).
@@ -618,6 +635,6 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   `git stash` (`stash@{0}`, 2026-10-26). Read them before any `git stash pop`. Xcode rewrote the two
   schemes again at 22:53 that night, while it was open — each loses its `BlueprintName` line, which
   changes nothing an archive builds. By 2026-11-04 Xcode had rewritten the three catalogues again too;
-  the working tree carries all five and `.claude/settings.json` unstaged, and none is part of 1.4.
+  the working tree carries all five and `.claude/settings.json` unstaged, and none is part of 1.4 or 1.4.1.
 - **The app icon appears only after a build is processed.** The 1024² marketing icon ships *inside*
   the binary's asset catalog — App Store Connect has no icon upload field.
