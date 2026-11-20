@@ -93,12 +93,13 @@ Six limits are conditions of the permission:
   against `WaterBuddyTests/WaterBuddy.storekit`, never the App Store
 - **Named calls.** For the review request, `requestReview` alone. For Premium, `Product.products(for:)`
   and its purchase call, `Transaction.updates`, `Transaction.currentEntitlements`,
-  `Product.price`, `Product.SubscriptionInfo.isEligibleForIntroOffer`, `finish()`,
+  `Product.price`, `Product.displayPrice` and `Product.priceFormatStyle` (the price shown, read back
+  for the yearly's saving since 1.4.1, #162), `Product.SubscriptionInfo.isEligibleForIntroOffer`, `finish()`,
   `AppStore.sync()` and `AppStore.showManageSubscriptions(in:)`. No offer codes, promoted purchases,
   app account tokens or consumables until an amendment here names them. A *Rate WaterBuddy* link to
   the App Store is not part of this permission
-- **The review request's moment.** Asked only after the user's own pour on Home reaches the goal on
-  the third day in a row, at most once per app version, after the confetti lands — never at launch,
+- **The review request's moment.** Asked only after the user's own pour on Home reaches the day's
+  goal, at most once per app version, after the confetti lands — never at launch,
   never from a button whose answer is the request, never from the widget, Siri, the control, a
   reminder's button, the watch or History
 - **The paywall's moment.** Shown only when the user opens it — Settings' *See Premium*, or a later
