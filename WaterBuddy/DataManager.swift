@@ -1731,19 +1731,23 @@ final class DataManager {
 
     // MARK: - The rating request
 
-    /// How many goal days in a row, today the last of them, before the app may ask iOS for a
-    /// rating (`docs/superpowers/specs/2026-10-15-rating-prompt-design.md`, D1).
+    /// How many goal days in a row, today the last of them, before the app may ask iOS for a rating.
     ///
-    /// Three: the request can then never fall in the first session or on the first day, and it
-    /// comes to someone the app is plainly working for. It reads ``streak``, so it costs no count
-    /// of its own.
-    nonisolated static let reviewStreak = 3
+    /// One: the first day the user's own pour on Home reaches the goal — the owner's R1, release 1.4.1's
+    /// spec (`docs/superpowers/specs/2026-11-20-release-1-4-1-design.md` §4). It was three
+    /// (`2026-10-15-rating-prompt-design.md`, D1) until the app had stood 77 days with no rating: three
+    /// goal days in a row, each crossed by a pour on Home, is a moment someone who logs from the widgets
+    /// and the Watch almost never reaches. It still reads ``streak``, so it costs no count of its own.
+    /// What one allows, put to the owner by the release's final review and kept (2026-11-21): a new user
+    /// may be asked in the first session, and a pour that crosses the goal and is undone after the
+    /// request's pause (`ReviewPrompt.pause`) has still spent the version's one ask (#138).
+    nonisolated static let reviewStreak = 1
 
     /// Whether the app may ask for a rating now — the whole decision, pure, so a test can hold it.
     ///
     /// All four must hold:
-    /// - `reachedToday`: a run of three can end yesterday while today is still short, and the
-    ///   request belongs to the day that completed the run;
+    /// - `reachedToday`: a run can end yesterday while today is still short, and the request belongs
+    ///   to the day the goal is reached;
     /// - `streak` is at least ``reviewStreak``;
     /// - `version` is not empty: an empty version could never be told from the next one;
     /// - `askedVersion` is not `version`: at most once per version, as Apple's own sample asks

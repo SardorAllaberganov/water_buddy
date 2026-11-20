@@ -9,6 +9,8 @@ in reviewing this document: only a pour made **on Home** asks, because a crossin
 app comes forward would ask straight after launch, which Apple's guidance says to avoid (§3.3). This
 document writes the outline out, with §5's rule wording, for the owner's review **before** the plan
 and before any code (`docs/ROADMAP.md` §8). Roadmap item **1.2.5**.
+*(2026-11-20: D1 superseded by release 1.4.1's R1 — the first goal day, still a pour on Home and still once
+per version — `2026-11-20-release-1-4-1-design.md` §4.)*
 
 **Authority.** Subordinate to the DocC on the type being changed, then `.claude/rules/`, then
 `CLAUDE.md` (rule `99-docs-cascade`). Where it contradicts the code, the code wins and this document

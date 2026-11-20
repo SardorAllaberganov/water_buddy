@@ -70,16 +70,17 @@ private func pour(goalDays days: Int, today todayAmount: Int, into manager: Data
 @MainActor
 struct ReviewRequestTests {
 
-    /// D1: the third goal day in a row asks; the second does not.
-    @Test func theRequestWaitsForTheThirdGoalDayInARow() {
-        #expect(DataManager.reviewStreak == 3)
-        #expect(!DataManager.mayRequestReview(reachedToday: true, streak: 2, askedVersion: nil, version: "1.2"))
-        #expect(DataManager.mayRequestReview(reachedToday: true, streak: 3, askedVersion: nil, version: "1.2"))
+    /// The owner's R1 (2026-11-20; release 1.4.1's spec §4): the first goal day asks. It was the third
+    /// (spec 2026-10-15, D1) until the app had stood 77 days with no rating.
+    @Test func theRequestComesOnTheFirstGoalDay() {
+        #expect(DataManager.reviewStreak == 1)
+        #expect(!DataManager.mayRequestReview(reachedToday: true, streak: 0, askedVersion: nil, version: "1.2"))
+        #expect(DataManager.mayRequestReview(reachedToday: true, streak: 1, askedVersion: nil, version: "1.2"))
         #expect(DataManager.mayRequestReview(reachedToday: true, streak: 40, askedVersion: nil, version: "1.2"))
     }
 
-    /// A run of three can end yesterday while today is still short. The request belongs to the day
-    /// that completed the run.
+    /// A run can end yesterday while today is still short. The request belongs to the day the goal is
+    /// reached.
     @Test func aRunThatEndedYesterdayIsNotAskedAbout() {
         #expect(!DataManager.mayRequestReview(reachedToday: false, streak: 3, askedVersion: nil, version: "1.2"))
     }
@@ -96,10 +97,10 @@ struct ReviewRequestTests {
     }
 
     /// The claim records before it answers, and answers once per version.
-    @Test func aClaimOnTheThirdGoalDayRecordsTheVersionBeforeAnswering() throws {
+    @Test func aClaimOnTheFirstGoalDayRecordsTheVersionBeforeAnswering() throws {
         try withManager { manager, defaults in
-            pour(goalDays: 2, today: 1_000, into: manager)
-            try #require(manager.streak == 3, "the fixture did not make a three-day run")
+            pour(goalDays: 0, today: 1_000, into: manager)
+            try #require(manager.streak == 1, "the fixture did not make a first goal day")
             try #require(manager.hasReachedGoal)
 
             #expect(manager.claimReviewRequest(version: "1.2"))
@@ -111,14 +112,16 @@ struct ReviewRequestTests {
         }
     }
 
-    /// The second goal day in a row is refused, and a refusal writes nothing.
-    @Test func aClaimOnTheSecondGoalDayWritesNothing() throws {
+    /// Once per version holds across days: a later goal day, in a version already asked in, is refused and
+    /// leaves the record as it was.
+    @Test func aLaterGoalDayInAnAskedVersionWritesNothingNew() throws {
         try withManager { manager, defaults in
+            defaults.set("1.2", forKey: DataManager.Key.reviewRequestedVersion)
             pour(goalDays: 1, today: 1_000, into: manager)
             try #require(manager.streak == 2, "the fixture did not make a two-day run")
 
             #expect(!manager.claimReviewRequest(version: "1.2"))
-            #expect(defaults.object(forKey: DataManager.Key.reviewRequestedVersion) == nil)
+            #expect(defaults.object(forKey: DataManager.Key.reviewRequestedVersion) as? String == "1.2")
         }
     }
 

@@ -12,7 +12,7 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 6 November 2026
+**Last updated:** 20 November 2026
 
 ---
 
@@ -120,7 +120,7 @@ Premium is sold and paid for entirely through Apple's App Store, under your Appl
 
 ### 3. The rating request
 
-At most once per app version, after you reach your goal on the Home screen three days in a row, WaterBuddy asks iOS to show Apple's standard rating request. iOS decides whether it appears. If you rate the app or write a review, that goes to Apple under Apple's terms, and the app learns nothing of what you chose. The app keeps only the version number in which it asked.
+At most once per app version, after a pour on the Home screen reaches your daily goal, WaterBuddy asks iOS to show Apple's standard rating request. iOS decides whether it appears. If you rate the app or write a review, that goes to Apple under Apple's terms, and the app learns nothing of what you chose. The app keeps only the version number in which it asked.
 
 ### 4. Siri and the Shortcuts app
 
