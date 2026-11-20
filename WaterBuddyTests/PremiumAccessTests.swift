@@ -36,6 +36,40 @@ private func price(_ text: String) -> Decimal {
     Decimal(string: text)!
 }
 
+/// A price as one storefront writes it: its currency, its region, the amount, and the whole number
+/// StoreKit's own `price` hands back for it on a device whose region writes a decimal comma (#162).
+/// Internal, not private: a parameterized test's parameter may not be of a private type.
+struct ShownPrice: Sendable, CustomTestStringConvertible {
+    let currency: String
+    let region: String
+    let amount: String
+    let whole: String
+
+    var testDescription: String { "\(currency) in \(region)" }
+    var format: Decimal.FormatStyle.Currency { .init(code: currency, locale: Locale(identifier: region)) }
+    var shown: String { price(amount).formatted(format) }
+}
+
+/// The app's three languages' regions, the euro, the stores the research priced, and two formats that write
+/// no fraction (#162; spec `2026-11-20-release-1-4-1-design.md` §3).
+private let shownPrices: [ShownPrice] = [
+    ShownPrice(currency: "USD", region: "en_US", amount: "19.99", whole: "19"),
+    ShownPrice(currency: "USD", region: "en_UZ", amount: "19.99", whole: "19"),
+    ShownPrice(currency: "USD", region: "uz_UZ", amount: "19.99", whole: "19"),
+    ShownPrice(currency: "RUB", region: "ru_RU", amount: "1890.99", whole: "1890"),
+    ShownPrice(currency: "KZT", region: "kk_KZ", amount: "9990.99", whole: "9990"),
+    ShownPrice(currency: "EUR", region: "de_DE", amount: "19.99", whole: "19"),
+    ShownPrice(currency: "TRY", region: "tr_TR", amount: "699.99", whole: "699"),
+    ShownPrice(currency: "BRL", region: "pt_BR", amount: "99.90", whole: "99"),
+    ShownPrice(currency: "MXN", region: "es_MX", amount: "399.99", whole: "399"),
+    ShownPrice(currency: "GBP", region: "en_GB", amount: "19.99", whole: "19"),
+    ShownPrice(currency: "IDR", region: "id_ID", amount: "329000", whole: "329000"),
+    ShownPrice(currency: "JPY", region: "ja_JP", amount: "3000", whole: "3000"),
+]
+
+/// The formats above that write a fraction: the ones whose saving a dropped fraction moves.
+private let fractionFormats: [ShownPrice] = shownPrices.filter { $0.amount != $0.whole }
+
 // MARK: - The decision
 
 /// Not `@MainActor`, on purpose: a canary for ``PremiumAccess`` staying off the main actor
@@ -169,6 +203,47 @@ struct PremiumAccessTests {
         let yearlyOffer = PremiumAccess.Plan(id: PremiumAccess.yearlyID, kind: .yearly, price: "$19.99", amount: price("19.99"), trial: nil)
         #expect(PremiumAccess.yearlySaving(among: [monthlyOffer, yearlyOffer]) == 0.44)
         #expect(PremiumAccess.yearlySaving(among: [yearlyOffer]) == nil)
+    }
+
+    /// #162: a shown price read back with its own format is the price — whatever whole number StoreKit's
+    /// `price` gave beside it.
+    @Test(arguments: shownPrices)
+    func aShownPriceReadsBackAsItsAmountInEveryFormat(_ storefront: ShownPrice) {
+        #expect(PremiumAccess.amount(shown: storefront.shown, format: storefront.format, otherwise: price(storefront.whole))
+            == price(storefront.amount))
+    }
+
+    /// Review Focus 1: what cannot be read, or reads as nothing, leaves StoreKit's own figure.
+    @Test func aShownPriceThatCannotBeReadFallsBack() {
+        let us = Decimal.FormatStyle.Currency(code: "USD", locale: Locale(identifier: "en_US"))
+        #expect(PremiumAccess.amount(shown: "", format: us, otherwise: 19) == 19)
+        #expect(PremiumAccess.amount(shown: "nineteen", format: us, otherwise: 19) == 19)
+        #expect(PremiumAccess.amount(shown: price("0").formatted(us), format: us, otherwise: 19) == 19)
+        #expect(PremiumAccess.amount(shown: price("-19.99").formatted(us), format: us, otherwise: 19) == 19)
+    }
+
+    /// The final review's Important 1: a shown price read with another locale's format can misread. A ruble
+    /// price written the Russian way and read the US way gives 29,900 for 299 (measured on the host,
+    /// 2026-11-21), and the paywall would claim *save 99%*. A read that does not share StoreKit's whole number
+    /// is not trusted, so the saving is never more than StoreKit's own figures give.
+    @Test func aShownPriceMisreadInAnotherLocaleNeverInventsASaving() {
+        let russian = Decimal.FormatStyle.Currency(code: "RUB", locale: Locale(identifier: "ru_RU"))
+        let readTheUSWay = Decimal.FormatStyle.Currency(code: "RUB", locale: Locale(identifier: "en_US"))
+        let monthly = PremiumAccess.amount(shown: price("299").formatted(russian), format: readTheUSWay, otherwise: 299)
+        let yearly = PremiumAccess.amount(shown: price("1990").formatted(russian), format: readTheUSWay, otherwise: 1990)
+        #expect(monthly == 299)
+        #expect(yearly == 1990)
+        #expect(PremiumAccess.yearlySaving(yearly: yearly, monthly: monthly) == 0.44)
+    }
+
+    /// #162 end to end: the monthly and the yearly, read back in a format that writes a fraction from the
+    /// whole numbers a decimal-comma region gives, still save 44 %.
+    @Test(arguments: fractionFormats)
+    func theYearlySavesFortyFourPercentInEveryFormat(_ storefront: ShownPrice) {
+        let format = storefront.format
+        let monthly = PremiumAccess.amount(shown: price("2.99").formatted(format), format: format, otherwise: 2)
+        let yearly = PremiumAccess.amount(shown: price("19.99").formatted(format), format: format, otherwise: 19)
+        #expect(PremiumAccess.yearlySaving(yearly: yearly, monthly: monthly) == 0.44)
     }
 
     @Test func theProductIDsAreThreeAndOurs() {

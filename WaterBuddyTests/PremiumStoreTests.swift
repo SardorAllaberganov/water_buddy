@@ -500,6 +500,17 @@ struct StoreKitSessionTests {
         }
     }
 
+    /// #162's probe, as the lesson of 2026-10-22 asks: the local configuration's three products read back as
+    /// the prices they show, and the yearly saves 44 %. On this Mac every simulator's region is `en_UZ`,
+    /// whose decimal comma made StoreKit's own `price` read 2, 19 and 39 — and the saving 20 %.
+    @Test func theLocalProductsReadAsTheirShownPricesAndTheYearlySaves44Percent() async throws {
+        try await withSession { _ in
+            let plans = try await PremiumStore.Source.live().plans()
+            #expect(plans.map(\.amount) == [Decimal(string: "2.99")!, Decimal(string: "19.99")!, Decimal(string: "39.99")!])
+            #expect(PremiumAccess.yearlySaving(among: plans) == 0.44)
+        }
+    }
+
     /// The configuration's monthly plan is a month.
     @Test func theConfigurationsMonthlyRenewsEveryMonth() throws {
         let url = try #require(Bundle(for: TestBundle.self).url(forResource: "WaterBuddy", withExtension: "storekit"))

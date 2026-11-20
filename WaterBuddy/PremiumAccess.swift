@@ -151,6 +151,27 @@ nonisolated enum PremiumAccess {
         return yearlySaving(yearly: yearly.amount, monthly: monthly.amount)
     }
 
+    /// What a plan costs, read back from the price StoreKit shows (#162).
+    ///
+    /// StoreKit's own `Product.price` is not enough: on a device whose region writes a decimal comma —
+    /// Russian, Uzbek, Kazakh, German, Brazilian, Turkish and Indonesian among them — it has handed back the
+    /// price's whole number, 19 for $19.99: in the local StoreKit configuration (2026-10-21) and from the
+    /// App Store sandbox (2026-11-13), though the sandbox gave 19.99 on the same region on 2026-11-20. It is
+    /// not constant, so the shown price is read back every time: `displayPrice`, read with the product's own
+    /// `priceFormatStyle`, keeps the fraction, and the yearly's saving is the true one.
+    ///
+    /// The read is trusted only where it shares StoreKit's whole number — `price ≤ read < price + 1`, all a
+    /// dropped fraction can change. A shown price that cannot be read, reads as nothing, or reads another
+    /// locale's way — a ruble price written the Russian way and read the US way is 29,900 for 299, which would
+    /// claim *save 99%* (the final review's Important 1) — leaves StoreKit's own figure, off by less than one
+    /// unit of the currency (spec `2026-11-20-release-1-4-1-design.md` §3).
+    static func amount(shown: String, format: Decimal.FormatStyle.Currency, otherwise price: Decimal) -> Decimal {
+        guard let read = try? format.parseStrategy.parse(shown), read > 0, read >= price, read < price + 1 else {
+            return price
+        }
+        return read
+    }
+
     /// One plan as the paywall draws it — a plain value, so no view holds a StoreKit `Product`
     /// (rule `50-views`).
     nonisolated struct Plan: Sendable, Equatable, Identifiable {
@@ -203,7 +224,9 @@ nonisolated enum PremiumAccess {
         let kind: Kind
         /// StoreKit's `displayPrice`, in the storefront's currency — drawn as it comes.
         let price: String
-        /// StoreKit's `price` — for the yearly's saving alone, never drawn (spec §3.2).
+        /// What the plan costs, for the yearly's saving alone, never drawn (spec §3.2): `displayPrice` read
+        /// back with the product's own format, StoreKit's `price` only where that cannot be read
+        /// (``PremiumAccess/amount(shown:format:otherwise:)``, #162).
         let amount: Decimal
         /// The free introductory offer's length — present only when StoreKit says this user is
         /// eligible for it. The subscription's own period is not carried: the product is monthly or

@@ -369,7 +369,11 @@ private extension PremiumAccess.Plan {
             id: product.id,
             kind: kind,
             price: product.displayPrice,
-            amount: product.price,
+            amount: PremiumAccess.amount(
+                shown: product.displayPrice,
+                format: product.priceFormatStyle,
+                otherwise: product.price
+            ),
             trial: trial
         )
     }
