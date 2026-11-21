@@ -276,6 +276,8 @@ struct SettingsView: View {
         .accessibilityHint(manager.reminderSchedule == .standard
             ? Text("Reminds you to drink every two hours between 9 AM and 9 PM", bundle: strings)
             : Text("Reminds you to drink at the hours of your schedule", bundle: strings))
+        // Its taps through a `Button` over the row: a switch drops a quick tap read late (#232).
+        .takesQuickTaps(remindersBinding)
     }
 
     /// Writing through the model, never to `UserDefaults` directly (rule `10-architecture`), and
@@ -351,6 +353,8 @@ struct SettingsView: View {
                 // On the `Toggle` itself, as the reminders row's are (rule `65-accessibility`).
                 .accessibilityLabel(Text("Apple Health", bundle: strings))
                 .accessibilityHint(Text("Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.", bundle: strings))
+                // As the reminders row's: its taps through a `Button` over the row (#232).
+                .takesQuickTaps(healthBinding)
 
                 Text(healthExplanation)
                     .cardNote()
@@ -654,6 +658,7 @@ private struct CoachingRows: View {
         .padding(.vertical, 8)
     }
 
+    /// The switch draws and speaks; ``SwitchRowTaps`` takes its row's taps (#229).
     private var behindToggle: some View {
         Toggle(isOn: behindBinding) {
             HStack(spacing: 8) {
@@ -675,6 +680,7 @@ private struct CoachingRows: View {
         .accessibilityHint(SettingsView.behindTapOpensPaywall(gate: gate, isOn: manager.onlyWhenBehind)
             ? Text("Opens Premium", bundle: strings)
             : Text(behindLine))
+        .takesQuickTaps(behindBinding)
     }
 
     /// Off is free for anyone (D2); on is Premium's, and for anyone else opens the paywall and stays off.
@@ -693,6 +699,42 @@ private struct CoachingRows: View {
 
     private var behindLine: String {
         strings.localizedString(forKey: "Skips a reminder when you've already drunk your share for its hour.", value: nil, table: nil)
+    }
+}
+
+/// A switch row's taps, taken by a clear `Button` laid over the row (#229, #232). Settings' three switches —
+/// *Smart reminders*, *Apple Health* and *Only when behind* — each carry one.
+///
+/// On iOS 27.0 a SwiftUI switch drops a quick tap its app reads only after the finger has lifted — a main thread
+/// busy for some 140 ms — and a `Button` keeps one. On 2026-11-21 three such taps on *Only when behind*, read
+/// 142–302 ms late, changed nothing; a 0.3 s press read at once opened the paywall; and in the same run a `Button`
+/// kept a tap read 151 ms late. The two UI tests that tap that switch failed exactly so under load, and the tap was
+/// a person's too, not only XCUITest's.
+///
+/// The overlay toggles the binding the `Toggle` draws, so the row runs one setter however it is reached, and it is
+/// hidden from VoiceOver: the `Toggle` stays the row's one element, spoken and activated as before. The whole row
+/// is the target now, the title included (rule `65-accessibility`).
+private struct SwitchRowTaps: ViewModifier {
+    let isOn: Binding<Bool>
+
+    func body(content: Content) -> some View {
+        content.overlay {
+            Button {
+                isOn.wrappedValue.toggle()
+            } label: {
+                Color.clear
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHidden(true)
+        }
+    }
+}
+
+private extension View {
+    /// Lays ``SwitchRowTaps`` over a switch's row.
+    func takesQuickTaps(_ isOn: Binding<Bool>) -> some View {
+        modifier(SwitchRowTaps(isOn: isOn))
     }
 }
 

@@ -164,6 +164,34 @@ final class CoachingUITests: XCTestCase {
         XCTAssertTrue(standard.contains("9:00"), "the row still says the seed's hours: \(standard)")
     }
 
+    /// The row takes a tap, not only its switch (#229, #232). On iOS 27.0 a switch drops a quick tap its app
+    /// reads late, so a clear `Button` laid over each of Settings' three switch rows takes their taps, and a tap
+    /// on the title reaches the binding only through it. That is the part of the fix a test sees without loading
+    /// the Mac, and this is the one row whose tap changes something here with no system prompt: *Smart reminders*
+    /// asks for notifications (rule `85-testing`), and the fresh start's Health never grants.
+    @MainActor
+    func testATapOnTheTitleTurnsTheSwitch() throws {
+        let app = launchHoldingPremium()
+        let behind = behindSwitch(in: app)
+        XCTAssertEqual(behind.value as? String, "0", "the fresh start's switch is on")
+
+        // A quarter of the way across the window, on the title: the switch sits at the row's trailing edge.
+        let window = app.windows.firstMatch
+        let title = window.coordinate(withNormalizedOffset: .zero)
+            .withOffset(CGVector(dx: window.frame.width * 0.25, dy: behind.frame.midY))
+        title.tap()
+        XCTAssertTrue(reads("1", app.switches["Only when behind"]), "a tap on the title did not turn the switch on")
+        title.tap()
+        XCTAssertTrue(reads("0", app.switches["Only when behind"]), "a tap on the title did not turn the switch off")
+    }
+
+    /// Whether `element`'s value reads `value` within three seconds, so a slow redraw is not taken for a lost tap.
+    @MainActor
+    private func reads(_ value: String, _ element: XCUIElement) -> Bool {
+        let settled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: element)
+        return XCTWaiter().wait(for: [settled], timeout: 3) == .completed
+    }
+
     /// The pace line is Premium's (D4): drawn for a holder, absent for a lapsed one on the same settings.
     /// Only inside the seed's window: before 05:00 nothing is due and from 23:00 every share is, and either
     /// way the line is absent by design (W1) — an absence then would prove nothing.
