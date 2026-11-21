@@ -16037,3 +16037,53 @@ No gate: no file in a target changed. The two validators as above, with `VerifyL
 (#233). The still, re-rendered from the edited page, differs by 2/255 at most, in one antialiased patch. Decoded video frames,
 drawn into sRGB, are within 1–2/255 of their sources. Connect's fields were read back after a reload, and both iPhone wells hold
 10 of 10 in name order.
+
+## [2026-11-22] — The header's loop drains back; 1.4.1 (7) taken out of review and submitted again
+
+### What happened
+
+- **The owner's `/commit`** (the app's *Commit*): `23cb368` *chore: add the product page header's looping video*, `399c457`
+  *chore: take the fallback names for the U.K. and Russian listings* and `e36c0ef` *docs: record 1.4.1's submission and its
+  looping header*, pushed `eecb9e8..e36c0ef`. Each committed file matched its staged blob.
+- **The owner's word** on the loop: "When came back to the initial position, it's swapping instantly, not reducing the water
+  with animation. Can we fix that and also replace the page header before reviewing?"
+- **The fix:** `Tools/ProductPageHeader.html` keeps one water. It rises with the tap and drains back from 6.1 s to 7.9 s, the
+  figures counting down with it; the cross-fade, its second water and its second readout are gone. Test frames read 65 %, 61 %,
+  54 % and 53 % across the drain. The seam's step is no larger than an ordinary frame's.
+- **The render**, both other sessions told before and after each run. The first stopped at frame 67 (Chrome exited with status 2
+  under another session's load). `Tools/RenderHeaderVideo.py` now draws a failed frame again, up to three times, each retry on a
+  fresh profile. The second run, 00:54–01:07, retried frame 205 once and made the video: 8.000 s, 3840 × 1646, 30 fps, avc1, no
+  audio, 7,835,084 bytes. It was checked for colour and for every frame step, then sent to the owner on their "first show me the
+  result". The owner approved it ("Yes, replace it").
+- **App Store Connect** had signed the owner's Chrome out, and they signed in. The header was locked while the version waited for
+  review. On "Yes, resubmit", 1.4.1 was removed from review (about 01:10, *Developer Rejected*), the old video came out of the
+  slot and the new one went in. *Add for Review* came back once the withdrawn submission stopped *Processing*, about 7 minutes
+  later. *Submit for Review* at 01:18: *1 Item Submitted*, **Waiting for Review**.
+
+### The rulings
+
+- The way back drains, slower than the fill and done by 7.9 s, so the last frames already hold the first one's water. The owner
+  ruled out the fade.
+- The renderer's retry: one Chrome's failure no longer costs a whole run. Its cost, a retried frame drawn on a fresh profile, is
+  checked by the frame-step scan.
+- The resubmission was the owner's choice, made with its cost stated: a new place in the review queue.
+
+### The records (hundred-and-twenty-seventh pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*'s new headline, and three *Files on disk* rows.
+- `README.md` and `AppStore/README.md`: the drain, and the second submission.
+- `tasks/lessons.md`: two entries, on a loop's way back and on Connect's lock during review.
+- `CLAUDE.md`, `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: checked, no change. 137 `.swift` files, 1117 / 71 / 76.
+- Growth Journal row GROW-94, a Change naming GROW-93.
+
+### Files touched
+
+`Tools/ProductPageHeader.html`, `Tools/RenderHeaderVideo.py`, `AppStore/screenshots/ProductPageHeader/1-one-tap.mp4`; the
+records: `README.md`, `AppStore/README.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.
+
+### Verification
+
+No gate: no file in a target changed. The video read back as 8.000 s, 3840 × 1646, 30 fps, avc1, with no audio track. Decoded
+frames in sRGB are within 1–2/255 of their sources. Scanned at a quarter size, the largest frame steps fall in the tap and fill
+(frames 77–83), the seam measures 0.195, and the retried frame 205 is ordinary. In Connect, the version reads *Waiting for Review*
+after a reload.

@@ -6113,3 +6113,27 @@ within 1–2 of 255, with no colour bias.
 
 **The rule:** convert a decoded frame to its source's colour space before comparing them. A difference in raw values between two
 colour spaces is not a colour shift.
+
+## 2026-11-22 — A loop's way back is part of what it shows
+
+**What happened.** The first header video filled the vessel on a tap, then returned to its start with a 0.7 s cross-fade in its
+last second. The numbers stepped out and in, and the water band faded. The seam measured clean, but the owner saw it once and
+ruled it out: "it's swapping instantly, not reducing the water with animation." It was already uploaded and submitted, so the fix
+meant a second render and a second upload while the version waited for review.
+
+**The rule:** a loop that changes something on screen must undo it with the same kind of motion, visibly: the water drains as it
+filled, the figures count down as they counted up, slower than the change, and done before the last frame. A fade is a cut to
+anyone watching. Watch the turn back at full speed before calling a loop done: a seam that measures clean can still read as a
+cut.
+
+## 2026-11-22 — App Store Connect locks a version's header and screenshots while it waits for review
+
+**What happened.** To replace 1.4.1's header after it was submitted, the version page showed the video in its slot but no
+*Remove*, no *Upload* and no file input; the screenshots were locked the same way. Only *remove this version from review* opened
+them: the version became *Developer Rejected*, and the header could be swapped. *Add for Review* then stayed greyed out for about
+seven minutes, with no reason given, until the withdrawn submission on the App Review page stopped reading *Processing*. The second
+submission took a new place in the queue.
+
+**The rule:** get every media asset right before *Submit for Review*, the header and screenshots most of all; after it, changing
+one costs a withdrawal and a resubmission. If one must change, remove the version from review, make the change, and wait for the
+old submission to leave *Processing* before looking for a fault in the page.

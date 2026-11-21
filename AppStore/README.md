@@ -16,11 +16,13 @@ terms tried, and the ranks read in the US, Russian and Uzbek stores.
 
 ## 1. Before you submit — in order, and yours
 
-**Done, 2026-11-21 to 22, in the owner's Chrome on their "go": steps 1 to 9. 1.4.1 (7) is *Waiting for Review* since 00:29
-on 22 November.** It went as written but in three places:
+**Done, 2026-11-21 to 22, in the owner's Chrome on their "go": steps 1 to 9. 1.4.1 (7) is *Waiting for Review* since 01:18
+on 22 November.** It went as written but in four places:
 - Connect refused the U.K. name, then the Russian one, as "already being used". Each took step 3's fallback (section 2's note).
 - The two new languages had no Privacy Policy URL, so each was given the same address (section 4).
 - The header became a looping video, confirmed by the owner before the submission (section 3).
+- After the 00:29 submission, the owner ruled out the loop's fade back. Connect locks the header while a version waits for
+  review, so 1.4.1 was taken out of review, given the video that drains back, and submitted again at 01:18.
 
 Step 10 and the real purchase below are still the owner's.
 
@@ -106,8 +108,8 @@ The *Apple Watch Series 12* well keeps `screenshots/AppleWatch/1-wrist.png` (416
 at 65 %), unchanged. Only the first three iPhone shots show on search results.
 
 **The product page header loops since 1.4.1:** `screenshots/ProductPageHeader/1-one-tap.mp4`, 8 s, 3840 × 1646,
-30 fps, H.264, no audio, 7.3 MB. A tap on the Glass fills the vessel from 1,050 to 1,300 of 2,000 ml, and the pour
-fades back. The slot holds one asset, so *Remove* the still first, then *Upload* the video. The still,
+30 fps, H.264, no audio. A tap on the Glass fills the vessel from 1,050 to 1,300 of 2,000 ml, then the water drains
+back to 1,050 with the figures counting down (a fade back read as a swap, the owner's ruling of 2026-11-22). The slot holds one asset, so *Remove* the still first, then *Upload* the video. The still,
 `1-one-tap.png` (*One tap. Watch it fill.*), stays in the folder and in Connect's Asset Library.
 
 | # | File | Headline | Shows |

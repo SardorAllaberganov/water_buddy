@@ -524,7 +524,8 @@ Upload in this order — only the **first three** appear on search results and i
 
 **The header loops since 1.4.1** (2026-11-22, on the owner's ask, modelled on Glazzy's). `Tools/ProductPageHeader.html`
 draws the header at `?t=` seconds into an 8-second loop. In it, a tap on the Glass fills the vessel from 1,050 to 1,300
-of 2,000 ml, and the pour fades back. Without `t` it draws the still. `python3 Tools/RenderHeaderVideo.py <an empty
+of 2,000 ml, then the water drains back to 1,050 with the figures counting down. The first version faded back instead,
+and you ruled the fade out: it read as a swap. Without `t` it draws the still. `python3 Tools/RenderHeaderVideo.py <an empty
 frames folder> AppStore/screenshots/ProductPageHeader/1-one-tap.mp4` renders the frames and encodes them with
 `Tools/EncodeHeaderVideo.swift`.
 
@@ -558,15 +559,17 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ## After the submission — outstanding (1.4.1, read 2026-11-22)
 
-**1.4.1 (7) is submitted and *Waiting for Review*** (2026-11-22, 00:29). It was done in your Chrome on your
-"go", then "Upload and submit":
+**1.4.1 (7) is submitted and *Waiting for Review*** (2026-11-22, 01:18). It was done in your Chrome on your
+"go", then "Upload and submit", and submitted again after the header's fix:
 - The privacy policy was published again: `a76b62a` on `SardorAllaberganov.github.io`, live at 23:31 and byte
   for byte `Tools/PrivacyPolicy.html`.
 - Build 7 was uploaded.
 - The listing was filled in for en-US, English (U.K.) and Russian. Connect refused the U.K. and Russian names
   as already used, so both took `AppStore/README.md` §1's fallbacks.
 - The new ten screenshots went in.
-- The header is now a looping video, confirmed by you before the submission.
+- The header is now a looping video. Its first version faded back, and you ruled that out. Connect locks the header
+  while a version waits for review, so 1.4.1 came out of review at about 01:10 and went back in at 01:18 with the
+  loop that drains back.
 
 `AppStore/README.md` §1 has the steps. Apple says review can take up to 48 hours and emails you when it's done.
 
