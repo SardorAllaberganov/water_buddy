@@ -563,13 +563,6 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 - 🔴 **App Store Connect, in `AppStore/README.md` §1's order:** + Version 1.4.1; the en-US name and subtitle
   on *App Information*, and English (U.K.) and Russian added with theirs; each language's version fields from
   its files; the screenshots; build 7; *Submit for Review*.
-- 🔴 **Three checks by hand on an iOS 27 simulator**, which nothing automated sees (`AppStore/README.md` §1,
-  step 8): the paywall in a decimal-comma region says *save 44%* (#162); the rating request comes after the first
-  pour on Home that reaches the goal, and not after an *Undo* inside its pause (`-WaterBuddyReviewPrompt`); and
-  Settings' *Only when behind* opens the paywall for a free user and turns on and off with Premium held. App
-  Review's notes send reviewers to that row. Two UI tests sometimes lose their tap on it under load; on 2026-11-21
-  that was traced to XCUITest's own touch pipeline, not the app, and a probe turned the switch with every one of
-  ten presses (#229), so this check is insurance.
 - 🔴 **One real purchase** (#156, #187), still open from 1.4: a sandbox purchase, a restore and a refund on a
   real iPhone. Nothing but the local StoreKit configuration has ever been bought from.
 - **The prices by country** (`AppStore/README.md` §5) don't block the submission: they go in on the day
@@ -585,6 +578,19 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   2026-11-21 and run on iOS 27.0 and 18.6).
 - **The rating moment (R1):** asked after the first pour on Home that reaches the day's goal, once per version
   (`DataManager.reviewStreak` is 1). Rule `70-privacy`'s wording and the policy's §3 say the same.
+- **The three checks by hand** (2026-11-21, on an iOS 27.0 simulator in `en_UZ`; `AppStore/README.md` §1,
+  step 8): the paywall says *save 44%* (#162); the rating request came after the first pour on Home that reached
+  the goal, and none came after an *Undo* inside its pause; and *Only when behind*, which failed at first: a free
+  user's quick tap did nothing. It passed on the fix below.
+- **Settings' switches take every tap** (#229 and #232, fixed 2026-11-21). On iOS 27.0 a switch drops a quick
+  tap that the app reads only after the finger has lifted, which happens when the app is busy for about 140 ms or
+  more. A button keeps such a tap. A clear button laid over each of the three switch rows — *Smart reminders*,
+  *Apple Health* and *Only when behind* — now takes their taps; the switches still draw, and VoiceOver still
+  reads and turns each switch itself. The two UI tests that tap *Only when behind* failed under load on 1.4.1's
+  first build and passed 5 of 5 each on the fix, and a new test pins the overlay. By hand, a free user's quick
+  taps opened the paywall 3 of 3, a holder's turned the switch on and off, and the other two rows' quick taps
+  brought iOS's notification prompt and Health's sheet. A tap anywhere on a row now counts, the title
+  included. 1.4 on the App Store has the same flaw.
 - **Three listings**, en-US, English (U.K.) and Russian, from the research in `AppStore/research/2026-11-20/`.
   `bash Tools/VerifyListing.sh` counts every field and checks every keyword rule.
 - **The ten screenshots** (2026-11-21): `02-widgets` and `04-lock-screen` taken on the capture pair, placed with
@@ -599,15 +605,19 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   Watch unit, 71 passed. Both widgets built. Warnings unchanged against 1.4 on all four schemes. **After the
   review's fix** (2026-11-21): phone unit 1117 passed, watch unit 71 passed, both widgets built, and warnings
   unchanged again on all four schemes, from a fresh copy of the index. The UI suite was not run again: the
-  guard keeps every read the suite's paywall makes, so no screen it draws changes.
+  guard keeps every read the suite's paywall makes, so no screen it draws changes. **After #229's and
+  #232's fixes** (2026-11-21, from a copy of the index): phone unit 1117 passed; phone UI on iOS 27.0, 73 methods
+  with the new one: 72 passed and 1 skipped by design, the two that had failed among the passes; watch unit 71
+  passed; both widgets built; warnings unchanged on all four schemes. Phone UI on iOS 26.5 was not run: that
+  runtime is still gone (#230).
 - **Privacy manifests**: all four declare `UserDefaults` (`1C8F.1`, `CA92.1`) and the system boot time
   (`35F9.1`), and `PrivacyManifestTests` pins them. No check sees a *new* required-reason API (#190); 1.4.1's
   code adds none.
 - **Export compliance** is answered in the build (`ITSAppUsesNonExemptEncryption = NO`).
 - **Signing:** 1.4 was signed, reviewed and released (2026-11-13) with distribution signing, the App Group and
   the HealthKit capability. 1.4.1 adds no target and no entitlement.
-- **The Release archive** (made again on 2026-11-21, 00:43, from a copy of the index with the review's fix):
-  `** ARCHIVE SUCCEEDED **`; `1.4.1 (7)`
+- **The Release archive** (made again on 2026-11-21, 19:30, from a copy of the index with #229's and #232's
+  fixes; its dSYM carries their `SwitchRowTaps`): `** ARCHIVE SUCCEEDED **`; `1.4.1 (7)`
   on all four bundles, the App Group on all four and HealthKit on the app alone, one privacy manifest four times,
   both Health keys, and no DEBUG-only symbol (`StoreSample`, `Source.held`) in its dSYM. Not uploaded: the upload
   is made again from the commit; the screenshots it waited for are in (2026-11-21).
@@ -619,7 +629,6 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   from the ruling R1, kept as ruled; the final review of 2026-11-20 put them to you.
 - **The Russian listing** was checked against the app's own strings and passed through `humanize`, but no
   native speaker has read it as a page.
-
 - **Russian and Uzbek on Premium's screens are drafts** that no native speaker has read: the month
   view, Patterns, Insights and the recap (#170, #175, #179, #185), set B (#207) and export (#210).
 - **Nothing has been tried on a real iPhone or Apple Watch** — the roadmap's device sweep (1.2.7) has

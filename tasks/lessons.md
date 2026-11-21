@@ -6053,3 +6053,20 @@ framed shot. Its *Color* style, the third under the style's name, holds one blue
 
 **The rule:** set a capture's Lock Screen wallpaper to *Color* in the same editor, and read the hue in the scratch picture. A shot
 whose look depends on the minute it was taken cannot be retaken to match.
+
+## 2026-11-21 — A tap the app reads late can be lost by the app, whoever made it
+
+**What happened.** That morning #229 was closed as the harness's: in the failing runs the app read the tap after XCUITest's per-tap
+digitizer had gone, and the entry *A lost UI-test tap is caught only while the simulator's log is being streamed* says such a
+tap is the harness's. The hand check before submission, kept "as
+insurance", failed the same afternoon: three quick taps of the simulator tool — the built-in touchscreen, no digitizer to detach —
+did nothing on the same switch. A short script over the stored log (`log show`), pairing each contact's down and up in
+`backboardd` with the app's first `Evaluating dispatch of UIEvent … type: 0`, found the three lost taps read 278, 302 and 142 ms
+after the lift, and a `Button` keeping a tap read 151 ms late. The common factor was the late read, not the digitizer: on iOS 27.0
+a SwiftUI switch drops a quick tap read after the lift. Twenty busy loops (`perl -e 'alarm 570; 1 while 1'`, load 70–240) made the
+two UI tests fail on the old build, once in three each, and pass on the fix, five in five each.
+
+**The rule:** before calling a lost tap the harness's, make it without the harness — a tap through the simulator tool, with the
+log kept — and compare when the app read the lift. A control that loses a tap read late is the product's, whatever made the tap;
+that entry's last line holds only where a tap read just as late by another control is kept. To prove a timing bug, load the Mac on
+purpose, hold RED and GREEN to the same load, and stop the load the moment another session asks.

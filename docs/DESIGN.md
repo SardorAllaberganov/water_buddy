@@ -7,6 +7,10 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-21, evening (hundred-and-twenty-fourth and -fifth passes — `/doc_sync` after #229's and #232's fixes).
+*Set B, measured*: Settings' three switch rows now take a tap anywhere; their look is unchanged. No colour moved and no pair was
+measured.
+
 **Last updated:** 2026-11-05, after midnight (hundred-and-fifteenth pass — `/doc_sync` run by the owner during the polish of 1.4's
 gate). *One finish*'s table: a purchase's laps take 1.9 s (#222), and Settings' lap waits for the slide's end (#223). No colour moved
 and no pair was measured.
@@ -2475,7 +2479,9 @@ finish*, below: 5.18 or better. The card draws itself in the sheet and never in 
 - *Schedule*: the card title, the schedule and its quiet days as notes, and a trailing glyph — `chevron.right`
   when open, `lock.fill` when locked — in footnote semibold white, 50 pt at least.
 - *Use the standard schedule*, only after a lapse: the card's sheer capsule.
-- *Only when behind*: the *Smart reminders* toggle's shape, its line as a card note.
+- *Only when behind*: the *Smart reminders* toggle's shape, its line as a card note. *(2026-11-21: its whole row takes a
+  tap, through a clear `Button` laid over the switch, because on iOS 27.0 the switch dropped a quick tap read late (#229);
+  *Smart reminders*' and *Apple Health*'s rows take theirs the same way (#232), all three through `SwitchRowTaps`.)*
 
 **The schedule sheet** stands on `AuroraBackground` with `SheetCloseButton(label: "Done")`. Its parts:
 - **The hour rows** are `.frosted` + `.raised` panes, 56 pt at least — a pair its siblings do not share, with no

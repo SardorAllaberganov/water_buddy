@@ -39,8 +39,12 @@ terms tried, and the ranks read in the US, Russian and Uzbek stores.
    - with `-WaterBuddyReviewPrompt`, the first pour on Home that reaches the goal brings the rating request
      after the confetti, and an *Undo* inside that pause brings none;
    - Settings' *Only when behind*: for a free user a tap opens the paywall, and with Premium held it turns on
-     and off. App Review's notes send reviewers to this row. The UI tests' lost taps on it are the test harness's
-     (#229), so this check is insurance.
+     and off. App Review's notes send reviewers to this row. On 2026-11-21 a quick tap there did nothing while
+     the app was busy, a person's tap and not only the UI tests' (#229). It was fixed the same day, and this
+     check passed by hand on the fixed build.
+
+   All three passed on 2026-11-21, the third after its fix. Run them again only if the code changes before you
+   submit.
 9. **Submit for Review.**
 10. **On the day 1.4.1 is released:** the prices by country — section 5.
 

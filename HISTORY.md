@@ -15873,3 +15873,96 @@ this file. Unstaged on purpose: `.claude/rules/70-privacy.md` and `Tools/StoreSc
 and `iPhone-6.3/`, nine names deleted and nine added, `1-home.png` unchanged; `Tools/StoreScreenshots.html`, `Tools/FrameScreenshots.sh`,
 `Tools/CapturePairScreenshots.sh`; `README.md`, `AppStore/README.md`; the records: `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this
 file.
+
+## [2026-11-21] — #229 fixed: *Only when behind* keeps a quick tap; the three hand checks pass
+
+### What happened
+
+- **The three hand checks** (`AppStore/README.md` §1 step 8), on the owner's *пщ*, 16:30–16:47, on *WaterBuddy Store iPhone* (iOS
+  27.0, `en_UZ`) through the simulator tool, both peers told: #162's tile reads *save 44%*; the rating request came after the first pour
+  that reached the goal, and none after an *Undo* inside its pause; *Only when behind* failed — a free user's three quick taps did
+  nothing, and a 0.3 s press opened the paywall. #229 reopened.
+- **The cause** (`/fix_bug`, on the owner's *Fix it here*): the simulator's stored log, read by a script — the app first read the three
+  lost taps 278, 302 and 142 ms after the lift and the 0.3 s press 13 ms after the down, and kept a `Button`'s tap read 151 ms late. On
+  iOS 27.0 a SwiftUI switch drops a quick tap its app reads after the lift. The tool's taps come from the built-in touchscreen, so the
+  morning's detached-digitizer reading was not the cause.
+- **RED:** `268e0c3`'s own build, the two UI tests that tap the switch three times each under 20 busy loops (load 70–240) — one failure
+  each, at `PremiumUITests.swift:49` and `CoachingUITests.swift:150`.
+- **The fix:** `SettingsView.behindToggle` gains a clear `Button` laid over its row, `.buttonStyle(.plain)` and hidden from VoiceOver,
+  toggling `behindBinding`; its DocC says why. **GREEN:** 5 of 5 each, under the same load.
+- **The gate**, on a copy of the index (`SettingsView.swift` the staged blob, `26f4732`): phone unit 1117; UI on 27.0, 72 methods — 71
+  passed and 1 skipped by design, after chunk 1's runner twice timed out waiting for AX and passed once the phone was booted again;
+  watch 71; both widgets; warnings 20 / 17 / 2 / 17 by message, unchanged. 26.5 not run (#230).
+- **By hand**, the fix's Debug build: a free user's quick taps opened the paywall 3 of 3, two at a load of 242 and one at 137; a holder's
+  turned the switch on, then off; a tap on the title turns it too.
+- **Glazzy** asked at 18:04 for the load to stop for its gates: the loops stopped at once and the simulator was shut down at 18:07; both
+  peers were told, and the archive waited for Glazzy's word.
+- **The Release archive**, on Glazzy's *go ahead with your archive*: a fresh copy of the index, `xcodebuild archive` 18:21–18:22,
+  `** ARCHIVE SUCCEEDED **`; `1.4.1 (7)` ×4, the App Group ×4, HealthKit on the app alone, one manifest hash (`410066a7bff47477`), both
+  Health keys, no DEBUG-only symbol, and `behindToggle` in the dSYM. Not uploaded; both peers told at 18:23.
+
+### The rulings
+
+- A `Button` laid over the native switch, not a switch of our own: the look and the one accessibility element stay; the whole row
+  answers a tap.
+- No new test: the two UI tests that tap the switch are its test, RED and GREEN under load.
+- *Smart reminders* and *Apple Health* are the same switch and stay as they are — #232, the owner's to order.
+- No fresh reviewer for an 18-line change; it was read against rules `50-views`, `60-design-system` and `65-accessibility` by its author.
+
+### The records (hundred-and-twenty-fourth pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*'s new headline, `SettingsView.swift`'s row, #229 retired with its last note, #232
+  opened, the *Git* block. `docs/DESIGN.md`: a dated note on the row. `tasks/lessons.md`: one entry. `docs/STATE.md`, `docs/WIDGET.md`
+  and `CLAUDE.md`: checked, no change. 137 `.swift` files, 1117 / 71 / 75.
+- `README.md`: the outstanding list (the hand checks done), *Done* (the checks and the fix), the gate, the archive note, *Your call*
+  (#232). `AppStore/README.md`: step 8.
+- Growth Journal rows GROW-80 (the failed check), GROW-81 (the correction to GROW-66 and GROW-71), GROW-82 (the fix) and GROW-83 (the
+  lesson), logged before the push.
+
+### Files touched
+
+`WaterBuddy/SettingsView.swift`; `README.md`, `AppStore/README.md`; the records: `docs/AI_CONTEXT.md`, `docs/DESIGN.md`,
+`tasks/lessons.md` and this file.
+
+## [2026-11-21] — #232 fixed: all three of Settings' switches keep a quick tap
+
+### What happened
+
+- **On the owner's *Go*** to fixing *Smart reminders* and *Apple Health* the same way before the submission; both peers told before
+  any build (18:45).
+- **The test first:** `CoachingUITests.testATapOnTheTitleTurnsTheSwitch` — a holder's tap on *Only when behind*'s title, a quarter of
+  the way across the window, turns the switch on, then off. **RED** on `HEAD` `268e0c3`'s code with the new test (18:47–18:48): "a tap
+  on the title did not turn the switch on", the tap at (100.5, 313.4).
+- **The change:** `SwitchRowTaps`, a private `ViewModifier` in `SettingsView.swift` — the clear `Button` over a switch's row, its DocC
+  the evidence — and `takesQuickTaps(_:)`, on all three switches; *Only when behind*'s own overlay folded into it. **GREEN** on a copy of
+  the index (18:50–18:52): the new test, both #229 tests and `testEverySettingsControlIsOneElement`, 4 of 4.
+- **The gate** on that copy: phone unit 1117; four clean builds, both widgets among them, warnings 20 / 17 / 2 / 17 by message,
+  unchanged; watch 71; UI on 27.0, 73 methods in 19 chunks — 72 passed, 1 skipped by design (`testTheBarsCaptionsShareALine`), after
+  chunks 1–3 first failed to start ("Timed out waiting for AX loaded notification") and passed once the iPhone 17 was booted again. 26.5
+  not run (#230).
+- **By hand** (19:28–19:29), WaterBuddy uninstalled from *WaterBuddy Store iPhone* and the change's Debug build installed, launched
+  without the fresh start: *Smart reminders*' quick tap raised iOS's notification prompt, *Apple Health*'s brought Health's sheet, *Allow*
+  turned each on, and on each a quick tap turned it off and a tap on the title on. At a load of 5–7.
+- **The Release archive** again (19:30–19:31): `1.4.1 (7)` ×4, the App Group ×4, HealthKit on the app alone, one manifest hash, both
+  Health keys, no DEBUG-only symbol, `SwitchRowTaps` in the dSYM. Not uploaded; both peers told.
+
+### The rulings
+
+- "Go" read as *fix both now*: it answered *Fix the Smart reminders and Apple Health switches the same way before submitting?*
+- One new UI test, through *Only when behind*, for the modifier the three rows share: the other two rows' taps show nothing in a UI run
+  without a system prompt, which rule `85-testing` keeps out, so they were seen by hand. A later change that drops the modifier from one
+  of those two rows passes the gate.
+- The check by hand on the Store iPhone, reinstalled: `Tools/CapturePairScreenshots.sh setup` makes that pair again by name on every run.
+
+### The records (hundred-and-twenty-fifth pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*'s new headline, `SettingsView.swift`'s and `CoachingUITests.swift`'s rows, #232
+  retired, the *Git* block. `docs/DESIGN.md`: the row's note names all three switches. `README.md`: *Done*, the gate and the archive
+  note; *Your call*'s #232 line gone. `tasks/lessons.md`: nothing new. `docs/STATE.md`, `docs/WIDGET.md` and `CLAUDE.md`: checked, no
+  change. 137 `.swift` files, 1117 / 71 / 76.
+- Growth Journal row GROW-85, logged before the push.
+
+### Files touched
+
+`WaterBuddy/SettingsView.swift`, `WaterBuddyUITests/CoachingUITests.swift`; `README.md`; the records: `docs/AI_CONTEXT.md`,
+`docs/DESIGN.md` and this file.
