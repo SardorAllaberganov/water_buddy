@@ -494,7 +494,7 @@ new ten in name order; `AppStore/README.md` §3 has the steps in order.
 | iPhone 6.3″ (Dynamic Island, medium) — **required** | 1206 × 2622 | `iPhone-6.3/` — the same ten, scaled evenly from `iPhone-6.9/` and trimmed by one pixel column |
 | iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**: eight from 1.4's capture of 2026-11-06, two from the capture pair's of 2026-11-21 |
 | Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | `AppleWatch/1-wrist.png` — **required**, because the app embeds a watchOS app; one meets it |
-| Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.png`, *One tap. Watch it fill.* |
+| Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.mp4`, the looping video since 1.4.1: 8 s, 30 fps, H.264, no audio. The still, `1-one-tap.png` (*One tap. Watch it fill.*), stays beside it |
 
 **The iPhone set is framed** (`docs/superpowers/specs/2026-11-06-framed-store-screenshots-design.md`): a
 two-line headline, the screen in a drawn phone and one of its panes lifted out, over the aurora running across
@@ -520,7 +520,13 @@ Upload in this order — only the **first three** appear on search results and i
 | 10 | `10-recap.png` | Share your month | Premium: the month before's recap card |
 
 `1-wrist.png` is the watch app, synced from the phone, at 65 %, taken on 2026-10-26 by
-`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.1 keeps it, as it keeps the header.
+`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.1 keeps it.
+
+**The header loops since 1.4.1** (2026-11-22, on the owner's ask, modelled on Glazzy's). `Tools/ProductPageHeader.html`
+draws the header at `?t=` seconds into an 8-second loop. In it, a tap on the Glass fills the vessel from 1,050 to 1,300
+of 2,000 ml, and the pour fades back. Without `t` it draws the still. `python3 Tools/RenderHeaderVideo.py <an empty
+frames folder> AppStore/screenshots/ProductPageHeader/1-one-tap.mp4` renders the frames and encodes them with
+`Tools/EncodeHeaderVideo.swift`.
 
 ## Review notes
 
@@ -550,23 +556,31 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ---
 
-## Before you submit — outstanding (1.4.1, read 2026-11-21)
+## After the submission — outstanding (1.4.1, read 2026-11-22)
 
-**Blocking — each is yours, or done in your Chrome on your word:**
+**1.4.1 (7) is submitted and *Waiting for Review*** (2026-11-22, 00:29). It was done in your Chrome on your
+"go", then "Upload and submit":
+- The privacy policy was published again: `a76b62a` on `SardorAllaberganov.github.io`, live at 23:31 and byte
+  for byte `Tools/PrivacyPolicy.html`.
+- Build 7 was uploaded.
+- The listing was filled in for en-US, English (U.K.) and Russian. Connect refused the U.K. and Russian names
+  as already used, so both took `AppStore/README.md` §1's fallbacks.
+- The new ten screenshots went in.
+- The header is now a looping video, confirmed by you before the submission.
 
-- 🔴 **Publish the privacy policy again, before the submission.** 1.4.1 changes when the app asks for a
-  rating, and the policy's §3 says so: publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html`
-  in the `SardorAllaberganov.github.io` repository, then check that
-  `https://sardorallaberganov.github.io/waterbuddy/privacy/` reads *after a pour on the Home screen reaches
-  your daily goal* and *Last updated 20 November 2026*. The app and the listing both link it; guideline
-  5.1.1(i). The policy promises it changes before or with the app.
-- 🔴 **App Store Connect, in `AppStore/README.md` §1's order:** + Version 1.4.1; the en-US name and subtitle
-  on *App Information*, and English (U.K.) and Russian added with theirs; each language's version fields from
-  its files; the screenshots; build 7; *Submit for Review*.
+`AppStore/README.md` §1 has the steps. Apple says review can take up to 48 hours and emails you when it's done.
+
+**Still yours:**
+
 - 🔴 **One real purchase** (#156, #187), still open from 1.4: a sandbox purchase, a restore and a refund on a
   real iPhone. Nothing but the local StoreKit configuration has ever been bought from.
-- **The prices by country** (`AppStore/README.md` §5) don't block the submission: they go in on the day
-  1.4.1 is released.
+- **The prices by country** (`AppStore/README.md` §5) go in on the day 1.4.1 is released. With *Automatically
+  release this version* set, that is the day App Review approves it.
+- **Connect's three notices**, none of which blocked 1.4.1 (#234):
+  - New age-rating questions on location sharing and dating, required from 15 January 2027.
+  - China mainland's security assessment and AI-generated-content declaration, due by 31 January 2027.
+- **`VerifyListing.sh` now reports the U.K. name** as different from en-US's (#233). Exempting the name from that
+  rule is a one-line change, if you want it.
 
 **Done in the repository:**
 
@@ -619,8 +633,10 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 - **The Release archive** (made again on 2026-11-21, 19:30, from a copy of the index with #229's and #232's
   fixes; its dSYM carries their `SwitchRowTaps`): `** ARCHIVE SUCCEEDED **`; `1.4.1 (7)`
   on all four bundles, the App Group on all four and HealthKit on the app alone, one privacy manifest four times,
-  both Health keys, and no DEBUG-only symbol (`StoreSample`, `Source.held`) in its dSYM. Not uploaded: the upload
-  is made again from the commit; the screenshots it waited for are in (2026-11-21).
+  both Health keys, and no DEBUG-only symbol (`StoreSample`, `Source.held`) in its dSYM. **Uploaded** on
+  2026-11-21, 23:31–23:33 (*Upload succeeded*), with 1.4's settings (`xcodebuild -exportArchive`,
+  `app-store-connect`). All 99 files it was built from are byte for byte the same as the pushed commit's
+  (`eecb9e8`), so it is the commit's build.
 
 **Your call before shipping — not checked by anything automated:**
 

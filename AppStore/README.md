@@ -8,12 +8,21 @@ searches. After any change to any field, run `bash Tools/VerifyListing.sh`: it c
 language, checks the keyword rules, and compares en-US with `README.md` and en-GB with en-US.
 
 Each `.txt` file is exactly what goes in its field: open it, select all, copy, paste. The files end without a
-newline, so the paste is exact. Every count below is the one `VerifyListing.sh` printed on 2026-11-20.
+newline, so the paste is exact. Every count below is the one `VerifyListing.sh` printed on 2026-11-20, but the U.K.
+and Russian names', printed on 2026-11-22 (section 2's note).
 
 The search research the words come from is in [`research/2026-11-20/`](research/2026-11-20): the report, the
 terms tried, and the ranks read in the US, Russian and Uzbek stores.
 
 ## 1. Before you submit — in order, and yours
+
+**Done, 2026-11-21 to 22, in the owner's Chrome on their "go": steps 1 to 9. 1.4.1 (7) is *Waiting for Review* since 00:29
+on 22 November.** It went as written but in three places:
+- Connect refused the U.K. name, then the Russian one, as "already being used". Each took step 3's fallback (section 2's note).
+- The two new languages had no Privacy Policy URL, so each was given the same address (section 4).
+- The header became a looping video, confirmed by the owner before the submission (section 3).
+
+Step 10 and the real purchase below are still the owner's.
 
 1. **Publish the policy again, first.** 1.4.1 changes when the app asks for a rating, and the policy says so:
    publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in the `SardorAllaberganov.github.io`
@@ -57,7 +66,7 @@ The name and subtitle are on *App Information*; the rest is on the version page.
 
 | Field | Limit | en-US — `AppStore/` | English (U.K.) — `en-GB/` | Russian — `ru/` |
 |---|---|---|---|---|
-| Name | 30 characters | [`name.txt`](name.txt) — 26 | [`name.txt`](en-GB/name.txt) — 26 | [`name.txt`](ru/name.txt) — 23 |
+| Name | 30 characters | [`name.txt`](name.txt) — 26 | [`name.txt`](en-GB/name.txt) — 25 | [`name.txt`](ru/name.txt) — 24 |
 | Subtitle | 30 characters | [`subtitle.txt`](subtitle.txt) — 30 | [`subtitle.txt`](en-GB/subtitle.txt) — 30 | [`subtitle.txt`](ru/subtitle.txt) — 29 |
 | Keywords | 100 bytes | [`keywords.txt`](keywords.txt) — 99 | [`keywords.txt`](en-GB/keywords.txt) — 98 | [`keywords.txt`](ru/keywords.txt) — 100 |
 | Promotional Text | 170 characters | [`promotional-text.txt`](promotional-text.txt) — 136 | [`promotional-text.txt`](en-GB/promotional-text.txt) — 136 | [`promotional-text.txt`](ru/promotional-text.txt) — 168 |
@@ -66,6 +75,11 @@ The name and subtitle are on *App Information*; the rest is on the version page.
 
 What's New is written against **1.4**, which is live. Promotional Text can be changed later without a new
 build; the name, subtitle and keywords cannot.
+
+*(2026-11-22: Connect saved en-US's new name, then refused the same name for English (U.K.) as "already being used",
+most likely because en-US's was still pending. It then refused *Трекер воды: WaterBuddy* for Russian. Each language
+took section 1's fallback, written into its `name.txt` first: `Water Tracker: WaterBuddy` and `Трекер воды — WaterBuddy`.
+`VerifyListing.sh` now reports the U.K. name as different from en-US's, because its rule predates the fallback (#233).)*
 
 The rest of the page, as 1.4 had it:
 
@@ -89,8 +103,12 @@ then drag in the folder's ten in name order:
 2. *iPhone with Dynamic Island (large display)*, optional — `screenshots/iPhone-6.9/`.
 
 The *Apple Watch Series 12* well keeps `screenshots/AppleWatch/1-wrist.png` (416 × 496: the watch app, synced,
-at 65 %), and the product page header keeps `screenshots/ProductPageHeader/1-one-tap.png` (3840 × 1646, *One
-tap. Watch it fill.*). Neither changes. Only the first three iPhone shots show on search results.
+at 65 %), unchanged. Only the first three iPhone shots show on search results.
+
+**The product page header loops since 1.4.1:** `screenshots/ProductPageHeader/1-one-tap.mp4`, 8 s, 3840 × 1646,
+30 fps, H.264, no audio, 7.3 MB. A tap on the Glass fills the vessel from 1,050 to 1,300 of 2,000 ml, and the pour
+fades back. The slot holds one asset, so *Remove* the still first, then *Upload* the video. The still,
+`1-one-tap.png` (*One tap. Watch it fill.*), stays in the folder and in Connect's Asset Library.
 
 | # | File | Headline | Shows |
 |---|---|---|---|
@@ -129,6 +147,10 @@ How each set is made:
   `sips -c 2622 1206 <that folder>/*.png --out iPhone-6.3/`. `FrameScreenshots.sh` writes only the 6.9″ set,
   so make this one again whenever it runs.
 - `bash Tools/VerifyScreenshots.sh` checks every file's size, alpha and format against its well.
+- `python3 Tools/RenderHeaderVideo.py <an empty frames folder> AppStore/screenshots/ProductPageHeader/1-one-tap.mp4`
+  makes the header's video. It draws `Tools/ProductPageHeader.html` at each of the loop's 240 frames with headless
+  Chrome, four at once (about 3½ minutes; tell the other sessions on this Mac first), then encodes them with
+  `Tools/EncodeHeaderVideo.swift`. Check a decoded frame's colour in sRGB: AVFoundation returns frames in BT.709.
 
 `screenshots/captures/` is not uploaded: it holds the raw captures, kept so a changed headline or crop is
 framed again without a new capture.
@@ -142,7 +164,7 @@ framed again without a new capture.
 | Price | Free, with in-app purchases |
 | App Privacy | **Data Not Collected** — tick no data type |
 | Export compliance | answered in the build (`ITSAppUsesNonExemptEncryption = NO`) |
-| Privacy Policy URL | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — published again first (section 1) |
+| Privacy Policy URL | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — published again first (section 1), and set for English (U.K.) and Russian too, which Connect left empty (2026-11-22) |
 | Terms of Use (EULA) | Apple's standard licence — leave the field at its default |
 
 ## 5. In-App Purchases and prices by country

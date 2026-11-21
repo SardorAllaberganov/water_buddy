@@ -6070,3 +6070,46 @@ two UI tests fail on the old build, once in three each, and pass on the fix, fiv
 log kept — and compare when the app read the lift. A control that loses a tap read late is the product's, whatever made the tap;
 that entry's last line holds only where a tap read just as late by another control is kept. To prove a timing bug, load the Mac on
 purpose, hold RED and GREEN to the same load, and stop the load the moment another session asks.
+
+## 2026-11-22 — App Store Connect refuses a new language's name while the primary's new name is pending
+
+**What happened.** For 1.4.1, en-US's new name, *Water Tracker - WaterBuddy*, saved at once. English (U.K.) was added with the same
+name and the page said *Saved*, but the next save, made to add Russian, failed: the U.K. name was "already being used". No other app
+in the UK store carries it. With the U.K. name changed to its fallback, the next save refused Russian's *Трекер воды: WaterBuddy* the
+same way, a name nobody else could hold. A reload then showed that Connect had kept en-US and the U.K. but not Russian. The page
+also held the failed edits, so leaving it raised a *Leave site?* dialog that blocked both the reload and closing the tab.
+
+**The rule:** expect a new language's name to be refused while the primary's new name waits for review, and use
+`AppStore/README.md` §1's fallback for that language, written into its `name.txt` first. After any save Connect refuses, read what
+it kept from a fresh tab before typing again: one refused save can keep some languages and drop others. Never retry a refused name
+unchanged.
+
+## 2026-11-22 — App Store Connect's fields ignore a value set from outside; type into them
+
+**What happened.** `form_input` set the version page's promotional text, What's New and keywords, and Connect put its own values
+straight back; *Save* stayed disabled. Typing into the same fields worked. Typing a 4,000-character description timed out the
+browser tool after 30 s ("the renderer may be frozen"), and a script read timed out after 45 s, but the page came back within a
+minute with all of the text in place.
+
+**The rule:** click the field, select all and type. After a long text, wait instead of typing again. Then read every field back
+after a reload and compare its SHA-256 with its file's, which is how all fifteen of 1.4.1's fields were checked.
+
+## 2026-11-22 — The browser's file upload takes 10.4 MB a call, and a batch is one call
+
+**What happened.** Claude in Chrome's `file_upload` refused four pairs of screenshots sent in one `browser_batch`: the call came to
+more than 10.4 MB, and nothing was uploaded. Sent one call at a time, each pair went up, but the file input's reference had been
+replaced after every upload, so each call first had to find the input again.
+
+**The rule:** keep each upload call under 10.4 MB of files: two 6.3″ shots, four 6.9″ shots, or the header's 7.3 MB video alone.
+Send one upload per tool call, find the well's file input again before each one, and read the well's thumbnails afterwards to
+check the order.
+
+## 2026-11-22 — A decoded video frame comes back in BT.709; compare its colour in sRGB
+
+**What happened.** To check the header video's colour, `AVAssetImageGenerator` decoded frames and Pillow compared them with the
+Chrome frames they came from. The decoded frames read 3, 7 and 9 of 255 darker in red, green and blue. They were in
+`kCGColorSpaceCoreMedia709`, and the comparison had read their raw values as sRGB. Drawn into an sRGB context first, they matched
+within 1–2 of 255, with no colour bias.
+
+**The rule:** convert a decoded frame to its source's colour space before comparing them. A difference in raw values between two
+colour spaces is not a colour shift.

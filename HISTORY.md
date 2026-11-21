@@ -15966,3 +15966,74 @@ file.
 
 `WaterBuddy/SettingsView.swift`, `WaterBuddyUITests/CoachingUITests.swift`; `README.md`; the records: `docs/AI_CONTEXT.md`,
 `docs/DESIGN.md` and this file.
+
+## [2026-11-22] — 1.4.1 (7) submitted to App Review; the policy published again; the header loops
+
+### What happened
+
+- **The owner's `/commit`** ("run it", then "Ok" to two commits): `698babe` *fix(app): keep a quick tap on Settings' three
+  switches* and `eecb9e8` *docs: record #229's and #232's fixes and the three hand checks*, pushed `268e0c3..eecb9e8`. The gate was
+  not run again: the two code files were byte for byte the blobs it ran on.
+- **"go"** to the release steps. The `aso` release checklist ran first, with `AppStore/README.md` coming first where they
+  overlap. `bash Tools/VerifyListing.sh` and `bash Tools/VerifyScreenshots.sh` passed. Apple's lookup read 1.4 live (released
+  2026-11-13) with 0 ratings.
+- **The privacy policy** (23:30–23:31): `a76b62a` *Update WaterBuddy's privacy policy for 1.4.1*, made in a scratchpad clone of
+  `SardorAllaberganov.github.io` and pushed with this Mac's GitHub login, changes `waterbuddy/privacy/index.html` alone: the date
+  and the rating sentence. Live at 23:31:28, byte for byte `Tools/PrivacyPolicy.html` (SHA-256 `76f20a6e…`). The support page was
+  already current.
+- **The upload** (23:31:19–23:33:35): `xcodebuild -exportArchive` with `app-store-connect`, destination upload, automatic signing
+  and `manageAppVersionAndBuildNumber` false, from the 19:30 archive. It printed *Upload succeeded*. Its 99 build inputs are
+  `eecb9e8`'s byte for byte.
+- **App Store Connect**, in the owner's Chrome ("Use my Chrome"):
+  - Version 1.4.1, with the en-US name and subtitle.
+  - English (U.K.) and Russian added. Connect refused each new language's name as "already being used", so each took
+    `AppStore/README.md` §1's fallback, written into its `name.txt` first (#233). A refused save had kept some languages and not
+    others, so the page was read again from a fresh tab.
+  - Fifteen version fields typed in and read back after a reload, each equal to its file by SHA-256.
+  - Both iPhone wells cleared of 1.4's ten and given the new ten in name order.
+  - Build 7 added, the three purchases read *Approved*, and the Privacy Policy URL set for the two new languages, which Connect had
+    left empty.
+- **The header** (the owner's ask while the work was under way): `Tools/ProductPageHeader.html` gained `?t=`, plus
+  `Tools/RenderHeaderVideo.py` and `Tools/EncodeHeaderVideo.swift` (Glazzy's encoder, copied). 240 frames, 00:19–00:23, both other
+  sessions told before and after, gave `AppStore/screenshots/ProductPageHeader/1-one-tap.mp4`: 8.000 s, 3840 × 1646, 30 fps, avc1,
+  no audio, 7,617,610 bytes. It was sent to the owner and confirmed ("Upload and submit"). The still came out of the slot and the
+  video went in.
+- **Submitted** at 00:29. Connect listed the shared information changed (the names and subtitles in three languages, the new
+  languages' privacy fields), said *1 Item Submitted*, and the version reads **Waiting for Review**. Release is automatic, as
+  1.4's was.
+
+### The rulings
+
+- "go" was read as the release steps run as 1.4's were, *Submit for Review* included. The owner then put the header's confirmation
+  before the submission, and it was asked for.
+- The upload came from the 19:30 archive, not a new one: the README asked for an upload from the commit, and the archive's inputs
+  are the commit's.
+- The U.K. and Russian names took §1's fallbacks after Connect refused the identical ones. `VerifyListing.sh` was left as it is
+  (#233).
+- The header is drawn from its own page with no Codex image: the skill's stills are 1672 × 941, and the `aso` skill warns against
+  AI-made store art. It is in English on all three listings, as the screenshots are (R3).
+
+### The records (hundred-and-twenty-sixth pass)
+
+- `docs/AI_CONTEXT.md`: the header; *Current state*'s new headline; the three `Tools/` rows and the `AppStore/` row; #233 and #234;
+  the *Git* block.
+- `CLAUDE.md`: the `Tools/` and `AppStore/` rows.
+- `README.md`: the header row, the header's paragraph, the release section rewritten for after the submission, and the archive
+  note.
+- `AppStore/README.md`: §1's status, §2's name counts and note, §3's header and how it is made, and §4's privacy URL.
+- `tasks/lessons.md`: four entries. `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: checked, no change. 137 `.swift`
+  files, 1117 / 71 / 76.
+- Growth Journal rows GROW-90 to GROW-93, logged before the push.
+
+### Files touched
+
+`Tools/ProductPageHeader.html`; new `Tools/RenderHeaderVideo.py`, `Tools/EncodeHeaderVideo.swift` and
+`AppStore/screenshots/ProductPageHeader/1-one-tap.mp4`; `AppStore/en-GB/name.txt`, `AppStore/ru/name.txt`; the records:
+`README.md`, `AppStore/README.md`, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this file.
+
+### Verification
+
+No gate: no file in a target changed. The two validators as above, with `VerifyListing.sh` reporting the one known difference
+(#233). The still, re-rendered from the edited page, differs by 2/255 at most, in one antialiased patch. Decoded video frames,
+drawn into sRGB, are within 1–2/255 of their sources. Connect's fields were read back after a reload, and both iPhone wells hold
+10 of 10 in name order.

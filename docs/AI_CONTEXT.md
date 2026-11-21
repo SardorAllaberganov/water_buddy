@@ -4,6 +4,23 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-22, 00:37 (hundred-and-twenty-sixth pass — `/doc_sync` after release 1.4.1 was submitted; on `main`, HEAD
+`eecb9e8`, level with `origin/main`; the release's records, its two changed name files, the header's video and its tools staged, not
+committed). What it checked and wrote, every figure printed:
+- 137 `.swift` files in the seven targets, none added; 1117 phone `@Test`, 71 watch, 76 UI `func test`. All unchanged, since no
+  file in a target changed after `eecb9e8`;
+- *Current state*'s new headline: the owner's `/commit` (`268e0c3..eecb9e8`), then 1.4.1 to App Review on their "go". The policy
+  was published again, build 7 uploaded, App Store Connect filled in their Chrome, the header made into a looping video, and the
+  version submitted;
+- *Files on disk*: `Tools/ProductPageHeader.html` (301 lines, the video's `?t=`), two new tools, `Tools/RenderHeaderVideo.py` (65)
+  and `Tools/EncodeHeaderVideo.swift` (120), and the `AppStore/` row (61 files, the video among them);
+- *Known issues*: **#233** (`VerifyListing.sh` against the U.K. name's fallback) and **#234** (Connect's three notices, due in 2027)
+  opened;
+- `CLAUDE.md`: the `Tools/` and `AppStore/` rows name the header's video and its tools. `docs/STATE.md`, `docs/WIDGET.md` and
+  `docs/DESIGN.md`: checked, no drift, since no key, widget, token or file in a target changed;
+- `tasks/lessons.md`: four entries: Connect's refused names, its fields that ignore a value set from outside, the browser upload's
+  10.4 MB a call, and a decoded video frame's colour space.
+
 **Last updated:** 2026-11-21, 19:40 (hundred-and-twenty-fifth pass — `/doc_sync` after #232's fix; on `main`, HEAD `268e0c3`, level
 with `origin/main`; #229's and #232's fixes staged with these records, not committed). What it checked and wrote, every figure printed:
 - 137 `.swift` files in the seven targets, none added; 1117 phone `@Test`, 71 watch, **76** UI `func test` (75 + 1:
@@ -2664,7 +2681,9 @@ Tools/VerifyListing.sh                             —   new 2026-11-20 (release
 Tools/RenameScreenshots.py                         —   xcresult attachment UUIDs → slot names, via manifest.json
 Tools/PrivacyPolicy.html                         —   the privacy policy as published *(2026-11-20, release 1.4.1, staged, with `PRIVACY.md`, the two changed together: §3's rating request — *after a pour on the Home screen reaches your daily goal*, at most once per version, where it said three days in a row; *Last updated* 20 November 2026 in both of the page's places. **To be published again before 1.4.1 is submitted**; live since 2026-11-06 in its 1.4 form)* *(2026-11-01, export, staged on `feature/export`, with `PRIVACY.md`, the two changed together: section 8, *A file of your servings you choose to share*, a retention bullet, and five statements a file in the user's hands made stale; *Last updated* 1 November 2026.)* *(2026-10-31, set B, staged on `feature/coaching`, with `PRIVACY.md`, the two changed together: the reminders row adds the schedule and *only when behind*; up to 64 pending reminders, not 28; *the standard daily schedule, or one you set*, and the share skipped *only when behind*; the pace among what is worked out when shown; Premium's list adds set B's three; *Last updated* 30 October 2026. To be published with the release that carries set B)* *(2026-10-30, hundredth pass — Apple Health, staged on its branch, with `PRIVACY.md`, the two changed together: HealthKit among the frameworks; *Copied to Apple Health, only if you turn it on*; *Your Apple Health setting* in the complete list; section 7, *Apple Health, if you turn it on* — what is written (amount, moment, the serving's id, a version, the user-entered mark), the whole history once, earlier entries left as they are, the log leads (D6), nothing read, Health's iCloud under the user's iCloud settings, turning off deletes nothing and where to delete — Settings › Privacy & Security › Health › WaterBuddy › Data from "WaterBuddy"; the one-sentence summary and the deletion section say the same; *Last updated* 29 October 2026. **To be published with the release that carries Health, never before** — `main`'s copy stays the 1.4 upload's)* (new 2026-10-24, staged): one self-contained page, PRIVACY.md's published form — they change together — for the owner's user site at waterbuddy/privacy/index.html; light and dark, 390 pt and up; CONTACT-EMAIL still a token *(2026-10-29, staged: the contact is filled — the owner's account email, chosen that day, superseding 2026-10-24's "an address other than the account's" — four times, as `mailto:` links, in both forms; `.band a { color: inherit; }` keeps the band's address white; 313 lines. Not yet published, #159)*
 Tools/Support.html                               —   *(2026-11-04, staged: read from the code again — the schedule, an Apple Health section, export, the Premium list, deleting data; build 5.)* new 2026-10-29, staged: the page App Store Connect's Support URL names, for waterbuddy/support/index.html on the same site — contact, logging, widgets and Siri, the Watch, reminders, Premium (restore, cancel, refunds through Apple), your data, what it needs; every answer read from the code (the Siri phrases, `ReminderPlan.hours`, the catalogue's labels, the widgets' names, Family Sharing). The policy's shape and colours, nothing fetched; 198 lines. Not yet published
-Tools/ProductPageHeader.html                     —   the App Store product page header (staged 2026-10-13): the redesign's vessel, discs and "One tap. Watch it fill." over the aurora, 1920 × 823 CSS px rendered at 2× by headless Chrome to Screenshots/en-US/ProductPageHeader/01-one-tap.png (3840 × 1646, no alpha); the render command is in its header comment
+Tools/RenderHeaderVideo.py                       —   new 2026-11-22 (release 1.4.1, staged; 65 lines): the header's looping video. It draws `ProductPageHeader.html` at each of the loop's 240 frames (30 a second) with headless Chrome, four at once on throwaway profiles with `--disable-gpu`, into an empty folder it never clears, then runs `EncodeHeaderVideo.swift`. About 3½ minutes
+Tools/EncodeHeaderVideo.swift                    —   new 2026-11-22 (release 1.4.1, staged; 120 lines): PNG frames to an H.264 MP4 through AVFoundation, 9 Mbps unless told otherwise, a key frame every 2 s, each frame marked sRGB and the video tagged BT.709. Copied from Glazzy's `docs/appstore/encode.swift` (2026-11-20), not shared
+Tools/ProductPageHeader.html                     —   *(2026-11-22, release 1.4.1, staged: 301 lines. Given `?t=<seconds>` it draws the header that far into an 8-second loop for the video: the aurora drifts, the bubbles float and rise, the waves travel, a tap on the Glass fills the vessel from 1,050 to 1,300 of 2,000 ml, and the pour fades back. Without `t` it draws the still as before; re-rendered, it differs by 2/255 at most, in one antialiased patch.)* the App Store product page header (staged 2026-10-13): the redesign's vessel, discs and "One tap. Watch it fill." over the aurora, 1920 × 823 CSS px rendered at 2× by headless Chrome to Screenshots/en-US/ProductPageHeader/01-one-tap.png (3840 × 1646, no alpha); the render command is in its header comment
 ```
 
 None of these carries the executable bit: `Bash(chmod:*)` is on this project's permission deny list,
@@ -2680,7 +2699,7 @@ WaterBuddyWatchWidget/PrivacyInfo.xcprivacy       —   /  gives membership with
 Screenshots/en-US/iPhone-6.9/*.png                8    the 6.9" store set, 1320x2868 — recaptured 2026-10-09 from 8a44e8f (1.1) on iOS 27.0; committed in 96ca467 (#88). *(2026-10-18, 1.2.8: retaken of the redesign at 15:06 on iOS 27.0, iPhone 18 Pro Max, over a lived-in week — staged, not committed.)* *(Committed on 2026-10-18 in `efa9ed3`, read from `git log` by the ninety-second pass.)* *(2026-10-25, the store page: still those four, `01-home`, `02-history`, `03-settings`, `04-goal-setup`. The set is to be ten, numbered anew — History `03`, Settings `10`, the goal step `09` — so the last three are removed once the new shots exist (#88).)* *(2026-10-25, 13:00, the capture under way: a fifth file, `02-widgets.png`, untracked — **a wrong shot, not of the widgets**: it was taken on a person's "widgets ready" while the pair's phone still had WaterBuddy in the foreground, and draws the app's Home tab. It is to be shot again; the other four are as above.)* *(2026-10-25, 13:57: **nine files** — the store capture's eight, `01-home` (retaken, modified), `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` (new, untracked), at 13:54, iPhone 18 Pro Max, iOS 27.0; `02-history`, `03-settings` and `04-goal-setup` removed with `git rm`, staged; and the wrong `02-widgets`. `04-lock-screen` and a right `02-widgets` are a person's to place.)* *(Ninety-fourth pass, 19:50: the eight staged at 14:14, by name, beside the three removals; the wrong `02-widgets` left untracked. The count column said 4 until this pass — nine files on disk, and the ten-shot set short of `02-widgets` and `04-lock-screen`.)* *(2026-10-26, night: **eight files, the whole iPhone set** — all eight retaken at 21:59 by `CaptureScreenshots.sh`, modified and unstaged; the wrong `02-widgets.png` moved out of the tree. `02-widgets` and `04-lock-screen` are out of 1.4's set by the owner's ruling (#88, retired), so the numbers skip 02 and 04. The count column said 9 until today.)*
 Screenshots/en-US/AppleWatch/01-wrist.png         1    416x496 — the empty state (known issue #32), from 2026-09-02; kept until a new watch capture exists *(2026-10-25, the store page: to be retaken synced by `Tools/CapturePairScreenshots.sh`, beside two face shots, `02-face-modular` and `03-face-infograph`; not taken)* *(2026-10-25, 12:58: **retaken synced**, by `shoot 01-wrist` on the pair `setup` made that day — 65 %, *1,300 of 2,000 ml*, the three vessels, *Synced just now*, its lower edge on the frame's; unstaged. #32 retired. The two face shots are not taken.)* *(14:14: staged, by name. Still not taken at 19:50: the two faces.)* *(2026-10-26, 22:39: **retaken** by `shoot 01-wrist` on a new pair — 65 %, *1,300 of 2,000 ml*, *Synced just now*, the watch's clock 22:38; modified, unstaged. It is 1.4's only watch shot: the two faces are out of the set by the owner's ruling (#88, retired).)*
 Screenshots/en-US/ProductPageHeader/01-one-tap.png 1  3840x1646, no alpha — the App Store product page header (iOS 27's), from Tools/ProductPageHeader.html; staged 2026-10-13, shows the redesign, so it goes up with 1.2
-AppStore/                                        39    *(2026-11-13, hundred-and-twentieth pass: **the folder is `AppStore/`** — `01cbe67` (2026-11-06) moved `AppStore/1.4/` up and merged `Screenshots/` into `AppStore/screenshots/`, and this row kept the old path and count until now. 39 files: the seven text and guide files, and `screenshots/` — `AppleWatch/` 1, `captures/` 10, `iPhone-6.9/` 10, `iPhone-6.3/` 10 (new, staged: the framed ten at 1206 × 2622 for the iPhone well Connect requires), `ProductPageHeader/` 1. `README.md` §3 gives Media Manager's wells in order.)* *(2026-11-04, staged: the five field files, the in-app purchases' note and the start-here README brought up to Apple Health, set B, export and build 5; the screenshots wait for phase 2.)* new 2026-10-28, staged: the 1.4 upload folder — README.md (start here: the blocking items, the version page's fields, the upload order, the unchanged fields, Premium's three products in short); in-app-purchases.md (Premium in App Store Connect field by field — the agreement, the group, the three products, the free week, the levels, the review screenshot with the run argument it needs (#163) and the saving to check (#162), the purchase on a device (#156), attaching them to 1.4); whats-new.txt 830, promotional-text.txt 164, description.txt 3992, keywords.txt 98, review-notes.txt 1998 characters, each the main README's code block exactly, no trailing newline; screenshots/ the ten store PNGs, byte-identical copies (sha256) renamed into upload order — iPhone-6.9/1-home … 8-settings, AppleWatch/1-wrist, ProductPageHeader/1-one-tap. A copy: the main README and Screenshots/en-US/ stay the masters
+AppStore/                                        61    *(2026-11-22, release 1.4.1, staged: 61 files, 60 tracked and the header's video, `screenshots/ProductPageHeader/1-one-tap.mp4`: 8 s, 3840 × 1646, 30 fps, H.264, no audio, 7,617,610 bytes, beside the still. `en-GB/name.txt` and `ru/name.txt` now hold the fallbacks Connect took.)* *(2026-11-13, hundred-and-twentieth pass: **the folder is `AppStore/`** — `01cbe67` (2026-11-06) moved `AppStore/1.4/` up and merged `Screenshots/` into `AppStore/screenshots/`, and this row kept the old path and count until now. 39 files: the seven text and guide files, and `screenshots/` — `AppleWatch/` 1, `captures/` 10, `iPhone-6.9/` 10, `iPhone-6.3/` 10 (new, staged: the framed ten at 1206 × 2622 for the iPhone well Connect requires), `ProductPageHeader/` 1. `README.md` §3 gives Media Manager's wells in order.)* *(2026-11-04, staged: the five field files, the in-app purchases' note and the start-here README brought up to Apple Health, set B, export and build 5; the screenshots wait for phase 2.)* new 2026-10-28, staged: the 1.4 upload folder — README.md (start here: the blocking items, the version page's fields, the upload order, the unchanged fields, Premium's three products in short); in-app-purchases.md (Premium in App Store Connect field by field — the agreement, the group, the three products, the free week, the levels, the review screenshot with the run argument it needs (#163) and the saving to check (#162), the purchase on a device (#156), attaching them to 1.4); whats-new.txt 830, promotional-text.txt 164, description.txt 3992, keywords.txt 98, review-notes.txt 1998 characters, each the main README's code block exactly, no trailing newline; screenshots/ the ten store PNGs, byte-identical copies (sha256) renamed into upload order — iPhone-6.9/1-home … 8-settings, AppleWatch/1-wrist, ProductPageHeader/1-one-tap. A copy: the main README and Screenshots/en-US/ stay the masters
 ```
 
 *(2026-10-21, 1.4.1, staged.)* And one file that is neither Swift nor shipped:
@@ -2953,6 +2972,39 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**1.4.1 (7) submitted: *Waiting for Review*** (2026-11-21, 23:31 to 2026-11-22, 00:29; on `main`, HEAD `eecb9e8`).
+- **The owner's `/commit`** ("run it", then "Ok" to two commits): `698babe` *fix(app): keep a quick tap on Settings' three
+  switches* and `eecb9e8` *docs: record #229's and #232's fixes and the three hand checks*, pushed `268e0c3..eecb9e8`. The gate was
+  not run again: the two code files were byte for byte the blobs it ran on, `f6c6809` and `db988cf`.
+- **"go"**, read as the release steps run the way 1.4's were, *Submit for Review* included. The `aso` release checklist ran first,
+  every line marked done, the owner's or not needed. `bash Tools/VerifyListing.sh` and `bash Tools/VerifyScreenshots.sh` (34 files)
+  passed.
+- **The privacy policy, published again:** `a76b62a` *Update WaterBuddy's privacy policy for 1.4.1* on `SardorAllaberganov.github.io`
+  changes `waterbuddy/privacy/index.html` alone and was pushed with this Mac's GitHub login. Live at 23:31:28, byte for byte
+  `Tools/PrivacyPolicy.html` (SHA-256 `76f20a6e…`). The support page was already current.
+- **Build 7 uploaded** (23:31:19–23:33:35, *Upload succeeded*) through `xcodebuild -exportArchive` with 1.4's settings. It came from
+  the 19:30 archive, not a new one: its 99 build inputs (the four targets' folders, `Entitlements/`, `project.pbxproj` and the
+  shared schemes) are `eecb9e8`'s byte for byte.
+- **App Store Connect**, in the owner's Chrome on "Use my Chrome":
+  - Version 1.4.1 created, with the names and subtitles.
+  - English (U.K.) and Russian added. Connect refused each one's name as "already being used", so each took `AppStore/README.md`
+    §1's fallback, written into its `name.txt` first (#233).
+  - Every language's promotional text, description, keywords, What's New and Support URL entered. Read back after a reload, each
+    matched its file by SHA-256.
+  - Both iPhone wells cleared of 1.4's ten and given the new ten in name order. The watch's one shot was kept, and the U.K. and
+    Russian pages show en-US's set.
+  - Build 7 added. The three purchases read *Approved*.
+  - App Privacy's Privacy Policy URL set for the two new languages, which Connect had left empty.
+- **The header loops** (the owner's mid-run ask, then "before submission confirm the page header"). `Tools/ProductPageHeader.html`'s
+  `?t=`, `Tools/RenderHeaderVideo.py` and `Tools/EncodeHeaderVideo.swift` made `AppStore/screenshots/ProductPageHeader/1-one-tap.mp4`:
+  8.000 s, 3840 × 1646, 30 fps, H.264, no audio, 7.26 MB. Decoded frames, drawn into sRGB, are within 1–2/255 of their sources. No
+  Codex image went into it: its stills are 1672 × 941, and the video is drawn from the header's own page. The owner confirmed it
+  ("Upload and submit"). The still came out of the slot (it stays in the Asset Library) and the video went in.
+- **Submitted** at 00:29. Connect listed the shared information the submission changes: the names and subtitles in three languages
+  and the two new languages' privacy URLs. *1 Item Submitted*, and the version reads **Waiting for Review**. Release is automatic,
+  to everyone at once, with the existing rating kept, as for 1.4.
+- **Still the owner's:** the prices by country on release day (`AppStore/README.md` §5), one real purchase (#156), #233 and #234.
 
 **#232 fixed: all three of Settings' switches keep a quick tap** (2026-11-21, 18:45–19:31; on `main`, HEAD `268e0c3`).
 - **On the owner's "Go"** to fixing *Smart reminders* and *Apple Health* the same way before the submission.
@@ -6927,6 +6979,13 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 00:37 on 2026-11-22, after the hundred-and-twenty-sixth pass's files were added by name: on `main`, HEAD `eecb9e8`, level with
+`origin/main`, the only branch. Staged 12: 3 added (`Tools/RenderHeaderVideo.py`, `Tools/EncodeHeaderVideo.swift` and
+`AppStore/screenshots/ProductPageHeader/1-one-tap.mp4`) and 9 modified (`Tools/ProductPageHeader.html`, `AppStore/en-GB/name.txt`,
+`AppStore/ru/name.txt`, `AppStore/README.md`, `README.md`, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md` and `HISTORY.md`).
+Unstaged 6, on purpose: `.claude/settings.json`, the two watch schemes and the three catalogues Xcode rewrote. Nothing untracked;
+`git diff --cached --check` clean.** This file is added again once this block is written. No `git commit`.
 
 **Read at 19:33 on 2026-11-21, after the hundred-and-twenty-fifth pass's files were added by name: on `main`, HEAD `268e0c3`, level with
 `origin/main`, the only branch. Staged 8, all modified — `WaterBuddy/SettingsView.swift` and `WaterBuddyUITests/CoachingUITests.swift`
@@ -12155,6 +12214,19 @@ fixes, and each stated in `DataManager.currentReminderSlots()`'s own DocC:
     By hand, WaterBuddy reinstalled so both permissions were undecided: *Smart reminders*' quick tap raised iOS's notification
     prompt, *Apple Health*'s brought Health's sheet, and on each a quick tap turned the switch off and a tap on the title on. Not
     under load; a later change that drops the modifier from one of these two rows passes the gate.)*
+233. **`Tools/VerifyListing.sh` fails on the U.K. name the README's fallback gave it** (2026-11-22, 1.4.1's listing). The script
+    requires every English (U.K.) field but the keywords to equal en-US's (the release spec's §5.2). App Store Connect refused the
+    identical U.K. name as "already being used", most likely because en-US's new name was still pending. So `AppStore/en-GB/name.txt`
+    holds `AppStore/README.md` §1's fallback, `Water Tracker: WaterBuddy`, and the script reports *1 problem*; every other field and
+    rule passes. Exempting the name from the U.K. rule is a one-line change to the script, the owner's to order. Russian took its own
+    fallback, `Трекер воды — WaterBuddy`, which no rule compares.
+234. **App Store Connect shows three notices that 1.4.1 did not need** (read 2026-11-22).
+    - Age ratings: new questions on location sharing and dating, required from 15 January 2027 or when the section's other answers
+      change. WaterBuddy has neither.
+    - China mainland: a security assessment, and an AI-generated or synthetic content (AIGC) services declaration, both required of
+      existing apps by 31 January 2027. The second may apply, since Insights can be worded by Apple's on-device model (rule
+      `70-privacy`).
+    Whether to keep China mainland among the app's territories is the owner's call.
 
 ## Where the rest is written down
 
