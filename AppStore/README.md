@@ -104,9 +104,9 @@ tap. Watch it fill.*). Neither changes. Only the first three iPhone shots show o
 The free core takes 1–5 and Premium 6–10, each Premium shot tagged *Premium*. 1.4's goal step and export leave
 the set (R4); their captures stay in `captures/`.
 
-*(2026-11-20: the two new captures and the framing are not made yet. `setup` builds only before 11:45 PM, and
-the widgets and the Lock Screen are placed by a person in DeviceHub or by the simulator tool. Until then
-`iPhone-6.9/` and `iPhone-6.3/` still hold 1.4's ten under 1.4's names: do not upload them for 1.4.1.)*
+*(2026-11-21: the two new captures were taken on the capture pair with the simulator tool, every figure at 65 %
+and 1,300 ml, and the ten framed; `iPhone-6.9/` and `iPhone-6.3/` hold 1.4.1's ten under the names above. 1.4's
+ten are gone from both folders.)*
 
 How each set is made:
 

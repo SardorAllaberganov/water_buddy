@@ -4,7 +4,8 @@
 #
 #  Run:  bash Tools/FrameScreenshots.sh [--in DIR] [--out DIR]
 #
-#  Reads   AppStore/screenshots/captures/iPhone-6.9/<slug>.png   Tools/CaptureScreenshots.sh's ten, 1320 x 2868
+#  Reads   AppStore/screenshots/captures/iPhone-6.9/<slug>.png   1320 x 2868: Tools/CaptureScreenshots.sh's eight of
+#          the app's own screens, and Tools/CapturePairScreenshots.sh's two of the system's (02-widgets, 04-lock-screen)
 #  Writes  AppStore/screenshots/iPhone-6.9/<n>-<name>.png        the upload names, in upload order, by default
 #
 #  Each shot is Tools/StoreScreenshots.html drawn by headless Chrome. The page reports on
@@ -22,8 +23,8 @@ IN="$ROOT/AppStore/screenshots/captures/iPhone-6.9"
 OUT="$ROOT/AppStore/screenshots/iPhone-6.9"
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 # capture:upload name, in upload order — the page's own table lists the slugs in this order.
-SHOTS="01-home:1-home 03-history:2-history 05-month:3-month 06-insights:4-insights 07-patterns:5-patterns
-08-recap:6-recap 11-schedule:7-schedule 12-export:8-export 09-goal-setup:9-goal-setup 10-settings:10-settings"
+SHOTS="01-home:1-home 02-widgets:2-widgets 04-lock-screen:3-lock-screen 03-history:4-history 10-settings:5-settings
+11-schedule:6-schedule 05-month:7-month 06-insights:8-insights 07-patterns:9-patterns 08-recap:10-recap"
 
 usage() { echo "usage: FrameScreenshots.sh [--in DIR] [--out DIR]" >&2; exit 2; }
 while [ $# -gt 0 ]; do

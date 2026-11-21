@@ -99,21 +99,21 @@ h1 em { font-style: normal; background: linear-gradient(90deg, #7FF6F6 0%, #5EF0
   </div>
 </div>
 <script>
-// The ten, in upload order: shot i is the strip's i-th window.
-const SHOTS = ['01-home', '03-history', '05-month', '06-insights', '07-patterns', '08-recap',
-               '11-schedule', '12-export', '09-goal-setup', '10-settings'];
+// The ten, in upload order: shot i is the strip's i-th window (release 1.4.1's spec §6.2).
+const SHOTS = ['01-home', '02-widgets', '04-lock-screen', '03-history', '10-settings', '11-schedule',
+               '05-month', '06-insights', '07-patterns', '08-recap'];
 
 const COPY = {
-  '01-home':       { lines: ['One tap.', 'Watch it <em>fill.</em>'], pill: 'No account · No cloud' },
-  '03-history':    { lines: ['Your <em>week,</em>', 'day by day'] },
-  '05-month':      { lines: ['A whole <em>month</em>', 'on one page'], premium: true },
-  '06-insights':   { lines: ['<em>Insights</em> from', 'your own week'], premium: true },
-  '07-patterns':   { lines: ['Learn <em>when</em>', 'you drink'], premium: true },
-  '08-recap':      { lines: ['<em>Share</em>', 'your month'], premium: true },
-  '11-schedule':   { lines: ['Reminders on', '<em>your hours</em>'], premium: true },
-  '12-export':     { lines: ['Your servings,', 'as a <em>CSV file</em>'], premium: true },
-  '09-goal-setup': { lines: ['A goal that', '<em>fits</em> you'] },
-  '10-settings':   { lines: ['Set your own', '<em>serving sizes</em>'] },
+  '01-home':        { lines: ['One tap.', 'Watch it <em>fill.</em>'], pill: 'No account · No cloud' },
+  '02-widgets':     { lines: ['Log without', '<em>opening the app</em>'] },
+  '04-lock-screen': { lines: ['Right on your', '<em>Lock Screen</em>'] },
+  '03-history':     { lines: ['Your <em>week,</em>', 'day by day'] },
+  '10-settings':    { lines: ['Set your own', '<em>serving sizes</em>'] },
+  '11-schedule':    { lines: ['Reminders on', '<em>your hours</em>'], premium: true },
+  '05-month':       { lines: ['A whole <em>month</em>', 'on one page'], premium: true },
+  '06-insights':    { lines: ['<em>Insights</em> from', 'your own week'], premium: true },
+  '07-patterns':    { lines: ['Learn <em>when</em>', 'you drink'], premium: true },
+  '08-recap':       { lines: ['<em>Share</em>', 'your month'], premium: true },
 };
 
 // The scene. Every item names its shot. A phone's x, y is its centre in that shot's own CSS px. A cut-out's rect
@@ -121,7 +121,7 @@ const COPY = {
 // its scale is CSS px a capture pixel. A cut-out marked on is lifted out of its own place on its shot's phone: the
 // page finds where the rect sits on the turned phone, so the copy covers its original, and dx, dy move it off it
 // and rot turns it on top of the phone's own turn. Any other cut-out stands at x, y. flow lets a cut-out cross into
-// a neighbour, where it is drawn too. rect: null is a cut still to be measured, on Sunday's capture. A note points
+// a neighbour, where it is drawn too. rect: null is a cut still to be measured (the page refuses the shot). A note points
 // its arrow at a cut-out (to), from its own centre plus from, to the cut-out's centre plus at.
 const SCENE = [
   // 1 · Home: the vessel and the Glass lifted out of a phone turned left, the Glass tapped.
@@ -131,54 +131,54 @@ const SCENE = [
   { kind: 'ripple', shot: 0, at: 'home.glass', r: 70 },
   { kind: 'cut', name: 'home.glass', shot: 0, src: '01-home', rect: [520, 2133, 280, 280], shape: 'circle', scale: 0.5, on: true, dy: -26, rot: 7 },
   { kind: 'note', shot: 0, x: 548, y: 1176, rot: -8, size: 40, text: 'one tap', arrow: { from: [-20, 26], to: 'home.glass', at: [62, -18], bend: [10, 26] } },
-  // 2 · History: the week lifted out; one serving row floats on into Month.
-  { kind: 'phone', shot: 1, src: '03-history', x: 360, y: 960, width: 420, rot: 5 },
-  { kind: 'cut', name: 'week.card', shot: 1, src: '03-history', rect: [68, 657, 1184, 825], scale: 0.46, on: true, dx: -30, rot: -6 },
-  { kind: 'cut', name: 'week.row', shot: 1, src: '03-history', rect: [68, 2235, 1184, 176], shape: 'capsule', scale: 0.46, on: true, away: [660, 1300], rot: -4, flow: true },
-  { kind: 'note', shot: 1, x: 120, y: 1205, rot: -8, size: 36, text: 'every glass', arrow: { from: [60, 26], to: 'week.row', at: [-252, -10], bend: [-10, 30] } },
-  // 3 · Month, no phone: the calendar and its three figures afloat.
-  { kind: 'cut', name: 'month.calendar', shot: 2, src: '05-month', rect: [68, 657, 1184, 1212], scale: 0.5, x: 340, y: 735, rot: 2 },
-  { kind: 'cut', name: 'month.days', shot: 2, src: '05-month', rect: [68, 1910, 379, 222], scale: 0.5, x: 150, y: 1112, rot: -6 },
-  { kind: 'cut', name: 'month.streak', shot: 2, src: '05-month', rect: [471, 1910, 379, 222], scale: 0.5, x: 345, y: 1150, rot: 3 },
-  { kind: 'cut', name: 'month.litres', shot: 2, src: '05-month', rect: [874, 1910, 379, 222], scale: 0.5, x: 540, y: 1105, rot: -3 },
-  { kind: 'note', shot: 2, x: 470, y: 1300, rot: -5, size: 36, text: 'a full ring: goal met', arrow: { from: [130, -30], to: 'month.calendar', at: [250, 250], bend: [30, 0] } },
-  // 4 · Insights: the lead pane lifted out of the phone; Worth knowing floats on into Patterns.
-  { kind: 'phone', shot: 3, src: '06-insights', x: 300, y: 1040, width: 400, rot: -6 },
-  { kind: 'cut', name: 'insights.lead', shot: 3, src: '06-insights', rect: [68, 813, 1184, 425], scale: 0.45, on: true, dx: 40, rot: 4 },
-  { kind: 'cut', name: 'insights.knowing', shot: 3, src: '06-insights', rect: [70, 1286, 1179, 225], scale: 0.45, on: true, away: [660, 470], rot: -3, flow: true },
-  { kind: 'note', shot: 3, x: 430, y: 1250, rot: -6, size: 36, text: 'from your own figures', arrow: { from: [70, -30], to: 'insights.lead', at: [190, 98], bend: [60, 10] } },
-  // 5 · Patterns: the chart and the first and last drinks lifted out of a phone turned right.
-  { kind: 'phone', shot: 4, src: '07-patterns', x: 360, y: 960, width: 400, rot: 6 },
-  { kind: 'cut', name: 'patterns.chart', shot: 4, src: '07-patterns', rect: [68, 1293, 1184, 477], scale: 0.46, on: true, dx: -40, rot: -8 },
-  { kind: 'cut', name: 'patterns.first', shot: 4, src: '07-patterns', rect: [68, 2328, 580, 222], scale: 0.46, on: true, dx: -40, rot: -10 },
-  { kind: 'cut', name: 'patterns.last', shot: 4, src: '07-patterns', rect: [672, 2328, 580, 222], scale: 0.46, on: true, dx: 40, rot: -2 },
-  // 6 · The recap, no phone: the card turned, the button and the promise under it.
-  { kind: 'cut', name: 'recap.card', shot: 5, src: '08-recap', rect: [70, 434, 1178, 1254], scale: 0.5, x: 330, y: 755, rot: -5 },
-  { kind: 'cut', name: 'recap.share', shot: 5, src: '08-recap', rect: [68, 2524, 1184, 176], shape: 'capsule', scale: 0.44, x: 350, y: 1160, rot: 2 },
-  { kind: 'cut', name: 'recap.private', shot: 5, src: '08-recap', rect: [75, 2355, 1172, 124], shape: 'capsule', scale: 0.42, x: 330, y: 1262, rot: -1 },
-  // 7 · The schedule: its two hours, its interval and its days lifted out, Sunday quiet.
-  { kind: 'phone', shot: 6, src: '11-schedule', x: 300, y: 1040, width: 400, rot: -6 },
-  { kind: 'cut', name: 'schedule.first', shot: 6, src: '11-schedule', rect: [70, 434, 1172, 175], shape: 'capsule', scale: 0.46, on: true, dx: 40, rot: 4 },
-  { kind: 'cut', name: 'schedule.last', shot: 6, src: '11-schedule', rect: [70, 650, 1172, 175], shape: 'capsule', scale: 0.46, on: true, dx: 60, rot: 8 },
-  { kind: 'cut', name: 'schedule.every', shot: 6, src: '11-schedule', rect: [470, 867, 379, 173], shape: 'capsule', scale: 0.5, on: true, dx: 24, dy: 4, rot: 2 },
-  { kind: 'cut', name: 'schedule.days', shot: 6, src: '11-schedule', rect: [80, 1140, 1160, 170], scale: 0.46, on: true, dx: 50, dy: 20, rot: 9 },
-  { kind: 'note', shot: 6, x: 190, y: 1250, rot: -7, size: 36, text: 'Sundays off', arrow: { from: [-40, -30], to: 'schedule.days', at: [-230, 30], bend: [-30, -10] } },
-  // 8 · Export: the file, shown before it is sent, and its button.
-  { kind: 'phone', shot: 7, src: '12-export', x: 360, y: 990, width: 400, rot: 6 },
-  { kind: 'cut', name: 'export.card', shot: 7, src: '12-export', rect: [69, 434, 1182, 1149], scale: 0.46, on: true, dx: -40, rot: -8 },
-  { kind: 'cut', name: 'export.share', shot: 7, src: '12-export', rect: [68, 2524, 1184, 176], shape: 'capsule', scale: 0.44, on: true, dx: -10, dy: -4, rot: -4 },
-  { kind: 'note', shot: 7, x: 470, y: 1215, rot: -6, size: 36, text: 'you choose where', arrow: { from: [-60, 24], to: 'export.share', at: [150, -36], bend: [0, 20] } },
-  // 9 · The goal: its card and the calculator's pill lifted out of the phone.
-  { kind: 'phone', shot: 8, src: '09-goal-setup', x: 360, y: 1020, width: 400, rot: 6 },
-  { kind: 'cut', name: 'goal.card', shot: 8, src: '09-goal-setup', rect: [68, 416, 1184, 729], scale: 0.46, on: true, dx: -40, rot: -8 },
-  { kind: 'cut', name: 'goal.suggest', shot: 8, src: '09-goal-setup', rect: [68, 1263, 1184, 175], shape: 'capsule', scale: 0.42, on: true, dx: -30, dy: 30, rot: -3 },
-  { kind: 'note', shot: 8, x: 220, y: 1185, rot: -6, size: 36, text: 'or let it suggest one', arrow: { from: [-70, -26], to: 'goal.suggest', at: [-150, 34], bend: [-30, -10] } },
-  // 10 · Settings: the three vessels lifted out, each on its own.
-  { kind: 'phone', shot: 9, src: '10-settings', x: 300, y: 820, width: 400, rot: -6 },
-  { kind: 'cut', name: 'vessel.cup', shot: 9, src: '10-settings', rect: [92, 1850, 1136, 220], scale: 0.42, on: true, dx: 40, rot: 3 },
-  { kind: 'cut', name: 'vessel.glass', shot: 9, src: '10-settings', rect: [92, 2105, 1136, 220], scale: 0.42, on: true, dx: 70, rot: 8 },
-  { kind: 'cut', name: 'vessel.bottle', shot: 9, src: '10-settings', rect: [92, 2370, 1136, 220], scale: 0.42, on: true, dx: 50, rot: 5 },
-  { kind: 'note', shot: 9, x: 330, y: 1290, rot: -6, size: 36, text: 'yours to change', arrow: { from: [110, -20], to: 'vessel.bottle', at: [160, 44], bend: [30, 0] } },
+  // 2 · The Home Screen: the small widget and the week lifted out of a phone turned right (release 1.4.1).
+  { kind: 'phone', shot: 1, src: '02-widgets', x: 360, y: 960, width: 420, rot: 5 },
+  // A Home Screen widget's corner is rounder than the app's panes: 116 px on this capture, plus the 4 px margin.
+  { kind: 'cut', name: 'widgets.small', shot: 1, src: '02-widgets', rect: [89, 930, 538, 538], radius: 120, scale: 0.46, on: true, dx: -40, dy: 70, rot: -6 },
+  { kind: 'cut', name: 'widgets.week', shot: 1, src: '02-widgets', rect: [89, 278, 1142, 538], radius: 120, scale: 0.46, on: true, dx: -10, rot: -3 },
+  // 3 · The Lock Screen: the rectangle with its button and the ring lifted out of a phone turned left (1.4.1).
+  { kind: 'phone', shot: 2, src: '04-lock-screen', x: 300, y: 840, width: 420, rot: -6 },
+  // A Lock Screen widget draws no pane: each is cut round its content, the rectangle as tall as the ring.
+  { kind: 'cut', name: 'lock.rectangle', shot: 2, src: '04-lock-screen', rect: [97, 2273, 537, 188], scale: 0.5, on: true, rot: 4 },
+  { kind: 'cut', name: 'lock.ring', shot: 2, src: '04-lock-screen', rect: [1007, 2273, 188, 188], shape: 'circle', scale: 0.5, on: true, dx: 20, rot: -5 },
+  // 4 · History: the week lifted out; one serving row floats free inside it (into Settings it lay over the phone).
+  { kind: 'phone', shot: 3, src: '03-history', x: 360, y: 960, width: 420, rot: 5 },
+  { kind: 'cut', name: 'week.card', shot: 3, src: '03-history', rect: [68, 657, 1184, 825], scale: 0.46, on: true, dx: -30, rot: -6 },
+  { kind: 'cut', name: 'week.row', shot: 3, src: '03-history', rect: [68, 2235, 1184, 176], shape: 'capsule', scale: 0.46, on: true, away: [330, 1300], rot: -4 },
+  { kind: 'note', shot: 3, x: 120, y: 1205, rot: -8, size: 36, text: 'every glass', arrow: { from: [60, 26], to: 'week.row', at: [-252, -10], bend: [-10, 30] } },
+  // 5 · Settings: the three vessels lifted out, each on its own.
+  { kind: 'phone', shot: 4, src: '10-settings', x: 300, y: 820, width: 400, rot: -6 },
+  { kind: 'cut', name: 'vessel.cup', shot: 4, src: '10-settings', rect: [92, 1850, 1136, 220], scale: 0.42, on: true, dx: 40, rot: 3 },
+  { kind: 'cut', name: 'vessel.glass', shot: 4, src: '10-settings', rect: [92, 2105, 1136, 220], scale: 0.42, on: true, dx: 70, rot: 8 },
+  { kind: 'cut', name: 'vessel.bottle', shot: 4, src: '10-settings', rect: [92, 2370, 1136, 220], scale: 0.42, on: true, dx: 50, rot: 5 },
+  { kind: 'note', shot: 4, x: 330, y: 1290, rot: -6, size: 36, text: 'yours to change', arrow: { from: [110, -20], to: 'vessel.bottle', at: [160, 44], bend: [30, 0] } },
+  // 6 · The schedule: its two hours, its interval and its days lifted out, Sunday quiet.
+  { kind: 'phone', shot: 5, src: '11-schedule', x: 300, y: 1040, width: 400, rot: -6 },
+  { kind: 'cut', name: 'schedule.first', shot: 5, src: '11-schedule', rect: [70, 434, 1172, 175], shape: 'capsule', scale: 0.46, on: true, dx: 40, rot: 4 },
+  { kind: 'cut', name: 'schedule.last', shot: 5, src: '11-schedule', rect: [70, 650, 1172, 175], shape: 'capsule', scale: 0.46, on: true, dx: 60, rot: 8 },
+  { kind: 'cut', name: 'schedule.every', shot: 5, src: '11-schedule', rect: [470, 867, 379, 173], shape: 'capsule', scale: 0.5, on: true, dx: 24, dy: 4, rot: 2 },
+  { kind: 'cut', name: 'schedule.days', shot: 5, src: '11-schedule', rect: [80, 1140, 1160, 170], scale: 0.46, on: true, dx: 50, dy: 20, rot: 9 },
+  { kind: 'note', shot: 5, x: 190, y: 1250, rot: -7, size: 36, text: 'Sundays off', arrow: { from: [-40, -30], to: 'schedule.days', at: [-230, 30], bend: [-30, -10] } },
+  // 7 · Month, no phone: the calendar and its three figures afloat.
+  { kind: 'cut', name: 'month.calendar', shot: 6, src: '05-month', rect: [68, 657, 1184, 1212], scale: 0.5, x: 340, y: 735, rot: 2 },
+  { kind: 'cut', name: 'month.days', shot: 6, src: '05-month', rect: [68, 1910, 379, 222], scale: 0.5, x: 150, y: 1112, rot: -6 },
+  { kind: 'cut', name: 'month.streak', shot: 6, src: '05-month', rect: [471, 1910, 379, 222], scale: 0.5, x: 345, y: 1150, rot: 3 },
+  { kind: 'cut', name: 'month.litres', shot: 6, src: '05-month', rect: [874, 1910, 379, 222], scale: 0.5, x: 540, y: 1105, rot: -3 },
+  { kind: 'note', shot: 6, x: 470, y: 1300, rot: -5, size: 36, text: 'a full ring: goal met', arrow: { from: [130, -30], to: 'month.calendar', at: [250, 250], bend: [30, 0] } },
+  // 8 · Insights: the lead pane lifted out of the phone; Worth knowing floats on into Patterns.
+  { kind: 'phone', shot: 7, src: '06-insights', x: 300, y: 1040, width: 400, rot: -6 },
+  { kind: 'cut', name: 'insights.lead', shot: 7, src: '06-insights', rect: [68, 813, 1184, 425], scale: 0.45, on: true, dx: 40, rot: 4 },
+  { kind: 'cut', name: 'insights.knowing', shot: 7, src: '06-insights', rect: [70, 1286, 1179, 225], scale: 0.45, on: true, away: [660, 470], rot: -3, flow: true },
+  { kind: 'note', shot: 7, x: 430, y: 1250, rot: -6, size: 36, text: 'from your own figures', arrow: { from: [70, -30], to: 'insights.lead', at: [190, 98], bend: [60, 10] } },
+  // 9 · Patterns: the chart and the first and last drinks lifted out of a phone turned right.
+  { kind: 'phone', shot: 8, src: '07-patterns', x: 360, y: 960, width: 400, rot: 6 },
+  { kind: 'cut', name: 'patterns.chart', shot: 8, src: '07-patterns', rect: [68, 1293, 1184, 477], scale: 0.46, on: true, dx: -40, rot: -8 },
+  { kind: 'cut', name: 'patterns.first', shot: 8, src: '07-patterns', rect: [68, 2328, 580, 222], scale: 0.46, on: true, dx: -40, rot: -10 },
+  { kind: 'cut', name: 'patterns.last', shot: 8, src: '07-patterns', rect: [672, 2328, 580, 222], scale: 0.46, on: true, dx: 40, rot: -2 },
+  // 10 · The recap, no phone: the card turned, the button and the promise under it.
+  { kind: 'cut', name: 'recap.card', shot: 9, src: '08-recap', rect: [70, 434, 1178, 1254], scale: 0.5, x: 330, y: 755, rot: -5 },
+  { kind: 'cut', name: 'recap.share', shot: 9, src: '08-recap', rect: [68, 2524, 1184, 176], shape: 'capsule', scale: 0.44, x: 350, y: 1160, rot: 2 },
+  { kind: 'cut', name: 'recap.private', shot: 9, src: '08-recap', rect: [75, 2355, 1172, 124], shape: 'capsule', scale: 0.42, x: 330, y: 1262, rot: -1 },
 ];
 
 // Drops and sparkles, in strip px, so they may sit on a seam. [x, y, size, blur] / [x, y, size].
@@ -303,7 +303,7 @@ function slot(item) {
   const el = document.createElement('div');
   el.className = 'item';
   Object.assign(el.style, { left: (c.x - w / 2) + 'px', top: (c.y - h / 2) + 'px', width: w + 'px', height: h + 'px',
-    transform: `rotate(${c.rot}deg)`, zIndex: 2, borderRadius: item.shape === 'capsule' ? '999px' : RADIUS * s + 'px',
+    transform: `rotate(${c.rot}deg)`, zIndex: 2, borderRadius: item.shape === 'capsule' ? '999px' : (item.radius ?? RADIUS) * s + 'px',
     background: 'rgba(5, 7, 36, .9)', boxShadow: 'inset 0 6px 14px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .12)' });
   return el;
 }
@@ -331,7 +331,7 @@ function cut(item, loaded) {
   Object.assign(el.style, {
     backgroundImage: `url("${captureURL(item.src)}")`, backgroundSize: `${CAPTURE.w * s}px ${CAPTURE.h * s}px`,
     backgroundPosition: `${-x * s}px ${-y * s}px`,
-    borderRadius: item.shape === 'circle' ? '50%' : item.shape === 'capsule' ? '999px' : RADIUS * s + 'px',
+    borderRadius: item.shape === 'circle' ? '50%' : item.shape === 'capsule' ? '999px' : (item.radius ?? RADIUS) * s + 'px',
   });
   return el;
 }

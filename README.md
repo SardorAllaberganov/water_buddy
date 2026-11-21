@@ -7,9 +7,9 @@ No account. No server. No analytics. No third-party dependencies of any kind.
 
 <p align="center">
   <img src="AppStore/screenshots/iPhone-6.9/1-home.png" width="24%" alt="Home — the vessel at 65%">
-  <img src="AppStore/screenshots/iPhone-6.9/2-history.png" width="24%" alt="History — the week card and today's servings">
-  <img src="AppStore/screenshots/iPhone-6.9/3-month.png" width="24%" alt="Premium — the month view">
-  <img src="AppStore/screenshots/iPhone-6.9/6-recap.png" width="24%" alt="Premium — the monthly recap">
+  <img src="AppStore/screenshots/iPhone-6.9/4-history.png" width="24%" alt="History — the week card and today's servings">
+  <img src="AppStore/screenshots/iPhone-6.9/7-month.png" width="24%" alt="Premium — the month view">
+  <img src="AppStore/screenshots/iPhone-6.9/10-recap.png" width="24%" alt="Premium — the monthly recap">
 </p>
 
 ---
@@ -492,7 +492,7 @@ new ten in name order; `AppStore/README.md` §3 has the steps in order.
 | Slot | Size | Files |
 |---|---|---|
 | iPhone 6.3″ (Dynamic Island, medium) — **required** | 1206 × 2622 | `iPhone-6.3/` — the same ten, scaled evenly from `iPhone-6.9/` and trimmed by one pixel column |
-| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**: eight from 1.4's capture of 2026-11-06, two from the capture pair's (not yet taken, 2026-11-20) |
+| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**: eight from 1.4's capture of 2026-11-06, two from the capture pair's of 2026-11-21 |
 | Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | `AppleWatch/1-wrist.png` — **required**, because the app embeds a watchOS app; one meets it |
 | Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.png`, *One tap. Watch it fill.* |
 
@@ -550,7 +550,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ---
 
-## Before you submit — outstanding (1.4.1, read 2026-11-20)
+## Before you submit — outstanding (1.4.1, read 2026-11-21)
 
 **Blocking — each is yours, or done in your Chrome on your word:**
 
@@ -563,10 +563,6 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 - 🔴 **App Store Connect, in `AppStore/README.md` §1's order:** + Version 1.4.1; the en-US name and subtitle
   on *App Information*, and English (U.K.) and Russian added with theirs; each language's version fields from
   its files; the screenshots; build 7; *Submit for Review*.
-- 🔴 **The two new screenshots and the framed ten** (spec §6): `02-widgets` and `04-lock-screen` are taken on
-  the capture pair, once a person in DeviceHub or the simulator tool has placed the widgets and the Lock
-  Screen; then the ten are framed and the 6.3″ set made. Not done on 2026-11-20: the capture builds only
-  before 11:45 PM. Until then `AppStore/screenshots/iPhone-6.9/` and `iPhone-6.3/` hold 1.4's ten.
 - 🔴 **Three checks by hand on an iOS 27 simulator**, which nothing automated sees (`AppStore/README.md` §1,
   step 8): the paywall in a decimal-comma region says *save 44%* (#162); the rating request comes after the first
   pour on Home that reaches the goal, and not after an *Undo* inside its pause (`-WaterBuddyReviewPrompt`); and
@@ -591,6 +587,10 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   (`DataManager.reviewStreak` is 1). Rule `70-privacy`'s wording and the policy's §3 say the same.
 - **Three listings**, en-US, English (U.K.) and Russian, from the research in `AppStore/research/2026-11-20/`.
   `bash Tools/VerifyListing.sh` counts every field and checks every keyword rule.
+- **The ten screenshots** (2026-11-21): `02-widgets` and `04-lock-screen` taken on the capture pair, placed with
+  the simulator tool and no pour button touched, every figure at 65 % and 1,300 ml; the ten framed (`10 of 10`)
+  under 1.4.1's names and the 6.3″ set made from them; `bash Tools/VerifyScreenshots.sh` passes all 34 files.
+  The Lock Screen is on the live clock and the *Color* wallpaper (`Tools/CapturePairScreenshots.sh` says why).
 - **Version 1.4.1, build 7**, on all fourteen sites in `project.pbxproj`; read back as `1.4.1 (7)` from the
   built app, its widget extension, the watch app and the watch widget.
 - **The gate** (2026-11-20): phone unit, 1116 passed. Phone UI on iOS 27.0, 72 methods: 69 passed, 1 skipped by
@@ -610,7 +610,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
   `** ARCHIVE SUCCEEDED **`; `1.4.1 (7)`
   on all four bundles, the App Group on all four and HealthKit on the app alone, one privacy manifest four times,
   both Health keys, and no DEBUG-only symbol (`StoreSample`, `Source.held`) in its dSYM. Not uploaded: the upload
-  is made again from the commit, once the screenshots are in.
+  is made again from the commit; the screenshots it waited for are in (2026-11-21).
 
 **Your call before shipping — not checked by anything automated:**
 

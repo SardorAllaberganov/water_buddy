@@ -141,7 +141,8 @@ setup() {
   # Launched last, so its activation publish carries the week to a watch that now has an app to land in.
   xcrun simctl launch "$phone" "$PHONE_ID" >/dev/null
   # The clock, frozen now — after every serving the week logged — in 24-hour form, the device's own
-  # hour cycle (2026-10-18), as `CaptureScreenshots.sh` freezes its phone's.
+  # hour cycle (2026-10-18), as `CaptureScreenshots.sh` freezes its phone's. The Lock Screen reads its
+  # date from this too, as 1 January 2000, so 04-lock-screen is taken on the live clock (the steps below).
   xcrun simctl status_bar "$phone" override \
     --time "$(date '+%H:%M')" \
     --dataNetwork wifi --wifiMode active --wifiBars 3 \
@@ -152,12 +153,17 @@ setup() {
 
 Ready. Arrange each surface in DeviceHub.app, then shoot it:
 
-  02-widgets       The phone's Home Screen: touch and hold, Edit ▸ Add Widget ▸ WaterBuddy — the
-                   small Hydration widget, the medium one and the week widget, on the first page.
-                   They read 1,300 ml and 65 %. Leave the Home Screen showing, not editing.
-  04-lock-screen   Lock the phone, wake it, touch and hold ▸ Customize ▸ Lock Screen: WaterBuddy's
-                   line above the clock, its ring and its rectangle below it, and Log Water in a
-                   bottom corner's control slot. Leave the Lock Screen showing.
+  02-widgets       The phone's Home Screen: touch and hold, swipe to the empty page edit mode adds
+                   at the end, then Edit ▸ Add Widget ▸ WaterBuddy — the small Hydration widget and
+                   the week widget, a page of their own. The small one reads 65 %. Leave the Home
+                   Screen showing, not editing.
+  04-lock-screen   First give the phone its live clock: the frozen time above dates the Lock Screen
+                   1 January 2000, and an ISO --time keeps the day but drops the year (2026-11-21).
+                   xcrun simctl status_bar <the phone's udid, above> clear, then the same override
+                   without --time. Lock the phone, wake it, touch and hold ▸ Customize: the Color
+                   style, blue (Dynamic drifts between hues from shot to shot), WaterBuddy's line
+                   above the clock, its rectangle and its ring in the widget row, and Log Water in a
+                   bottom control slot. Leave the Lock Screen showing.
   01-wrist         The watch: WaterBuddy open on its main screen, 65 %, "Synced just now". If it
                    reads "Not yet synced", open WaterBuddy on the phone once, then look again.
   02-face-modular  The watch face: Modular, WaterBuddy's rectangle in the large slot and its circle
