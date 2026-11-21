@@ -47,9 +47,10 @@
   the page draws the header that far into an 8-second loop: the aurora drifts and breathes, the
   bubbles float, the water's two waves travel opposite ways and bubbles rise through it; at 2.4 s
   a tap lands on the Glass and the vessel fills from 1,050 to 1,300 of 2,000 ml (screenshot 1's
-  figures); from 7.3 s the pour fades back to where the loop began. Every swing's period divides
-  the 8 seconds and everything that happens once is undone before they end, so the last frame
-  leads into the first without a seam. The words hold still. Without `t` nothing moves and the
+  figures); from 6.1 s the water drains back to where the loop began, the figures counting down
+  with it. The owner ruled out a fade for the way back (2026-11-22): it read as a swap. Every
+  swing's period divides the 8 seconds and everything that happens once is undone before they
+  end, so the last frame leads into the first without a seam. The words hold still. Without `t` nothing moves and the
   still is drawn exactly as before.
 
     python3 Tools/RenderHeaderVideo.py <an empty frames folder> AppStore/screenshots/ProductPageHeader/1-one-tap.mp4
@@ -204,9 +205,9 @@ html, body { margin: 0; padding: 0; background: #0A2185; }
     // Past 1 by about 4% and back, as the app's water settles after a pour.
     const settle = v => 1 + 2 * Math.pow(v - 1, 3) + Math.pow(v - 1, 2);
 
-    // The story: 1,050 of 2,000 ml; a tap on the Glass; 1,300 ml; the pour fades back.
+    // The story: 1,050 of 2,000 ml; a tap on the Glass; 1,300 ml; the water drains back to 1,050.
     const GOAL = 2000, BEFORE = 1050, GLASS = 250;
-    const TAP = 2.4, FILL = 2.55, RESET = 7.3, FADE = .7;
+    const TAP = 2.4, FILL = 2.55, DRAIN = 6.1, DRAINING = 1.8;
     const grouped = ml => ml.toLocaleString('en-US');
     // The app's own rounding: half up, so 1,050 ml of 2,000 reads 53%.
     const show = (readout, ml) => {
@@ -234,12 +235,8 @@ html, body { margin: 0; padding: 0; background: #0A2185; }
       bubble.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)`;
     });
 
-    // Two waters: the pour, and under it the vessel as the loop began, which the pour fades back
-    // to. Under, so the water both hold stays opaque while the pour fades.
-    const glass = document.querySelector('.glass');
-    const pour = glass.querySelector('.water');
-    const before = pour.cloneNode(true);
-    glass.insertBefore(before, pour);
+    // One water: it rises with a settle after the tap, and drains back, slower, before the loop
+    // ends, so the last frame is the first.
     const BUBBLES = [  // x, diameter, period, phase
       [58, 7, 8 / 3, 0], [92, 5, 2, .35], [124, 8, 8 / 3, .62], [151, 5, 2, .12],
       [176, 6, 8 / 3, .81], [204, 4, 2, .5], [233, 7, 4, .27], [258, 5, 4, .7],
@@ -264,24 +261,17 @@ html, body { margin: 0; padding: 0; background: #0A2185; }
       });
       water.appendChild(fizz);
     };
-    // The pour's water rises with a settle; its waves swell with the pour and calm by the fade.
-    const swell = 1 + .8 * progress(FILL, .2) * Math.exp(-2.4 * Math.max(0, t - FILL - .2));
-    draw(pour, (BEFORE + GLASS * settle(progress(FILL, 1.1))) / GOAL, swell);
-    draw(before, BEFORE / GOAL, 1);
-    const fade = easeInOut(progress(RESET, FADE));
-    pour.style.opacity = (1 - fade).toFixed(4);
-    before.style.opacity = t >= RESET ? '1' : '0';
+    // The waves swell with the pour and calm long before the drain, which stirs them a little.
+    // The drain is done by 7.9 s, so the loop's last frames already hold the first one's water.
+    const poured = settle(progress(FILL, 1.1)) - easeInOut(progress(DRAIN, DRAINING));
+    const swell = 1 + .8 * progress(FILL, .2) * Math.exp(-2.4 * Math.max(0, t - FILL - .2))
+      + .3 * bump(DRAIN, DRAINING);
+    draw(document.querySelector('.glass .water'), (BEFORE + GLASS * poured) / GOAL, swell);
 
-    // The figures count up with the pour. On the way back they go out, then the first come in:
-    // two numbers cross-faded read as one smudged number.
+    // The figures count up with the pour and down with the drain.
     const vessel = document.querySelector('.vessel');
-    const readout = vessel.querySelector('.readout');
-    const readoutBefore = readout.cloneNode(true);
-    vessel.appendChild(readoutBefore);
-    show(readout, BEFORE + 10 * Math.round(GLASS / 10 * easeOut(progress(FILL, .9))));
-    show(readoutBefore, BEFORE);
-    readout.style.opacity = (1 - easeInOut(progress(RESET, FADE / 2))).toFixed(4);
-    readoutBefore.style.opacity = easeInOut(progress(RESET + FADE / 2, FADE / 2)).toFixed(4);
+    const counted = easeOut(progress(FILL, .9)) - easeInOut(progress(DRAIN, DRAINING));
+    show(vessel.querySelector('.readout'), BEFORE + 10 * Math.round(GLASS / 10 * counted));
     vessel.querySelector('.glow').style.transform = `scaleX(${(1 + .12 * bump(FILL, 1.5)).toFixed(4)})`;
 
     // The tap: the Glass gives, its halo brightens, and a ring spreads from it.
