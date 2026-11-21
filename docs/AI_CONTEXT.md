@@ -4,6 +4,18 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-21, 16:25 (hundred-and-twenty-third pass — `/doc_sync` after release 1.4.1's two new store screenshots were
+taken and the ten framed; on `main`, HEAD `bf01891`, level with `origin/main`, the only branch again; docs only in this pass). What it
+checked and wrote, every figure printed:
+- 137 `.swift` files in the seven targets, none added; 1117 phone `@Test`, 71 watch, 75 UI `func test` — unchanged; no Swift file
+  changed since `bf01891`;
+- *Current state*'s new headline: the owner's `/commit` (`19fdc0f..bf01891`), `main` fast-forwarded to `bf01891` and `release/1.4.1`
+  deleted, #229 closed, then the plan's Tasks 11–12 — the two captures on the capture pair, the framed ten, the 6.3″ set, the tools;
+- *Files on disk*: `Tools/CapturePairScreenshots.sh`'s row, a dated note (run again; its printed steps; 203 lines);
+- `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md`: checked, no drift — this pass touches no key, widget, token,
+  file in a target or entitlement, and `CLAUDE.md`'s `AppStore/` row (`captures/`, `iPhone-6.9/`, `iPhone-6.3/`) still reads true;
+- `tasks/lessons.md`: two entries — the Lock Screen's date from a frozen status bar, and the default wallpaper's *Dynamic* drift.
+
 **Last updated:** 2026-11-21, 00:55 (hundred-and-twenty-second pass — `/doc_sync` in release 1.4.1's last task, on `release/1.4.1`,
 HEAD `752a0a3`, the release staged and not committed; docs only in this pass). What it checked and wrote, every figure printed:
 - 137 `.swift` files in the seven targets, none added; **1117** phone `@Test` (1112 + 5: `PremiumAccessTests` +4,
@@ -2621,7 +2633,7 @@ Tools/GenerateAppIcon.swift                      267   generates the three iOS i
 Tools/FlattenPNG.swift                            99   re-encodes a PNG to colour type 2, RGB untouched. Required for every watch capture: simctl writes RGBA on watchOS even with --mask=ignored
 Tools/CaptureScreenshots.sh                        —   *(2026-11-04, staged: ten slugs, `11-schedule` and `12-export` added.)* the iPhone App Store set. WATERBUDDY_SCREENSHOT_SLOT picks iPhone-6.9 (default) or iPhone-6.5. Its default device is gone — known issue #45. It no longer overrides the status bar's clock (2026-10-09, committed in `12ddfc4`). *(2026-10-18, 1.2.8, staged: it finds the phone by name and runtime — iPhone 18 Pro Max, iOS 27.0, the first of two; WATERBUDDY_SCREENSHOT_PHONE still takes a UDID — so its half of #45 is fixed; no dirty-device gate, since the harness starts clean; the clock frozen again, at the run's start, in 24-hour form, the owner's ruling; DerivedData kept between runs. Run end to end twice.)* *(2026-10-18, #144, staged with 1.2.8: the clock is read once at the top and a run outside 1:45–11:45 PM is refused there, before the boot and the build — the harness keeps its own check — and the time checked is the time frozen; its header and `--time` comment say what the code and the 1.2.8 transcript show. Proved by fake-clock runs against a device name nothing matches; not run end to end since.)* *(2026-10-25, the store page, staged: eight of the ten iPhone shots — `01-home`, `03-history`, `05-month`, `06-insights`, `07-patterns`, `08-recap`, `09-goal-setup`, `10-settings` — in the harness's two launches; it refuses a run before the 8th of a month beside its clock check, because Patterns need seven finished days of the month holding today. Not run since.)*
 Tools/CaptureFullCensus.sh                         —   the 25-shot coverage run, every screen/state/scroll position. Its default device is gone — #45
-Tools/CapturePairScreenshots.sh                    —   new 2026-10-25 (the store page, staged): the other five shots — the iPhone's Home Screen widgets and Lock Screen (`02-widgets`, `04-lock-screen`) and the watch's three (`01-wrist`, `02-face-modular`, `03-face-infograph`). `setup` deletes and makes again, by name, a *WaterBuddy Store iPhone* (iPhone 18 Pro Max, iOS 27.0) paired with a *WaterBuddy Store Watch* (Series 12 46mm, watchOS 27.0), runs `testBuildTheLivedInWeek` on the phone, installs the phone app through `simctl` and then the watch app embedded in it, launches both and freezes the clock; a person arranges each surface in DeviceHub; `shoot <name>` takes it, flattens it and verifies it. Replaces `Tools/CaptureWatchScreenshot.sh`, deleted the same day. `setup` ran once before its install step took its present order; not run since
+Tools/CapturePairScreenshots.sh                    —   new 2026-10-25 (the store page, staged): the other five shots — the iPhone's Home Screen widgets and Lock Screen (`02-widgets`, `04-lock-screen`) and the watch's three (`01-wrist`, `02-face-modular`, `03-face-infograph`). `setup` deletes and makes again, by name, a *WaterBuddy Store iPhone* (iPhone 18 Pro Max, iOS 27.0) paired with a *WaterBuddy Store Watch* (Series 12 46mm, watchOS 27.0), runs `testBuildTheLivedInWeek` on the phone, installs the phone app through `simctl` and then the watch app embedded in it, launches both and freezes the clock; a person arranges each surface in DeviceHub; `shoot <name>` takes it, flattens it and verifies it. Replaces `Tools/CaptureWatchScreenshot.sh`, deleted the same day. `setup` ran once before its install step took its present order; not run since *(2026-11-21, 15:46–16:10: **run again** for release 1.4.1 — `setup` exit 0 in twelve minutes; the widgets and the Lock Screen placed with the simulator tool, no pour button touched; `shoot 02-widgets`, `shoot 04-lock-screen`. Its printed steps now say: the two widgets on a page of their own, the Lock Screen on the live clock — the frozen time dates it 1 January 2000 — and the wallpaper's *Color* style; 203 lines.)*
 Tools/VerifyScreenshots.sh                         —   *(2026-11-13, staged: an `iPhone-6.3/` slot — 1179 × 2556 and 1206 × 2622 — where a folder it did not know was passed unchecked as *(unknown slot)*, and a header line on Connect's required well; 32 files pass; 85 lines, 81 before.)* proves each capture's size/alpha/format against the slot it will be uploaded to
 Tools/VerifyListing.sh                             —   new 2026-11-20 (release 1.4.1, staged; 127 lines): every store text field in every listing language — `AppStore/`, `AppStore/en-GB/`, `AppStore/ru/` — against its limit (characters, or bytes for the keywords and the review notes), no trailing newline and no empty file, the keyword rules (no space, no word of two letters or fewer, none from the name or subtitle, no *apple* or *iphone*, no repeat), en-US against `README.md`'s *App Store Connect* blocks and en-GB against en-US but its keywords; exit 1 on any problem. Run: bash Tools/VerifyListing.sh
 Tools/RenameScreenshots.py                         —   xcresult attachment UUIDs → slot names, via manifest.json
@@ -2916,6 +2928,26 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Release 1.4.1 committed and on `main`, the only branch; its ten store screenshots made** (2026-11-21, 04:21–16:25).
+- **Committed** on the owner's `/commit` ("Go"): `19fdc0f` (1.4.1 (7)), `74ce7fc` (#162), `a744b43` (R1), `bce5fb6` (the listings),
+  `575ceaa` (the spec and plan), `e28790f` (the records), `bf01891` (rule `70-privacy`'s wording, no longer unstaged) — 43 files.
+- **`main`**, on the owner's "now merge locally to main and commit & push": fast-forwarded `752a0a3..bf01891` — no merge commit, as
+  with 1.4 — pushed and checked out. **`release/1.4.1` deleted** here and on `origin` ("Yes, delete it"), both tips first proved inside
+  `main`; `origin` holds `main` alone.
+- **#229 closed** on the owner's "Close it": the harness's, not fixed; its hand check stays before the submission.
+- **The two captures** (the plan's Task 11, 15:46–16:10, in a window Avtolog and Glazzy gave): `setup` exit 0 on a new pair (phone
+  `0891A388`, watch `808700D9`); the simulator tool, its access granted by the owner, placed the Home Screen's two widgets and the Lock
+  Screen's line, rectangle, ring and *Log Water*, with no pour button touched; every scratch picture and capture read 65 % and 1,300 ml.
+  The Lock Screen is shot on the live clock and the wallpaper's *Color* style (`tasks/lessons.md`, 2026-11-21).
+- **The framed ten and the 6.3″ set** (Task 12): four rects measured from the captures' pixels, a per-cut `radius` for the widgets'
+  rounder corner, `week.row` kept inside History; `FrameScreenshots.sh` 10 of 10, `VerifyScreenshots.sh` 34 of 34. `iPhone-6.9/` and
+  `iPhone-6.3/` hold 1.4.1's ten; 1.4's are gone from both.
+- **The READMEs** say so: `README.md`'s header images, 6.9″ row, outstanding list and archive note; `AppStore/README.md` §3.
+- **Staged for the owner's `/commit`**, with this pass's records; the *Git* block has the count. Unstaged on purpose:
+  `.claude/settings.json`, the two watch schemes and the three catalogues Xcode rewrote.
+- **Not run:** the gate — no Swift changed since `bf01891`. **The owner's:** the three hand checks, the policy published, a new archive
+  from the commit and its upload, App Store Connect (the ten are ready), the prices on release day, #156.
 
 **Release 1.4.1 staged on `release/1.4.1`, not committed; its two new store screenshots not yet taken** (2026-11-20 into the
 small hours of 2026-11-21; spec `docs/superpowers/specs/2026-11-20-release-1-4-1-design.md`, plan
@@ -6827,6 +6859,12 @@ both roots rendering at accessibility text sizes.
   device run happened after 21:00 when today was empty anyway, so it was not independently exercised.
 
 ### Git
+
+**Read at 16:22 on 2026-11-21, after the hundred-and-twenty-third pass's files were added by name: on `main`, HEAD `bf01891`, level with
+`origin/main`, the only branch. Staged 46 — 20 added (the two captures, and the nine new names in each of `iPhone-6.9/` and
+`iPhone-6.3/`), 18 deleted (the nine old names in each), 8 modified (`Tools/StoreScreenshots.html`, `Tools/FrameScreenshots.sh`,
+`Tools/CapturePairScreenshots.sh`, `README.md`, `AppStore/README.md`, `docs/AI_CONTEXT.md`, `tasks/lessons.md`, `HISTORY.md`).
+Unstaged 6, on purpose: `.claude/settings.json`, the two watch schemes and the three catalogues Xcode rewrote. Nothing untracked.**
 
 **Read at 00:48 on 2026-11-21, after the hundred-and-twenty-second pass's files were added by name: on `release/1.4.1`, HEAD
 `752a0a3`; 42 staged — 22 added and 20 modified, release 1.4.1's change and its records; 8 unstaged — rule `70-privacy`'s edit and

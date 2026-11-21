@@ -6033,3 +6033,23 @@ pressed the control at ten durations showed the control itself was fine.
 Compare a failure with a pass on four lines: the destination at the down, when `backboardd` sent the up, when the digitizer
 disappeared, and when the app sent the up to its window. A tap the app reads after its digitizer has gone is the harness's,
 not the product's.
+
+## 2026-11-21 — A frozen status-bar clock dates the Lock Screen 1 January 2000
+
+**What happened.** `CapturePairScreenshots.sh setup` freezes the phone's clock with `xcrun simctl status_bar <udid> override --time
+15:58`, so every shot's status bar reads one time. The Lock Screen took its date from the same override and read *Sat 1 Jan* — the
+year 2000. An ISO time (`2026-11-21T10:58:00.000Z`, the one form `simctl` took; a `+05:00` offset and whole seconds were refused as
+"non-ISO") gave *Tue 21 Nov*: the day and the month, the year dropped. Nothing automated reads a Lock Screen's date; the scratch
+picture did.
+
+**The rule:** shoot the Lock Screen on the live clock — `xcrun simctl status_bar <udid> clear`, then the same override without
+`--time` — and read its date line in the scratch picture before `shoot`. Keep the frozen clock for the app's screens and the Home Screen.
+
+## 2026-11-21 — The default wallpaper's *Dynamic* style changes hue between looks
+
+**What happened.** Arranging WaterBuddy's Lock Screen widgets on iOS 27.0, the default wallpaper's *Dynamic* style was indigo before
+the editor opened, ran through gold, rose and indigo inside it, and settled on rose; white figures on rose made weak cut-outs for the
+framed shot. Its *Color* style, the third under the style's name, holds one blue.
+
+**The rule:** set a capture's Lock Screen wallpaper to *Color* in the same editor, and read the hue in the scratch picture. A shot
+whose look depends on the minute it was taken cannot be retaken to match.

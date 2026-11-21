@@ -15831,3 +15831,45 @@ store: `AppStore/README.md`, `AppStore/in-app-purchases.md`, `AppStore/keywords.
 new), `AppStore/research/2026-11-20/` (five files, new); `README.md`; the spec and the plan (new) and
 `docs/superpowers/specs/2026-10-15-rating-prompt-design.md`; the records: `docs/AI_CONTEXT.md`, `docs/STATE.md`, `tasks/lessons.md` and
 this file. Unstaged on purpose: `.claude/rules/70-privacy.md` and `Tools/StoreScreenshots.html`.
+
+## [2026-11-21] — Release 1.4.1 committed and on `main`; its two new screenshots taken and the ten framed
+
+### What happened
+
+- **`/commit`** (the owner's, "Go"): seven commits, `19fdc0f..bf01891`, 43 files, pushed to a new `origin/release/1.4.1`.
+- **`main`**, on the owner's *now merge locally to main and commit & push*: fast-forwarded `752a0a3..bf01891` — no merge commit, as 1.4
+  reached `main` — pushed and checked out. Growth Journal rows GROW-71 (#229 closed) and GROW-72 (the merge) logged before the push.
+- **`release/1.4.1` deleted**, on the owner's *Yes, delete it*: both tips first proved inside `main`, then `git branch -d` here and
+  `git push origin --delete`; `origin` holds `main` alone.
+- **#229 closed** on the owner's *Close it*, as the hundred-and-twenty-second pass's file records.
+- **The plan's Task 11, the two captures**, on the owner's *Yes, take them*: Avtolog's and Glazzy's go; `setup` 15:46–15:58, exit 0
+  (`testBuildTheLivedInWeek` 328.8 s); the simulator tool, its device access granted by the owner at 15:58, placed the Home Screen's
+  widgets — edit mode's empty last page took the week widget and the small one, no drag — and the Lock Screen: WaterBuddy's line, its
+  rectangle and its ring, *Log Water* in place of the flashlight. No pour button touched; every scratch picture and both captures read
+  65 % and 1,300 ml. The pair shut down and both sessions told at 16:09.
+- **Task 12, the framed ten:** the four rects measured from the captures' pixels; a per-cut `radius` in `Tools/StoreScreenshots.html`;
+  the two new shots' positions tuned until `ready` and read; `bash Tools/FrameScreenshots.sh` 10 of 10; the 6.3″ set by `sips`;
+  `bash Tools/VerifyScreenshots.sh` 34 of 34.
+- **The READMEs:** `README.md`'s header images, 6.9″ row, outstanding list and archive note; `AppStore/README.md` §3's note.
+
+### The rulings
+
+- The Lock Screen is shot on the live clock: the frozen status-bar time dated it 1 January 2000, and an ISO time dropped the year.
+- Its wallpaper is the default's *Color* style, blue: *Dynamic* changed hue between looks.
+- *Log Water* replaces the flashlight in the bottom-left slot, as the plan says; the right slot was empty on this runtime.
+- The Home Screen widgets' cut-outs take a 120-px corner, 116 measured and the 4-px margin, not the app panes' 88.
+- `week.row` keeps no `flow`: across the seam it covered Settings' tab bar and ran into the *yours to change* note.
+- `Tools/CapturePairScreenshots.sh`'s printed steps now say so: two widgets on a page of their own, the live clock, the *Color* style.
+
+### The records (hundred-and-twenty-third pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*'s new headline, `Tools/CapturePairScreenshots.sh`'s row, the *Git* block.
+  `tasks/lessons.md`: two entries. `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and `CLAUDE.md`: checked, no change. 137
+  `.swift` files, 1117 / 71 / 75. Not run: the gate — no Swift file changed since `bf01891`.
+
+### Files touched
+
+`AppStore/screenshots/captures/iPhone-6.9/02-widgets.png` and `04-lock-screen.png` (new); in each of `AppStore/screenshots/iPhone-6.9/`
+and `iPhone-6.3/`, nine names deleted and nine added, `1-home.png` unchanged; `Tools/StoreScreenshots.html`, `Tools/FrameScreenshots.sh`,
+`Tools/CapturePairScreenshots.sh`; `README.md`, `AppStore/README.md`; the records: `docs/AI_CONTEXT.md`, `tasks/lessons.md` and this
+file.
