@@ -459,6 +459,16 @@ On a lapse, the three on Home stay as they are and still log; only picking from 
 extra. Today `Key.servings` holds exactly three amounts and the names and glyphs are fixed in
 `vesselSlots`, which the watch draws too. **Needs rule changes** (§8).
 
+*(2026-11-22 into the 23rd: **set C — 1.4.5 and 1.4.8 — designed, specified and planned; no code.**
+The owner's rulings: **a theme reaches the app, the Home Screen and week widgets, and the watch
+app**, not the Lock Screen widget, the control or the watch faces; **four themes beside Aurora —
+Lagoon, Dusk, Midnight and Bloom**; **any vessel may stand in Home's middle slot**, and every
+one-tap door logs it; **the app icon is its own choice**, one per theme. D5–D22 as recommended.
+Spec `docs/superpowers/specs/2026-11-22-set-c-design.md` and its rule wording approved ("Approve
+both"), then the plan, `docs/superpowers/plans/2026-11-22-set-c.md` ("Approve plan"): five steps,
+set C on sale with the last. All three were written in their own worktree and came into `main` on
+2026-11-23 for the owner's `/commit`; the build has not started.)*
+
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.
 Worked out when shown and stored nowhere, as `remaining` is (rule `20-state`).

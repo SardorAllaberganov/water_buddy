@@ -16087,3 +16087,81 @@ No gate: no file in a target changed. The video read back as 8.000 s, 3840 × 16
 frames in sRGB are within 1–2/255 of their sources. Scanned at a quarter size, the largest frame steps fall in the tap and fill
 (frames 77–83), the seam measures 0.195, and the retried frame 205 is ordinary. In Connect, the version reads *Waiting for Review*
 after a reload.
+
+## [2026-11-23] — Set C's design comes into main; the gate green on 285e195; Files on disk recounted
+
+### What happened
+
+- **The owner's `/commit`** of the last pass at 02:31 on 2026-11-22 — `aea3f81`, `0516afc` and `285e195` — pushed
+  `e36c0ef..285e195`.
+- **The gate on `285e195`** (2026-11-22, 18:21–19:06), on the owner's "Run", on an export of the commit: phone unit 1117 tests in
+  122 suites; UI on iOS 27.0 72 of 73, 1 skipped by design, in 19 groups of at most four; watch 71 in 7 suites; both widgets
+  built. Warnings 20 / 17 / 2 / 17 by file and message and 36 / 29 / 2 / 29 by site, unchanged. iOS 26.5 not run (#230).
+- **Set C started** on the owner's "so what is next feature?" and "go next": roadmap 1.4.5, themes and app icons, and 1.4.8, a
+  vessel library, as a design session and a build session, each in its own worktree. The design session wrote the spec (554 lines)
+  and the plan (4,190 lines, Tasks 0–22 in five steps) and amended twelve rule files and `CLAUDE.md`. The owner ruled D1–D4 and
+  approved the spec with its rule wording ("Approve both"), then the plan ("Approve plan"). Nothing was committed, so the build
+  session, started at 22:54 from `main`, waited without building.
+- **The owner's word**, at about 03:00 on the 23rd: "clean other worktrees and merge into main and /doc_sync and /commit". The
+  owner also ran `/doc_sync` in the build session's worktree, at about 03:05.
+- **The merge:** the design worktree's 15 files applied to `main` with `git apply`, each file's blob equal to the worktree's; the
+  spec and the plan are the blobs the build session recorded. Staged by name. Then the build session's doc sync, from the two
+  patches it left: its *Files on disk* fixes applied, and its two lessons taken whole. Its header, headline and checkpoint are
+  folded into this pass's.
+- **The worktrees:** the stale `wt-1.4` entry pruned and the design worktree removed, its branch kept. The build session's worktree
+  is kept: set C runs there, from this commit.
+
+### Drift found and fixed
+
+- `docs/AI_CONTEXT.md`, *Files on disk* (the build session's findings; none from a change since the last pass):
+  - `WaterBuddyUITests/AppStoreScreenshotUITests.swift` is 863 lines, not 866: `01cbe67` (2026-11-07) cut three, and no pass
+    recounted it.
+  - The bold total is 137 `.swift` files in the seven targets, 140 with `Tools/`'s three Swift scripts. It read 81, its
+    2026-10-14 figure.
+  - `Tools/FrameScreenshots.sh` (90 lines) and `Tools/StoreScreenshots.html` (496) have rows, missing since `01cbe67`.
+  - The three `Screenshots/en-US/` rows read gone, count 0: `01cbe67` deleted the folder, and its files are `AppStore/`'s.
+  - `Tools/CaptureScreenshots.sh`'s row says it runs on any day and writes into `AppStore/screenshots/captures/`, since `01cbe67`.
+- `CLAUDE.md` runs ahead of the code with the design's approved wording: known issue #235.
+
+### Checked and already accurate
+
+- 137 `.swift` files in the seven targets, every one named in `docs/AI_CONTEXT.md`; 1117 phone `@Test`, 71 watch, 76 UI
+  `func test`.
+- `DataManager.Key`: 16 keys, 14 in the phone's suite and 2 in the watch's. The three `membershipExceptions` sets, six files
+  each. Every `` rule `nn-name` `` citation resolves to a file.
+- `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: no key, widget or token moved since their last passes.
+
+### The rulings
+
+- The design reaches `main` as a patch, not as a commit on its own branch, so every commit stays the owner's `/commit`, grouped by
+  topic.
+- `CLAUDE.md`'s set C wording is kept as approved although it runs ahead of the code: known issue #235, retired by the build's
+  records.
+- One checkpoint for the night: the build session's doc sync is folded into this one, not committed beside it as a second
+  hundred-and-twenty-eighth pass.
+- The build session's worktree is not removed: it holds nothing of its own, and set C's build starts there.
+
+### The records (hundred-and-twenty-eighth pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*'s new headline, *Files on disk*'s five fixes, known issue #235 and the Git
+  block.
+- `docs/ROADMAP.md`: set C's note under 1.4.8.
+- `tasks/lessons.md`: three entries — a row check that sees only rows and waiting on another session's commit, both the build
+  session's, and a design reaching its build only through `main`.
+- `CLAUDE.md`: set C's approved wording, from the design; otherwise checked, no change.
+- Growth Journal rows GROW-118 to GROW-123: the gate, set C chosen, set C designed, the design brought into `main`, the lesson,
+  and GROW-123 correcting GROW-122 (the build watched the design's branch, not `main`).
+
+### Files touched
+
+The design: `docs/superpowers/specs/2026-11-22-set-c-design.md`, `docs/superpowers/plans/2026-11-22-set-c.md`, twelve files under
+`.claude/rules/` (10, 15, 20, 25, 40, 43, 50, 60, 65, 70, 80 and 85) and `CLAUDE.md`. The records: `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `tasks/lessons.md` and this file.
+
+### Verification
+
+The gate on `285e195`, above. For this change no gate: no file in a target changed. The 15 applied files match the design
+worktree's, blob for blob. The *Files on disk* figures were read again from the disk (863, 90 and 496 lines; three Swift scripts in
+`Tools/`; `Screenshots/` gone), and `tasks/lessons.md` equalled the build worktree's staged blob before this pass's entry was
+added. `git diff --check` is clean. No set C name — `AppTheme`, `VesselLibrary`, `servingGlyph`, `AppIconSwitcher` — is in a
+target.

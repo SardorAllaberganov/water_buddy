@@ -6137,3 +6137,43 @@ submission took a new place in the queue.
 **The rule:** get every media asset right before *Submit for Review*, the header and screenshots most of all; after it, changing
 one costs a withdrawal and a resubmission. If one must change, remove the version from review, make the change, and wait for the
 old submission to leave *Processing* before looking for a fault in the page.
+
+## 2026-11-23 — A row check sees only rows
+
+**What happened.** The hundred-and-twenty-eighth pass compared every *Files on disk* row of `docs/AI_CONTEXT.md` with `wc -l`, as
+the passes before it had, and found one count stale. Three other faults were ones such a check cannot see. `01cbe67`
+(2026-11-07) added `Tools/FrameScreenshots.sh` and `Tools/StoreScreenshots.html`, and no pass since gave either a row: a check
+that walks the rows never meets a file without one, and `/doc_sync`'s own `find` lists four folders, not `Tools/`. The same
+commit deleted `Screenshots/`, and three rows went on naming it; the hundred-and-twentieth pass moved the `AppStore/` row to its
+new path and left them. And the section's bold total read **81** `.swift` files, its 2026-10-14 figure, while the passes' own
+headers counted 137: the total is prose, and the script reads rows.
+
+**The rule:** check *Files on disk* three ways. Walk the disk, the seven target folders **and** `Tools/`, for a file with no
+row; walk the rows for a path that names no file; and set the bold total beside the `find` count. Read the counts a row keeps
+in its note too (`—`, then "…; 90 lines").
+
+## 2026-11-23 — Waiting on another session's commit: read the branch, and read it without a lock
+
+**What happened.** The set C executor was to cut `feature/set-c` once the design session had committed the spec, the plan and the
+rule wording. Twice a go-ahead said the commit had landed while the design's branch still stood at `285e195` and its worktree
+held the fifteen changes; acting on it would have started Task 0 on a tree without the spec. The executor then watched the
+design's worktree every ten seconds. A plain `git status` there refreshes that worktree's index and takes its `index.lock` for a
+moment, so a poll landing while the owner's `/commit` ran there could fail the commit on *Unable to create '…/index.lock': File
+exists*.
+
+**The rule:** before building on another session's commit, read it from git: the branch's tip past the base, each file in the
+tip's tree (`git cat-file -e <tip>:<path>`), and the worktree clean on those paths. Read another session's worktree only with
+`git --no-optional-locks status`, which never writes its index.
+
+## 2026-11-23 — A design made in a worktree reaches its build only through `main`
+
+**What happened.** Set C's design session left the spec, the plan, twelve rule files and `CLAUDE.md` uncommitted in its own
+worktree, for the owner's `/commit`. Its build session was started at 22:54 on 2026-11-22 in a second worktree cut from `main`,
+before that commit, and waited more than four hours for it, as the entry above tells. The two did not even agree where the commit
+would land: the design's report said the files "must reach main", while the build watched the design's branch. At about 03:00 on
+the 23rd the owner had the main session bring the design into `main`.
+
+**The rule:** commit a design on `main` before starting the session that builds it, and name that commit in the build's brief.
+To bring a worktree's uncommitted work into `main` without committing on its branch: `git diff --binary` for its changed files
+and `git diff --no-index --binary /dev/null <file>` for each new one, `git apply --check`, then `git apply` on `main`. Compare
+every file's blob with the worktree's, stage them, and only then remove the worktree (`git worktree remove --force`).
