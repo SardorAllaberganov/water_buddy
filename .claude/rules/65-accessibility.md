@@ -34,10 +34,10 @@ rather than re-deriving it.
   neutral system grey
 - Home's vessel draws its glow, halo and highlight only when Reduce Transparency is off
 - In the widget, `WidgetCardBackdrop` draws `Color.clear` when the setting is on, and `WidgetAurora`
-  keeps its three light blobs inside `if !reduceTransparency`, leaving only `Aurora.gradient`
+  keeps its three light blobs inside `if !reduceTransparency`, leaving only the theme's `gradient`
 - On the watch, `WristAurora` — `WidgetAurora`'s own proportional-geometry twin (rule
   `60-design-system`) — keeps the identical branch: its three blobs sit inside `if
-  !reduceTransparency`, leaving only `Aurora.gradient` behind the list. It shipped without one for a
+  !reduceTransparency`, leaving only the theme's `gradient` behind the list. It shipped without one for a
   time, a real gap this rule's own widening to the watch exists to catch: `WristAurora` is a
   self-declared sibling of `WidgetAurora`, and a sibling that skips the branch its own doc claims to
   follow is a defect, not a stylistic difference
@@ -161,6 +161,17 @@ rather than re-deriving it.
   locked, or the line saying why nothing opened. The export sheet's heading carries the header trait and its close
   button is *Done*. Its card is one element, its label the count, the dates, the file's name and the note; the drawn
   figure, the rows and the line under them are hidden. *Share as a CSV file* is one button whose label is the words it draws
+- Settings' *Appearance*: each theme's swatch is one button — label the theme's name, `.isSelected` on
+  the chosen one, value *Premium* and hint *Opens Premium* while locked — and each icon is one button,
+  labelled with the theme's icon name, with the same traits. A swatch is told apart by its name and its
+  ring, never by colour alone
+- *Your vessels*: each vessel is one button — label its name, value its amount in millilitres, the
+  middle Home vessel's hint *Your Glass*. In the editor each icon is one button, label its spoken name,
+  `.isSelected` on the chosen; the name field's label is *Name*; the amount slider speaks the vessel's
+  name and millilitres
+- A vessel's name is the user's own where they typed one. Home's and the watch's buttons say it in their
+  existing sentence; Home draws it on one line, scaled to 0.8 and then cut at its end, and VoiceOver says
+  it whole
 
 ## Contrast
 - Small text holds 4.5:1; a non-text glyph holds 3:1
@@ -177,6 +188,9 @@ rather than re-deriving it.
   the readout's two shadows — a contrast threshold, not taste
 - Keep the `@Environment(\.colorSchemeContrast)` edge boost **multiplicative** with the press boost
   and clamped — never let one replace the other
+- Every theme holds every floor on its own renders, with Increase Contrast and under Reduce
+  Transparency, whose fill is the theme's own; its table stands beside Aurora's in `docs/DESIGN.md`
+  (rule `60-design-system`)
 
 ## Proving it
 - When a change adds or wraps a control, assert in `WaterBuddyUITests` that its accessibility label

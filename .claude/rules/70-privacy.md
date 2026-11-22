@@ -128,7 +128,7 @@ Six limits are conditions of the permission:
   (the owner's ruling, set aside as "a"). A second model needs an amendment here first
 - **The app's own sentences in, nothing else.** The model is handed the English sentences
   `InsightCopy` writes for the page — what the page would draw anyway — and the suggested vessel's
-  name. Never a `WaterLog`, a timestamp, the goal history, the streak or the user's language
+  name, which since set C may be one the user typed. Never a `WaterLog`, a timestamp, the goal history, the streak or the user's language
 - **Nothing it adds is shown.** Its note is drawn only when `InsightWriter.accepts(_:for:)` passes:
   every number in it one of the facts' own. Anything else is declined and the app's sentences stand
 - **Kept in memory only.** A note lives for the run of the app and is written to neither store, and
@@ -214,6 +214,25 @@ Five limits are conditions of the permission:
 - **No usage key.** *Add no `NS*UsageDescription` key* stands. *Save to Files* needs none
 - **Nothing recorded.** No completion handler, no count of exports, no diagnostic of the destination. The press's
   haptic is presentation state, gone with the sheet
+
+## Themes, icons and vessels, on the device
+
+Set C (spec `2026-11-22-set-c-design.md`) adds what a user chooses to see, and what they call their vessels.
+Nothing leaves the device for it, nothing is asked, and no framework, entitlement or usage key is added.
+
+Four limits hold:
+- **Two keys, and the Watch's copy.** The chosen theme (`Key.theme`) and the vessels — each one's icon, amount
+  and, for the user's own, the name they typed (`Key.vessels`) — are stored in the App Group. The theme and Home's
+  three vessels' icons and names go to the user's own Watch in the mirror, as the language and the amounts do
+  (*WatchConnectivity is a ruling, not an omission*)
+- **A vessel's name is the user's own words.** It is drawn in the app and on the Watch, spoken by VoiceOver, and may
+  reach Apple's on-device model as the suggested vessel's name (*FoundationModels, for the insights*). It never
+  reaches a notification, a widget, Siri, Control Center, the export file or the recap's image, and no diagnostic
+  carries it
+- **The app icon is iOS's.** The app stores nothing about it and asks no permission to change it; iOS shows its own
+  alert
+- **The policy first.** `PRIVACY.md` and its page list the theme, the vessels and the Watch's copy of them before
+  set C goes on sale
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a

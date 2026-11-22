@@ -132,6 +132,11 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `ServingsExport` and `ExportSheet` are app-only and stay out of every exception set; the read they need,
   `logs(since:)`, is already in `DataManager.swift`. The closure form of `suggestedFileName` is iOS 17.0, the floor, so
   export adds no version check
+- `AppIconSwitcher`, the Appearance card and the vessel library's two sheets are app-only and stay out of every
+  exception set. `AppTheme`, `Vessel` and `VesselLibrary` live in `DataManager.swift`, `Aurora` and `VesselGlyph` in
+  `WaterSurface.swift`, all already in the three sets: set C adds no shared file and no membership edit. Every
+  vessel icon exists on iOS 17 and watchOS 26 — `cup.and.heat.waves.fill`, iOS 18, is left out — so set C adds no
+  version check (spec `2026-11-22-set-c-design.md` D13)
 - `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
   `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
   `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,
@@ -216,6 +221,12 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   **byte-identical** `Assets.car` from RGB and RGBA sources (proven by sha256, both platforms). The
   compiled rendition is marked `Opaque: true` either way, because `Opaque` is derived from content
   rather than from the encoding. Stripping cannot change one byte of what is submitted
+- **Alternate icons are generated like the primary** (set C). `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` on
+  the app target's two configurations lists `AppIcon-Lagoon AppIcon-Dusk AppIcon-Midnight AppIcon-Bloom`; each set
+  holds light, dark and tinted 1024² images from `Tools/GenerateAppIcon.swift`, beside an `IconPreview-*` image for
+  the picker. Xcode writes `CFBundleAlternateIcons` into the generated Info.plist; never edit it. The watch has no
+  alternate icons. Prove each alternate's three appearances from a TestFlight install before the release: a forum
+  report says they do not survive distribution, and a simulator cannot say
 
 ## Localization
 - `developmentRegion = en`, `knownRegions = (en, ru, uz, Base)`, and

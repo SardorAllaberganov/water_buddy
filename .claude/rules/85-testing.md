@@ -34,7 +34,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   in-memory store, with no widget, reminder or watch side effects. So does the store capture,
   `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run,
   and so does `CoachingUITests`, for set B's controls with Premium held or lapsed, and so does
-  `ExportUITests`, for a holder's export. No other UI test passes it.
+  `ExportUITests`, for a holder's export, and so do `AppearanceUITests`, for set C's card and library,
+  and the theme census. No other UI test passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
   test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not
@@ -58,7 +59,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `PremiumStore.Source.held()`, a lifetime purchase from no store. Alone, either does nothing.
   `testCaptureAppStoreScreenshots` passes them and no other UI test does but `CoachingUITests`, which
   passes `-WaterBuddyPremiumHeld` beside the fresh start to hold Premium for set B's controls (spec
-  `2026-10-30-coaching-design.md` D13), and `ExportUITests`, which passes it to hold Premium for the export card;
+  `2026-10-30-coaching-design.md` D13), and `ExportUITests`, which passes it to hold Premium for the export card,
+  and `AppearanceUITests`, which passes it for set C's card and library, and the theme census, which passes both;
   `FreshStartTests` pins both
   (`docs/superpowers/specs/2026-10-25-store-page-design.md`)
 - `-WaterBuddyCoachingSeed` is DEBUG's set B seed, and acts only beside `-WaterBuddyFreshStart`: it sets
@@ -66,6 +68,10 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   Beside `-WaterBuddyPremiumHeld` it is a holder's settings; beside `-WaterBuddyPremium` alone, a lapsed
   holder's. `CoachingUITests` passes it and no other UI test does. `FreshStartTests` pins it
   (`docs/superpowers/specs/2026-10-31-finish-set-b-design.md` D8)
+- `-WaterBuddyTheme <code>` is DEBUG's theme for a capture, and acts only beside `-WaterBuddyFreshStart`: it
+  sets the theme through its setter in the fresh start's own suite. Alone it does nothing.
+  `AppStoreScreenshotUITests.testCaptureThemeCensus`, the theme census, passes it, and no gate test does;
+  `FreshStartTests` pins it (spec `2026-11-22-set-c-design.md` §3.9)
 - `AppStoreScreenshotUITests.testBuildTheLivedInWeek` is the one capture that opens a device's own
   App Group: it builds the store set's week through History's sheet for the widgets and the watch, on
   the new phone `Tools/CapturePairScreenshots.sh setup` makes — the pair it deletes and makes again by
@@ -112,7 +118,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
   `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
-  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`. They are compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
+  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`, `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests`. They are compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
   the plan stayed pure (rule `80-notifications`)
@@ -164,7 +170,8 @@ xcodebuild build -project WaterBuddy.xcodeproj -scheme WaterBuddyWatchWidget \
   driven only by `bash Tools/CapturePairScreenshots.sh setup`. Its census method, `testCaptureFullScreenCensus`, is still
   **deliberately non-idempotent** — it asserts *Get Started* exists, so it fails on any device where
   setup has already been completed, which is every ordinary run. Dropping the skip turns a green
-  gate red for a reason that has nothing to do with the product
+  gate red for a reason that has nothing to do with the product. Its theme census,
+  `testCaptureThemeCensus`, is driven only by `Tools/CaptureThemeCensus.sh`, one theme a run
 - **`OS=27.0` is load-bearing on both platforms — do not simplify it away.** The pin moved from
   `26.5` on 2026-10-10, on the owner's ruling: the simulator set lost its data on 2026-10-08, the
   watchOS 26.5 runtime went with it, and the gate has to name runtimes that are installed and boot.
@@ -224,7 +231,11 @@ in Health's sheet, then *Allow* — pour, correct, delete and *Undo*, and read t
 refuse it on a fresh install; withdraw it in Settings › Privacy & Security › Health and come back. After a
 change to set B, set a schedule, a quiet day and *Only when behind*, see *Next reminder* follow, pour from
 the widget and see the schedule kept, and lapse an expired monthly to see the rows lock. After a change to
-export, share to *Save to Files* and open the file. The same
+export, share to *Save to Files* and open the file. After a change to a theme, see it on Home, History,
+Settings, the paywall and the recap's image, on the placed widgets and on the watch, and read its table again.
+After a change to the icons, set each from Settings and see its light, dark and tinted forms on the Home
+Screen — from a TestFlight install too. After a change to the library, add a vessel, put it in the middle,
+and see the widget, Control Center, the reminder's button and the watch log it and draw its glyph. The same
 applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face
 by hand, a tinted face among them: no part of the automated gate renders them.
 

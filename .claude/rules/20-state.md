@@ -42,6 +42,26 @@ after the body above had already conceded it.
   them. Setting `.standard` removes `Key.reminderSchedule`. Neither knows Premium — Settings decides who
   may change them, and what is stored keeps working after a lapse (spec `2026-10-30-coaching-design.md`
   D2)
+- `theme` joins that surface. Its setter writes `Key.theme`'s code — removing the key for Aurora, as
+  `.system` removes `Key.language` — rings the widget doorbell and publishes to the wrist, and
+  reschedules nothing: a theme moves no reminder. It knows nothing of Premium, as set B's setters do not
+  (spec `2026-11-22-set-c-design.md` D5)
+- The vessel library joins it: `addVessel(glyph:name:amount:)`, `updateVessel(id:glyph:name:amount:)`,
+  `deleteVessel(id:)`, `putOnHome(id:slot:)` and `useStandardVessels()`. Each writes `Key.vessels`
+  **first** and `Key.servings` — Home's three amounts — **after**, with the `servings` path's doorbell and
+  wrist publish, and calls `rescheduleRemindersNow()` only when Home's middle glyph changed, so the app
+  registers the reminder's category with its new icon. None knows Premium
+- `Key.servings` stays the one-tap doors' read. With a library, the `servings` setter writes the three
+  amounts into Home's vessels first, then the key. The app's launch, behind `role.ownsSharedStorage`,
+  rewrites `Key.servings` from a library whose Home amounts differ — only a crash between the two writes
+  leaves them apart. Never the extension
+- The library is validated on the way out and **discarded whole** on any anomaly — Home not exactly
+  three, more than nine others, an id twice, a standard vessel missing, renamed or re-glyphed, a user's
+  vessel without a valid name, an amount out of `1...maximumDailyIntake`, a glyph this build does not
+  know — reading as no library. Never repaired, and never written back by the read
+- The standard three — Cup, Glass, Bottle — are never deleted, renamed or re-glyphed, and a user's vessel
+  is deleted only from *More vessels*. Home's order is the user's: never sort it, for `Key.servings`'
+  reason
 - `addLog(amount:at:)` returns the id of the row it inserted, `nil` for a refused amount. Home's
   *Undo* is the one caller that keeps it. `undoLog(id:)` finds that row among today's, read fresh,
   and deletes it through `deleteLog(_:)`; it does nothing when the row is gone or today's rows
@@ -99,8 +119,8 @@ after the body above had already conceded it.
   (`defaults.object(forKey:) as? Bool != true`) and the **observation** separately on
   `storedIsGoalSet`. They are not the same: `resolveIsGoalSet(in:goal:)` infers `true` from a
   non-default goal when the key is absent
-- `isGoalSet`, `todaysLogs`, `historyLogs`, `month`, `monthLogs`, `insights` and `streak` stay
-  get-only. All seven are consequences, not inputs
+- `isGoalSet`, `todaysLogs`, `historyLogs`, `month`, `monthLogs`, `insights`, `streak` and `vessels`
+  stay get-only. All eight are consequences, not inputs
 - `insights` is published only while History has asked for a week through `showInsights(_:)`, behind
   `role.drawsHistory`, from the sites that publish `month` — never `init`, never the `servings` setter
   (the suggestion's vessel is chosen when drawn). A failed read leaves it as it stands. `showInsights(_:)`
@@ -139,13 +159,14 @@ after the body above had already conceded it.
 - `DataManager` stays `@MainActor`. Anything an extension's `nonisolated` code must reach —
   `defaultServing`, `defaultServings`, `maximumDailyIntake`, `appGroupIdentifier`, `isAppExtension`,
   `snapshot(defaults:calendar:now:)`, `dayOrdinal(for:in:)`, `resolveLanguage(in:)`,
-  `resolveServings(in:)`, `usualServing(in:)` — is declared `nonisolated static` (rule `43-concurrency`)
+  `resolveServings(in:)`, `usualServing(in:)`, `resolveTheme(in:)`, `resolveVessels(in:)` — is declared
+  `nonisolated static` (rule `43-concurrency`)
 - The clock and calendar are injected (`now: @escaping () -> Date = Date.init`,
   `calendar: Calendar = .waterBuddyDay`). Call `now()`, never a bare `Date()`, in any rollover,
   fetch-bounds or reminder-planning logic (rule `30-rollover`)
 - **The quick-add amounts are stored state, not a constant.** `Key.servings` holds a positional
-  `[Int]` of exactly three — Cup, Glass, Bottle — and index 1 is the vessel the widget draws and
-  logs. `defaultServing` is now only the fallback the resolver returns and the middle of
+  `[Int]` of exactly three — Home's three vessels, Cup, Glass and Bottle until a library puts others
+  there — and index 1 is the vessel the widget draws and logs. `defaultServing` is now only the fallback the resolver returns and the middle of
   `defaultServings`; it stopped being "the one spelling of the quick-add amount" when the vessels
   became editable, and was renamed from `standardServing` so the name could not assert an invariant
   the product no longer has

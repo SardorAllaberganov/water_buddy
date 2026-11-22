@@ -24,6 +24,9 @@ persist anything.
   never holds a `Product`; it is handed `PremiumAccess.Plan`s
 - Apple Health's switch reads `@Environment(HealthMirror.self)`: its binding calls `enable()` on and
   `disable()` off — one call each — and Settings draws the card only where `isAvailable`
+- The theme reaches a view as `@Environment(\.aurora)`, the palette of the `\.theme` its root injected
+  beside `\.strings` and `\.locale`. A view never names a palette — `Aurora.classic` only for water —
+  and never switches on a theme (rule `60-design-system`)
 
 ## Arithmetic belongs to the model
 - A `body` must not recompute a figure the model already publishes. Take the total and the goal off
@@ -52,7 +55,8 @@ persist anything.
 - A helper view stays a `private struct` in the file that uses it, and earns its own file only when
   a second screen wants it
 - The **menu** a screen offers is a `static let` on that view — `HistoryView.servingRange`/
-  `servingStep`, `WelcomeView.goalRange`/`goalStep` — never on `DataManager`. A second screen
+  `servingStep`, `WelcomeView.goalRange`/`goalStep`, and since set C the vessels' 50–2,000 ml by 50 on
+  the view that edits them — never on `DataManager`. A second screen
   asking the same question reads the first screen's declaration
 - A menu is what a screen *offers*; a **preference is what the user chose**, and rule `20-state`
   makes `DataManager` the only thing allowed to persist one. `dailyGoal` is the precedent: its range
@@ -68,6 +72,11 @@ persist anything.
   file both `HomeView` and `WristView` already need for the vessel geometry itself, so the menu
   followed it rather than becoming a new shared file of its own (rule `15-project`'s seventh-file
   cost)
+- **Since set C, Home's three are the library's.** `vesselSlots` names the standard three and
+  `VesselGlyph` the seven icons a vessel may wear, both in `WaterSurface.swift`;
+  `HomeView.servings(library:)` joins `DataManager.vessels.home` to their presentation. A vessel on
+  screen is **identified by its slot**, never by its name — Home's buttons, their drop and their bounce,
+  and the watch's row — because names may repeat (spec `2026-11-22-set-c-design.md` D17)
 - A `static` that projects model state takes the state **as a parameter**. Reaching a `@MainActor`
   property from a `nonisolated` static needs `MainActor.assumeIsolated`, which traps when the
   assumption is wrong — a `precondition` in all but name, and rule `75-diagnostics` records that this
@@ -130,6 +139,14 @@ persist anything.
   tap and handed to `ExportSheet` through `init`, for Premium alone — the card opens the paywall for anyone else.
   With no servings, or a failed read, the sheet does not open and the card says so. A lapse clears the selection, so
   the sheet closes
+- The vessel library is presented with `.sheet(item:)` from Settings' *Your vessels* row, for Premium
+  alone — the row opens the paywall for anyone else — and a vessel's editor with a second
+  `.sheet(item:)` from the library, handed the vessel, or a new one, through `init`. Changes save as
+  they are made; a new vessel is added by its editor's *Add to your vessels*. A lapse clears both
+  selections, so both sheets close
+- The Appearance card sets the theme and the icon in place: a swatch's tap is one call,
+  `manager.theme = …`, and an icon's tap goes through `AppIconSwitcher`, never `UIApplication` from a
+  view. Aurora and the standard icon are free for everyone; the others open the paywall where locked
 - `.safeAreaInset` reserves the bar's height for **scrolling**, not for the resting layout. A screen
   whose last card sits under the bar needs its own bottom padding
 - Declare `.preferredColorScheme(.dark)` once per hosting controller — on `RootTabView` for the
@@ -162,6 +179,8 @@ persist anything.
 - A state-carrying modifier stays present in both branches with a `.clear` value rather than being
   inserted and removed, so SwiftUI animates a colour instead of a layer
 - A celebration is anchored to the thing that filled, not to the screen
+- A theme's change is animated once, at the root, `.animation(.smooth(duration: 0.4), value:)` on the
+  theme — never view by view
 
 ## Text and strings
 - Resolve every user-visible string through `@Environment(\.strings) private var strings`, injected

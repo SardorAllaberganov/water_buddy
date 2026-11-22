@@ -38,6 +38,11 @@ warning here is a Swift 6 error later.
   hears its manager's saves through `logsDidSaveNotification`, observed with `object:` that manager,
   `queue: .main` and `MainActor.assumeIsolated`. `HealthPlan` is `nonisolated` and imports Foundation alone
 - `ServingsExport` is `nonisolated` and imports `Foundation` alone
+- `AppTheme`, `Aurora`, `VesselGlyph`, `Vessel`, `VesselLibrary` and `WristVessel` are `nonisolated` and
+  `Sendable`; the palettes are `nonisolated static let`, and every value derived from a theme — the glass
+  tint, the scrims, `Base.archived(for:)`, `AuroraBackground.lights(in:)` — is a `nonisolated static func`
+  taking the theme as a parameter. `AppIconSwitcher` is a struct of `@MainActor` closures built by
+  `static func live()`, each reaching `UIApplication.shared` in its own body
 
 ## Sendable, and what may cross a process
 - `WaterSnapshot` is the only **state** value handed to a widget process: `Sendable`, `Equatable`,
@@ -154,4 +159,5 @@ warning here is a Swift 6 error later.
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
   `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
-  `ExportSheetTests`, `LandingTests`, `RollingFigureTests` or `PremiumRimTests` to make them compile. They are compile-time canaries: fix the declaration they read instead
+  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`,
+  `AuroraPaletteTests`, `VesselLibraryTests` or `VesselGlyphTests` to make them compile. They are compile-time canaries: fix the declaration they read instead

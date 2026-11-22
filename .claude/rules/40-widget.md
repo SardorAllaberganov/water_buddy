@@ -59,6 +59,9 @@ target the file joins.
   `water * 100 / goal`, which rounds differently from the app
 - `WaterSnapshot.serving` comes from `DataManager.usualServing(in:)` — the one definition the Siri
   shortcut also logs
+- `WaterSnapshot.theme` — the stored theme — and `WaterSnapshot.servingGlyph` — Home's middle glyph,
+  from the library or `vesselSlots` — are resolved in `snapshot(...)` from the cache and defaulted, so
+  the memberwise callers build. Reading them writes nothing
 - Do not add a seventh file to the shared set. Anything both processes need goes into one of the
   existing six; `WaterSnapshot` and `AppLanguage` live in `DataManager.swift` for exactly this reason
 - Any change here keeps `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys`
@@ -125,8 +128,8 @@ target the file joins.
   `LiquidGlass.Base.archived` (or another `.flat`). A widget snapshot is rendered out of process
   against a backdrop the extension cannot sample, so a `Material` resolves against nothing and the
   pane comes back muddy or invisible
-- Treat `Base.archived`'s two fills as derived constants. Do not retune them by eye; re-derive from
-  the material recipe and the aurora's luminance if the backdrop changes
+- Treat `Base.archived(for:)`'s fills — one pair per theme — as derived constants. Do not retune them
+  by eye; re-derive from the material recipe and the theme's luminance if a palette changes
 - Anything tinted, scrimmed or gradient-filled branches on
   `@Environment(\.widgetRenderingMode) == .fullColor` and falls back to a shape that survives
   templating — a stroked rim, an opaque silhouette, a flat colour
@@ -138,7 +141,8 @@ target the file joins.
   or any clock-driven phase into the extension's view tree — a widget gets snapshots, not frames
 - Set the dark appearance with `.environment(\.colorScheme, .dark)`, never
   `.preferredColorScheme(.dark)`, and inject `entry.snapshot.language.bundle` and `.locale` at the
-  same root
+  same root — and `entry.snapshot.theme` where the widget draws the aurora: the Home Screen and week
+  widgets, never the Lock Screen widget
 - `WidgetCardBackdrop` is applied with `.background` **after** `.widgetPane` so it lands beneath the
   glass, drawn scaled and blurred so it is out of register with the pane
 - `@ScaledMetric` in the widget scales a real magnitude, never a unitless `1` — `UIFontMetrics`
@@ -188,9 +192,9 @@ target the file joins.
 - The button is `ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving))` — the Glass
   from the snapshot, as both widgets' buttons take it. Never `AddWaterIntent()`, whose `init()` seeds
   `defaultServing`, and never an amount resolved when the control is pressed
-- It draws no figure — its title and the Glass's glyph, `vesselSlots[DataManager.usualSlot].symbol`,
-  and nothing else (rule `70-privacy`). `usualSlot` is the one name for the slot the one-tap doors
-  log; `usualServing(in:)` reads it too, so never spell the index here
+- It draws no figure — its title and Home's middle glyph, `snapshot.servingGlyph`, and nothing else
+  (rule `70-privacy`). `usualSlot` is the one name for the slot the one-tap doors log; the snapshot and
+  `usualServing(in:)` read it, so never spell the index here
 - Its title is resolved in the extension's process from `snapshot.language.bundle` and handed to
   `Text` as a finished `String`, so it is in the app's language whichever process draws it
 - Its gallery strings are `AddWaterIntent`'s own title and description, as static literals
@@ -208,7 +212,7 @@ target the file joins.
   and draws `entry.snapshot.week(endingOn: entry.date, calendar: .waterBuddyDay)`, so the midnight
   entry shifts its week from the same snapshot that zeroes the total
 - It keeps the Home Screen widget's `.contentMarginsDisabled()`, card, backdrop and aurora, and
-  injects `entry.snapshot.language.bundle` and `.locale` at its root
+  injects `entry.snapshot.language.bundle`, `.locale` and `entry.snapshot.theme` at its root
 - It carries no button. A tap opens History through `.widgetURL(WidgetLink.history)`, the one
   spelling of the link, which the app reads too
 - When the snapshot's week is `nil` it says so — *Open WaterBuddy to see your week* — and never

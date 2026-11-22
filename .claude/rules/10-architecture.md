@@ -18,7 +18,7 @@ globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch
     ┌─────┴─────────────────┐                                        │
     ▼                       ▼                                        │
 SwiftData                UserDefaults suite  ◄───────────────────────┘
-WaterBuddy.store         14 keys, derived cache
+WaterBuddy.store         16 keys, derived cache
 source of truth          read by the app AND the widget
 app only
 ```
@@ -33,7 +33,7 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
 `Key.reviewRequestedVersion`, the version the app last asked for a rating in, brings it to 10;
 `Key.weekTotals`, the last seven days' totals the week widget draws, brings it to 11.
 `Key.healthEnabled`, the Apple Health switch, brings it to 12. `Key.reminderSchedule` and
-`Key.onlyWhenBehind`, set B's, bring it to 14.
+`Key.onlyWhenBehind`, set B's, bring it to 14. `Key.theme` and `Key.vessels`, set C's, bring it to 16.
 
 ## The rulings
 - **One writer per store — the one honest weakening.** `DataManager` remains the only writer to
@@ -77,6 +77,17 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
   WaterBuddy already wrote; `HealthMirror`, app-only and the one file importing HealthKit, carries it out
   through one `ReconcileQueue`. It reads back only WaterBuddy's own samples, and no figure comes from Health
   (rule `70-privacy`)
+- **A theme is a stored choice and a palette value.** `AppTheme` is stored like the language —
+  `Key.theme`, written by the app, read by the widget's snapshot and by the watch through the mirror —
+  and injected at every root that draws the aurora. Views draw the environment's `aurora`; every value
+  measured on a theme's renders is a function of the theme (rule `60-design-system`)
+- **The vessel library is one value, and `Key.servings` stays the doors' read.** `Key.vessels` holds
+  Home's three and up to nine more; every change writes it, then `Key.servings` from Home's three, so
+  the widget, Siri, the control, the reminder and the watch read the amounts they read before. Only the
+  control's and the reminder's glyph follow the library — through the snapshot and the app (rule
+  `20-state`)
+- **The app icon is iOS's.** `AppIconSwitcher`, app-only, asks iOS to change it and reads it back; the
+  app stores nothing about it (rule `70-privacy`)
 
 ## Import direction
 - The widget may import from the six shared files. **Nothing shared may import from the widget or
@@ -111,3 +122,4 @@ membership* section.
 - `import StoreKit` outside `HomeView.swift` and `PremiumStore.swift`
 - `import FoundationModels` outside `InsightWriter.swift`, and any model but `SystemLanguageModel.default`
 - `import HealthKit` outside `HealthMirror.swift`, and any read of a type or a source but WaterBuddy's own Water
+- `UIApplication.setAlternateIconName` or `alternateIconName` outside `AppIconSwitcher`

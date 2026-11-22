@@ -42,6 +42,13 @@ it is the only thing the widget can read.
   read through `ReminderPlan.Schedule(stored:)` and discarded whole on any anomaly, as `servings` is.
   Only the app writes either; every process that builds a `DataManager` reads both, so a widget tap
   files the schedule the app set (spec `2026-10-30-coaching-design.md` D7)
+- Set C's two keys carry meaning in their absence as well (spec `2026-11-22-set-c-design.md` D9, D11).
+  `Key.theme` absent is Aurora: it holds `AppTheme`'s code, choosing Aurora removes it, and an unknown
+  code reads as Aurora. `Key.vessels` absent means no library was ever made, so Home's three are Cup,
+  Glass and Bottle at `Key.servings`' amounts: it holds the library as JSON `{home, more}`, validated
+  on the way out and discarded whole on any anomaly. Only the app writes either, `Key.vessels` always
+  before `Key.servings`. Every `DataManager` reads both; the widget's snapshot reads the theme and, of
+  the library, Home's middle glyph alone; the watch reads both secondhand, through the mirror
 - Validate on the way out, not just on the way in: read the goal with `object(forKey:) as? Int` (not
   `integer(forKey:)`, which reads a missing key as 0), clamp `currentWater` to
   `0...maximumDailyIntake`, and fall back to `.system` for an unrecognised language code
@@ -62,7 +69,8 @@ somebody answers all four for it — a grep for `!Self.isAppExtension` in the tr
   the goal in `init` (so a widget reading the plist directly never sees a missing key as goal 0 —
   a non-owner doing it plants a key the migration then reads as "already migrated") and the
   fresh-install day stamp in `resetIfNeeded()` (when `Key.lastActiveDay` is absent only the app may
-  adopt today, and the function returns `false` rather than reporting a rollover)
+  adopt today, and the function returns `false` rather than reporting a rollover) — and, since set C,
+  the launch's heal of `Key.servings` from a library whose Home amounts differ (rule `20-state`)
 - **`role.mayHaveLegacyStandardDefaults`** — *has my `.standard` ever held WaterBuddy state?* Gates
   `seedFromCachedTotalIfNeeded()` (keep all three guards — the role check, no rows today, and the
   cached total stamped *today*; dropping the second doubles the user's water on next launch,
@@ -137,6 +145,12 @@ case: it lives in the phone's container and the watch never reads or writes it. 
 namespaced under the shared `"sardor.WaterBuddy."` prefix and listed in `Key.all`, because the
 App Group identifier string, and therefore the key-collision hazard the prefix defends against, is
 identical on both devices even though the physical containers are not.
+
+Since set C the mirror also carries the theme's code, `themeCode`, and Home's three vessels, `vessels`
+— each a glyph code and the user's name, or none for a standard vessel, which the watch names from its
+own catalogue. Both fields are optional, so a mirror from before them still decodes and `schemaVersion`
+stays 1; an older watch app ignores them (spec `2026-11-22-set-c-design.md` D18). The watch's suite
+gains no key: `Key.wristMirror` holds them with the rest.
 
 ## Target membership
 - Any Swift file more than one target needs is listed in a

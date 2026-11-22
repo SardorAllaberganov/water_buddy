@@ -116,14 +116,16 @@ system.
   literal at a call site, and never built from `identifierPrefix`, which names requests — and
   `reminderContent(in:)` sets the category, so a reminder the widget extension files carries the
   button too
-- The category is built by `NotificationManager.reminderCategory(in:)`, whose bundle is never
-  defaulted, and registered **only by the app**: `DataManager.requestReminderReschedule` registers it
-  through the scheduler's `setCategories`, inside its queued operation, in the bundle it files the
-  copy in, before the reconcile. Never from `reconcile` itself, which the extension runs —
+- The category is built by `NotificationManager.reminderCategory(in:glyph:)`, whose bundle and glyph
+  are never defaulted, and registered **only by the app**: `DataManager.requestReminderReschedule`
+  registers it through the scheduler's `setCategories`, inside its queued operation, in the bundle it
+  files the copy in and with Home's middle glyph, before the reconcile. Never from `reconcile` itself, which the extension runs —
   `setNotificationCategories` replaces every category the app has
 - The action's options are empty: not `.foreground`, because the press logs without opening the app;
-  not `.authenticationRequired` (rule `70-privacy`); not `.destructive`. Its icon is the Glass's glyph,
-  `vesselSlots[DataManager.usualSlot].symbol`
+  not `.authenticationRequired` (rule `70-privacy`); not `.destructive`. Its icon is Home's middle
+  glyph — the library's `home[DataManager.usualSlot]`, `vesselSlots`' Glass until a library puts another
+  vessel there. Its title stays *Log a Glass*: the Glass is the middle slot's role, and a notification
+  carries no name the user typed (spec `2026-11-22-set-c-design.md` D3)
 - The press is answered by `ReminderResponder`, the app's notification delegate, installed in
   `WaterBuddyApp.init()` and held by its `static let shared` — the centre holds its delegate weakly.
   It logs only for `logTheGlassActionIdentifier`; a tap on the reminder opens the app as it always
@@ -144,7 +146,8 @@ system.
 - Every state change that can move the plan calls `rescheduleRemindersNow()`: the `currentWater`
   path via `recomputeToday()`, the `dailyGoal` setter, the `remindersEnabled` setter, the
   `reminderSchedule` and `onlyWhenBehind` setters, the `language` setter — which moves no slot, but
-  every pending reminder's wording —, `applyDailyReset(on:)` and `refresh()`. A new mutation path
+  every pending reminder's wording —, a library change that moves Home's middle glyph — which moves no
+  slot, but the button's icon —, `applyDailyReset(on:)` and `refresh()`. A new mutation path
   without that call is incomplete
 - Never guard the reschedule on `remindersEnabled` — always call through and let `slots` return `[]`.
   **An empty plan is the instruction to clear the schedule**

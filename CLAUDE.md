@@ -66,7 +66,7 @@ design:**
 | Store | Holds | Read by |
 |---|---|---|
 | SwiftData — `WaterBuddy.store` | every `WaterLog` (`id`, `amount`, `timestamp`) — the **source of truth** | the app — and, to log a serving only, the extension's `AddWaterIntent` through `DataManager.shared` (which recomputes today and the week from the rows in the same pass); never the widget's draw path |
-| `UserDefaults` — fourteen keys | today's total, the goal, the day ordinal, five flags (the fourth the Apple Health switch, since 2026-10-30; the fifth *Only when behind*, set B's), the reminder schedule (set B's), the chosen language, the three quick-add amounts, the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
+| `UserDefaults` — sixteen keys | today's total, the goal, the day ordinal, five flags (the fourth the Apple Health switch, since 2026-10-30; the fifth *Only when behind*, set B's), the reminder schedule (set B's), the chosen language, the chosen theme (set C's), the three quick-add amounts, the vessel library (set C's), the phone's applied-pours ledger, the version the app last asked for a rating in, the last seven days' totals — a **derived cache** | the app *and* the widget |
 
 **Today's total is not stored as an authored value.** It is the sum of today's logs, recomputed
 after every mutation and written through to the cache. **The widget's draw path never opens
@@ -294,7 +294,8 @@ something to record.
   of the middle vessel, which the widget's snapshot reads too
   (`docs/superpowers/specs/2026-10-07-siri-phrase-design.md`). **The Control Center control is a
   fourth:** `LogWaterControl` runs `AddWaterIntent(amount: snapshot.serving)` from the same snapshot,
-  draws the glyph at `DataManager.usualSlot` — the one name for that vessel's index — and is kept
+  draws the glyph of the vessel at `DataManager.usualSlot` — the one name for that vessel's index;
+  since set C the snapshot's `servingGlyph`, Home's middle vessel's — and is kept
   current by `requestWidgetReload()`'s `reloadAllControls()`
   (`docs/superpowers/specs/2026-10-08-control-center-design.md`). **A reminder's *Log a Glass* is a
   fifth:** pressed on the notification, it runs `LogServingIntent.logTheGlassInTheBackground()` in
@@ -339,9 +340,10 @@ something to record.
 - **Only the app writes on behalf of the group.** Materialising the goal, stamping the day on a
   fresh install, the one-shot migration, the seed from a cached total, drawing the history, the
   streak, History's shown month, its week's insights and a finished month's recap, and filing reminders
-  are all guarded by `DataManager.role` — ten sites, the seventh the redesign's stage 2's, the eighth
+  are all guarded by `DataManager.role` — eleven sites, the seventh the redesign's stage 2's, the eighth
   set A's step 2's (`republishMonth()`), the ninth set A's step 4's (`republishInsights()`), the tenth
-  set A's step 5's (`recap(of:)`, a read that publishes nothing) — a four-state
+  set A's step 5's (`recap(of:)`, a read that publishes nothing), the eleventh set C's heal of
+  `Key.servings` from the library at launch — a four-state
   `nonisolated static let` (`.phoneApp`, `.phoneExtension`, `.watchApp`, `.watchExtension`) that
   replaced the two-state `isAppExtension` at every guard site on 2026-08-31. A grep for
   `!Self.isAppExtension` now returns zero. An extension that stamped an empty group would
@@ -412,6 +414,15 @@ something to record.
   `.lands` puts its parts in place whole. Home's water rises only on the page the app opens on, after its vessel has stood
   (`HomeView.openingLevel`, `waterWait`); a tab turn and a return come whole. The rim stays Premium's; the rest reaches free screens too
   (`docs/superpowers/specs/2026-11-01-premium-look-design.md`; rule `60-design-system`, committed in `aa2f7ce`)
+- **Set C: a theme is a stored choice and a measured palette; the vessels are one library** (roadmap 1.4.5,
+  1.4.8; spec `2026-11-22-set-c-design.md`, designed, not built). `AppTheme` is stored like the language —
+  `Key.theme`, absent for Aurora — read by the widget's snapshot and sent to the watch; every root that draws
+  the aurora injects it, and views draw the environment's `aurora`. Each theme is five colours and the values
+  measured on its renders; water keeps `Aurora.classic` in every theme. `Key.vessels` holds Home's three and up
+  to nine more, the standard three never deleted; every change writes it, then `Key.servings`, so every one-tap
+  door reads what it read before and logs the middle slot, whatever stands there. The app icon is iOS's, set
+  through `AppIconSwitcher`. A lapse keeps what was chosen and locks choosing again; Aurora, the standard icon
+  and the standard vessels stay free
 - **Import direction**: the widget may import from the shared six; nothing shared may import
   from the widget or from `HomeView`
 
