@@ -6177,3 +6177,46 @@ the 23rd the owner had the main session bring the design into `main`.
 To bring a worktree's uncommitted work into `main` without committing on its branch: `git diff --binary` for its changed files
 and `git diff --no-index --binary /dev/null <file>` for each new one, `git apply --check`, then `git apply` on `main`. Compare
 every file's blob with the worktree's, stage them, and only then remove the worktree (`git worktree remove --force`).
+
+## 2026-11-23 — Translate a store page from its version's final English
+
+**What happened.** The owner asked for a Spanish (Mexico) page for Glazzy as well as for WaterBuddy. Glazzy's first translation
+was made from 1.1's English, the text its repo held, while the Glazzy session was still finishing 1.2's English; that English was
+final at about 21:45. The table shown to the owner had to be redone from 1.2's English and asked for again before anything was
+saved.
+
+**The rule:** before translating a store page, read the target version's English in App Store Connect, or in the file the release
+names as its master once it matches Connect, and note when you read it. If another session is still changing that English, wait
+for its word that it is final. WaterBuddy's Spanish page is the next case: set C's English page is written at its release, and the
+Spanish description follows it then (`AppStore/README.md` §6).
+
+## 2026-11-23 — zsh does not split an unquoted variable
+
+**What happened.** The five Spanish field files were compared with the approved drafts in a zsh loop that split each pair with
+`set -- $pair`. zsh keeps an unquoted `$pair` as one word, so `$1` held the whole pair and `$2` nothing, and every pair printed
+*DIFFERS* with empty names. With a function taking the two paths as separate arguments, all five were equal.
+
+**The rule:** in zsh, the shell here, an unquoted `$var` is one word: split it with `${=var}`, or pass the values as separate
+arguments. A check that prints an empty name or path has failed itself and proves nothing either way; fix it before reading its
+verdict.
+
+## 2026-11-24 — In a Connect price menu, pick by element, inside the open menu, and read the row back
+
+**What happened.** Setting yearly prices store by store in App Store Connect's price-change dialog, a click by screen position
+on Albania's menu landed on an option the list had just loaded under the pointer, and set $0.99 in place of $14.99. The row
+showed it, and it was put right before *Confirm*. A page script that searched each menu then picked the first button reading
+"$13.49", which was Albania's own row button and not the menu's option, so it did nothing. A script that ran six stores in one
+call outlived the browser tool's 45-second limit, though the page finished all six.
+
+**The rule:** open the menu, search it, and pick the option from inside the open menu (a button outside the table's rows), never
+by screen position. Read the row back after every pick, and compare the confirmation screen with the proposal row for row before
+*Confirm*. Keep a script call under 45 seconds: five stores a call.
+
+## 2026-11-24 — Connect's comparable prices don't keep the ratio between two plans
+
+**What happened.** From US prices of $2.99 a month and $19.99 a year, a 44 % saving, Connect's comparable prices gave 42 of the 69
+high-income stores a yearly saving outside 43–45 %: the euro stores €2.99 and €22.99, 36 %; Japan ¥500 and ¥3,000, 50 %. The new
+tiers did the same in 46 of 106 stores. Each plan is rounded to its own local price point, tax included, so the two drift apart.
+
+**The rule:** after a price change on one plan, compute every store's saving from the two plans' local prices and fix the ones
+outside the range the paywall promises before the change starts. `AppStore/prices-by-country.md` holds the method and the result.
