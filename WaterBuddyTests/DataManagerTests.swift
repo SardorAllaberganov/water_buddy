@@ -134,6 +134,7 @@ struct DataManagerTests {
             // anywhere near the real group (rule `85-testing`).
             manager.saveDailyGoal(ml: 2_500)          // dailyGoal, isGoalSet
             manager.servings = [200, 300, 600]        // servings
+            _ = manager.addVessel(glyph: .flask, name: "Office", amount: 400)   // vessels
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
             manager.healthEnabled = true              // healthEnabled
@@ -172,6 +173,7 @@ struct DataManagerTests {
                 live.contains(DataManager.Key.reviewRequestedVersion),
                 "the claim wrote nothing, so the roster's check never saw its key"
             )
+            #expect(live.contains(DataManager.Key.vessels), "the library wrote nothing, so the roster's check never saw its key")
         }
     }
 

@@ -433,7 +433,7 @@ struct WaterSnapshotTests {
             let snapshot = DataManager.snapshot(defaults: defaults, calendar: utcDay, now: utc(2026, 8, 28))
 
             #expect(snapshot.serving == 330)
-            #expect(snapshot.serving == HomeView.servings(amounts: [200, 330, 750])[1].amount,
+            #expect(snapshot.serving == HomeView.servings(library: .standard(amounts: [200, 330, 750]))[1].amount,
                     "one value, read by both front doors")
         }
     }
@@ -441,6 +441,31 @@ struct WaterSnapshotTests {
     @Test func theDefaultServingIsStillTheMiddleOfTheDefaultTriple() {
         #expect(DataManager.defaultServing == 250)
         #expect(DataManager.defaultServings[1] == DataManager.defaultServing)
+    }
+
+    /// D19: the control draws the glyph of what it logs — Home's middle vessel's, whatever stands there.
+    @Test func theSnapshotCarriesTheMiddleVesselsGlyph() throws {
+        try withTempDefaults { defaults in
+            #expect(DataManager.snapshot(defaults: defaults).servingGlyph == "mug.fill", "no library: the Glass")
+            let library = try #require(VesselLibrary.standard(amounts: [150, 250, 500])
+                .adding(glyph: .flask, name: "Office", amount: 400, id: "o")?
+                .puttingOnHome(id: "o", slot: DataManager.usualSlot))
+            defaults.set(try JSONEncoder().encode(library), forKey: DataManager.Key.vessels)
+            #expect(DataManager.snapshot(defaults: defaults).servingGlyph == "flask.fill")
+            #expect(DataManager.usualGlyph(in: defaults) == "flask.fill", "one definition for the control and the button")
+        }
+    }
+
+    /// A read with a library present writes nothing either (rule `40-widget`).
+    @Test func readingALibraryLeavesTheStoreUntouched() throws {
+        try withTempDefaults { defaults in
+            let library = try #require(VesselLibrary.standard(amounts: [150, 250, 500])
+                .adding(glyph: .drop, name: "Sip", amount: 100, id: "s"))
+            defaults.set(try JSONEncoder().encode(library), forKey: DataManager.Key.vessels)
+            let before = waterBuddyKeys(in: defaults)
+            _ = DataManager.snapshot(defaults: defaults)
+            #expect(waterBuddyKeys(in: defaults) == before)
+        }
     }
 }
 

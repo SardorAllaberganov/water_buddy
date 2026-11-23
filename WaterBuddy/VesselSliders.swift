@@ -24,9 +24,17 @@ struct VesselSliders: View {
     /// Cup, Glass, Bottle — positional and exactly three (``DataManager/servings``).
     @Binding var amounts: [Int]
 
+    /// Home's three, whose names and glyphs the rows wear; `nil` for the standard three — the welcome's.
+    var vessels: [Vessel]? = nil
+
     /// Told `true` as a finger lands on a slider and `false` as it lifts. Settings saves on the
     /// lift; the welcome does not listen.
     var onDrag: (Bool) -> Void = { _ in }
+
+    /// The menu a vessel's amount is chosen from — the screen's offer, not the store's clamp (rule `50-views`):
+    /// 50 ml to two litres, a library being where a 1.2-litre bottle lives (D12).
+    nonisolated static let range: ClosedRange<Int> = 50...2_000
+    nonisolated static let step = 50
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
@@ -44,16 +52,21 @@ struct VesselSliders: View {
     @ScaledMetric(relativeTo: .body) private var glyphBox: CGFloat = 26
 
     var body: some View {
+        // The rows wear the vessels the caller hands over, or the standard three at these amounts. Only the
+        // slots both hold are drawn, so a short array draws a shorter card rather than trapping.
+        let faces = vessels ?? VesselLibrary.standard(amounts: amounts).home
         VStack(alignment: .leading, spacing: 20) {
-            ForEach(Array(vesselSlots.enumerated()), id: \.element.nameKey) { index, slot in
-                vessel(at: index, slot: slot)
+            ForEach(faces.indices.filter(amounts.indices.contains), id: \.self) { slot in
+                vessel(at: slot, in: faces)
             }
         }
         .sensoryFeedback(Haptics.select, trigger: steps)
     }
 
-    private func vessel(at index: Int, slot: (nameKey: String, symbol: String)) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+    private func vessel(at index: Int, in faces: [Vessel]) -> some View {
+        let name = faces[index].name(in: strings)
+        let symbol = faces[index].glyph.symbol
+        return VStack(alignment: .leading, spacing: 10) {
             // Side by side while they fit. At the accessibility text sizes on a small phone the
             // amount was cut to "150…" beside its name; there it drops under the name instead
             // (rule `65-accessibility`, *Dynamic Type*).
@@ -65,17 +78,17 @@ struct VesselSliders: View {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) {
                     ZStack(alignment: .leading) {
-                        ForEach(vesselSlots, id: \.nameKey) { label(for: $0).hidden() }
-                        label(for: slot)
+                        ForEach(faces.indices, id: \.self) { label(name: faces[$0].name(in: strings), symbol: faces[$0].glyph.symbol).hidden() }
+                        label(name: name, symbol: symbol)
                     }
                     Spacer(minLength: 8)
                     ZStack(alignment: .trailing) {
-                        amountText(HistoryView.servingRange.upperBound).hidden()
+                        amountText(Self.range.upperBound).hidden()
                         amount(at: index, anchor: .trailing)
                     }
                 }
                 VStack(alignment: .leading, spacing: 4) {
-                    label(for: slot)
+                    label(name: name, symbol: symbol)
                     amount(at: index, anchor: .leading)
                 }
             }
@@ -89,8 +102,8 @@ struct VesselSliders: View {
 
             Slider(
                 value: binding(for: index),
-                in: Double(HistoryView.servingRange.lowerBound)...Double(HistoryView.servingRange.upperBound),
-                step: Double(HistoryView.servingStep),
+                in: Double(Self.range.lowerBound)...Double(Self.range.upperBound),
+                step: Double(Self.step),
                 onEditingChanged: { editing in
                     held = editing ? index : nil
                     onDrag(editing)
@@ -99,20 +112,20 @@ struct VesselSliders: View {
             .tint(Aurora.cyan)
             // A `Slider`'s stock VoiceOver value is a percentage of its range, which would announce
             // "22%" for a 250 ml glass — a number that appears nowhere in the product.
-            // Resolved through the chosen bundle rather than written as `Text(slot.nameKey,
-            // bundle:)`: that initialiser takes a `LocalizedStringKey`, which must be a literal,
-            // and a runtime key silently becomes the *fallback text* instead of a lookup.
-            .accessibilityLabel(strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
+            // The name already resolved through the chosen bundle (`Vessel.name(in:)`), or typed by
+            // the user: a `String`, read verbatim, never a `LocalizedStringKey`, which must be a
+            // literal and would silently turn a runtime key into the *fallback text*.
+            .accessibilityLabel(name)
             .accessibilityValue(strings.localized("%1$d millilitres", amounts[index], locale: locale))
         }
     }
 
     /// A vessel's glyph and name.
-    private func label(for slot: (nameKey: String, symbol: String)) -> some View {
+    private func label(name: String, symbol: String) -> some View {
         let box = min(glyphBox, 40)
 
         return HStack(spacing: 12) {
-            Image(systemName: slot.symbol)
+            Image(systemName: symbol)
                 .font(.system(size: box * 0.8))
                 // Against its 3:1 floor the Cup's, beside the card's sheen, is the tightest:
                 // 3.08 / 4.02 / 3.09:1 on iOS 27.0 / 26.5 / 18.6 (`docs/DESIGN.md`, *Settings,
@@ -125,7 +138,7 @@ struct VesselSliders: View {
                 // second stop saying the same thing.
                 .accessibilityHidden(true)
 
-            Text(verbatim: strings.localizedString(forKey: slot.nameKey, value: slot.nameKey, table: nil))
+            Text(verbatim: name)
                 .font(.body.weight(.medium))
         }
     }

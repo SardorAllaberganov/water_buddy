@@ -142,6 +142,12 @@ final class DataManager {
         /// per-key fallback could resolve a triple nobody wrote — Cup stored at 500 beside a Glass
         /// that fell back to 250.
         static let servings = prefix + "servings"
+        /// Set C's vessel library, a JSON-encoded `VesselLibrary` — Home's three and up to nine more. **Absent means
+        /// no library was ever made**: Home's three are the standard ones at ``servings``' amounts, so nothing
+        /// materialises it. Written by the app alone, always **before** ``servings``; read by every `DataManager`
+        /// and, for Home's middle glyph, by the widget's snapshot (spec `2026-11-22-set-c-design.md` D11).
+        /// `nonisolated`: `DataManager/resolveVessels(in:)`, on the widget's read path, names it.
+        nonisolated static let vessels = prefix + "vessels"
         /// The app's version — its `CFBundleShortVersionString`, e.g. `"1.2"` — the last time it
         /// asked iOS for a rating. **Absent means never asked**, so nothing materialises it, like
         /// ``remindersEnabled`` and ``language``. Written only by
@@ -192,7 +198,7 @@ final class DataManager {
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
             didMigrateFromStandard, remindersEnabled, healthEnabled, reminderSchedule, onlyWhenBehind,
-            language, servings, reviewRequestedVersion,
+            language, servings, vessels, reviewRequestedVersion,
             weekTotals, wristOutbox, wristMirror, wristApplied,
         ]
     }
@@ -256,6 +262,7 @@ final class DataManager {
     @ObservationIgnored private var storedOnlyWhenBehind: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
     @ObservationIgnored private var storedServings: [Int]
+    @ObservationIgnored private var storedVessels: VesselLibrary?
 
     /// Millilitres logged so far today. Clamped to `0...maximumDailyIntake`.
     ///
@@ -339,6 +346,8 @@ final class DataManager {
     /// The setter rings ``reloadWidgets()`` and does **not** reschedule reminders: `ReminderPlan`
     /// takes no serving, so the plan cannot move. The doorbell is not optional — the amount is
     /// baked into the widget's archive when it renders, so nothing else would refresh its face.
+    ///
+    /// Since set C, while a library exists the setter writes Home's three amounts into it first (rule `20-state`).
     var servings: [Int] {
         get {
             access(keyPath: \.servings)
@@ -348,12 +357,90 @@ final class DataManager {
             guard newValue.count == Self.defaultServings.count else { return }
             let clamped = newValue.map { $0.clamped(to: 1...Self.maximumDailyIntake) }
             guard clamped != storedServings else { return }
+            // With a library, Home's vessels carry the amounts: it is written first, as every library change
+            // writes it (D11), and `Key.servings` after.
+            if let library = storedVessels, let next = library.withHomeAmounts(clamped),
+               let data = try? JSONEncoder().encode(next) {
+                withMutation(keyPath: \.vessels) {
+                    storedVessels = next
+                    defaults.set(data, forKey: Key.vessels)
+                }
+            }
             withMutation(keyPath: \.servings) {
                 storedServings = clamped
                 defaults.set(clamped, forKey: Key.servings)
             }
             reloadWidgets()
             publishWrist(defaults)
+        }
+    }
+
+    /// Home's three and the rest: the stored library, or — when none was ever made — the standard three at
+    /// ``servings``' amounts. **Get-only**, a consequence like ``todaysLogs`` (rule `20-state`): change it through
+    /// the five methods below. Reads ``servings`` too, so a view drawing the standard three redraws on an edit.
+    var vessels: VesselLibrary {
+        access(keyPath: \.vessels)
+        access(keyPath: \.servings)
+        return storedVessels ?? .standard(amounts: storedServings)
+    }
+
+    /// Adds a vessel of the user's own to *More vessels*; its id, or `nil` if refused — a tenth, or a name that
+    /// cannot be one. The amount is clamped on the way in, as every vessel's is.
+    @discardableResult
+    func addVessel(glyph: VesselGlyph, name: String, amount: Int) -> String? {
+        let id = UUID().uuidString
+        guard let next = vessels.adding(glyph: glyph, name: name, amount: amount.clamped(to: 1...Self.maximumDailyIntake), id: id)
+        else { return nil }
+        apply(next)
+        return id
+    }
+
+    /// Changes a vessel in place — for a standard one, its amount alone.
+    func updateVessel(id: String, glyph: VesselGlyph, name: String?, amount: Int) {
+        guard let next = vessels.updating(id: id, glyph: glyph, name: name, amount: amount.clamped(to: 1...Self.maximumDailyIntake))
+        else { return }
+        apply(next)
+    }
+
+    /// Deletes one of the user's vessels from *More vessels*. A standard vessel, or one on Home, stays.
+    func deleteVessel(id: String) {
+        guard let next = vessels.deleting(id: id) else { return }
+        apply(next)
+    }
+
+    /// Puts `id` in Home's `slot`, trading places with the vessel there (D3: any vessel, the middle included).
+    func putOnHome(id: String, slot: Int) {
+        guard let next = vessels.puttingOnHome(id: id, slot: slot) else { return }
+        apply(next)
+    }
+
+    /// Cup, Glass and Bottle back in their own places, every vessel kept — free for everyone (D5).
+    func useStandardVessels() {
+        apply(vessels.standardOnHome())
+    }
+
+    /// One library change. **The library first, then `Key.servings`** (D11): a crash between them leaves a stale
+    /// `Key.servings` the app's next launch heals, never a vessel wearing another's amount. Then the widget
+    /// doorbell and the wrist, once — and the reminders only when Home's middle glyph moved, so the app registers
+    /// the reminder's button with its new icon (rule `80-notifications`). A change that changes nothing writes
+    /// nothing, so a library that was never made is not made by one.
+    private func apply(_ next: VesselLibrary) {
+        let current = vessels
+        guard next.isValid, next != current, let data = try? JSONEncoder().encode(next) else { return }
+        withMutation(keyPath: \.vessels) {
+            storedVessels = next
+            defaults.set(data, forKey: Key.vessels)
+        }
+        if next.amounts != storedServings {
+            withMutation(keyPath: \.servings) {
+                storedServings = next.amounts
+                defaults.set(next.amounts, forKey: Key.servings)
+            }
+        }
+        reloadWidgets()
+        publishWrist(defaults)
+        if next.home[Self.usualSlot].glyph != current.home[Self.usualSlot].glyph {
+            rescheduleRemindersNow()
         }
     }
 
@@ -738,6 +825,12 @@ final class DataManager {
         storedOnlyWhenBehind = defaults.bool(forKey: Key.onlyWhenBehind)
         storedLanguage = Self.resolveLanguage(in: defaults)
         storedServings = Self.resolveServings(in: defaults)
+        storedVessels = Self.resolveVessels(in: defaults)
+        // A crash between a library change's two writes is healed here, by the app alone (§3.6).
+        if let healed = Self.healedServings(library: storedVessels, servings: storedServings, role: Self.role) {
+            storedServings = healed
+            defaults.set(healed, forKey: Key.servings)
+        }
         storedDailyGoal = Self.resolveDailyGoal(in: defaults)
         storedIsGoalSet = Self.resolveIsGoalSet(in: defaults, goal: storedDailyGoal)
         storedCurrentWater = defaults.integer(forKey: Key.currentWater).clamped(to: 0...Self.maximumDailyIntake)
@@ -1901,7 +1994,7 @@ final class DataManager {
             // The button, registered before the reminders that name it — here and only here: the
             // call replaces every category the app has, and the widget extension, which reconciles
             // too, must never make it (rule `80-notifications`).
-            scheduler.setCategories([NotificationManager.reminderCategory(in: strings)])
+            scheduler.setCategories([NotificationManager.reminderCategory(in: strings, glyph: usualGlyph(in: sharedDefaults))])
             await NotificationManager.reconcile(slots, calendar: calendar, strings: strings, using: scheduler)
         }
         #endif
@@ -1946,6 +2039,13 @@ final class DataManager {
         let vessels = Self.resolveServings(in: defaults)
         if vessels != storedServings {
             withMutation(keyPath: \.servings) { storedServings = vessels }
+        }
+
+        // Re-read for `servings`' reason: the library is Home's names and glyphs, and another process may have
+        // changed it. Compared first, so a foreground that changed nothing redraws nothing.
+        let library = Self.resolveVessels(in: defaults)
+        if library != storedVessels {
+            withMutation(keyPath: \.vessels) { storedVessels = library }
         }
 
         let language = Self.resolveLanguage(in: defaults)
@@ -2026,6 +2126,34 @@ final class DataManager {
         return stored
     }
 
+    /// The stored library, or `nil` — for absence, and for anything ``VesselLibrary/isValid`` refuses, which is
+    /// discarded whole and never repaired (rule `20-state`). The stored value is left as it is: only the next
+    /// library change rewrites it. `nonisolated static`, as ``resolveServings(in:)`` is, for the widget.
+    nonisolated static func resolveVessels(in defaults: UserDefaults) -> VesselLibrary? {
+        guard let data = defaults.data(forKey: Key.vessels) else { return nil }
+        guard let library = try? JSONDecoder().decode(VesselLibrary.self, from: data), library.isValid else {
+            #if DEBUG
+            print("WaterBuddy: the stored vessel library could not be read; Home shows the standard three.")
+            #endif
+            return nil
+        }
+        return library
+    }
+
+    /// The servings a launch writes, or `nil` when they already agree with the library's Home.
+    ///
+    /// Every library change writes the library first and `Key.servings` after it, so only a crash between the two
+    /// leaves them apart — and the library is the one to trust. **The app's role alone heals**: an extension
+    /// never writes on behalf of the group (rule `25-shared-storage`), and until the app runs a widget tap logs
+    /// what `Key.servings` holds. The role is a parameter so `VesselStoreTests` can ask every role's question.
+    ///
+    /// Not `nonisolated`, unlike ``resolveVessels(in:)``: `Role`'s answers are main-actor, as every reader of them
+    /// is, and only the app's launch asks this question.
+    static func healedServings(library: VesselLibrary?, servings: [Int], role: Role) -> [Int]? {
+        guard role.ownsSharedStorage, let library, library.amounts != servings else { return nil }
+        return library.amounts
+    }
+
     /// Set B's schedule as stored, or the standard one — for absence, and for anything
     /// ``ReminderPlan/Schedule/init(stored:)`` refuses, which is discarded whole, never repaired
     /// (``resolveServings(in:)``'s rule). `nonisolated static`, as that is.
@@ -2051,6 +2179,14 @@ final class DataManager {
     /// carries no isolation and reaches it through `snapshot`.
     nonisolated static func usualServing(in defaults: UserDefaults) -> Int {
         resolveServings(in: defaults)[usualSlot]
+    }
+
+    /// The glyph every one-tap door draws for what it logs: Home's middle vessel's, from the library, or the
+    /// Glass's while none was made. **One definition**, as ``usualServing(in:)`` is for the amount — the snapshot
+    /// hands it to the Control Center control, and the app hands it to the reminder's button (D19).
+    /// `nonisolated static`, for the widget's read path.
+    nonisolated static func usualGlyph(in defaults: UserDefaults) -> String {
+        resolveVessels(in: defaults)?.home[usualSlot].glyph.symbol ?? vesselSlots[usualSlot].symbol
     }
 
     /// Which of the three vessels the one-tap doors log: the middle one, the Glass.
@@ -2401,7 +2537,9 @@ final class DataManager {
             composedAt: now,
             phoneDayStart: calendar.startOfDay(for: now),
             phoneDayEnd: nextDayBoundary(after: now, calendar: calendar),
-            acked: acked
+            acked: acked,
+            // Home's three, once a library exists: the watch draws what the phone's row draws (D18).
+            vessels: resolveVessels(in: defaults)?.home.map { WristMirror.Vessel(glyph: $0.glyph.rawValue, name: $0.name) }
         )
     }
 
@@ -2561,6 +2699,175 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
         case .uzbek: "O‘zbekcha"
         }
     }
+}
+
+// MARK: - The vessel library
+
+/// One vessel the user can pour from — one of the standard three, or one of their own (spec
+/// `2026-11-22-set-c-design.md` §3.6).
+///
+/// **The standard three keep their glyph and their translated name**, and are never deleted: `name` is `nil` for
+/// them and their id is one of ``standardIDs``. A user's vessel has a UUID's string for an id and the name they
+/// typed. `nonisolated`, because the widget's snapshot and the mirror composer read it (rule `43-concurrency`).
+nonisolated struct Vessel: Codable, Sendable, Equatable, Identifiable {
+    let id: String
+    let glyph: VesselGlyph
+    /// `nil` for a standard vessel, whose name is translated; the user's own words otherwise.
+    let name: String?
+    let amount: Int
+
+    /// The standard three's ids, in their own places: Cup, Glass, Bottle.
+    static let standardIDs = ["cup", "glass", "bottle"]
+
+    /// The longest name, in `Character`s (D10) — what Home's caption and the watch's label can carry on one line.
+    static let nameLimit = 20
+
+    var isStandard: Bool { Self.standardIDs.contains(id) }
+
+    /// The standard vessel of `slot` — 0 Cup, 1 Glass, 2 Bottle — wearing `amount`.
+    static func standard(_ slot: Int, amount: Int) -> Vessel {
+        Vessel(id: standardIDs[slot], glyph: VesselGlyph.standardThree[slot], name: nil, amount: amount)
+    }
+
+    /// `typed`, trimmed, if it can be a name — one to ``nameLimit`` characters, on one line — or `nil`.
+    static func validName(_ typed: String) -> String? {
+        let trimmed = typed.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard (1...nameLimit).contains(trimmed.count), !trimmed.contains(where: \.isNewline) else { return nil }
+        return trimmed
+    }
+
+    /// The name drawn: the user's own words, or the standard vessel's, translated in `bundle`.
+    func name(in bundle: Bundle) -> String {
+        if let name { return name }
+        let key = glyph.standardNameKey ?? "Glass"
+        return bundle.localizedString(forKey: key, value: key, table: nil)
+    }
+
+    /// Whether this vessel keeps every rule a stored one must: a standard one wears its own glyph and no name;
+    /// one of the user's has a valid name; every amount is in `1...maximumDailyIntake`.
+    var isWellFormed: Bool {
+        guard (1...DataManager.maximumDailyIntake).contains(amount) else { return false }
+        if let index = Self.standardIDs.firstIndex(of: id) {
+            return name == nil && glyph == VesselGlyph.standardThree[index]
+        }
+        guard let name, Self.validName(name) == name else { return false }
+        return true
+    }
+}
+
+/// Every vessel the user has: Home's three, positional, and up to nine more (spec `2026-11-22-set-c-design.md`
+/// §3.6). Stored whole under `Key.vessels`; **validated on the way out and discarded whole** on any anomaly, as
+/// the servings triple is (rule `20-state`).
+///
+/// Every change below is a pure function returning the next library, or `nil` when the change is refused — so
+/// `DataManager` can never write a library this type would refuse to read.
+nonisolated struct VesselLibrary: Codable, Sendable, Equatable {
+    /// Home's three, positional: `home[DataManager.usualSlot]` is the Glass every one-tap door logs.
+    let home: [Vessel]
+    /// The rest, at most ``moreLimit``, in the order they were added or moved.
+    let more: [Vessel]
+
+    /// Nine more beside Home's three: twelve in all (D10).
+    static let moreLimit = 9
+
+    /// A library that was never made: the standard three in their own places, wearing `amounts`.
+    static func standard(amounts: [Int]) -> VesselLibrary {
+        VesselLibrary(
+            home: (0..<3).map { Vessel.standard($0, amount: amounts.indices.contains($0) ? amounts[$0] : DataManager.defaultServings[$0]) },
+            more: []
+        )
+    }
+
+    /// Home's three amounts — what `Key.servings` holds, and every one-tap door reads.
+    var amounts: [Int] { home.map(\.amount) }
+
+    var all: [Vessel] { home + more }
+
+    func vessel(id: String) -> Vessel? { all.first { $0.id == id } }
+
+    /// Every rule a stored library keeps: exactly three on Home, at most nine more, every id once, the standard
+    /// three present, and every vessel well formed.
+    var isValid: Bool {
+        guard home.count == 3, more.count <= Self.moreLimit else { return false }
+        let ids = all.map(\.id)
+        guard Set(ids).count == ids.count, Vessel.standardIDs.allSatisfy(ids.contains) else { return false }
+        return all.allSatisfy(\.isWellFormed)
+    }
+
+    /// Whether Home holds Cup, Glass and Bottle in their own places — when *Use the standard vessels* has nothing to do.
+    var isStandardOnHome: Bool { home.map(\.id) == Vessel.standardIDs }
+
+    /// A vessel of the user's own, added to *More vessels* under `id`.
+    func adding(glyph: VesselGlyph, name typed: String, amount: Int, id: String) -> VesselLibrary? {
+        guard more.count < Self.moreLimit, let name = Vessel.validName(typed) else { return nil }
+        let next = VesselLibrary(home: home, more: more + [Vessel(id: id, glyph: glyph, name: name, amount: amount)])
+        return next.isValid ? next : nil
+    }
+
+    /// `id` changed in place. A standard vessel changes its amount alone; one of the user's, all three.
+    func updating(id: String, glyph: VesselGlyph, name typed: String?, amount: Int) -> VesselLibrary? {
+        guard let old = vessel(id: id) else { return nil }
+        let updated: Vessel
+        if old.isStandard {
+            guard glyph == old.glyph, typed == nil else { return nil }
+            updated = Vessel(id: id, glyph: glyph, name: nil, amount: amount)
+        } else {
+            guard let typed, let name = Vessel.validName(typed) else { return nil }
+            updated = Vessel(id: id, glyph: glyph, name: name, amount: amount)
+        }
+        let swap = { (vessel: Vessel) in vessel.id == id ? updated : vessel }
+        let next = VesselLibrary(home: home.map(swap), more: more.map(swap))
+        return next.isValid ? next : nil
+    }
+
+    /// One of the user's vessels, removed from *More vessels*. Never a standard vessel, never one on Home.
+    func deleting(id: String) -> VesselLibrary? {
+        guard let index = more.firstIndex(where: { $0.id == id }), !more[index].isStandard else { return nil }
+        var rest = more
+        rest.remove(at: index)
+        return VesselLibrary(home: home, more: rest)
+    }
+
+    /// `id` put in Home's `slot`. From *More vessels* it trades places with the vessel standing there; from
+    /// another slot on Home, the two slots trade.
+    func puttingOnHome(id: String, slot: Int) -> VesselLibrary? {
+        guard home.indices.contains(slot) else { return nil }
+        var home = self.home
+        var more = self.more
+        if let from = home.firstIndex(where: { $0.id == id }) {
+            home.swapAt(from, slot)
+        } else if let from = more.firstIndex(where: { $0.id == id }) {
+            (home[slot], more[from]) = (more[from], home[slot])
+        } else {
+            return nil
+        }
+        return VesselLibrary(home: home, more: more)
+    }
+
+    /// Cup, Glass and Bottle back in their own places; whatever stood there joins *More vessels* after the rest.
+    /// Nothing is deleted — the free way back for a lapsed holder (D5).
+    func standardOnHome() -> VesselLibrary {
+        VesselLibrary(
+            home: Vessel.standardIDs.compactMap(vessel(id:)),
+            more: more.filter { !$0.isStandard } + home.filter { !$0.isStandard }
+        )
+    }
+
+    /// Home's three amounts replaced together — the `servings` setter's path while a library exists.
+    func withHomeAmounts(_ amounts: [Int]) -> VesselLibrary? {
+        guard amounts.count == home.count else { return nil }
+        let next = VesselLibrary(
+            home: zip(home, amounts).map { Vessel(id: $0.id, glyph: $0.glyph, name: $0.name, amount: $1) },
+            more: more
+        )
+        return next.isValid ? next : nil
+    }
+}
+
+/// One library at a time, for `.sheet(item:)` (rule `50-views`): the id is constant, so an edit made while the
+/// sheet is open never closes and reopens it. `nonisolated`, as the type it extends is (rule `43-concurrency`).
+extension VesselLibrary: Identifiable {
+    nonisolated var id: String { "library" }
 }
 
 // MARK: - Resolving strings in the view tree
@@ -3699,6 +4006,11 @@ struct WaterSnapshot: Sendable, Equatable {
     /// (rule `43-concurrency`, #147).
     nonisolated var weekTotals: [Int: Int]? = nil
 
+    /// The glyph of the vessel ``serving`` pours — Home's middle vessel's — which the Control Center control draws
+    /// beside its title (D19). **Defaulted**, like ``serving``, so the memberwise calls in the widget target build
+    /// unchanged; `nonisolated`, as ``weekTotals`` is (rule `43-concurrency`).
+    nonisolated var servingGlyph: String = vesselSlots[DataManager.usualSlot].symbol
+
     /// Fraction of the goal reached today, clamped to `0...1`.
     var progress: Double {
         min(max(progressUnclamped, 0), 1)
@@ -3858,7 +4170,7 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
     let isGoalSet: Bool
     /// An instant: when the phone composed this mirror, for the watch's "Synced Nm ago" line.
     ///
-    /// The one `var`, so ``isNews(since:)`` can re-stamp a whole copy rather than list the fields.
+    /// A `var`, so ``isNews(since:)`` can re-stamp a whole copy rather than list the fields.
     var composedAt: Date
     /// The phone's `startOfDay`, **as an instant** — compared against the watch's own day, never
     /// stored as an ordinal the watch would have to re-interpret under its own time zone
@@ -3882,6 +4194,22 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
     /// authored pours, so those are the ones the cap must never strand. This is what lets the watch
     /// retire a pour from its own outbox.
     let acked: [UUID]
+    /// Home's three vessels, positional, since set C — `nil` while no library was ever made, and in a mirror from
+    /// before it. **A defaulted `var`**, so every memberwise call builds, and optional so an older mirror still
+    /// decodes: `schemaVersion` stays 1, because a bump would make every older watch drop every new mirror.
+    var vessels: [Vessel]? = nil
+
+    /// One of Home's three vessels as the watch draws it: its glyph's code (``VesselGlyph``'s raw value) and the
+    /// name the user typed — `nil` for a standard vessel, which the watch names from its own catalogue in the
+    /// phone's language (spec `2026-11-22-set-c-design.md` D18). The name is the user's words and goes no further
+    /// than the watch app's own screen (rule `70-privacy`).
+    ///
+    /// **Nested, as `WristPlan.Face` is**: the watch already names its vessel view `WristVessel`, and this file
+    /// compiles into the watch, so a top-level type of that name would declare it twice.
+    nonisolated struct Vessel: Codable, Sendable, Equatable {
+        let glyph: String
+        let name: String?
+    }
 
     static let currentSchemaVersion = 1
     static let maximumAckedIds = 256
@@ -4308,7 +4636,9 @@ extension DataManager {
             serving: usualServing(in: defaults),
             // The week widget's bars; the day of `now` is laid over them from `water`
             // (``WaterSnapshot/week(endingOn:calendar:)``).
-            weekTotals: readWeekTotals(from: defaults)
+            weekTotals: readWeekTotals(from: defaults),
+            // That middle vessel's glyph, which the Control Center control draws (D19).
+            servingGlyph: usualGlyph(in: defaults)
         )
     }
 

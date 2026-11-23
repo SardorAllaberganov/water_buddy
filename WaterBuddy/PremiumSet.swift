@@ -28,11 +28,15 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
     /// Export, sold beside the sets (`docs/ROADMAP.md` §5; spec `2026-11-01-export-design.md` D11).
     case portable
 
+    /// Set C — themes, app icons, your vessels (spec `2026-11-22-set-c-design.md`).
+    case personal
+
     /// One thing a set does, as the paywall and the Settings card name it.
     nonisolated enum Feature: CaseIterable, Sendable, Hashable {
         case monthView, patterns, insights, recap
         case schedule, pace, onlyWhenBehind
         case export
+        case themes, appIcons, vessels
 
         /// The paywall row's title.
         func title(in strings: Bundle) -> String {
@@ -61,6 +65,10 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .pace: "speedometer"
             case .onlyWhenBehind: "bell.badge"
             case .export: "square.and.arrow.up"
+            // All three iOS 14 to 17, read from SF Symbols' own availability table.
+            case .themes: "paintpalette.fill"
+            case .appIcons: "apps.iphone"
+            case .vessels: "waterbottle.fill"
             }
         }
 
@@ -77,6 +85,9 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .pace: "A pace line"
             case .onlyWhenBehind: "Reminders only when behind"
             case .export: "Export your servings"
+            case .themes: "Themes"
+            case .appIcons: "App icons"
+            case .vessels: "Your vessels"
             }
         }
 
@@ -90,6 +101,9 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .pace: "Where you should be by now, on Home"
             case .onlyWhenBehind: "A nudge only when you need one"
             case .export: "Every serving as a CSV file, yours to keep"
+            case .themes: "Four new skies for the app, its widgets and your Watch"
+            case .appIcons: "An icon to match, on your Home Screen"
+            case .vessels: "Your own cups and bottles, named by you"
             }
         }
 
@@ -102,7 +116,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
             case .recap: nil
             // D10 (spec `2026-10-30-coaching-design.md`): the card keeps set A's three previews; four abreast
             // break at the ordinary sizes. The paywall names set B's in full.
-            case .schedule, .pace, .onlyWhenBehind, .export: nil
+            case .schedule, .pace, .onlyWhenBehind, .export, .themes, .appIcons, .vessels: nil
             }
         }
     }
@@ -113,6 +127,7 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
         case .understand: [.monthView, .patterns, .insights, .recap]
         case .coached: [.schedule, .pace, .onlyWhenBehind]
         case .portable: [.export]
+        case .personal: [.themes, .appIcons, .vessels]
         }
     }
 
@@ -120,11 +135,13 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
     /// (spec `2026-10-24-monthly-recap-design.md` §3.8); a Release build offers it only once the privacy
     /// policy's address is set (`PaywallView.isOffered(arguments:)`). **Set B went on sale with the pace
     /// line**, its last feature (spec `2026-10-30-coaching-design.md`). Export went on sale as it was built.
+    /// Set C goes on sale with its last step, Task 20 of its plan.
     var isOnSale: Bool {
         switch self {
         case .understand: true
         case .coached: true
         case .portable: true
+        case .personal: false
         }
     }
 

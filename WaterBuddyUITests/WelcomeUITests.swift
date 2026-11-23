@@ -106,6 +106,16 @@ private func spoken(_ millilitres: Int) -> String {
     "\(millilitres.formatted(.number)) millilitres"
 }
 
+/// Drags a slider to its top end. XCUITest's drag can stop a step or more short of the end on a slider with many
+/// steps — the vessels' menu has thirty-nine since set C (D12), and one drag read 1,800 for 2,000 — so it drags
+/// again while the slider reads short, three times at most. The assertion after it still demands the top exactly.
+@MainActor
+private func dragToTop(_ slider: XCUIElement, reading top: String) {
+    for _ in 0..<3 where slider.value as? String != top {
+        slider.adjust(toNormalizedSliderPosition: 1)
+    }
+}
+
 /// The welcome, from outside the process (spec 2026-10-14 §10).
 ///
 /// **The only class that launches with the fresh start.** A DEBUG build given
@@ -250,15 +260,16 @@ final class WelcomeUITests: XCTestCase {
         tapWhenReady(app.buttons["Get Started"])
         tapWhenReady(app.buttons["Continue"])
 
+        // The top of the vessels' menu: two litres since set C (D12), one before.
         let bottle = app.sliders["Bottle"]
         XCTAssertTrue(bottle.waitForExistence(timeout: 5))
-        bottle.adjust(toNormalizedSliderPosition: 1)
-        XCTAssertEqual(bottle.value as? String, spoken(1_000))
+        dragToTop(bottle, reading: spoken(2_000))
+        XCTAssertEqual(bottle.value as? String, spoken(2_000))
 
         tapWhenReady(app.buttons["Continue"])
         tapWhenReady(app.buttons["Not now"])
         XCTAssertTrue(
-            app.buttons["Bottle, add \(spoken(1_000))"].waitForExistence(timeout: 5),
+            app.buttons["Bottle, add \(spoken(2_000))"].waitForExistence(timeout: 5),
             "Home does not pour the bottle the welcome set"
         )
     }
@@ -276,12 +287,13 @@ final class WelcomeUITests: XCTestCase {
         let bottle = app.sliders["Bottle"]
         XCTAssertTrue(bottle.waitForExistence(timeout: 5), "Settings did not appear")
         for _ in 0..<3 where !bottle.isHittable { app.swipeUp() }
-        bottle.adjust(toNormalizedSliderPosition: 1)
-        XCTAssertEqual(bottle.value as? String, spoken(1_000))
+        // The top of the vessels' menu: two litres since set C (D12), one before.
+        dragToTop(bottle, reading: spoken(2_000))
+        XCTAssertEqual(bottle.value as? String, spoken(2_000))
 
         app.buttons["Home"].tap()
         XCTAssertTrue(
-            app.buttons["Bottle, add \(spoken(1_000))"].waitForExistence(timeout: 5),
+            app.buttons["Bottle, add \(spoken(2_000))"].waitForExistence(timeout: 5),
             "a vessel edited in Settings was not saved"
         )
     }

@@ -52,60 +52,49 @@ struct HomeView: View {
     /// `SettingsView` offers exactly that range. But these three numbers are now a stored
     /// preference, and rule `20-state` makes `DataManager` the only thing allowed to persist one.
     struct Serving: Identifiable, Hashable {
-        /// The **untranslated key** spoken by VoiceOver; the glyph is what says "cup" on screen.
-        ///
-        /// A key rather than a resolved string, because `servings` is a `static let` evaluated once
-        /// and the user can change the language at any time — a name resolved here would be frozen
-        /// at whatever the app launched in. ``name(in:)`` resolves it at render.
-        let nameKey: String
+        /// Its place in the row, 0 to 2 — **the identity** (D17). Names may repeat since set C, and an `id` that
+        /// collided would make SwiftUI drop or merge a row and route a tap to the wrong button.
+        let slot: Int
+        /// The standard name's key — `Cup`, `Glass`, `Bottle` — or `nil` for a vessel of the user's own.
+        let nameKey: String?
+        /// The name the user typed, when the vessel is theirs.
+        let customName: String?
         /// Millilitres, as `Int`, like every volume in this product.
         let amount: Int
-        /// An SF Symbol name. `HomeServingTests.everyServingSymbolResolves` proves it resolves,
-        /// because an unknown symbol draws **nothing at all** — no glyph, no warning, no failed
-        /// build, and nothing else in the gate can see it.
+        /// An SF Symbol name; `VesselGlyphTests.everyGlyphResolves` proves every one resolves.
         let symbol: String
-        /// Whether this is the Glass — the slot every one-tap door logs
-        /// (``DataManager/usualSlot``), and so the one Home draws as its main action.
+        /// Whether this is the Glass's slot — the one every one-tap door logs (``DataManager/usualSlot``) and the
+        /// one Home draws as its main action, whatever vessel stands there.
         let isUsual: Bool
 
-        func name(in bundle: Bundle) -> String {
-            bundle.localizedString(forKey: nameKey, value: nameKey, table: nil)
-        }
+        var id: Int { slot }
 
-        /// The **slot**, not the amount.
-        ///
-        /// This was `amount`, which was safe only while the three were compile-time constants
-        /// chosen to be distinct. The user can now set two vessels to the same number, and a
-        /// colliding `id` in the row's `ForEach` makes SwiftUI drop or merge a row, route a tap to
-        /// the wrong button and mis-target `PressStyle`'s recoil — silently, with at most a debug
-        /// warning, and invisibly to every test in the gate.
-        ///
-        /// The slot is also what the stored triple's index means and what "the middle vessel" names
-        /// for the widget, so identifying by it keeps all three in agreement.
-        var id: String { nameKey }
+        /// Resolved at render, so a language switch reaches a standard name; a typed name is drawn as typed.
+        func name(in bundle: Bundle) -> String {
+            if let customName { return customName }
+            let key = nameKey ?? "Glass"
+            return bundle.localizedString(forKey: key, value: key, table: nil)
+        }
     }
 
-    /// The vessels the row draws: the fixed slots, wearing the user's amounts.
+    /// Home's three, as the row draws them: the library's vessels, in their slots.
     ///
-    /// **Takes the amounts rather than the `DataManager` that holds them**, which is what keeps it
-    /// a pure function and safely `nonisolated`. Taking the model would mean reaching a
-    /// `@MainActor` property from a `nonisolated` context, and the only way to do that without an
-    /// `await` is `MainActor.assumeIsolated`, which *traps* when the assumption is wrong — a
-    /// `precondition` in all but name, and rule `75-diagnostics` records that this codebase has
-    /// zero of those. The caller is a `body`, which is already on the main actor, so it simply
-    /// reads `manager.servings` and hands the array over; that read is also what registers the
+    /// **Takes the library rather than the `DataManager` that holds it**, which is what keeps it a pure function
+    /// and safely `nonisolated`. Taking the model would mean reaching a `@MainActor` property from a
+    /// `nonisolated` context, and the only way to do that without an `await` is `MainActor.assumeIsolated`, which
+    /// *traps* when the assumption is wrong — a `precondition` in all but name, and rule `75-diagnostics` records
+    /// that this codebase has zero of those. The caller is a `body`, which is already on the main actor, so it
+    /// simply reads `manager.vessels` and hands the library over; that read is also what registers the
     /// observation which redraws the row after an edit.
-    ///
-    /// `zip` truncates to the shorter side, so a mismatch between slots and amounts silently
-    /// shortens the row rather than trapping — and `everySlotIsNamedAndDrawn` asserts the two
-    /// counts agree so the mismatch cannot arrive unnoticed.
-    nonisolated static func servings(amounts: [Int]) -> [Serving] {
-        zip(vesselSlots, amounts).enumerated().map { index, pair in
+    nonisolated static func servings(library: VesselLibrary) -> [Serving] {
+        library.home.enumerated().map { slot, vessel in
             Serving(
-                nameKey: pair.0.nameKey,
-                amount: pair.1,
-                symbol: pair.0.symbol,
-                isUsual: index == DataManager.usualSlot
+                slot: slot,
+                nameKey: vessel.isStandard ? vessel.glyph.standardNameKey : nil,
+                customName: vessel.name,
+                amount: vessel.amount,
+                symbol: vessel.glyph.symbol,
+                isUsual: slot == DataManager.usualSlot
             )
         }
     }
@@ -231,7 +220,7 @@ struct HomeView: View {
     @State private var landings = 0
     /// How many times each vessel has been poured from this screen, by slot. Drives that disc's
     /// own bounce, so only the one that was pressed answers.
-    @State private var poured: [String: Int] = [:]
+    @State private var poured: [Int: Int] = [:]
     /// Bumped when a pour is taken back.
     @State private var undos = 0
     /// Bumped when the streak goes up. Drives the flame's bounce, so a count that drops — the
@@ -863,7 +852,7 @@ struct HomeView: View {
     /// its neighbours rather than pushing its caption below theirs.
     private var vesselRow: some View {
         HStack(alignment: .bottom, spacing: 24) {
-            ForEach(Self.servings(amounts: manager.servings)) { serving in
+            ForEach(Self.servings(library: manager.vessels)) { serving in
                 servingButton(serving)
             }
         }
@@ -902,6 +891,8 @@ struct HomeView: View {
                 // magenta light; the Glass is set apart by its disc and its heavier figure.
                 Text(serving.name(in: strings))
                     .font(.system(size: sideDisc * 0.18, weight: .semibold))
+                    // A name the user typed can run to twenty characters: scaled first, then cut (§3.6).
+                    .minimumScaleFactor(0.8)
             }
             .foregroundStyle(.white)
             .lineLimit(1)
@@ -990,7 +981,7 @@ struct HomeView: View {
 /// One drop in flight: which pour it is, and which disc it left.
 nonisolated private struct PourFlight: Identifiable, Equatable {
     let id: Int
-    let slot: String
+    let slot: Int
 }
 
 /// What Home's expiry task is keyed on.

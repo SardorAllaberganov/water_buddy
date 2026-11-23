@@ -257,7 +257,7 @@ struct NotificationManagerTests {
     /// boundary. The copy names no total, no goal and no serving.
     @Test func theReminderCopyCarriesNoUserValues() {
         let content = NotificationManager.reminderContent(in: .main)
-        let button = NotificationManager.reminderCategory(in: .main).actions.map(\.title)
+        let button = NotificationManager.reminderCategory(in: .main, glyph: "mug.fill").actions.map(\.title)
 
         let text = ([content.title, content.body] + button).joined(separator: " ")
         let carriesAFigure = text.contains { $0.isNumber }
@@ -277,7 +277,7 @@ struct NotificationManagerTests {
     /// app; not `.authenticationRequired`, which would ask for the passcode (rule `70-privacy`); not
     /// `.destructive`.
     @Test func theCategoryOffersOneButtonThatLogsWithoutOpeningTheApp() throws {
-        let category = NotificationManager.reminderCategory(in: .main)
+        let category = NotificationManager.reminderCategory(in: .main, glyph: "mug.fill")
 
         #expect(category.identifier == NotificationManager.reminderCategoryIdentifier)
         #expect(category.options.isEmpty, "no category option — a dismissal must not reach the app")
@@ -295,9 +295,17 @@ struct NotificationManagerTests {
         let expected = russian.localizedString(forKey: "Log a Glass", value: nil, table: nil)
         try #require(expected != "Log a Glass", "the Russian bundle must translate it, or this proves nothing")
 
-        let action = try #require(NotificationManager.reminderCategory(in: russian).actions.first)
+        let action = try #require(NotificationManager.reminderCategory(in: russian, glyph: "mug.fill").actions.first)
 
         #expect(action.title == expected)
+    }
+
+    /// The glyph is handed in, never compiled in: the middle vessel can be any vessel (D3, D19).
+    @Test func theButtonWearsWhicheverGlyphItIsHanded() throws {
+        for glyph in VesselGlyph.allCases {
+            let category = NotificationManager.reminderCategory(in: .main, glyph: glyph.symbol)
+            #expect(try #require(category.actions.first).icon != nil, "\(glyph.symbol)")
+        }
     }
 
     /// Only the button logs. A tap on the reminder itself opens the app, as it always did, and logs

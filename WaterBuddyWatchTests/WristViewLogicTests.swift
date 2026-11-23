@@ -5,6 +5,7 @@
 
 import Foundation
 import Testing
+import UIKit
 @testable import WaterBuddyWatch
 
 /// One language's strings as the watch ships them. This suite is hosted by the watch app
@@ -215,8 +216,8 @@ struct WristViewLogicTests {
     func theMenuOffersEverySlotExceptTheOneTheVesselPours() {
         let menu = WristView.secondary(from: Self.mirror(isGoalSet: true, servings: [100, 200, 300]))
         #expect(menu == [
-            WristServing(nameKey: "Cup", symbol: "cup.and.saucer.fill", amount: 100),
-            WristServing(nameKey: "Bottle", symbol: "waterbottle.fill", amount: 300),
+            WristServing(slot: 0, nameKey: "Cup", customName: nil, symbol: "cup.and.saucer.fill", amount: 100),
+            WristServing(slot: 2, nameKey: "Bottle", customName: nil, symbol: "waterbottle.fill", amount: 300),
         ])
     }
 
@@ -239,9 +240,9 @@ struct WristViewLogicTests {
     func theRowOffersCupGlassAndBottleInTheirSlotsOrder() {
         let row = WristView.pourRow(from: Self.mirror(isGoalSet: true, servings: [100, 200, 300]))
         #expect(row == [
-            WristServing(nameKey: "Cup", symbol: "cup.and.saucer.fill", amount: 100),
-            WristServing(nameKey: "Glass", symbol: "mug.fill", amount: 200),
-            WristServing(nameKey: "Bottle", symbol: "waterbottle.fill", amount: 300),
+            WristServing(slot: 0, nameKey: "Cup", customName: nil, symbol: "cup.and.saucer.fill", amount: 100),
+            WristServing(slot: 1, nameKey: "Glass", customName: nil, symbol: "mug.fill", amount: 200),
+            WristServing(slot: 2, nameKey: "Bottle", customName: nil, symbol: "waterbottle.fill", amount: 300),
         ])
         #expect(WristView.pourRow(from: nil).map(\.amount) == DataManager.defaultServings)
     }
@@ -252,11 +253,11 @@ struct WristViewLogicTests {
     func theRowKeepsTheGlassForAShortOrEmptyMirror() {
         let short = WristView.pourRow(from: Self.mirror(isGoalSet: true, servings: [100]))
         #expect(short == [
-            WristServing(nameKey: "Cup", symbol: "cup.and.saucer.fill", amount: 100),
-            WristServing(nameKey: "Glass", symbol: "mug.fill", amount: DataManager.defaultServing),
+            WristServing(slot: 0, nameKey: "Cup", customName: nil, symbol: "cup.and.saucer.fill", amount: 100),
+            WristServing(slot: 1, nameKey: "Glass", customName: nil, symbol: "mug.fill", amount: DataManager.defaultServing),
         ])
         let empty = WristView.pourRow(from: Self.mirror(isGoalSet: true, servings: []))
-        #expect(empty == [WristServing(nameKey: "Glass", symbol: "mug.fill", amount: DataManager.defaultServing)])
+        #expect(empty == [WristServing(slot: 1, nameKey: "Glass", customName: nil, symbol: "mug.fill", amount: DataManager.defaultServing)])
     }
 
     /// Review focus 2: a vessel of a litre is grouped wherever the row says it.
@@ -264,7 +265,7 @@ struct WristViewLogicTests {
     func aVesselOfAThousandIsGroupedEverywhereTheRowSaysIt() throws {
         let english = try #require(shipped("en"))
         let en = AppLanguage.english.locale
-        let bottle = WristServing(nameKey: "Bottle", symbol: "waterbottle.fill", amount: 1_000)
+        let bottle = WristServing(slot: 2, nameKey: "Bottle", customName: nil, symbol: "waterbottle.fill", amount: 1_000)
         #expect(WristView.amountLabel(bottle.amount, strings: english, locale: en) == "1,000 ml")
         #expect(WristView.pourLabel(for: bottle, strings: english, locale: en) == "Bottle, add 1,000 millilitres")
     }
@@ -273,7 +274,7 @@ struct WristViewLogicTests {
     @Test(arguments: ["en", "ru", "uz"])
     func eachButtonIsLabelledWithThePhonesSentence(language: String) throws {
         let strings = try #require(shipped(language))
-        let glass = WristServing(nameKey: "Glass", symbol: "mug.fill", amount: 250)
+        let glass = WristServing(slot: 1, nameKey: "Glass", customName: nil, symbol: "mug.fill", amount: 250)
         let expected = [
             "en": "Glass, add 250 millilitres",
             "ru": "Стакан, добавить 250 миллилитров",
@@ -288,7 +289,7 @@ struct WristViewLogicTests {
     func theLineAndTheLabelsFollowThePhonesLanguage() {
         let russian = AppLanguage(code: "ru")
         let line = WristPlan.Face(total: 1_250, goal: 2_000).millilitreLine(in: russian.bundle, locale: russian.locale)
-        let label = WristView.pourLabel(for: WristServing(nameKey: "Glass", symbol: "mug.fill", amount: 250),
+        let label = WristView.pourLabel(for: WristServing(slot: 1, nameKey: "Glass", customName: nil, symbol: "mug.fill", amount: 250),
                                         strings: russian.bundle, locale: russian.locale)
         #expect(line.hasSuffix(" мл") && line.contains(" из "), "\(line) is not the Russian line")
         #expect(!line.contains(","), "\(line) groups with the English separator")
@@ -396,5 +397,57 @@ struct WristViewLogicTests {
     func belowWhereWaterReachesThePercentageTheScrimIsStillRamping() {
         let earliest = [60.0, 80, 100, 123].map(Self.waterReachesThePercentage).min()!
         #expect(WristVessel.scrimIntensity(at: earliest - 0.05) < 1)
+    }
+
+    /// The watch draws a vessel's glyph from its code: every one must exist on watchOS 26.
+    @Test(arguments: VesselGlyph.allCases)
+    func everyVesselGlyphResolvesOnTheWatch(_ glyph: VesselGlyph) {
+        #expect(UIImage(systemName: glyph.symbol) != nil, "\(glyph.symbol) draws nothing on the watch")
+    }
+
+    // MARK: - The library on the wrist (spec 2026-11-22 D18)
+
+    private static func mirror(vessels: [WristMirror.Vessel]?, servings: [Int] = [150, 1_180, 500]) -> WristMirror {
+        WristMirror(
+            schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 2_000, servings: servings,
+            languageCode: nil, isGoalSet: true, composedAt: Date(timeIntervalSince1970: 0),
+            phoneDayStart: Date(timeIntervalSince1970: 0), phoneDayEnd: nil, acked: [], vessels: vessels
+        )
+    }
+
+    @Test func theRowWearsTheMirrorsVesselsBySlot() {
+        let mirror = Self.mirror(vessels: [
+            WristMirror.Vessel(glyph: "cup", name: nil), WristMirror.Vessel(glyph: "bottle", name: "Stanley"), WristMirror.Vessel(glyph: "bottle", name: nil),
+        ])
+        let row = WristView.servings(from: mirror)
+        #expect(row.map(\.slot) == [0, 1, 2])
+        #expect(row.map(\.symbol) == ["cup.and.saucer.fill", "waterbottle.fill", "waterbottle.fill"])
+        #expect(row[1].name(in: .main) == "Stanley")
+        #expect(row[2].nameKey == "Bottle", "a standard vessel keeps its own name wherever it stands")
+        #expect(WristView.primary(from: mirror).amount == 1_180)
+    }
+
+    /// Review Focus 3, on the wrist.
+    @Test func twoVesselsWithOneNameStillPourByTheirOwnSlot() {
+        let mirror = Self.mirror(vessels: [
+            WristMirror.Vessel(glyph: "flask", name: "Gym"), WristMirror.Vessel(glyph: "glass", name: nil), WristMirror.Vessel(glyph: "drop", name: "Gym"),
+        ], servings: [300, 250, 700])
+        let row = WristView.pourRow(from: mirror)
+        #expect(row.count == 3)
+        #expect(Set(row.map(\.id)).count == 3)
+        #expect(row.map(\.amount) == [300, 250, 700])
+    }
+
+    @Test func anUnknownGlyphCodeDrawsTheSlotsStandardGlyph() {
+        let mirror = Self.mirror(vessels: [
+            WristMirror.Vessel(glyph: "teapot", name: "Tea"), WristMirror.Vessel(glyph: "glass", name: nil), WristMirror.Vessel(glyph: "bottle", name: nil),
+        ])
+        #expect(WristView.servings(from: mirror)[0].symbol == "cup.and.saucer.fill")
+    }
+
+    @Test func aMirrorWithoutVesselsOrWithTheWrongCountDrawsTheStandardThree() {
+        for vessels in [nil, [WristMirror.Vessel(glyph: "cup", name: nil)]] as [[WristMirror.Vessel]?] {
+            #expect(WristView.servings(from: Self.mirror(vessels: vessels)).map(\.nameKey) == ["Cup", "Glass", "Bottle"])
+        }
     }
 }

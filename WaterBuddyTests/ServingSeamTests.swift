@@ -268,8 +268,8 @@ struct ServingSeamTests {
             manager.servings = [250, 250, 500]
 
             #expect(manager.servings == [250, 250, 500])
-            #expect(HomeView.servings(amounts: manager.servings).map(\.id).count == 3)
-            #expect(Set(HomeView.servings(amounts: manager.servings).map(\.id)).count == 3,
+            #expect(HomeView.servings(library: .standard(amounts: manager.servings)).map(\.id).count == 3)
+            #expect(Set(HomeView.servings(library: .standard(amounts: manager.servings)).map(\.id)).count == 3,
                     "three distinct identities even when two amounts match")
         }
     }
@@ -279,8 +279,8 @@ struct ServingSeamTests {
             let manager = makeManager(defaults)
             manager.servings = [200, 330, 750]
 
-            #expect(HomeView.servings(amounts: manager.servings).map(\.amount) == [200, 330, 750])
-            #expect(HomeView.servings(amounts: manager.servings).map(\.symbol)
+            #expect(HomeView.servings(library: .standard(amounts: manager.servings)).map(\.amount) == [200, 330, 750])
+            #expect(HomeView.servings(library: .standard(amounts: manager.servings)).map(\.symbol)
                     == ["cup.and.saucer.fill", "mug.fill", "waterbottle.fill"],
                     "the glyphs and names stay on the view; only the amounts come off the model")
         }

@@ -1220,9 +1220,16 @@ final class GoalSetupUITests: XCTestCase {
         let app = launchedOnHome()
         app.buttons["Settings"].tap()
 
+        // Since set C the note names the reminders and the watch too, and calls the Glass the middle one,
+        // whatever vessel stands there (spec 2026-11-22 D14).
         XCTAssertTrue(
-            app.staticTexts["The Glass is the one your widget, Siri and Control Center log."].waitForExistence(timeout: 5),
-            "Settings does not say which vessel the widget, Siri and Control Center log"
+            app.staticTexts["The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it."]
+                .waitForExistence(timeout: 5),
+            "Settings does not say which vessel the widget, Siri, Control Center, reminders and the watch log"
+        )
+        XCTAssertFalse(
+            app.staticTexts["The Glass is the one your widget, Siri and Control Center log."].exists,
+            "Settings still draws the note set C replaced"
         )
         XCTAssertFalse(
             app.staticTexts["The middle vessel is the one your widget logs."].exists,

@@ -148,8 +148,8 @@ struct HistoryView: View {
     /// a guess from today's vessels: it is shown, never spoken, and it changes when the vessels
     /// do. The Glass is checked first — it is what the widget, Siri, the Control Center control
     /// and the watch all log, so when two vessels hold one amount it is the likelier source.
-    nonisolated static func vessel(forAmount amount: Int, amounts: [Int]) -> HomeView.Serving? {
-        let row = HomeView.servings(amounts: amounts)
+    nonisolated static func vessel(forAmount amount: Int, library: VesselLibrary) -> HomeView.Serving? {
+        let row = HomeView.servings(library: library)
         return row.first { $0.isUsual && $0.amount == amount } ?? row.first { $0.amount == amount }
     }
 
@@ -495,9 +495,9 @@ struct HistoryView: View {
             ServingSheet(
                 editor: editor,
                 range: manager.correctionRange(),
-                // Index 1 is the middle vessel — the serving the widget logs, so the sheet starts
-                // where the user's own "usual glass" is.
-                startingAmount: manager.servings[1]
+                // The middle vessel, `DataManager.usualSlot` — the serving the widget logs, so the sheet
+                // starts where the user's own "usual glass" is, whatever vessel stands there.
+                startingAmount: manager.servings[DataManager.usualSlot]
             ) { saved in
                 // Follow the serving to the day it landed on. The model answers which day that is,
                 // on its own calendar — a view holds none (rule `30-rollover`).
@@ -647,7 +647,7 @@ struct HistoryView: View {
 
                     // Read-only, for every day (spec §3.4): no sheet, no swipe.
                     ForEach(logs, id: \.id) { log in
-                        ServingRow(log: log, vessel: Self.vessel(forAmount: log.amount, amounts: manager.servings), edit: nil)
+                        ServingRow(log: log, vessel: Self.vessel(forAmount: log.amount, library: manager.vessels), edit: nil)
                             .historyRow(top: 5, bottom: 5, sides: Self.margin)
                     }
                 }
@@ -726,13 +726,13 @@ struct HistoryView: View {
     /// nothing the page would not (§3.5). Only an English page is handed to it.
     @ViewBuilder
     private func insightPanes(_ insights: WeekInsights, _ content: WeekInsights.Content) -> some View {
-        let page = InsightCopy.page(for: content, vessels: manager.servings, in: strings, locale: locale)
+        let page = InsightCopy.page(for: content, library: manager.vessels, in: strings, locale: locale)
         let english = InsightWriter.speaksEnglish(manager.language)
         let note = english ? writer.note(for: page) : nil
         let shown = note ?? page
         let footer: InsightFooter.Source = note != nil ? .model : english && writer.isWriting(page) ? .writing : .app
         let glyph = content.suggestion?.vessel(in: manager.servings).flatMap { slot in
-            vesselSlots.indices.contains(slot) ? vesselSlots[slot].symbol : nil
+            manager.vessels.home.indices.contains(slot) ? manager.vessels.home[slot].glyph.symbol : nil
         }
 
         OneThingPane(
@@ -941,7 +941,7 @@ struct HistoryView: View {
                 log: log,
                 // The amounts are read here, in a `body`, which is what registers the observation
                 // that renames a row after the vessels are edited.
-                vessel: Self.vessel(forAmount: log.amount, amounts: manager.servings)
+                vessel: Self.vessel(forAmount: log.amount, library: manager.vessels)
             ) { editor = .editing(log) }
             .arrives(arrived, order: 2)
             // The pane is the row.
@@ -3393,7 +3393,7 @@ private struct ServingSheet: View {
 
     private func shortcutRow(stacked: Bool) -> some View {
         HStack(spacing: 8) {
-            ForEach(HomeView.servings(amounts: manager.servings)) { serving in
+            ForEach(HomeView.servings(library: manager.vessels)) { serving in
                 shortcut(serving, stacked: stacked)
             }
         }

@@ -229,12 +229,14 @@ enum NotificationManager {
     /// `setNotificationCategories` replaces every category the app has.
     /// - Parameter bundle: the strings to compose the title in. **Not defaulted**, as on
     ///   ``reminderContent(in:)`` and for its reason.
-    nonisolated static func reminderCategory(in bundle: Bundle) -> UNNotificationCategory {
+    /// - Parameter glyph: Home's middle vessel's glyph, ``DataManager/usualGlyph(in:)``. **Not defaulted**, as the
+    ///   bundle is not: the app reads both from the suite in the one operation that registers the button.
+    nonisolated static func reminderCategory(in bundle: Bundle, glyph: String) -> UNNotificationCategory {
         let logTheGlass = UNNotificationAction(
             identifier: logTheGlassActionIdentifier,
             title: bundle.localizedString(forKey: "Log a Glass", value: nil, table: nil),
             options: [],
-            icon: UNNotificationActionIcon(systemImageName: vesselSlots[DataManager.usualSlot].symbol)
+            icon: UNNotificationActionIcon(systemImageName: glyph)
         )
         return UNNotificationCategory(
             identifier: reminderCategoryIdentifier,

@@ -127,7 +127,7 @@ struct InsightCopyTests {
             working: .everyWeekdayMet,
             worthKnowing: .emptyDays(2)
         )
-        let page = InsightCopy.page(for: content, vessels: [200, 250, 750], in: english, locale: en)
+        let page = InsightCopy.page(for: content, library: .standard(amounts: [200, 250, 750]), in: english, locale: en)
         #expect(page.oneThing == "Weekends ran 1,500 ml a day below weekdays.")
         // 250 is nearest 300: the Glass.
         #expect(page.detail == "Another 250 ml on each weekend day would help close the gap.")
@@ -144,12 +144,32 @@ struct InsightCopyTests {
             working: nil,
             worthKnowing: nil
         )
-        let page = InsightCopy.page(for: content, vessels: [200, 250, 750], in: english, locale: en)
+        let page = InsightCopy.page(for: content, library: .standard(amounts: [200, 250, 750]), in: english, locale: en)
         #expect(page.oneThing == "Every day on goal.")
         #expect(page.detail == "An average day: 2,200 ml, against a goal of 2,000 ml.")
         #expect(page.working == nil)
         #expect(page.worthKnowing == nil)
         #expect(page.vessel == nil)
+    }
+
+    /// A weekend shortfall whose gap, 1,000 ml, is nearest the third vessel's amount once a 1,180 ml vessel
+    /// stands there — `aShortfallsPageCarriesItsSuggestionAndNamesTheVessel`'s content, with that gap.
+    static let contentSuggestingTheLargestVessel = WeekInsights.Content(
+        oneThing: .weekendsLower(1_500),
+        suggestion: WeekInsights.Suggestion(gap: 1_000, when: .weekendDays),
+        detail: nil,
+        working: .everyWeekdayMet,
+        worthKnowing: .emptyDays(2)
+    )
+
+    /// The suggested vessel's name is the library's — the user's own words where they typed one (D20).
+    @Test func theSuggestionNamesTheLibrarysVessel() throws {
+        let library = try #require(VesselLibrary.standard(amounts: [150, 250, 500])
+            .adding(glyph: .bottle, name: "Stanley", amount: 1_180, id: "s")?
+            .puttingOnHome(id: "s", slot: 2))
+        let page = InsightCopy.page(for: Self.contentSuggestingTheLargestVessel, library: library,
+                                    in: AppLanguage.english.bundle, locale: Locale(identifier: "en_US"))
+        #expect(page.vessel == "Stanley")
     }
 }
 

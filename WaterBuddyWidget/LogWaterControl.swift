@@ -44,9 +44,9 @@ struct LogWaterControl: ControlWidget {
                     // one either way.
                     Text(snapshot.language.bundle.localizedString(forKey: "Log Water", value: nil, table: nil))
                 } icon: {
-                    // The Glass's own glyph, from the menu that owns the vessels' glyphs, at the one
-                    // named slot `DataManager.usualServing(in:)` also reads.
-                    Image(systemName: vesselSlots[DataManager.usualSlot].symbol)
+                    // The glyph of the vessel the press logs — Home's middle one — from the same snapshot
+                    // as the amount (D19).
+                    Image(systemName: snapshot.servingGlyph)
                 }
             }
         }

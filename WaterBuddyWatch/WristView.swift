@@ -58,27 +58,29 @@ nonisolated let wristGlyphShare: CGFloat = 0.46
 
 // MARK: - One offered serving
 
-/// A slot from `vesselSlots` married to the amount the phone last published for it.
+/// One slot of Home's row — the vessel the phone last sent for it, or the standard one — married to
+/// the amount the phone last published for it.
 ///
 /// **File scope, not nested inside `WristView`**, for the reason rule `43-concurrency` gives: a
 /// `View` is `@MainActor`, so a type declared inside one inherits that isolation, and
 /// `WristViewLogicTests` is deliberately not `@MainActor`. `AppTab` and `ConfettiPiece` are the
 /// precedent on the phone side; this is the watch's.
 nonisolated struct WristServing: Equatable, Identifiable {
+    /// Its place in the row, 0 to 2. **The identity**, never the name: two vessels may share one (D17).
+    let slot: Int
+    /// The standard name's key — Cup, Glass or Bottle — for a standard vessel and for the fallback.
     let nameKey: String
+    /// The name the user typed, when the vessel is theirs.
+    let customName: String?
     let symbol: String
     let amount: Int
 
-    /// The slot's name, not the amount. Two vessels holding the same figure is a state the user is
-    /// allowed to choose (rule `20-state`), so keying a `ForEach` on the amount would collapse two
-    /// legitimate rows into one.
-    var id: String { nameKey }
+    var id: Int { slot }
 
-    /// The slot's name in the language being drawn — `HomeView.Serving.name(in:)`'s twin, down to
-    /// the `value:` fallback. A function taking a bundle rather than a stored string, so a language
-    /// switch reaches it (`tasks/lessons.md`, 2026-08-29).
+    /// The vessel's name in the language being drawn: the user's own, or the standard one, translated —
+    /// `HomeView.Serving.name(in:)`'s twin.
     func name(in bundle: Bundle) -> String {
-        bundle.localizedString(forKey: nameKey, value: nameKey, table: nil)
+        customName ?? bundle.localizedString(forKey: nameKey, value: nameKey, table: nil)
     }
 }
 
@@ -244,6 +246,21 @@ struct WristView: View {
         mirror?.servings ?? DataManager.defaultServings
     }
 
+    /// Home's three as the phone last sent them — names and glyphs, positional — or the standard three, before a
+    /// library or from an older phone. A count other than three, like a glyph this build does not know, falls
+    /// back rather than trapping: discard, never repair (rule `20-state`).
+    nonisolated static func faces(from mirror: WristMirror?) -> [(nameKey: String, name: String?, symbol: String)] {
+        guard let vessels = mirror?.vessels, vessels.count == vesselSlots.count else {
+            return vesselSlots.map { (nameKey: $0.nameKey, name: nil, symbol: $0.symbol) }
+        }
+        return vessels.enumerated().map { slot, vessel in
+            let glyph = VesselGlyph(rawValue: vessel.glyph)
+            return (nameKey: glyph?.standardNameKey ?? vesselSlots[slot].nameKey,
+                    name: vessel.name,
+                    symbol: glyph?.symbol ?? vesselSlots[slot].symbol)
+        }
+    }
+
     /// Every serving the screen offers, each slot married to its amount.
     ///
     /// **`zip` is the arity guard, and deliberately the only one.** `WristMirror.servings` crosses
@@ -253,8 +270,9 @@ struct WristView: View {
     /// the same discard-rather-than-repair instinct rule `20-state` applies to
     /// `resolveServings(in:)`, one device further out.
     nonisolated static func servings(from mirror: WristMirror?) -> [WristServing] {
-        zip(vesselSlots, resolveServings(from: mirror)).map { slot, amount in
-            WristServing(nameKey: slot.nameKey, symbol: slot.symbol, amount: amount)
+        zip(faces(from: mirror).enumerated(), resolveServings(from: mirror)).map { face, amount in
+            WristServing(slot: face.offset, nameKey: face.element.nameKey, customName: face.element.name,
+                         symbol: face.element.symbol, amount: amount)
         }
     }
 
@@ -271,10 +289,9 @@ struct WristView: View {
     /// screen's primary action.
     nonisolated static func primary(from mirror: WristMirror?) -> WristServing {
         let amounts = resolveServings(from: mirror)
-        let slot = vesselSlots[DataManager.usualSlot]
+        let face = faces(from: mirror)[DataManager.usualSlot]
         return WristServing(
-            nameKey: slot.nameKey,
-            symbol: slot.symbol,
+            slot: DataManager.usualSlot, nameKey: face.nameKey, customName: face.name, symbol: face.symbol,
             amount: amounts.indices.contains(DataManager.usualSlot) ? amounts[DataManager.usualSlot] : DataManager.defaultServing
         )
     }
@@ -298,12 +315,13 @@ struct WristView: View {
     /// **Built from ``primary(from:)`` and ``secondary(from:)``, never from the raw servings** (the
     /// redesign's §9.2): a mirror too short to name a middle vessel still leaves a Glass that pours
     /// the default, because on this screen the row is the only action there is. A slot whose amount
-    /// the mirror does not carry is left out, as the menu always left it out.
+    /// the mirror does not carry is left out, as the menu always left it out. Each found by slot,
+    /// never by name: two vessels may share one (D17).
     nonisolated static func pourRow(from mirror: WristMirror?) -> [WristServing] {
         let primary = primary(from: mirror)
         let others = secondary(from: mirror)
-        return vesselSlots.compactMap { slot in
-            slot.nameKey == primary.nameKey ? primary : others.first { $0.nameKey == slot.nameKey }
+        return vesselSlots.indices.compactMap { slot in
+            slot == primary.slot ? primary : others.first { $0.slot == slot }
         }
     }
 
@@ -391,7 +409,7 @@ struct WristView: View {
 private struct WristPourRow: View {
 
     let servings: [WristServing]
-    let glassID: String
+    let glassID: WristServing.ID
     /// The width the row is laid across — the screen's, less ``wristScreenInset`` either side.
     let rowWidth: CGFloat
     let pour: (Int) -> Void

@@ -37,13 +37,12 @@ nonisolated enum InsightCopy {
         let vessel: String?
     }
 
-    /// `content` as sentences, the suggestion's amount taken from `vessels` — the user's three, in slot
-    /// order.
-    static func page(for content: WeekInsights.Content, vessels: [Int], in strings: Bundle, locale: Locale) -> Page {
-        let slot = content.suggestion?.vessel(in: vessels)
+    /// `content` as sentences, the suggestion's amount and name taken from `library` — Home's three, in slot order.
+    static func page(for content: WeekInsights.Content, library: VesselLibrary, in strings: Bundle, locale: Locale) -> Page {
+        let slot = content.suggestion?.vessel(in: library.amounts)
         let detail: String?
         if let suggestion = content.suggestion, let slot {
-            detail = Self.suggestion(suggestion, amount: vessels[slot], in: strings, locale: locale)
+            detail = Self.suggestion(suggestion, amount: library.home[slot].amount, in: strings, locale: locale)
         } else {
             detail = content.detail.map { sentence(for: $0, in: strings, locale: locale) }
         }
@@ -52,8 +51,7 @@ nonisolated enum InsightCopy {
             detail: detail,
             working: content.working.map { sentence(for: $0, in: strings, locale: locale) },
             worthKnowing: content.worthKnowing.map { sentence(for: $0, in: strings, locale: locale) },
-            vessel: slot.flatMap { vesselSlots.indices.contains($0) ? vesselSlots[$0].nameKey : nil }
-                .map { strings.localizedString(forKey: $0, value: nil, table: nil) }
+            vessel: slot.flatMap { library.home.indices.contains($0) ? library.home[$0].name(in: strings) : nil }
         )
     }
 

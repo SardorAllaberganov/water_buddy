@@ -713,7 +713,7 @@ private func specifiers(in text: String) -> Set<String> {
     /// tables, in every language, because the note is resolved through the in-app picker's bundle.
     @Test(arguments: ["en"] + translated)
     func theVesselsNoteNamesTheGlassByItsOwnName(language: String) {
-        let note = value(appBundle, language, "The Glass is the one your widget, Siri and Control Center log.")
+        let note = value(appBundle, language, "The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it.")
         let glass = value(appBundle, language, "Glass")
 
         #expect(note != nil, "Settings' vessels note has no \(language) entry")

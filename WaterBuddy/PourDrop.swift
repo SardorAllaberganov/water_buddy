@@ -58,8 +58,8 @@ nonisolated enum PourArc {
 
 /// A place a drop goes from or to, as the screen that draws both reports them.
 nonisolated enum PourPlace: Hashable, Sendable {
-    /// The centre of a quick-add disc, by the vessel's slot.
-    case disc(String)
+    /// The centre of a quick-add disc, by its slot.
+    case disc(Int)
     /// The centre of the vessel.
     case vessel
 }

@@ -159,17 +159,70 @@ enum Aurora {
     }
 }
 
+/// The seven icons a vessel may wear — the standard three's and four more — in the order the editor offers
+/// them (spec `2026-11-22-set-c-design.md` D13).
+///
+/// **Stored by code**, the raw value, never by symbol name: a symbol Apple renames changes one `case` here and
+/// no stored library. Every symbol exists on iOS 17 and watchOS 26 — read from SF Symbols' own availability
+/// table; `cup.and.heat.waves.fill` needs iOS 18 and is left out. `VesselGlyphTests` proves each resolves,
+/// because an unknown symbol draws nothing at all. Here, beside `vesselSlots`, because the widget's snapshot
+/// and the watch read it and this file is in all three exception sets (rule `15-project`).
+nonisolated enum VesselGlyph: String, CaseIterable, Codable, Sendable {
+    case cup, glass, bottle, wineGlass, takeaway, flask, drop
+
+    /// The SF Symbol drawn for it.
+    var symbol: String {
+        switch self {
+        case .cup: "cup.and.saucer.fill"
+        case .glass: "mug.fill"
+        case .bottle: "waterbottle.fill"
+        case .wineGlass: "wineglass.fill"
+        case .takeaway: "takeoutbag.and.cup.and.straw.fill"
+        case .flask: "flask.fill"
+        case .drop: "drop.fill"
+        }
+    }
+
+    /// What VoiceOver calls the icon in the vessel editor — the icon, not a vessel's name.
+    var spokenKey: String {
+        switch self {
+        case .cup: "Cup"
+        case .glass: "Mug"
+        case .bottle: "Bottle"
+        case .wineGlass: "Wine glass"
+        case .takeaway: "Takeaway cup"
+        case .flask: "Flask"
+        case .drop: "Drop"
+        }
+    }
+
+    /// The translated name a standard vessel wears: only the standard three's glyphs have one. A user's vessel
+    /// always carries the name they typed.
+    var standardNameKey: String? {
+        switch self {
+        case .cup: "Cup"
+        case .glass: "Glass"
+        case .bottle: "Bottle"
+        case .wineGlass, .takeaway, .flask, .drop: nil
+        }
+    }
+
+    /// The standard three's glyphs, in their own places: Cup, Glass, Bottle.
+    static let standardThree: [VesselGlyph] = [.cup, .glass, .bottle]
+}
+
 /// The three quick-add vessels' presentation — names and SF Symbols, smallest first: Cup, Glass,
 /// Bottle. The **amounts** live on `DataManager.servings` (state); this is presentation, and lives
 /// here — a shared design-token file, not `DataManager.swift` — because `HomeView`, which used to
 /// own it, is app-only and unreachable from the watch (`WristView`, Task 15, is the second
 /// consumer). Order is load-bearing the same way `DataManager.servings`' order is: index 1 is the
 /// vessel the widget's own button draws and logs.
-nonisolated let vesselSlots: [(nameKey: String, symbol: String)] = [
-    (nameKey: "Cup", symbol: "cup.and.saucer.fill"),
-    (nameKey: "Glass", symbol: "mug.fill"),
-    (nameKey: "Bottle", symbol: "waterbottle.fill"),
-]
+///
+/// **Since set C, the standard three's presentation alone**, built from ``VesselGlyph``: what Home, the watch and
+/// the one-tap doors draw while no library was ever made (spec `2026-11-22-set-c-design.md` §3.6).
+nonisolated let vesselSlots: [(nameKey: String, symbol: String)] = VesselGlyph.standardThree.map {
+    (nameKey: $0.standardNameKey ?? "", symbol: $0.symbol)
+}
 
 // MARK: - Preview
 

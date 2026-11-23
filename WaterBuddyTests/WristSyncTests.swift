@@ -85,6 +85,19 @@ struct WristWireTests {
         #expect(decoded.phoneDayEnd == nil)
         #expect(decoded.currentWater == 500)
     }
+
+    /// A mirror from before set C — persisted on a watch across the update, or sent by a phone not yet updated —
+    /// decodes with no vessels, and the watch draws the standard three (D18).
+    @Test
+    func aMirrorFromBeforeSetCStillDecodes() throws {
+        let legacy = Data("""
+            {"schemaVersion":1,"currentWater":500,"dailyGoal":2000,"servings":[150,250,500],
+             "isGoalSet":true,"composedAt":3000,"phoneDayStart":2900,"phoneDayEnd":90000,"acked":[]}
+            """.utf8)
+        let decoded = try JSONDecoder().decode(WristMirror.self, from: legacy)
+        #expect(decoded.vessels == nil)
+        #expect(decoded.schemaVersion == WristMirror.currentSchemaVersion, "no bump: an older watch must keep reading")
+    }
 }
 
 /// `ingest(_:)`'s conjunction guard — the mechanism spec §4 built specifically because either half
@@ -838,6 +851,28 @@ struct WristPublishTests {
             #expect(fresh.currentWater == 1_800, "stamped today, the same figure is today's and goes as it is")
         }
     }
+
+    /// Noon on a day, in ``utc`` — the composer's clock for a test that only needs a day.
+    private static func noon(_ year: Int, _ month: Int, _ day: Int) -> Date {
+        utc.date(from: DateComponents(year: year, month: month, day: day, hour: 12))!
+    }
+
+    @Test
+    func theMirrorCarriesHomesVesselsOnceALibraryIsMade() throws {
+        try withTempDefaults { defaults in
+            #expect(DataManager.composeWristMirror(from: defaults, calendar: Self.utc, now: Self.noon(2026, 11, 22)).vessels == nil)
+            let library = try #require(VesselLibrary.standard(amounts: [150, 250, 500])
+                .adding(glyph: .bottle, name: "Stanley", amount: 1_180, id: "s")?
+                .puttingOnHome(id: "s", slot: 1))
+            defaults.set(try JSONEncoder().encode(library), forKey: DataManager.Key.vessels)
+            let mirror = DataManager.composeWristMirror(from: defaults, calendar: Self.utc, now: Self.noon(2026, 11, 22))
+            #expect(mirror.vessels == [
+                WristMirror.Vessel(glyph: "cup", name: nil),
+                WristMirror.Vessel(glyph: "bottle", name: "Stanley"),
+                WristMirror.Vessel(glyph: "bottle", name: nil),
+            ])
+        }
+    }
 }
 
 /// When a mirror tells the watch something the last one did not — the one test the phone uses to
@@ -859,12 +894,13 @@ struct WristMirrorNewsTests {
         composedAt: Date = Date(timeIntervalSince1970: 1_000),
         phoneDayStart: Date = Date(timeIntervalSince1970: 0),
         phoneDayEnd: Date? = Date(timeIntervalSince1970: 86_400),
-        acked: [UUID] = [WristMirrorNewsTests.ackedId]
+        acked: [UUID] = [WristMirrorNewsTests.ackedId],
+        vessels: [WristMirror.Vessel]? = nil
     ) -> WristMirror {
         WristMirror(
             schemaVersion: schemaVersion, currentWater: currentWater, dailyGoal: dailyGoal,
             servings: servings, languageCode: languageCode, isGoalSet: isGoalSet, composedAt: composedAt,
-            phoneDayStart: phoneDayStart, phoneDayEnd: phoneDayEnd, acked: acked
+            phoneDayStart: phoneDayStart, phoneDayEnd: phoneDayEnd, acked: acked, vessels: vessels
         )
     }
 
@@ -897,6 +933,7 @@ struct WristMirrorNewsTests {
         #expect(Self.mirror(composedAt: later, phoneDayStart: Date(timeIntervalSince1970: 3_600)).isNews(since: base), "phoneDayStart")
         #expect(Self.mirror(composedAt: later, phoneDayEnd: Date(timeIntervalSince1970: 90_000)).isNews(since: base), "phoneDayEnd")
         #expect(Self.mirror(composedAt: later, acked: []).isNews(since: base), "acked")
+        #expect(Self.mirror(composedAt: later, vessels: [WristMirror.Vessel(glyph: "cup", name: nil)]).isNews(since: base), "vessels")
     }
 }
 

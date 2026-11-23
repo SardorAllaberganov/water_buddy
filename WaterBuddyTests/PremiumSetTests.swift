@@ -15,7 +15,7 @@ import UIKit
 struct PremiumSetTests {
 
     @Test func setAListsItsFourFeaturesInOrder() {
-        #expect(PremiumSet.allCases == [.understand, .coached, .portable])
+        #expect(PremiumSet.allCases == [.understand, .coached, .portable, .personal])
         #expect(PremiumSet.understand.features == [.monthView, .patterns, .insights, .recap])
     }
 
@@ -102,5 +102,20 @@ struct PremiumSetTests {
         let strings = Bundle.main
         #expect(PremiumSet.Feature.recap.caption(in: strings) == nil)
         #expect(PremiumSet.Feature.allCases.filter { $0.caption(in: strings) != nil } == [.monthView, .patterns, .insights])
+    }
+
+    @Test func setCListsItsThreeFeaturesAndIsNotYetOnSale() {
+        #expect(PremiumSet.personal.features == [.themes, .appIcons, .vessels])
+        #expect(!PremiumSet.personal.isOnSale, "on sale only with its last step (D22)")
+        #expect(!PremiumSet.onSale.contains(.personal))
+        #expect(PremiumSet.personal.features.allSatisfy { $0.caption(in: AppLanguage.english.bundle) == nil },
+                "the Settings card's three previews are taken (set B's D10)")
+    }
+
+    @Test func setCsRowsAreWorded() {
+        let english = AppLanguage.english.bundle
+        #expect(PremiumSet.Feature.themes.title(in: english) == "Themes")
+        #expect(PremiumSet.Feature.appIcons.title(in: english) == "App icons")
+        #expect(PremiumSet.Feature.vessels.title(in: english) == "Your vessels")
     }
 }

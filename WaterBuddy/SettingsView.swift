@@ -39,6 +39,10 @@ struct SettingsView: View {
     /// (rule `50-views`).
     @State private var exporting: ServingsExport?
 
+    /// The vessel library, while its sheet is open — its `.sheet(item:)` selection, read once by the vessels card's
+    /// tap (rule `50-views`). A holder's alone: a lapse closes it, as it closes the export.
+    @State private var libraryOpen: VesselLibrary?
+
     /// What the card's tap found instead of a file. Here and not on the card: the card changes height with it,
     /// and only the stack's animation moves the card below with it. It goes with the page, which `RootTabView`
     /// builds again each time the tab is shown, so a pour on another tab cannot leave it standing.
@@ -112,7 +116,13 @@ struct SettingsView: View {
                     // Then the goal: it is the number the whole product is measured against, and
                     // reminders are a preference about it.
                     GoalCard(currentGoal: manager.dailyGoal).arrives(arrived, order: lead).scrollDepth()
-                    ServingsCard(current: manager.servings).arrives(arrived, order: lead + 1).scrollDepth()
+                    ServingsCard(
+                        current: manager.servings,
+                        gate: premiumGate,
+                        openLibrary: { libraryOpen = manager.vessels },
+                        openPaywall: { paywall = .settings }
+                    )
+                    .arrives(arrived, order: lead + 1).scrollDepth()
                     remindersCard.arrives(arrived, order: lead + 2).scrollDepth()
                     // Under reminders: both are about what happens between pours, and both ask iOS first.
                     healthCard.arrives(arrived, order: lead + 3).scrollDepth()
@@ -175,9 +185,13 @@ struct SettingsView: View {
         .task { await readSystemState() }
         .sheet(item: $paywall) { entry in PaywallView(entry: entry) }
         .sheet(item: $exporting) { export in ExportSheet(export: export) }
-        // A lapse closes the sheet: the file is a holder's (rule `50-views`).
+        .sheet(item: $libraryOpen) { VesselLibrarySheet(opened: $0) }
+        // A lapse closes the sheets: the file and the library are a holder's (rule `50-views`).
         .onChange(of: premiumGate) { _, gate in
-            if gate != .open { exporting = nil }
+            if gate != .open {
+                exporting = nil
+                libraryOpen = nil
+            }
         }
         // A watch pour, or a widget tap read on coming forward: the line that said there was nothing goes with the
         // nothing. Nothing in the suite can drive either (spec `2026-11-01-finish-export-design.md` D11).
@@ -242,6 +256,11 @@ struct SettingsView: View {
     /// (spec `2026-10-30-coaching-design.md` D2). An open row's sheet has its own.
     nonisolated static func offersStandardReset(gate: PremiumAccess.Gate, schedule: ReminderPlan.Schedule) -> Bool {
         gate == .locked && schedule != .standard
+    }
+
+    /// The free way back for a locked holder: Cup, Glass and Bottle on Home again, every vessel kept (D5, D14).
+    nonisolated static func offersStandardVessels(gate: PremiumAccess.Gate, library: VesselLibrary) -> Bool {
+        gate == .locked && !library.isStandardOnHome
     }
 
     /// Whether a tap on *Only when behind* opens the paywall: only where it would turn the switch on without
@@ -1214,8 +1233,18 @@ private struct ServingsCard: View {
     /// Bumped on a committed change, so the haptic fires on the change rather than on the touch.
     @State private var commits = 0
 
-    init(current: [Int]) {
+    /// Whether the library is a holder's, locked or not offered (``PremiumAccess/Gate``).
+    let gate: PremiumAccess.Gate
+    /// Opens the library sheet, for a holder.
+    let openLibrary: () -> Void
+    /// Opens the paywall, for anyone else.
+    let openPaywall: () -> Void
+
+    init(current: [Int], gate: PremiumAccess.Gate, openLibrary: @escaping () -> Void, openPaywall: @escaping () -> Void) {
         _amounts = State(initialValue: current)
+        self.gate = gate
+        self.openLibrary = openLibrary
+        self.openPaywall = openPaywall
     }
 
     var body: some View {
@@ -1225,14 +1254,55 @@ private struct ServingsCard: View {
                 // Drawn when a vessel's new amount has been saved (``SavedTick``).
                 .savedTick(commits)
 
-            VesselSliders(amounts: $amounts) { editing in
+            // Home's own three — a library's names and glyphs, or the standard three (D14).
+            VesselSliders(amounts: $amounts, vessels: manager.vessels.home) { editing in
                 isDragging = editing
                 if !editing { commitIfChanged() }
             }
 
+            if gate != .hidden {
+                Hairline()
+                Button {
+                    gate == .open ? openLibrary() : openPaywall()
+                } label: {
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Your vessels", bundle: strings).cardTitle()
+                            Text("Add your own, and choose which three stand on Home", bundle: strings).cardNote()
+                        }
+                        Spacer(minLength: 8)
+                        Image(systemName: gate == .open ? "chevron.right" : "lock.fill")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .accessibilityHidden(true)
+                    }
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PressStyle())
+                .accessibilityLabel(Text("Your vessels", bundle: strings))
+                .accessibilityValue(gate == .locked ? strings.localizedString(forKey: "Premium", value: nil, table: nil) : "")
+                .accessibilityHint(Text("Add your own, and choose which three stand on Home", bundle: strings))
+            }
+            if SettingsView.offersStandardVessels(gate: gate, library: manager.vessels) {
+                Button {
+                    manager.useStandardVessels()
+                    commits += 1
+                } label: {
+                    Text("Use the standard vessels", bundle: strings)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(PressStyle())
+                .accessibilityHint(Text("Puts Cup, Glass and Bottle back on Home. Your own vessels stay.", bundle: strings))
+            }
+
             VStack(alignment: .leading, spacing: 16) {
                 Hairline()
-                Text("The Glass is the one your widget, Siri and Control Center log.", bundle: strings)
+                Text("The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it.", bundle: strings)
                     .cardNote()
             }
         }

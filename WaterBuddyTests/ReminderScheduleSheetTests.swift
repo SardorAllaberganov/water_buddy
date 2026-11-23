@@ -82,4 +82,19 @@ struct ReminderScheduleSheetTests {
         #expect(!SettingsView.offersStandardReset(gate: .open, schedule: custom), "the sheet has its own")
         #expect(!SettingsView.offersStandardReset(gate: .hidden, schedule: custom))
     }
+
+    /// Review Focus 4: the free way back is offered to a locked holder whose Home is not the standard three.
+    @Test func theStandardVesselsAreOfferedToALockedHolderOnly() throws {
+        let standard = VesselLibrary.standard(amounts: [150, 250, 500])
+        let mine = try #require(standard.adding(glyph: .flask, name: "Office", amount: 400, id: "o")?.puttingOnHome(id: "o", slot: 1))
+        #expect(SettingsView.offersStandardVessels(gate: .locked, library: mine))
+        #expect(!SettingsView.offersStandardVessels(gate: .open, library: mine), "a holder uses the library itself")
+        #expect(!SettingsView.offersStandardVessels(gate: .hidden, library: mine))
+        #expect(!SettingsView.offersStandardVessels(gate: .locked, library: standard))
+    }
+
+    @Test func theVesselsMenuRunsFromFiftyMillilitresToTwoLitres() {
+        #expect(VesselSliders.range == 50...2_000)
+        #expect(VesselSliders.step == 50)
+    }
 }

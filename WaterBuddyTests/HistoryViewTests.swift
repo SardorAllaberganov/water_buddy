@@ -161,22 +161,22 @@ struct HistoryLayoutTests {
     @Test func aServingIsNamedForTheVesselItsAmountEquals() {
         let amounts = [150, 250, 500]
 
-        #expect(HistoryView.vessel(forAmount: 150, amounts: amounts)?.nameKey == "Cup")
-        #expect(HistoryView.vessel(forAmount: 250, amounts: amounts)?.nameKey == "Glass")
-        #expect(HistoryView.vessel(forAmount: 500, amounts: amounts)?.nameKey == "Bottle")
+        #expect(HistoryView.vessel(forAmount: 150, library: .standard(amounts: amounts))?.nameKey == "Cup")
+        #expect(HistoryView.vessel(forAmount: 250, library: .standard(amounts: amounts))?.nameKey == "Glass")
+        #expect(HistoryView.vessel(forAmount: 500, library: .standard(amounts: amounts))?.nameKey == "Bottle")
     }
 
     /// A log stores an amount and nothing else, so any other amount has no name to draw.
     @Test func anAmountNoVesselHoldsIsNotNamed() {
-        #expect(HistoryView.vessel(forAmount: 300, amounts: [150, 250, 500]) == nil)
-        #expect(HistoryView.vessel(forAmount: 250, amounts: []) == nil)
+        #expect(HistoryView.vessel(forAmount: 300, library: .standard(amounts: [150, 250, 500])) == nil)
+        #expect(HistoryView.vessel(forAmount: 250, library: VesselLibrary(home: [], more: [])) == nil)
     }
 
     /// Two vessels may hold one amount — the user is allowed to choose that. The Glass is what
     /// every one-tap door logs, so it is the likelier source and is checked first.
     @Test func theGlassIsCheckedFirstWhenTwoVesselsShareAnAmount() {
-        #expect(HistoryView.vessel(forAmount: 250, amounts: [250, 250, 500])?.nameKey == "Glass")
-        #expect(HistoryView.vessel(forAmount: 250, amounts: [250, 300, 250])?.nameKey == "Cup")
+        #expect(HistoryView.vessel(forAmount: 250, library: .standard(amounts: [250, 250, 500]))?.nameKey == "Glass")
+        #expect(HistoryView.vessel(forAmount: 250, library: .standard(amounts: [250, 300, 250]))?.nameKey == "Cup")
     }
 
     // MARK: The strip

@@ -98,7 +98,7 @@ struct HomeServingTests {
         try withTempStore { manager, defaults in
             manager.servings = [200, 330, 750]
 
-            let row = HomeView.servings(amounts: manager.servings)
+            let row = HomeView.servings(library: .standard(amounts: manager.servings))
             let snapshot = DataManager.snapshot(defaults: defaults, calendar: utcDay, now: { utc(2026, 8, 28) }())
 
             #expect(row[1].amount == 330)
@@ -109,8 +109,8 @@ struct HomeServingTests {
 
     @Test func theDefaultRowIsTheStandardThreeVessels() throws {
         try withTempStore { manager, _ in
-            #expect(HomeView.servings(amounts: manager.servings).map(\.amount) == [150, 250, 500])
-            #expect(HomeView.servings(amounts: manager.servings).map(\.amount) == DataManager.defaultServings)
+            #expect(HomeView.servings(library: .standard(amounts: manager.servings)).map(\.amount) == [150, 250, 500])
+            #expect(HomeView.servings(library: .standard(amounts: manager.servings)).map(\.amount) == DataManager.defaultServings)
         }
     }
 
@@ -145,7 +145,7 @@ struct HomeServingTests {
         try withTempStore { manager, _ in
             manager.servings = [500, 250, 250]
 
-            let row = HomeView.servings(amounts: manager.servings)
+            let row = HomeView.servings(library: .standard(amounts: manager.servings))
             #expect(row.count == 3)
             #expect(Set(row.map(\.id)).count == 3, "a colliding id makes SwiftUI drop or merge a row")
             #expect(row.map(\.amount) == [500, 250, 250], "never re-sorted on the way out")
@@ -175,7 +175,7 @@ struct HomeServingTests {
     @Test func loggingEveryQuickAddServingAccumulatesAndWritesThrough() throws {
         try withTempStore { manager, defaults in
             manager.servings = [200, 330, 750]
-            let row = HomeView.servings(amounts: manager.servings)
+            let row = HomeView.servings(library: .standard(amounts: manager.servings))
 
             for serving in row {
                 manager.addLog(amount: serving.amount)
@@ -190,6 +190,28 @@ struct HomeServingTests {
             #expect(defaults.integer(forKey: DataManager.Key.currentWater) == total)
         }
     }
+
+    /// Review Focus 3: names may repeat now, so the row is identified by slot (D17).
+    @Test func twoVesselsWithOneNameStillDrawAsThreeButtons() throws {
+        let library = try #require(VesselLibrary.standard(amounts: [150, 250, 500])
+            .adding(glyph: .flask, name: "Gym", amount: 300, id: "a")?
+            .adding(glyph: .drop, name: "Gym", amount: 700, id: "b")?
+            .puttingOnHome(id: "a", slot: 0)?
+            .puttingOnHome(id: "b", slot: 2))
+        let row = HomeView.servings(library: library)
+        #expect(row.map(\.id) == [0, 1, 2])
+        #expect(row.map(\.amount) == [300, 250, 700])
+        #expect(row[0].name(in: .main) == "Gym" && row[2].name(in: .main) == "Gym")
+    }
+
+    @Test func theMiddleIsTheUsualSlotWhateverStandsThere() throws {
+        let library = try #require(VesselLibrary.standard(amounts: [150, 250, 500])
+            .adding(glyph: .bottle, name: "Stanley", amount: 1_180, id: "s")?
+            .puttingOnHome(id: "s", slot: DataManager.usualSlot))
+        let row = HomeView.servings(library: library)
+        #expect(row.map(\.isUsual) == [false, true, false])
+        #expect(row[1].symbol == "waterbottle.fill" && row[1].nameKey == nil && row[1].customName == "Stanley")
+    }
 }
 
 // MARK: - Layout and Undo, as values
@@ -201,7 +223,7 @@ struct HomeLayoutTests {
     /// The Glass is ranked above Cup and Bottle (spec §5.2): it is the slot the widget, Siri, the
     /// Control Center control and the watch all log.
     @Test func onlyTheGlassIsRankedAboveTheOthers() {
-        let row = HomeView.servings(amounts: [150, 250, 500])
+        let row = HomeView.servings(library: .standard(amounts: [150, 250, 500]))
 
         #expect(row.map(\.isUsual) == [false, true, false])
         #expect(row.first(where: \.isUsual)?.nameKey == vesselSlots[DataManager.usualSlot].nameKey)
