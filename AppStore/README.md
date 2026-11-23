@@ -203,3 +203,28 @@ twice the yearly (spec §7):
 - **Never mention another country's price**, in the app or on the page: App Review can read it as misleading.
 - Which country is in which group: the World Bank's lists, as the release playbook keeps them, in
   `~/.claude/skills/aso/references/price-tiers.md` (the 2027 fiscal year's lists, published each July).
+
+## 6. Spanish (Mexico) — goes up with set C's version, not 1.4.1
+
+Approved by the owner on 2026-11-23 ("Wait for set C"). Apple's localization page lists Spanish (Mexico) among the US
+store's languages, so this page's name, subtitle and keywords add a second set of search words there. It is also the
+default page in Mexico and 15 other Latin American stores. Connect changes a name only with a new version, and 1.4.1 is
+live, so the page waits for set C's version. The screenshots stay en-US's, Connect's default for a new language.
+
+| Field | Limit | Spanish (Mexico) — `es-MX/` |
+|---|---|---|
+| Name | 30 characters | [`name.txt`](es-MX/name.txt) — 23 |
+| Subtitle | 30 characters | [`subtitle.txt`](es-MX/subtitle.txt) — 30 |
+| Keywords | 100 bytes | [`keywords.txt`](es-MX/keywords.txt) — 96 |
+| Promotional Text | 170 characters | [`promotional-text.txt`](es-MX/promotional-text.txt) — 168 |
+| Description | 4000 characters | [`description.txt`](es-MX/description.txt) — 3980 |
+| What's New | 4000 characters | written with set C's |
+| Support URL, Privacy Policy URL | — | en-US's addresses: Connect leaves a new language's empty (section 1) |
+
+- **The description is 1.4.1's in Spanish, shortened to fit,** because Spanish runs longer: its second paragraph is
+  cut. It adds that the app is in English, Russian and Uzbek, *not Spanish*, and that the Siri phrases work only in
+  English and Russian. Every change set C makes to the English page goes into this one too.
+- **The keywords** take no word already on the en-US page or in the Spanish name and subtitle, and no accents. The
+  research is in [`research/2026-11-23/spanish-mexico.md`](research/2026-11-23/spanish-mexico.md).
+- **`VerifyListing.sh` doesn't read `es-MX/` yet,** because it requires a What's New in every language. Add `es-MX`
+  to its `LISTINGS` once set C's What's New is written. The counts above are from the same rules, run on 2026-11-23.
