@@ -559,7 +559,7 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 
 ## After the submission — outstanding (1.4.1, read 2026-11-22)
 
-**1.4.1 (7) is submitted and *Waiting for Review*** (2026-11-22, 01:18). It was done in your Chrome on your
+**1.4.1 (7) is live** since 2026-11-22, 06:21; it was submitted at 01:18. It was done in your Chrome on your
 "go", then "Upload and submit", and submitted again after the header's fix:
 - The privacy policy was published again: `a76b62a` on `SardorAllaberganov.github.io`, live at 23:31 and byte
   for byte `Tools/PrivacyPolicy.html`.
@@ -570,15 +570,15 @@ Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBu
 - The header is now a looping video. Its first version faded back, and you ruled that out. Connect locks the header
   while a version waits for review, so 1.4.1 came out of review at about 01:10 and went back in at 01:18 with the
   loop that drains back.
+- The prices by country were set on 2026-11-24, on your "Set prices now": the lifetime purchase at once, both
+  subscriptions from 25 November. Every store's prices are in `AppStore/prices-by-country.md`.
 
-`AppStore/README.md` §1 has the steps. Apple says review can take up to 48 hours and emails you when it's done.
+`AppStore/README.md` §1 has the steps, and §5 the prices.
 
 **Still yours:**
 
 - 🔴 **One real purchase** (#156, #187), still open from 1.4: a sandbox purchase, a restore and a refund on a
   real iPhone. Nothing but the local StoreKit configuration has ever been bought from.
-- **The prices by country** (`AppStore/README.md` §5) go in on the day 1.4.1 is released. With *Automatically
-  release this version* set, that is the day App Review approves it.
 - **Connect's three notices**, none of which blocked 1.4.1 (#234):
   - New age-rating questions on location sharing and dating, required from 15 January 2027.
   - China mainland's security assessment and AI-generated-content declaration, due by 31 January 2027.

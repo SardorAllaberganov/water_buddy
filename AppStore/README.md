@@ -182,7 +182,8 @@ framed again without a new capture.
 All three must exist with exactly these IDs: if one fails to load, the paywall sells nothing. Family Sharing is
 on for all three, and in Connect it cannot be turned off once saved.
 
-**Prices by country — set in Connect, not in the build, on the day 1.4.1 is released.** Three tiers by the
+**Prices by country — set in Connect, not in the build; set on 2026-11-24, every store's in
+[`prices-by-country.md`](prices-by-country.md).** Three tiers by the
 World Bank's income groups, each plan's ratio kept so the yearly saving stays near 44 % and the lifetime is
 twice the yearly (spec §7):
 
@@ -199,6 +200,11 @@ twice the yearly (spec §7):
   for both subscriptions and the lifetime purchase, take the nearest one that keeps the saving within 43–45 %.
 - **After each tier, read every sample storefront's proposed price**, and set by hand any yearly saving outside
   43–45 % (the euro stores read 36 % today).
+- **Done on 2026-11-24**, two days after the release: the lifetime purchase at once, both subscriptions from
+  25 November, the earliest start Connect allows. Each tier is Connect's comparable prices for the US prices above.
+  Where the saving then fell outside 43–45 %, the monthly price was kept and the yearly price set by hand: in 46
+  tier stores, and in 42 high-income ones, 29 down (the euro stores to €19.99) and 13 up, with existing subscribers
+  kept at their price. Every store now saves 43.5–45.0 %.
 - Uzbekistan is billed in US dollars, at the lower tier.
 - **Never mention another country's price**, in the app or on the page: App Review can read it as misleading.
 - Which country is in which group: the World Bank's lists, as the release playbook keeps them, in
