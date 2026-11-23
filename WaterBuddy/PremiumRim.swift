@@ -48,6 +48,7 @@ struct PremiumRim: ViewModifier {
     let laps: Int
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.aurora) private var aurora
 
     func body(content: Content) -> some View {
         content
@@ -55,7 +56,7 @@ struct PremiumRim: ViewModifier {
                 RoundedRectangle(cornerRadius: LiquidGlass.cornerRadius, style: .continuous)
                     .strokeBorder(
                         LinearGradient(
-                            colors: [Aurora.cyan, Aurora.magenta, Aurora.blue],
+                            colors: [aurora.accent, aurora.second, aurora.first],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),

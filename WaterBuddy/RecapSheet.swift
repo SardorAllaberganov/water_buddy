@@ -31,6 +31,7 @@ struct RecapSheet: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.theme) private var theme
 
     /// The card, rendered — presentation state, gone with the sheet.
     @State private var image: UIImage?
@@ -71,7 +72,7 @@ struct RecapSheet: View {
         .presentationDragIndicator(.visible)
         .sensoryFeedback(Haptics.confirm, trigger: shares)
         .tracksLanding($landed)
-        .task { image = RecapCard.image(of: month, strings: strings, locale: locale) }
+        .task { image = RecapCard.image(of: month, strings: strings, locale: locale, theme: theme) }
     }
 
     /// The heading, on the aurora with its shadows, and the paywall's close button, labelled *Done*: this

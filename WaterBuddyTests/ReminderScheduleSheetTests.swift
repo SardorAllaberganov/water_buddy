@@ -93,6 +93,15 @@ struct ReminderScheduleSheetTests {
         #expect(!SettingsView.offersStandardVessels(gate: .locked, library: standard))
     }
 
+    /// Aurora is free for everyone — the way back after a lapse (D5); the others choose for Premium alone.
+    @Test func auroraIsFreeAndTheOtherThemesOpenThePaywallWhereLocked() {
+        for theme in AppTheme.allCases {
+            #expect(!SettingsView.themeOpens(theme, gate: .open))
+        }
+        #expect(!SettingsView.themeOpens(.aurora, gate: .locked))
+        #expect(AppTheme.allCases.dropFirst().allSatisfy { SettingsView.themeOpens($0, gate: .locked) })
+    }
+
     @Test func theVesselsMenuRunsFromFiftyMillilitresToTwoLitres() {
         #expect(VesselSliders.range == 50...2_000)
         #expect(VesselSliders.step == 50)

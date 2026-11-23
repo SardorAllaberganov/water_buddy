@@ -435,6 +435,19 @@ struct FreshStartTests {
         #expect(next.onlyWhenBehind == false)
     }
 
+    /// The theme census's argument (spec `2026-11-22-set-c-design.md` §3.9): the theme set through its setter in the
+    /// fresh start's own suite, nowhere without it, and Aurora for a code this build does not know.
+    @Test func theThemeArgumentActsOnlyBesideTheFreshStart() throws {
+        defer { UserDefaults(suiteName: WaterBuddyApp.freshStartSuite)?.removePersistentDomain(forName: WaterBuddyApp.freshStartSuite) }
+        #expect(WaterBuddyApp.freshStartManager(arguments: ["WaterBuddy", WaterBuddyApp.themeArgument, "dusk"]) == nil)
+        let manager = try #require(WaterBuddyApp.freshStartManager(
+            arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES", WaterBuddyApp.themeArgument, "dusk"]))
+        #expect(manager.theme == .dusk)
+        let unknown = try #require(WaterBuddyApp.freshStartManager(
+            arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES", WaterBuddyApp.themeArgument, "neon"]))
+        #expect(unknown.theme == .aurora)
+    }
+
     @Test func theHeldPremiumNeedsTheFreshStart() {
         #expect(WaterBuddyApp.premiumSource(arguments: ["WaterBuddy", WaterBuddyApp.premiumHeldArgument, "YES"]) == nil)
         #expect(WaterBuddyApp.premiumSource(arguments: ["WaterBuddy", WaterBuddyApp.freshStartArgument, "YES"]) == nil)

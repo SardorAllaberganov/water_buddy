@@ -139,24 +139,88 @@ struct WaveShape: Shape {
 
 // MARK: - Backdrop
 
-/// Deep blue into purple, with soft colour pushed off-centre. The blobs are not decoration:
-/// a perfectly smooth gradient gives the material nothing to blur, and the glass disappears.
+/// One theme's sky: five colours (spec `2026-11-22-set-c-design.md` §3.4). Aurora's is deep blue into purple, with
+/// soft colour pushed off-centre. The blobs are not decoration: a perfectly smooth gradient gives the material
+/// nothing to blur, and the glass disappears.
 ///
-/// The colour is shared with the widget; the shape of the light is not. `AuroraBackground` in the
-/// app blurs three circles at absolute offsets sized for a phone screen, which means nothing in a
-/// 158pt widget — see `WidgetAurora` for the same three lights re-expressed proportionally.
-enum Aurora {
+/// The colour is shared with the widget and the watch; the shape of the light is not. `AuroraBackground` in the
+/// app blurs three circles at absolute offsets sized for a phone screen, which means nothing in a 158pt widget —
+/// see `WidgetAurora` for the same three lights re-expressed proportionally.
+///
+/// **A value, one per theme.** `top` is the sky's head and the ink on white — the primary surface's label, the
+/// selection discs' letters — and Apple's glass's tint and the phone's scrim; `bottom` its foot; `first` and
+/// `second` the two broad lights, the confetti and the rim; `accent` the third light and every mark, switch and
+/// accent line. A view draws the environment's `aurora`, never a palette by name — except water, which is
+/// ``classic``'s in every theme (D6). Every value measured on a theme's renders is a function of the theme, beside
+/// Aurora's number (rule `60-design-system`).
+nonisolated struct Aurora: Equatable, Sendable {
+    let top: Color
+    let bottom: Color
+    let first: Color
+    let second: Color
+    let accent: Color
 
-    static let top = Color(red: 0.04, green: 0.13, blue: 0.52)
-    static let bottom = Color(red: 0.36, green: 0.10, blue: 0.62)
-
-    static let blue = Color(red: 0.00, green: 0.55, blue: 1.00)
-    static let magenta = Color(red: 0.78, green: 0.25, blue: 0.98)
-    static let cyan = Color(red: 0.00, green: 0.85, blue: 0.85)
-
-    static var gradient: LinearGradient {
+    var gradient: LinearGradient {
         LinearGradient(colors: [top, bottom], startPoint: .top, endPoint: .bottom)
     }
+
+    /// The palette the app always drew — Aurora's — and the water's in every theme (D6).
+    static let classic = Aurora(
+        top: Color(red: 0.04, green: 0.13, blue: 0.52), bottom: Color(red: 0.36, green: 0.10, blue: 0.62),
+        first: Color(red: 0.00, green: 0.55, blue: 1.00), second: Color(red: 0.78, green: 0.25, blue: 0.98),
+        accent: Color(red: 0.00, green: 0.85, blue: 0.85)
+    )
+    /// The board's starting values (§3.4), confirmed on renders with the owner; derived values per theme are
+    /// measured (D7), never read off these by eye.
+    static let lagoon = Aurora(
+        top: Color(red: 0.01, green: 0.15, blue: 0.26), bottom: Color(red: 0.00, green: 0.27, blue: 0.33),
+        first: Color(red: 0.00, green: 0.60, blue: 0.78), second: Color(red: 0.05, green: 0.58, blue: 0.50),
+        accent: Color(red: 0.25, green: 0.88, blue: 0.75)
+    )
+    static let dusk = Aurora(
+        top: Color(red: 0.17, green: 0.04, blue: 0.20), bottom: Color(red: 0.42, green: 0.09, blue: 0.22),
+        first: Color(red: 0.95, green: 0.38, blue: 0.22), second: Color(red: 0.90, green: 0.22, blue: 0.50),
+        accent: Color(red: 1.00, green: 0.74, blue: 0.30)
+    )
+    static let midnight = Aurora(
+        top: Color(red: 0.04, green: 0.05, blue: 0.09), bottom: Color(red: 0.11, green: 0.12, blue: 0.18),
+        first: Color(red: 0.28, green: 0.38, blue: 0.62), second: Color(red: 0.42, green: 0.40, blue: 0.55),
+        accent: Color(red: 0.40, green: 0.82, blue: 1.00)
+    )
+    static let bloom = Aurora(
+        top: Color(red: 0.20, green: 0.03, blue: 0.18), bottom: Color(red: 0.36, green: 0.06, blue: 0.34),
+        first: Color(red: 0.92, green: 0.30, blue: 0.62), second: Color(red: 0.62, green: 0.30, blue: 0.96),
+        accent: Color(red: 1.00, green: 0.66, blue: 0.78)
+    )
+}
+
+extension AppTheme {
+    /// The theme's palette. `palette`, not `aurora`: an instance member may not share the case's name.
+    nonisolated var palette: Aurora {
+        switch self {
+        case .aurora: .classic
+        case .lagoon: .lagoon
+        case .dusk: .dusk
+        case .midnight: .midnight
+        case .bloom: .bloom
+        }
+    }
+}
+
+private struct ThemeKey: EnvironmentKey {
+    static let defaultValue: AppTheme = .aurora
+}
+
+extension EnvironmentValues {
+    /// The theme a root injected beside `\.strings` and `\.locale`: the stored one in the app, the snapshot's in a
+    /// widget, the mirror's on the watch (rule `50-views`).
+    var theme: AppTheme {
+        get { self[ThemeKey.self] }
+        set { self[ThemeKey.self] = newValue }
+    }
+
+    /// The palette every view draws. Read-only: inject ``theme``.
+    var aurora: Aurora { theme.palette }
 }
 
 /// The seven icons a vessel may wear — the standard three's and four more — in the order the editor offers
@@ -228,7 +292,7 @@ nonisolated let vesselSlots: [(nameKey: String, symbol: String)] = VesselGlyph.s
 
 #Preview("Water") {
     ZStack {
-        Aurora.gradient.ignoresSafeArea()
+        Aurora.classic.gradient.ignoresSafeArea()
 
         HStack(spacing: 20) {
             ForEach([0.15, 0.5, 0.85], id: \.self) { level in

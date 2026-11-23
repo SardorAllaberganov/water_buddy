@@ -120,17 +120,20 @@ struct LiquidGlassBaseTests {
     /// `.material`'s Reduce-Transparency fill must equal `.archived`'s — not merely "some
     /// colour". If a future edit reintroduces a system-material colour here, this is the test
     /// that catches it before the watch target stops compiling again.
-    @Test
-    func materialAndArchivedAgreeUnderReduceTransparency() {
-        #expect(LiquidGlass.Base.material(.thin).opaqueFill == LiquidGlass.Base.archived.opaqueFill)
+    @Test(arguments: AppTheme.allCases)
+    func materialAndArchivedAgreeUnderReduceTransparency(theme: AppTheme) {
+        #expect(LiquidGlass.Base.material(.ultraThinMaterial).opaqueFill(in: theme)
+                == LiquidGlass.Base.archived(for: theme).opaqueFill(in: theme))
     }
 
-    /// `.flat`'s own opaque fill is returned verbatim, never substituted.
+    /// `.flat`'s own opaque fill is returned verbatim, never substituted — in every theme.
     @Test
     func flatReturnsItsOwnOpaqueFillUnchanged() {
         let fill = Color(red: 0.5, green: 0.1, blue: 0.9)
         let base = LiquidGlass.Base.flat(translucent: .clear, opaque: fill)
-        #expect(base.opaqueFill == fill)
+        for theme in AppTheme.allCases {
+            #expect(base.opaqueFill(in: theme) == fill)
+        }
     }
 }
 
@@ -150,14 +153,14 @@ struct LiquidGlassRoutingTests {
     @Test(arguments: [true, false])
     func reduceTransparencyAlwaysDrawsTheOpaquePane(systemGlassAvailable: Bool) {
         #expect(LiquidGlass.rendering(base: material, reduceTransparency: true, systemGlassAvailable: systemGlassAvailable) == .opaque)
-        #expect(LiquidGlass.rendering(base: .archived, reduceTransparency: true, systemGlassAvailable: systemGlassAvailable) == .opaque)
+        #expect(LiquidGlass.rendering(base: .archived(for: .aurora),reduceTransparency: true, systemGlassAvailable: systemGlassAvailable) == .opaque)
     }
 
     /// The widget's base. It exists because a widget cannot sample a backdrop, and Apple's glass
     /// samples one — so it never reaches Apple's glass, whatever the OS.
     @Test(arguments: [true, false])
     func aFlatBaseIsAlwaysHandMade(systemGlassAvailable: Bool) {
-        #expect(LiquidGlass.rendering(base: .archived, reduceTransparency: false, systemGlassAvailable: systemGlassAvailable) == .handMade)
+        #expect(LiquidGlass.rendering(base: .archived(for: .aurora),reduceTransparency: false, systemGlassAvailable: systemGlassAvailable) == .handMade)
     }
 
     @Test func aMaterialBaseDrawsApplesGlassWhereTheSystemHasIt() {
@@ -195,24 +198,28 @@ struct LiquidGlassRoutingTests {
     /// measured under 4.5:1 on it (`docs/DESIGN.md`, *Apple's glass, measured*) — so the regular
     /// variant is darkened. The clear one is the vessel, whose readout has `WaterReadabilityScrim`
     /// and whose water has to stay the colour it is.
-    @Test func onlyTheRegularVariantIsDarkened() {
-        #expect(LiquidGlass.systemTintOpacity(for: .regular) > 0)
-        #expect(LiquidGlass.systemTintOpacity(for: .clear) == 0)
+    @Test(arguments: AppTheme.allCases)
+    func onlyTheRegularVariantIsDarkened(theme: AppTheme) {
+        #expect(LiquidGlass.systemTintOpacity(for: .regular, theme: theme) > 0)
+        #expect(LiquidGlass.systemTintOpacity(for: .clear, theme: theme) == 0)
     }
 
     /// A floor, and a measured one: every lighter rung was rendered and failed or had no room.
-    /// With `Aurora.top` as the tint, iOS 27.0, the rim and the sheen on: at `0.52` the weekday
+    /// With Aurora's `top` as the tint, iOS 27.0, the rim and the sheen on: at `0.52` the weekday
     /// letters read 4.28 and at `0.56` 4.48, under 4.5; `0.60` passed with 0.14 to spare; `0.64`
     /// is the first rung with room (stage 3c's ledger; `docs/DESIGN.md`). A lighter glass is a new
-    /// measurement first, and then this number.
-    @Test func theTintIsNoLighterThanTheLightestRungThatPassed() {
-        #expect(LiquidGlass.systemTintOpacity(for: .regular) >= 0.64)
+    /// measurement first, and then this number. Every theme holds Aurora's rung until its own
+    /// table says otherwise (set C, D7).
+    @Test(arguments: AppTheme.allCases)
+    func theTintIsNoLighterThanTheLightestRungThatPassed(theme: AppTheme) {
+        #expect(LiquidGlass.systemTintOpacity(for: .regular, theme: theme) >= 0.64)
     }
 
-    /// The sky's own blue, not black: a black tint greys the aurora under the pane, and the canvas
-    /// drew its panes navy (spec `2026-10-13-the-look-design.md` §3.1).
-    @Test func theGlassIsTintedWithTheSkysOwnBlue() {
-        #expect(LiquidGlass.systemTintColor == Aurora.top)
+    /// The sky's own colour, not black: a black tint greys the aurora under the pane, and the canvas
+    /// drew its panes navy (spec `2026-10-13-the-look-design.md` §3.1). Each theme's own sky, at its head.
+    @Test(arguments: AppTheme.allCases)
+    func theGlassIsTintedWithTheSkysOwnBlue(theme: AppTheme) {
+        #expect(LiquidGlass.systemTintColor(for: theme) == theme.palette.top)
     }
 }
 
@@ -241,15 +248,16 @@ struct LiquidGlassScrimTests {
     /// Each value is the rung stage 3c measured on iOS 18.6 (`docs/DESIGN.md`, *The look,
     /// measured*): sheer the lightest rung tried, which left *Cancel* with room, frosted the one
     /// swept, opaque the lightest measured rung above frosted.
-    @Test func thePhonesOwnPanesAreScrimmedWithTheSky() {
+    @Test(arguments: AppTheme.allCases)
+    func thePhonesOwnPanesAreScrimmedWithTheSky(theme: AppTheme) {
         for density in densities {
-            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: true)
-            #expect(scrim.color == Aurora.top)
+            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: true, theme: theme)
+            #expect(scrim.color == theme.palette.top)
             #expect(scrim.opacity > before(density))
             #expect(scrim.opacity < 1)
         }
         let opacity = { (density: LiquidGlass.Density) in
-            LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: true).opacity
+            LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: true, theme: theme).opacity
         }
         #expect(opacity(.sheer) == 0.30)
         #expect(opacity(.frosted) == 0.70)
@@ -260,9 +268,10 @@ struct LiquidGlassScrimTests {
 
     /// The widget's archive cannot sample a backdrop and its fills were derived for the black scrim
     /// (`Base.archived`); the redesign keeps its glass as it is.
-    @Test func theWidgetKeepsItsBlackScrim() {
+    @Test(arguments: AppTheme.allCases)
+    func theWidgetKeepsItsBlackScrim(theme: AppTheme) {
         for density in densities {
-            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: .archived, onPhone: true)
+            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: .archived(for: theme), onPhone: true, theme: theme)
             #expect(scrim.color == Color.black)
             #expect(scrim.opacity == before(density))
         }
@@ -271,19 +280,21 @@ struct LiquidGlassScrimTests {
     /// The watch's answer stays black. No watch pane asks it since the redesign's stage 7 — the
     /// watch draws Apple's glass, or the opaque fill under Reduce Transparency — so a watch that
     /// ever fell back to the hand-made stack would draw what it drew before.
-    @Test func theWatchKeepsItsBlackScrim() {
+    @Test(arguments: AppTheme.allCases)
+    func theWatchKeepsItsBlackScrim(theme: AppTheme) {
         for density in densities {
-            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: false)
+            let scrim = LiquidGlass.scrim(density: density, scheme: .dark, base: material, onPhone: false, theme: theme)
             #expect(scrim.color == Color.black)
             #expect(scrim.opacity == before(density))
         }
     }
 
     /// Light Mode has no scrim, on any pane — as before.
-    @Test func lightModeHasNoScrim() {
+    @Test(arguments: AppTheme.allCases)
+    func lightModeHasNoScrim(theme: AppTheme) {
         for density in densities {
-            #expect(LiquidGlass.scrim(density: density, scheme: .light, base: material, onPhone: true).opacity == 0)
-            #expect(LiquidGlass.scrim(density: density, scheme: .light, base: .archived, onPhone: true).opacity == 0)
+            #expect(LiquidGlass.scrim(density: density, scheme: .light, base: material, onPhone: true, theme: theme).opacity == 0)
+            #expect(LiquidGlass.scrim(density: density, scheme: .light, base: .archived(for: theme), onPhone: true, theme: theme).opacity == 0)
         }
     }
 }
@@ -310,10 +321,11 @@ struct PrimarySurfaceTests {
         0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
     }
 
-    /// `Aurora.top` on the primary fill, taken at the fill's darkest point: its foot, where the
-    /// shade toward `Aurora.top` is strongest. About 13:1 at the head and 10.6:1 here.
-    @Test func thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade() {
-        let resolved = Aurora.top.resolve(in: EnvironmentValues())
+    /// The theme's `top` on the primary fill, taken at the fill's darkest point: its foot, where the
+    /// shade toward the ink is strongest. For Aurora about 13:1 at the head and 10.6:1 here.
+    @Test(arguments: AppTheme.allCases)
+    func thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade(theme: AppTheme) {
+        let resolved = theme.palette.top.resolve(in: EnvironmentValues())
         let ink = [resolved.linearRed, resolved.linearGreen, resolved.linearBlue].map(Double.init)
         let shade = LiquidGlass.Primary.shadeOpacity
 
@@ -325,10 +337,11 @@ struct PrimarySurfaceTests {
         #expect(ratio >= 7)
     }
 
-    /// The week card's shown letter: `Aurora.top` on the white disc behind it. Both fills are solid,
-    /// so the pair is derived, not measured — about 13:1.
-    @Test func theShownDaysLetterReadsOnItsDisc() {
-        let inkColour = Aurora.top.resolve(in: EnvironmentValues())
+    /// The week card's shown letter: the theme's `top` on the white disc behind it. Both fills are solid,
+    /// so the pair is derived, not measured — about 13:1 for Aurora.
+    @Test(arguments: AppTheme.allCases)
+    func theShownDaysLetterReadsOnItsDisc(theme: AppTheme) {
+        let inkColour = theme.palette.top.resolve(in: EnvironmentValues())
         let discColour = LiquidGlass.Selection.discFill.resolve(in: EnvironmentValues())
         let ink = luminance([inkColour.linearRed, inkColour.linearGreen, inkColour.linearBlue].map(Double.init))
         let disc = luminance([discColour.linearRed, discColour.linearGreen, discColour.linearBlue].map(Double.init))

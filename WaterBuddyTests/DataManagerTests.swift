@@ -135,6 +135,7 @@ struct DataManagerTests {
             manager.saveDailyGoal(ml: 2_500)          // dailyGoal, isGoalSet
             manager.servings = [200, 300, 600]        // servings
             _ = manager.addVessel(glyph: .flask, name: "Office", amount: 400)   // vessels
+            manager.theme = .lagoon                   // theme
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
             manager.healthEnabled = true              // healthEnabled
@@ -174,6 +175,7 @@ struct DataManagerTests {
                 "the claim wrote nothing, so the roster's check never saw its key"
             )
             #expect(live.contains(DataManager.Key.vessels), "the library wrote nothing, so the roster's check never saw its key")
+            #expect(live.contains(DataManager.Key.theme), "the theme wrote nothing, so the roster's check never saw its key")
         }
     }
 

@@ -97,13 +97,15 @@ struct BarShadeTests {
     /// minute read 4.78:1, and `0.25` is the first rung with room (`docs/DESIGN.md`, *Apple's
     /// tab bar, measured*). Re-take the figures before lowering it; never estimate one rung from
     /// another.
-    @Test func theShadeIsNoLighterThanTheFirstRungWithRoom() {
-        #expect(BarShade.opacity >= 0.25)
+    @Test(arguments: AppTheme.allCases)
+    func theShadeIsNoLighterThanTheFirstRungWithRoom(theme: AppTheme) {
+        #expect(BarShade.opacity(for: theme) >= 0.25)
     }
 
     /// It darkens the ground under the bar; it is not a plate over the aurora.
-    @Test func theShadeLeavesTheAuroraShowing() {
-        #expect(BarShade.opacity <= 0.5)
+    @Test(arguments: AppTheme.allCases)
+    func theShadeLeavesTheAuroraShowing(theme: AppTheme) {
+        #expect(BarShade.opacity(for: theme) <= 0.5)
     }
 
     /// The shade fades in above the bar, and that ramp is no taller than the padding Home keeps

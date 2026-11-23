@@ -159,6 +159,8 @@ struct HydrationView: View {
             // carries both across via `rolledOver()`.
             .environment(\.strings, entry.snapshot.language.bundle)
             .environment(\.locale, entry.snapshot.language.locale)
+            // The stored theme, read from the same snapshot: the aurora, the glass and the button wear it (set C).
+            .environment(\.theme, entry.snapshot.theme)
     }
 
     /// The card, or — for the small family once iOS has removed the background — the bare layout.
@@ -566,11 +568,12 @@ private struct WidgetPane<S: Shape & InsettableShape>: ViewModifier {
     let glass: Bool
 
     @Environment(\.widgetRenderingMode) private var renderingMode
+    @Environment(\.theme) private var theme
 
     @ViewBuilder
     func body(content: Content) -> some View {
         if glass && renderingMode == .fullColor {
-            content.liquidGlass(in: shape, base: .archived, density: density, elevation: elevation)
+            content.liquidGlass(in: shape, base: .archived(for: theme), density: density, elevation: elevation)
         } else {
             content.background {
                 shape.strokeBorder(.white.opacity(0.45), lineWidth: 1)
@@ -610,7 +613,7 @@ private extension View {
     }
 }
 
-/// The widget's one action as the redesign's primary surface: solid white, `Aurora.top` content
+/// The widget's one action as the redesign's primary surface: solid white, the theme's `top` content
 /// (rule `60-design-system`).
 ///
 /// **No ring.** ``PrimarySurfaceModifier``'s ring reaches six points outside the shape, and the
@@ -668,7 +671,7 @@ private struct WidgetCardBackdrop: View {
                 .scaleEffect(1.22)
                 .blur(radius: 12)
                 // `.ultraThinMaterial`'s recipe boosts saturation by exactly this much before it
-                // mixes toward grey. `LiquidGlass.Base.archived` reproduces the mix but cannot
+                // mixes toward grey. `LiquidGlass.Base.archived(for:)` reproduces the mix but cannot
                 // reproduce the boost, because a flat fill has no backdrop to saturate — so it
                 // is applied here, to the backdrop itself.
                 .saturation(1.1)
@@ -689,6 +692,8 @@ struct WidgetAurora: View {
 
     @Environment(\.widgetRenderingMode) private var renderingMode
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    /// The snapshot's theme, injected at the root: the sky and its three lights (set C).
+    @Environment(\.aurora) private var aurora
 
     var body: some View {
         if renderingMode == .fullColor {
@@ -696,15 +701,15 @@ struct WidgetAurora: View {
                 let width = proxy.size.width
 
                 ZStack {
-                    Aurora.gradient
+                    aurora.gradient
 
                     // With Reduce Transparency on, the card above is an opaque slab and the lights
                     // would only show as a rim of colour around it. The plain gradient is the
                     // calmer read.
                     if !reduceTransparency {
-                        light(Aurora.blue, at: UnitPoint(x: 0.18, y: 0.10), size: width * 1.05, opacity: 0.75)
-                        light(Aurora.magenta, at: UnitPoint(x: 0.86, y: 0.92), size: width * 1.00, opacity: 0.70)
-                        light(Aurora.cyan, at: UnitPoint(x: 0.84, y: 0.20), size: width * 0.65, opacity: 0.38)
+                        light(aurora.first, at: UnitPoint(x: 0.18, y: 0.10), size: width * 1.05, opacity: 0.75)
+                        light(aurora.second, at: UnitPoint(x: 0.86, y: 0.92), size: width * 1.00, opacity: 0.70)
+                        light(aurora.accent, at: UnitPoint(x: 0.84, y: 0.20), size: width * 0.65, opacity: 0.38)
                     }
                 }
             }

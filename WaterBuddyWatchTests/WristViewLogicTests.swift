@@ -407,11 +407,14 @@ struct WristViewLogicTests {
 
     // MARK: - The library on the wrist (spec 2026-11-22 D18)
 
-    private static func mirror(vessels: [WristMirror.Vessel]?, servings: [Int] = [150, 1_180, 500]) -> WristMirror {
+    private static func mirror(
+        vessels: [WristMirror.Vessel]?, servings: [Int] = [150, 1_180, 500], themeCode: String? = nil
+    ) -> WristMirror {
         WristMirror(
             schemaVersion: WristMirror.currentSchemaVersion, currentWater: 0, dailyGoal: 2_000, servings: servings,
             languageCode: nil, isGoalSet: true, composedAt: Date(timeIntervalSince1970: 0),
-            phoneDayStart: Date(timeIntervalSince1970: 0), phoneDayEnd: nil, acked: [], vessels: vessels
+            phoneDayStart: Date(timeIntervalSince1970: 0), phoneDayEnd: nil, acked: [], vessels: vessels,
+            themeCode: themeCode
         )
     }
 
@@ -449,5 +452,12 @@ struct WristViewLogicTests {
         for vessels in [nil, [WristMirror.Vessel(glyph: "cup", name: nil)]] as [[WristMirror.Vessel]?] {
             #expect(WristView.servings(from: Self.mirror(vessels: vessels)).map(\.nameKey) == ["Cup", "Glass", "Bottle"])
         }
+    }
+
+    /// Review Focus 5, on the wrist.
+    @Test func anUnknownThemeCodeOnTheWireDrawsAurora() {
+        #expect(WristView.theme(from: nil) == .aurora)
+        #expect(WristView.theme(from: Self.mirror(vessels: nil, themeCode: "dusk")) == .dusk)
+        #expect(WristView.theme(from: Self.mirror(vessels: nil, themeCode: "neon")) == .aurora)
     }
 }

@@ -66,6 +66,8 @@ struct WeekView: View {
         .environment(\.colorScheme, .dark)
         .environment(\.strings, entry.snapshot.language.bundle)
         .environment(\.locale, entry.snapshot.language.locale)
+        // The stored theme, read from the same snapshot: the aurora and the met bars wear it (set C).
+        .environment(\.theme, entry.snapshot.theme)
     }
 }
 
@@ -91,6 +93,7 @@ private struct WeekCard: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     /// The title's size at default Dynamic Type — a real magnitude, never a unitless `1`
     /// (rule `40-widget`). The figure and the letters are ratios of it. Capped at `.accessibility1` by
@@ -211,7 +214,7 @@ private struct WeekCard: View {
                 .fill(.white.opacity(0.10))
 
             shape
-                .fill(met ? Aurora.cyan : Color.white)
+                .fill(met ? aurora.accent : Color.white)
                 // A day with nothing logged still draws a sliver, so it reads as an empty day rather
                 // than a missing one — History's rule.
                 .frame(height: max(height * fraction, day.total > 0 ? 4 : 2))

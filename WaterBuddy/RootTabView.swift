@@ -134,6 +134,7 @@ struct RootTabView: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.theme) private var theme
 
     /// Whether a change of page carries the pages across the screen, or cross-fades them.
     private var slides: Bool { !reduceMotion }
@@ -272,13 +273,13 @@ struct RootTabView: View {
         if #available(iOS 26.0, *) {
             VStack(spacing: 0) {
                 LinearGradient(
-                    colors: [.clear, .black.opacity(BarShade.opacity)],
+                    colors: [.clear, .black.opacity(BarShade.opacity(for: theme))],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 .frame(height: BarShade.ramp)
 
-                Color.black.opacity(BarShade.opacity)
+                Color.black.opacity(BarShade.opacity(for: theme))
                     .ignoresSafeArea(edges: .bottom)
                     .frame(height: 0)
             }
@@ -361,7 +362,7 @@ private struct SystemTabBar: UIViewRepresentable {
     func makeUIView(context: Context) -> UITabBar {
         let bar = UITabBar()
         bar.delegate = context.coordinator
-        // The selected tab's glyph and caption. White, not `Aurora.cyan`: on iOS 26.5 the system
+        // The selected tab's glyph and caption. White, not the accent: on iOS 26.5 the system
         // draws the selected lozenge lighter than the bar, and cyan on it read 3.98:1
         // (`docs/DESIGN.md`, *Apple's tab bar, measured*).
         bar.tintColor = .white
@@ -414,8 +415,13 @@ private struct SystemTabBar: UIViewRepresentable {
 /// `43-concurrency`). Drawn on iOS 26 and later only: the app's own bar carries its own pane.
 nonisolated enum BarShade {
 
-    /// How dark the ground under the bar is made.
-    static let opacity: Double = 0.25
+    /// How dark the ground under the bar is made — **measured per theme** (D7): every theme keeps Aurora's 0.25
+    /// until its own table (`docs/DESIGN.md`) says otherwise.
+    static func opacity(for theme: AppTheme) -> Double {
+        switch theme {
+        case .aurora, .lagoon, .dusk, .midnight, .bloom: 0.25
+        }
+    }
 
     /// The height the shade fades in over, above the bar. No taller than the padding Home keeps
     /// at its foot (`theRampFitsInsideHomesFoot`), so where Home fits its screen the ramp dims
@@ -440,6 +446,7 @@ private struct GlassTabBar: View {
     @Binding var selection: AppTab
 
     @Environment(\.strings) private var strings
+    @Environment(\.aurora) private var aurora
 
     /// A real magnitude, not a unitless `1` — `@ScaledMetric` resolves through `UIFontMetrics`,
     /// which rounds to the nearest third of a point (rule `65-accessibility`).
@@ -493,14 +500,14 @@ private struct GlassTabBar: View {
                     // under its own glyph, and *History* stood two and a half points above the
                     // other two (`testTheBarsCaptionsShareALine`).
                     .frame(height: glyph * 1.2)
-                    .foregroundStyle(isActive ? Aurora.cyan : Color.white.opacity(0.72))
+                    .foregroundStyle(isActive ? aurora.accent : Color.white.opacity(0.72))
                     // The glow, and it is two shadows for the same reason the design system's
                     // elevation is: one alone either hugs the glyph with no bloom or floats with
                     // no core. Both are `.clear` when inactive, so the modifier is present in
                     // either branch and SwiftUI animates the colour rather than inserting and
                     // removing a layer.
-                    .shadow(color: isActive ? Aurora.cyan.opacity(0.55) : .clear, radius: 9)
-                    .shadow(color: isActive ? Aurora.cyan.opacity(0.40) : .clear, radius: 3)
+                    .shadow(color: isActive ? aurora.accent.opacity(0.55) : .clear, radius: 9)
+                    .shadow(color: isActive ? aurora.accent.opacity(0.40) : .clear, radius: 3)
 
                 Text(tab.title(in: strings))
                     // Sized as a ratio of the glyph it annotates, never with its own text style.
@@ -511,7 +518,7 @@ private struct GlassTabBar: View {
                     .font(.system(size: glyph * 0.62, weight: .semibold))
                     // **The label stays white even when the tab is active, and that is measured.**
                     // Sampled off the rendered bar, the pane is sRGB (0.388, 0.282, 0.484), and
-                    // `Aurora.cyan` on it is **4.34:1** — under the 4.5:1 that rule
+                    // Aurora's accent on it is **4.34:1** — under the 4.5:1 that rule
                     // `65-accessibility` requires of small text. The *glyph* may still be cyan:
                     // an icon is not text and its floor is 3:1, which 4.34:1 clears. White at
                     // 0.72 measures **4.89:1** and full white **7.66:1**, so the state is carried

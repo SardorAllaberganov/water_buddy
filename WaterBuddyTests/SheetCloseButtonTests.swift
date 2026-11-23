@@ -39,7 +39,7 @@ struct SheetCloseButtonTests {
             // SwiftUI's own setter for what `accessibilityReduceTransparency` reads.
             .environment(\._accessibilityReduceTransparency, true)
             .padding(8)
-            .background(Aurora.top))
+            .background(Aurora.classic.top))
         renderer.scale = 3
         return renderer.uiImage
     }

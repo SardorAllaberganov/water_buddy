@@ -73,5 +73,7 @@ private struct WristRoot: View {
         WristView()
             .environment(\.strings, model.language.bundle)
             .environment(\.locale, model.language.locale)
+            // The phone's theme, carried on the mirror: the watch's sky and glass wear it (set C, D18).
+            .environment(\.theme, model.theme)
     }
 }

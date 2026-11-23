@@ -12,8 +12,8 @@ import SwiftUI
 ///
 /// **The card is the image**: one view from one ``MonthHistory``, so what is sent is what was seen.
 ///
-/// **Flat, because it is rendered.** Its canvas is `Aurora.gradient`, not glass, and its tiles take a
-/// flat base, ``tileBase`` — History's own glass, frozen into a derived fill — because `ImageRenderer`,
+/// **Flat, because it is rendered.** Its canvas is the theme's `gradient`, not glass, and its tiles take a
+/// flat base, ``tileBase(for:)`` — History's own glass, frozen into a derived fill — because `ImageRenderer`,
 /// like a widget snapshot, has no live backdrop for a `Material` to sample (rule `40-widget`'s ruling, in
 /// its second case). They took the widget's ``LiquidGlass/Base/archived`` until known issue #182, and
 /// read grey-brown beside the app's panes.
@@ -28,6 +28,8 @@ struct RecapCard: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
+    @Environment(\.theme) private var theme
 
     let month: MonthHistory
 
@@ -53,7 +55,7 @@ struct RecapCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: LiquidGlass.cornerRadius, style: .continuous)
-                .fill(Aurora.gradient)
+                .fill(aurora.gradient)
         )
         .premiumRim(lit: lit)
         .accessibilityElement(children: .ignore)
@@ -93,7 +95,7 @@ struct RecapCard: View {
                 .textCase(.uppercase)
                 .font(.footnote.weight(.heavy))
                 .tracking(Self.tracking)
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
         }
     }
 
@@ -154,7 +156,7 @@ struct RecapCard: View {
         if !day.isCounted {
             Circle().fill(.white.opacity(Self.uncountedDot))
         } else if day.isMet {
-            Circle().fill(Aurora.cyan)
+            Circle().fill(aurora.accent)
         } else {
             Circle().strokeBorder(.white.opacity(Self.unmetRing), lineWidth: Self.ringWidth)
         }
@@ -203,14 +205,14 @@ struct RecapCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .liquidGlass(cornerRadius: LiquidGlass.innerCornerRadius, base: Self.tileBase, density: .sheer, elevation: .flush)
+        .liquidGlass(cornerRadius: LiquidGlass.innerCornerRadius, base: Self.tileBase(for: theme), density: .sheer, elevation: .flush)
     }
 
     private func changeLine(_ change: Int) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Image(systemName: HistoryView.changeSymbol(change))
                 .font(.body.weight(.semibold))
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
             Text(HistoryView.drawnChange(change, strings: strings, locale: locale))
                 .font(.subheadline.weight(.bold))
                 .fixedSize(horizontal: false, vertical: true)
@@ -250,13 +252,14 @@ struct RecapCard: View {
 
     // MARK: - The tiles' fill
 
-    /// History's own pane — Apple's regular glass tinted `Aurora.top`, a `.frosted` pane — frozen into
+    /// History's own pane — Apple's regular glass tinted the theme's `top`, a `.frosted` pane — frozen into
     /// one flat fill under the hand-made sheer stack (known issue #182, the owner's ruling; spec
-    /// `2026-10-24-finish-set-a-design.md` §2.4).
+    /// `2026-10-24-finish-set-a-design.md` §2.4). **Fitted per theme** on iOS 27.0 (set C, D7; `docs/DESIGN.md`):
+    /// Aurora's is the fit of 2026-10-25, and every other theme wears it until its own is fitted.
     ///
     /// **Derived, never chosen.** A `.flat` base is always drawn hand-made: in the dark scheme the fill,
     /// then the black scrim at 0.16, then white at 0.05 — `out = w + (1 − w)(1 − s)(a·F + (1 − a)·B)`.
-    /// Five live panes over `Aurora.gradient` on iOS 27.0, each read where its sheen is clear and over
+    /// Five live panes over Aurora's `gradient` on iOS 27.0, each read where its sheen is clear and over
     /// the same pixels bare, fitted one colour `F` and one opacity `a` by least squares: worst ΔE₂₀₀₀
     /// 0.26 fitted, 0.29 drawn. sRGB. Retune it only by measuring again — and if the scrim or the tint a
     /// flat base takes moves, this moves with them (`theTilesFillGivesBackTheAppsOwnGlass`).
@@ -264,14 +267,22 @@ struct RecapCard: View {
     /// Not the tile's own `.sheer` glass: that is Apple's clear glass, untinted, which lightens every
     /// ground alike while the stack's scrim darkens in proportion — no fill in range gives it back
     /// (best 3.34).
-    static let tileFill = (red: 0.0287, green: 0.1761, blue: 0.8521, opacity: 0.4856)
+    static func tileFill(for theme: AppTheme) -> (red: Double, green: Double, blue: Double, opacity: Double) {
+        switch theme {
+        case .aurora, .lagoon, .dusk, .midnight, .bloom:
+            return (red: 0.0287, green: 0.1761, blue: 0.8521, opacity: 0.4856)
+        }
+    }
 
-    /// The tiles' base: ``tileFill``, and `archived`'s slab under Reduce Transparency — the one opaque
+    /// The tiles' base: ``tileFill(for:)``, and `archived`'s slab under Reduce Transparency — the one opaque
     /// colour every pane takes there, so no second literal.
-    static let tileBase = LiquidGlass.Base.flat(
-        translucent: Color(red: tileFill.red, green: tileFill.green, blue: tileFill.blue).opacity(tileFill.opacity),
-        opaque: LiquidGlass.Base.archived.opaqueFill
-    )
+    static func tileBase(for theme: AppTheme) -> LiquidGlass.Base {
+        let fill = tileFill(for: theme)
+        return .flat(
+            translucent: Color(red: fill.red, green: fill.green, blue: fill.blue).opacity(fill.opacity),
+            opaque: LiquidGlass.Base.archived(for: theme).opaqueFill(in: theme)
+        )
+    }
 }
 
 // MARK: - The image
@@ -284,18 +295,20 @@ extension RecapCard {
 
     /// The card rendered as the image the user may share — in memory only: no file, no key, neither
     /// store (rule `70-privacy`). `nil` if the renderer draws nothing.
-    static func image(of month: MonthHistory, strings: Bundle, locale: Locale) -> UIImage? {
+    static func image(of month: MonthHistory, strings: Bundle, locale: Locale, theme: AppTheme) -> UIImage? {
         let renderer = ImageRenderer(
             content: Rendered(month: month)
                 .environment(\.strings, strings)
                 .environment(\.locale, locale)
+                // The theme the sender sees the card in: the picture is drawn in it too (set C).
+                .environment(\.theme, theme)
         )
         renderer.scale = imageScale
         return renderer.uiImage
     }
 
     /// The card on its margin, at the image's width, at the default text size and in the dark
-    /// appearance — what ``image(of:strings:locale:)`` renders.
+    /// appearance — what ``image(of:strings:locale:theme:)`` renders.
     struct Rendered: View {
 
         let month: MonthHistory
@@ -305,13 +318,21 @@ extension RecapCard {
         }
     }
 
+    /// The ground around the card in the image: the theme's `top`, read from the environment
+    /// ``image(of:strings:locale:theme:)`` injects — a view, because ``framed(_:)`` is a `static` and cannot read it.
+    private struct ImageGround: View {
+        @Environment(\.aurora) private var aurora
+
+        var body: some View { aurora.top }
+    }
+
     /// What stands around a card in the image. ``Rendered`` hands it a card that asks for no motion, and only
     /// `theImageIsNeverHalfDrawn` hands it any other.
     static func framed(_ card: RecapCard) -> some View {
         card
             .padding(imageMargin)
             .frame(width: imageWidth)
-            .background(Aurora.top)
+            .background(ImageGround())
             // The picture never depends on the sender's text size (spec §3.4).
             .dynamicTypeSize(.large)
             // A renderer has no hosting controller for `.preferredColorScheme` to reach — the app's

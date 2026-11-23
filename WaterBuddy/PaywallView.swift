@@ -104,6 +104,7 @@ struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.aurora) private var aurora
 
     /// The plan picked — the yearly when the sheet opens.
     @State private var chosen: PremiumAccess.Plan.Kind = .yearly
@@ -225,7 +226,7 @@ struct PaywallView: View {
             ) {
                 ForEach(0..<35, id: \.self) { day in
                     Circle()
-                        .fill(PaywallStyle.quietDays.contains(day) ? .white.opacity(PaywallStyle.restOpacity) : Aurora.cyan)
+                        .fill(PaywallStyle.quietDays.contains(day) ? .white.opacity(PaywallStyle.restOpacity) : aurora.accent)
                         .frame(width: PaywallStyle.dot, height: PaywallStyle.dot)
                         .scaleEffect(drawn ? 1 : 0)
                         .animation(drawn ? Motion.popped(at: day) : nil, value: drawn)
@@ -236,7 +237,7 @@ struct PaywallView: View {
             HStack(alignment: .bottom, spacing: PaywallStyle.barGap) {
                 ForEach(PaywallStyle.bars.indices, id: \.self) { index in
                     Capsule()
-                        .fill(index == PaywallStyle.tallestBar ? Aurora.cyan : .white.opacity(PaywallStyle.barOpacity))
+                        .fill(index == PaywallStyle.tallestBar ? aurora.accent : .white.opacity(PaywallStyle.barOpacity))
                         .frame(height: PaywallStyle.barHeight * PaywallStyle.bars[index])
                         .scaleEffect(y: drawn ? 1 : 0, anchor: .bottom)
                         .animation(drawn ? Motion.drawn(at: index * 4) : nil, value: drawn)
@@ -289,7 +290,7 @@ struct PaywallView: View {
         .liquidGlass(density: .frosted, elevation: .resting)
     }
 
-    /// A glyph, a title and one line — one element to VoiceOver. The glyph is `Aurora.cyan`, as the
+    /// A glyph, a title and one line — one element to VoiceOver. The glyph is the theme's `accent`, as the
     /// Settings card draws the same features: blue and magenta read 1.5 to 1.7:1 on frosted glass
     /// (Task 8; the owner's ruling R2).
     private func featureRow(_ feature: PremiumSet.Feature) -> some View {
@@ -298,7 +299,7 @@ struct PaywallView: View {
         return HStack(alignment: typeSize.isAccessibilitySize ? .top : .center, spacing: 14) {
             Image(systemName: feature.symbol)
                 .font(.system(size: box * PaywallStyle.glyphScale, weight: .semibold))
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
                 .frame(width: box, height: box)
             VStack(alignment: .leading, spacing: 2) {
                 Text(feature.title(in: strings))

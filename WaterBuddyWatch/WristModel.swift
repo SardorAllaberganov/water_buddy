@@ -137,6 +137,12 @@ final class WristModel {
         AppLanguage(code: mirror?.languageCode)
     }
 
+    /// The theme the watch draws in: the phone's choice, carried on the mirror, or Aurora before a sync (spec
+    /// `2026-11-22-set-c-design.md` D18). A read, never a write, and tracked through `mirror`, as ``language`` is.
+    var theme: AppTheme {
+        WristView.theme(from: mirror)
+    }
+
     /// `true` when the mirror's own day and the watch's own day disagree, compared on the watch's
     /// calendar — the phone may not have rolled over yet, or the two devices are in different time
     /// zones right now.

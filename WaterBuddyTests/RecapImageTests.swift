@@ -45,7 +45,7 @@ struct RecapImageTests {
     @Test func theImageIsTenEightyPixelsWide() throws {
         let month = try #require(september())
         let image = try #require(RecapCard.image(of: month, strings: AppLanguage.english.bundle,
-                                                 locale: AppLanguage.english.locale))
+                                                 locale: AppLanguage.english.locale, theme: .aurora))
         #expect(image.size.width * image.scale == 1_080)
     }
 
@@ -61,15 +61,16 @@ struct RecapImageTests {
     }
 
     /// Known issue #182: the tiles' fill is derived from History's own pane — Apple's regular glass tinted
-    /// `Aurora.top` — read live on iOS 27.0 over the card's gradient (spec
+    /// Aurora's `top` — read live on iOS 27.0 over the card's gradient (spec
     /// `2026-10-24-finish-set-a-design.md` §2.4). Drawn through the hand-made sheer stack, with the scrim
     /// and the tint the stack itself declares, it gives that glass back at both ends of the gradient. A
     /// fill retuned by eye fails this, and so does a change to the stack the derivation rests on.
     @Test func theTilesFillGivesBackTheAppsOwnGlass() {
-        let scrim = LiquidGlass.scrim(density: .sheer, scheme: .dark, base: RecapCard.tileBase, onPhone: true)
+        let scrim = LiquidGlass.scrim(density: .sheer, scheme: .dark, base: RecapCard.tileBase(for: .aurora), onPhone: true,
+                                      theme: .aurora)
         let tint = LiquidGlass.Density.sheer.tintOpacity(for: .dark)
         #expect(scrim.color == .black, "the derivation takes the flat base's black scrim")
-        let fill = RecapCard.tileFill
+        let fill = RecapCard.tileFill(for: .aurora)
         // The ground, then the live glass over it, sRGB of 255 — the probe's top and bottom panes.
         let measured: [(ground: [Double], glass: [Double])] = [
             ([30, 34, 137], [28, 45, 154]),
@@ -90,7 +91,7 @@ struct RecapImageTests {
         let month = try #require(september())
         #expect(language.bundle.bundleURL.lastPathComponent == "\(language.code ?? "").lproj",
                 "the \(language.code ?? "") strings did not resolve")
-        let image = try #require(RecapCard.image(of: month, strings: language.bundle, locale: language.locale))
+        let image = try #require(RecapCard.image(of: month, strings: language.bundle, locale: language.locale, theme: .aurora))
         #expect(image.size.width * image.scale == 1_080)
     }
 
@@ -106,9 +107,9 @@ struct RecapImageTests {
         #expect(august.total == 31 * DataManager.maximumDailyIntake)
         let strings = AppLanguage.russian.bundle
         let locale = AppLanguage.russian.locale
-        let image = try #require(RecapCard.image(of: august, strings: strings, locale: locale))
+        let image = try #require(RecapCard.image(of: august, strings: strings, locale: locale, theme: .aurora))
         let september = try #require(september())
-        let thirty = try #require(RecapCard.image(of: september, strings: strings, locale: locale))
+        let thirty = try #require(RecapCard.image(of: september, strings: strings, locale: locale, theme: .aurora))
         #expect(image.size.width * image.scale == 1_080)
         #expect(image.size.height > thirty.size.height, "the 31st day's row is missing")
     }
@@ -134,7 +135,7 @@ struct RecapImageTests {
         guard #available(iOS 18.2, *) else { return }
         let month = try #require(september())
         let rendered = try #require(RecapCard.image(of: month, strings: AppLanguage.english.bundle,
-                                                    locale: AppLanguage.english.locale))
+                                                    locale: AppLanguage.english.locale, theme: .aurora))
         let data = try await RecapSheet.sharedItem(rendered).exported(as: .png)
         let received = try #require(UIImage(data: data))
         #expect(received.cgImage?.width == 1_080)

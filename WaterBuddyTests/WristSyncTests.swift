@@ -96,6 +96,7 @@ struct WristWireTests {
             """.utf8)
         let decoded = try JSONDecoder().decode(WristMirror.self, from: legacy)
         #expect(decoded.vessels == nil)
+        #expect(decoded.themeCode == nil)
         #expect(decoded.schemaVersion == WristMirror.currentSchemaVersion, "no bump: an older watch must keep reading")
     }
 }
@@ -895,12 +896,14 @@ struct WristMirrorNewsTests {
         phoneDayStart: Date = Date(timeIntervalSince1970: 0),
         phoneDayEnd: Date? = Date(timeIntervalSince1970: 86_400),
         acked: [UUID] = [WristMirrorNewsTests.ackedId],
-        vessels: [WristMirror.Vessel]? = nil
+        vessels: [WristMirror.Vessel]? = nil,
+        themeCode: String? = nil
     ) -> WristMirror {
         WristMirror(
             schemaVersion: schemaVersion, currentWater: currentWater, dailyGoal: dailyGoal,
             servings: servings, languageCode: languageCode, isGoalSet: isGoalSet, composedAt: composedAt,
-            phoneDayStart: phoneDayStart, phoneDayEnd: phoneDayEnd, acked: acked, vessels: vessels
+            phoneDayStart: phoneDayStart, phoneDayEnd: phoneDayEnd, acked: acked, vessels: vessels,
+            themeCode: themeCode
         )
     }
 
@@ -934,6 +937,7 @@ struct WristMirrorNewsTests {
         #expect(Self.mirror(composedAt: later, phoneDayEnd: Date(timeIntervalSince1970: 90_000)).isNews(since: base), "phoneDayEnd")
         #expect(Self.mirror(composedAt: later, acked: []).isNews(since: base), "acked")
         #expect(Self.mirror(composedAt: later, vessels: [WristMirror.Vessel(glyph: "cup", name: nil)]).isNews(since: base), "vessels")
+        #expect(Self.mirror(composedAt: later, themeCode: "dusk").isNews(since: base), "themeCode")
     }
 }
 

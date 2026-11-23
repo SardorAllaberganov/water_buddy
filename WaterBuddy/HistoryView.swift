@@ -1074,6 +1074,7 @@ private struct HistoryCard: View {
     @Environment(\.locale) private var locale
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.aurora) private var aurora
 
     /// The day the list below is showing — outlined here, and announced as selected.
     let shown: Int?
@@ -1219,12 +1220,12 @@ private struct HistoryCard: View {
                     // sizes and the label overtakes the figure — this codebase has shipped that
                     // inversion once already (rule `65-accessibility`).
                     .font(.system(size: barHeight * 0.14, weight: isShown ? .heavy : .semibold))
-                    // Full white, as the canvas drew them; the shown day's in `Aurora.top` on its
+                    // Full white, as the canvas drew them; the shown day's in the theme's `top` on its
                     // white disc (``disc(over:)``), heavier than the rest — never colour alone
                     // (rule `65-accessibility`). Measured on stage 3c's panes in `docs/DESIGN.md`,
                     // *The look, measured*; the shown pair is derived by
                     // `theShownDaysLetterReadsOnItsDisc`.
-                    .foregroundStyle(isShown ? Aurora.top : Color.white)
+                    .foregroundStyle(isShown ? aurora.top : Color.white)
                     .lineLimit(1)
                     .anchorPreference(key: LetterCentres.self, value: .center) { [day.dayOrdinal: $0] }
             }
@@ -1257,8 +1258,8 @@ private struct HistoryCard: View {
             // (rule `50-views`). **Colour is not the only carrier**: a met bar also stands at or
             // above the goal line (rule `65-accessibility`).
             //
-            // Solid `Aurora.cyan`, **not** a `Aurora.blue` → `Aurora.cyan` gradient, and the
-            // reason is a measurement rather than taste. Pure `Aurora.blue` composites to
+            // Solid accent, **not** a first-light → accent gradient, and the reason is a
+            // measurement rather than taste. Aurora's pure blue, its first light, composites to
             // **2.72:1** against this pane — under the 3:1 non-text floor — so the foot of every
             // bar failed, and a nearly-empty day is drawn almost entirely in that end. Sampling a
             // *rendered* bar gave a reassuring 3.33:1, but that is the average of the whole
@@ -1271,7 +1272,7 @@ private struct HistoryCard: View {
             // measured*). On iOS 18.6 cyan read 2.78:1 before stage 3c darkened the hand-made pane
             // (#85).
             shape
-                .fill(day.reached(manager.dailyGoal) ? Aurora.cyan : Color.white)
+                .fill(day.reached(manager.dailyGoal) ? aurora.accent : Color.white)
                 // A day with nothing logged still draws a sliver, so the bar reads as an empty day
                 // rather than as a missing one. The series is zero-filled for the same reason.
                 .frame(height: grown ? max(barHeight * fraction, day.total > 0 ? 6 : 2) : 0)
@@ -1607,6 +1608,7 @@ private struct MonthCard: View {
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     /// The month on screen, or `nil` before its first read has answered.
     let month: MonthHistory?
@@ -1770,7 +1772,7 @@ private struct MonthCard: View {
                 Circle()
                     .inset(by: arc / 2)
                     .trim(from: 0, to: drawn ? day.fraction : 0)
-                    .stroke(day.isMet ? Aurora.cyan : Color.white, style: StrokeStyle(lineWidth: arc, lineCap: .round))
+                    .stroke(day.isMet ? aurora.accent : Color.white, style: StrokeStyle(lineWidth: arc, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     // A wave across the month, a day behind the day before. Inside the card's own animation, so a turned
                     // page's rings drop to nothing at once rather than sweeping back (spec M1).
@@ -1787,9 +1789,9 @@ private struct MonthCard: View {
                     // A ratio of the ring, never a text style of its own (rule `65-accessibility`).
                     .font(.system(size: ring * 0.38, weight: isOpened || day.isToday ? .heavy : .semibold, design: .rounded))
                     .monospacedDigit()
-                    // `Aurora.top` on the white disc, as the week card's shown letter is
+                    // The theme's `top` on the white disc, as the week card's shown letter is
                     // (`theShownDaysLetterReadsOnItsDisc`).
-                    .foregroundStyle(isOpened ? Aurora.top : Color.white)
+                    .foregroundStyle(isOpened ? aurora.top : Color.white)
             }
             .frame(width: ring, height: ring)
             .animation(Motion.land, value: isOpened)
@@ -1824,12 +1826,12 @@ private struct MonthCard: View {
     private var legend: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 18) {
-                legendItem(Text("Goal met", bundle: strings), colour: Aurora.cyan, fraction: 1)
+                legendItem(Text("Goal met", bundle: strings), colour: aurora.accent, fraction: 1)
                 legendItem(Text("Part of it", bundle: strings), colour: .white, fraction: 0.6)
             }
             .fixedSize()
             VStack(alignment: .leading, spacing: 6) {
-                legendItem(Text("Goal met", bundle: strings), colour: Aurora.cyan, fraction: 1)
+                legendItem(Text("Goal met", bundle: strings), colour: aurora.accent, fraction: 1)
                 legendItem(Text("Part of it", bundle: strings), colour: .white, fraction: 0.6)
             }
         }
@@ -1912,6 +1914,7 @@ private struct MonthFigures: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     let month: MonthHistory
 
@@ -2004,7 +2007,7 @@ private struct MonthFigures: View {
                 Image(systemName: HistoryView.changeSymbol(change))
                     .font(.body.weight(.semibold))
                     // A glyph on dark glass, read at 3:1 in the walk (`tasks/lessons.md`, 2026-10-22).
-                    .foregroundStyle(Aurora.cyan)
+                    .foregroundStyle(aurora.accent)
                     .accessibilityHidden(true)
             }
         }
@@ -2094,7 +2097,7 @@ private struct PatternsHeading: View {
     }
 }
 
-/// *When you drink*: a bar an hour across the whole day, the busiest in `Aurora.cyan`, on the day
+/// *When you drink*: a bar an hour across the whole day, the busiest in the theme's `accent`, on the day
 /// strip's axis — so the month's hours and a day's servings read alike (spec §3.2, §3.3).
 ///
 /// **One element**: the title, its value the busiest hour. The bars and the axis are hidden.
@@ -2103,6 +2106,7 @@ private struct HoursChart: View {
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     let patterns: MonthPatterns
 
@@ -2184,7 +2188,7 @@ private struct HoursChart: View {
     private var busiestLine: some View {
         Text(busiest)
             .font(.footnote.weight(.semibold))
-            .foregroundStyle(Aurora.cyan)
+            .foregroundStyle(aurora.accent)
             .accessibilityHidden(true)
     }
 
@@ -2202,7 +2206,7 @@ private struct HoursChart: View {
                 // month grows and shrinks the bars rather than inserting them (rule `50-views`).
                 ForEach(bars.indices, id: \.self) { hour in
                     Capsule()
-                        .fill(hour == patterns.busiestHour ? Aurora.cyan : Color.white.opacity(0.7))
+                        .fill(hour == patterns.busiestHour ? aurora.accent : Color.white.opacity(0.7))
                         .frame(width: barWidth, height: drawn && bars[hour] > 0 ? max(proxy.size.height * bars[hour], barWidth) : 0)
                         .offset(x: travel * HistoryView.hourPosition(hour))
                         // Across the day, an hour behind the hour before; inside the plot's own animation, so a turned
@@ -2235,7 +2239,7 @@ private struct HoursChart: View {
 }
 
 /// *Weekdays* and *Weekends*: each its average day, and a bar against the goal's tick at its end —
-/// `Aurora.cyan` when the average reaches the goal and white when it does not, the week card's
+/// The theme's `accent` when the average reaches the goal and white when it does not, the week card's
 /// meaning, and never colour alone: a met bar reaches the tick (spec §3.2, §3.4).
 ///
 /// **Each row one element**: its name, its average in millilitres.
@@ -2243,6 +2247,7 @@ private struct WeekSplit: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     let split: MonthPatterns.Split
 
@@ -2311,7 +2316,7 @@ private struct WeekSplit: View {
                 shape
                     .fill(.white.opacity(0.10))
                 shape
-                    .fill(side.isMet ? Aurora.cyan : Color.white)
+                    .fill(side.isMet ? aurora.accent : Color.white)
                     .frame(width: drawn && side.fraction > 0 ? max(proxy.size.width * side.fraction, proxy.size.height) : 0)
                     // Inside the bar's own animation, so a turned page's fill drops to nothing at once.
                     .animation(drawn ? Motion.draw : nil, value: drawn)
@@ -2746,6 +2751,8 @@ private struct LockedPage: View {
 /// locked month's backdrop, `pattern` cyan and white as a month of water would be, and a month's quiet
 /// form before its first read, every ring empty. No pane of its own; its callers hide it from VoiceOver.
 private struct DrawnMonth: View {
+    @Environment(\.aurora) private var aurora
+
 
     let pattern: Bool
 
@@ -2778,7 +2785,7 @@ private struct DrawnMonth: View {
     /// short of the goal, the last week still to come.
     private func colour(at index: Int) -> Color {
         guard pattern, index < 28 else { return .white.opacity(0.10) }
-        return [2, 6].contains(index % 9) ? .white.opacity(0.45) : Aurora.cyan
+        return [2, 6].contains(index % 9) ? .white.opacity(0.45) : aurora.accent
     }
 }
 
@@ -2786,6 +2793,8 @@ private struct DrawnMonth: View {
 /// Insights' backdrop (spec `2026-10-23-insights-design.md` §3.4). No pane of its own; its caller hides
 /// it from VoiceOver.
 private struct DrawnInsight: View {
+    @Environment(\.aurora) private var aurora
+
 
     /// Each line's share of the width, its height and its strength — a label, the headline's two lines
     /// and the detail's, then two shorter parts.
@@ -2815,7 +2824,7 @@ private struct DrawnInsight: View {
     private func bar(_ line: (width: CGFloat, height: CGFloat, opacity: Double), lead: Bool) -> some View {
         GeometryReader { proxy in
             Capsule()
-                .fill(lead ? Aurora.cyan : .white.opacity(line.opacity))
+                .fill(lead ? aurora.accent : .white.opacity(line.opacity))
                 .frame(width: proxy.size.width * line.width)
         }
         .frame(height: line.height)
@@ -2856,6 +2865,7 @@ private struct DayStrip: View {
     let arrived: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.aurora) private var aurora
 
     /// The day whose bars have been let grow. A turn behind ``day`` whenever that changes,
     /// which is the moment the bars stand at nothing.
@@ -2964,7 +2974,7 @@ private struct DayStrip: View {
 
                 ForEach(bars) { bar in
                     Capsule()
-                        .fill(Aurora.cyan)
+                        .fill(aurora.accent)
                         // A dark hairline round each bar. Two drinks inside forty minutes
                         // overlap on a plot this wide, and without an edge they are one wide bar.
                         .overlay { Capsule().strokeBorder(.black.opacity(0.45), lineWidth: 1) }
@@ -3041,6 +3051,7 @@ private struct ServingRow: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     let log: WaterLog
 
@@ -3110,10 +3121,10 @@ private struct ServingRow: View {
                 // mark at every wash tried — the wash lightens its own ground, and the sheen
                 // lands on the row's top left, where the glyph sits. White on the 0.16 wash
                 // read 4.42–5.30 swept (`docs/DESIGN.md`, *The look, measured*). The canvas's
-                // wash is not an `Aurora` colour; `Aurora.cyan` stands in.
+                // wash is not an `Aurora` colour; the theme's `accent` stands in.
                 .foregroundStyle(.white)
                 .frame(width: disc, height: disc)
-                .background(Circle().fill(Aurora.cyan.opacity(0.16)))
+                .background(Circle().fill(aurora.accent.opacity(0.16)))
                 .accessibilityHidden(true)
 
             if stacked {
@@ -3199,7 +3210,7 @@ private enum ServingEditor: Identifiable, Hashable {
 /// Adds a serving, or corrects one's amount and time.
 ///
 /// Deliberately the same lockup as the welcome's goal card — one glass pane, a hero readout
-/// with a ratio-sized unit, an `Aurora.cyan` slider — because every pane in this product is lit by
+/// with a ratio-sized unit, an accent slider — because every pane in this product is lit by
 /// the same light, and a second layout for "pick a number in millilitres" would be a second one.
 /// Under the slider sit the three vessels, as one-tap amounts; the time is a wheel inside the same
 /// pane: one pane asks how much and when.
@@ -3217,6 +3228,7 @@ private struct ServingSheet: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.aurora) private var aurora
 
     /// The amount under the finger, as an `Int` for the same reason every other volume here is
     /// one. The `Double` a `Slider` demands lives only inside ``sliderValue``.
@@ -3332,7 +3344,7 @@ private struct ServingSheet: View {
             in: Double(bounds.lowerBound)...Double(bounds.upperBound),
             step: Double(HistoryView.servingStep)
         )
-        .tint(Aurora.cyan)
+        .tint(aurora.accent)
         // A `Slider`'s stock VoiceOver value is a percentage of its range, which here would
         // announce "21%" for 250 ml — a number that appears nowhere in the product.
         .accessibilityLabel(Text("Serving amount", bundle: strings))

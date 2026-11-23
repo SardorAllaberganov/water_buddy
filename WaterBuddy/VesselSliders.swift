@@ -38,6 +38,7 @@ struct VesselSliders: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     /// Which vessel's slider is held, by slot. Its figure is drawn a little larger meanwhile, and a
     /// step is ticked only while one is.
@@ -109,7 +110,7 @@ struct VesselSliders: View {
                     onDrag(editing)
                 }
             )
-            .tint(Aurora.cyan)
+            .tint(aurora.accent)
             // A `Slider`'s stock VoiceOver value is a percentage of its range, which would announce
             // "22%" for a 250 ml glass — a number that appears nowhere in the product.
             // The name already resolved through the chosen bundle (`Vessel.name(in:)`), or typed by
@@ -130,7 +131,7 @@ struct VesselSliders: View {
                 // Against its 3:1 floor the Cup's, beside the card's sheen, is the tightest:
                 // 3.08 / 4.02 / 3.09:1 on iOS 27.0 / 26.5 / 18.6 (`docs/DESIGN.md`, *Settings,
                 // measured*).
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
                 // One box for all three, so the names beside them start on one line whatever
                 // each glyph's own width.
                 .frame(width: box, height: box)

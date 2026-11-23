@@ -63,7 +63,7 @@ private struct WristFaceRing: View {
                 Image(systemName: "drop.fill")
             }
             .gaugeStyle(.accessoryCircular)
-            .tint(Aurora.blue)
+            .tint(Aurora.classic.first)
             .widgetAccentable()
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Today's hydration", bundle: strings))
@@ -75,7 +75,7 @@ private struct WristFaceRing: View {
                     .minimumScaleFactor(0.4)
             }
             .gaugeStyle(.accessoryCircular)
-            .tint(Aurora.blue)
+            .tint(Aurora.classic.first)
             .widgetAccentable()
             .privacySensitive()
             .accessibilityElement(children: .ignore)
@@ -105,7 +105,7 @@ private struct WristFaceCorner: View {
                     // The system draws the label along the bezel; hidden here too, so it can never
                     // be a second stop beside the face's one element (rule `65-accessibility`).
                     Gauge(value: 0.0) { EmptyView() }
-                        .tint(Aurora.blue)
+                        .tint(Aurora.classic.first)
                         .widgetAccentable()
                         .accessibilityHidden(true)
                 }
@@ -123,7 +123,7 @@ private struct WristFaceCorner: View {
                 .privacySensitive()
                 .widgetLabel {
                     Gauge(value: face.progress) { EmptyView() }
-                        .tint(Aurora.blue)
+                        .tint(Aurora.classic.first)
                         .widgetAccentable()
                         .privacySensitive()
                         // Spoken by the figure's element below, as the quiet form's gauge is.
@@ -175,7 +175,7 @@ private struct WristFaceCard: View {
 
             Gauge(value: quiet ? 0 : face.progress) { EmptyView() }
                 .gaugeStyle(.accessoryLinearCapacity)
-                .tint(Aurora.blue)
+                .tint(Aurora.classic.first)
                 .widgetAccentable()
                 .privacySensitive(!quiet)
         }

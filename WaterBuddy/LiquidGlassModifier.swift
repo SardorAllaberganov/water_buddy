@@ -58,12 +58,12 @@ enum LiquidGlass {
     ///
     /// Solid white, because a main action drawn as one more glass pane read as disabled — *Get
     /// Started* was frosted glass with a glow, and looked like a control waiting to be enabled.
-    /// The content on it is `Aurora.top`, the deep blue the backdrop starts from, so the surface
+    /// The content on it is the theme's `top`, the deep colour the backdrop starts from, so the surface
     /// borrows the product's colour without a new token
-    /// (`thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`).
+    /// (`thePrimaryLabelClearsSevenToOneEvenAtTheFootOfTheShade`, for every theme).
     enum Primary {
 
-        /// How far the fill leans toward `Aurora.top` at its foot. Enough to read as lit from
+        /// How far the fill leans toward the theme's `top` at its foot. Enough to read as lit from
         /// above; the contrast test is what stops it growing.
         nonisolated static let shadeOpacity = 0.12
 
@@ -99,7 +99,7 @@ enum LiquidGlass {
         /// The ring's width, the canvas's 1.5 pt.
         nonisolated static let ringWidth: CGFloat = 1.5
 
-        /// The disc behind the shown day's letter, which is drawn in `Aurora.top` on it —
+        /// The disc behind the shown day's letter, which is drawn in the theme's `top` on it —
         /// `theShownDaysLetterReadsOnItsDisc` derives that pair.
         nonisolated static let discFill = Color.white
     }
@@ -160,22 +160,29 @@ enum LiquidGlass {
         ///
         /// `opaque` is that stack composited down over the aurora, rather than the neutral
         /// `secondarySystemBackground` grey, so Reduce Transparency keeps the product's colour.
-        static let archived = Base.flat(
-            translucent: Color(white: 0.24).opacity(0.5),
-            opaque: Color(red: 0.22, green: 0.19, blue: 0.36)
-        )
-
-        /// The fill that replaces the whole stack when Reduce Transparency is on.
         ///
-        /// `.material` delegates to `.archived.opaqueFill` rather than a system colour: the app
+        /// **One per theme** (D7): the translucent fill holds while the theme's colours stay under the recipe's first
+        /// stop; the opaque fill is composited down over the theme's sky — Aurora's for every theme until each theme's
+        /// own is derived (`docs/DESIGN.md`).
+        nonisolated static func archived(for theme: AppTheme) -> Base {
+            switch theme {
+            case .aurora, .lagoon, .dusk, .midnight, .bloom:
+                return .flat(translucent: Color(white: 0.24).opacity(0.5),
+                             opaque: Color(red: 0.22, green: 0.19, blue: 0.36))
+            }
+        }
+
+        /// The fill that replaces the whole stack when Reduce Transparency is on, in `theme`.
+        ///
+        /// `.material` delegates to `.archived(for:)`'s opaque fill rather than a system colour: the app
         /// and the widget already agree here (rule `65-accessibility`: "the widget draws ... a
         /// contrast threshold, not taste"), and `Color(.secondarySystemBackground)` does not exist
         /// on watchOS — this is the fix for the one compile error that blocks `WaterSurface.swift`
         /// from joining a watch target (`docs/superpowers/specs/2026-08-31-waterbuddy-watchos-design.md`
-        /// §13). Never add a second literal here: `Base.archived` is the one place the number lives.
-        var opaqueFill: Color {
+        /// §13). Never add a second literal here: `Base.archived(for:)` is the one place the number lives.
+        nonisolated func opaqueFill(in theme: AppTheme) -> Color {
             switch self {
-            case .material: Base.archived.opaqueFill
+            case .material: Base.archived(for: theme).opaqueFill(in: theme)
             case .flat(_, let opaque): opaque
             }
         }
@@ -280,35 +287,41 @@ enum LiquidGlass {
         }
     }
 
-    /// What Apple's regular glass is tinted with, through `Glass.tint(_:)`: the sky's own deep blue.
+    /// What Apple's regular glass is tinted with, through `Glass.tint(_:)`: the theme's sky at its head — Aurora's
+    /// deep blue.
     ///
     /// Not black. A black tint greys the aurora under the pane, and the canvas drew its panes navy;
     /// stage 3c rendered both and the blue reads like the canvas (spec
     /// `2026-10-13-the-look-design.md` §3.1). It is lighter than black at the same strength — the
     /// weekday letters read 6.52 under black `0.52` and 4.74 under this — which is why the
     /// opacity below rose with it.
-    nonisolated static let systemTintColor: Color = Aurora.top
+    nonisolated static func systemTintColor(for theme: AppTheme) -> Color { theme.palette.top }
 
-    /// How much of ``systemTintColor`` Apple's glass is tinted with.
+    /// How much of ``systemTintColor(for:)`` Apple's glass is tinted with — **measured per theme** (D7): each value
+    /// is the rung adopted on that theme's renders, iOS 27.0's glass being the lightest. Every theme starts at
+    /// Aurora's 0.64 and keeps it until its own table (`docs/DESIGN.md`) says otherwise.
     ///
-    /// **Measured, not chosen.** Climbed a rung at a time on iOS 27.0 — whose glass is the
+    /// **Measured, not chosen.** Aurora's was climbed a rung at a time on iOS 27.0 — whose glass is the
     /// lightest — with the lit rim and sheen drawn over it, and followed through a minute of the
     /// aurora's swing: `0.52` and `0.56` left the weekday letters under 4.5:1, `0.60` passed with
     /// 0.14 to spare, and this is the first rung with room. iOS 26.5's glass is darker and passed
     /// with more. The tables are in `docs/DESIGN.md`, *The look, measured* — re-take them before
-    /// moving the number, and never estimate one value from another.
+    /// moving the number, and never estimate one value from another, one theme's from another's included.
     ///
     /// The clear variant takes none. It is the vessel: its readout has
     /// ``WaterReadabilityScrim``, and a tint would dull the water behind it.
-    nonisolated static func systemTintOpacity(for variant: SystemVariant) -> Double {
+    nonisolated static func systemTintOpacity(for variant: SystemVariant, theme: AppTheme) -> Double {
         switch variant {
-        case .regular: return 0.64
         case .clear: return 0
+        case .regular:
+            switch theme {
+            case .aurora, .lagoon, .dusk, .midnight, .bloom: return 0.64
+            }
         }
     }
 
     /// Whether this binary is the phone's — the app or its widget extension — rather than the
-    /// watch's. Resolved at compile time; ``scrim(density:scheme:base:onPhone:)`` takes it as a
+    /// watch's. Resolved at compile time; ``scrim(density:scheme:base:onPhone:theme:)`` takes it as a
     /// parameter so a test can ask the watch's question on a phone.
     nonisolated static let runsOnPhone: Bool = {
         #if os(iOS)
@@ -327,15 +340,16 @@ enum LiquidGlass {
     /// white text to go. The scrim attenuates first; the tint then only has to supply sheen.
     ///
     /// - **The phone's own panes** — a `.material` base on iOS, the hand-made path from iOS 17 to
-    ///   25 — are scrimmed with the sky's blue, as Apple's glass is tinted with it, so the panes
+    ///   25 — are scrimmed with the theme's sky, as Apple's glass is tinted with it, so the panes
     ///   read alike on every system. Darker than the black they replace: that black left the
     ///   week card's letters at 4.38:1 and its cyan bar at 2.97:1 on iOS 18.6 (#85). Frosted was
     ///   swept on iOS 18.6; sheer and opaque were measured in stage 3c's own pass
     ///   (`docs/DESIGN.md`, *The look, measured*). The three stay in density order — opaque is the
     ///   lightest measured rung above frosted, though a lighter one passed — and opaque stays under
-    ///   1, or the pane is a slab.
+    ///   1, or the pane is a slab. **Measured per theme** (D7): one line per theme below, each Aurora's
+    ///   until that theme's own table says otherwise.
     /// - **The widget's `.archived` base** keeps black at today's values: the archive's fills were
-    ///   derived for it (``Base/archived``). The watch's answer is black too, and no watch pane asks
+    ///   derived for it (``Base/archived(for:)``). The watch's answer is black too, and no watch pane asks
     ///   it: since the redesign's stage 7 the watch draws Apple's glass, or the opaque fill under
     ///   Reduce Transparency, never this stack. It is kept for the test that asks the watch's
     ///   question, so a watch that ever fell back would draw what it drew before.
@@ -343,19 +357,26 @@ enum LiquidGlass {
         density: Density,
         scheme: ColorScheme,
         base: Base,
-        onPhone: Bool
+        onPhone: Bool,
+        theme: AppTheme
     ) -> (color: Color, opacity: Double) {
         guard scheme == .dark else { return (.black, 0) }
 
         if onPhone, case .material = base {
-            let opacity: Double = switch density {
-            case .sheer:   0.30
-            case .frosted: 0.70
-            case .opaque:  0.80
+            let (sheer, frosted, opaque): (Double, Double, Double) = switch theme {
+            case .aurora:   (0.30, 0.70, 0.80)
+            case .lagoon:   (0.30, 0.70, 0.80)
+            case .dusk:     (0.30, 0.70, 0.80)
+            case .midnight: (0.30, 0.70, 0.80)
+            case .bloom:    (0.30, 0.70, 0.80)
             }
-            // The tint's own blue, read through the nonisolated constant: `Aurora` is main-actor
-            // isolated in the app target, and this function is not.
-            return (systemTintColor, opacity)
+            let opacity = switch density {
+            case .sheer:   sheer
+            case .frosted: frosted
+            case .opaque:  opaque
+            }
+            // The theme's sky, as Apple's glass is tinted with it.
+            return (systemTintColor(for: theme), opacity)
         }
 
         let opacity: Double = switch density {
@@ -440,6 +461,8 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    /// The theme the root injected: Apple's glass's tint, the phone's scrim and the opaque fill are its (set C).
+    @Environment(\.theme) private var theme
 
     /// Injected by ``PressStyle``, which is the only thing in the app that knows a finger is down.
     ///
@@ -540,7 +563,7 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
     @available(iOS 26.0, watchOS 26.0, *)
     private var systemGlass: Glass {
         let variant = LiquidGlass.systemVariant(density: density, interactive: interactive)
-        let darkening = LiquidGlass.systemTintOpacity(for: variant)
+        let darkening = LiquidGlass.systemTintOpacity(for: variant, theme: theme)
 
         let glass: Glass
         switch variant {
@@ -548,7 +571,7 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
         case .clear: glass = .clear
         }
         // `nil` rather than a clear colour: no tint at all is what the vessel is meant to get.
-        let tinted = glass.tint(darkening > 0 ? LiquidGlass.systemTintColor.opacity(darkening) : nil)
+        let tinted = glass.tint(darkening > 0 ? LiquidGlass.systemTintColor(for: theme).opacity(darkening) : nil)
         return interactive ? tinted.interactive() : tinted
     }
 
@@ -558,14 +581,15 @@ struct LiquidGlassModifier<S: Shape & InsettableShape>: ViewModifier {
     /// surface, keeping only the edge and the depth.
     private var opaquePane: some View {
         shape
-            .fill(base.opaqueFill)
+            .fill(base.opaqueFill(in: theme))
             .overlay { shape.strokeBorder(edge, lineWidth: borderWidth) }
             .compositingGroup()
             .modifier(Shadows(elevation: elevation, colorScheme: colorScheme))
     }
 
     private var handMadePane: some View {
-        let scrim = LiquidGlass.scrim(density: density, scheme: colorScheme, base: base, onPhone: LiquidGlass.runsOnPhone)
+        let scrim = LiquidGlass.scrim(density: density, scheme: colorScheme, base: base, onPhone: LiquidGlass.runsOnPhone,
+                                      theme: theme)
 
         return baseLayer
             .overlay { shape.fill(scrim.color.opacity(scrim.opacity)) }
@@ -681,11 +705,14 @@ struct PrimarySurfaceModifier<S: Shape & InsettableShape>: ViewModifier {
     /// Set by ``PressStyle``, as for a glass pane.
     @Environment(\.glassIsPressed) private var isPressed
 
+    /// The theme's palette: its `top` is the label's ink and the shade's colour (set C).
+    @Environment(\.aurora) private var aurora
+
     func body(content: Content) -> some View {
         content
             // The surface owns its content's colour: a label that set `.white` itself would be
             // white on white.
-            .foregroundStyle(Aurora.top)
+            .foregroundStyle(aurora.top)
             .background(surface)
             // The same spring as `PressStyle` and `LiquidGlassModifier`, so the wash and the
             // frame move together (rule `60-design-system`).
@@ -697,7 +724,7 @@ struct PrimarySurfaceModifier<S: Shape & InsettableShape>: ViewModifier {
             .fill(.white)
             .overlay { shape.fill(shade) }
             .overlay {
-                shape.fill(Aurora.top.opacity(isPressed ? LiquidGlass.Primary.pressedShadeOpacity : 0))
+                shape.fill(aurora.top.opacity(isPressed ? LiquidGlass.Primary.pressedShadeOpacity : 0))
             }
             // One shadow for the assembled surface, not one per layer.
             .compositingGroup()
@@ -713,7 +740,7 @@ struct PrimarySurfaceModifier<S: Shape & InsettableShape>: ViewModifier {
 
     private var shade: LinearGradient {
         LinearGradient(
-            colors: [Aurora.top.opacity(0), Aurora.top.opacity(LiquidGlass.Primary.shadeOpacity)],
+            colors: [aurora.top.opacity(0), aurora.top.opacity(LiquidGlass.Primary.shadeOpacity)],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -804,7 +831,7 @@ extension View {
         )
     }
 
-    /// Places the content on the primary surface: solid white, `Aurora.top` content.
+    /// Places the content on the primary surface: solid white, the theme's `top` content.
     ///
     /// One per screen, for its main action. Never give its label a foreground colour of its own.
     func primarySurface<S: Shape & InsettableShape>(in shape: S, ring: Bool = true) -> some View {

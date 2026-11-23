@@ -112,6 +112,11 @@ struct WaterBuddyApp: App {
     /// `2026-10-31-finish-set-b-design.md` D8). Alone it does nothing.
     static let coachingSeedArgument = "-WaterBuddyCoachingSeed"
 
+    /// DEBUG's theme for a capture: the value after it is a theme's code, set through the setter in the fresh
+    /// start's own suite — `testCaptureThemeCensus` passes it (spec `2026-11-22-set-c-design.md` §3.9). Alone it
+    /// does nothing.
+    static let themeArgument = "-WaterBuddyTheme"
+
     /// The seed's schedule: shares due from 05:00 to 23:00, so its pace runs as much of the day as any
     /// schedule can, and Saturday quiet, so Settings' row has a quiet day to name. Built by the sheet's own
     /// moves, so it is one the plan accepts.
@@ -179,6 +184,9 @@ struct WaterBuddyApp: App {
         if arguments.contains(coachingSeedArgument) {
             manager.reminderSchedule = coachingSeed
             manager.onlyWhenBehind = true
+        }
+        if let index = arguments.firstIndex(of: themeArgument), arguments.indices.contains(index + 1) {
+            manager.theme = AppTheme(code: arguments[index + 1])
         }
         return manager
     }
@@ -258,5 +266,9 @@ private struct RootView: View {
         // tree redraws without a relaunch.
         .environment(\.strings, manager.language.bundle)
         .environment(\.locale, manager.language.locale)
+        // The theme beside them, read from the model, so a choice redraws every screen and every sheet at once
+        // (rule `50-views`). Animated once, here — a tap's one-off change, never a loop (rule `65-accessibility`).
+        .environment(\.theme, manager.theme)
+        .animation(.smooth(duration: 0.4), value: manager.theme)
     }
 }

@@ -84,7 +84,8 @@ struct AuroraBackground: View {
         var id: Double { period }
     }
 
-    /// The three lights, in draw order.
+    /// The three lights, in draw order, wearing `aurora`'s colours. A function of the palette since set C; the
+    /// geometry, the periods and the opacities are every theme's.
     ///
     /// The periods are 16 / 22.5 / 28.5 seconds — the drift runs about **20% faster** than the
     /// 19 / 27 / 34 it shipped with, at the owner's request.
@@ -95,25 +96,30 @@ struct AuroraBackground: View {
     /// approximately repeat, and never visibly beats. Speeding the lights up by a round factor
     /// would have preserved the ratios exactly and therefore the beat; these were re-chosen
     /// instead.
-    nonisolated static let lights: [Light] = [
-        Light(
-            color: Aurora.blue, alternate: Aurora.cyan,
-            size: 340, rest: CGPoint(x: -130, y: -240),
-            drift: CGSize(width: 70, height: 90), period: 16, opacity: 0.75
-        ),
-        Light(
-            color: Aurora.magenta, alternate: Aurora.blue,
-            size: 320, rest: CGPoint(x: 150, y: 250),
-            drift: CGSize(width: -90, height: -60), period: 22.5, opacity: 0.70
-        ),
-        Light(
-            color: Aurora.cyan, alternate: Aurora.magenta,
-            size: 210, rest: CGPoint(x: 140, y: -140),
-            drift: CGSize(width: -60, height: 80), period: 28.5, opacity: 0.38
-        ),
-    ]
+    nonisolated static func lights(in aurora: Aurora) -> [Light] {
+        [
+            Light(
+                color: aurora.first, alternate: aurora.accent,
+                size: 340, rest: CGPoint(x: -130, y: -240),
+                drift: CGSize(width: 70, height: 90), period: 16, opacity: 0.75
+            ),
+            Light(
+                color: aurora.second, alternate: aurora.first,
+                size: 320, rest: CGPoint(x: 150, y: 250),
+                drift: CGSize(width: -90, height: -60), period: 22.5, opacity: 0.70
+            ),
+            Light(
+                color: aurora.accent, alternate: aurora.second,
+                size: 210, rest: CGPoint(x: 140, y: -140),
+                drift: CGSize(width: -60, height: 80), period: 28.5, opacity: 0.38
+            ),
+        ]
+    }
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// The theme's palette: the sky and the three lights (set C).
+    @Environment(\.aurora) private var aurora
 
     /// Flipped once, on appear, to send every light toward its far endpoint. ``AuroraDrift``
     /// does the rest — this is a starting pistol, not a clock.
@@ -121,9 +127,9 @@ struct AuroraBackground: View {
 
     var body: some View {
         ZStack {
-            Aurora.gradient
+            aurora.gradient
 
-            ForEach(Self.lights) { light in
+            ForEach(Self.lights(in: aurora)) { light in
                 blob(light)
             }
         }

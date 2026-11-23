@@ -98,9 +98,9 @@ struct PourDrop: View {
         Circle()
             // The palette's own water colours, lightest at the top like the surface it joins
             // (rule `60-design-system`).
-            .fill(LinearGradient(colors: [Aurora.cyan, Aurora.blue], startPoint: .top, endPoint: .bottom))
+            .fill(LinearGradient(colors: [Aurora.classic.accent, Aurora.classic.first], startPoint: .top, endPoint: .bottom))
             .frame(width: PourArc.size, height: PourArc.size)
-            .shadow(color: Aurora.cyan.opacity(0.7), radius: 10)
+            .shadow(color: Aurora.classic.accent.opacity(0.7), radius: 10)
             .modifier(Flight(progress: progress, start: start, end: end))
             .allowsHitTesting(false)
             .accessibilityHidden(true)

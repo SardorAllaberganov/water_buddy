@@ -61,7 +61,7 @@ struct HapticLadderTests {
 struct ConfettiTests {
 
     @Test func aBurstHasTheExpectedNumberOfPieces() {
-        #expect(Confetti.pieces(seed: 1).count == Confetti.pieceCount)
+        #expect(Confetti.pieces(seed: 1, in: .classic).count == Confetti.pieceCount)
         #expect(Confetti.pieceCount >= 12, "too sparse to read as a celebration")
         #expect(Confetti.pieceCount <= 60, "a burst nobody asked to render on every goal")
     }
@@ -69,29 +69,29 @@ struct ConfettiTests {
     /// Same seed, same burst. This is what stops the confetti reshuffling itself mid-flight every
     /// time the view is re-evaluated.
     @Test func aBurstIsDeterministic() {
-        #expect(Confetti.pieces(seed: 7) == Confetti.pieces(seed: 7))
+        #expect(Confetti.pieces(seed: 7, in: .classic) == Confetti.pieces(seed: 7, in: .classic))
     }
 
     /// Different seeds, different bursts — so hitting the goal two days running does not replay a
     /// recording.
     @Test func consecutiveBurstsDiffer() {
-        #expect(Confetti.pieces(seed: 1) != Confetti.pieces(seed: 2))
+        #expect(Confetti.pieces(seed: 1, in: .classic) != Confetti.pieces(seed: 2, in: .classic))
     }
 
-    /// Colour is `Aurora`'s to own (rule `60-design-system`). Confetti is the most tempting place
-    /// in the whole app to reach for a fistful of new literals.
-    @Test(arguments: [1, 2, 3, 99])
-    func everyPieceIsPaintedFromTheAuroraPalette(seed: Int) {
-        let palette: Set<Color> = [Aurora.blue, Aurora.magenta, Aurora.cyan]
+    /// Colour is the theme's to own (rule `60-design-system`). Confetti is the most tempting place
+    /// in the whole app to reach for a fistful of new literals — and since set C it wears the theme's lights.
+    @Test(arguments: [1, 2, 3, 99], AppTheme.allCases)
+    func everyPieceIsPaintedFromTheAuroraPalette(seed: Int, theme: AppTheme) {
+        let palette: Set<Color> = [theme.palette.accent, theme.palette.first, theme.palette.second]
 
-        for piece in Confetti.pieces(seed: seed) {
-            #expect(palette.contains(piece.color), "a colour literal outside Aurora")
+        for piece in Confetti.pieces(seed: seed, in: theme.palette) {
+            #expect(palette.contains(piece.color), "a colour literal outside \(theme)'s palette")
         }
     }
 
     /// A burst that all goes one way is a leak, not a celebration.
     @Test func aBurstThrowsPiecesInEveryDirection() {
-        let angles = Confetti.pieces(seed: 3).map(\.angle)
+        let angles = Confetti.pieces(seed: 3, in: .classic).map(\.angle)
         let quadrants = Set(angles.map { Int(($0 / (.pi / 2)).rounded(.down)) % 4 })
 
         #expect(quadrants.count == 4, "every piece left through the same side of the screen")
@@ -99,7 +99,7 @@ struct ConfettiTests {
 
     @Test(arguments: [1, 2, 3, 99])
     func everyPieceIsDrawableAndLands(seed: Int) {
-        for piece in Confetti.pieces(seed: seed) {
+        for piece in Confetti.pieces(seed: seed, in: .classic) {
             #expect(piece.distance > 0, "a piece that never leaves the origin")
             #expect(piece.size > 0)
             #expect(piece.delay >= 0 && piece.delay < Confetti.duration,

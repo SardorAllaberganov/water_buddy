@@ -109,6 +109,7 @@ struct WelcomeView: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.aurora) private var aurora
 
     /// The step on screen. Presentation state, and only the user's taps change it.
     @State private var step = WelcomeStep.hello
@@ -422,7 +423,7 @@ struct WelcomeView: View {
                     // pane's lit sheen and read 2.84:1 (the owner's ruling, 2026-10-14).
                     Image(systemName: "sparkles")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(Aurora.cyan)
+                        .foregroundStyle(aurora.accent)
                         .accessibilityHidden(true)
                     Spacer(minLength: 8)
                     Image(systemName: "chevron.down")
@@ -511,7 +512,7 @@ struct WelcomeView: View {
                 step: Double(Self.goalStep),
                 onEditingChanged: { isDraggingGoal = $0 }
             )
-            .tint(Aurora.cyan)
+            .tint(aurora.accent)
             // Glides when *Use* sets it, and only then: keyed to the tap, not to the goal, so a
             // drag is never chased by its own animation.
             .animation(Motion.settle, value: uses)
@@ -901,6 +902,7 @@ private struct CalculatorPanel: View {
 
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     /// Bumped by a unit or an activity picked: the tick. The wheel plays the system's own.
     @State private var picks = 0
@@ -1093,7 +1095,7 @@ private struct CalculatorPanel: View {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark")
                     .font(.body.weight(.bold))
-                    .foregroundStyle(Aurora.cyan)
+                    .foregroundStyle(aurora.accent)
                     .accessibilityHidden(true)
                 Text(strings.figure("Your goal is %1$@ ml", suggestion, locale: locale))
                     .font(.body.weight(.semibold))
@@ -1139,14 +1141,15 @@ private struct CalculatorPanel: View {
 private struct NotificationPreview: View {
 
     @Environment(\.strings) private var strings
+    @Environment(\.aurora) private var aurora
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "drop.fill")
                 .font(.system(size: WelcomeStyle.tileGlyph))
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
                 .frame(width: WelcomeStyle.tile, height: WelcomeStyle.tile)
-                .background(Aurora.gradient,
+                .background(aurora.gradient,
                             in: RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous))
                 .accessibilityHidden(true)
 
@@ -1188,6 +1191,7 @@ private struct ReminderBells: View {
 
     @Environment(\.calendar) private var calendar
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     private static let hour = Date.FormatStyle.dateTime.hour(.defaultDigits(amPM: .abbreviated))
 
@@ -1199,7 +1203,7 @@ private struct ReminderBells: View {
                 VStack(spacing: 6) {
                     Image(systemName: "bell")
                         .font(.system(size: WelcomeStyle.bellGlyph, weight: .semibold))
-                        .foregroundStyle(Aurora.cyan)
+                        .foregroundStyle(aurora.accent)
                         .frame(width: WelcomeStyle.bell, height: WelcomeStyle.bell)
                         // Frosted, not sheer: on iOS 27.0 a sheer disc came out light enough that
                         // the cyan bell on it read 1.83:1 (the owner's ruling, 2026-10-14).

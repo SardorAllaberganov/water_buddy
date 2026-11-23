@@ -246,6 +246,12 @@ struct WristView: View {
         mirror?.servings ?? DataManager.defaultServings
     }
 
+    /// The theme the phone last sent, or Aurora — before a sync, from an older phone, and for a code this build does
+    /// not know (``AppTheme/init(code:)``).
+    nonisolated static func theme(from mirror: WristMirror?) -> AppTheme {
+        AppTheme(code: mirror?.themeCode)
+    }
+
     /// Home's three as the phone last sent them — names and glyphs, positional — or the standard three, before a
     /// library or from an older phone. A count other than three, like a glyph this build does not know, falls
     /// back rather than trapping: discard, never repair (rule `20-state`).

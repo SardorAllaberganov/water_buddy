@@ -210,6 +210,7 @@ struct HomeView: View {
     @Environment(\.pageSettlesIn) private var settles
     /// StoreKit's rating request — one of StoreKit's two uses in the product (rule `70-privacy`).
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.aurora) private var aurora
 
     /// Bumped on every pour. Drives the haptic, so a daily rollover cannot fire one.
     @State private var pours = 0
@@ -422,7 +423,7 @@ struct HomeView: View {
     private func streakCapsule(_ count: Text) -> some View {
         HStack(spacing: 6) {
             Image(systemName: Self.streakSymbol)
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
                 // Once, when the count goes up. The first day of a streak is the chip itself
                 // arriving, and plays no bounce.
                 .symbolEffect(.bounce, value: streakRises)
@@ -800,7 +801,7 @@ struct HomeView: View {
     private var undoWord: some View {
         HStack(spacing: 6) {
             Image(systemName: Self.undoSymbol)
-                .foregroundStyle(Aurora.cyan)
+                .foregroundStyle(aurora.accent)
             Text("Undo", bundle: strings)
         }
         .font(.subheadline.weight(.bold))
@@ -1217,7 +1218,7 @@ private struct WaterVessel: View {
     // MARK: Depth
 
     /// The canvas's vessel, a 300 pt board (`Main.dc.html`), turned into ratios of the diameter: a
-    /// glow beneath it — `rgba(0,200,255,.36)`, not an `Aurora` colour, so `Aurora.cyan` stands in —
+    /// glow beneath it — `rgba(0,200,255,.36)`, not an `Aurora` colour, so `Aurora.classic.accent` stands in, water's in every theme —
     /// 36 pt in from each side, 64 pt tall, 30 pt below the foot, blurred 10; a halo, a 10 pt ring of
     /// white at 0.05 just outside the rim; and a highlight, 128 × 62 pt at (30, 20), turned −28°.
     private enum Depth {
@@ -1238,7 +1239,7 @@ private struct WaterVessel: View {
         ZStack {
             Ellipse()
                 .fill(RadialGradient(
-                    colors: [Aurora.cyan.opacity(Depth.glowOpacity), Aurora.cyan.opacity(0)],
+                    colors: [Aurora.classic.accent.opacity(Depth.glowOpacity), Aurora.classic.accent.opacity(0)],
                     center: .center,
                     startRadius: 0,
                     endRadius: diameter * Depth.glowWidth / 2

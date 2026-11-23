@@ -15,6 +15,7 @@ struct VesselLibrarySheet: View {
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     /// The library the row opened the sheet on (rule `50-views`). What the sheet draws is `manager.vessels`,
     /// read live, so a change made in the editor is here when it closes.
@@ -89,8 +90,7 @@ struct VesselLibrarySheet: View {
             HStack(spacing: 12) {
                 Image(systemName: vessel.glyph.symbol)
                     .font(.body.weight(.semibold))
-                    // `Aurora.cyan` until the themes' `\.aurora` exists (set C's Task 11; Task 12 moves it).
-                    .foregroundStyle(Aurora.cyan)
+                    .foregroundStyle(aurora.accent)
                     .frame(width: 28)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {

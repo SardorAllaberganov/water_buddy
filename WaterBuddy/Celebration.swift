@@ -59,9 +59,10 @@ enum Confetti {
     /// tap again.
     static let duration: Double = 1.8
 
-    static func pieces(seed: Int) -> [ConfettiPiece] {
+    /// The burst for `seed`, painted from `aurora`'s three lights — the theme's, since set C.
+    static func pieces(seed: Int, in aurora: Aurora) -> [ConfettiPiece] {
         var rng = SeededGenerator(seed)
-        let palette = [Aurora.cyan, Aurora.blue, Aurora.magenta]
+        let palette = [aurora.accent, aurora.first, aurora.second]
         let slice = (2 * Double.pi) / Double(pieceCount)
 
         return (0..<pieceCount).map { index in
@@ -156,6 +157,8 @@ struct ConfettiOverlay: View {
 /// A separate view so `.id(seed)` can rebuild it wholesale — restarting the flight is a fresh
 /// `@State`, not a value to reset by hand.
 private struct Burst: View {
+    @Environment(\.aurora) private var aurora
+
 
     let seed: Int
 
@@ -163,7 +166,7 @@ private struct Burst: View {
 
     var body: some View {
         ZStack {
-            ForEach(Confetti.pieces(seed: seed)) { piece in
+            ForEach(Confetti.pieces(seed: seed, in: aurora)) { piece in
                 Capsule()
                     .fill(piece.color)
                     .frame(width: piece.size * 0.6, height: piece.size)

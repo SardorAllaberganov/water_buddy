@@ -59,4 +59,20 @@ final class AppearanceUITests: XCTestCase {
             XCTAssertEqual(app.buttons.matching(identifier: name).count - count, 1, "\(name)")
         }
     }
+
+    /// Each theme is one button, and a tap selects it.
+    @MainActor
+    func testEachThemeIsOneButtonAndATapSelectsIt() {
+        let app = launch()
+        app.buttons["Settings"].firstMatch.tap()
+        let dusk = app.buttons["Dusk"]
+        XCTAssertTrue(dusk.waitForExistence(timeout: 5))
+        for name in ["Aurora", "Lagoon", "Dusk", "Midnight", "Bloom"] {
+            XCTAssertEqual(app.buttons.matching(identifier: name).count, 1, name)
+        }
+        XCTAssertTrue(app.buttons["Aurora"].isSelected)
+        dusk.tap()
+        XCTAssertTrue(dusk.isSelected)
+        XCTAssertFalse(app.buttons["Aurora"].isSelected)
+    }
 }

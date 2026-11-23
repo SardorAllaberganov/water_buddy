@@ -15,7 +15,7 @@ import Testing
 /// The backdrop's **lights**, in the same sense as ``AppTabTests`` and ``HomeServingTests``: what a
 /// view offers, pinned where the compiler cannot notice one of them moving.
 ///
-/// Deliberately **not** `@MainActor`. ``AuroraBackground/lights`` is `nonisolated` for the reason
+/// Deliberately **not** `@MainActor`. ``AuroraBackground/lights(in:)`` is `nonisolated` for the reason
 /// `HomeView.servings` is — a `View` is `@MainActor`, so a static declared inside one inherits that
 /// isolation and `@Test(arguments:)` evaluates its arguments off the main actor, which cost three
 /// *"error in the Swift 6 language mode"* warnings the last time it was missed (rule `43-concurrency`).
@@ -26,9 +26,10 @@ struct AuroraLightTests {
     /// This is the whole safety net under the animation. Reduce Motion draws the lights at rest and
     /// nothing else, so if these four numbers drift, a user who turns motion off silently gets a
     /// different product — and no rendered check would catch it, because the animated build would
-    /// still look right.
-    @Test func theRestingLightsAreTheOnesTheStaticBackdropDrew() {
-        let resting = AuroraBackground.lights.map { ($0.size, $0.rest.x, $0.rest.y, $0.opacity) }
+    /// still look right. In every theme: a theme changes the lights' colours, never where they rest.
+    @Test(arguments: AppTheme.allCases)
+    func theRestingLightsAreTheOnesTheStaticBackdropDrew(theme: AppTheme) {
+        let resting = AuroraBackground.lights(in: theme.palette).map { ($0.size, $0.rest.x, $0.rest.y, $0.opacity) }
 
         #expect(resting.count == 3)
         #expect(resting[0] == (340, -130, -240, 0.75))
@@ -36,20 +37,22 @@ struct AuroraLightTests {
         #expect(resting[2] == (210, 140, -140, 0.38))
     }
 
-    /// Colour is `Aurora`'s to own (rule `60-design-system`). A light that introduced its own would
+    /// Colour is the theme's to own (rule `60-design-system`). A light that introduced its own would
     /// be a second palette, and the widget — which re-expresses these same three lights
     /// proportionally in `WidgetAurora` — could no longer match it.
-    @Test(arguments: AuroraBackground.lights)
-    func everyLightIsPaintedFromTheAuroraPalette(light: AuroraBackground.Light) {
-        let palette: Set<Color> = [Aurora.blue, Aurora.magenta, Aurora.cyan]
+    @Test(arguments: AppTheme.allCases)
+    func everyLightIsPaintedFromTheAuroraPalette(theme: AppTheme) {
+        let palette: Set<Color> = [theme.palette.first, theme.palette.second, theme.palette.accent]
 
-        #expect(palette.contains(light.color), "a colour literal outside Aurora")
-        #expect(palette.contains(light.alternate), "a colour literal outside Aurora")
+        for light in AuroraBackground.lights(in: theme.palette) {
+            #expect(palette.contains(light.color), "a colour literal outside \(theme)'s palette")
+            #expect(palette.contains(light.alternate), "a colour literal outside \(theme)'s palette")
+        }
     }
 
     /// The point of the feature: each light travels *between two* palette colours, so what moves
     /// across the backdrop is hue and not merely a shape.
-    @Test(arguments: AuroraBackground.lights)
+    @Test(arguments: AuroraBackground.lights(in: .classic))
     func everyLightActuallyChangesColour(light: AuroraBackground.Light) {
         #expect(light.color != light.alternate,
                 "a light that fades to itself is an animation nobody can see")
@@ -62,7 +65,7 @@ struct AuroraLightTests {
     /// different frequencies instead of scaling one: what sells the effect is that it never quite
     /// repeats.
     @Test func noTwoLightsShareOrDivideAPeriod() {
-        let periods = AuroraBackground.lights.map(\.period)
+        let periods = AuroraBackground.lights(in: .classic).map(\.period)
 
         #expect(Set(periods).count == periods.count, "two lights breathing in lockstep")
 
@@ -79,7 +82,7 @@ struct AuroraLightTests {
     /// blur and the panes disappear (rule `60-design-system`). A light that wandered far enough to
     /// leave its own footprint would take that texture with it, so the drift stays inside the
     /// radius.
-    @Test(arguments: AuroraBackground.lights)
+    @Test(arguments: AuroraBackground.lights(in: .classic))
     func noLightDriftsOffItsOwnFootprint(light: AuroraBackground.Light) {
         let travel = max(abs(light.drift.width), abs(light.drift.height))
 
@@ -90,7 +93,7 @@ struct AuroraLightTests {
 
     /// Slow enough to read as weather rather than as a screensaver. Anything under ~10s starts to
     /// register as motion in peripheral vision while someone is reading the vessel.
-    @Test(arguments: AuroraBackground.lights)
+    @Test(arguments: AuroraBackground.lights(in: .classic))
     func everyLightMovesSlowly(light: AuroraBackground.Light) {
         #expect(light.period >= 12, "fast enough to be distracting behind body text")
         #expect(light.period <= 60, "so slow the backdrop reads as static anyway")

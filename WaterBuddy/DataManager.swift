@@ -132,6 +132,11 @@ final class DataManager {
         /// The chosen UI language, as a code like `"ru"`. **Absent means follow the device**, which
         /// is the third key whose absence carries meaning — see ``AppLanguage/system``.
         static let language = prefix + "language"
+        /// Set C's theme, as ``AppTheme``'s code. **Absent means Aurora** — choosing Aurora removes it, as
+        /// `.system` removes ``language`` — so nothing materialises it (spec `2026-11-22-set-c-design.md` D9).
+        /// Written by the app alone; read by every `DataManager`, the widget's snapshot and, through the mirror's
+        /// `themeCode`, the watch. `nonisolated`: `DataManager/resolveTheme(in:)` names it on the widget's path.
+        nonisolated static let theme = prefix + "theme"
         /// The three quick-add amounts, as a positional `[Int]` of exactly three: Cup, Glass,
         /// Bottle. **Absent means the user has kept the defaults**, which is why nothing
         /// materialises it — `resolveServings(in:)` answers absence itself, the way
@@ -198,7 +203,7 @@ final class DataManager {
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
             didMigrateFromStandard, remindersEnabled, healthEnabled, reminderSchedule, onlyWhenBehind,
-            language, servings, vessels, reviewRequestedVersion,
+            language, theme, servings, vessels, reviewRequestedVersion,
             weekTotals, wristOutbox, wristMirror, wristApplied,
         ]
     }
@@ -261,6 +266,7 @@ final class DataManager {
     @ObservationIgnored private var storedReminderSchedule: ReminderPlan.Schedule
     @ObservationIgnored private var storedOnlyWhenBehind: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
+    @ObservationIgnored private var storedTheme: AppTheme
     @ObservationIgnored private var storedServings: [Int]
     @ObservationIgnored private var storedVessels: VesselLibrary?
 
@@ -724,6 +730,32 @@ final class DataManager {
         }
     }
 
+    /// The theme every root draws in (spec `2026-11-22-set-c-design.md` §3.5).
+    ///
+    /// Written through like ``language``: the code, or the key removed for Aurora. It rings the widget doorbell — the
+    /// Home Screen and week widgets draw it — and publishes to the wrist, whose app draws it too. **It reschedules
+    /// nothing**: a theme moves no reminder and changes no reminder's words. It knows nothing of Premium: Settings
+    /// decides who may change it, and what is stored keeps drawing after a lapse (D5).
+    var theme: AppTheme {
+        get {
+            access(keyPath: \.theme)
+            return storedTheme
+        }
+        set {
+            guard newValue != storedTheme else { return }
+            withMutation(keyPath: \.theme) {
+                storedTheme = newValue
+                if let code = newValue.code {
+                    defaults.set(code, forKey: Key.theme)
+                } else {
+                    defaults.removeObject(forKey: Key.theme)
+                }
+            }
+            reloadWidgets()
+            publishWrist(defaults)
+        }
+    }
+
     /// Fraction of the goal reached today, clamped to `0...1`.
     ///
     /// Safe to hand straight to `ProgressView(value:)` or `Gauge`.
@@ -824,6 +856,7 @@ final class DataManager {
         storedReminderSchedule = Self.resolveReminderSchedule(in: defaults)
         storedOnlyWhenBehind = defaults.bool(forKey: Key.onlyWhenBehind)
         storedLanguage = Self.resolveLanguage(in: defaults)
+        storedTheme = Self.resolveTheme(in: defaults)
         storedServings = Self.resolveServings(in: defaults)
         storedVessels = Self.resolveVessels(in: defaults)
         // A crash between a library change's two writes is healed here, by the app alone (§3.6).
@@ -2053,6 +2086,11 @@ final class DataManager {
             withMutation(keyPath: \.language) { storedLanguage = language }
         }
 
+        let theme = Self.resolveTheme(in: defaults)
+        if theme != storedTheme {
+            withMutation(keyPath: \.theme) { storedTheme = theme }
+        }
+
         // Only the app writes this flag, and a widget extension can outlive the write. Without the
         // re-read, `AddWaterIntent` plans from the value its process launched with: an empty plan
         // that clears the reminders just switched on, or a full one that brings back the ones just
@@ -2098,6 +2136,12 @@ final class DataManager {
     /// isolation at all (rule `43-concurrency`).
     nonisolated static func resolveLanguage(in defaults: UserDefaults) -> AppLanguage {
         AppLanguage(code: defaults.string(forKey: Key.language))
+    }
+
+    /// The chosen theme, or Aurora — for absence and for a code this build does not know (``AppTheme/init(code:)``).
+    /// `nonisolated static`, as ``resolveLanguage(in:)`` is, for the widget's read path.
+    nonisolated static func resolveTheme(in defaults: UserDefaults) -> AppTheme {
+        AppTheme(code: defaults.string(forKey: Key.theme))
     }
 
     /// A missing key reads as `0` through `integer(forKey:)`, and a `0` goal would make the
@@ -2539,7 +2583,9 @@ final class DataManager {
             phoneDayEnd: nextDayBoundary(after: now, calendar: calendar),
             acked: acked,
             // Home's three, once a library exists: the watch draws what the phone's row draws (D18).
-            vessels: resolveVessels(in: defaults)?.home.map { WristMirror.Vessel(glyph: $0.glyph.rawValue, name: $0.name) }
+            vessels: resolveVessels(in: defaults)?.home.map { WristMirror.Vessel(glyph: $0.glyph.rawValue, name: $0.name) },
+            // The theme the watch draws in, `nil` for Aurora (D18).
+            themeCode: resolveTheme(in: defaults).code
         )
     }
 
@@ -2697,6 +2743,46 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
         case .english: "English"
         case .russian: "Русский"
         case .uzbek: "O‘zbekcha"
+        }
+    }
+}
+
+/// The theme the app draws in — Aurora until the user chooses another (spec `2026-11-22-set-c-design.md` D9).
+///
+/// **Stored as ``AppLanguage`` is**: its code under `Key.theme`, and Aurora as the key's absence, so "never chose"
+/// and "chose Aurora" are one state. Beside `AppLanguage` for its reason: the snapshot and the mirror carry it, and
+/// no seventh shared file is added (rule `40-widget`). Its palette is ``palette`` (`WaterSurface.swift`).
+nonisolated enum AppTheme: String, CaseIterable, Sendable, Identifiable {
+    case aurora, lagoon, dusk, midnight, bloom
+
+    var id: String { rawValue }
+
+    /// What goes in the suite: `nil` for Aurora, which is why the setter removes the key.
+    var code: String? { self == .aurora ? nil : rawValue }
+
+    /// Reads a stored code — Aurora for none, and for one this build does not know, said under `#if DEBUG`
+    /// (rule `75-diagnostics`). `"aurora"` is accepted and is Aurora.
+    init(code: String?) {
+        guard let code, let match = AppTheme(rawValue: code) else {
+            #if DEBUG
+            if let code, !code.isEmpty {
+                print("WaterBuddy: unrecognised theme code — drawing Aurora instead")
+            }
+            #endif
+            self = .aurora
+            return
+        }
+        self = match
+    }
+
+    /// The theme's name, as the Appearance card draws it and VoiceOver speaks it.
+    var nameKey: String {
+        switch self {
+        case .aurora: "Aurora"
+        case .lagoon: "Lagoon"
+        case .dusk: "Dusk"
+        case .midnight: "Midnight"
+        case .bloom: "Bloom"
         }
     }
 }
@@ -4011,6 +4097,10 @@ struct WaterSnapshot: Sendable, Equatable {
     /// unchanged; `nonisolated`, as ``weekTotals`` is (rule `43-concurrency`).
     nonisolated var servingGlyph: String = vesselSlots[DataManager.usualSlot].symbol
 
+    /// The theme the widgets draw in — the stored one, resolved from the cache (rule `40-widget`). Defaulted, like
+    /// the fields above it, so the memberwise callers build.
+    nonisolated var theme: AppTheme = .aurora
+
     /// Fraction of the goal reached today, clamped to `0...1`.
     var progress: Double {
         min(max(progressUnclamped, 0), 1)
@@ -4198,6 +4288,9 @@ nonisolated struct WristMirror: Codable, Sendable, Equatable {
     /// before it. **A defaulted `var`**, so every memberwise call builds, and optional so an older mirror still
     /// decodes: `schemaVersion` stays 1, because a bump would make every older watch drop every new mirror.
     var vessels: [Vessel]? = nil
+    /// The theme's code since set C — `nil` for Aurora, and in a mirror from before it. A defaulted optional `var`,
+    /// for ``vessels``' reasons.
+    var themeCode: String? = nil
 
     /// One of Home's three vessels as the watch draws it: its glyph's code (``VesselGlyph``'s raw value) and the
     /// name the user typed — `nil` for a standard vessel, which the watch names from its own catalogue in the
@@ -4638,7 +4731,9 @@ extension DataManager {
             // (``WaterSnapshot/week(endingOn:calendar:)``).
             weekTotals: readWeekTotals(from: defaults),
             // That middle vessel's glyph, which the Control Center control draws (D19).
-            servingGlyph: usualGlyph(in: defaults)
+            servingGlyph: usualGlyph(in: defaults),
+            // The theme the Home Screen and week widgets draw in (§3.5).
+            theme: resolveTheme(in: defaults)
         )
     }
 

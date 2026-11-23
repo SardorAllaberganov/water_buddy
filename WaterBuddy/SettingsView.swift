@@ -82,6 +82,7 @@ struct SettingsView: View {
     /// for to run its lap. Not ``arrived``, which rises while the page is still sliding in, so the light ran across a
     /// moving page (plan P19), and not a sheet's ``Landing/wait`` from the build, which load shortens (#223).
     @Environment(\.pageHasLanded) private var landed
+    @Environment(\.aurora) private var aurora
 
     private let scheduler = ReminderScheduler.live()
 
@@ -136,9 +137,13 @@ struct SettingsView: View {
                         )
                             .arrives(arrived, order: lead + 4)
                             .scrollDepth()
+                        // Above the language: both are how the app looks to you (spec `2026-11-22-set-c-design.md` §3.8).
+                        AppearanceCard(gate: premiumGate, openPaywall: { paywall = .settings })
+                            .arrives(arrived, order: lead + 5)
+                            .scrollDepth()
                     }
-                    LanguageCard().arrives(arrived, order: lead + 5).scrollDepth()
-                    privacyPolicyLink.arrives(arrived, order: lead + 6).scrollDepth()
+                    LanguageCard().arrives(arrived, order: lead + 6).scrollDepth()
+                    privacyPolicyLink.arrives(arrived, order: lead + 7).scrollDepth()
                     Spacer(minLength: 0)
                 }
                 // The reminders card changes what it says, and with it its height: when
@@ -252,6 +257,11 @@ struct SettingsView: View {
         PremiumAccess.gate(status: premium.state.status, offered: PaywallView.isOfferedHere)
     }
 
+    /// Whether a theme's tap opens the paywall rather than choosing it: Aurora never does (D5).
+    nonisolated static func themeOpens(_ theme: AppTheme, gate: PremiumAccess.Gate) -> Bool {
+        theme != .aurora && gate != .open
+    }
+
     /// After a lapse, the free way back: *Use the standard schedule*, under a locked custom schedule
     /// (spec `2026-10-30-coaching-design.md` D2). An open row's sheet has its own.
     nonisolated static func offersStandardReset(gate: PremiumAccess.Gate, schedule: ReminderPlan.Schedule) -> Bool {
@@ -283,7 +293,7 @@ struct SettingsView: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.7)
         }
-        .toggleStyle(SwitchToggleStyle(tint: Aurora.cyan))
+        .toggleStyle(SwitchToggleStyle(tint: aurora.accent))
         // The floor and no more: the canvas sets the title and the switch on one line, with its
         // sentence close under them, and a taller row only stood the sentence further off.
         .frame(minHeight: 44)
@@ -367,7 +377,7 @@ struct SettingsView: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.7)
                 }
-                .toggleStyle(SwitchToggleStyle(tint: Aurora.cyan))
+                .toggleStyle(SwitchToggleStyle(tint: aurora.accent))
                 .frame(minHeight: 44)
                 // On the `Toggle` itself, as the reminders row's are (rule `65-accessibility`).
                 .accessibilityLabel(Text("Apple Health", bundle: strings))
@@ -473,6 +483,89 @@ struct SettingsView: View {
     }
 }
 
+// MARK: - Appearance
+
+/// *Appearance* — the theme and, from Task 19, the app icon (spec `2026-11-22-set-c-design.md` §3.8, D16).
+///
+/// A swatch is one button: the theme's own sky, its accent's light, its name under it — told apart by the name and
+/// the ring, never by colour alone (rule `65-accessibility`). A tap is one call into the model. Aurora is free for
+/// everyone; the others open the paywall where locked (D5).
+private struct AppearanceCard: View {
+
+    @Environment(DataManager.self) private var manager
+    @Environment(\.strings) private var strings
+
+    let gate: PremiumAccess.Gate
+    let openPaywall: () -> Void
+
+    @State private var picks = 0
+    @ScaledMetric(relativeTo: .body) private var swatch: CGFloat = 44
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Appearance", bundle: strings).cardTitle()
+            Text("Theme", bundle: strings).cardNote()
+            ViewThatFits(in: .horizontal) {
+                themes
+                ScrollView(.horizontal, showsIndicators: false) { themes }
+            }
+        }
+        .settingsCard()
+        .sensoryFeedback(Haptics.select, trigger: picks)
+    }
+
+    private var themes: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ForEach(AppTheme.allCases) { theme in
+                Button {
+                    if SettingsView.themeOpens(theme, gate: gate) {
+                        openPaywall()
+                    } else {
+                        manager.theme = theme
+                        picks += 1
+                    }
+                } label: {
+                    VStack(spacing: 6) {
+                        Circle()
+                            .fill(theme.palette.gradient)
+                            .overlay(alignment: .topTrailing) {
+                                Circle().fill(theme.palette.accent).frame(width: diameter * 0.3, height: diameter * 0.3).padding(diameter * 0.1)
+                            }
+                            .overlay {
+                                Circle().strokeBorder(.white.opacity(manager.theme == theme ? LiquidGlass.Selection.ringOpacity : 0),
+                                                      lineWidth: LiquidGlass.Selection.ringWidth)
+                            }
+                            .overlay {
+                                if SettingsView.themeOpens(theme, gate: gate) {
+                                    Image(systemName: "lock.fill").font(.caption.weight(.semibold)).foregroundStyle(.white)
+                                }
+                            }
+                            .frame(width: diameter, height: diameter)
+                        Text(LocalizedStringKey(theme.nameKey), bundle: strings)
+                            .font(.caption.weight(manager.theme == theme ? .bold : .regular))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                    }
+                    .frame(minWidth: 52, minHeight: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PressStyle())
+                // Label, trait, value and hint go on the `Button`, never on a wrapping
+                // `.accessibilityElement(children: .ignore)` — that adds a stop when what it wraps is a
+                // control (`tasks/lessons.md`), and a swatch was announced twice.
+                .accessibilityLabel(Text(LocalizedStringKey(theme.nameKey), bundle: strings))
+                .accessibilityAddTraits(manager.theme == theme ? [.isSelected] : [])
+                .accessibilityValue(SettingsView.themeOpens(theme, gate: gate) ? strings.localizedString(forKey: "Premium", value: nil, table: nil) : "")
+                .accessibilityHint(SettingsView.themeOpens(theme, gate: gate) ? Text("Opens Premium", bundle: strings) : Text(verbatim: ""))
+            }
+        }
+    }
+
+    /// The swatch: 44 pt at the default size, never under the tap floor, capped so five still share a row as long as
+    /// they can (rule `65-accessibility`).
+    private var diameter: CGFloat { min(max(swatch, 44), 60) }
+}
+
 // MARK: - The language picker
 
 /// Switches the language the whole product draws in, **without a relaunch**.
@@ -497,6 +590,7 @@ private struct LanguageCard: View {
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
+    @Environment(\.aurora) private var aurora
 
     /// Bumped on a real change, so the haptic fires on a switch rather than on a re-tap.
     @State private var switches = 0
@@ -556,8 +650,8 @@ private struct LanguageCard: View {
                     // `.clear` rather than absent, so the row does not resize as the selection
                     // moves and SwiftUI animates a colour instead of inserting a layer — the same
                     // ruling `GlassTabBar` records for its glow.
-                    .foregroundStyle(isSelected ? Aurora.cyan : .clear)
-                    .shadow(color: isSelected ? Aurora.cyan.opacity(0.5) : .clear, radius: 8)
+                    .foregroundStyle(isSelected ? aurora.accent : .clear)
+                    .shadow(color: isSelected ? aurora.accent.opacity(0.5) : .clear, radius: 8)
                     // Once, on the row that was picked — and on the one that was left, where the
                     // mark is clear and nothing shows.
                     .symbolEffect(.bounce, value: isSelected)
@@ -592,6 +686,7 @@ private struct CoachingRows: View {
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
+    @Environment(\.aurora) private var aurora
 
     /// The schedule being edited — the sheet's `.sheet(item:)` selection (rule `50-views`).
     @State private var editing: ReminderPlan.Schedule?
@@ -693,7 +788,7 @@ private struct CoachingRows: View {
                 }
             }
         }
-        .toggleStyle(SwitchToggleStyle(tint: Aurora.cyan))
+        .toggleStyle(SwitchToggleStyle(tint: aurora.accent))
         .frame(minHeight: 44)
         .accessibilityLabel(Text("Only when behind", bundle: strings))
         .accessibilityHint(SettingsView.behindTapOpensPaywall(gate: gate, isOn: manager.onlyWhenBehind)
@@ -849,6 +944,7 @@ private struct PremiumCard: View {
     @Environment(\.strings) private var strings
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.aurora) private var aurora
 
     /// Whether the page has landed. The card runs its lap once it has, or as it appears after that: it is drawn only
     /// once StoreKit's first read has answered, and a card inserted with its flag already up saw no change to animate,
@@ -943,7 +1039,7 @@ private struct PremiumCard: View {
                         // `sparkles` stands taller than the rest (the walk, W1).
                         Text(Image(systemName: feature.symbol))
                             .font(.title3.weight(.semibold))
-                            .foregroundStyle(Aurora.cyan)
+                            .foregroundStyle(aurora.accent)
                         Text(caption)
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white)
@@ -1009,7 +1105,7 @@ private enum PremiumCardStyle {
 /// goal they had already chosen and could no longer reach.
 ///
 /// It shares setup's readout *idiom* — monospaced digits, a ratio-sized unit, a numeric transition,
-/// an `Aurora.cyan` slider — but arranges it as a settings row rather than as a hero, because on
+/// an accent slider — but arranges it as a settings row rather than as a hero, because on
 /// the welcome's goal step that card is the whole page and here it is one of four. It wears `remindersCard`'s
 /// `.raised` elevation for the same reason (rule `60-design-system`).
 ///
@@ -1030,6 +1126,7 @@ private struct GoalCard: View {
     @Environment(\.locale) private var locale
 
     @Environment(DataManager.self) private var manager
+    @Environment(\.aurora) private var aurora
 
     /// The amount under the finger, in millilitres, held as an `Int` for the same reason every
     /// other volume in this product is one. The `Double` a `Slider` demands exists only inside
@@ -1130,7 +1227,7 @@ private struct GoalCard: View {
                     if !editing { commitIfChanged() }
                 }
             )
-            .tint(Aurora.cyan)
+            .tint(aurora.accent)
             // A `Slider`'s stock VoiceOver value is a percentage of its range, which here would
             // announce "50%" for 2,500 ml — a number that appears nowhere in the product.
             .accessibilityLabel(Text("Daily water goal", bundle: strings))
@@ -1415,6 +1512,8 @@ private extension View {
 /// (``Motion/land``). Decoration: the slider beside it speaks its own value, so this is hidden
 /// from accessibility (rule `65-accessibility`).
 private struct SavedTick: View {
+    @Environment(\.aurora) private var aurora
+
 
     /// How many times the card has saved. Zero is the card as it opens, and draws nothing.
     let commits: Int
@@ -1432,7 +1531,7 @@ private struct SavedTick: View {
     var body: some View {
         CheckShape()
             .trim(from: 0, to: shown ? 1 : 0)
-            .stroke(Aurora.cyan, style: StrokeStyle(lineWidth: size * 0.16, lineCap: .round, lineJoin: .round))
+            .stroke(aurora.accent, style: StrokeStyle(lineWidth: size * 0.16, lineCap: .round, lineJoin: .round))
             .frame(width: size, height: size * 0.75)
             .opacity(shown ? 1 : 0)
             // Drawn on the way in, faded on the way out.
