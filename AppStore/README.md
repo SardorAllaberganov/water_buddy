@@ -182,7 +182,8 @@ framed again without a new capture.
 All three must exist with exactly these IDs: if one fails to load, the paywall sells nothing. Family Sharing is
 on for all three, and in Connect it cannot be turned off once saved.
 
-**Prices by country — set in Connect, not in the build, on the day 1.4.1 is released.** Three tiers by the
+**Prices by country — set in Connect, not in the build; set on 2026-11-24, every store's in
+[`prices-by-country.md`](prices-by-country.md).** Three tiers by the
 World Bank's income groups, each plan's ratio kept so the yearly saving stays near 44 % and the lifetime is
 twice the yearly (spec §7):
 
@@ -199,7 +200,37 @@ twice the yearly (spec §7):
   for both subscriptions and the lifetime purchase, take the nearest one that keeps the saving within 43–45 %.
 - **After each tier, read every sample storefront's proposed price**, and set by hand any yearly saving outside
   43–45 % (the euro stores read 36 % today).
+- **Done on 2026-11-24**, two days after the release: the lifetime purchase at once, both subscriptions from
+  25 November, the earliest start Connect allows. Each tier is Connect's comparable prices for the US prices above.
+  Where the saving then fell outside 43–45 %, the monthly price was kept and the yearly price set by hand: in 46
+  tier stores, and in 42 high-income ones, 29 down (the euro stores to €19.99) and 13 up, with existing subscribers
+  kept at their price. Every store now saves 43.5–45.0 %.
 - Uzbekistan is billed in US dollars, at the lower tier.
 - **Never mention another country's price**, in the app or on the page: App Review can read it as misleading.
 - Which country is in which group: the World Bank's lists, as the release playbook keeps them, in
   `~/.claude/skills/aso/references/price-tiers.md` (the 2027 fiscal year's lists, published each July).
+
+## 6. Spanish (Mexico) — goes up with set C's version, not 1.4.1
+
+Approved by the owner on 2026-11-23 ("Wait for set C"). Apple's localization page lists Spanish (Mexico) among the US
+store's languages, so this page's name, subtitle and keywords add a second set of search words there. It is also the
+default page in Mexico and 15 other Latin American stores. Connect changes a name only with a new version, and 1.4.1 is
+live, so the page waits for set C's version. The screenshots stay en-US's, Connect's default for a new language.
+
+| Field | Limit | Spanish (Mexico) — `es-MX/` |
+|---|---|---|
+| Name | 30 characters | [`name.txt`](es-MX/name.txt) — 23 |
+| Subtitle | 30 characters | [`subtitle.txt`](es-MX/subtitle.txt) — 30 |
+| Keywords | 100 bytes | [`keywords.txt`](es-MX/keywords.txt) — 96 |
+| Promotional Text | 170 characters | [`promotional-text.txt`](es-MX/promotional-text.txt) — 168 |
+| Description | 4000 characters | [`description.txt`](es-MX/description.txt) — 3980 |
+| What's New | 4000 characters | written with set C's |
+| Support URL, Privacy Policy URL | — | en-US's addresses: Connect leaves a new language's empty (section 1) |
+
+- **The description is 1.4.1's in Spanish, shortened to fit,** because Spanish runs longer: its second paragraph is
+  cut. It adds that the app is in English, Russian and Uzbek, *not Spanish*, and that the Siri phrases work only in
+  English and Russian. Every change set C makes to the English page goes into this one too.
+- **The keywords** take no word already on the en-US page or in the Spanish name and subtitle, and no accents. The
+  research is in [`research/2026-11-23/spanish-mexico.md`](research/2026-11-23/spanish-mexico.md).
+- **`VerifyListing.sh` doesn't read `es-MX/` yet,** because it requires a What's New in every language. Add `es-MX`
+  to its `LISTINGS` once set C's What's New is written. The counts above are from the same rules, run on 2026-11-23.

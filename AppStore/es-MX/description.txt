@@ -1,0 +1,54 @@
+Un toque registra un vaso desde tu pantalla de inicio, la pantalla bloqueada, el Centro de control o tu Apple Watch, y ves cómo se llena. Sin cuenta y sin servidor.
+
+REGISTRO
+- Tres recipientes para registrar rápido: taza de 150 ml, vaso de 250 ml y botella de 500 ml, cada uno ajustable de 50 a 1,000 ml.
+- Una meta diaria de 1,000 a 4,000 ml, o deja que WaterBuddy te sugiera una según tu peso y tu nivel de actividad. No guarda ninguno de los dos.
+- Un recipiente con agua en movimiento muestra el porcentaje de hoy y los mililitros exactos.
+- Deshaz un registro con un toque. Al llegar a tu meta, la pantalla lo celebra y tu racha suma un día.
+
+SIN ABRIR LA APP
+- Widgets para la pantalla de inicio: pequeño y mediano, con un botón que registra tu vaso, y otro con tus últimos siete días. El pequeño también funciona en modo En espera.
+- Widgets para la pantalla bloqueada: un anillo, una línea y un rectángulo con su propio botón.
+- Un control para registrar agua desde el Centro de control, la pantalla bloqueada y el botón de acción (iOS 18 o posterior).
+- Siri: di "Log water in WaterBuddy" o pregunta "How much water today in WaterBuddy". Solo en inglés y ruso.
+- Registra un vaso desde un recordatorio, sin abrir la app.
+
+APPLE WATCH
+- Taza, vaso y botella en tu muñeca. Funciona sin tu iPhone cerca y se sincroniza cuando vuelve.
+- Tres complicaciones (circular, rectangular y de esquina) ponen tu avance de hoy en la carátula.
+
+TU HISTORIAL
+- Tus últimos siete días en barras frente a tu meta, con tu promedio y tu mejor día.
+- Cada registro con su hora. Cambia una cantidad o una hora, borra un toque equivocado o agrega uno que olvidaste.
+
+RECORDATORIOS QUE SABEN CUÁNDO PARAR
+Opcionales y apagados hasta que los actives: un aviso cada dos horas de 9 a.m. a 9 p.m., que se omite si tomaste agua en la hora anterior y se calla al llegar a tu meta. No muestran números: la pantalla bloqueada está a la vista de todos.
+
+APP SALUD
+Opcional, y apagado hasta que lo actives: cada registro se guarda en la app Salud como Agua y se corrige o borra ahí cuando lo cambias aquí. WaterBuddy no lee nada de Salud.
+
+WATERBUDDY PREMIUM
+Extras opcionales:
+- Vista mensual: todo tu mes de un vistazo.
+- Tus patrones: a qué hora tomas agua, entre semana contra el fin de semana, y tu primer y último vaso habituales.
+- Análisis semanales, calculados con tus datos en tu iPhone. Donde esté disponible, el modelo de Apple en el dispositivo puede redactarlos, en inglés. No es consejo médico.
+- Resumen mensual: tu mes en una tarjeta, para compartir como imagen.
+- Tu propio horario de recordatorios: horas, intervalo y días sin avisos.
+- Una línea de ritmo en la pantalla principal y recordatorios solo cuando te quedes atrás.
+- Exporta todos tus registros como archivo CSV.
+Premium es una suscripción mensual o anual (el plan anual empieza con una semana gratis) o una compra única de por vida. Registrar agua siempre es gratis.
+
+PRIVADA POR DISEÑO
+Sin cuenta, servidor, nube, analíticas, rastreo, anuncios ni código de terceros: WaterBuddy solo usa frameworks de Apple y no tiene código de red. Lo que registras solo viaja entre tu iPhone y tu Apple Watch, a Salud si lo activas, y sale como imagen o archivo solo cuando tú lo compartes.
+
+HECHA PARA EL DÍA A DÍA
+- Un diseño oscuro de vidrio líquido sobre una aurora que se mueve despacio.
+- En inglés, ruso y uzbeko, no en español; el idioma se cambia dentro de la app.
+- VoiceOver, Texto más grande, Reducir movimiento y Reducir transparencia.
+
+LO QUE NO ES
+No es una app médica ni hace afirmaciones de salud. Sin amigos, sin publicaciones, sin rankings. Agua y nada más.
+
+Las suscripciones se renuevan automáticamente, a menos que las canceles al menos 24 horas antes de que termine el periodo actual, en la configuración de tu cuenta de Apple. Términos de uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+Requiere iOS 17 o posterior en iPhone; el control necesita iOS 18 y la app de Apple Watch, watchOS 26.

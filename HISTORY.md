@@ -16165,3 +16165,123 @@ worktree's, blob for blob. The *Files on disk* figures were read again from the 
 `Tools/`; `Screenshots/` gone), and `tasks/lessons.md` equalled the build worktree's staged blob before this pass's entry was
 added. `git diff --check` is clean. No set C name — `AppTheme`, `VesselLibrary`, `servingGlyph`, `AppIconSwitcher` — is in a
 target.
+
+## [2026-11-23] — 1.4.1 is live; a Spanish (Mexico) store page for WaterBuddy, staged for set C's version
+
+### What happened
+
+- **The owner's `/commit`** of the last pass at 03:30 — `a84b7b3`, `cf3c1ae` and `d006cc0` — left `main` level with `origin/main` at
+  `d006cc0`.
+- **1.4.1 (7) went live** on 2026-11-22 at 06:21 (Apple's lookup: released 2026-11-22T01:21:28Z, 0 ratings), and nothing in the
+  repository said so until this pass. Its prices by country, due that day (`AppStore/README.md` §5), are not set: Connect at 23:38
+  shows the yearly plan's starting price in all 175 storefronts — $19.99 in Uzbekistan, ₹1,999 in India, MX$399 in Mexico. They
+  wait for the owner's word, since a decrease cannot be taken back.
+- **The task**, pasted by the owner: a Spanish (Mexico) page for WaterBuddy and for Glazzy, for a second set of search words in the
+  US store. The name and subtitle in Mexican Spanish; keywords mostly new English words and a few Spanish ones, each for a feature
+  the app has; the description and promotional text translated; en-US's screenshots kept; a table per app before any save; no
+  submission without the owner's word; a Growth Journal row per app.
+- **Apple's *App Store localizations* page**, read on 2026-11-23: Spanish (Mexico) is one of the US storefront's languages beside
+  English (U.S.), and the default in Mexico and 15 other Latin American storefronts. Apple doesn't say whether two pages' words
+  combine in one search.
+- **The research:** 21 searches through the aso skill's `rank.py`, 13 in the US store and 8 in Mexico's. WaterBuddy is in no top
+  50. Written to `AppStore/research/2026-11-23/spanish-mexico.md` with what it decided.
+- **No version to put it on:** 1.4.1 is live, and Connect changes a name only with a new version. The owner chose "Wait for set C":
+  no 1.4.2; the page goes up with set C's version.
+- **WaterBuddy's page**, on the owner's OK: `AppStore/es-MX/` and `AppStore/README.md` §6 — name *Beber Agua - WaterBuddy*,
+  subtitle *Recordatorio y contador diario*, keywords, promotional text, and 1.4.1's description in Spanish, shortened to fit.
+  Staged, not committed; nothing in App Store Connect.
+- **Glazzy 1.2's page**, saved in App Store Connect on the owner's "Save as drafted" and read back after a reload; nothing
+  submitted. Its first translation was of 1.1's English and was redone from 1.2's final English before anything was saved
+  (`tasks/lessons.md`).
+- **The set C build session** keeps the four release steps in its ledger for its final report: set C's English changes carried
+  into the Spanish description, a Spanish What's New, the Support and Privacy Policy URLs, and `es-MX` in `Tools/VerifyListing.sh`.
+- **The owner's word** at about 23:30: "if c set has done, remove it, /doc_sync and go next tasks". Set C is not done —
+  `feature/set-c` at `010b114`, two commits past `d006cc0`, Tasks 0–15 of 0–22 in its ledger, staged work in its worktree — so its
+  session stays, and this is the `/doc_sync`.
+
+### Drift found and fixed
+
+- Nothing recorded 1.4.1's release; `docs/AI_CONTEXT.md`'s *Current state* now does. Left for the owner, outside this sync's
+  scope: `README.md`'s *After the submission — outstanding* still reads *Waiting for Review*.
+- `CLAUDE.md`'s `AppStore/` row said the folder holds the current version's page and nothing older. It now names `es-MX/`, the
+  next version's Spanish page, and `research/`.
+- `docs/AI_CONTEXT.md`, *Files on disk*: `AppStore/` is 67 files, not 61, and `Tools/VerifyListing.sh`'s row says it does not read
+  `es-MX/` yet.
+
+### Checked and already accurate
+
+- 137 `.swift` files in the seven targets, every one named in `docs/AI_CONTEXT.md`; 1117 phone `@Test`, 71 watch, 76 UI
+  `func test`. No file in a target, and not `project.pbxproj`, changed after `d006cc0`.
+- Every `` rule `nn-name` `` citation resolves to a file. `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md` and
+  `docs/ROADMAP.md`: nothing in their subjects moved.
+- The six unstaged files are the owner's, left on purpose: `.claude/settings.json`, the two watch schemes and the three
+  catalogues Xcode rewrote.
+
+### The rulings
+
+- The page waits for set C's version, not a 1.4.2 of its own: the owner's "Wait for set C".
+- The Spanish description is 1.4.1's, its second paragraph cut to fit 4,000 characters; it adds that the app is in English,
+  Russian and Uzbek, not Spanish, and that the Siri phrases work only in English and Russian.
+- Set C's session is not archived: it is not done, and archiving cleans up a worktree that holds work not yet committed.
+
+### The records (hundred-and-twenty-ninth pass)
+
+- `docs/AI_CONTEXT.md`: the header, *Current state*'s new headline, two *Files on disk* rows and the Git block.
+- `CLAUDE.md`: the `AppStore/` row.
+- `tasks/lessons.md`: two entries — translating a store page from its version's final English, and zsh's unsplit variable.
+- Growth Journal: GROW-141 (WaterBuddy's page) and GROW-142 (Glazzy's).
+
+### Files touched
+
+The page: `AppStore/es-MX/` (`name.txt`, `subtitle.txt`, `keywords.txt`, `promotional-text.txt`, `description.txt`),
+`AppStore/research/2026-11-23/spanish-mexico.md` and `AppStore/README.md`. The records: `CLAUDE.md`, `docs/AI_CONTEXT.md`,
+`tasks/lessons.md` and this file.
+
+### Verification
+
+No gate: no file in a target changed. The five Spanish fields recounted by a script: name 23 characters, subtitle 30, keywords 96
+bytes, promotional text 168, description 3,980 characters, none with a trailing newline; the 14 keywords have no space, none of
+two letters or fewer, none from the Spanish name or subtitle, and no repeat. `Tools/VerifyListing.sh` does not read `es-MX/` yet,
+and the three listings it reads did not change, so it was not run for this pass. Apple's lookup and Connect's price list for the
+yearly plan were read, and nothing in Connect was changed.
+
+## [2026-11-24] — 1.4.1's prices by country, set in App Store Connect
+
+### What happened
+
+- **The owner's word**, "Set prices now", answering whether to set them once the doc sync above found them unset:
+  `AppStore/README.md` §5's three tiers, with any yearly saving outside 43–45 % fixed by hand.
+- **The lifetime purchase:** two custom price changes, *Make Price Change Now*, from a US price of $23.99 for the 53
+  upper-middle-income stores and $11.99 for the 53 lower ones. Connect now shows 106 stores *Manually Adjusted* and 69 that may
+  adjust automatically. Apple's 3 December tax and exchange-rate change for Colombia, Egypt, Rwanda and Türkiye is gone, replaced
+  by these.
+- **The monthly plan:** two price changes from 25 November, the earliest start Connect allows for a subscription, at US $1.79 and
+  $0.89. Existing subscribers renew at the lower price.
+- **The yearly plan:** three price changes from 25 November: the two tiers at US $11.99 and $5.99, then the 42 high-income stores
+  whose saving was already outside 43–45 % at full price. In 46 tier stores and those 42, the yearly price was set by hand to the
+  store's price point nearest twelve monthly payments × 0.557, the monthly kept. 13 high-income yearly prices went up, existing
+  subscribers' price preserved; the other 75 set by hand went down.
+- **Read back from Connect** after saving: the yearly plan's 25 November list equals the 148 prices set, the monthly's the 106, and
+  the lifetime's 106 hand-set prices the ones confirmed. Every store's yearly saving from 25 November is 43.5–45.0 %: the paywall
+  reads *save 44%* in 148 stores and *save 45%* in 27.
+- **Growth Journal:** GROW-150.
+
+### The rulings
+
+- **Keep the monthly, move the yearly** wherever the saving missed 43–45 %, in every store, high-income ones included: the README's
+  rule names the range, not the plan to move, and this keeps the US ratio. It raised the yearly price in 13 high-income stores
+  (Australia, Barbados, Canada, the Czech Republic, Denmark, Hungary, Iceland, Israel, Japan, Norway, Sweden, Switzerland, the
+  United Arab Emirates), each with existing subscribers' price preserved, and lowered it in the rest it touched.
+- **The tiers are Connect's comparable prices for a US price**, so a store whose price includes tax pays more in dollars than the
+  README's table: $1.99 a month in Albania, $12.99 for the lifetime in Uzbekistan.
+
+### Files touched
+
+`AppStore/prices-by-country.md` (new), `AppStore/README.md` §5, `README.md`'s outstanding list, `docs/AI_CONTEXT.md`,
+`tasks/lessons.md` (two entries) and this file.
+
+### Verification
+
+No gate: no file in a target changed. Each confirmation screen was compared row for row with the proposal it came from before
+*Confirm*, and each saved list was read back afterwards; the savings were computed by script from the read-back prices. The
+paywall's own reading of a local price (#162) was not run against the new prices on a device.
