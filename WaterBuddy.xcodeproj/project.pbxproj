@@ -908,6 +908,7 @@
 		9947C23D3046293F00972CEA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Lagoon AppIcon-Dusk AppIcon-Midnight AppIcon-Bloom";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddy.entitlements;
@@ -948,6 +949,7 @@
 		9947C23E3046293F00972CEA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Lagoon AppIcon-Dusk AppIcon-Midnight AppIcon-Bloom";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Entitlements/WaterBuddy.entitlements;

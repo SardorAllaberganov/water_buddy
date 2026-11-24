@@ -485,21 +485,31 @@ struct SettingsView: View {
 
 // MARK: - Appearance
 
-/// *Appearance* — the theme and, from Task 19, the app icon (spec `2026-11-22-set-c-design.md` §3.8, D16).
+/// *Appearance* — the theme and the app icon (spec `2026-11-22-set-c-design.md` §3.7, §3.8, D16).
 ///
 /// A swatch is one button: the theme's own sky, its accent's light, its name under it — told apart by the name and
 /// the ring, never by colour alone (rule `65-accessibility`). A tap is one call into the model. Aurora is free for
 /// everyone; the others open the paywall where locked (D5).
+///
+/// An icon is one button too, the theme's icon drawn from its generated preview, apart from the theme: iOS keeps the
+/// choice, through ``AppIconSwitcher``, and the card reads it back each time it appears — nothing is stored. Aurora's,
+/// the primary, is free; the others are locked as a swatch is.
 private struct AppearanceCard: View {
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
+    @Environment(\.locale) private var locale
 
     let gate: PremiumAccess.Gate
     let openPaywall: () -> Void
 
     @State private var picks = 0
+    /// The theme whose icon iOS shows, read on appear.
+    @State private var icon: AppTheme = .aurora
     @ScaledMetric(relativeTo: .body) private var swatch: CGFloat = 44
+
+    /// An icon's side: a home-screen icon's size, over the 44-pt tap floor (rule `65-accessibility`).
+    private let iconSide: CGFloat = 52
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -509,9 +519,64 @@ private struct AppearanceCard: View {
                 themes
                 ScrollView(.horizontal, showsIndicators: false) { themes }
             }
+            Text("App icon", bundle: strings).cardNote()
+            ViewThatFits(in: .horizontal) {
+                icons
+                ScrollView(.horizontal, showsIndicators: false) { icons }
+            }
         }
         .settingsCard()
         .sensoryFeedback(Haptics.select, trigger: picks)
+        .onAppear { icon = AppTheme.icon(named: AppIconSwitcher.live().current()) }
+    }
+
+    private var icons: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ForEach(AppTheme.allCases) { theme in
+                let locked = SettingsView.themeOpens(theme, gate: gate)
+                Button {
+                    if locked {
+                        openPaywall()
+                    } else {
+                        Task {
+                            let switcher = AppIconSwitcher.live()
+                            do {
+                                try await switcher.set(theme.iconName)
+                                icon = theme
+                                picks += 1
+                            } catch {
+                                #if DEBUG
+                                print("WaterBuddy: the app icon could not be changed.")
+                                #endif
+                            }
+                        }
+                    }
+                } label: {
+                    let shape = RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous)
+                    Image(theme.iconPreviewName)
+                        .resizable()
+                        .frame(width: iconSide, height: iconSide)
+                        .clipShape(shape)
+                        .overlay {
+                            shape.strokeBorder(.white.opacity(icon == theme ? LiquidGlass.Selection.ringOpacity : 0),
+                                               lineWidth: LiquidGlass.Selection.ringWidth)
+                        }
+                        .overlay {
+                            if locked {
+                                Image(systemName: "lock.fill").font(.caption.weight(.semibold)).foregroundStyle(.white)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(PressStyle())
+                // As a swatch's: label, trait, value and hint on the `Button` itself.
+                .accessibilityLabel(Text(verbatim: strings.localized(
+                    "%1$@ icon", strings.localizedString(forKey: theme.nameKey, value: nil, table: nil), locale: locale)))
+                .accessibilityAddTraits(icon == theme ? [.isSelected] : [])
+                .accessibilityValue(locked ? strings.localizedString(forKey: "Premium", value: nil, table: nil) : "")
+                .accessibilityHint(locked ? Text("Opens Premium", bundle: strings) : Text(verbatim: ""))
+            }
+        }
     }
 
     private var themes: some View {

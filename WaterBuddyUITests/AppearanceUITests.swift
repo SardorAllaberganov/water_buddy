@@ -75,4 +75,43 @@ final class AppearanceUITests: XCTestCase {
         XCTAssertTrue(dusk.isSelected)
         XCTAssertFalse(app.buttons["Aurora"].isSelected)
     }
+
+    /// Each icon is one button; choosing one passes iOS's own alert and selects it.
+    @MainActor
+    func testEachIconIsOneButtonAndAChoiceSelectsIt() {
+        let app = launch()
+        app.buttons["Settings"].firstMatch.tap()
+        let lagoon = app.buttons["Lagoon icon"]
+        XCTAssertTrue(lagoon.waitForExistence(timeout: 5))
+        for name in ["Aurora", "Lagoon", "Dusk", "Midnight", "Bloom"] {
+            XCTAssertEqual(app.buttons.matching(identifier: "\(name) icon").count, 1, name)
+        }
+        lagoon.tap()
+        acceptIconAlert(app)
+        // The card marks the icon once iOS's change completes, which is after its alert: wait for it.
+        XCTAssertTrue(waitUntilSelected(app.buttons["Lagoon icon"]))
+        app.buttons["Aurora icon"].tap()   // leave the simulator on the primary icon
+        acceptIconAlert(app)
+        XCTAssertTrue(waitUntilSelected(app.buttons["Aurora icon"]))
+    }
+
+    /// iOS's own alert after an icon change, dismissed — looked for in the app's tree and in SpringBoard's, since a
+    /// system may draw it in either.
+    @MainActor
+    private func acceptIconAlert(_ app: XCUIApplication) {
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        for alerts in [app.alerts, springboard.alerts] {
+            let ok = alerts.buttons.firstMatch
+            if ok.waitForExistence(timeout: 5) {
+                ok.tap()
+                return
+            }
+        }
+    }
+
+    @MainActor
+    private func waitUntilSelected(_ element: XCUIElement) -> Bool {
+        let selected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "isSelected == true"), object: element)
+        return XCTWaiter().wait(for: [selected], timeout: 5) == .completed
+    }
 }
