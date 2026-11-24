@@ -267,10 +267,18 @@ struct RecapCard: View {
     /// Not the tile's own `.sheer` glass: that is Apple's clear glass, untinted, which lightens every
     /// ground alike while the stack's scrim darkens in proportion — no fill in range gives it back
     /// (best 3.34).
+    ///
+    /// **One per theme** (set C): each fitted as Aurora's was, over the theme's own gradient on iOS 27.0
+    /// (2026-11-23, `docs/DESIGN.md`, *Themes, measured*). Lagoon's red came out below zero, which a colour cannot
+    /// hold: it is held at 0, and the opacity raised to 0.71 so the stack gives the glass back at both ends of the
+    /// gradient — the stack's white tint alone draws more red than Lagoon's live glass shows (worst ΔE₂₀₀₀ 0.93).
     static func tileFill(for theme: AppTheme) -> (red: Double, green: Double, blue: Double, opacity: Double) {
         switch theme {
-        case .aurora, .lagoon, .dusk, .midnight, .bloom:
-            return (red: 0.0287, green: 0.1761, blue: 0.8521, opacity: 0.4856)
+        case .aurora: (red: 0.0287, green: 0.1761, blue: 0.8521, opacity: 0.4856)   // worst ΔE₂₀₀₀ 0.26
+        case .lagoon: (red: 0.0000, green: 0.2212, blue: 0.3776, opacity: 0.7100)   // 0.93, red held at 0
+        case .dusk: (red: 0.2807, green: 0.0493, blue: 0.3144, opacity: 0.5232)     // 0.27
+        case .midnight: (red: 0.0647, green: 0.0742, blue: 0.1464, opacity: 0.5320) // 0.31
+        case .bloom: (red: 0.3301, green: 0.0399, blue: 0.2994, opacity: 0.5346)    // 0.21
         }
     }
 

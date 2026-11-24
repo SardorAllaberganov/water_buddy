@@ -861,3 +861,113 @@ extension AppStoreScreenshotUITests {
                     withVelocity: .slow, thenHoldForDuration: 0.4)
     }
 }
+
+// MARK: - The theme census
+
+/// Every screen `docs/DESIGN.md` measures, in one theme, for `Tools/MeasureContrast.swift` (spec
+/// `2026-11-22-set-c-design.md` §3.9). Driven only by `Tools/CaptureThemeCensus.sh`, one theme a run; the gate skips
+/// this class (rule `85-testing`). The theme arrives as `TEST_RUNNER_WATERBUDDY_THEME`, which `xcodebuild` hands the
+/// runner as `WATERBUDDY_THEME`, and the screens to sweep as `WATERBUDDY_SCREENS`.
+extension AppStoreScreenshotUITests {
+
+    /// Seconds between frames, and frames per screen that stands on the aurora: a minute, the swing of all three
+    /// lights at least once (`tasks/lessons.md` 2759).
+    private static let frameGap: TimeInterval = 3
+    private static let framesOnTheAurora = 20
+
+    @MainActor
+    func testCaptureThemeCensus() throws {
+        let env = ProcessInfo.processInfo.environment
+        let theme = try XCTUnwrap(env["WATERBUDDY_THEME"], "run through CaptureThemeCensus.sh")
+        // One group of screens a run, so each command ends inside the 600-s limit (the driver's groups).
+        let screens = Set((env["WATERBUDDY_SCREENS"] ?? "").split(separator: ",").map(String.init))
+        let wanted = { (screen: String) in screens.isEmpty || screens.contains(screen) }
+
+        if wanted("paywall") {
+            // The paywall, as a free user meets it.
+            let free = XCUIApplication()
+            free.launchArguments = ["-WaterBuddyFreshStart", "YES", "-WaterBuddyStoreSample", "YES", "-WaterBuddyPremium", "YES",
+                                    "-WaterBuddyTheme", theme]
+            free.launch()
+            completeWelcomeIfShown(free)
+            free.buttons["Settings"].firstMatch.tap()
+            free.buttons["See Premium"].tap()
+            try sweep(free, screen: "paywall", theme: theme, frames: Self.framesOnTheAurora)
+            free.terminate()
+        }
+
+        let holderScreens = ["home", "history-week", "history-month", "history-insights", "settings", "settings-lower", "library",
+                             "settings-appearance", "settings-end"]
+        guard holderScreens.contains(where: wanted) else { return }
+        // Everything else, as a holder. The walk always goes the whole way; only the wanted screens are swept.
+        let app = XCUIApplication()
+        app.launchArguments = ["-WaterBuddyFreshStart", "YES", "-WaterBuddyStoreSample", "YES", "-WaterBuddyPremiumHeld", "YES",
+                               "-WaterBuddyPremium", "YES", "-WaterBuddyTheme", theme]
+        app.launch()
+        completeWelcomeIfShown(app)
+        // Every screen settles before the next tap, swept or not: straight after the welcome, the cross-fade still
+        // holds a second tab bar, and "History" matched two buttons. Tabs and segments are tapped by their first match.
+        let settle = { Thread.sleep(forTimeInterval: 2) }
+        settle()
+        if wanted("home") { try sweep(app, screen: "home", theme: theme, frames: Self.framesOnTheAurora) }
+        app.buttons["History"].firstMatch.tap()
+        settle()
+        if wanted("history-week") { try sweep(app, screen: "history-week", theme: theme, frames: Self.framesOnTheAurora) }
+        for mode in ["Month", "Insights"] {
+            app.buttons[mode].firstMatch.tap()
+            settle()
+            let screen = "history-\(mode.lowercased())"
+            if wanted(screen) { try sweep(app, screen: screen, theme: theme, frames: Self.framesOnTheAurora) }
+        }
+        app.buttons["Settings"].firstMatch.tap()
+        settle()
+        if wanted("settings") { try sweep(app, screen: "settings", theme: theme, frames: Self.framesOnTheAurora) }
+        app.swipeUp()
+        if wanted("settings-lower") { try sweep(app, screen: "settings-lower", theme: theme, frames: Self.framesOnTheAurora) }
+        if wanted("library") {
+            app.buttons["Your vessels"].tap()
+            try sweep(app, screen: "library", theme: theme, frames: Self.framesOnTheAurora)
+            app.buttons["Done"].firstMatch.tap()
+            settle()
+        }
+        // Further down Settings: the Appearance and language cards, then the page's foot with the privacy link — a
+        // screen holds 874 pt, and the cards stand below it.
+        for screen in ["settings-appearance", "settings-end"] {
+            app.swipeUp()
+            settle()
+            if wanted(screen) { try sweep(app, screen: screen, theme: theme, frames: Self.framesOnTheAurora) }
+        }
+    }
+
+    /// `frames` screenshots `frameGap` apart, each attached, and the frames of every labelled element, once.
+    ///
+    /// The frames come from **one** accessibility snapshot, walked here, rather than a query per element: a screen
+    /// holds hundreds of elements, and a round trip each would spend a minute before the first frame. A label two
+    /// elements share keeps both frames, in the walk's order — History's heading *Today* and the week card's
+    /// *Today* are two — and a pair names which (`Tools/theme-pairs.json`'s `frameIndex`).
+    @MainActor
+    private func sweep(_ app: XCUIApplication, screen: String, theme: String, frames: Int) throws {
+        Thread.sleep(forTimeInterval: 2)   // the screen's arrival settles first
+        var elements: [String: [[Double]]] = [:]
+        func walk(_ node: XCUIElementSnapshot) {
+            if !node.label.isEmpty {
+                let f = node.frame
+                elements[node.label, default: []].append([Double(f.minX), Double(f.minY), Double(f.width), Double(f.height)])
+            }
+            node.children.forEach(walk)
+        }
+        walk(try app.snapshot())
+        let json = XCTAttachment(data: try JSONSerialization.data(withJSONObject: elements, options: [.sortedKeys]),
+                                 uniformTypeIdentifier: "public.json")
+        json.name = "\(theme)-\(screen)-frames.json"
+        json.lifetime = .keepAlways
+        add(json)
+        for n in 0..<frames {
+            let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            shot.name = String(format: "%@-%@-%02d", theme, screen, n)
+            shot.lifetime = .keepAlways
+            add(shot)
+            if n < frames - 1 { Thread.sleep(forTimeInterval: Self.frameGap) }
+        }
+    }
+}

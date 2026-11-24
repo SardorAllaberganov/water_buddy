@@ -539,6 +539,51 @@ other way round — fitted to a live render of Apple's glass rather than read of
 fit, its proof and its pairs are under *The recap, measured*. It shares `archived`'s `opaque` fill. *Three
 ways to draw a pane*'s `.flat` row covers it: a flat base is drawn hand-made, whichever it is.)*
 
+### The archived fills, derived
+
+*(2026-11-23, set C — spec `2026-11-22-set-c-design.md` §3.5, R2.)* `Base.archived(for:)` is one base per theme.
+Nothing recorded how Aurora's `opaque` (0.22, 0.19, 0.36) was made, so the arithmetic was found first, as the one
+that gives it back within 2/255, and only then applied to the other four.
+
+**The arithmetic is the recipe written out.** On the mean of the theme's gradient's two ends, `(top + bottom) / 2`:
+
+1. Apply the saturation boost of `1.1`: Rec. 709 luma on the encoded sRGB values, as `WidgetCardBackdrop`'s
+   `.saturation(1.1)`.
+2. Composite the archived frosted stack over it: white 0.24 at 0.5, then the black scrim at 0.28, then the white tint
+   at 0.07.
+
+For Aurora this gives (0.2185, 0.1871, 0.3547), against the recorded number by 0.39, 0.73 and 1.35 of 255.
+
+Three candidates without the boost missed:
+- **The stack over the gradient's mean:** `[55, 48, 87]` against `[56, 48, 92]`, blue 5 off.
+- **The stack over the app's rendered aurora** (its mean behind Home, outside every element and the vessel, on iOS
+  27.0 and 18.6): `[56, 59, 95]` and `[56, 57, 93]`, green 9–11 off. The rendered lights lift the sky's green, so no
+  frame of it comes within 2.
+- **The stack over the widget's rendered aurora:** not taken, since it carries the same lights.
+
+| Theme | `opaque` (sRGB) | The recipe's value, to six places |
+|---|---|---|
+| Aurora | **0.22, 0.19, 0.36** — the recorded number, kept | 0.218453, 0.187149, 0.354717 |
+| Lagoon | **0.150, 0.222, 0.253** | 0.150352, 0.221914, 0.253217 |
+| Dusk | **0.255, 0.170, 0.224** | 0.254831, 0.170126, 0.223527 |
+| Midnight | **0.175, 0.179, 0.197** | 0.175078, 0.178760, 0.197174 |
+| Bloom | **0.250, 0.163, 0.242** | 0.249771, 0.163226, 0.242406 |
+
+`theOpaqueFillIsTheArchivedStackOverItsOwnSky` recomputes each from its palette and holds the code to it within 2/255.
+
+**The translucent fill**, `Color(white: 0.24).opacity(0.5)`, stays every theme's. Its condition is the doc's own: the
+rendered aurora stays under the recipe's first knee, so the grey remap is constant at 0.24. It was read on the census's
+Home frames of 2026-11-23 (iOS 27.0, twenty frames over a minute), in the screen's two side margins (x 2–18 and 384–400
+pt, y 140–780 pt), which hold aurora only. The brightest relative luminance there:
+
+| Theme | Aurora | Lagoon | Dusk | Midnight | Bloom |
+|---|---|---|---|---|---|
+| Brightest relative luminance | 0.173 | 0.187 | 0.164 | 0.139 | 0.152 |
+
+Every theme is under a third, the knee of stops `[0.24, 0.24, 0.30, 0.39]` taken at even steps. The recipe's own scale
+is not documented. Relative luminance is the one on which the doc's sentence holds for Aurora: encoded luma, by
+contrast, puts Aurora's brightest at 0.413, over a third.
+
 ## `Aurora` — colour is shared, shape is not
 
 ```swift
@@ -2690,6 +2735,415 @@ arrives; under Reduce Motion they are simply there and the arrival is the fade a
 capsule arrives from 0.92 of its size on `.smooth(duration: 0.3)`. **Reduce Motion was not
 rendered.** *(All of this paragraph is the first build's too: the capsule arrives from 0.8 on
 `Motion.land` now, and Reduce Motion has been rendered — Motion, below.)*
+
+## Themes, measured
+
+*(2026-11-23 and 2026-11-24, set C — spec `2026-11-22-set-c-design.md` §3.9; rule `60-design-system`, *a theme
+ships only with its table*.)* Each of the four new themes was measured on its own renders against Aurora taken
+again in the same sitting. On both runtimes, **every theme keeps Aurora's values**:
+- the tint on Apple's glass, `Aurora.top` at 0.64;
+- the hand-made pane's scrims, 0.30, 0.70 and 0.80;
+- the tab bar's shade.
+
+Two values are fitted to each theme instead of measured against a floor: `Base.archived`'s opaque fill, under *The
+archived fills, derived*, and the recap's tile fill, below.
+
+**The harness.** It is kept in the tree, in no target.
+- **Capture.** `Tools/CaptureThemeCensus.sh` drives `AppStoreScreenshotUITests.testCaptureThemeCensus`. Each theme
+  gets the census's fresh start with the store's sample (three months of servings; today's last at 1:30 PM) and
+  Premium held, the paywall excepted. It captures ten screens: the paywall, Home, History's week, month and Insights,
+  Settings at four scroll positions, and the vessel library. Each screen is taken in 20 frames 3 s apart, with every
+  element's frame from one accessibility snapshot.
+- **Reading.** `Tools/MeasureContrast.swift` reads the frames against `Tools/theme-pairs.json`: the pairs this file
+  records, and set C's new ones.
+- **Finding the ink.** A pair's ink is found by one of four means: its element's frame, its text as text recognition
+  reads it, its colour (a shape in the theme's accent, or a white shape), or its place in a holder.
+- **Reading the ground.** The ground is read *beside* (a ring 2–6 pt out), *clean* (bands 10–14 pt out, any band
+  touching other ink or a rim's peak dropped), or *by hand*. A hand-placed rectangle sits relative to the ink or its
+  holder and is checked by eye on an annotated frame. These cover the binding pairs: the week's letters and goal line,
+  today's bar, Settings' vessel glyphs, a serving's glyph on its wash, the month's letters and legend, the streak flame
+  and the tab bar.
+- **The figure.** WCAG 2 contrast, worst frame. White ink is composited at its opacity over the lightest ground pixel;
+  a mark's rendered ink is the 98th percentile of its own coloured pixels.
+
+**The method's rulings** (the owner's, 2026-11-23, and the run's ledger):
+- **The control is Aurora re-measured.** Aurora's table, taken again by the harness, is the control, not this
+  sheet's earlier figures. Those rest on rectangles placed by eye, one a pair, which no automatic ground reproduces to
+  0.06. Against them, Aurora's re-taken table differs by a median of **0.32** on iOS 27.0 (129 of 133 pairs on the
+  same side of the floor) and **0.48** on iOS 18.6 (65 of 71).
+- **Aurora is captured in each sitting.** Every sitting captures Aurora with the four themes, group by group, between
+  1:45 and 11:45 PM: the week, the month and the insights are the day's, and every launch's lights start on one clock.
+- **The bar a theme must clear.** Every pair must reach its floor. Where Aurora itself is under, a theme may fall no
+  more than 0.06 (the spread between captures) below Aurora's figure (#95).
+- **The water's pairs are set apart.** The vessel's readouts sit over the water, which is `Aurora.classic` in every
+  theme under Apple's clear glass, untinted. No theme's value moves them, and their worst frame swings with the waves:
+  Aurora's own % read 3.00 at 17:24 and 2.31 at 22:07 on the same build. They stay #95's pairs.
+
+**The sittings.**
+
+| Runtime | Device | When | What ran |
+|---|---|---|---|
+| iOS 27.0 | iPhone 17 | 2026-11-23, 21:54–23:12 | 25 runs, every one passing |
+| iOS 18.6 | iPhone 16 | 2026-11-24, 20:00–21:13 | 25 runs, every one passing |
+
+**The verdict, theme by theme** (the comparison against Aurora's same-sitting table, the water's pairs apart):
+
+| Theme | iOS 27.0 | iOS 18.6 |
+|---|---|---|
+| Lagoon | nothing failing | nothing failing |
+| Dusk | nothing failing | nothing failing |
+| Midnight | nothing failing | nothing failing |
+| Bloom | nothing failing | nothing failing |
+
+**Under its floor, in Aurora too:**
+- **The goal line over a day's track** (a new pair: the line where it crosses T-6's track). Aurora reads 2.82 on 27.0
+  and 2.85 on 18.6; Lagoon 2.89 and 2.87; the others 3.08–3.30. The doc's 3.67 is the line beside its dashes, read on
+  the pane between two columns, which the harness reads as 3.54 and 3.60.
+- **Insights' title on iOS 27.0**, on its premium rim's glow: Aurora 4.47; the themes 4.68–5.67.
+- **On iOS 18.6, the app's own tab bar's active glyph** on the selected slot: Aurora **2.70**, Lagoon 2.82, Bloom 2.90,
+  Dusk 3.10, Midnight 3.27. This predates set C. Stage 3c read 4.49, before the slot took its selection fill. A theme
+  is held to Aurora's figure here.
+
+**The recap's tile fills**, fitted as Aurora's was. Method: a probe in a scratch copy of the tree, not kept, on the
+iPhone 17, iOS 27.0, dark. Each theme's `gradient` is drawn full screen under five `.frosted` panes, 150 × 70 pt, and
+the same layout bare; each pane is read where its sheen is clear. The readings are taken back through the sheer stack's
+black 0.16 and white 0.05, and `F` and `a` fitted by least squares.
+
+| Theme | `tileFill` (opacity · sRGB) | Worst ΔE₂₀₀₀ | Top pane: ground → glass | Bottom pane: ground → glass |
+|---|---|---|---|---|
+| Aurora (2026-10-25, kept) | 0.4856 · (0.0287, 0.1761, 0.8521) | 0.26 | [30, 34, 137] → [28, 45, 154] | [83, 28, 155] → [50, 41, 160] |
+| Lagoon | **0.7100 · (0.0000, 0.2212, 0.3776)** | 0.93 | [2, 45, 70] → [13, 54, 84] | [1, 63, 81] → [11, 60, 86] |
+| Dusk | **0.5232 · (0.2807, 0.0493, 0.3144)** | 0.27 | [57, 14, 53] → [64, 24, 67] | [95, 22, 56] → [79, 26, 67] |
+| Midnight | **0.5320 · (0.0647, 0.0742, 0.1464)** | 0.31 | [14, 17, 28] → [25, 27, 39] | [25, 27, 42] → [29, 31, 44] |
+| Bloom | **0.5346 · (0.3301, 0.0399, 0.2994)** | 0.21 | [60, 9, 55] → [71, 21, 66] | [84, 14, 79] → [80, 22, 75] |
+
+- **Lagoon.** Its least-squares red came out at −0.009, which a colour cannot hold, so red is held at 0. The stack's
+  white tint alone draws red 12.75, and Lagoon's live glass reads 11. So the opacity is raised from the refit's 0.6643
+  to 0.71, the least that gives the glass back within 2/255 at both ends with room (1.98). It costs 0.15 ΔE.
+- **Aurora's probe, taken again on 2026-11-24 as a control.** It fits 0.4743 · (0.0338, 0.1909, 0.8650) at ΔE 0.19.
+  The recorded fill still gives that day's live glass back within 1.89/255.
+- **The tests.** `theTilesFillGivesBackTheAppsOwnGlass` holds every theme to its own two grounds.
+
+**Not measured.**
+- **The widgets and the watch.** `-WaterBuddyTheme` acts only beside the fresh start, whose manager writes to a
+  throwaway suite with no widget doorbell and no wrist link. A theme never reaches a placed widget or the watch except
+  through Premium in a real launch, and the local StoreKit configuration is the Run action's alone. Their frames are
+  taken on the owner's walk before set C goes on sale.
+- **The screens the census does not open**, 177 pairs: the welcome, the sheets (serving, schedule, vessel editor,
+  export, recap), the recap's card, and the paywall's end.
+- **Other settings.** Increase Contrast; Reduce Transparency, whose fills are derived; another text size or language;
+  iOS 26.5 (#230).
+
+**Each pair, worst frame, both runtimes.** A figure in bold is under its floor; † marks a theme more than 0.06 below
+Aurora where Aurora is under. The only † pairs are Lagoon's over the water, set apart as above. *Ground* is the pair's
+yardstick, and its sides where some were left out by hand.
+
+*iOS 27.0, iPhone 17 (Apple's glass):*
+
+| Screen | Pair | Kind | Ground | Floor | Aurora | Lagoon | Dusk | Midnight | Bloom |
+|---|---|---|---|---|---|---|---|---|---|
+| history-insights | Insights — “Insights” | text | beside | 3 | 3.33 | 3.10 | 3.30 | 3.60 | 3.50 |
+| history-insights | The one thing | mark | clean | 3 | 4.21 | 4.34 | 4.80 | 5.17 | 4.83 |
+| history-insights | The one thing | mark | beside | 3 | 6.11 | 6.44 | 7.32 | 8.08 | 7.33 |
+| history-insights | The one thing — “<detail>” | text | beside, above/left/right | 4.5 | 6.50 | 6.78 | 7.75 | 8.62 | 8.22 |
+| history-insights | The one thing — “<detail>” | text | clean | 4.5 | 9.21 | 9.99 | 11.77 | 13.62 | 11.70 |
+| history-insights | The one thing — “<headline>” | text | clean | 3 | 5.10 | 5.25 | 5.93 | 6.49 | 5.96 |
+| history-insights | The one thing — “<headline>” | text | beside, above/left/right | 3 | 5.14 | 5.34 | 6.08 | 6.53 | 6.05 |
+| history-insights | The one thing — “<week range>” | text | beside | 4.5 | 7.36 | 7.94 | 9.37 | 10.46 | 9.18 |
+| history-insights | The one thing — “<week range>” | text | clean | 4.5 | 7.38 | 7.95 | 9.41 | 10.46 | 9.18 |
+| history-insights | The one thing — “The one thing” | text | clean | 4.5 | **4.47** | 4.68 | 5.26 | 5.67 | 5.23 |
+| history-insights | The one thing — “The one thing” | text | beside | 4.5 | 4.53 | 4.69 | 5.26 | 5.68 | 5.28 |
+| history-insights | What is working | mark | beside | 3 | 5.16 | 5.36 | 6.06 | 6.75 | 6.13 |
+| history-insights | What is working — “<working sentence>” | text | beside | 4.5 | 6.27 | 6.55 | 7.53 | 8.66 | 7.61 |
+| history-insights | What is working — “What is working” | text | beside | 4.5 | 6.04 | 6.28 | 7.15 | 8.16 | 7.26 |
+| history-insights | Worth knowing — “<worth-knowing sentence>” | text | beside | 4.5 | 6.37 | 6.75 | 7.70 | 9.00 | 7.88 |
+| history-insights | Written by WaterBuddy from your own figures, on your iPhone. Not medical advice. — “Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.” | text | beside | 4.5 | 5.73 | 6.02 | 6.91 | 7.54 | 7.00 |
+| history-month | <Month YYYY> | text | beside | 4.5 | 5.66 | 5.95 | 6.76 | 7.33 | 6.69 |
+| history-month | Best streak — “<bestRun> days” | text | beside, clipped | 4.5 | 5.77 | 6.06 | 6.86 | 8.04 | 6.89 |
+| history-month | Best streak — “Best streak” | text | beside, left/right/below | 4.5 | 6.36 | 6.63 | 7.76 | 9.33 | 7.86 |
+| history-month | Days on goal — “<daysMet>/<daysCounted>” | text | beside, clipped | 4.5 | 6.27 | 6.58 | 7.48 | 8.69 | 7.59 |
+| history-month | Days on goal — “Days on goal” | text | beside, left/right/below | 4.5 | 6.84 | 7.32 | 8.38 | 10.06 | 8.65 |
+| history-month | Goal met — “Goal met” | text | beside, above/below/right | 4.5 | 7.65 | 8.31 | 9.44 | 11.95 | 9.35 |
+| history-month | Measured against your current goal — “Measured against your current goal” | text | beside | 4.5 | 7.17 | 7.81 | 8.83 | 11.07 | 8.64 |
+| history-month | Month — “Month” | text | beside | 4.5 | 6.20 | 6.65 | 7.72 | 8.55 | 7.63 |
+| history-month | Part of it — “Part of it” | text | beside, above/below/right | 4.5 | 7.43 | 8.09 | 9.17 | 11.63 | 9.05 |
+| history-month | This month — “<litres> L” | text | beside, clipped | 4.5 | 5.49 | 5.77 | 6.50 | 7.67 | 6.55 |
+| history-month | This month — “This month” | text | beside, left/right/below | 4.5 | 5.95 | 6.37 | 7.17 | 8.60 | 7.19 |
+| history-month | Today | text | by hand | 4.5 | 10.09 | 11.08 | 12.88 | 15.44 | 12.91 |
+| history-month | Week — “Week” | text | beside | 4.5 | 5.13 | 5.35 | 6.12 | 6.73 | 6.10 |
+| history-month | a met day's arc (yesterday's) | mark | beside | 3 | 5.51 | 6.36 | 7.34 | 8.69 | 6.71 |
+| history-month | a met day's number (yesterday's) | text | by hand | 4.5 | 9.85 | 10.76 | 12.42 | 15.36 | 12.29 |
+| history-month | a part day's arc (T-6's), against its track | mark | by hand | 3 | 6.60 | 6.87 | 7.91 | 8.99 | 7.94 |
+| history-month | a part day's arc (T-6's), against the glass | mark | beside | 3 | 9.30 | 9.95 | 11.57 | 13.60 | 11.57 |
+| history-month | a part-met day's number (T-6's, 1,650 ml) | text | by hand | 4.5 | 9.55 | 10.25 | 11.98 | 13.97 | 11.89 |
+| history-month | quiet day 24's number | text | by hand | 4.5 | 5.13 | 5.53 | 6.20 | 7.22 | 6.17 |
+| history-month | quiet day 26's number | text | by hand | 4.5 | 4.91 | 5.27 | 5.83 | 7.03 | 5.84 |
+| history-month | quiet day 31's number | text | by hand | 4.5 | not read | not read | not read | not read | not read |
+| history-month | the legend's 'Goal met' mark | mark | beside | 3 | 5.50 | 6.36 | 7.27 | 8.78 | 6.64 |
+| history-month | the legend's 'Part of it' mark, against its track | mark | by hand | 3 | 6.34 | 6.70 | 7.59 | 9.21 | 7.64 |
+| history-month | the legend's 'Part of it' mark, against the glass | mark | beside | 3 | 8.87 | 9.81 | 11.17 | 14.23 | 10.92 |
+| history-month | the month card's weekday letter 'M' | text | beside | 4.5 | 4.83 | 5.09 | 5.76 | 6.20 | 5.69 |
+| history-month | the month card's weekday letter 'S' (Sunday's, the first) | text | beside | 4.5 | 6.93 | 7.39 | 8.67 | 9.62 | 8.61 |
+| history-month | the month card's weekday letter 'W' | text | beside | 4.5 | 5.72 | 6.01 | 6.97 | 7.56 | 6.87 |
+| history-month | the number of a day with nothing logged | text | beside | 4.5 | not read | not read | not read | not read | not read |
+| history-week | 1,300 of 2,000 ml — “1,300 of 2,000 ml” | text | beside | 4.5 | 5.41 | 5.30 | 5.67 | 6.77 | 5.94 |
+| history-week | 1,300 of 2,000 ml — “1,300 of 2,000 ml” | text | clean | 4.5 | 5.64 | 5.73 | 6.08 | 7.41 | 6.34 |
+| history-week | 150 millilitres | mark | by hand | 3 | 4.66 | 4.52 | 5.08 | 5.69 | 5.17 |
+| history-week | 150 millilitres — “150 ml” | text | clean | 4.5 | 8.48 | 9.15 | 10.53 | 13.31 | 10.51 |
+| history-week | 150 millilitres — “Cup” | text | clean | 4.5 | 7.16 | 7.65 | 8.73 | 10.89 | 8.76 |
+| history-week | 5 servings — “5 servings” | text | clean | 4.5 | 7.70 | 8.42 | 9.57 | 11.98 | 9.40 |
+| history-week | Add a serving | mark | by hand | 3 | 9.52 | 9.85 | 10.80 | 12.53 | 10.76 |
+| history-week | Average — “Average” | text | clean | 4.5 | 7.53 | 8.02 | 9.31 | 10.70 | 9.24 |
+| history-week | Last 7 days | text | clean, below/right | 4.5 | 6.72 | 7.16 | 8.30 | 9.15 | 8.22 |
+| history-week | Measured against your current goal | text | clean | 4.5 | 7.54 | 8.09 | 9.39 | 10.83 | 9.32 |
+| history-week | Today | text | beside | 3 | 5.81 | 5.84 | 6.25 | 8.64 | 6.47 |
+| history-week | Today | text | clean | 3 | 6.03 | 6.14 | 6.57 | 8.66 | 6.79 |
+| history-week | Today | mark | clean | 3 | 7.05 | 7.44 | 8.72 | 9.61 | 8.71 |
+| history-week | When you drank — “When you drank” | text | clean, below/right | 4.5 | 6.30 | 6.59 | 7.57 | 8.71 | 7.62 |
+| history-week | a met day's bar (yesterday's) | mark | clean | 3 | 3.88 | 4.31 | 5.03 | 5.34 | 4.64 |
+| history-week | a past day's weekday letter (each of T-1 … T-6) | text | by hand | 4.5 | 7.42 | 7.79 | 9.04 | 10.23 | 9.12 |
+| history-week | the goal line over the first day's track | mark | by hand | 3 | **2.82** | **2.89** | 3.16 | 3.30 | 3.15 |
+| history-week | the strip's hour labels — '6 AM' located; also '12 PM' and '6 PM' — “6 AM” | text | clean | 4.5 | 6.40 | 8.10 | 9.29 | 11.37 | 9.29 |
+| history-week | the strip's serving bars | mark | clean, above | 3 | 5.11 | 5.84 | 6.71 | 8.02 | 6.15 |
+| history-week | the week card's dashed goal line | mark | by hand | 3 | 3.54 | 3.70 | 4.15 | 4.44 | 4.11 |
+| history-week | the week card's figures — Average '1,978 ml' located; also Best day '2,500 ml' and Goal met '5 of 7' — “1,978 ml” | text | clean | 4.5 | 8.06 | 8.54 | 10.08 | 11.36 | 9.99 |
+| home | 150 ml — “150 ml” | text | beside | 4.5 | 8.50 | 8.09 | 8.75 | 13.40 | 9.40 |
+| home | 250 ml — “250 ml” | text | beside | 4.5 | 7.39 | 6.92 | 7.36 | 11.55 | 7.84 |
+| home | 500 ml — “500 ml” | text | clean | 4.5 | 5.53 | 5.62 | 6.11 | 8.46 | 6.67 |
+| home | 500 ml — “500 ml” | text | beside | 4.5 | 5.54 | 5.62 | 6.10 | 8.46 | 6.70 |
+| home | 700 millilitres to go | text | beside, left/right/below | 4.5 | 5.96 | 5.54 | 6.07 | 8.72 | 6.49 |
+| home | 700 millilitres to go | text | clean, left/right | 4.5 | 6.19 | 5.83 | 6.31 | 9.42 | 6.68 |
+| home | Bottle — “Bottle” | text | clean | 4.5 | 5.70 | 5.84 | 6.32 | 8.77 | 6.94 |
+| home | Bottle — “Bottle” | text | beside | 4.5 | 5.89 | 6.00 | 6.50 | 9.07 | 7.17 |
+| home | Bottle, add 500 millilitres | mark | clean | 3 | 6.51 | 6.83 | 5.19 | 8.73 | 5.56 |
+| home | Cup — “Cup” | text | beside | 4.5 | 9.28 | 8.96 | 9.70 | 14.41 | 10.49 |
+| home | Cup, add 150 millilitres | mark | by hand | 3 | 8.36 | 8.90 | 10.42 | 12.72 | 10.47 |
+| home | Day streak | mark | by hand | 3 | 3.43 | 3.87 | 4.46 | 4.82 | 4.14 |
+| home | Day streak — “5 days” | text | clean | 4.5 | 10.67 | 11.36 | 13.35 | 15.57 | 13.43 |
+| home | Glass — “Glass” | text | beside | 4.5 | 7.68 | 7.23 | 7.80 | 12.01 | 8.32 |
+| home | History — “History” | text | beside | 4.5 | 7.14 | 7.27 | 7.82 | 10.21 | 8.27 |
+| home | Home — “Home” | text | beside | 4.5 | 10.23 | 11.58 | 9.83 | 16.10 | 11.91 |
+| home | Last drink 1:30 PM — “Last drink 1:30 PM” | text | clean | 4.5 | 5.44 | 5.11 | 5.32 | 9.17 | 5.74 |
+| home | Last drink 1:30 PM — “Last drink 1:30 PM” | text | beside | 4.5 | 5.57 | 5.24 | 5.42 | 9.39 | 5.82 |
+| home | Settings — “Settings” | text | beside | 4.5 | 6.46 | 6.65 | 6.99 | 9.18 | 7.52 |
+| home | Today | text | beside | 3 | 5.84 | 5.83 | 6.16 | 8.44 | 6.40 |
+| home | Today | text | clean | 3 | 6.05 | 6.15 | 6.57 | 8.66 | 6.80 |
+| home | Today's hydration — “%” | text | clean | 3 | **2.19** | **2.09** † | **2.13** | **2.22** | **2.27** |
+| home | Today's hydration — “%” | text | beside | 3 | **2.31** | **2.16** † | **2.27** | **2.43** | **2.52** |
+| home | Today's hydration — “1,300 of 2,000 ml” | text | clean | 4.5 | **4.42** | **4.42** | **4.47** | **4.43** | **4.46** |
+| home | Today's hydration — “1,300 of 2,000 ml” | text | beside | 4.5 | 4.72 | 4.73 | 4.77 | 4.73 | 4.74 |
+| home | the date under 'Today' — “<Weekday, Month D>” | text | clean | 4.5 | 4.79 | 4.60 | 5.19 | 5.81 | 5.40 |
+| home | the date under 'Today' — “<Weekday, Month D>” | text | beside | 4.5 | 5.12 | 4.91 | 5.49 | 6.40 | 5.75 |
+| library | Bottle — “500 ml” | text | clean | 4.5 | 8.56 | 9.24 | 11.03 | 12.34 | 10.86 |
+| library | Bottle — “Bottle” | text | clean | 4.5 | 7.34 | 7.85 | 9.23 | 10.16 | 9.06 |
+| library | Cup — “150 ml” | text | clean | 4.5 | 9.45 | 10.43 | 12.30 | 14.07 | 12.03 |
+| library | Cup — “Cup” | text | clean | 4.5 | 5.74 | 6.29 | 7.10 | 7.90 | 7.08 |
+| library | Glass — “250 ml” | text | clean | 4.5 | 8.74 | 9.39 | 11.17 | 12.68 | 11.02 |
+| library | Glass — “Glass” | text | clean | 4.5 | 6.14 | 6.40 | 7.42 | 8.14 | 7.41 |
+| library | Glass — “Your Glass: the widget, Siri, Control Center, reminders and your watch log it” | text | by hand | 4.5 | 6.34 | 6.79 | 7.99 | 8.79 | 7.78 |
+| paywall | A monthly recap, Your month in one card, yours to share | mark | beside | 3 | 5.31 | 6.08 | 7.06 | 8.16 | 7.07 |
+| paywall | A monthly recap, Your month in one card, yours to share — “A monthly recap” | text | beside | 4.5 | 8.74 | 9.43 | 10.84 | 13.67 | 10.78 |
+| paywall | A monthly recap, Your month in one card, yours to share — “Your month in one card, yours to share” | text | beside | 4.5 | 7.67 | 8.35 | 9.47 | 11.83 | 9.36 |
+| paywall | Logging water is free, always. | mark | beside | 3 | 4.97 | 5.26 | 5.94 | 6.72 | 5.96 |
+| paywall | Logging water is free, always. — “Logging water is free, always.” | text | by hand | 4.5 | 6.83 | 7.42 | 8.88 | 9.98 | 8.85 |
+| paywall | Month view and full history, Every day you have logged, a month at a glance | mark | beside | 3 | 3.17 | 3.53 | 4.01 | 4.23 | 4.16 |
+| paywall | Month view and full history, Every day you have logged, a month at a glance — “Every day you have logged, a month at a glance” | text | beside | 4.5 | 5.20 | 5.44 | 6.20 | 6.76 | 6.23 |
+| paywall | Month view and full history, Every day you have logged, a month at a glance — “Month view and full history” | text | beside | 4.5 | 5.47 | 5.66 | 6.46 | 7.04 | 6.48 |
+| paywall | Not now | mark | beside | 3 | 7.41 | 7.95 | 9.27 | 11.11 | 9.24 |
+| paywall | Personal insights, Each week, from your own figures, on your iPhone | mark | beside | 3 | 4.66 | 5.33 | 6.15 | 6.94 | 6.38 |
+| paywall | Personal insights, Each week, from your own figures, on your iPhone — “Each week, from your own figures, on your iPhone” | text | beside | 4.5 | 7.58 | 8.15 | 9.33 | 10.99 | 9.30 |
+| paywall | Personal insights, Each week, from your own figures, on your iPhone — “Personal insights” | text | beside | 4.5 | 8.03 | 8.54 | 9.99 | 11.65 | 10.05 |
+| paywall | See how you really drink, and what would help. | text | beside | 4.5 | 4.55 | 4.67 | 5.21 | 5.60 | 5.28 |
+| paywall | WaterBuddy Premium | text | beside | 3 | 3.15 | 3.00 | 3.17 | 3.42 | 3.38 |
+| paywall | WaterBuddy Premium | text | clean | 3 | 4.98 | 4.73 | 5.24 | 5.97 | 5.52 |
+| paywall | Your patterns, When you drink, weekdays against weekends | mark | beside | 3 | 3.90 | 4.33 | 4.99 | 5.45 | 5.22 |
+| paywall | Your patterns, When you drink, weekdays against weekends — “When you drink, weekdays against weekends” | text | beside | 4.5 | 6.51 | 6.89 | 7.95 | 9.07 | 8.00 |
+| paywall | Your patterns, When you drink, weekdays against weekends — “Your patterns” | text | beside | 4.5 | 6.87 | 7.32 | 8.31 | 9.49 | 8.41 |
+| settings | 1,000 — “1,000” | text | clean | 4.5 | 5.05 | 5.30 | 5.97 | 6.53 | 5.99 |
+| settings | 150 ml — “150 ml” | text | clean | 4.5 | 8.80 | 9.37 | 10.93 | 12.98 | 10.87 |
+| settings | 2,000 — “2,000” | text | clean | 4.5 | 8.30 | 8.90 | 10.68 | 11.88 | 10.38 |
+| settings | 4,000 — “4,000” | text | clean | 4.5 | 7.32 | 7.86 | 9.19 | 10.31 | 9.05 |
+| settings | Bottle's glyph, left of 'Bottle' above its slider | mark | clean | 3 | 5.32 | 6.10 | 7.08 | 8.24 | 6.55 |
+| settings | Bottle's name and amount, above the 'Bottle' slider — 'Bottle' located; also '500 ml' — “Bottle” | text | clean | 4.5 | 9.07 | 9.85 | 11.33 | 14.06 | 11.26 |
+| settings | Cup's glyph, left of 'Cup' above its slider | mark | clean | 3 | 3.26 | 3.60 | 4.12 | 4.42 | 3.83 |
+| settings | Cup's name, in the row above the 'Cup' slider — “Cup” | text | clean | 4.5 | 6.11 | 6.37 | 7.22 | 8.18 | 7.34 |
+| settings | Daily goal — “Daily goal” | text | clean | 4.5 | 4.92 | 5.10 | 5.69 | 6.22 | 5.76 |
+| settings | Glass's glyph, left of 'Glass' above its slider | mark | clean | 3 | 4.43 | 5.06 | 5.84 | 6.55 | 5.42 |
+| settings | Glass's name and amount, above the 'Glass' slider — 'Glass' located; also '250 ml' — “Glass” | text | clean | 4.5 | 8.20 | 8.84 | 10.19 | 12.27 | 10.30 |
+| settings | Quick-add vessels | text | clean, below/right | 4.5 | 5.75 | 6.05 | 6.84 | 7.67 | 6.92 |
+| settings | ml — “ml” | text | clean | 4.5 | 7.57 | 8.21 | 9.54 | 10.69 | 9.39 |
+| settings-appearance | Aurora — “Aurora” | text | clean | 4.5 | 6.57 | 6.88 | 8.29 | 9.03 | 8.18 |
+| settings-appearance | Bloom — “Bloom” | text | clean | 4.5 | 8.95 | 9.50 | 11.63 | 12.75 | 11.50 |
+| settings-appearance | Dusk — “Dusk” | text | clean | 4.5 | 8.47 | 9.01 | 11.05 | 11.70 | 10.80 |
+| settings-appearance | English — “English” | text | clean | 4.5 | 7.38 | 7.82 | 9.23 | 10.54 | 9.27 |
+| settings-appearance | Follow device | mark | clean | 3 | 5.59 | 6.49 | 7.28 | 8.79 | 4.72 |
+| settings-appearance | Follow device — “Follow device” | text | clean | 4.5 | 6.14 | 6.34 | 7.51 | 8.25 | 7.51 |
+| settings-appearance | Lagoon — “Lagoon” | text | clean | 4.5 | 7.75 | 8.70 | 10.05 | 10.59 | 9.80 |
+| settings-appearance | Language | text | clean, below/right | 4.5 | 6.91 | 7.37 | 8.77 | 9.78 | 8.73 |
+| settings-appearance | Midnight — “Midnight” | text | clean | 4.5 | 8.82 | 9.40 | 11.40 | 12.97 | 11.24 |
+| settings-appearance | O‘zbekcha — “O‘zbekcha” | text | clean | 4.5 | 9.47 | 10.27 | 11.80 | 14.44 | 11.74 |
+| settings-appearance | The app switches straight away. The widget follows on its next refresh. | text | clean | 4.5 | 7.85 | 8.43 | 9.53 | 11.68 | 9.68 |
+| settings-appearance | Русский — “Русский” | text | clean | 4.5 | 8.65 | 9.35 | 10.82 | 12.92 | 10.95 |
+| settings-end | Privacy Policy — “Privacy Policy” | text | clean | 4.5 | 5.57 | 5.39 | 5.68 | 8.73 | 6.06 |
+| settings-end | Privacy Policy — “Privacy Policy” | text | beside | 4.5 | 5.76 | 5.39 | 5.67 | 8.93 | 6.04 |
+| settings-lower | A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day. | text | clean | 4.5 | 5.04 | 5.29 | 5.99 | 6.46 | 5.92 |
+| settings-lower | Smart reminders — “Smart reminders” | text | clean, below/right | 4.5 | 5.54 | 5.83 | 6.62 | 7.24 | 6.58 |
+| settings-lower | The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it. | text | clean | 4.5 | 7.22 | 7.78 | 9.12 | 10.03 | 8.91 |
+
+*iOS 18.6, iPhone 16 (the hand-made pane):*
+
+| Screen | Pair | Kind | Ground | Floor | Aurora | Lagoon | Dusk | Midnight | Bloom |
+|---|---|---|---|---|---|---|---|---|---|
+| history-insights | Insights — “Insights” | text | beside | 3 | 3.73 | 3.52 | 3.70 | 4.03 | 3.92 |
+| history-insights | The one thing | mark | beside | 3 | not read | not read | not read | not read | not read |
+| history-insights | The one thing | mark | clean | 3 | 4.11 | 4.17 | 4.59 | 4.90 | 4.62 |
+| history-insights | The one thing — “<detail>” | text | clean | 4.5 | 5.92 | 6.07 | 6.86 | 7.54 | 6.90 |
+| history-insights | The one thing — “<detail>” | text | beside, above/left/right | 4.5 | 6.02 | 6.24 | 6.96 | 7.67 | 7.00 |
+| history-insights | The one thing — “<headline>” | text | clean | 3 | 4.97 | 5.13 | 5.73 | 6.12 | 5.71 |
+| history-insights | The one thing — “<headline>” | text | beside, above/left/right | 3 | 5.05 | 5.17 | 5.78 | 6.21 | 5.79 |
+| history-insights | The one thing — “<week range>” | text | beside | 4.5 | 7.58 | 7.97 | 9.13 | 10.13 | 9.06 |
+| history-insights | The one thing — “<week range>” | text | clean | 4.5 | 7.60 | 7.89 | 9.12 | 10.05 | 9.07 |
+| history-insights | The one thing — “The one thing” | text | beside | 4.5 | 4.52 | 4.61 | 5.09 | 5.48 | 5.09 |
+| history-insights | The one thing — “The one thing” | text | clean | 4.5 | 4.56 | 4.62 | 5.11 | 5.56 | 5.11 |
+| history-insights | What is working | mark | beside | 3 | 5.09 | 5.28 | 5.83 | 6.34 | 5.92 |
+| history-insights | What is working — “<working sentence>” | text | beside | 4.5 | 6.30 | 6.57 | 7.41 | 8.13 | 7.44 |
+| history-insights | What is working — “What is working” | text | beside | 4.5 | 6.06 | 6.34 | 7.11 | 7.83 | 7.21 |
+| history-insights | Worth knowing — “<worth-knowing sentence>” | text | beside | 4.5 | 6.40 | 6.66 | 7.48 | 8.33 | 7.52 |
+| history-insights | Written by WaterBuddy from your own figures, on your iPhone. Not medical advice. — “Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.” | text | beside | 4.5 | 5.82 | 6.24 | 7.03 | 7.79 | 6.95 |
+| history-month | <Month YYYY> | text | beside | 4.5 | 5.68 | 5.75 | 6.47 | 7.04 | 6.48 |
+| history-month | Best streak — “<bestRun> days” | text | beside, clipped | 4.5 | 5.92 | 6.17 | 6.92 | 7.67 | 7.00 |
+| history-month | Best streak — “Best streak” | text | beside, left/right/below | 4.5 | 7.04 | 7.49 | 8.27 | 9.16 | 8.29 |
+| history-month | Days on goal — “<daysMet>/<daysCounted>” | text | beside, clipped | 4.5 | 6.08 | 6.26 | 7.09 | 7.89 | 7.17 |
+| history-month | Days on goal — “Days on goal” | text | beside, left/right/below | 4.5 | 6.93 | 7.19 | 8.19 | 9.23 | 8.17 |
+| history-month | Goal met — “Goal met” | text | beside, above/below/right | 4.5 | 7.84 | 8.28 | 9.45 | 10.96 | 9.50 |
+| history-month | Measured against your current goal — “Measured against your current goal” | text | beside | 4.5 | 7.45 | 7.79 | 8.87 | 10.22 | 8.90 |
+| history-month | Month — “Month” | text | beside | 4.5 | 6.89 | 7.09 | 8.07 | 8.90 | 8.09 |
+| history-month | Part of it — “Part of it” | text | beside, above/below/right | 4.5 | 7.72 | 8.15 | 9.24 | 10.69 | 9.30 |
+| history-month | This month — “<litres> L” | text | beside, clipped | 4.5 | 5.85 | 6.08 | 6.79 | 7.41 | 6.85 |
+| history-month | This month — “This month” | text | beside, left/right/below | 4.5 | 6.84 | 7.14 | 7.97 | 8.96 | 8.09 |
+| history-month | Today | text | by hand | 4.5 | 9.86 | 10.61 | 12.16 | 13.95 | 12.31 |
+| history-month | Week — “Week” | text | beside | 4.5 | 5.38 | 5.53 | 6.13 | 6.75 | 6.24 |
+| history-month | a met day's arc (yesterday's) | mark | beside | 3 | 5.43 | 6.18 | 7.15 | 7.74 | 6.58 |
+| history-month | a met day's number (yesterday's) | text | by hand | 4.5 | 9.78 | 10.49 | 12.08 | 13.61 | 11.97 |
+| history-month | a part day's arc (T-6's), against its track | mark | by hand | 3 | 6.42 | 6.78 | 7.59 | 8.38 | 7.63 |
+| history-month | a part day's arc (T-6's), against the glass | mark | beside | 3 | 9.29 | 9.87 | 11.41 | 12.76 | 11.39 |
+| history-month | a part-met day's number (T-6's, 1,650 ml) | text | by hand | 4.5 | 9.45 | 10.07 | 11.67 | 13.25 | 11.74 |
+| history-month | quiet day 24's number | text | by hand | 4.5 | not read | not read | not read | not read | not read |
+| history-month | quiet day 26's number | text | by hand | 4.5 | 4.90 | 5.24 | 5.79 | 6.50 | 5.80 |
+| history-month | quiet day 31's number | text | by hand | 4.5 | not read | not read | not read | not read | not read |
+| history-month | the legend's 'Goal met' mark | mark | beside | 3 | 5.47 | 6.21 | 7.12 | 7.93 | 6.60 |
+| history-month | the legend's 'Part of it' mark, against its track | mark | by hand | 3 | 6.34 | 6.54 | 7.47 | 8.42 | 7.50 |
+| history-month | the legend's 'Part of it' mark, against the glass | mark | beside | 3 | 9.24 | 9.75 | 11.09 | 13.13 | 11.18 |
+| history-month | the month card's weekday letter 'M' | text | beside | 4.5 | 4.87 | 4.96 | 5.54 | 6.00 | 5.54 |
+| history-month | the month card's weekday letter 'S' (Sunday's, the first) | text | beside | 4.5 | 7.05 | 7.32 | 8.35 | 9.18 | 8.34 |
+| history-month | the month card's weekday letter 'W' | text | beside | 4.5 | 5.71 | 5.90 | 6.58 | 7.19 | 6.66 |
+| history-month | the number of a day with nothing logged | text | beside | 4.5 | not read | not read | not read | not read | not read |
+| history-week | 1,300 of 2,000 ml — “1,300 of 2,000 ml” | text | clean | 4.5 | 5.62 | 5.68 | 6.04 | 7.42 | 6.22 |
+| history-week | 1,300 of 2,000 ml — “1,300 of 2,000 ml” | text | beside | 4.5 | 5.62 | 5.60 | 5.93 | 6.92 | 6.18 |
+| history-week | 150 millilitres | mark | by hand | 3 | 4.54 | 4.45 | 4.86 | 5.28 | 4.97 |
+| history-week | 150 millilitres — “150 ml” | text | clean | 4.5 | 9.10 | 9.69 | 11.11 | 12.77 | 11.15 |
+| history-week | 150 millilitres — “Cup” | text | clean | 4.5 | 7.60 | 7.99 | 9.09 | 10.26 | 9.14 |
+| history-week | 5 servings — “5 servings” | text | clean | 4.5 | 7.88 | 8.39 | 9.59 | 10.96 | 9.60 |
+| history-week | Add a serving | mark | by hand | 3 | 9.27 | 8.76 | 10.16 | 11.29 | 10.13 |
+| history-week | Average — “Average” | text | clean | 4.5 | 7.30 | 7.77 | 8.84 | 9.84 | 8.85 |
+| history-week | Last 7 days | text | clean, below/right | 4.5 | 6.95 | 7.13 | 8.09 | 8.89 | 8.14 |
+| history-week | Measured against your current goal | text | clean | 4.5 | 7.30 | 7.73 | 8.84 | 9.84 | 8.87 |
+| history-week | Today | mark | clean | 3 | 7.10 | 7.40 | 8.35 | 9.26 | 8.46 |
+| history-week | Today | text | beside | 3 | 5.70 | 5.77 | 6.20 | 8.18 | 6.39 |
+| history-week | Today | text | clean | 3 | 5.82 | 5.91 | 6.36 | 8.19 | 6.48 |
+| history-week | When you drank — “When you drank” | text | clean, below/right | 4.5 | 5.95 | 6.24 | 6.97 | 7.70 | 6.99 |
+| history-week | a met day's bar (yesterday's) | mark | clean | 3 | 3.93 | 4.28 | 4.91 | 5.13 | 4.50 |
+| history-week | a past day's weekday letter (each of T-1 … T-6) | text | by hand | 4.5 | 7.55 | 7.79 | 8.88 | 9.88 | 8.94 |
+| history-week | the goal line over the first day's track | mark | by hand | 3 | **2.85** | **2.87** | 3.08 | 3.25 | 3.10 |
+| history-week | the strip's hour labels — '6 AM' located; also '12 PM' and '6 PM' — “6 AM” | text | clean | 4.5 | 7.42 | 7.97 | 8.99 | 10.27 | 9.04 |
+| history-week | the strip's serving bars | mark | clean, above | 3 | 5.12 | 5.78 | 6.64 | 7.31 | 6.13 |
+| history-week | the week card's dashed goal line | mark | by hand | 3 | 3.60 | 3.70 | 4.07 | 4.33 | 4.07 |
+| history-week | the week card's figures — Average '1,978 ml' located; also Best day '2,500 ml' and Goal met '5 of 7' — “1,978 ml” | text | clean | 4.5 | 8.13 | 8.52 | 9.77 | 10.95 | 9.85 |
+| home | 150 ml — “150 ml” | text | beside | 4.5 | 9.00 | 8.58 | 9.24 | 13.62 | 9.74 |
+| home | 250 ml — “250 ml” | text | beside | 4.5 | 7.23 | 6.63 | 6.98 | 11.07 | 7.49 |
+| home | 500 ml — “500 ml” | text | clean | 4.5 | 5.79 | 5.86 | 6.36 | 8.74 | 6.93 |
+| home | 500 ml — “500 ml” | text | beside | 4.5 | 5.92 | 6.01 | 6.56 | 8.80 | 7.10 |
+| home | 700 millilitres to go | text | beside, left/right/below | 4.5 | 7.00 | 6.45 | 7.00 | 10.02 | 7.44 |
+| home | 700 millilitres to go | text | clean, left/right | 4.5 | 7.18 | 6.70 | 7.23 | 10.52 | 7.74 |
+| home | Bottle — “Bottle” | text | clean | 4.5 | 5.90 | 6.01 | 6.53 | 8.89 | 7.10 |
+| home | Bottle — “Bottle” | text | beside | 4.5 | 6.10 | 6.24 | 6.73 | 9.08 | 7.31 |
+| home | Bottle, add 500 millilitres | mark | clean | 3 | 7.29 | 5.18 | 5.36 | 9.25 | 5.74 |
+| home | Cup — “Cup” | text | beside | 4.5 | 9.59 | 9.27 | 9.87 | 14.44 | 10.79 |
+| home | Cup, add 150 millilitres | mark | by hand | 3 | 8.26 | 8.80 | 10.02 | 11.32 | 10.07 |
+| home | Day streak | mark | by hand | 3 | 3.29 | 3.67 | 4.14 | 4.31 | 3.83 |
+| home | Day streak — “5 days” | text | clean | 4.5 | 11.38 | 12.10 | 13.79 | 15.78 | 13.92 |
+| home | Glass — “Glass” | text | beside | 4.5 | 7.58 | 7.07 | 7.41 | 11.72 | 7.95 |
+| home | History — “History” | text | clean | 4.5 | 5.75 | 6.07 | 6.76 | 7.55 | 6.79 |
+| home | History — “History” | text | beside | 4.5 | 5.76 | 6.14 | 6.83 | 7.63 | 6.76 |
+| home | Home | mark | by hand | 3 | **2.70** | **2.82** | 3.10 | 3.27 | **2.90** |
+| home | Home — “Home” | text | by hand | 4.5 | 4.84 | 4.98 | 5.51 | 6.00 | 5.58 |
+| home | Last drink 1:30 PM — “Last drink 1:30 PM” | text | clean | 4.5 | 5.49 | 5.17 | 5.39 | 9.27 | 5.77 |
+| home | Last drink 1:30 PM — “Last drink 1:30 PM” | text | beside | 4.5 | 5.57 | 5.25 | 5.49 | 9.39 | 5.85 |
+| home | Settings — “Settings” | text | clean | 4.5 | 5.48 | 5.68 | 5.95 | 7.53 | 6.41 |
+| home | Settings — “Settings” | text | beside | 4.5 | 5.62 | 5.91 | 6.67 | 7.32 | 6.59 |
+| home | Today | text | beside | 3 | 5.63 | 5.68 | 6.04 | 8.09 | 6.31 |
+| home | Today | text | clean | 3 | 5.81 | 5.91 | 6.28 | 8.20 | 6.52 |
+| home | Today's hydration — “%” | text | clean | 3 | 3.02 | 3.03 | 3.06 | 3.05 | 3.06 |
+| home | Today's hydration — “%” | text | beside | 3 | 3.14 | 3.17 | 3.18 | 3.17 | 3.18 |
+| home | Today's hydration — “1,300 of 2,000 ml” | text | clean | 4.5 | 4.52 | **4.48** | **4.45** | 4.52 | **4.45** |
+| home | Today's hydration — “1,300 of 2,000 ml” | text | beside | 4.5 | 4.75 | 4.75 | 4.73 | 4.76 | 4.73 |
+| home | the date under 'Today' — “<Weekday, Month D>” | text | beside | 4.5 | 5.23 | 5.03 | 5.42 | 6.12 | 5.63 |
+| home | the date under 'Today' — “<Weekday, Month D>” | text | clean | 4.5 | 5.50 | 5.52 | 5.78 | 8.45 | 6.03 |
+| library | Bottle — “500 ml” | text | clean | 4.5 | 8.81 | 9.25 | 10.69 | 11.91 | 10.61 |
+| library | Bottle — “Bottle” | text | clean | 4.5 | 7.56 | 7.84 | 8.97 | 9.96 | 8.97 |
+| library | Cup — “150 ml” | text | clean | 4.5 | 9.37 | 9.92 | 11.43 | 12.81 | 11.53 |
+| library | Cup — “Cup” | text | clean | 4.5 | 5.77 | 5.95 | 6.66 | 7.24 | 6.75 |
+| library | Glass — “250 ml” | text | clean | 4.5 | 8.90 | 9.29 | 10.79 | 12.09 | 10.82 |
+| library | Glass — “Glass” | text | clean | 4.5 | 6.14 | 6.29 | 7.09 | 7.80 | 7.16 |
+| library | Glass — “Your Glass: the widget, Siri, Control Center, reminders and your watch log it” | text | by hand | 4.5 | 6.47 | 6.70 | 7.68 | 8.40 | 7.59 |
+| paywall | A monthly recap, Your month in one card, yours to share | mark | beside | 3 | 5.07 | 5.72 | 6.57 | 7.10 | 6.85 |
+| paywall | A monthly recap, Your month in one card, yours to share — “A monthly recap” | text | beside | 4.5 | 8.64 | 9.19 | 10.55 | 12.24 | 10.64 |
+| paywall | A monthly recap, Your month in one card, yours to share — “Your month in one card, yours to share” | text | beside | 4.5 | 7.72 | 8.19 | 9.31 | 10.78 | 9.37 |
+| paywall | Logging water is free, always. | mark | beside | 3 | 5.06 | 5.28 | 5.87 | 6.40 | 5.90 |
+| paywall | Logging water is free, always. — “Logging water is free, always.” | text | by hand | 4.5 | 7.01 | 7.42 | 8.47 | 9.36 | 8.54 |
+| paywall | Month view and full history, Every day you have logged, a month at a glance | mark | beside | 3 | 3.25 | 3.56 | 4.01 | 4.20 | 4.02 |
+| paywall | Month view and full history, Every day you have logged, a month at a glance — “Every day you have logged, a month at a glance” | text | beside | 4.5 | 5.38 | 5.56 | 6.25 | 6.85 | 6.31 |
+| paywall | Month view and full history, Every day you have logged, a month at a glance — “Month view and full history” | text | beside | 4.5 | 5.68 | 5.77 | 6.53 | 7.08 | 6.60 |
+| paywall | Not now | mark | beside | 3 | 6.49 | 6.67 | 7.23 | 8.31 | 7.34 |
+| paywall | Personal insights, Each week, from your own figures, on your iPhone | mark | beside | 3 | 4.50 | 5.05 | 5.85 | 6.25 | 6.01 |
+| paywall | Personal insights, Each week, from your own figures, on your iPhone — “Each week, from your own figures, on your iPhone” | text | beside | 4.5 | 7.40 | 7.87 | 8.98 | 10.04 | 8.87 |
+| paywall | Personal insights, Each week, from your own figures, on your iPhone — “Personal insights” | text | beside | 4.5 | 8.02 | 8.42 | 9.61 | 10.83 | 9.58 |
+| paywall | See how you really drink, and what would help. | text | beside | 4.5 | 4.64 | 4.69 | 5.15 | 5.62 | 5.20 |
+| paywall | WaterBuddy Premium | text | beside | 3 | 3.59 | 3.28 | 3.52 | 3.91 | 3.77 |
+| paywall | WaterBuddy Premium | text | clean | 3 | 3.64 | 3.36 | 3.60 | 4.01 | 3.82 |
+| paywall | Your patterns, When you drink, weekdays against weekends | mark | beside | 3 | 3.86 | 4.27 | 4.88 | 5.19 | 4.96 |
+| paywall | Your patterns, When you drink, weekdays against weekends — “When you drink, weekdays against weekends” | text | beside | 4.5 | 6.57 | 6.90 | 7.85 | 8.70 | 7.86 |
+| paywall | Your patterns, When you drink, weekdays against weekends — “Your patterns” | text | beside | 4.5 | 6.94 | 7.31 | 8.34 | 9.22 | 8.45 |
+| settings | 1,000 — “1,000” | text | clean | 4.5 | 5.03 | 5.14 | 5.77 | 6.31 | 5.79 |
+| settings | 150 ml — “150 ml” | text | clean | 4.5 | 8.51 | 9.00 | 10.36 | 11.73 | 10.47 |
+| settings | 2,000 — “2,000” | text | clean | 4.5 | 8.62 | 9.03 | 10.45 | 11.59 | 10.41 |
+| settings | 4,000 — “4,000” | text | clean | 4.5 | 7.53 | 7.89 | 9.01 | 10.00 | 9.00 |
+| settings | Bottle's glyph, left of 'Bottle' above its slider | mark | clean | 3 | 5.09 | 5.80 | 6.57 | 7.18 | 6.04 |
+| settings | Bottle's name and amount, above the 'Bottle' slider — 'Bottle' located; also '500 ml' — “Bottle” | text | clean | 4.5 | 8.94 | 9.56 | 10.93 | 12.60 | 11.02 |
+| settings | Cup's glyph, left of 'Cup' above its slider | mark | clean | 3 | 3.14 | 3.48 | 3.87 | 4.01 | 3.62 |
+| settings | Cup's name, in the row above the 'Cup' slider — “Cup” | text | clean | 4.5 | 5.96 | 6.19 | 7.00 | 7.62 | 7.02 |
+| settings | Daily goal — “Daily goal” | text | clean | 4.5 | 4.84 | 4.99 | 5.54 | 5.98 | 5.55 |
+| settings | Glass's glyph, left of 'Glass' above its slider | mark | clean | 3 | 4.19 | 4.67 | 5.36 | 5.71 | 4.95 |
+| settings | Glass's name and amount, above the 'Glass' slider — 'Glass' located; also '250 ml' — “Glass” | text | clean | 4.5 | 7.84 | 8.29 | 9.54 | 10.70 | 9.45 |
+| settings | Quick-add vessels | text | clean, below/right | 4.5 | 5.60 | 5.80 | 6.45 | 7.04 | 6.52 |
+| settings | ml — “ml” | text | clean | 4.5 | 7.68 | 8.05 | 9.21 | 10.34 | 9.19 |
+| settings-appearance | Aurora — “Aurora” | text | clean | 4.5 | 6.77 | 7.16 | 7.99 | 8.85 | 8.11 |
+| settings-appearance | Bloom — “Bloom” | text | clean | 4.5 | 9.25 | 10.04 | 11.24 | 12.61 | 11.44 |
+| settings-appearance | Dusk — “Dusk” | text | clean | 4.5 | 9.02 | 9.55 | 10.82 | 11.72 | 11.02 |
+| settings-appearance | English — “English” | text | clean | 4.5 | 7.03 | 7.30 | 8.44 | 9.41 | 8.45 |
+| settings-appearance | Follow device | mark | clean | 3 | 5.41 | 6.07 | 7.07 | 7.82 | 4.43 |
+| settings-appearance | Follow device — “Follow device” | text | clean | 4.5 | 5.95 | 6.16 | 6.92 | 7.70 | 7.00 |
+| settings-appearance | Lagoon — “Lagoon” | text | clean | 4.5 | 8.19 | 9.46 | 9.75 | 10.59 | 9.88 |
+| settings-appearance | Language | text | clean, below/right | 4.5 | 7.17 | 7.57 | 8.48 | 9.50 | 8.62 |
+| settings-appearance | Midnight — “Midnight” | text | clean | 4.5 | 9.31 | 9.83 | 11.12 | 13.00 | 11.28 |
+| settings-appearance | O‘zbekcha — “O‘zbekcha” | text | clean | 4.5 | 9.07 | 9.65 | 11.15 | 12.62 | 11.02 |
+| settings-appearance | The app switches straight away. The widget follows on its next refresh. | text | clean | 4.5 | 8.35 | 8.98 | 9.95 | 11.22 | 10.06 |
+| settings-appearance | Русский — “Русский” | text | clean | 4.5 | 8.25 | 8.68 | 10.02 | 11.20 | 9.98 |
+| settings-end | Privacy Policy — “Privacy Policy” | text | clean | 4.5 | 5.99 | 5.62 | 5.83 | 9.03 | 6.20 |
+| settings-end | Privacy Policy — “Privacy Policy” | text | beside | 4.5 | 6.05 | 5.62 | 5.86 | 9.18 | 6.27 |
+| settings-lower | A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day. | text | clean | 4.5 | 5.10 | 5.14 | 5.74 | 6.31 | 5.75 |
+| settings-lower | Smart reminders — “Smart reminders” | text | clean, below/right | 4.5 | 5.61 | 5.71 | 6.42 | 7.03 | 6.40 |
+| settings-lower | The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it. | text | clean | 4.5 | 7.60 | 7.93 | 8.99 | 9.86 | 8.99 |
 
 ## Motion
 

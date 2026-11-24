@@ -162,14 +162,20 @@ enum LiquidGlass {
         /// `secondarySystemBackground` grey, so Reduce Transparency keeps the product's colour.
         ///
         /// **One per theme** (D7): the translucent fill holds while the theme's colours stay under the recipe's first
-        /// stop; the opaque fill is composited down over the theme's sky — Aurora's for every theme until each theme's
-        /// own is derived (`docs/DESIGN.md`).
+        /// stop; the opaque fill is the recipe composited down over the theme's sky — the saturation boost of 1.1
+        /// (Rec. 709 luma, encoded sRGB) on the mean of the gradient's two ends, then white 0.24 at 0.5, the black
+        /// scrim at 0.28 and the white tint at 0.07 (`docs/DESIGN.md`, *The archived fills, derived*). Aurora's is
+        /// the recorded number, which the recipe gives back within 1.35/255; the other four are the recipe's, to
+        /// three decimals. `theOpaqueFillIsTheArchivedStackOverItsOwnSky` holds every one.
         nonisolated static func archived(for theme: AppTheme) -> Base {
-            switch theme {
-            case .aurora, .lagoon, .dusk, .midnight, .bloom:
-                return .flat(translucent: Color(white: 0.24).opacity(0.5),
-                             opaque: Color(red: 0.22, green: 0.19, blue: 0.36))
+            let opaque = switch theme {
+            case .aurora: Color(red: 0.22, green: 0.19, blue: 0.36)
+            case .lagoon: Color(red: 0.150, green: 0.222, blue: 0.253)
+            case .dusk: Color(red: 0.255, green: 0.170, blue: 0.224)
+            case .midnight: Color(red: 0.175, green: 0.179, blue: 0.197)
+            case .bloom: Color(red: 0.250, green: 0.163, blue: 0.242)
             }
+            return .flat(translucent: Color(white: 0.24).opacity(0.5), opaque: opaque)
         }
 
         /// The fill that replaces the whole stack when Reduce Transparency is on, in `theme`.

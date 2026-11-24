@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Testing
+import UIKit
 @testable import WaterBuddy
 
 // MARK: - Tests
@@ -135,6 +136,42 @@ struct LiquidGlassBaseTests {
             #expect(base.opaqueFill(in: theme) == fill)
         }
     }
+
+    /// The material recipe written out (`docs/DESIGN.md`, *The archived fills, derived*): the saturation boost of
+    /// `1.1` on the sky (Rec. 709 luma, encoded sRGB, as `WidgetCardBackdrop`'s `.saturation(1.1)`), then the archived
+    /// frosted stack — translucent white 0.24 at 0.5, the black scrim at 0.28, the white tint at 0.07.
+    private static func archivedOpaque(over sky: (Double, Double, Double)) -> (Double, Double, Double) {
+        let luma = 0.2126 * sky.0 + 0.7152 * sky.1 + 0.0722 * sky.2
+        func boosted(_ v: Double) -> Double { min(1, max(0, luma + 1.1 * (v - luma))) }
+        func over(_ fg: Double, _ a: Double, _ bg: (Double, Double, Double)) -> (Double, Double, Double) {
+            (fg * a + bg.0 * (1 - a), fg * a + bg.1 * (1 - a), fg * a + bg.2 * (1 - a))
+        }
+        return over(1, 0.07, over(0, 0.28, over(0.24, 0.5, (boosted(sky.0), boosted(sky.1), boosted(sky.2)))))
+    }
+
+    /// The sky the stack is composited over: the mean of the theme's gradient's two ends.
+    private static func sky(of theme: AppTheme) -> (Double, Double, Double) {
+        let top = rgb(theme.palette.top), bottom = rgb(theme.palette.bottom)
+        return ((top.r + bottom.r) / 2, (top.g + bottom.g) / 2, (top.b + bottom.b) / 2)
+    }
+
+    /// Aurora's recorded (0.22, 0.19, 0.36) comes back from the recipe, and every theme's Reduce Transparency fill
+    /// is the same recipe over its own sky (spec `2026-11-22-set-c-design.md` §3.5, R2).
+    @Test(arguments: AppTheme.allCases)
+    func theOpaqueFillIsTheArchivedStackOverItsOwnSky(_ theme: AppTheme) {
+        let want = Self.archivedOpaque(over: Self.sky(of: theme))
+        let got = rgb(LiquidGlass.Base.archived(for: theme).opaqueFill(in: theme))
+        #expect(abs(got.r - want.0) <= 2.0 / 255, "\(theme) red")
+        #expect(abs(got.g - want.1) <= 2.0 / 255, "\(theme) green")
+        #expect(abs(got.b - want.2) <= 2.0 / 255, "\(theme) blue")
+    }
+}
+
+/// A colour's encoded sRGB components (`AuroraPaletteTests`' helper).
+private func rgb(_ color: Color) -> (r: Double, g: Double, b: Double) {
+    var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+    UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a)
+    return (Double(r), Double(g), Double(b))
 }
 
 /// The **routing** half of the design system: which pane a `liquidGlass(…)` call draws

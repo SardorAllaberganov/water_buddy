@@ -1,0 +1,6035 @@
+[
+ {
+  "screen": "home",
+  "element": "500 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.59,
+   "26.5": 4.66,
+   "18.6": 5.17
+  },
+  "note": "Bottle's amount caption under its disc (15 pt bold, two shadows) over the aurora's magenta light. Hidden from VoiceOver (the disc button 'Bottle, add 500 millilitres' speaks it); label is the drawn text at the default 500 ml.",
+  "designLine": 1268,
+  "box": "hidden",
+  "find": "text",
+  "text": "500 ml"
+ },
+ {
+  "screen": "home",
+  "element": "Bottle",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.72,
+   "26.5": 4.73,
+   "18.6": 5.09
+  },
+  "note": "Bottle's name caption under its amount (12 pt semibold). Hidden from VoiceOver; label is the drawn text.",
+  "designLine": 1269,
+  "box": "hidden",
+  "find": "text",
+  "text": "Bottle"
+ },
+ {
+  "screen": "home",
+  "element": "Today's hydration",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.8,
+   "26.5": 4.82,
+   "18.6": 4.87
+  },
+  "note": "The vessel's 'X of Y ml' line (17 pt bold, four shadows) over the water, inside the vessel element. Census state: '1,300 of 2,000 ml' at 65 %.",
+  "designLine": 1270,
+  "box": "container",
+  "find": "text",
+  "text": "1,300 of 2,000 ml",
+  "within": "Today's hydration"
+ },
+ {
+  "screen": "home",
+  "element": "the date under 'Today'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.87,
+   "26.5": 4.85,
+   "18.6": 4.73
+  },
+  "note": "The date line under the title (.headline). Measured at white 0.92 (stage 2); ScreenHeader has drawn it full white since stage 3b, so inkOpacity is today's 1.0. Hidden: it is the 'Today' heading's value.",
+  "designLine": 1271,
+  "box": "hidden",
+  "find": "text",
+  "text": "<Weekday, Month D>"
+ },
+ {
+  "screen": "home",
+  "element": "Last drink 1:30 PM",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.95,
+   "26.5": 4.94,
+   "18.6": 5.06
+  },
+  "note": "The quiet line (footnote medium, full white, two shadows): 'Next reminder …' and/or 'Last drink …' as one combined element across the row's full width, its glyphs inside. Census (reminders off, last pour 1:30 PM): 'Last drink 1:30 PM', the space before PM being iOS's narrow no-break space U+202F; a 24-hour region reads 'Last drink 13:30'.",
+  "designLine": 1272,
+  "box": "container",
+  "find": "text",
+  "text": "Last drink 1:30 PM",
+  "within": "Last drink 1:30 PM"
+ },
+ {
+  "screen": "home",
+  "element": "Today's hydration",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.43,
+   "26.5": 3.44,
+   "18.6": 3.48
+  },
+  "note": "The vessel's '%' (30 pt bold, large text) after the percentage, over the water; inside the vessel element.",
+  "designLine": 1273,
+  "box": "container",
+  "find": "text",
+  "text": "%",
+  "within": "Today's hydration"
+ },
+ {
+  "screen": "home",
+  "element": "700 millilitres to go",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.74,
+   "26.5": 5.76,
+   "18.6": 6.31
+  },
+  "note": "The status line (title2 bold rounded, two shadows): draws '700 ml to go' and is labelled '700 millilitres to go' in the census (1,300 of 2,000); 'Goal reached' once met. The doc holds it to 4.5 although 22 pt bold is large text.",
+  "designLine": 1274,
+  "box": "own",
+  "find": "frame",
+  "bands": [
+   "left",
+   "right",
+   "below"
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "Today",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.17,
+   "26.5": 5.15,
+   "18.6": 5.09
+  },
+  "note": "Home's title 'Today' (largeTitle bold, two shadows), the screen's heading (its value is the date).",
+  "designLine": 1275,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "home",
+  "element": "250 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.18,
+   "26.5": 6.17,
+   "18.6": 6.13
+  },
+  "note": "The Glass's amount caption (heavy) under its disc. Group figure: the doc gives one range for the four captions (6.18–7.39 / 6.17–7.40 / 6.13–7.91); recorded is the range's low end, not this caption's own. Hidden from VoiceOver; label is the drawn text.",
+  "designLine": 1276,
+  "box": "hidden",
+  "find": "text",
+  "text": "250 ml"
+ },
+ {
+  "screen": "home",
+  "element": "Glass",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.18,
+   "26.5": 6.17,
+   "18.6": 6.13
+  },
+  "note": "The Glass's name caption under its disc. Group figure: the doc gives one range for the four captions (6.18–7.39 / 6.17–7.40 / 6.13–7.91); recorded is the range's low end, not this caption's own. Hidden from VoiceOver; label is the drawn text.",
+  "designLine": 1276,
+  "box": "hidden",
+  "find": "text",
+  "text": "Glass"
+ },
+ {
+  "screen": "home",
+  "element": "150 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.18,
+   "26.5": 6.17,
+   "18.6": 6.13
+  },
+  "note": "The Cup's amount caption under its disc. Group figure: the doc gives one range for the four captions (6.18–7.39 / 6.17–7.40 / 6.13–7.91); recorded is the range's low end, not this caption's own. Hidden from VoiceOver; label is the drawn text.",
+  "designLine": 1276,
+  "box": "hidden",
+  "find": "text",
+  "text": "150 ml"
+ },
+ {
+  "screen": "home",
+  "element": "Cup",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.18,
+   "26.5": 6.17,
+   "18.6": 6.13
+  },
+  "note": "The Cup's name caption under its disc. Group figure: the doc gives one range for the four captions (6.18–7.39 / 6.17–7.40 / 6.13–7.91); recorded is the range's low end, not this caption's own. Hidden from VoiceOver; label is the drawn text.",
+  "designLine": 1276,
+  "box": "hidden",
+  "find": "text",
+  "text": "Cup"
+ },
+ {
+  "screen": "home",
+  "element": "500 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.12,
+   "26.5": 4.15,
+   "18.6": 4.42
+  },
+  "note": "Bottle's amount caption on clean ground (a rectangle 12 pt out): under its floor on all three (#95). Hidden; drawn-text label.",
+  "designLine": 1287,
+  "box": "hidden",
+  "find": "text",
+  "text": "500 ml"
+ },
+ {
+  "screen": "home",
+  "element": "Bottle",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.2,
+   "26.5": 4.2,
+   "18.6": 4.43
+  },
+  "note": "Bottle's name caption on clean ground: under its floor on all three (#95). Hidden; drawn-text label.",
+  "designLine": 1288,
+  "box": "hidden",
+  "find": "text",
+  "text": "Bottle"
+ },
+ {
+  "screen": "home",
+  "element": "Today's hydration",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.05,
+   "26.5": 4.05,
+   "18.6": 4.2
+  },
+  "note": "The vessel's ml line on clean ground — The look's figure (stage 3c, the newest), under its floor on every system (#95). Home, measured read it 3.39 / 3.26 / 3.29 (27.0), 3.39 / 3.29 / 3.31 (26.5), 3.45 / 3.34 / 3.34 (18.6) at 45 %, 70 % and full (L1289), and 5.01 / 5.52 / 8.25 with the vessel empty (L1292). Level-dependent; the census stands at 65 %.",
+  "designLine": 1644,
+  "box": "container",
+  "find": "text",
+  "text": "1,300 of 2,000 ml",
+  "within": "Today's hydration"
+ },
+ {
+  "screen": "home",
+  "element": "Today's hydration",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 2.71,
+   "26.5": 2.71,
+   "18.6": 2.75
+  },
+  "note": "The vessel's '%' on clean ground at its worst level, a full vessel — under 3 on all three. At 45 % and 70 %: 3.26 / 3.13 (27.0), 3.26 / 3.13 (26.5), 3.33 / 3.16 (18.6) (L1291). Level-dependent; the census stands at 65 %.",
+  "designLine": 1290,
+  "box": "container",
+  "find": "text",
+  "text": "%",
+  "within": "Today's hydration"
+ },
+ {
+  "screen": "home",
+  "element": "Last drink 1:30 PM",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.7,
+   "26.5": 4.7,
+   "18.6": 4.58
+  },
+  "note": "The quiet line on clean ground; an earlier build read 4.48 at full white (L1302). Label as in the beside row.",
+  "designLine": 1293,
+  "box": "container",
+  "find": "text",
+  "text": "Last drink 1:30 PM",
+  "within": "Last drink 1:30 PM"
+ },
+ {
+  "screen": "home",
+  "element": "the date under 'Today'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.78,
+   "26.5": 4.73,
+   "18.6": 4.69
+  },
+  "note": "The date on clean ground. Measured at white 0.92; drawn full white since stage 3b. Hidden.",
+  "designLine": 1294,
+  "box": "hidden",
+  "find": "text",
+  "text": "<Weekday, Month D>"
+ },
+ {
+  "screen": "home",
+  "element": "700 millilitres to go",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.99,
+   "26.5": 4.97,
+   "18.6": 5.32
+  },
+  "note": "The status line on clean ground. Label as in the beside row.",
+  "designLine": 1295,
+  "box": "own",
+  "find": "frame",
+  "bands": [
+   "left",
+   "right"
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "Today",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.65,
+   "26.5": 4.64,
+   "18.6": 4.68
+  },
+  "note": "Home's title on clean ground.",
+  "designLine": 1296,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "home",
+  "element": "Day streak",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 10.43,
+   "26.5": 13.44,
+   "18.6": 10.21
+  },
+  "note": "The streak chip's count (subheadline bold) on its .frosted capsule; the chip is one element (value '5 days' in the census).",
+  "designLine": 1640,
+  "box": "container",
+  "find": "text",
+  "text": "5 days",
+  "within": "Day streak"
+ },
+ {
+  "screen": "home",
+  "element": "Day streak",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.84,
+   "26.5": 4.76,
+   "18.6": 3.77
+  },
+  "note": "The chip's flame in the theme's accent (Aurora's cyan).",
+  "designLine": 1641,
+  "box": "container",
+  "find": "accent",
+  "within": "Day streak",
+  "rects": [
+   [
+    -7,
+    3,
+    4,
+    10
+   ],
+   [
+    1,
+    -6,
+    11,
+    3
+   ],
+   [
+    1,
+    19,
+    11,
+    3
+   ]
+  ],
+  "withinOffset": [
+   8,
+   6,
+   20,
+   24
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "Cup, add 150 millilitres",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.58,
+   "26.5": 9.51,
+   "18.6": 7.45
+  },
+  "note": "The Cup's glyph on its .frosted disc; the button's frame is the disc. Label from the default 150 ml.",
+  "designLine": 1642,
+  "box": "container",
+  "find": "white",
+  "within": "Cup, add 150 millilitres",
+  "rects": [
+   [
+    -7,
+    4,
+    4,
+    19
+   ],
+   [
+    39,
+    4,
+    4,
+    19
+   ],
+   [
+    8,
+    -7,
+    20,
+    4
+   ],
+   [
+    8,
+    30,
+    20,
+    4
+   ]
+  ],
+  "withinOffset": [
+   12,
+   16,
+   44,
+   36
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "Bottle, add 500 millilitres",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.48,
+   "26.5": 9.06,
+   "18.6": 6.87
+  },
+  "note": "The Bottle's glyph on its .frosted disc; the button's frame is the disc. Label from the default 500 ml.",
+  "designLine": 1643,
+  "box": "container",
+  "find": "white",
+  "within": "Bottle, add 500 millilitres"
+ },
+ {
+  "screen": "home-undo",
+  "element": "Undo",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.21,
+   "26.5": 6.13,
+   "18.6": 5.05
+  },
+  "note": "The Undo capsule's 'Added 250 ml' (subheadline medium) on .opaque glass — drawn for 8 s after a pour, which the census does not make. The capsule is one button 'Undo' (value the amount).",
+  "designLine": 1645,
+  "box": "container"
+ },
+ {
+  "screen": "home-undo",
+  "element": "Undo",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.34,
+   "26.5": 11.36,
+   "18.6": 8.96
+  },
+  "note": "The Undo capsule's word 'Undo' (subheadline bold).",
+  "designLine": 1646,
+  "box": "container"
+ },
+ {
+  "screen": "home-undo",
+  "element": "Undo",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.01,
+   "26.5": 6.82,
+   "18.6": 5.44
+  },
+  "note": "The Undo capsule's arrow glyph in the accent.",
+  "designLine": 1647,
+  "box": "container"
+ },
+ {
+  "screen": "home",
+  "element": "Home",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.03,
+   "26.5": 11.09
+  },
+  "note": "The selected tab's caption — 'the selected one ≥ 9.03' (27.0) and '≥ 11.09' (26.5). Apple's tab bar (iOS 26 and later); its caption colour is the system's, so the ink is read off the render. The doc's figures are bounds over all three tabs, by a first-read method (caption band against the lightest 2 % of its darker half) it says does not compare with its other tables: 27.0 from the TabView build (L2106 — the standalone bar since is 'as the TabView's to the eye'), 26.5 from seven frames of the standalone bar (L2068). The same pair stands on history-week and settings with that tab selected.",
+  "designLine": 2106,
+  "box": "container",
+  "find": "text",
+  "text": "Home",
+  "within": "Home",
+  "runtimes": [
+   "27.0",
+   "26.5"
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "History",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.77,
+   "26.5": 8.03
+  },
+  "note": "An unselected tab's caption — 'every caption ≥ 6.77' (27.0) and '≥ 8.03' (26.5). Apple's tab bar (iOS 26 and later); its caption colour is the system's, so the ink is read off the render. The doc's figures are bounds over all three tabs, by a first-read method (caption band against the lightest 2 % of its darker half) it says does not compare with its other tables: 27.0 from the TabView build (L2106 — the standalone bar since is 'as the TabView's to the eye'), 26.5 from seven frames of the standalone bar (L2068). The same pair stands on history-week and settings with that tab selected.",
+  "designLine": 2106,
+  "box": "container",
+  "find": "text",
+  "text": "History",
+  "within": "History"
+ },
+ {
+  "screen": "home",
+  "element": "Settings",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.77,
+   "26.5": 8.03
+  },
+  "note": "An unselected tab's caption — 'every caption ≥ 6.77' (27.0) and '≥ 8.03' (26.5). Apple's tab bar (iOS 26 and later); its caption colour is the system's, so the ink is read off the render. The doc's figures are bounds over all three tabs, by a first-read method (caption band against the lightest 2 % of its darker half) it says does not compare with its other tables: 27.0 from the TabView build (L2106 — the standalone bar since is 'as the TabView's to the eye'), 26.5 from seven frames of the standalone bar (L2068). The same pair stands on history-week and settings with that tab selected.",
+  "designLine": 2106,
+  "box": "container",
+  "find": "text",
+  "text": "Settings",
+  "within": "Settings"
+ },
+ {
+  "screen": "home",
+  "element": "Home",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "18.6": 7.92
+  },
+  "note": "The active tab's caption, full white. The app's own GlassTabBar, drawn below iOS 26 only — on 26 and later this label is Apple's bar, so skip there. Worst across the screens The look swept; the same pair stands on history-week and settings with that tab active.",
+  "designLine": 1680,
+  "box": "container",
+  "find": "text",
+  "text": "Home",
+  "within": "Home",
+  "runtimes": [
+   "18.6"
+  ],
+  "rects": [
+   [
+    -16,
+    1,
+    4,
+    9
+   ],
+   [
+    47,
+    1,
+    4,
+    9
+   ]
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "History",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.72,
+  "yardstick": "clean",
+  "recorded": {
+   "18.6": 5.22
+  },
+  "note": "An inactive tab's caption at white 0.72. The app's own GlassTabBar, drawn below iOS 26 only — on 26 and later this label is Apple's bar, so skip there. Worst across the screens The look swept; the same pair stands on history-week and settings with that tab active.",
+  "designLine": 1679,
+  "box": "container",
+  "find": "text",
+  "text": "History",
+  "within": "History",
+  "runtimes": [
+   "18.6"
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "Settings",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.72,
+  "yardstick": "clean",
+  "recorded": {
+   "18.6": 5.22
+  },
+  "note": "An inactive tab's caption at white 0.72. The app's own GlassTabBar, drawn below iOS 26 only — on 26 and later this label is Apple's bar, so skip there. Worst across the screens The look swept; the same pair stands on history-week and settings with that tab active.",
+  "designLine": 1679,
+  "box": "container",
+  "find": "text",
+  "text": "Settings",
+  "within": "Settings",
+  "runtimes": [
+   "18.6"
+  ]
+ },
+ {
+  "screen": "home",
+  "element": "Home",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "18.6": 4.49
+  },
+  "note": "The active tab's glyph in the accent. The app's own GlassTabBar, drawn below iOS 26 only — on 26 and later this label is Apple's bar, so skip there. Worst across the screens The look swept; the same pair stands on history-week and settings with that tab active.",
+  "designLine": 1681,
+  "box": "container",
+  "find": "accent",
+  "within": "Home",
+  "runtimes": [
+   "18.6"
+  ],
+  "rects": [
+   [
+    -8,
+    4,
+    4,
+    10
+   ],
+   [
+    21,
+    4,
+    4,
+    10
+   ]
+  ],
+  "withinOffset": [
+   35,
+   3,
+   25,
+   24
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "Today",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.74,
+   "26.5": 4.74,
+   "18.6": 4.61
+  },
+  "note": "History's heading 'Today' (largeTitle bold, two shadows) on the aurora. Duplicate label: the week card's 'Today' day button is later in the walk, so the census's frames map holds that button's frame — this pair needs the heading's own.",
+  "designLine": 1468,
+  "box": "own",
+  "find": "frame",
+  "frameIndex": 1
+ },
+ {
+  "screen": "history-week",
+  "element": "Today",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.19,
+   "26.5": 5.19,
+   "18.6": 5.07
+  },
+  "note": "History's heading beside its glyphs. Duplicate label: the week card's 'Today' day button is later in the walk, so the census's frames map holds that button's frame — this pair needs the heading's own.",
+  "designLine": 1469,
+  "box": "own",
+  "find": "frame",
+  "frameIndex": 1
+ },
+ {
+  "screen": "history-week",
+  "element": "1,300 of 2,000 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.44,
+   "26.5": 4.45,
+   "18.6": 4.34
+  },
+  "note": "The total under the heading (.headline rounded, two shadows) — under its floor on every system (#95). Hidden (the heading's value); label is the census's drawn text, which XCUITest may list (known issue #139).",
+  "designLine": 1470,
+  "box": "hidden",
+  "find": "text",
+  "text": "1,300 of 2,000 ml"
+ },
+ {
+  "screen": "history-week",
+  "element": "1,300 of 2,000 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.68,
+   "26.5": 4.65,
+   "18.6": 4.62
+  },
+  "note": "The total beside its glyphs. Hidden; drawn-text label.",
+  "designLine": 1471,
+  "box": "hidden",
+  "find": "text",
+  "text": "1,300 of 2,000 ml"
+ },
+ {
+  "screen": "history-week",
+  "element": "Add a serving",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.04,
+   "26.5": 11.41,
+   "18.6": 9.02
+  },
+  "note": "The '+' on its .frosted disc beside the heading; the button's frame is the disc.",
+  "designLine": 1648,
+  "box": "container",
+  "find": "white",
+  "within": "Add a serving",
+  "textToo": true,
+  "rects": [
+   [
+    -6,
+    3,
+    3,
+    8
+   ],
+   [
+    17,
+    3,
+    3,
+    8
+   ],
+   [
+    3,
+    -6,
+    8,
+    3
+   ],
+   [
+    3,
+    17,
+    8,
+    3
+   ]
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "Last 7 days",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.93,
+   "26.5": 9.59,
+   "18.6": 6.93
+  },
+  "note": "The week card's title (callout semibold); its value speaks the card's figures.",
+  "designLine": 1649,
+  "box": "own",
+  "find": "frame",
+  "bands": [
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "a past day's weekday letter (each of T-1 … T-6)",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.58,
+   "26.5": 10.69,
+   "18.6": 7.79
+  },
+  "note": "A past day's weekday letter inside its day button. <Weekday> is the full name of each of the six past days (the buttons' labels); today's button is 'Today', and its letter — Aurora.top on a white disc — is derived, not measured. Worst over the letters.",
+  "designLine": 1650,
+  "box": "container",
+  "find": "holder",
+  "within": "<Weekday T-n>",
+  "rects": [
+   [
+    2,
+    101,
+    11,
+    15
+   ],
+   [
+    33,
+    101,
+    10,
+    15
+   ]
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "the week card's figures — Average '1,978 ml' located; also Best day '2,500 ml' and Goal met '5 of 7'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.29,
+   "26.5": 11.73,
+   "18.6": 8.61
+  },
+  "note": "The Average / Best day / Goal met figures (title3 bold rounded; the doc holds them to 4.5). Hidden (the title's value); the census draws e.g. '2,500 ml' and '5 of 7'.",
+  "designLine": 1651,
+  "box": "hidden",
+  "find": "text",
+  "text": "1,978 ml"
+ },
+ {
+  "screen": "history-week",
+  "element": "Average",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.16,
+   "26.5": 9.82,
+   "18.6": 7.45
+  },
+  "note": "The 'Average' label under its figure (footnote medium, 0.9). Hidden; drawn-text label (XCUITest may list it, #139).",
+  "designLine": 1652,
+  "box": "hidden",
+  "find": "text",
+  "text": "Average"
+ },
+ {
+  "screen": "history-week",
+  "element": "Measured against your current goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.42,
+   "26.5": 9.91,
+   "18.6": 7.6
+  },
+  "note": "The week card's disclosure (caption2, 0.88).",
+  "designLine": 1653,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "history-week",
+  "element": "the week card's dashed goal line",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.62,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.67,
+   "26.5": 4.56,
+   "18.6": 3.71
+  },
+  "note": "The dashed goal line, 1.5 pt at white 0.62, drawn over the day row; no element of its own. Its ground is the pane beside the line in the gap between the first two columns (T-6's and T-5's), above and below it, placed by hand from T-6's day button — where the doc's 3.67 was read (Aurora's census of 2026-11-23 reads 3.54 on 27.0 and 3.60 on 18.6 there). Over a track, the next pair.",
+  "designLine": 1654,
+  "box": "hidden",
+  "find": "holder",
+  "within": "<Weekday T-6>",
+  "rects": [
+   [
+    43,
+    19,
+    5,
+    4
+   ],
+   [
+    43,
+    28.5,
+    5,
+    4
+   ]
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "the goal line over the first day's track",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.62,
+  "yardstick": "clean",
+  "note": "The same line where it crosses T-6's track (white 0.10, its short bar standing below the line): the track above and below the line, placed by hand from T-6's day button. Never recorded; Aurora reads 2.82 on 27.0 and 2.85 on 18.6 (2026-11-23), under its floor, so a theme is held to Aurora's figure here (#95's rule). The doc's earlier finding: the goal line over an empty day's track, 3.05 on 27.0 and 2.12 on 18.6, at white 0.55 (stage 2).",
+  "find": "holder",
+  "within": "<Weekday T-6>",
+  "rects": [
+   [
+    8,
+    14,
+    28,
+    8
+   ],
+   [
+    8,
+    28.5,
+    28,
+    6
+   ]
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "Today",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.8,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.57,
+   "26.5": 8.62,
+   "18.6": 6.59
+  },
+  "note": "The ring (white 0.8, 1.5 pt) round the shown day's track — today by default, the 'Today' day button (which wins the label over the heading in the frames map).",
+  "designLine": 1655,
+  "box": "container",
+  "find": "white",
+  "within": "Today",
+  "withinIndex": 2,
+  "nth": 1
+ },
+ {
+  "screen": "history-week",
+  "element": "a met day's bar (yesterday's)",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.44,
+   "26.5": 4.57,
+   "18.6": 3.38
+  },
+  "note": "A met day's bar in the accent against the gap between tracks and its own track above. Census: the five days before today met the goal, the sixth back did not (white). <Weekday> as in the letters row.",
+  "designLine": 1656,
+  "box": "container",
+  "find": "accent",
+  "within": "<Weekday T-1>",
+  "largest": true
+ },
+ {
+  "screen": "history-week",
+  "element": "Today",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.0,
+   "26.5": 9.6,
+   "18.6": 7.0
+  },
+  "note": "Today's bar, white while today is short of the goal (census 1,300 of 2,000), against its white 0.10 track.",
+  "designLine": 1657,
+  "box": "container",
+  "find": "white",
+  "within": "Today",
+  "withinIndex": 2,
+  "nth": 1,
+  "rects": [
+   [
+    8,
+    20,
+    22,
+    14
+   ]
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "When you drank",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.84,
+   "26.5": 12.0,
+   "18.6": 8.84
+  },
+  "note": "The strip's title (callout semibold), a heading whose value is the count.",
+  "designLine": 1658,
+  "box": "own",
+  "find": "text",
+  "text": "When you drank",
+  "bands": [
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "the strip's hour labels — '6 AM' located; also '12 PM' and '6 PM'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.72,
+   "26.5": 10.04,
+   "18.6": 7.71
+  },
+  "note": "The axis hours (0.18 of the plot, semibold, 0.9) — '6 AM', '12 PM', '6 PM' in an en_US 12-hour region. Hidden.",
+  "designLine": 1659,
+  "box": "hidden",
+  "find": "text",
+  "text": "6 AM"
+ },
+ {
+  "screen": "history-week",
+  "element": "5 servings",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.17,
+   "26.5": 10.64
+  },
+  "note": "The count at the strip heading's trailing edge (footnote medium, 0.9); '5 servings' in the census. A scratch probe's figure (2026-10-17): the glyphs' 99.5th-percentile luminance against the 95th percentile of clean ground in a band 3–9 pt out — between this file's two yardsticks. 18.6 not measured. Hidden (the title's value).",
+  "designLine": 1693,
+  "box": "hidden",
+  "find": "text",
+  "text": "5 servings"
+ },
+ {
+  "screen": "history-week",
+  "element": "the strip's serving bars",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.03,
+   "26.5": 6.61,
+   "18.6": 4.95
+  },
+  "note": "A serving's 8-pt bar in the accent (with a black 0.45 hairline) against the strip's pane. Hidden.",
+  "designLine": 1660,
+  "box": "hidden",
+  "find": "accent",
+  "bands": [
+   "above"
+  ],
+  "within": "When you drank",
+  "withinOffset": [
+   0,
+   40,
+   393,
+   80
+  ],
+  "largest": true
+ },
+ {
+  "screen": "history-week",
+  "element": "150 millilitres",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.26,
+   "26.5": 11.54,
+   "18.6": 8.85
+  },
+  "note": "Row 1's amount (body bold) on its .frosted capsule; each serving row is a button labelled by its amount. Census: row 1 (the newest) is the 1:30 PM Cup, '150 millilitres' — a label row 4 (the 9:15 AM Cup) shares; the frames map keeps the later one, row 4, while row 4 is in the tree.",
+  "designLine": 1661,
+  "box": "container",
+  "find": "text",
+  "text": "150 ml",
+  "within": "150 millilitres",
+  "withinIndex": 1
+ },
+ {
+  "screen": "history-week",
+  "element": "150 millilitres",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.46,
+   "26.5": 5.3,
+   "18.6": 4.42
+  },
+  "note": "Row 1's vessel glyph, white on its accent 0.16 wash. Census: row 1 (the newest) is the 1:30 PM Cup, '150 millilitres' — a label row 4 (the 9:15 AM Cup) shares; the frames map keeps the later one, row 4, while row 4 is in the tree.",
+  "designLine": 1662,
+  "box": "container",
+  "find": "holder",
+  "within": "150 millilitres",
+  "withinOffset": [
+   36,
+   16,
+   36,
+   36
+  ],
+  "rects": [
+   [
+    2,
+    10,
+    3,
+    16
+   ],
+   [
+    31,
+    10,
+    3,
+    16
+   ],
+   [
+    8,
+    2,
+    20,
+    3
+   ],
+   [
+    8,
+    31,
+    20,
+    3
+   ]
+  ]
+ },
+ {
+  "screen": "history-week",
+  "element": "150 millilitres",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.96,
+   "26.5": 9.34,
+   "18.6": 7.39
+  },
+  "note": "Row 1's vessel name ('Cup', footnote, 0.9), drawn and not spoken. Census: row 1 (the newest) is the 1:30 PM Cup, '150 millilitres' — a label row 4 (the 9:15 AM Cup) shares; the frames map keeps the later one, row 4, while row 4 is in the tree.",
+  "designLine": 1663,
+  "box": "container",
+  "find": "text",
+  "text": "Cup",
+  "within": "150 millilitres",
+  "withinIndex": 1
+ },
+ {
+  "screen": "history-week-lower",
+  "element": "250 millilitres",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.66,
+   "26.5": 5.41,
+   "18.6": 4.42
+  },
+  "note": "Row 5's vessel glyph, white on its wash. Census: row 5 is the 7:40 AM Glass, '250 millilitres' (row 2 shares the label; row 5 is the later). Rows 4–5 sit below the fold on a 402 × 874 phone and the census does not scroll History, hence 'history-week-lower'.",
+  "designLine": 1662,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-lower",
+  "element": "250 millilitres",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.4,
+   "26.5": 9.56,
+   "18.6": 7.89
+  },
+  "note": "Row 5's vessel name ('Glass', footnote, 0.9). Rows 4–5 sit below the fold on a 402 × 874 phone and the census does not scroll History, hence 'history-week-lower'.",
+  "designLine": 1663,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-lower",
+  "element": "150 millilitres",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.94,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.66,
+   "26.5": 10.51,
+   "18.6": 8.48
+  },
+  "note": "Row 4's time (subheadline semibold, 0.94); census row 4 is the 9:15 AM Cup. Rows 4–5 sit below the fold on a 402 × 874 phone and the census does not scroll History, hence 'history-week-lower'.",
+  "designLine": 1664,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-empty",
+  "element": "Nothing logged yet today, Pick a vessel on the Home tab to log your first serving.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.13,
+   "26.5": 12.57,
+   "18.6": 9.24
+  },
+  "note": "Its title (callout semibold). Today's empty state on its .frosted pane, one combined element — drawn only on a day with nothing logged, not the census's.",
+  "designLine": 1682,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-empty",
+  "element": "Nothing logged yet today, Pick a vessel on the Home tab to log your first serving.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.25,
+   "26.5": 6.86,
+   "18.6": 5.43
+  },
+  "note": "Its second line (footnote, 0.7). Today's empty state on its .frosted pane, one combined element — drawn only on a day with nothing logged, not the census's.",
+  "designLine": 1683,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-empty",
+  "element": "Nothing logged yet today, Pick a vessel on the Home tab to log your first serving.",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.8,
+   "26.5": 6.32,
+   "18.6": 5.0
+  },
+  "note": "Its drop glyph (white 0.7). Today's empty state on its .frosted pane, one combined element — drawn only on a day with nothing logged, not the census's.",
+  "designLine": 1684,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-past-empty",
+  "element": "Nothing logged that day, Tap + to add a serving you forgot.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "A past day's empty state: its title. No in-force figure — only History, measured's one capture (13.33 on 26.5, 12.37 on 27.0, 5.37 on 18.6), taken before stage 3c re-tinted the panes; The look did not measure it (L1726). The capture is attributed to the past day's state by HistoryView.swift's own comment.",
+  "designLine": 1561,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-past-empty",
+  "element": "Nothing logged that day, Tap + to add a serving you forgot.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "clean",
+  "note": "A past day's empty state: 'Tap + to add a serving you forgot.' (footnote, 0.7). No in-force figure — 7.37 / 6.84 / 3.80 (26.5 / 27.0 / 18.6, under its floor on 18.6) before stage 3c.",
+  "designLine": 1562,
+  "box": "container"
+ },
+ {
+  "screen": "history-week-reminders",
+  "element": "(hidden) the strip's reminder mark",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "The next reminder's white bell and 1.5-pt rule on today's strip — drawn only with reminders on (the census has them off). No in-force figure — History, measured (before stage 3c): 14.21 / 13.11 / 12.40 (26.5), 11.38 / 9.97 / 9.84 (27.0), 4.82 / 6.71 / 6.52 (18.6) in the small hours / at midday / in the evening. Hidden.",
+  "designLine": 1492,
+  "box": "hidden"
+ },
+ {
+  "screen": "serving-sheet",
+  "element": "(hidden) the sheet's 'ml' beside the amount",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.8,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.9,
+   "26.5": 7.9,
+   "18.6": 5.96
+  },
+  "note": "The serving sheet, from History's '+' or a row; its 'ml' (0.36 of the 52-pt figure, semibold, 0.8) on the .frosted card. Hidden (the readout is hidden; the slider 'Serving amount' speaks it).",
+  "designLine": 1665,
+  "box": "hidden"
+ },
+ {
+  "screen": "serving-sheet",
+  "element": "Cancel",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.97,
+   "26.5": 7.22,
+   "18.6": 5.46
+  },
+  "note": "The serving sheet, from History's '+' or a row; 'Cancel' (headline semibold) on its .sheer capsule; the button's frame is the capsule.",
+  "designLine": 1666,
+  "box": "container"
+ },
+ {
+  "screen": "serving-sheet",
+  "element": "Cup",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.74,
+   "26.5": 10.93,
+   "18.6": 7.87
+  },
+  "note": "The serving sheet, from History's '+' or a row; an unselected shortcut's amount (15 pt semibold rounded) — the sheet opens on the Glass's amount, so Cup is unselected; each shortcut is a button labelled by its vessel (value the amount). Worst over the unselected ones.",
+  "designLine": 1667,
+  "box": "container"
+ },
+ {
+  "screen": "serving-sheet",
+  "element": "Bottle",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.74,
+   "26.5": 10.93,
+   "18.6": 7.87
+  },
+  "note": "The serving sheet, from History's '+' or a row; an unselected shortcut's amount (15 pt semibold rounded) — the sheet opens on the Glass's amount, so Bottle is unselected; each shortcut is a button labelled by its vessel (value the amount). Worst over the unselected ones.",
+  "designLine": 1667,
+  "box": "container"
+ },
+ {
+  "screen": "serving-sheet",
+  "element": "Glass",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "18.6": 6.96
+  },
+  "note": "The serving sheet, from History's '+' or a row; the selected shortcut's amount (bold) on LiquidGlass.Selection's fill; not measured on 27.0 or 26.5.",
+  "designLine": 1668,
+  "box": "container"
+ },
+ {
+  "screen": "settings",
+  "element": "Daily goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.27,
+   "26.5": 6.76,
+   "18.6": 5.25
+  },
+  "note": "The goal card's title (17 pt semibold). The goal card's readout row and range labels are hidden from VoiceOver (the slider 'Daily water goal' speaks them). Label is the drawn text.",
+  "designLine": 1866,
+  "box": "hidden",
+  "find": "text",
+  "text": "Daily goal"
+ },
+ {
+  "screen": "settings",
+  "element": "2,000",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.65,
+   "26.5": 10.55,
+   "18.6": 7.79
+  },
+  "note": "The goal's figure (36 pt bold rounded; the doc holds it to 4.5). The goal card's readout row and range labels are hidden from VoiceOver (the slider 'Daily water goal' speaks them). Census goal 2,000.",
+  "designLine": 1867,
+  "box": "hidden",
+  "find": "text",
+  "text": "2,000"
+ },
+ {
+  "screen": "settings",
+  "element": "ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.76,
+   "26.5": 10.38,
+   "18.6": 7.82
+  },
+  "note": "The goal's 'ml' (17/36 of the figure, semibold, 0.9). The goal card's readout row and range labels are hidden from VoiceOver (the slider 'Daily water goal' speaks them).",
+  "designLine": 1868,
+  "box": "hidden",
+  "find": "text",
+  "text": "ml",
+  "nth": 1
+ },
+ {
+  "screen": "settings",
+  "element": "1,000",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.35,
+   "26.5": 7.06,
+   "18.6": 5.5
+  },
+  "note": "The slider's left range label (footnote semibold, 0.88); one figure for both labels. The goal card's readout row and range labels are hidden from VoiceOver (the slider 'Daily water goal' speaks them).",
+  "designLine": 1869,
+  "box": "hidden",
+  "find": "text",
+  "text": "1,000"
+ },
+ {
+  "screen": "settings",
+  "element": "4,000",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.35,
+   "26.5": 7.06,
+   "18.6": 5.5
+  },
+  "note": "The slider's right range label (footnote semibold, 0.88); one figure for both labels. The goal card's readout row and range labels are hidden from VoiceOver (the slider 'Daily water goal' speaks them).",
+  "designLine": 1869,
+  "box": "hidden",
+  "find": "text",
+  "text": "4,000"
+ },
+ {
+  "screen": "settings",
+  "element": "Quick-add vessels",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.1,
+   "26.5": 9.83,
+   "18.6": 7.22
+  },
+  "note": "The vessels card's title (17 pt semibold).",
+  "designLine": 1870,
+  "box": "own",
+  "find": "frame",
+  "bands": [
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "settings",
+  "element": "Cup's name, in the row above the 'Cup' slider",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.95,
+   "26.5": 8.01,
+   "18.6": 6.02
+  },
+  "note": "Cup's name (body medium). In force: Welcome, measured's re-read of Settings after the rows became VesselSliders (2026-10-14), which supersedes stage 4's joint 'name and amount' 6.78 / 9.39 / 6.70 (L1871). The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Its drawn 'Cup' would collide with the slider's label.",
+  "designLine": 2011,
+  "box": "hidden",
+  "find": "text",
+  "text": "Cup"
+ },
+ {
+  "screen": "settings",
+  "element": "150 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.78,
+   "26.5": 9.39,
+   "18.6": 6.7
+  },
+  "note": "Cup's amount (body bold rounded). Stage 4's figure covers the name and the amount together; the amount was not read again. The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Label is the drawn text.",
+  "designLine": 1871,
+  "box": "hidden",
+  "find": "text",
+  "text": "150 ml"
+ },
+ {
+  "screen": "settings",
+  "element": "Glass's name and amount, above the 'Glass' slider — 'Glass' located; also '250 ml'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.66,
+   "26.5": 11.7,
+   "18.6": 8.67
+  },
+  "note": "Glass's row, its name and amount, one figure. The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them.",
+  "designLine": 1872,
+  "box": "hidden",
+  "find": "text",
+  "text": "Glass"
+ },
+ {
+  "screen": "settings",
+  "element": "Bottle's name and amount, above the 'Bottle' slider — 'Bottle' located; also '500 ml'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.11,
+   "26.5": 12.59,
+   "18.6": 9.38
+  },
+  "note": "Bottle's row, its name and amount, one figure. The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. May fall under the tab bar on the first screenful.",
+  "designLine": 1873,
+  "box": "hidden",
+  "find": "text",
+  "text": "Bottle"
+ },
+ {
+  "screen": "settings",
+  "element": "Cup's glyph, left of 'Cup' above its slider",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.11,
+   "26.5": 4.08,
+   "18.6": 3.1
+  },
+  "note": "Cup's glyph in the accent, by the card's lit top-left corner — the tightest pair on the screen. In force: Welcome, measured's re-read, superseding stage 4's 3.08 / 4.02 / 3.09 (L1874). The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them.",
+  "designLine": 2011,
+  "box": "hidden",
+  "find": "accent",
+  "within": "Cup",
+  "withinOffset": [
+   -6,
+   -45,
+   40,
+   38
+  ]
+ },
+ {
+  "screen": "settings",
+  "element": "Glass's glyph, left of 'Glass' above its slider",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.76,
+   "26.5": 6.21,
+   "18.6": 4.66
+  },
+  "note": "Glass's glyph in the accent. The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them.",
+  "designLine": 1875,
+  "box": "hidden",
+  "find": "accent",
+  "within": "Glass",
+  "withinOffset": [
+   -6,
+   -45,
+   40,
+   38
+  ]
+ },
+ {
+  "screen": "settings",
+  "element": "Bottle's glyph, left of 'Bottle' above its slider",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.48,
+   "26.5": 6.96,
+   "18.6": 5.28
+  },
+  "note": "Bottle's glyph in the accent. The vessel rows (glyph, name, amount) are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them.",
+  "designLine": 1876,
+  "box": "hidden",
+  "find": "accent",
+  "within": "Bottle",
+  "withinOffset": [
+   -6,
+   -45,
+   40,
+   38
+  ]
+ },
+ {
+  "screen": "settings-lower",
+  "element": "The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.45,
+   "26.5": 10.29,
+   "18.6": 7.86
+  },
+  "note": "The vessels card's note (subheadline, 0.92). Measured at stage 4 on its old words, 'The Glass is the one your widget, Siri and Control Center log.'; set C changed them and moved the note under the 'Your vessels' row. Recorded is the worse of top / end: 7.75 / 7.45 (27.0), 10.62 / 10.29 (26.5), 7.97 / 7.86 (18.6).",
+  "designLine": 1877,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "settings-lower",
+  "element": "Smart reminders",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.9,
+   "26.5": 11.28,
+   "18.6": 8.16
+  },
+  "note": "The reminders card's title, the Toggle's label: the switch is the element, its frame the whole row with the switch.",
+  "designLine": 1878,
+  "box": "container",
+  "find": "text",
+  "text": "Smart reminders",
+  "within": "Smart reminders",
+  "bands": [
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "settings-lower",
+  "element": "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.89,
+   "26.5": 6.37,
+   "18.6": 4.93
+  },
+  "note": "The reminders explanation (subheadline, 0.92), its first line at the card's sheen. The census's words (reminders off, the standard schedule, no notification summary); other states draw another sentence.",
+  "designLine": 1879,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Language",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.09,
+   "26.5": 9.25,
+   "18.6": 6.86
+  },
+  "note": "The language card's title. Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1880,
+  "box": "own",
+  "find": "frame",
+  "bands": [
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Follow device",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.5,
+   "26.5": 11.32,
+   "18.6": 8.35
+  },
+  "note": "A language row's name (body); each row is a button. One figure for the rows (the worst). Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1881,
+  "box": "container",
+  "find": "text",
+  "text": "Follow device",
+  "within": "Follow device"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "English",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.5,
+   "26.5": 11.32,
+   "18.6": 8.35
+  },
+  "note": "A language row's name (body); each row is a button. One figure for the rows (the worst). Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1881,
+  "box": "container",
+  "find": "text",
+  "text": "English",
+  "within": "English"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Русский",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.5,
+   "26.5": 11.32,
+   "18.6": 8.35
+  },
+  "note": "A language row's name (body); each row is a button. One figure for the rows (the worst). Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1881,
+  "box": "container",
+  "find": "text",
+  "text": "Русский",
+  "within": "Русский"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "O‘zbekcha",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.5,
+   "26.5": 11.32,
+   "18.6": 8.35
+  },
+  "note": "A language row's name (body); each row is a button. One figure for the rows (the worst). Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1881,
+  "box": "container",
+  "find": "text",
+  "text": "O‘zbekcha",
+  "within": "O‘zbekcha"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Follow device",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.11,
+   "26.5": 6.9,
+   "18.6": 5.18
+  },
+  "note": "The selected row's checkmark in the accent — 'Follow device' in the census (a fresh start follows the device). Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1882,
+  "box": "container",
+  "find": "accent",
+  "within": "Follow device"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "The app switches straight away. The widget follows on its next refresh.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.9,
+   "26.5": 10.64,
+   "18.6": 8.01
+  },
+  "note": "The language card's footnote (subheadline, 0.92). Near the end of the scroll: one swipe may not bring it on screen.",
+  "designLine": 1883,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "settings-end",
+  "element": "Privacy Policy",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.8,
+   "26.5": 5.74
+  },
+  "note": "The privacy policy link under the cards, on the aurora (footnote semibold, 0.92, two shadows); a full-width, 44-pt Link, so its frame is wider than the text. The last thing on the screen: one swipe may not reach it.",
+  "designLine": 1928,
+  "box": "own",
+  "find": "text",
+  "text": "Privacy Policy",
+  "within": "Privacy Policy"
+ },
+ {
+  "screen": "settings-end",
+  "element": "Privacy Policy",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.61,
+   "26.5": 5.6
+  },
+  "note": "The privacy policy link under the cards, on the aurora (footnote semibold, 0.92, two shadows); a full-width, 44-pt Link, so its frame is wider than the text. The last thing on the screen: one swipe may not reach it.",
+  "designLine": 1928,
+  "box": "own",
+  "find": "text",
+  "text": "Privacy Policy",
+  "within": "Privacy Policy"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Aurora",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: 'Aurora' under its swatch on the Appearance card (caption; bold for the chosen theme). Each swatch is one button whose frame holds the swatch circle too.",
+  "box": "container",
+  "find": "text",
+  "text": "Aurora",
+  "within": "Aurora"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Lagoon",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: 'Lagoon' under its swatch on the Appearance card (caption; bold for the chosen theme). Each swatch is one button whose frame holds the swatch circle too.",
+  "box": "container",
+  "find": "text",
+  "text": "Lagoon",
+  "within": "Lagoon"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Dusk",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: 'Dusk' under its swatch on the Appearance card (caption; bold for the chosen theme). Each swatch is one button whose frame holds the swatch circle too.",
+  "box": "container",
+  "find": "text",
+  "text": "Dusk",
+  "within": "Dusk"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Midnight",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: 'Midnight' under its swatch on the Appearance card (caption; bold for the chosen theme). Each swatch is one button whose frame holds the swatch circle too.",
+  "box": "container",
+  "find": "text",
+  "text": "Midnight",
+  "within": "Midnight"
+ },
+ {
+  "screen": "settings-appearance",
+  "element": "Bloom",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: 'Bloom' under its swatch on the Appearance card (caption; bold for the chosen theme). Each swatch is one button whose frame holds the swatch circle too.",
+  "box": "container",
+  "find": "text",
+  "text": "Bloom",
+  "within": "Bloom"
+ },
+ {
+  "screen": "settings-free",
+  "element": "WaterBuddy Premium",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.8
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. Its title (17 pt semibold).",
+  "designLine": 2211,
+  "box": "own"
+ },
+ {
+  "screen": "settings-free",
+  "element": "Extras for the way you drink. Logging water stays free.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.45
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. Its note (subheadline, 0.92).",
+  "designLine": 2211,
+  "box": "own"
+ },
+ {
+  "screen": "settings-free",
+  "element": "Month view",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.43
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. A preview's caption, 'Month view' (footnote semibold); worst of the three. The previews are hidden from VoiceOver; label is the drawn text.",
+  "designLine": 2211,
+  "box": "hidden"
+ },
+ {
+  "screen": "settings-free",
+  "element": "Patterns",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.43
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. A preview's caption, 'Patterns' (footnote semibold); worst of the three. The previews are hidden from VoiceOver; label is the drawn text.",
+  "designLine": 2211,
+  "box": "hidden"
+ },
+ {
+  "screen": "settings-free",
+  "element": "Insights",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.43
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. A preview's caption, 'Insights' (footnote semibold); worst of the three. The previews are hidden from VoiceOver; label is the drawn text.",
+  "designLine": 2211,
+  "box": "hidden"
+ },
+ {
+  "screen": "settings-free",
+  "element": "(hidden) the Premium card's sparkles glyph",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.06
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. The header sparkle, white. Hidden.",
+  "designLine": 2212,
+  "box": "hidden"
+ },
+ {
+  "screen": "settings-free",
+  "element": "(hidden) the Premium card's preview glyphs",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.42
+  },
+  "note": "Settings' Premium card as a free user meets it (the paywall run's Settings, before 'See Premium'); the holder census shows the held card instead. Paywall, measured's walk, beside the glyphs. The three preview glyphs (calendar, chart.bar.fill, sparkles) in the accent; worst of the three. Hidden.",
+  "designLine": 2212,
+  "box": "hidden"
+ },
+ {
+  "screen": "library",
+  "element": "Cup",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the row's name 'Cup' (body semibold) on the 'On Home' section's .frosted pane. The row is one button (label the name, value the amount); Settings' slider of the same name under the sheet shares the label, and the sheet's row is later in the walk.",
+  "box": "container",
+  "find": "text",
+  "text": "Cup"
+ },
+ {
+  "screen": "library",
+  "element": "Cup",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the row's amount '150 ml' (body semibold) at its trailing edge, inside the row's button.",
+  "box": "container",
+  "find": "text",
+  "text": "150 ml"
+ },
+ {
+  "screen": "library",
+  "element": "Glass",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the row's name 'Glass' (body semibold) on the 'On Home' section's .frosted pane. The row is one button (label the name, value the amount); Settings' slider of the same name under the sheet shares the label, and the sheet's row is later in the walk.",
+  "box": "container",
+  "find": "text",
+  "text": "Glass",
+  "nth": 1
+ },
+ {
+  "screen": "library",
+  "element": "Glass",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the row's amount '250 ml' (body semibold) at its trailing edge, inside the row's button.",
+  "box": "container",
+  "find": "text",
+  "text": "250 ml"
+ },
+ {
+  "screen": "library",
+  "element": "Bottle",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the row's name 'Bottle' (body semibold) on the 'On Home' section's .frosted pane. The row is one button (label the name, value the amount); Settings' slider of the same name under the sheet shares the label, and the sheet's row is later in the walk.",
+  "box": "container",
+  "find": "text",
+  "text": "Bottle"
+ },
+ {
+  "screen": "library",
+  "element": "Bottle",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the row's amount '500 ml' (body semibold) at its trailing edge, inside the row's button.",
+  "box": "container",
+  "find": "text",
+  "text": "500 ml"
+ },
+ {
+  "screen": "library",
+  "element": "Glass",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the line 'Your Glass: the widget, Siri, Control Center, reminders and your watch log it' under the middle row's name (footnote, 0.88), inside the row's button.",
+  "box": "container",
+  "find": "text",
+  "text": "Your Glass: the widget, Siri, Control Center, reminders and your watch log it",
+  "rects": [
+   [
+    195,
+    2,
+    4,
+    42
+   ],
+   [
+    60,
+    -12,
+    100,
+    4
+   ]
+  ]
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Cup",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Cup' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Mug",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Mug' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Bottle",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Bottle' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Wine glass",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Wine glass' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Takeaway cup",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Takeaway cup' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Flask",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Flask' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Drop",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The 'Drop' icon (title3 semibold, white) on its .sheer tile; the chosen tile — Bottle for a new vessel — wears Selection's fill and rim. The library's rows under the sheet share 'Cup' and 'Bottle'.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Name",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The name field's typed text (body semibold, white) on its .frosted field.",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "Name",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The empty name field's prompt 'Name', in the system's placeholder colour (rendered).",
+  "box": "container"
+ },
+ {
+  "screen": "vessel-editor",
+  "element": "(hidden) the editor's amount over its slider",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "note": "New (set C), not in docs/DESIGN.md: the vessel editor opened by the library's 'Add a vessel' (a new vessel: icons, name, amount; a standard vessel's editor draws the amount and 'Put on Home' only). The amount over the slider ('500 ml' for a new vessel; title3 bold — floor 3 by the large-text rule, though the doc holds such figures on panes to 4.5). Hidden (the slider speaks it).",
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month",
+  "element": "Week",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.96
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. History's switch: 'Week' while Month is shown (subheadline semibold) on the switch's .frosted capsule; each segment is a button.",
+  "designLine": 2259,
+  "box": "container",
+  "find": "text",
+  "text": "Week",
+  "within": "Week"
+ },
+ {
+  "screen": "history-month",
+  "element": "Month",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.08
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. 'Month', shown (bold), on Selection's fill and rim.",
+  "designLine": 2259,
+  "box": "container",
+  "find": "text",
+  "text": "Month",
+  "within": "Month"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "Month",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.08
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. 'Month' with its lock, for a free user (value 'Premium').",
+  "designLine": 2259,
+  "box": "container"
+ },
+ {
+  "screen": "history-month",
+  "element": "<Month YYYY>",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.01
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The month card's name (headline bold), a heading — e.g. 'November 2026'.",
+  "designLine": 2260,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "history-month",
+  "element": "the month card's weekday letter 'M'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.9
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The weekday letter 'M' (0.34 of the ring, semibold, 0.9). Hidden.",
+  "designLine": 2261,
+  "box": "hidden",
+  "find": "white",
+  "within": "<Month YYYY>",
+  "withinOffset": [
+   -95,
+   42,
+   46,
+   18
+  ],
+  "textToo": true
+ },
+ {
+  "screen": "history-month",
+  "element": "the month card's weekday letter 'W'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.91
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The weekday letter 'W' (0.34 of the ring, semibold, 0.9). Hidden.",
+  "designLine": 2261,
+  "box": "hidden",
+  "find": "white",
+  "within": "<Month YYYY>",
+  "withinOffset": [
+   -2,
+   42,
+   46,
+   18
+  ],
+  "textToo": true
+ },
+ {
+  "screen": "history-month",
+  "element": "the month card's weekday letter 'S' (Sunday's, the first)",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.59
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The weekday letter 'S' (0.34 of the ring, semibold, 0.9) — the doc does not say which of the two S's. Hidden.",
+  "designLine": 2261,
+  "box": "hidden",
+  "find": "white",
+  "nth": 1,
+  "within": "<Month YYYY>",
+  "withinOffset": [
+   133,
+   42,
+   46,
+   18
+  ],
+  "textToo": true
+ },
+ {
+  "screen": "history-month",
+  "element": "a met day's number (yesterday's)",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.23
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A met day's number on its ring (semibold rounded), worst of four. A day's button, labelled with its date in full, e.g. 'Monday, November 2' (<Weekday, Month D>); the doc does not name which day.",
+  "designLine": 2262,
+  "box": "container",
+  "find": "holder",
+  "within": "<Date T-1>",
+  "rects": [
+   [
+    -4.5,
+    -12,
+    9,
+    2.5
+   ],
+   [
+    -4.5,
+    9.5,
+    9,
+    2.5
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month",
+  "element": "a part-met day's number (T-6's, 1,650 ml)",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.56
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A part-met day's number. A day's button, labelled with its date in full, e.g. 'Monday, November 2' (<Weekday, Month D>); the doc does not name which day.",
+  "designLine": 2262,
+  "box": "container",
+  "find": "holder",
+  "within": "<Date T-6>",
+  "rects": [
+   [
+    -4.5,
+    -12,
+    9,
+    2.5
+   ],
+   [
+    -4.5,
+    9.5,
+    9,
+    2.5
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month",
+  "element": "the number of a day with nothing logged",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.78
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The number of a day with nothing logged. A day's button, labelled with its date in full, e.g. 'Monday, November 2' (<Weekday, Month D>); the doc does not name which day.",
+  "designLine": 2262,
+  "box": "container",
+  "find": "manual"
+ },
+ {
+  "screen": "history-month",
+  "element": "Today",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.74
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Today's number (heavy) — the month's 'Today' button, later in the walk than History's heading 'Today'.",
+  "designLine": 2263,
+  "box": "container",
+  "find": "holder",
+  "within": "Today",
+  "withinIndex": 2,
+  "rects": [
+   [
+    -4.5,
+    -12,
+    9,
+    2.5
+   ],
+   [
+    -4.5,
+    9.5,
+    9,
+    2.5
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month",
+  "element": "quiet day 24's number",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.03
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A quiet day's number (still to come, or before the first serving) at white 0.7 on its white 0.06 disc — day 24 of the walk's month. Hidden.",
+  "designLine": 2264,
+  "box": "hidden",
+  "find": "holder",
+  "within": "24",
+  "rects": [
+   [
+    -4.5,
+    -12,
+    9,
+    2.5
+   ],
+   [
+    -4.5,
+    9.5,
+    9,
+    2.5
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month",
+  "element": "quiet day 26's number",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.23
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A quiet day's number (still to come, or before the first serving) at white 0.7 on its white 0.06 disc — day 26 of the walk's month. Hidden.",
+  "designLine": 2264,
+  "box": "hidden",
+  "find": "holder",
+  "within": "26",
+  "rects": [
+   [
+    -4.5,
+    -12,
+    9,
+    2.5
+   ],
+   [
+    -4.5,
+    9.5,
+    9,
+    2.5
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month",
+  "element": "quiet day 31's number",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.8
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A quiet day's number (still to come, or before the first serving) at white 0.7 on its white 0.06 disc — day 31 of the walk's month, which a 30-day month has not. Hidden.",
+  "designLine": 2264,
+  "box": "hidden",
+  "find": "holder",
+  "within": "31",
+  "rects": [
+   [
+    -4.5,
+    -12,
+    9,
+    2.5
+   ],
+   [
+    -4.5,
+    9.5,
+    9,
+    2.5
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month-opened",
+  "element": "<Weekday, Month D>",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 13.39
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The opened day's number in Aurora.top (heavy) on its white disc, inside the opened day's button. Needs a day opened; the census opens none.",
+  "designLine": 2265,
+  "box": "container"
+ },
+ {
+  "screen": "history-month",
+  "element": "a met day's arc (yesterday's)",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.36
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A met day's arc in the accent against the glass inside and outside its ring, worst of three. A day's button, labelled with its date in full, e.g. 'Monday, November 2' (<Weekday, Month D>); the doc does not name which day.",
+  "designLine": 2266,
+  "box": "container",
+  "find": "accent",
+  "within": "<Date T-1>"
+ },
+ {
+  "screen": "history-month",
+  "element": "a part day's arc (T-6's), against the glass",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.3
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A part day's arc (white) against the glass. A day's button, labelled with its date in full, e.g. 'Monday, November 2' (<Weekday, Month D>); the doc does not name which day.",
+  "designLine": 2267,
+  "box": "container",
+  "find": "white",
+  "within": "<Date T-6>"
+ },
+ {
+  "screen": "history-month",
+  "element": "a part day's arc (T-6's), against its track",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.29
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A part day's arc (white) against its own white 0.14 track. A day's button, labelled with its date in full, e.g. 'Monday, November 2' (<Weekday, Month D>); the doc does not name which day.",
+  "designLine": 2267,
+  "box": "container",
+  "find": "white",
+  "within": "<Date T-6>",
+  "rects": [
+   [
+    -8.5,
+    -14,
+    2,
+    2
+   ]
+  ],
+  "rectsFrom": "centre"
+ },
+ {
+  "screen": "history-month",
+  "element": "Goal met",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.77
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The legend's 'Goal met' (caption, 0.9). Hidden (each day speaks its own figures); label is the drawn text.",
+  "designLine": 2268,
+  "box": "hidden",
+  "find": "text",
+  "text": "Goal met",
+  "bands": [
+   "above",
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "history-month",
+  "element": "Part of it",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.51
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The legend's 'Part of it' (caption, 0.9). Hidden (each day speaks its own figures); label is the drawn text.",
+  "designLine": 2268,
+  "box": "hidden",
+  "find": "text",
+  "text": "Part of it",
+  "bands": [
+   "above",
+   "below",
+   "right"
+  ]
+ },
+ {
+  "screen": "history-month",
+  "element": "the legend's 'Goal met' mark",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.63
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The legend's met ring in the accent. Hidden.",
+  "designLine": 2269,
+  "box": "hidden",
+  "find": "accent",
+  "within": "Goal met",
+  "withinOffset": [
+   -22,
+   -4,
+   18,
+   22
+  ]
+ },
+ {
+  "screen": "history-month",
+  "element": "the legend's 'Part of it' mark, against the glass",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.98
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The legend's white part-ring against the glass. Hidden.",
+  "designLine": 2269,
+  "box": "hidden",
+  "find": "white",
+  "within": "Part of it",
+  "withinOffset": [
+   -22,
+   -4,
+   18,
+   22
+  ],
+  "textToo": true
+ },
+ {
+  "screen": "history-month",
+  "element": "the legend's 'Part of it' mark, against its track",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.48
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The legend's white part-ring against its own track. Hidden.",
+  "designLine": 2269,
+  "box": "hidden",
+  "find": "white",
+  "within": "Part of it",
+  "withinOffset": [
+   -22,
+   -4,
+   18,
+   22
+  ],
+  "rects": [
+   [
+    -3.3,
+    -3.3,
+    1.2,
+    1.2
+   ]
+  ],
+  "rectsFrom": "centre",
+  "textToo": true
+ },
+ {
+  "screen": "history-month",
+  "element": "Measured against your current goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.17
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The month card's disclosure (caption2, 0.88; a full-width frame). The patterns' own line further down shares the label and is later in the walk whenever it is in the tree.",
+  "designLine": 2270,
+  "box": "own",
+  "find": "text",
+  "text": "Measured against your current goal",
+  "within": "Measured against your current goal",
+  "withinIndex": 1
+ },
+ {
+  "screen": "history-month-opened",
+  "element": "<Weekday, Month D>",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.62
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The opened day's heading on the aurora (title3 bold, two shadows), e.g. 'Monday, November 2' or 'Today' — the same label as the day's button above it. Floor 3 by the owner's ruling on #177 (a title3-bold heading on the aurora); the month's table, measured before the ruling, says 4.5. Needs a day opened.",
+  "designLine": 2271,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-opened",
+  "element": "<Weekday, Month D>",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.55
+  },
+  "note": "The month walk, clean ground 10–14 pt out. The opened day's heading on the aurora (title3 bold, two shadows), e.g. 'Monday, November 2' or 'Today' — the same label as the day's button above it. Floor 3 by the owner's ruling on #177 (a title3-bold heading on the aurora); the month's table, measured before the ruling, says 4.5. Needs a day opened.",
+  "designLine": 2271,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-opened",
+  "element": "(hidden) the opened day's total",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.08
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The opened day's total under its heading ('X of Y ml', subheadline semibold rounded, two shadows). Hidden (the heading's value). Needs a day opened.",
+  "designLine": 2271,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-opened",
+  "element": "(hidden) the opened day's total",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.72
+  },
+  "note": "The month walk, clean ground 10–14 pt out. The opened day's total under its heading ('X of Y ml', subheadline semibold rounded, two shadows). Hidden (the heading's value). Needs a day opened.",
+  "designLine": 2271,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month",
+  "element": "Days on goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.46
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The 'Days on goal' tile's figure (title3 bold rounded; the doc holds it to 4.5); each tile is one element. Worst of three.",
+  "designLine": 2272,
+  "box": "container",
+  "find": "text",
+  "text": "<daysMet>/<daysCounted>",
+  "within": "Days on goal",
+  "clip": true
+ },
+ {
+  "screen": "history-month",
+  "element": "Days on goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.73
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The 'Days on goal' tile's label (footnote medium, 0.9). Worst of three.",
+  "designLine": 2272,
+  "box": "container",
+  "find": "text",
+  "text": "Days on goal",
+  "within": "Days on goal",
+  "bands": [
+   "left",
+   "right",
+   "below"
+  ],
+  "clip": true
+ },
+ {
+  "screen": "history-month",
+  "element": "Best streak",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.46
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The 'Best streak' tile's figure (title3 bold rounded; the doc holds it to 4.5); each tile is one element. Worst of three.",
+  "designLine": 2272,
+  "box": "container",
+  "find": "text",
+  "text": "<bestRun> days",
+  "within": "Best streak",
+  "clip": true
+ },
+ {
+  "screen": "history-month",
+  "element": "Best streak",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.73
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The 'Best streak' tile's label (footnote medium, 0.9). Worst of three.",
+  "designLine": 2272,
+  "box": "container",
+  "find": "text",
+  "text": "Best streak",
+  "within": "Best streak",
+  "bands": [
+   "left",
+   "right",
+   "below"
+  ],
+  "clip": true
+ },
+ {
+  "screen": "history-month",
+  "element": "This month",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.46
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The 'This month' tile's figure (title3 bold rounded; the doc holds it to 4.5); each tile is one element. Worst of three.",
+  "designLine": 2272,
+  "box": "container",
+  "find": "text",
+  "text": "<litres> L",
+  "within": "This month",
+  "clip": true
+ },
+ {
+  "screen": "history-month",
+  "element": "This month",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.73
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The 'This month' tile's label (footnote medium, 0.9). Worst of three.",
+  "designLine": 2272,
+  "box": "container",
+  "find": "text",
+  "text": "This month",
+  "within": "This month",
+  "bands": [
+   "left",
+   "right",
+   "below"
+  ],
+  "clip": true
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "the average line's figure",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.38
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The average line's figure 'Average N ml a day' (subheadline bold) on its own .frosted pane; one element, labelled 'Average N millilitres a day'.",
+  "designLine": 2273,
+  "box": "container",
+  "find": "text",
+  "text": "Average <n> ml a day",
+  "within": "Average <n> millilitres a day"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "the change from the month before",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.82
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The change from the month before (footnote, 0.9), e.g. 'Up 120 ml on the month before'.",
+  "designLine": 2273,
+  "box": "container",
+  "find": "text",
+  "text": "<change>",
+  "within": "Average <n> millilitres a day"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "the trend glyph",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.76
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. The trend glyph in the accent.",
+  "designLine": 2274,
+  "box": "container",
+  "find": "accent",
+  "within": "Average <n> millilitres a day"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "Your whole month at a glance",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.86
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. The locked card's title (title3 bold, on the card's pane; the doc holds it to 4.5).",
+  "designLine": 2275,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "Every day you have logged is kept. Premium shows it as months, with your patterns and a recap.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.94
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. The locked card's line (subheadline, 0.92).",
+  "designLine": 2275,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "Back to this week",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 10.62
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. 'Back to this week' (subheadline semibold), a plain button.",
+  "designLine": 2275,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "(hidden) the locked card's calendar glyph",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.3
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. The locked card's white calendar glyph. Hidden.",
+  "designLine": 2276,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "Month",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.33
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. The lock beside 'Month' in the switch.",
+  "designLine": 2276,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "The week, today and every serving stay free. Nothing you logged is ever hidden or deleted.",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.4
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. The promise's white check, inside its combined element.",
+  "designLine": 2276,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-locked",
+  "element": "The week, today and every serving stay free. Nothing you logged is ever hidden or deleted.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.3
+  },
+  "note": "The month walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. A free user's Month (the locked page), which the holder census does not show. The promise under the locked card (footnote) on its .frosted pane.",
+  "designLine": 2277,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-recap",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.17
+  },
+  "note": "The recap row on History's Month, a button 'Monthly recap' (value the offered month) — drawn on a finished month's page, or in a month's first seven days; not on the census's current month after the 7th. The recap's method: one frame, a box per element split by Otsu's threshold. Its title 'Monthly recap' (subheadline bold).",
+  "designLine": 2425,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-recap",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.52
+  },
+  "note": "The recap row on History's Month, a button 'Monthly recap' (value the offered month) — drawn on a finished month's page, or in a month's first seven days; not on the census's current month after the 7th. The recap's method: one frame, a box per element split by Otsu's threshold. Its month's name (footnote, 0.9).",
+  "designLine": 2425,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-recap",
+  "element": "Monthly recap",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.12
+  },
+  "note": "The recap row on History's Month, a button 'Monthly recap' (value the offered month) — drawn on a finished month's page, or in a month's first seven days; not on the census's current month after the 7th. The recap's method: one frame, a box per element split by Otsu's threshold. Its doc.text.image glyph, white.",
+  "designLine": 2425,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-recap",
+  "element": "Monthly recap",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.38
+  },
+  "note": "The recap row on History's Month, a button 'Monthly recap' (value the offered month) — drawn on a finished month's page, or in a month's first seven days; not on the census's current month after the 7th. The recap's method: one frame, a box per element split by Otsu's threshold. Its chevron.",
+  "designLine": 2425,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Patterns",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.14
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. 'Patterns' on the aurora (title3 bold, two shadows), a heading. Floor 3 (#177). In force: set A's step 4's unmasked re-measure, 3.14 (L2344); the table's 5.73 is the masked tool's reading, kept as taken.",
+  "designLine": 2315,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "When you drink",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.08
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The hours chart's title (callout semibold), a heading whose value is the busiest hour.",
+  "designLine": 2317,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the busiest-hour line beside 'When you drink'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.21
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. 'Most around 13:00' (footnote semibold) in the accent. Hidden (the title's value).",
+  "designLine": 2318,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the hours chart's axis label '06'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.61
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The axis label '06' (0.18 of the plot, semibold, 0.9) — '6 AM' in an en_US 12-hour region. Hidden.",
+  "designLine": 2319,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the hours chart's axis label '12'",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.19
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The axis label '12' (0.18 of the plot, semibold, 0.9) — '12 PM' in an en_US 12-hour region. Hidden.",
+  "designLine": 2319,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the hours chart's busiest bar",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.18
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The busiest hour's bar in the accent. Hidden.",
+  "designLine": 2320,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the hours chart's 10:00 bar",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.17
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. An hour's bar at white 0.7 — 10. Hidden.",
+  "designLine": 2321,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the hours chart's 07:00 bar",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.1
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. An hour's bar at white 0.7 — 07. Hidden.",
+  "designLine": 2321,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "(hidden) the hours chart's least bar (a sip at the floor)",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.33
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. An hour's bar at white 0.7 — a sip at the floor. Hidden.",
+  "designLine": 2321,
+  "box": "hidden"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Weekdays",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.74
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. 'Weekdays' (subheadline semibold); the row is one element.",
+  "designLine": 2322,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Weekdays",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.09
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. Weekdays' figure 'N ml a day' (subheadline bold rounded).",
+  "designLine": 2322,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Weekdays",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.96
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The weekday bar (white: its average short of the goal).",
+  "designLine": 2323,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Weekends",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.7
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The weekend bar against its white 0.10 track — its colour not stated; white unless the weekend average met the goal.",
+  "designLine": 2323,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Weekdays",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.56
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. A met side's bar in the accent — read on September's page in the walk; the doc does not say which side, and the census's sample may meet neither. Label assumes Weekdays.",
+  "designLine": 2324,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Weekdays",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.62,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.84
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The goal's rule at the bar's end (1.5 pt, white 0.62); both rows draw one.",
+  "designLine": 2325,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Measured against your current goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.18
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The week split's disclosure (footnote, 0.9) — the later of the screen's two lines with this label.",
+  "designLine": 2326,
+  "box": "own"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "First drink, usually",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.24
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The 'First drink, usually' tile's time (title3 bold rounded; the doc holds it to 4.5); worst of two.",
+  "designLine": 2327,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "First drink, usually",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.1
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The 'First drink, usually' tile's label (footnote medium, 0.9); worst of two.",
+  "designLine": 2327,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Last drink, usually",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.24
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The 'Last drink, usually' tile's time (title3 bold rounded; the doc holds it to 4.5); worst of two.",
+  "designLine": 2327,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-lower",
+  "element": "Last drink, usually",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.1
+  },
+  "note": "The patterns walk (27.0), a ring 2–6 pt round the ink, clipped to its pane. Below the month's figures, where the census, which does not scroll History, does not reach — hence 'history-month-lower'. The 'Last drink, usually' tile's label (footnote medium, 0.9); worst of two.",
+  "designLine": 2327,
+  "box": "container"
+ },
+ {
+  "screen": "history-month-pending",
+  "element": "Patterns need 7 days of water",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.66
+  },
+  "note": "The patterns walk (27.0). A month with fewer than seven days of water (June in the walk): the line (subheadline) on its .frosted pane.",
+  "designLine": 2328,
+  "box": "own"
+ },
+ {
+  "screen": "history-insights",
+  "element": "Insights",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.37
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). 'Insights' on the aurora (title3 bold, two shadows), a heading valued with the week's range. Floor 3 by the owner's ruling on #177 (L2383); the table says 4.5. Worst 3.37, median 4.55, best 5.22; clean ground never measured. The switch's 'Insights' segment shares the label and is earlier in the walk.",
+  "designLine": 2365,
+  "box": "own",
+  "find": "text",
+  "text": "Insights",
+  "within": "Insights",
+  "withinIndex": 2
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.6
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). The lead pane's label 'The one thing' (footnote semibold, 0.9); the pane is one element. Read before One finish restyled the pane (its rim, a larger headline).",
+  "designLine": 2366,
+  "box": "container",
+  "find": "text",
+  "text": "The one thing",
+  "within": "The one thing"
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.47
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). The week's range (footnote semibold, 0.9) at the lead pane's trailing edge. Read before One finish's restyle.",
+  "designLine": 2366,
+  "box": "container",
+  "find": "text",
+  "text": "<week range>",
+  "within": "The one thing",
+  "nth": 2
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.12
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). The lead pane's headline — read at title3 bold, held then to 4.5; One finish made it title2 heavy, large text, held to 3.",
+  "designLine": 2367,
+  "box": "container",
+  "find": "text",
+  "text": "<headline>",
+  "within": "The one thing",
+  "nth": 3,
+  "bands": [
+   "above",
+   "left",
+   "right"
+  ]
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.54
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). The lead pane's detail sentence (body). Read before One finish's restyle.",
+  "designLine": 2367,
+  "box": "container",
+  "find": "text",
+  "text": "<detail>",
+  "within": "The one thing",
+  "nth": 5,
+  "bands": [
+   "above",
+   "left",
+   "right"
+  ]
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.02
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). The suggested vessel's glyph before the detail (white); not read again by One finish.",
+  "designLine": 2368,
+  "box": "container",
+  "find": "white",
+  "within": "The one thing",
+  "nth": 1
+ },
+ {
+  "screen": "history-insights",
+  "element": "What is working",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.16
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). 'What is working''s glyph (checkmark.circle, white); the pane is one element.",
+  "designLine": 2368,
+  "box": "container",
+  "find": "white",
+  "within": "What is working",
+  "withinIndex": 2,
+  "withinOffset": [
+   -34,
+   -3,
+   24,
+   24
+  ]
+ },
+ {
+  "screen": "history-insights",
+  "element": "What is working",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.06
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). Its title (subheadline bold).",
+  "designLine": 2369,
+  "box": "container",
+  "find": "text",
+  "text": "What is working",
+  "within": "What is working"
+ },
+ {
+  "screen": "history-insights",
+  "element": "What is working",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.35
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). Its sentence (subheadline).",
+  "designLine": 2369,
+  "box": "container",
+  "find": "text",
+  "text": "<working sentence>",
+  "within": "What is working",
+  "nth": 2
+ },
+ {
+  "screen": "history-insights",
+  "element": "Worth knowing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.51
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). 'Worth knowing''s sentence (subheadline); drawn only when the week has one.",
+  "designLine": 2370,
+  "box": "container",
+  "find": "text",
+  "text": "<worth-knowing sentence>",
+  "within": "Worth knowing",
+  "nth": 2
+ },
+ {
+  "screen": "history-insights",
+  "element": "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.89
+  },
+  "note": "The insights walk (27.0, set A's step 4), the ring-around-ink tool (2–6 pt). The footer on its .frosted pane (footnote, white, a lock glyph), one combined element. When Apple's model wrote the page it reads 'Written by Apple's on-device model from your own figures, on your iPhone. Not medical advice.'",
+  "designLine": 2371,
+  "box": "container",
+  "find": "text",
+  "text": "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice.",
+  "within": "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice."
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.66
+  },
+  "note": "One finish's stage 4 re-read of the lead pane after its restyle, clean ground beside each ink (27.0). 'The one thing': 4.66 above it, 4.86 below, 6.44 beside — recorded is the worst; the brightest ground is the glass's own top-left light, not the rim.",
+  "designLine": 2598,
+  "box": "container",
+  "find": "text",
+  "text": "The one thing",
+  "within": "The one thing"
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.42
+  },
+  "note": "One finish's stage 4 re-read of the lead pane after its restyle, clean ground beside each ink (27.0). The week's range.",
+  "designLine": 2599,
+  "box": "container",
+  "find": "text",
+  "text": "<week range>",
+  "within": "The one thing",
+  "nth": 2
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.26
+  },
+  "note": "One finish's stage 4 re-read of the lead pane after its restyle, clean ground beside each ink (27.0). The label's sparkles glyph (0.9): 4.26 on the pane's left margin, 4.51 below.",
+  "designLine": 2600,
+  "box": "container",
+  "find": "white",
+  "within": "The one thing",
+  "withinIndex": 2,
+  "withinOffset": [
+   -22,
+   -3,
+   20,
+   22
+  ],
+  "textToo": true
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.16
+  },
+  "note": "One finish's stage 4 re-read of the lead pane after its restyle, clean ground beside each ink (27.0). The headline (title2 heavy, large text): 5.16 on the left margin, 8.38 beside its lines' ends.",
+  "designLine": 2601,
+  "box": "container",
+  "find": "text",
+  "text": "<headline>",
+  "within": "The one thing",
+  "nth": 3
+ },
+ {
+  "screen": "history-insights",
+  "element": "The one thing",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.09
+  },
+  "note": "One finish's stage 4 re-read of the lead pane after its restyle, clean ground beside each ink (27.0). The detail (body): 6.09 on the left margin, 8.46 beside.",
+  "designLine": 2602,
+  "box": "container",
+  "find": "text",
+  "text": "<detail>",
+  "within": "The one thing",
+  "nth": 5
+ },
+ {
+  "screen": "paywall",
+  "element": "WaterBuddy Premium",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.2
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The title on the aurora (largeTitle heavy, two shadows), a heading: top 3.20 · end 6.52. Settings' Premium card title under the sheet shares the label; the sheet is later in the walk.",
+  "designLine": 2196,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "paywall",
+  "element": "WaterBuddy Premium",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.2
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The title on clean ground (10–14 pt): top 3.20 · end 4.07.",
+  "designLine": 2196,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "paywall",
+  "element": "See how you really drink, and what would help.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.77
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The subtitle (body, full white) on the feature card: top 4.77 · end 4.98.",
+  "designLine": 2197,
+  "box": "own",
+  "find": "frame"
+ },
+ {
+  "screen": "paywall",
+  "element": "Month view and full history, Every day you have logged, a month at a glance",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.28
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's title (subheadline bold); each row is one combined element 'title, line'. Worst of set A's four rows (the only ones then): top 6.28 · end 6.35.",
+  "designLine": 2198,
+  "box": "container",
+  "find": "text",
+  "text": "Month view and full history",
+  "within": "Month view and full history, Every day you have logged, a month at a glance"
+ },
+ {
+  "screen": "paywall",
+  "element": "Month view and full history, Every day you have logged, a month at a glance",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.92
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's line (footnote, 0.92). Worst of four: top 5.94 · end 5.92.",
+  "designLine": 2199,
+  "box": "container",
+  "find": "text",
+  "text": "Every day you have logged, a month at a glance",
+  "within": "Month view and full history, Every day you have logged, a month at a glance"
+ },
+ {
+  "screen": "paywall",
+  "element": "Month view and full history, Every day you have logged, a month at a glance",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.35
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The row's calendar glyph in the accent: top · end 3.41 · 3.35.",
+  "designLine": 2201,
+  "box": "container",
+  "find": "accent",
+  "within": "Month view and full history, Every day you have logged, a month at a glance"
+ },
+ {
+  "screen": "paywall",
+  "element": "Your patterns, When you drink, weekdays against weekends",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.28
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's title (subheadline bold); each row is one combined element 'title, line'. Worst of set A's four rows (the only ones then): top 6.28 · end 6.35.",
+  "designLine": 2198,
+  "box": "container",
+  "find": "text",
+  "text": "Your patterns",
+  "within": "Your patterns, When you drink, weekdays against weekends"
+ },
+ {
+  "screen": "paywall",
+  "element": "Your patterns, When you drink, weekdays against weekends",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.92
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's line (footnote, 0.92). Worst of four: top 5.94 · end 5.92.",
+  "designLine": 2199,
+  "box": "container",
+  "find": "text",
+  "text": "When you drink, weekdays against weekends",
+  "within": "Your patterns, When you drink, weekdays against weekends"
+ },
+ {
+  "screen": "paywall",
+  "element": "Your patterns, When you drink, weekdays against weekends",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.84
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The row's chart.bar.fill glyph in the accent: top · end 4.26 · 3.84.",
+  "designLine": 2201,
+  "box": "container",
+  "find": "accent",
+  "within": "Your patterns, When you drink, weekdays against weekends"
+ },
+ {
+  "screen": "paywall",
+  "element": "Personal insights, Each week, from your own figures, on your iPhone",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.28
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's title (subheadline bold); each row is one combined element 'title, line'. Worst of set A's four rows (the only ones then): top 6.28 · end 6.35.",
+  "designLine": 2198,
+  "box": "container",
+  "find": "text",
+  "text": "Personal insights",
+  "within": "Personal insights, Each week, from your own figures, on your iPhone"
+ },
+ {
+  "screen": "paywall",
+  "element": "Personal insights, Each week, from your own figures, on your iPhone",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.92
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's line (footnote, 0.92). Worst of four: top 5.94 · end 5.92.",
+  "designLine": 2199,
+  "box": "container",
+  "find": "text",
+  "text": "Each week, from your own figures, on your iPhone",
+  "within": "Personal insights, Each week, from your own figures, on your iPhone"
+ },
+ {
+  "screen": "paywall",
+  "element": "Personal insights, Each week, from your own figures, on your iPhone",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.37
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The row's sparkles glyph in the accent: top · end 5.21 · 4.37.",
+  "designLine": 2201,
+  "box": "container",
+  "find": "accent",
+  "within": "Personal insights, Each week, from your own figures, on your iPhone"
+ },
+ {
+  "screen": "paywall",
+  "element": "A monthly recap, Your month in one card, yours to share",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.28
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's title (subheadline bold); each row is one combined element 'title, line'. Worst of set A's four rows (the only ones then): top 6.28 · end 6.35.",
+  "designLine": 2198,
+  "box": "container",
+  "find": "text",
+  "text": "A monthly recap",
+  "within": "A monthly recap, Your month in one card, yours to share"
+ },
+ {
+  "screen": "paywall",
+  "element": "A monthly recap, Your month in one card, yours to share",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.92
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. A feature row's line (footnote, 0.92). Worst of four: top 5.94 · end 5.92.",
+  "designLine": 2199,
+  "box": "container",
+  "find": "text",
+  "text": "Your month in one card, yours to share",
+  "within": "A monthly recap, Your month in one card, yours to share"
+ },
+ {
+  "screen": "paywall",
+  "element": "A monthly recap, Your month in one card, yours to share",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.7
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The row's doc.text.image glyph in the accent: top · end 5.56 · 4.70.",
+  "designLine": 2201,
+  "box": "container",
+  "find": "accent",
+  "within": "A monthly recap, Your month in one card, yours to share"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "New Premium features arrive in updates, included.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.68
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The included line (footnote semibold, 0.92): top 7.68 · end 7.78. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2200,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Yearly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.61
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. BEST VALUE (caption2 heavy, uppercase) on the selected yearly tile, hidden inside the tile's button: top 4.63 · end 4.61. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2202,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Monthly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.65
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Monthly tile's name (subheadline bold); each tile is one button (label the name, value the price line): top · end 6.86 · 6.65. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2203,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Yearly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.25
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Yearly tile's name (subheadline bold); each tile is one button (label the name, value the price line): top · end 5.28 · 5.25. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2203,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Lifetime",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.0
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Lifetime tile's name (subheadline bold); each tile is one button (label the name, value the price line): top · end 6.00 · 6.28. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2203,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Monthly",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.27
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Monthly tile's price $2.99 (title2 heavy, large): top · end 8.44 · 8.27. The lifetime's price was not given. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2204,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Yearly",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.36
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Yearly tile's price $19.99 (title2 heavy, large): top · end 6.36 · 6.43. The lifetime's price was not given. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2204,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Monthly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.46
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Monthly tile's line 'a month' (caption, 0.92): top · end 8.49 · 8.46. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2205,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Monthly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.43
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Monthly tile's line 'Cancel any time' (caption, 0.92): top · end 8.73 · 8.43. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2205,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Yearly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.51
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Yearly tile's line 'a year' (caption, 0.92): top · end 6.53 · 6.51. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2206,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Yearly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.63
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Yearly tile's line 'save 20%' (caption, 0.92): top · end 6.89 · 6.63. The saving now drawn follows the StoreKit prices (about 44 % at $2.99 / $19.99). With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2206,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Yearly",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.51
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Yearly tile's line '1 week free' (caption, 0.92): top · end 6.94 · 6.51. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2206,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Lifetime",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.49
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Lifetime tile's line 'once' (caption, 0.92): top · end 7.60 · 7.49. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2207,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Lifetime",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.67
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The Lifetime tile's line 'Yours for good' (caption, 0.92): top · end 7.97 · 7.67. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2207,
+  "box": "container"
+ },
+ {
+  "screen": "paywall",
+  "element": "Not now",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.33
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The close button's ✕ (17/44 of its .sheer circle); the button is 'Not now'.",
+  "designLine": 2208,
+  "box": "container",
+  "find": "white",
+  "within": "Not now",
+  "withinOffset": [
+   12,
+   12,
+   20,
+   20
+  ],
+  "textToo": true
+ },
+ {
+  "screen": "paywall",
+  "element": "Logging water is free, always.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.9
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The promise (footnote semibold) on its .frosted capsule beside the close button; one Label element.",
+  "designLine": 2208,
+  "box": "container",
+  "find": "text",
+  "text": "Logging water is free, always.",
+  "within": "Logging water is free, always.",
+  "rects": [
+   [
+    10,
+    -5,
+    170,
+    3
+   ],
+   [
+    194,
+    3,
+    4,
+    11
+   ]
+  ]
+ },
+ {
+  "screen": "paywall",
+  "element": "Logging water is free, always.",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.98
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The promise's white check.",
+  "designLine": 2208,
+  "box": "container",
+  "find": "white",
+  "within": "Not now",
+  "withinOffset": [
+   130,
+   12,
+   25,
+   22
+  ],
+  "textToo": true,
+  "largest": true,
+  "runtimes": [
+   "27.0",
+   "26.5"
+  ]
+ },
+ {
+  "screen": "paywall",
+  "element": "Logging water is free, always.",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The promise's white check.",
+  "designLine": 2208,
+  "box": "container",
+  "find": "white",
+  "within": "Not now",
+  "withinOffset": [
+   123,
+   12,
+   23,
+   22
+  ],
+  "textToo": true,
+  "largest": true,
+  "runtimes": [
+   "18.6"
+  ]
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Free trial: 1 week. Then $19.99 is charged each year until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 4.65
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The terms under the buy button, on the aurora (footnote, 0.88, two shadows; a full-width frame). The label is the chosen plan's terms — the yearly with its free week, the default (no trial: '$19.99 is charged each year …'; monthly and lifetime read otherwise). With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2209,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Free trial: 1 week. Then $19.99 is charged each year until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.66
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The terms under the buy button, on the aurora (footnote, 0.88, two shadows; a full-width frame). The label is the chosen plan's terms — the yearly with its free week, the default (no trial: '$19.99 is charged each year …'; monthly and lifetime read otherwise). With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2209,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Restore Purchases",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.15
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The footer's 'Restore Purchases' on the aurora (footnote semibold, 0.92, two shadows; a 44-pt frame). One figure for the footer. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2210,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Restore Purchases",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.05
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The footer's 'Restore Purchases' on the aurora (footnote semibold, 0.92, two shadows; a 44-pt frame). One figure for the footer. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2210,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Terms of Use",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.15
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The footer's 'Terms of Use' on the aurora (footnote semibold, 0.92, two shadows; a 44-pt frame). One figure for the footer. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2210,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Terms of Use",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.05
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The footer's 'Terms of Use' on the aurora (footnote semibold, 0.92, two shadows; a 44-pt frame). One figure for the footer. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2210,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Privacy Policy",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.15
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The footer's 'Privacy Policy' on the aurora (footnote semibold, 0.92, two shadows; a 44-pt frame). One figure for the footer. Settings' own 'Privacy Policy' link under the sheet shares the label. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2210,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-end",
+  "element": "Privacy Policy",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.05
+  },
+  "note": "The paywall walk (27.0), a ring 2–6 pt round the ink; recorded is the worse of the sheet's top · end where the doc gives both. The footer's 'Privacy Policy' on the aurora (footnote semibold, 0.92, two shadows; a 44-pt frame). One figure for the footer. Settings' own 'Privacy Policy' link under the sheet shares the label. With eleven feature rows in a DEBUG paywall this sits below the sheet's fold; the census holds the sheet's top, hence 'paywall-end'.",
+  "designLine": 2210,
+  "box": "own"
+ },
+ {
+  "screen": "paywall-held",
+  "element": "You have Premium., Lifetime",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.61
+  },
+  "note": "The paywall's held card, as a holder opening the paywall sees it — one combined element, 'You have Premium.' and the plan's line ('Lifetime' for the census's lifetime holder). One finish's stage 2, clean ground, two frames only. The title (largeTitle heavy): 7.43 above the words, 6.61 beside it.",
+  "designLine": 2583,
+  "box": "container"
+ },
+ {
+  "screen": "paywall-held",
+  "element": "You have Premium., Lifetime",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.5
+  },
+  "note": "The paywall's held card, as a holder opening the paywall sees it — one combined element, 'You have Premium.' and the plan's line ('Lifetime' for the census's lifetime holder). One finish's stage 2, clean ground, two frames only. The plan's line (subheadline, 0.92): 9.50 beside it.",
+  "designLine": 2583,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.35
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The card's month name (footnote heavy, uppercase) in the accent on Aurora.gradient; ru 7.36.",
+  "designLine": 2415,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.86,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.86
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The card's 'WaterBuddy' mark (caption bold, 0.86).",
+  "designLine": 2416,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 12.43
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The hero '23/30' (largeTitle heavy rounded).",
+  "designLine": 2416,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 12.17
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. 'Days on goal' (headline).",
+  "designLine": 2416,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.16
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The 'This month' tile's figure in litres (title3 heavy rounded). In force: the like-for-like re-read after #182 gave the tiles RecapCard.tileBase (tileBase, en); the first table's 12.03 / 9.34 (L2417) came from another month and tool.",
+  "designLine": 2460,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.86,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.49
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The 'This month' tile's label (footnote, 0.86). In force: the like-for-like re-read after #182 gave the tiles RecapCard.tileBase (tileBase, en); the first table's 12.03 / 9.34 (L2417) came from another month and tool.",
+  "designLine": 2460,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.64
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The 'A day, on average' tile's figure. In force: the like-for-like re-read after #182 gave the tiles RecapCard.tileBase (tileBase, en); the first table's 12.03 / 9.34 (L2417) came from another month and tool.",
+  "designLine": 2461,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.86,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.74
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The 'A day, on average' tile's label (footnote, 0.86). In force: the like-for-like re-read after #182 gave the tiles RecapCard.tileBase (tileBase, en); the first table's 12.03 / 9.34 (L2417) came from another month and tool.",
+  "designLine": 2461,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 10.2
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The change line (subheadline bold).",
+  "designLine": 2418,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.79
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The change line's glyph in the accent.",
+  "designLine": 2418,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.67
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. A met day's dot in the accent.",
+  "designLine": 2419,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.4,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.1
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. An unmet day's ring (white 0.4, 2 pt) — 0.10 over its floor.",
+  "designLine": 2419,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.91
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. Premium's rim (the accent, second and first lights) against the shared image's Aurora.top margin — read off the rendered PNG, not the screen.",
+  "designLine": 2420,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Monthly recap",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.6
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The sheet's heading on the aurora (title2 bold, large text, two shadows); one frame (#177's caveat). The card element shares the label and is later in the walk, so the frames map may hold the card's frame.",
+  "designLine": 2421,
+  "box": "own"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Best streak, <n> days, Stays in the app, not on the image",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.57
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The best streak's pane, one combined element: 'Best streak' (subheadline bold).",
+  "designLine": 2422,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Best streak, <n> days, Stays in the app, not on the image",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.84
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. Its days, e.g. '12 days' (subheadline bold).",
+  "designLine": 2422,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Best streak, <n> days, Stays in the app, not on the image",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.04
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. Its footnote 'Stays in the app, not on the image' (footnote, 0.9).",
+  "designLine": 2422,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Share as an image",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "rendered",
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 11.45
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The primary surface: its Aurora.top label on white.",
+  "designLine": 2423,
+  "box": "container"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "The image leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.18
+  },
+  "note": "The recap sheet's note on its .frosted pane at the sheet's foot, where One finish's stage 3 moved it: 5.18–5.37 over 22 frames in English, 5.28 in Russian. The Text carries its own pane, so its frame is the pane. The first table's 6.33 (L2424) is of its old place. Clean ground assumed — the method is not restated there; the export card's, the same stage's, is clean.",
+  "designLine": 2587,
+  "box": "own"
+ },
+ {
+  "screen": "recap-sheet",
+  "element": "Done",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 9.89
+  },
+  "note": "The recap sheet (27.0), opened from History's recap row; one frame a state, a box per element split by Otsu's threshold. The card is one element labelled 'Monthly recap' — so are the sheet's heading and History's row under the sheet. The close button's ✕ on its .sheer circle; the button is 'Done'.",
+  "designLine": 2424,
+  "box": "container"
+ },
+ {
+  "screen": "schedule-sheet",
+  "element": "Friday",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.87
+  },
+  "note": "The schedule sheet (Settings' 'Schedule' row, Premium), off one screenshot (27.0): the letter's brightest strokes against the disc's glass at its lower quartile. Each day is a 44-pt .sheer disc button labelled with the weekday's full name. Friday, keeping its reminders: a bold white letter on Selection's mark.",
+  "designLine": 2504,
+  "box": "container"
+ },
+ {
+  "screen": "schedule-sheet",
+  "element": "Sunday",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 8.1
+  },
+  "note": "The schedule sheet (Settings' 'Schedule' row, Premium), off one screenshot (27.0): the letter's brightest strokes against the disc's glass at its lower quartile. Each day is a 44-pt .sheer disc button labelled with the weekday's full name. Sunday, keeping its reminders.",
+  "designLine": 2504,
+  "box": "container"
+ },
+ {
+  "screen": "schedule-sheet",
+  "element": "Saturday",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.7,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.68
+  },
+  "note": "The schedule sheet (Settings' 'Schedule' row, Premium), off one screenshot (27.0): the letter's brightest strokes against the disc's glass at its lower quartile. Each day is a 44-pt .sheer disc button labelled with the weekday's full name. A quiet day's letter at white 0.7, no mark — Saturday set quiet in the walk; the standard schedule has no quiet day.",
+  "designLine": 2505,
+  "box": "container"
+ },
+ {
+  "screen": "schedule-sheet",
+  "element": "First reminder",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.93
+  },
+  "note": "The schedule sheet (27.0), off the walk's screenshot: the 'First reminder' hour row's white title and hour (their brightest 5 %) against the bare glass between them, its brightest pixel (9.27 at the median). One control per row (value the hour).",
+  "designLine": 2517,
+  "box": "container"
+ },
+ {
+  "screen": "schedule-sheet",
+  "element": "Last reminder",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.6
+  },
+  "note": "The schedule sheet (27.0): the 'Last reminder' hour row's title and hour against the bare glass (8.81 at the median).",
+  "designLine": 2518,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "<N> servings, <first – last date>, WaterBuddy-<yyyy-MM-dd>.csv, Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.92
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The card is one element whose label speaks the count, the dates, the file's name and the note. The figure (52 pt heavy rounded), on the card's lit corner.",
+  "designLine": 2542,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "<N> servings, <first – last date>, WaterBuddy-<yyyy-MM-dd>.csv, Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.79
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The card is one element whose label speaks the count, the dates, the file's name and the note. 'Servings in this file' (headline).",
+  "designLine": 2543,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "<N> servings, <first – last date>, WaterBuddy-<yyyy-MM-dd>.csv, Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.56
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The card is one element whose label speaks the count, the dates, the file's name and the note. The dates (subheadline).",
+  "designLine": 2544,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "<N> servings, <first – last date>, WaterBuddy-<yyyy-MM-dd>.csv, Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.39
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The card is one element whose label speaks the count, the dates, the file's name and the note. The file's first rows (monospaced footnote).",
+  "designLine": 2545,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "<N> servings, <first – last date>, WaterBuddy-<yyyy-MM-dd>.csv, Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.1
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The card is one element whose label speaks the count, the dates, the file's name and the note. 'and N more' (footnote semibold).",
+  "designLine": 2546,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "<N> servings, <first – last date>, WaterBuddy-<yyyy-MM-dd>.csv, Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.41
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The card is one element whose label speaks the count, the dates, the file's name and the note. The note (footnote).",
+  "designLine": 2547,
+  "box": "container"
+ },
+ {
+  "screen": "export-sheet",
+  "element": "Export your servings",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.99
+  },
+  "note": "The export sheet (Settings' 'Export your servings', Premium), 22 frames over a minute (27.0), white's worst pixel on clean ground beside each part, no shadow counted. The sheet's heading on the aurora (title2 bold, two shadows), sampled beside it and not under its first letters. Settings' card under the sheet shares the label.",
+  "designLine": 2548,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-hello",
+  "element": "Welcome to, WaterBuddy",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.83,
+   "26.5": 5.83,
+   "18.6": 5.89
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. 'Welcome to' (title2 semibold, 0.92); the greeting is one combined heading.",
+  "designLine": 1987,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-hello",
+  "element": "Welcome to, WaterBuddy",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.3,
+   "26.5": 6.3,
+   "18.6": 6.36
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. 'WaterBuddy' (42 pt heavy).",
+  "designLine": 1987,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-hello",
+  "element": "One tap logs a glass. Watch your day fill up.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.76,
+   "26.5": 4.76,
+   "18.6": 4.76
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). Hello's line on the aurora (body, 0.92, two shadows), clean ground 10–14 pt.",
+  "designLine": 1988,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-hello",
+  "element": "Step 1 of 4",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.19,
+   "26.5": 7.19,
+   "18.6": 6.96
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. The bar's current dot (white, 22 × 8); the dots are one element 'Step N of 4' on every step.",
+  "designLine": 1989,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-hello",
+  "element": "Step 1 of 4",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.6,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 3.66,
+   "26.5": 3.66,
+   "18.6": 3.57
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. An inactive dot (white 0.6).",
+  "designLine": 1989,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Daily goal",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.94,
+   "26.5": 6.99,
+   "18.6": 6.72
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. The step's title 'Daily goal' (largeTitle bold, two shadows), a heading. One figure for the steps' titles (the worst). The goal figure's element is also 'Daily goal', later in the walk.",
+  "designLine": 1990,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "Quick-add vessels",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.94,
+   "26.5": 6.99,
+   "18.6": 6.72
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. The step's title 'Quick-add vessels' (largeTitle bold, two shadows), a heading. One figure for the steps' titles (the worst).",
+  "designLine": 1990,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "Reminders",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 6.94,
+   "26.5": 6.99,
+   "18.6": 6.72
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. The step's title 'Reminders' (largeTitle bold, two shadows), a heading. One figure for the steps' titles (the worst).",
+  "designLine": 1990,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "How much water do you want to drink each day?",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.13,
+   "26.5": 6.56,
+   "18.6": 5.02
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The goal card's opening line (body, full white).",
+  "designLine": 1991,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Daily goal",
+  "kind": "text",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.06,
+   "26.5": 9.83,
+   "18.6": 7.04
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The goal's figure (60 pt bold rounded); figure and 'ml' are one element 'Daily goal'.",
+  "designLine": 1992,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Daily goal",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.9,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.48,
+   "26.5": 10.28,
+   "18.6": 7.68
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The goal's 'ml' (22/60 of the figure, bold, 0.9; the doc holds it to 4.5).",
+  "designLine": 1992,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "1,000",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.63,
+   "26.5": 9.02,
+   "18.6": 6.79
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The slider's left range label (footnote semibold, 0.88). Hidden (the slider 'Daily water goal' speaks it); label is the drawn text.",
+  "designLine": 1993,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "4,000",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.2,
+   "26.5": 9.82,
+   "18.6": 7.32
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The slider's right range label (footnote semibold, 0.88). Hidden (the slider 'Daily water goal' speaks it); label is the drawn text.",
+  "designLine": 1993,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "You can change this later in Settings.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.95,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.91,
+   "26.5": 4.91,
+   "18.6": 6.11
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). The footnote under the goal card, on the aurora (footnote, 0.95, two shadows).",
+  "designLine": 1994,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Work it out for me",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.83,
+   "26.5": 4.92,
+   "18.6": 6.32
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. 'Work it out for me' (body semibold), the calculator's row on its .frosted pane; the row is a button.",
+  "designLine": 1995,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Work it out for me",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.74,
+   "26.5": 6.58,
+   "18.6": 5.3
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The sparkle after the words, in the accent.",
+  "designLine": 1995,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Work it out for me",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.0,
+   "26.5": 10.44,
+   "18.6": 8.33
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The row's chevron (white 0.92).",
+  "designLine": 1996,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal",
+  "element": "Back",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.88,
+   "26.5": 11.8,
+   "18.6": 8.29
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. 'Back' (headline) on its .sheer glass in the bar; the button's frame is the glass.",
+  "designLine": 1996,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "How active are you?",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 9.31,
+   "26.5": 12.53,
+   "18.6": 9.13
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). The activity column's heading (subheadline semibold).",
+  "designLine": 1997,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Light, Mostly sitting",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.97,
+   "26.5": 10.37,
+   "18.6": 7.76
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). An activity's name (subheadline; bold when chosen); each level is one button 'name, line'. Worst of the three.",
+  "designLine": 1998,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Light, Mostly sitting",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.01,
+   "26.5": 9.19,
+   "18.6": 6.92
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). An activity's line (caption medium; 0.92 when chosen, 0.88 otherwise — 0.88 here, Moderate being the default). Worst of the three.",
+  "designLine": 1998,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Moderate, Exercise some days",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.97,
+   "26.5": 10.37,
+   "18.6": 7.76
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). An activity's name (subheadline; bold when chosen); each level is one button 'name, line'. Worst of the three.",
+  "designLine": 1998,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Moderate, Exercise some days",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.01,
+   "26.5": 9.19,
+   "18.6": 6.92
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). An activity's line (caption medium; 0.92 when chosen, 0.88 otherwise — 0.92 here, Moderate being the default). Worst of the three.",
+  "designLine": 1998,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Active, Exercise most days",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.97,
+   "26.5": 10.37,
+   "18.6": 7.76
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). An activity's name (subheadline; bold when chosen); each level is one button 'name, line'. Worst of the three.",
+  "designLine": 1998,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Active, Exercise most days",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.01,
+   "26.5": 9.19,
+   "18.6": 6.92
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). An activity's line (caption medium; 0.92 when chosen, 0.88 otherwise — 0.88 here, Moderate being the default). Worst of the three.",
+  "designLine": 1998,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "kg",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.1,
+   "26.5": 10.14,
+   "18.6": 7.68
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). 'kg', picked (subheadline bold, white) on Selection's mark.",
+  "designLine": 1999,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "lb",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.87,
+   "26.5": 10.24,
+   "18.6": 7.86
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). 'lb', not picked (0.88).",
+  "designLine": 1999,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Use <n> millilitres",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.8,
+   "26.5": 12.09,
+   "18.6": 8.29
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). 'Use N ml' (body bold) on .sheer glass, labelled 'Use N millilitres' — drawn while the suggestion differs from the goal.",
+  "designLine": 2000,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "A starting point, not medical advice.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.45,
+   "26.5": 9.91,
+   "18.6": 7.71
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). The disclaimer (footnote, 0.88).",
+  "designLine": 2000,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Your goal is <n> ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.17,
+   "26.5": 10.9,
+   "18.6": 8.02
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). 'Your goal is N ml' (body semibold, 0.92), drawn once the goal is the suggestion; one combined element.",
+  "designLine": 2001,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-goal-calculator",
+  "element": "Your goal is <n> ml",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.04,
+   "26.5": 7.7,
+   "18.6": 5.75
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The calculator, open (tap 'Work it out for me'). Its check in the accent.",
+  "designLine": 2001,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "Home pours these in one tap. Set each to what yours holds.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.95,
+   "26.5": 6.29,
+   "18.6": 4.89
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The vessels card's opening line (body, full white).",
+  "designLine": 2002,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "(hidden) the name 'Cup' in the row above the 'Cup' slider",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.2,
+   "26.5": 8.42,
+   "18.6": 6.18
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The rows are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Cup's name (body medium).",
+  "designLine": 2003,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "150 ml",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.66,
+   "26.5": 12.09,
+   "18.6": 8.65
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The rows are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Cup's amount (body bold rounded); label is the drawn text.",
+  "designLine": 2003,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "(hidden) Cup's glyph, above the 'Cup' slider",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.28,
+   "26.5": 4.39,
+   "18.6": 3.25
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The rows are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Cup's glyph in the accent.",
+  "designLine": 2004,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "(hidden) Glass's glyph, above the 'Glass' slider",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.08,
+   "26.5": 5.67,
+   "18.6": 4.16
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The rows are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Glass's glyph in the accent.",
+  "designLine": 2004,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "(hidden) Bottle's glyph, above the 'Bottle' slider",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.78,
+   "26.5": 6.64,
+   "18.6": 4.88
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The rows are hidden from VoiceOver; each slider, labelled with the vessel's name, speaks them. Bottle's glyph in the accent.",
+  "designLine": 2004,
+  "box": "hidden"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "The Glass is the one your widget, Siri and Control Center log.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.9,
+   "26.5": 10.56,
+   "18.6": 8.02
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The Glass note at the vessels card's foot (subheadline, 0.92) — the welcome keeps these words.",
+  "designLine": 2005,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-vessels",
+  "element": "You can change these later in Settings.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.95,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 5.8,
+   "26.5": 5.75,
+   "18.6": 6.39
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. The footnote under the vessels card (footnote, 0.95, two shadows).",
+  "designLine": 2005,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "A gentle nudge when it has been a while.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.84,
+   "26.5": 4.92,
+   "18.6": 5.22
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). The reminders step's line under its title, on the aurora (body, full white, two shadows), clean ground 10–14 pt.",
+  "designLine": 2006,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "WaterBuddy, now, Time for water, A glass now keeps you on track for the day.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.45,
+   "26.5": 7.05,
+   "18.6": 5.44
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The notification preview on its .frosted pane, one combined element: 'WaterBuddy' (footnote semibold, 0.88).",
+  "designLine": 2007,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "WaterBuddy, now, Time for water, A glass now keeps you on track for the day.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.88,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 7.62,
+   "26.5": 10.04,
+   "18.6": 7.63
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The notification preview on its .frosted pane, one combined element: 'now' (footnote semibold, 0.88).",
+  "designLine": 2007,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "WaterBuddy, now, Time for water, A glass now keeps you on track for the day.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.49,
+   "26.5": 11.93,
+   "18.6": 8.82
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The notification preview on its .frosted pane, one combined element: the title 'Time for water' (subheadline bold).",
+  "designLine": 2007,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "WaterBuddy, now, Time for water, A glass now keeps you on track for the day.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 6.19,
+   "26.5": 8.48,
+   "18.6": 6.61
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The notification preview on its .frosted pane, one combined element: the body (subheadline, 0.92).",
+  "designLine": 2007,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "Smart reminders",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 1.0,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 4.93,
+   "26.5": 6.36,
+   "18.6": 4.91
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The schedule card's title (body semibold).",
+  "designLine": 2008,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day.",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 8.0,
+   "26.5": 10.08,
+   "18.6": 7.75
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The schedule sentence (subheadline, 0.92).",
+  "designLine": 2008,
+  "box": "own"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "9 AM, 11 AM, 1 PM, 3 PM, 5 PM, 7 PM, and 9 PM",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 5.78,
+   "26.5": 7.6,
+   "18.6": 6.26
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The seven bells over their hours, one element labelled with the hours as a list (en_US, U+202F before AM/PM — an assumption; a 24-hour region reads '9, 11, 13, …'). A bell's hour (caption semibold, 0.92), the worst.",
+  "designLine": 2009,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "9 AM, 11 AM, 1 PM, 3 PM, 5 PM, 7 PM, and 9 PM",
+  "kind": "mark",
+  "floor": 3,
+  "ink": "rendered",
+  "yardstick": "clean",
+  "recorded": {
+   "27.0": 3.72,
+   "26.5": 5.36,
+   "18.6": 4.53
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On a pane: clean ground, as 'As Settings, measured' implies — the band's distance is not stated. The seven bells over their hours, one element labelled with the hours as a list (en_US, U+202F before AM/PM — an assumption; a 24-hour region reads '9, 11, 13, …'). A bell in the accent on its .frosted disc.",
+  "designLine": 2009,
+  "box": "container"
+ },
+ {
+  "screen": "welcome-reminders",
+  "element": "Not now",
+  "kind": "text",
+  "floor": 4.5,
+  "ink": "white",
+  "inkOpacity": 0.92,
+  "yardstick": "beside",
+  "recorded": {
+   "27.0": 7.36,
+   "26.5": 7.36,
+   "18.6": 7.25
+  },
+  "note": "The welcome (Welcome, measured, final source, a minute a system). On the aurora with no 'clean ground' mark: taken as beside its glyphs (2–6 pt), as the paywall's later 'As Welcome' table states its default — the welcome's own table does not say. 'Not now' (headline, 0.92, two shadows) under the bar's buttons; a 44-pt button.",
+  "designLine": 2010,
+  "box": "container"
+ }
+]

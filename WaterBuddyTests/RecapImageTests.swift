@@ -60,28 +60,37 @@ struct RecapImageTests {
         #expect(plain.size == huge.size)
     }
 
-    /// Known issue #182: the tiles' fill is derived from History's own pane — Apple's regular glass tinted
-    /// Aurora's `top` — read live on iOS 27.0 over the card's gradient (spec
-    /// `2026-10-24-finish-set-a-design.md` §2.4). Drawn through the hand-made sheer stack, with the scrim
-    /// and the tint the stack itself declares, it gives that glass back at both ends of the gradient. A
-    /// fill retuned by eye fails this, and so does a change to the stack the derivation rests on.
-    @Test func theTilesFillGivesBackTheAppsOwnGlass() {
-        let scrim = LiquidGlass.scrim(density: .sheer, scheme: .dark, base: RecapCard.tileBase(for: .aurora), onPhone: true,
-                                      theme: .aurora)
+    /// The ground, then the live glass over it, sRGB of 255 — the probe's top and bottom `.frosted` panes on iOS 27.0,
+    /// over the theme's own gradient: Aurora's of 2026-10-25, the other four's of 2026-11-23 (`docs/DESIGN.md`, *The
+    /// recap, measured* and *Themes, measured*).
+    private static func measured(_ theme: AppTheme) -> [(ground: [Double], glass: [Double])] {
+        switch theme {
+        case .aurora: [([30, 34, 137], [28, 45, 154]), ([83, 28, 155], [50, 41, 160])]
+        case .lagoon: [([2, 45, 70], [13, 54, 84]), ([1, 63, 81], [11, 60, 86])]
+        case .dusk: [([57, 14, 53], [64, 24, 67]), ([95, 22, 56], [79, 26, 67])]
+        case .midnight: [([14, 17, 28], [25, 27, 39]), ([25, 27, 42], [29, 31, 44])]
+        case .bloom: [([60, 9, 55], [71, 21, 66]), ([84, 14, 79], [80, 22, 75])]
+        }
+    }
+
+    /// Known issue #182: the tiles' fill is derived from History's own pane — Apple's regular glass tinted the
+    /// theme's `top` — read live on iOS 27.0 over the card's gradient (spec `2026-10-24-finish-set-a-design.md`
+    /// §2.4; set C's §3.5, each theme fitted as Aurora's was). Drawn through the hand-made sheer stack, with the
+    /// scrim and the tint the stack itself declares, it gives that glass back at both ends of the gradient. A fill
+    /// retuned by eye fails this, and so does a change to the stack the derivation rests on.
+    @Test(arguments: AppTheme.allCases)
+    func theTilesFillGivesBackTheAppsOwnGlass(_ theme: AppTheme) {
+        let scrim = LiquidGlass.scrim(density: .sheer, scheme: .dark, base: RecapCard.tileBase(for: theme), onPhone: true,
+                                      theme: theme)
         let tint = LiquidGlass.Density.sheer.tintOpacity(for: .dark)
         #expect(scrim.color == .black, "the derivation takes the flat base's black scrim")
-        let fill = RecapCard.tileFill(for: .aurora)
-        // The ground, then the live glass over it, sRGB of 255 — the probe's top and bottom panes.
-        let measured: [(ground: [Double], glass: [Double])] = [
-            ([30, 34, 137], [28, 45, 154]),
-            ([83, 28, 155], [50, 41, 160]),
-        ]
-        for (ground, glass) in measured {
+        let fill = RecapCard.tileFill(for: theme)
+        for (ground, glass) in Self.measured(theme) {
             for (channel, colour) in [fill.red, fill.green, fill.blue].enumerated() {
                 let base = fill.opacity * colour + (1 - fill.opacity) * ground[channel] / 255
                 let drawn = tint + (1 - tint) * (1 - scrim.opacity) * base
                 #expect(abs(drawn * 255 - glass[channel]) <= 2,
-                        "channel \(channel) over \(ground) drew \(drawn * 255), the glass read \(glass[channel])")
+                        "\(theme): channel \(channel) over \(ground) drew \(drawn * 255), the glass read \(glass[channel])")
             }
         }
     }
