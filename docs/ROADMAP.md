@@ -477,6 +477,11 @@ the widgets, the control, the reminder's button and the watch walked in each the
 stores, and each alternate icon's forms from a TestFlight install (`docs/AI_CONTEXT.md` #236, #237).)*
 *(2026-11-25, evening: step 5 committed as `cd5e930` and its records as `7adf2f1`; `main` fast-forwarded to `7adf2f1` by the
 store session at 19:16, on the owner's word, and the build session archived. Not pushed when this was written.)*
+*(2026-11-25, night: `main` pushed as `eca5615`. **Set C's release, 1.4.2 (8), prepared on `release/1.4.2` and staged** — spec
+`docs/superpowers/specs/2026-11-25-release-set-c-design.md`, approved with R1–R5 as recommended: the version, a themes shot in slot
+9, the words in four languages with the Spanish (Mexico) page, the policy's wording. Gated by 01:04 on the 26th and archived on
+the owner's "Yes, fetch profiles", then uploaded to App Store Connect on their "Upload it" (01:08). Waiting: the owner's
+`/commit`, TestFlight (#237) and the device walk (#236), and the submission, each on the owner's word.)*
 
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.

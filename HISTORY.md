@@ -16425,3 +16425,114 @@ No gate: the fast-forward made `main`'s tree the one the build session's final g
 changed after it. This pass printed 148 Swift files in the seven targets, each named in *Files on disk*; 1181 phone `@Test`, 77
 watch and 82 UI `func test`; 153 counted rows equal to `wc -l`; every rule citation resolving. `git worktree list` names this
 checkout alone.
+
+## [2026-11-25] — Release 1.4.2, set C's version: prepared on `release/1.4.2` and staged; the walk, the test runs and the archive wait
+
+### What happened
+
+- **The design.** On the owner's "Go next", after `main` was pushed as `eca5615`, set C's release was written whole —
+  `docs/superpowers/specs/2026-11-25-release-set-c-design.md` — and approved by "Go" with its five rulings as recommended:
+  R1 1.4.2 (8); R2 a themes shot in slot 9, the patterns out; R3 the policy published by me on the owner's word; R4 *WaterBuddy's
+  Home screen*; R5 set C's 37 Russian and Uzbek strings as a table for the owner.
+- **The version:** 1.4.2 (8) on all fourteen sites each, on `release/1.4.2` from `eca5615`.
+- **The shots.** The app's store captures were taken again at 21:21–21:36 (iPhone 18 Pro Max, iOS 27.0), because set C changed
+  Settings' vessels card, which shot 5 shows; a new method, `testCaptureThemesShot`, took `13-themes`, Settings' Appearance card
+  in Lagoon. The ten were framed with *Make it / yours* in slot 9; Insights' two cut-outs were measured again; the 6.3″ set was
+  made; `VerifyScreenshots.sh` passed 35 files.
+- **The words.** The descriptions in four languages gain set C and the 2,000 ml the sliders have offered since set C, where they
+  said 1,000; What's New is written in four; the review notes name set C's rows; the Spanish (Mexico) page has its What's New and
+  joins `VerifyListing.sh`. The policy's sentence is R4's.
+- **R5.** The owner's second "Go" came with no correction: the 37 strings ship as drafted, and #239 is retired.
+- **The walk (#236)** stays the owner's. They declined computer use on Xcode twice; the walk pair is made, *WaterBuddy Walk
+  iPhone* and *WaterBuddy Walk Watch*.
+- **The gate**, on an export of the staged index: the builds and the warning comparison passed; the test runs hung under the
+  Mac's load and wait. **The archive** failed on signing: the profiles on disk lack the one valid identity.
+
+### The rulings
+
+- The capture is `13-themes`, not the spec's `11-themes`, which is the schedule's.
+- The store method's ten app captures were retaken with the themes shot: 1.4's of 2026-11-06 predate set C's Settings card.
+- `CaptureScreenshots.sh`'s steps were run by hand, without its `xcrun simctl shutdown all`: other projects' sessions hold
+  simulators on this Mac.
+- Insights' two cut-outs were measured again on the new capture; the sparkle over *Worth knowing* is the live set's too, and stays.
+- The gate runs on an export of the staged index, so the owner's six unstaged re-saves stay out of it.
+- The gate and the archive run before the walk: TestFlight gives the walk a phone that holds Premium, and #237 in one install.
+- A scratch UI test holding Premium through `SKTestSession` was set aside: rules `70-privacy` and `85-testing`, and the owner's
+  decline.
+- `-allowProvisioningUpdates` waits for the owner's OK: it changes their developer account.
+
+### Files touched
+
+`WaterBuddy.xcodeproj/project.pbxproj`; `WaterBuddyUITests/AppStoreScreenshotUITests.swift`; `Tools/CaptureScreenshots.sh`,
+`Tools/FrameScreenshots.sh`, `Tools/StoreScreenshots.html`, `Tools/VerifyListing.sh`, `Tools/PrivacyPolicy.html`; `PRIVACY.md`;
+`README.md`; `AppStore/README.md`, the en-US, en-GB, Russian and Spanish field files that changed and
+`AppStore/es-MX/whats-new.txt` (new); the eleven captures and both framed sets, `9-patterns.png` removed and `9-themes.png`
+added in each; `docs/superpowers/specs/2026-11-25-release-set-c-design.md` (new); `CLAUDE.md`, `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `tasks/lessons.md` (two entries) and this file.
+
+### Verification
+
+Run: the store capture (both methods passed); `FrameScreenshots.sh`, 10 of 10; `VerifyScreenshots.sh`, 35 files acceptable;
+`VerifyListing.sh`, every field of four listings inside its limit, the U.K. name its one problem (#233); on an export of the
+staged index (tree `6703ad2`), build-for-testing on iOS 27.0 into an empty DerivedData, 20 unique warning lines, the same 20 by
+file and message as a clean build of an `eca5615` export; the phone widget scheme, 17; the watch widget scheme, 17.
+**Not run:** the phone unit tests (two runs hung under load averages of 28–45), the UI suite on 27.0 and 18.6, the watch unit
+tests, the Release archive's checks (the archive failed on signing), and the walk. 148 Swift files; 1181 phone `@Test`, 77 watch,
+83 UI `func test`.
+
+## [2026-11-26] — Release 1.4.2 gated and archived; the upload and the walk wait
+
+### What happened
+
+- **The gate**, finished once the Mac's load fell (23:37–01:04), on the same export of the staged index as the checkpoint
+  above: the phone unit tests, the UI suite on iOS 27.0 and 18.6, and the watch unit tests.
+- **The archive.** On the owner's "Yes, fetch profiles" it ran again with `-allowProvisioningUpdates`, which brought profiles
+  holding the current development certificate, and succeeded. It is read, and not uploaded.
+- **The records** above the checkpoint are brought up to it: `docs/AI_CONTEXT.md`'s *Current state*, #237's note, and
+  `docs/ROADMAP.md`'s note.
+
+### The rulings
+
+- The 18.6 UI groups ran on *WaterBuddy Gate 18.6*, made for them and pinned by UDID: two boots of the by-name iPhone 16 failed
+  while another session's shell waited on that same device. The 18.6 build is unchanged; a simulator build runs on any phone of
+  its runtime.
+- A test that failed in its group was called a load flake only after it passed alone, on the same phone and build.
+
+### Files touched
+
+`docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and this file.
+
+### Verification
+
+On the export of the staged index (tree `6703ad2`):
+- the phone unit tests: 1181 in 129 suites passed;
+- the UI suite on iOS 27.0, iPhone 17: 78 methods, 76 passed and 2 skipped by their own guards;
+- the watch unit tests: 77 in 7 suites passed, with 2 unique warning lines;
+- the 18.6 build: 20 lines;
+- the UI suite on iOS 18.6: 78 methods. 72 passed in their groups and 2 skipped by their own guards. 4 failed in their groups
+  under loads of 27–104 and passed alone: the theme swatches' test, the lapsed holder's, the screen shown again, and the title's
+  place.
+
+The archive: `1.4.2 (8)` four times; the App Group on all four bundles and HealthKit on the app alone; one manifest hash; both
+Health keys; four alternate icons; no capture-only symbol in the dSYM. Not uploaded. The walk has not run.
+
+## [2026-11-26] — 1.4.2 (8) uploaded to App Store Connect
+
+### What happened
+
+On the owner's "Upload it", the archive of the checkpoint above was uploaded with `xcodebuild -exportArchive`: `app-store-connect`,
+destination upload, automatic signing, `manageAppVersionAndBuildNumber` false — 1.4.1's settings — and `-allowProvisioningUpdates`,
+as the archive needed. 01:06:33–01:08:43, *Upload succeeded*, `EXPORT SUCCEEDED`, no error or warning line.
+
+### The rulings
+
+- Connect's processing was not read. The built-in browser reached App Store Connect's sign-in page, the sign-in is the owner's,
+  and the owner has not asked for their Chrome this time.
+
+### Files touched
+
+`build/release-1.4.2/ExportOptions.plist`, in the ignored `build/`; `docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and this file.
+
+### Verification
+
+The upload's own log, `build/release-1.4.2/upload.log`. Not read: Connect's build list, its processing, TestFlight.

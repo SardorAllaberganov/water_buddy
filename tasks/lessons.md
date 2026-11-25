@@ -6319,3 +6319,26 @@ tied to `PATH`, so the first row replaced the search path, `wc` and `tr` were no
 
 **The rule:** never name a shell variable `path` — nor `status`, `options` or `prompt`, which zsh reserves too; use `p` or
 `file`. A check that reports every row wrong at once is a broken check before it is a broken document.
+
+## 2026-11-25 — Archiving a session deletes its notes, and `git worktree remove` takes its ledger
+
+**What happened.** The records named set C's build report, in the build session's side-session notes folder, as the home of
+its 78 rulings and nine deferred minors. The session's archive at 19:17 deleted that folder. The executing-plans ledger,
+`.superpowers/sdd/2026-11-22-set-c/progress.md`, lived in the worktree, where git ignores it, so `git worktree remove` took it
+without a word. Both survived only in the session's transcript under `~/.claude/projects/`, from which the release design
+read the minors back that evening.
+
+**The rule:** before archiving a session or removing its worktree, copy its ledger and its final report into the main
+checkout's `.superpowers/sdd/<plan>/`, and point the records there, never at a session's notes folder. A path the records
+cite must outlive the session that wrote it.
+
+## 2026-11-25 — A feature that changes a captured screen leaves its store shot stale without a word
+
+**What happened.** Set C widened the quick-add sliders to 2,000 ml and added *Your vessels* to Settings' card. Shot 5, *Set your
+own serving sizes*, still framed 1.4's capture of 2026-11-06, with the old thumbs and the old note, and the description still
+said "50 to 1,000 ml". No check failed on either. When the captures were taken again for 1.4.2, two of Insights' cut-outs no
+longer fit: its panes follow the week the sample's dates land on, and the lead pane's last line was clipped.
+
+**The rule:** a release after a feature takes the app's captures again, and reads every cut-out in the framing page's measure
+mode against the new captures, then every framed shot by eye. Every claim in the description is read against the build,
+its numbers first.
