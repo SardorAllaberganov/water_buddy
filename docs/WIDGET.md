@@ -3,6 +3,15 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-11-25 (hundred-and-thirtieth pass — `/doc_sync` on set C's staged tree, on `feature/set-c`: steps
+1–4 committed, step 5 staged, not merged). **Two contracts moved, both on the read path.** `WaterSnapshot` gains `theme`
+and `servingGlyph`, resolved from the cache and defaulted; the Home Screen and week widgets draw the stored theme, and the
+control draws Home's middle vessel's glyph — two dated notes, under *The read path* and in the control's table. Three files
+under `WaterBuddyWidget/` changed — `WaterBuddyWidget.swift`, `WeekWidget.swift`, `LogWaterControl.swift` — and the watch
+faces' `WristFaceView.swift` names water's colour `Aurora.classic.first`. No intent, kind, family, timeline or gallery
+string moved. **Nothing was placed on a Home Screen, in Control Center or on a watch face in any theme** — that walk is the
+owner's (`docs/AI_CONTEXT.md`'s known issues).
+
 **Last updated:** 2026-10-31 (hundred-and-third pass — `/doc_sync` on set B's staged tree, on
 `feature/coaching`). **One contract moved: what `AddWaterIntent` files.** Its reconcile now plans the stored
 schedule and *Only when behind*, read by the extension's `DataManager` — a bullet under *The intent also
@@ -310,6 +319,23 @@ SwiftData. Defaulted, like `serving`, so every memberwise call builds unchanged;
 only through `week(endingOn:calendar:)`, which walks `DaySummary.window` — History's own walk — and
 takes the day of `instant` from `currentWater`, so the midnight entry, `rolledOver()`, shifts the week
 by itself. The snapshot still writes nothing: `readingACachedWeekLeavesTheStoreUntouched`.)*
+
+*(2026-11-25, set C, staged on `feature/set-c`: a sixth and a seventh field. `theme: AppTheme`, from
+`resolveTheme(in:)` — `Key.theme`, absent or unknown read as Aurora — is the palette the Home Screen and week
+widgets draw: each injects `entry.snapshot.theme` at its root, `WidgetAurora` takes the theme's sky and three
+lights, every pane `LiquidGlass.Base.archived(for:)` — the theme's own derived pair — and the week card's met bars
+the theme's `accent`. The Lock Screen widget and the control take no theme, and water — the waves, the vessel's
+glow and the watch faces' gauges, now named `Aurora.classic.first` — keeps Aurora's colours in every theme.
+`servingGlyph: String`, from `usualGlyph(in:)` — Home's middle vessel's symbol from `Key.vessels`, or
+`vesselSlots`' Glass, `mug.fill`, while no library was ever made — is what the control draws beside its title.
+Both are defaulted, like `serving`, so every memberwise call builds, and `nonisolated`; the button still logs
+`serving`, from `Key.servings`, so the glyph and the amount come from one snapshot. Reading them writes nothing:
+both keys are on `Key.all`, which the two read-path tripwires compare. **The theme reaches the sky twice:** both
+widgets inject it at their roots and again inside `.containerBackground(for: .widget)`'s own closure,
+`WidgetAurora().environment(\.theme, entry.snapshot.theme)` — WidgetKit draws the container background apart from
+the layout, and nothing showed that a value injected below it arrives there; without it a Dusk card could stand on
+Aurora's sky (the final review's Important 3). Whether the outer injection alone reached it is unknown: no themed widget
+has been placed.)*
 
 `serving` is the newest and the one to reason about carefully: it is why `PourButton` takes an
 `Int` and builds `AddWaterIntent(amount:)` rather than `init()`. Taking it from the snapshot rather
@@ -795,7 +821,7 @@ the authority for everything below; rules `40-widget`, `70-privacy`, `15-project
 | Provider | `LogWaterControlProvider` (`ControlValueProvider`, private, file scope): `currentValue()` returns `DataManager.snapshot(now: Date())`; `previewValue` is the default Glass in `.system` |
 | Button | `ControlWidgetButton(action: AddWaterIntent(amount: snapshot.serving))` — the Glass, from the snapshot |
 | Title | *Log Water*, resolved from `snapshot.language.bundle` and handed over as a `String` — the app's chosen language |
-| Glyph | `vesselSlots[DataManager.usualSlot].symbol` — `mug.fill`, the slot `usualServing(in:)` reads |
+| Glyph | `snapshot.servingGlyph` — Home's middle vessel's glyph, the slot `usualServing(in:)` reads: `mug.fill`, the Glass, until a library puts another vessel there *(2026-11-25, set C; `vesselSlots[DataManager.usualSlot].symbol` until then)* |
 | Gallery strings | `.displayName("Log Water")`, `.description("Adds a serving of water to today's total in WaterBuddy.")` — `AddWaterIntent`'s own, static; iOS draws them, and the Action Button's hint, in the phone's language |
 | Figures | **none** — no total, goal, percentage or serving size (rule `70-privacy`) |
 

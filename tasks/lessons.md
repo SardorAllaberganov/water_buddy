@@ -6220,3 +6220,83 @@ tiers did the same in 46 of 106 stores. Each plan is rounded to its own local pr
 
 **The rule:** after a price change on one plan, compute every store's saving from the two plans' local prices and fix the ones
 outside the range the paywall promises before the change starts. `AppStore/prices-by-country.md` holds the method and the result.
+
+## 2026-11-24 — An automatic contrast harness cannot reproduce figures measured on hand-placed grounds
+
+**What happened.** Set C's plan held the new measurement harness to a control: Aurora's table, taken again, every pair within
+0.06 of its recorded figure. No automatic harness could meet it — the recorded figures rest on grounds each placed by hand, an
+Otsu split here, a disc quartile there — and the first runs disagreed for reasons of the harness, not the theme: a screen's frames
+matched by substring (`settings` read `settings-lower`'s too), a row's frame 1–3 pt wider than its text masked every band, an
+arc's ink was read off the white number inside it, and a lighter theme's lit rim passed for an accent mark.
+
+**The rule:** measure a new theme against Aurora **taken again by the same harness in the same sitting**, never against the
+recorded table; place a binding pair's ground by hand and check it by eye on an annotated frame; match a capture's name whole;
+treat a frame that holds the located box to within 4 pt as its container; and read a mark found by colour from its own pixels,
+searched for inside its own spot.
+
+## 2026-11-24 — iOS's alternate-icon alert may be the app's or SpringBoard's, and the choice is marked after it
+
+**What happened.** Set C's icon test read the icon's selection straight after its tap and looked for iOS's alert in SpringBoard
+alone. The run's recording showed the alert — "You have changed the icon for 'WaterBuddy'" — and a card that marks the icon only
+when `setAlternateIconName` returns, after the alert; the test failed on the selection.
+
+**The rule:** after an icon change, accept the alert from the app's tree or SpringBoard's, whichever has it, and wait for the
+selection with an expectation rather than reading it once. Leave the simulator on the primary icon at the end.
+
+## 2026-11-25 — A finding fixed in one view was left in its twin, and the test counted the wrong label
+
+**What happened.** Set C's Task 14 found that `.accessibilityElement(children: .ignore)` and `.isButton` on a `Button` made every
+theme swatch two buttons, and fixed the swatch. The library's vessel rows, written from the same plan in Task 9, kept the pattern,
+and the walk's tree showed each vessel twice: "Cup", "150 millilitres", and under it the `Button` surfaced again as "Cup, 150 ml"
+— a second VoiceOver stop, the 2026-08-28 lesson's shape. `testEachVesselIsOneButton` passed throughout: it counted the exact
+label "Cup", and the surfaced button's label is different.
+
+**The rule:** when a finding names a pattern, grep for every instance before closing it — here `accessibilityElement(children:
+.ignore)` among a `Button`'s modifiers. A one-element assertion counts what the screen adds by the label's prefix, `"<name>, "`,
+as well as by the exact label. Before reading an XCUITest tree as VoiceOver's, read its depth: a control nested inside the
+`.ignore` element is a second stop; text listed there is not (2026-10-17).
+
+## 2026-11-25 — `isHittable` is true in the home indicator's strip, under the tab bar
+
+**What happened.** The walk's scratch test scrolled until History's recap row was hittable and tapped it. On the iPhone 17 the
+sheet opened; on the smaller iPhone 16 the row stood under the tab bar with its centre in the bottom strip, the tap opened nothing,
+and the next step failed on a *Done* that was never drawn.
+
+**The rule:** a scripted tap scrolls its target clear of the bar first — `frame.maxY` at least 120 pt above the window's foot — as
+a person would. `isHittable` means the point is on screen, not that a person could tap it there.
+
+## 2026-11-25 — A UI test run cannot hold Premium on a phone's own stores
+
+**What happened.** The walk needed the widgets, the control, a reminder's button and the watch drawn in each theme. Each reads the
+theme or the library from the phone's own App Group, and only Premium may choose either. The scheme's StoreKit configuration sits
+on its Launch action alone, so `xcodebuild test` reads the products from the App Store's sandbox — the paywall showed $2.99,
+$19.99 and $39.99 — and rule `85-testing` keeps the sandbox out of tests. `-WaterBuddyPremiumHeld` acts only beside the fresh
+start, whose throwaway suite no widget and no watch reads.
+
+**The rule:** a check that needs Premium on a phone's own stores is a person's, from Xcode's Run, where the local StoreKit
+configuration applies — say so in the plan, and pin each surface's data path with a unit test meanwhile. XCUITest cannot place a
+widget, a control or a complication either (`Tools/CapturePairScreenshots.sh`).
+
+## 2026-11-25 — A walk that holds Premium never sees a lock, and one at the default size never sees the large-text layout
+
+**What happened.** Set C's final review found the four locked app icons showing no lock — a white `lock.fill` at the centre,
+on each preview's white drop, about 1:1 — and the walk, asked to look, found the library's rows broken at the accessibility
+sizes: "Bot-tle", "Gran / dma' / s", the glyph over the name, "150 / ml". Neither had ever been drawn. The theme census, the
+walk and `AppearanceUITests` all launched with Premium held, and the walk looked at the library at the default size only.
+
+**The rule:** walk every new screen in each state it has — as a free user (`-WaterBuddyPremium` without
+`-WaterBuddyPremiumHeld`) and as a holder — and at `UICTContentSizeCategoryAccessibilityXXXL`, before the review rather than
+after it. A mark laid on an image is checked on that image: a white glyph that reads on a dark swatch vanishes on an icon's
+white drop.
+
+## 2026-11-25 — An unlimited `simctl bootstatus` can hang for hours on a phone listed Booted
+
+**What happened.** Set C's final gate shut down the iPhone 17, booted the iPhone 16 on iOS 18.6 and waited with
+`xcrun simctl bootstatus <udid> -b` before its first UI group. The call ran past the 600-s limit and was moved to the
+background, where `bootstatus` waited 5 hours 32 minutes with the device listed Booted the whole time. No group ran, and the
+ledger had recorded the call as running to its end.
+
+**The rule:** never wait on `simctl bootstatus` without a limit — `perl -e 'alarm shift; exec @ARGV' 180 xcrun simctl bootstatus
+<udid>` stands in for the `timeout` macOS lacks — and boot a device in a call of its own before the first test call. A call moved
+to the background is checked within minutes by its processes and its log, not trusted to finish: a quiet background call may
+be stuck before its first line of output.

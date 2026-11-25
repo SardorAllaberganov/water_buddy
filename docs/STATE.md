@@ -4,6 +4,14 @@ What is actually on disk in the App Group, as of the source in this tree. This i
 reference; the *rulings* behind these choices are in the DocC on `DataManager` and in
 `.claude/rules/20-state`, `25-shared-storage` and `30-rollover`.
 
+**Last updated:** 2026-11-25 (hundred-and-thirtieth pass — `/doc_sync` on set C's staged tree, roadmap items 1.4.5 and 1.4.8,
+on the branch `feature/set-c`: steps 1–4 committed, step 5 staged; not merged). **Two keys added:** `sardor.WaterBuddy.theme`,
+`AppTheme`'s code, absent for Aurora, and `sardor.WaterBuddy.vessels`, the vessel library as JSON, absent until one is made —
+**18** on `DataManager.Key` and in `Key.all` (both counted by script), the phone's suite **16**. Two rows in the table, a dated
+note wherever a count moved, the mirror's two new fields and the snapshot's two, the heal of `Key.servings` at launch among the
+guarded writes — the fifth write and the eleventh site, every site's line re-derived — and a section, *The fifteenth and
+sixteenth keys, and set C's theme and library*. No other key or stored byte moved; `WaterLog` gained no field.
+
 **Last updated:** 2026-11-21 (hundred-and-twenty-second pass — `/doc_sync` on release 1.4.1's staged tree). **No key and no stored
 byte moved:** `DataManager.swift` changes one constant, `reviewStreak` 3 → 1 (the owner's R1), and DocC; `reviewRequestedVersion` keeps
 its type, its absence and its one writer, `claimReviewRequest(version:)`. A dated note under roadmap 1.2.5's tests says which three
@@ -436,7 +444,7 @@ and which is authoritative matters more than either on its own:
 
 | | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
 |---|---|---|
-| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | fourteen keys (below; ten until 2026-10-20, `weekTotals` the eleventh; eleven until 2026-10-30, `healthEnabled` the twelfth, on `feature/apple-health`; twelve until 2026-10-31, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, on `feature/coaching`) |
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | sixteen keys (below; ten until 2026-10-20, `weekTotals` the eleventh; eleven until 2026-10-30, `healthEnabled` the twelfth, on `feature/apple-health`; twelve until 2026-10-31, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, on `feature/coaching`; fourteen until 2026-11-25, `theme` and `vessels` the fifteenth and sixteenth, on `feature/set-c`) |
 | Status | **source of truth** | **derived cache** |
 | Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
 | Read by | the app — and the extension's own `DataManager`, inside `AddWaterIntent.perform()` and nowhere else | the app **and the widget** |
@@ -508,6 +516,8 @@ eleventh, and the watch's two.)* *(2026-10-30, hundredth pass, Apple Health stag
 *(2026-10-31, hundred-and-third pass, set B staged on `feature/coaching`: **sixteen** in `Key.all` — the
 fourteen in this table, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, and the watch's
 two.)*
+*(2026-11-25, hundred-and-thirtieth pass, set C staged on `feature/set-c`: **eighteen** in `Key.all` — the sixteen
+in this table, `theme` and `vessels` the fifteenth and sixteenth, and the watch's two.)*
 
 | Stored key | Type | Range / clamp | Written by | Why it exists |
 |---|---|---|---|---|
@@ -515,12 +525,14 @@ two.)*
 | `sardor.WaterBuddy.dailyGoal` | `Int` | `1...100_000` | **app only** | The target. Clamped to ≥ 1 so `progress` cannot divide by zero. Materialised at app launch so a widget never reads a missing key as `0` and shows the first sip as 100%. |
 | `sardor.WaterBuddy.lastActiveDay` | `Int` | `yyyyMMdd` ordinal | app + extension — **the fresh-install stamp is the app's alone**; the rollover's is unguarded, so a widget tap that is the first act of a new day writes it, in the same call that zeroes `currentWater` | The day `currentWater` belongs to. An ordinal, not a `Date`, so travel cannot re-interpret it (see below). |
 | `sardor.WaterBuddy.isGoalSet` | `Bool` | — | app only | Whether the user has *chosen* a goal, so setup is shown once. **Deliberately never materialised — its absence carries meaning.** |
-| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut, the Control Center control and — since 2026-10-15 — a reminder's *Log a Glass* log** — read through `DataManager.usualServing(in:)`, the one definition they all call, at the index `DataManager.usualSlot` names — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. |
+| `sardor.WaterBuddy.servings` | `[Int]` | exactly 3, each `1...100_000` | **app only** | The three quick-add vessel amounts, positional: Cup, Glass, Bottle. **Index 1 is the vessel the widget draws and logs, and the one the Siri shortcut, the Control Center control and — since 2026-10-15 — a reminder's *Log a Glass* log** — read through `DataManager.usualServing(in:)`, the one definition they all call, at the index `DataManager.usualSlot` names — which is how the front doors agree now that the amount is no longer a shared constant. Never materialised — absence means the user kept the defaults. Never sorted or deduped: sorting would move which vessel the widget follows. Any anomaly (failed cast, wrong arity, an element out of range) discards the **whole** triple rather than repairing one element, because a partly-repaired triple is a row nobody authored. *(2026-11-25, set C, staged: Home's three vessels' amounts — Cup, Glass and Bottle until a library puts others there, and still the one key every one-tap door reads. Every library change writes `vessels` first and this key after; with a library, the setter writes the amounts into Home's vessels first; and the app's launch rewrites this key from a library whose Home amounts differ — see *The fifteenth and sixteenth keys*.)* |
+| `sardor.WaterBuddy.vessels` | `Data` (JSON `VesselLibrary`, `{home, more}`) | Home exactly 3 and at most `moreLimit` (9) more; every id once; the standard three — `cup`, `glass`, `bottle` — present, unnamed and on their own glyphs; a user's name 1–`nameLimit` (20) characters after trimming, on one line; each amount `1...100_000`; each glyph one this build knows — validated on the way **out** by `resolveVessels(in:)` through `VesselLibrary.isValid`, the whole library discarded on any anomaly, never repaired and never written back | **app only — `addVessel`, `updateVessel`, `deleteVessel`, `putOnHome` and `useStandardVessels`, and, with a library, the `servings` setter — always before `servings`** | Set C's vessel library (2026-11-25, on `feature/set-c`; spec `2026-11-22-set-c-design.md` D11). **Absent means no library was ever made** — Home's three are Cup, Glass and Bottle at `servings`' amounts — so it is never materialised, and a change that changes nothing makes none. Every process's `DataManager` reads it; the widget's snapshot reads Home's middle glyph alone, as `WaterSnapshot.servingGlyph`, and the watch reads Home's three secondhand, as `WristMirror.vessels`. A user's name reaches the app's screens, VoiceOver, the watch app and Apple's on-device model, and never a notification, a widget, Siri, the control, the export or the recap's image (rule `70-privacy`). See *The fifteenth and sixteenth keys*. |
 | `sardor.WaterBuddy.remindersEnabled` | `Bool` | — | app only | The reminders toggle. **Absent until switched on** — see below. |
 | `sardor.WaterBuddy.healthEnabled` | `Bool` | — (read with `bool(forKey:)`: absent and `false` are both off) | **app only — the `healthEnabled` setter, which only `HealthMirror` calls, after asking Health** | Settings' *Apple Health* switch (2026-10-30, staged on `feature/apple-health`). **Absent until switched on** — see *The twelfth key*. Every process's `DataManager` reads it in `init`; only the app acts on it. |
 | `sardor.WaterBuddy.reminderSchedule` | `[Int]` | exactly 4 — `[first, last, every, quietMask]`: first and last whole hours `5...23` with the last on the grid `first + k × every`, `k ≥ 1`; `every` 1, 2 or 3; the mask's bit `n − 1` for Gregorian weekday `n`, below 127 (never all seven) — validated on the way out by `ReminderPlan.Schedule(stored:)`, the whole value discarded to the standard schedule on any anomaly, never repaired | **app only — the `reminderSchedule` setter, which only Settings' schedule sheet and *Use the standard schedule* call** *(2026-10-31, finishing set B, staged: and, in a DEBUG build, `-WaterBuddyCoachingSeed` beside `-WaterBuddyFreshStart` alone — on the fresh start's own throwaway suite, never the group's)* | Set B's reminder schedule (2026-10-31, on `feature/coaching`). **Absent means the standard schedule** — every two hours, 9 to 9, every day — so it is never materialised, and choosing *Standard schedule* removes it. Every process's `DataManager` reads it in `init` and again in `refresh()`, so the widget's tap files the schedule the app set. See *The thirteenth and fourteenth keys*. |
 | `sardor.WaterBuddy.onlyWhenBehind` | `Bool` | — (read with `bool(forKey:)`: absent and `false` are both off) | **app only — the `onlyWhenBehind` setter, from Settings' switch** *(2026-10-31, finishing set B, staged: and from the DEBUG seed beside the fresh start, as the schedule's row says)* | Set B's *Only when behind* (2026-10-31, on `feature/coaching`). **Absent until switched on.** Read by every process's `DataManager`, for the same reason. |
 | `sardor.WaterBuddy.language` | `String` | — | app only — the `language` setter, whose one caller is `SettingsView`. The widget *reads* it, and the watch reads it secondhand, as `WristMirror.languageCode` | The chosen UI language (`"en"`/`"ru"`/`"uz"`). **Absent means follow the device**, so it is never materialised either. |
+| `sardor.WaterBuddy.theme` | `String` | `AppTheme`'s code — `lagoon`, `dusk`, `midnight` or `bloom` — read with `string(forKey:)` by `resolveTheme(in:)`; anything else reads as Aurora and is left as it is, never written back | **app only — the `theme` setter, from Settings' Appearance card** (and, in a DEBUG build, `-WaterBuddyTheme` beside `-WaterBuddyFreshStart`, on the fresh start's own throwaway suite, never the group's) | Set C's theme (2026-11-25, on `feature/set-c`; D9). **Absent means Aurora** — choosing Aurora removes it, as *Follow device* removes `language` — so it is never materialised. Every process's `DataManager` reads it; the widget's snapshot reads it as `WaterSnapshot.theme`, and the watch reads it secondhand, as `WristMirror.themeCode`. The setter rings the widget doorbell and publishes to the wrist, and reschedules nothing: a theme moves no reminder. |
 | `sardor.WaterBuddy.didMigrateFromStandardDefaults` | `Bool` | — | **app only** | The one-shot flag for the migration below. Cannot be reset from inside the app. |
 | `sardor.WaterBuddy.wristApplied` | `Data` (JSON `[Int: [UUID]]`) | **unbounded per day, until the 90-day trim** — see note below | **app only, via `ingest(_:)`** | The phone's per-day applied ledger for wrist-authored pours — day ordinal → the `WaterLog.id`s already folded in. `nonisolated`, unlike the eight keys above it (and the watch's two), because `readAppliedLedger(from:)`/`writeAppliedLedger(_:to:keepingDaysSince:)` are themselves `nonisolated static` and a nested type's members otherwise infer the enclosing `@MainActor` class's isolation. Trimmed to the last `appliedLedgerRetentionDays` (90) real calendar days on every write — never by subtracting a raw integer from the `yyyyMMdd` ordinal, which borrows across the month/day radix incorrectly (a real bug this plan introduced and fixed in its own Task 4, before it shipped). A write also protects any day it just folded into, even one already older than the 90-day cutoff, so the same write that adds an entry can never be the write that trims it (final review, `ingest(_:)`'s cutoff is `min(normalCutoff, foldedDaysThisPass.min() ?? normalCutoff)`). |
 | `sardor.WaterBuddy.reviewRequestedVersion` | `String` | — (read with `object(forKey:) as? String`; anything else reads as never asked) | **app only, via `claimReviewRequest(version:)`** | The app's version (`CFBundleShortVersionString`, e.g. `"1.2"`) the last time it asked iOS for a rating (roadmap 1.2.5, `docs/superpowers/specs/2026-10-15-rating-prompt-design.md`). **Absent means never asked**, so it is never materialised. The claim writes it **before** answering `true`, so nothing asks without recording it, and Home asks at most once per version. It writes nothing else: no row, no widget doorbell, no reschedule — no widget, snapshot, mirror or notification reads it. Not `string(forKey:)`, which hands back a stored number as a string: a stored `1.2` would read as version 1.2 asked (`aStoredNumberCountsAsNeverAsked`, seen to fail against that read). No role guard: `streak` is zero in every process but the phone app, so the claim refuses there by construction. |
@@ -544,20 +556,20 @@ two.)*
 `WaterBuddyWatch` and `WaterBuddyWatchWidget` resolve the identical App Group *identifier string*,
 `group.sardor.WaterBuddy`, through the same `DataManager.sharedDefaults` accessor the phone uses —
 but the watch is a **different physical device**, so this is a different container on disk, holding
-none of the phone's fourteen keys above *(twelve until 2026-10-31, set B)* and read by none of the phone-side code. Never confuse "same
+none of the phone's sixteen keys above *(fourteen until 2026-11-25, set C; twelve until 2026-10-31, set B)* and read by none of the phone-side code. Never confuse "same
 identifier" with "same storage": nothing written on one device is visible on the other except
 through an explicit `WatchConnectivity` transfer (rule `70-privacy`).
 
 | Stored key | Type | Range / clamp | Written by | Read by | Why it exists |
 |---|---|---|---|---|---|
 | `sardor.WaterBuddy.wristOutbox` | `Data` (JSON `[WristPour]`) | at most 64 pours per chunk sent, unbounded at rest *(2026-10-25, #154: validated on the way out — read through `WristPlan`, a pour counts only with an amount in `1...maximumDailyIntake`, the filter the phone's `ingest` folds by, and the day's sum saturates there)* | `WristModel`, **watch only** | `WristModel` **and** `WaterBuddyWatchWidget`, watch only — the complication counts the pending pours beside the mirror (spec §16) | The watch's own pending pours not yet durably queued to the phone (or queued but not yet acknowledged back). Local to the watch; the phone never reads or writes this key. |
-| `sardor.WaterBuddy.wristMirror` | `Data` (JSON `WristMirror`) | one value, no clamp — the phone's own values are already clamped when composed *(2026-10-25, #154: validated on the way out — read through `WristPlan`, `currentWater` is held to `0...maximumDailyIntake` and its sum with the outbox saturates there; `WristView.syncedCaption` reads a `composedAt` whose age fits no `Int` as *Not yet synced*)* | `WristModel`, **watch only**, from a decoded `WCSession` application context **or a complication push** (spec 2026-10-07 §4.5) — either way through `apply(_:)`, which never takes a mirror composed before the one held, unless the one held is stamped more than a minute ahead of the watch's own clock | `WristModel` **and** `WaterBuddyWatchWidget`, watch only | The last mirror received from the phone — `schemaVersion`, `currentWater`, `dailyGoal`, `servings`, `languageCode`, `isGoalSet`, `composedAt`, `phoneDayStart`, `phoneDayEnd`, `acked`. **`currentWater` is the phone's total for `[phoneDayStart, phoneDayEnd)` and for nothing after it (spec §17, 2026-10-05):** `WristPlan.todaysTotal(mirror:outbox:now:calendar:)` counts it only while `now < phoneDayEnd`, for `WristModel` and the complication alike, so a phone that slept through midnight no longer leaves yesterday's water on the wrist. `phoneDayEnd` is an instant composed on the phone's own calendar, not a day the watch re-reads under its own zone; it is optional only so a value persisted before it existed still decodes, and when absent the watch falls back to its own next midnight after `phoneDayStart`. The phone composes `currentWater` through `DataManager.snapshot`'s rollover, so a stale cached total never goes out under today's window. What the watch draws before its first `updateApplicationContext` of a fresh launch. **Its absence is no longer a dead end (spec §16, 2026-09-01):** `WristModel.displayGoal` falls back to `DataManager.defaultDailyGoal` and `WristView` draws a usable screen anyway, saying so in its attribution line — the key's absence now means "nothing from the phone yet", not "show a nag instead of a screen". `WaterBuddyWatchWidget` reads it directly, never through `WristModel.shared` (the identical discipline rule `40-widget` holds the phone widget to), and now takes the same fallback and adds `Key.wristOutbox`'s pending pours, so the face cannot read 0% while the app beside it shows real water. |
+| `sardor.WaterBuddy.wristMirror` | `Data` (JSON `WristMirror`) | one value, no clamp — the phone's own values are already clamped when composed *(2026-10-25, #154: validated on the way out — read through `WristPlan`, `currentWater` is held to `0...maximumDailyIntake` and its sum with the outbox saturates there; `WristView.syncedCaption` reads a `composedAt` whose age fits no `Int` as *Not yet synced*)* | `WristModel`, **watch only**, from a decoded `WCSession` application context **or a complication push** (spec 2026-10-07 §4.5) — either way through `apply(_:)`, which never takes a mirror composed before the one held, unless the one held is stamped more than a minute ahead of the watch's own clock | `WristModel` **and** `WaterBuddyWatchWidget`, watch only | The last mirror received from the phone — `schemaVersion`, `currentWater`, `dailyGoal`, `servings`, `languageCode`, `isGoalSet`, `composedAt`, `phoneDayStart`, `phoneDayEnd`, `acked`. **`currentWater` is the phone's total for `[phoneDayStart, phoneDayEnd)` and for nothing after it (spec §17, 2026-10-05):** `WristPlan.todaysTotal(mirror:outbox:now:calendar:)` counts it only while `now < phoneDayEnd`, for `WristModel` and the complication alike, so a phone that slept through midnight no longer leaves yesterday's water on the wrist. `phoneDayEnd` is an instant composed on the phone's own calendar, not a day the watch re-reads under its own zone; it is optional only so a value persisted before it existed still decodes, and when absent the watch falls back to its own next midnight after `phoneDayStart`. The phone composes `currentWater` through `DataManager.snapshot`'s rollover, so a stale cached total never goes out under today's window. What the watch draws before its first `updateApplicationContext` of a fresh launch. **Its absence is no longer a dead end (spec §16, 2026-09-01):** `WristModel.displayGoal` falls back to `DataManager.defaultDailyGoal` and `WristView` draws a usable screen anyway, saying so in its attribution line — the key's absence now means "nothing from the phone yet", not "show a nag instead of a screen". `WaterBuddyWatchWidget` reads it directly, never through `WristModel.shared` (the identical discipline rule `40-widget` holds the phone widget to), and now takes the same fallback and adds `Key.wristOutbox`'s pending pours, so the face cannot read 0% while the app beside it shows real water. *(2026-11-25, set C, staged: two more fields, `themeCode` — the theme's code, `nil` for Aurora — and `vessels` — Home's three, each a glyph code and the user's name, or no name for a standard vessel, which the watch names from its own catalogue in the phone's language. Both are optional, defaulted `var`s, so a mirror from before them still decodes and `schemaVersion` stays 1; an older watch app ignores them, and a code or glyph this build does not know draws Aurora or the slot's standard glyph. The key itself is unchanged: the watch's suite gains no key.)* |
 
 Both are written **only** by `WristModel`, never by `DataManager` — the one honest weakening rule
 `20-state` now states plainly: one writer per store, not one writer full stop. `WristModel` never
 opens SwiftData and never touches the phone's own App Group container.
 
-**Of the phone's fourteen keys *(twelve until 2026-10-31)*, four are carried by the migration** — `currentWater`, `dailyGoal`,
+**Of the phone's sixteen keys *(fourteen until 2026-11-25; twelve until 2026-10-31)*, four are carried by the migration** — `currentWater`, `dailyGoal`,
 `lastActiveDay`, `isGoalSet` (`migrateIfNeeded(from:into:)` names exactly those).
 `didMigrateFromStandardDefaults` is not, because it *is* the bookkeeping; and `language` is not,
 because it did not exist before the App Group did, so there is nothing in a pre-capability
@@ -566,7 +578,8 @@ the list either; this sheet has never recorded a reason for those three. `review
 is not, for `language`'s reason: it was born in the App Group, in 1.2.5 — and `weekTotals` is not,
 for the same reason, born in 1.3.1's 6c (2026-10-20) — and `healthEnabled` is not, born in 1.3.3
 (2026-10-30, on its branch) — and neither are `reminderSchedule` and `onlyWhenBehind`, born in set B
-(2026-10-31, on `feature/coaching`). *(This paragraph is
+(2026-10-31, on `feature/coaching`) — nor `theme` and `vessels`, born in set C (2026-11-25, on
+`feature/set-c`). *(This paragraph is
 about the phone's suite and sits under the watch's table; the twenty-seventh pass left it where
 it stood and said so.)*
 
@@ -603,6 +616,7 @@ adopting a new store looks exactly like data loss.
 (`wristOutbox`, `wristMirror`) — directly under the declarations it mirrors, below its own DocC.
 *(2026-10-31, set B staged: sixteen — the phone's fourteen, with `healthEnabled`, `reminderSchedule` and
 `onlyWhenBehind`, and the watch's two.)*
+*(2026-11-25, set C staged: eighteen — the phone's sixteen, with `theme` and `vessels`, and the watch's two.)*
 *(2026-10-20, 1.3.1's 6c, staged: thirteen — the phone's eleven with `weekTotals`. Every
 `DataManager` writes it in `init`, so `everyKeyTheProductWritesIsOnTheRoster` reads it back and
 requires it, and `readingACachedWeekLeavesTheStoreUntouched` compares it as one of the roster.)*
@@ -621,10 +635,11 @@ Keeping the roster beside the declarations is what makes the omission hard rathe
 `DataManager`'s real writers and the migration, reads back every `sardor.WaterBuddy.` key that
 landed in the suite, and requires the roster to hold it — and, since 1.2.5, requires the claim's
 own key among them, because its count guard (`>= 8`) cannot see the claim: the other writers meet
-it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's fourteen keys and
+it without it (measured: it held on a stub claim that wrote nothing). **That covers the phone's sixteen keys and
 not the watch's two** (ten until 2026-10-20; `weekTotals` is written by every `init`, so the test reads
 it back without a change of its own; eleven until 2026-10-30, when the test began setting `healthEnabled`;
-twelve until 2026-10-31, when it began setting `reminderSchedule` and `onlyWhenBehind`): `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
+twelve until 2026-10-31, when it began setting `reminderSchedule` and `onlyWhenBehind`; fourteen until 2026-11-25,
+when it began adding a vessel and setting the theme to Lagoon): `wristOutbox` and `wristMirror` are written only by `WristModel`, in a
 target the phone's tests cannot reach, and no watch test reads `Key.all` — so nothing would catch
 either of those two going missing from the roster. `theTripwireHelperEnumeratesEveryStoredKey` does not — the helper
 it checks *is* `Key.all`, so it compares the roster with itself and pins only that the helper is
@@ -1062,6 +1077,46 @@ the schedule the app set after it was built (`aWidgetTapAfterAChangeFilesTheNewS
   over every schedule the type accepts.
 - Identifiers keep their `dayOrdinal.HH` shape: a schedule is whole hours.
 
+## The fifteenth and sixteenth keys, and set C's theme and library
+
+*(2026-11-25, hundred-and-thirtieth pass — roadmap 1.4.5 and 1.4.8, on `feature/set-c`: steps 1–4 committed, step 5
+staged, not merged; `docs/superpowers/specs/2026-11-22-set-c-design.md`.)*
+
+**`theme`** holds `AppTheme`'s code. The setter writes it, or **removes the key for Aurora**, as *Follow device*
+removes `language`. It rings the widget doorbell and publishes to the wrist — the Home Screen and week widgets and
+the watch app draw it — and reschedules nothing. `resolveTheme(in:)` reads it with `string(forKey:)`: an unknown code
+reads as Aurora and is left as it is, never written back (`anUnknownThemeReadsAsAuroraAndIsLeftAsItIs`).
+
+**`vessels`** holds the library as JSON, `{home, more}`: Home's three and up to nine more. Five methods change it —
+`addVessel(glyph:name:amount:)`, `updateVessel(id:glyph:name:amount:)`, `deleteVessel(id:)`,
+`putOnHome(id:slot:)` and `useStandardVessels()` — all through one `apply(_:)`:
+- **The library first, then `servings`** — Home's three amounts — so a crash between the two leaves a stale
+  `servings`, never a vessel wearing another's amount. Then the widget doorbell and the wrist, once.
+- It reschedules **only when Home's middle glyph changed**, so the app registers the reminder's button with its new
+  icon. A change that changes nothing writes nothing, so a library that was never made is not made by one.
+- With a library, the `servings` setter writes the three amounts into Home's vessels first and the key after.
+- `resolveVessels(in:)` validates on the way out and **discards the whole library** on any anomaly — a failed
+  decode (a glyph this build does not know among them), Home not exactly three, more than nine others, an id twice,
+  a standard vessel missing, a user's vessel without a valid name — reading as no library. Never repaired, never
+  written back.
+
+**The heal, the app's alone.** At launch, `init` asks `healedServings(library:servings:role:)`: behind
+`role.ownsSharedStorage`, a library whose Home amounts differ from `servings` rewrites `servings` — only a crash
+between a change's two writes leaves them apart, and the library is the one to trust. The extension never writes
+it, and until the app runs a widget tap logs what `servings` holds (`theHealIsTheAppsAlone`,
+`aLibraryAndServingsLeftApartAreHealedAtLaunch`). It is the fifth guarded write, below.
+
+**What the other processes read.** `WaterSnapshot` gains `theme` and `servingGlyph` — Home's middle glyph, from the
+library or `vesselSlots` — both resolved from the cache in `snapshot(...)` and defaulted, so the memberwise callers
+build; reading them writes nothing (the roster tripwires cover both keys). `WristMirror` gains `themeCode` and
+`vessels` (*The watch's own suite*, above). Every one-tap door still logs `servings`' middle amount — the widget,
+Siri, the control, a reminder's *Log a Glass* and the watch — so a pick made while the extension's
+`DataManager.shared` is alive reaches its next tap through `servings` (`aSecondInstanceReadsTheNewMiddleVessel`).
+
+**Nothing about Premium is stored** (spec D5): Settings decides who may choose, and what was chosen keeps working
+after a lapse. **The app icon is iOS's**: `AppIconSwitcher` asks iOS to change it and reads it back, and neither store
+holds it.
+
 ## The sixth key, and the seam that reads it
 
 `remindersEnabled` is a `Bool`, **absent until the user turns reminders on**. Like `isGoalSet` and
@@ -1353,26 +1408,33 @@ moved all of them, and
 the pass that recorded stage 2 left them where `b8a1386` had them. Before that, 2026-10-09: the fix
 for #73 moved all six, by four lines or by thirteen; and 2026-10-08: all six had moved since the
 2026-09-01 check that followed the watchOS plan's ~500-line addition. *This sentence said "by three
-different questions" until the twenty-sixth pass; the four writes have only ever asked two.*):
+different questions" until the twenty-sixth pass; the four writes have only ever asked two.*)
+*(2026-11-25, set C, staged: **five writes** — the heal is the fifth, and the eleventh site in all, the count
+`CLAUDE.md` gives. Every line below re-derived by `grep` for its guard's own words on set C's working tree; they
+read `:654`, `:1513`, `:1434`, `:2168`, `:1106`, `:1167`, `:1201`, `:1229`, `:1287` and `:1768` before.)*:
 
-1. **Materialising `dailyGoal` in `init`** (`:654`, `ownsSharedStorage`) — the write exists *for*
+1. **Materialising `dailyGoal` in `init`** (`:875`, `ownsSharedStorage`) — the write exists *for*
    the extensions; a non-owner doing it to itself puts a key in the group that the migration then
    mistakes for state the app already wrote.
-2. **Stamping `lastActiveDay` on a fresh install** (`:1513`, `ownsSharedStorage`) — same reason.
-3. **`seedFromCachedTotalIfNeeded`** (`:1434`, `mayHaveLegacyStandardDefaults`).
-4. **The migration itself** (`:2168`, `mayHaveLegacyStandardDefaults`).
+2. **Stamping `lastActiveDay` on a fresh install** (`:1754`, `ownsSharedStorage`) — same reason.
+3. **`seedFromCachedTotalIfNeeded`** (`:1675`, `mayHaveLegacyStandardDefaults`).
+4. **The migration itself** (`:2493`, `mayHaveLegacyStandardDefaults`).
+5. **The heal of `servings` from the library at launch** (`:2197`, `ownsSharedStorage`, in
+   `healedServings(library:servings:role:)`, which `init` calls at `:863`) — set C's, 2026-11-25: a non-owner
+   that rewrote `servings` would be writing on behalf of the group, and until the app runs a widget tap logs what
+   `servings` holds.
 
 Six further sites are guarded by the same enum but are not group bookkeeping:
-`republishHistory` (`:1106`, `drawsHistory`, cost rather than correctness); `republishStreak`
-(`:1167`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
-because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1201`,
+`republishHistory` (`:1340`, `drawsHistory`, cost rather than correctness); `republishStreak`
+(`:1400`, `drawsHistory` again — **new with stage 2, the seventh site**, with a guard of its own
+because the `dailyGoal` setter calls it outside `republishHistory`); `republishMonth` (`:1434`,
 `drawsHistory` a third time — **new with set A's step 2, the eighth site**, with a guard of
 its own for the same reason: `showMonth(_:)`, `refresh()`, `saveAndRecompute()`, `dayDidTurn()` and
-the `dailyGoal` setter call it outside `republishHistory`); `recap(of:)` (`:1229`, `drawsHistory` a
+the `dailyGoal` setter call it outside `republishHistory`); `recap(of:)` (`:1462`, `drawsHistory` a
 fourth time — **new with set A's step 5, staged, the tenth site**: a read for the recap's sheet, which
 returns a value and publishes nothing, guarded for `republishMonth()`'s reason); `republishInsights`
-(`:1287`, `drawsHistory` a fifth time — **new with set A's step 4, the ninth site**, called beside each
-`republishMonth()` and from `showInsights(_:)`); and `requestReminderReschedule` (`:1768`,
+(`:1520`, `drawsHistory` a fifth time — **new with set A's step 4, the ninth site**, called beside each
+`republishMonth()` and from `showInsights(_:)`); and `requestReminderReschedule` (`:2015`,
 `mayFileReminders`, the one whose wrong answer is immediately user-visible).
 *(Lines re-derived by `grep` for each guard's own words on 2026-10-24, set A's step 5, on its staged tree —
 its insertions in `DataManager.swift` begin after line 1191; at `HEAD` `ad244c2` they read `:1485`,

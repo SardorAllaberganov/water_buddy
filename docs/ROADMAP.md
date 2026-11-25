@@ -468,6 +468,13 @@ Spec `docs/superpowers/specs/2026-11-22-set-c-design.md` and its rule wording ap
 both"), then the plan, `docs/superpowers/plans/2026-11-22-set-c.md` ("Approve plan"): five steps,
 set C on sale with the last. All three were written in their own worktree and came into `main` on
 2026-11-23 for the owner's `/commit`; the build has not started.)*
+*(2026-11-23 to the 25th: **set C — 1.4.5 and 1.4.8 — built test-first, measured, walked, reviewed and gated on
+`feature/set-c`; on sale in code with its last step.** Step 1, the library, `2cf4f8f`; step 2, the five themes in code,
+`010b114`; step 3, the measurement — every theme keeps Aurora's glass values, and each its own derived fills — `9f3ce07`;
+`main` merged in at `28ee3eb`; step 4, the five icons, `5d2f22c`; step 5, on sale and the privacy policy, staged for the
+owner's `/commit`, then a fast-forward into `main` by the store session. Not merged, not pushed. Left for the owner's hand:
+the widgets, the control, the reminder's button and the watch walked in each theme, which need Premium on a phone's own
+stores, and each alternate icon's forms from a TestFlight install (`docs/AI_CONTEXT.md` #236, #237).)*
 
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.
