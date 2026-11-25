@@ -415,7 +415,7 @@ something to record.
   (`HomeView.openingLevel`, `waterWait`); a tab turn and a return come whole. The rim stays Premium's; the rest reaches free screens too
   (`docs/superpowers/specs/2026-11-01-premium-look-design.md`; rule `60-design-system`, committed in `aa2f7ce`)
 - **Set C: a theme is a stored choice and a measured palette; the vessels are one library** (roadmap 1.4.5,
-  1.4.8; spec `2026-11-22-set-c-design.md`; built on `feature/set-c`, 2026-11-25, not yet on `main`). `AppTheme` is stored like the language —
+  1.4.8; spec `2026-11-22-set-c-design.md`; built 2026-11-25, on `main` since `7adf2f1`, not yet released). `AppTheme` is stored like the language —
   `Key.theme`, absent for Aurora — read by the widget's snapshot and sent to the watch; every root that draws
   the aurora injects it, and views draw the environment's `aurora`. Each theme is five colours and the values
   measured on its renders; water keeps `Aurora.classic` in every theme. `Key.vessels` holds Home's three and up

@@ -6300,3 +6300,22 @@ ledger had recorded the call as running to its end.
 <udid>` stands in for the `timeout` macOS lacks — and boot a device in a call of its own before the first test call. A call moved
 to the background is checked within minutes by its processes and its log, not trusted to finish: a quiet background call may
 be stuck before its first line of output.
+
+## 2026-11-25 — An archived session's worktree can stay on disk
+
+**What happened.** The store session archived set C's build session after fast-forwarding `main` to its branch. The archive,
+which removes a session's worktree by default, detached the worktree's HEAD at `7adf2f1` and left the folder — 12 GB, its build
+caches and the theme census among them — and `git worktree list` still listed it. The app held no kept worktree for the session,
+so `discard_kept_worktree` had nothing to discard.
+
+**The rule:** after archiving a session that owned a worktree, read `git worktree list`. If the folder is still there, list what
+git ignores in it (`git status --short --ignored`), move out what is worth keeping, and remove it with `git worktree remove` —
+without `--force`, so a modified or untracked file still stops it. Delete the session's branches after the worktree is gone.
+
+## 2026-11-25 — In zsh, `path` is the command search path
+
+**What happened.** The doc sync's row check read *Files on disk* with `while read -r path n rest`. In zsh `path` is the array
+tied to `PATH`, so the first row replaced the search path, `wc` and `tr` were not found, and every row read as stale.
+
+**The rule:** never name a shell variable `path` — nor `status`, `options` or `prompt`, which zsh reserves too; use `p` or
+`file`. A check that reports every row wrong at once is a broken check before it is a broken document.

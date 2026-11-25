@@ -475,6 +475,8 @@ set C on sale with the last. All three were written in their own worktree and ca
 owner's `/commit`, then a fast-forward into `main` by the store session. Not merged, not pushed. Left for the owner's hand:
 the widgets, the control, the reminder's button and the watch walked in each theme, which need Premium on a phone's own
 stores, and each alternate icon's forms from a TestFlight install (`docs/AI_CONTEXT.md` #236, #237).)*
+*(2026-11-25, evening: step 5 committed as `cd5e930` and its records as `7adf2f1`; `main` fast-forwarded to `7adf2f1` by the
+store session at 19:16, on the owner's word, and the build session archived. Not pushed when this was written.)*
 
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.

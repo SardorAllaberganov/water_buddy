@@ -16385,3 +16385,43 @@ On clean builds into empty DerivedData folders, on the final tree:
   5 h 32 min in `simctl bootstatus` before any test and was stopped; the boot wait is now time-limited (`tasks/lessons.md`).
 - **Not run:** iOS 26.5 (#230); a device, a placed widget, the control, a reminder's button and the watch in each theme (#236);
   a TestFlight install's icons (#237); VoiceOver itself (#238).
+
+## [2026-11-25] — Set C into `main`: a fast-forward to `7adf2f1`, and its build session cleared
+
+### What happened
+
+- **The owner's word**, "After set C finishes, merge them into main and clear the set C.", given on the 24th. The build session
+  kept it in its ledger and sent "done" at 19:15, after the owner's `/commit` of step 5 (`cd5e930`) and of its records
+  (`7adf2f1`), with its worktree clean.
+- **The merge:** `git merge --ff-only feature/set-c` in this checkout at 19:16 — `1a8af08..7adf2f1`, seven commits, 104 files.
+  `main` had not moved since the branch merged it in (`28ee3eb`), and none of the 104 files is among the six the owner holds
+  uncommitted here, which stayed as they were.
+- **The clear:** the build session unpinned and archived; `feature/set-c` and `claude/hopeful-edison-f6b307` deleted with
+  `git branch -d`. The archive detached the worktree's HEAD at `7adf2f1` and left the folder on disk, with no kept worktree in
+  the app's record to discard; `git worktree remove` took it once the theme census had moved to this checkout's `build/themes`
+  (8,474 files, 2,000 of them renders, 8.3 GB) and the census's two build caches were deleted (1.4 GB). The folder's other build
+  caches (2.4 GB) went with it.
+- **This pass:** `/doc_sync` on the owner's "Yes, push", then the Growth Journal, then the owner's `/commit` and the push.
+- **Read for the release:** the live privacy policy still reads *Last updated 20 November 2026* (19:34); set C's text, in
+  `PRIVACY.md` and `Tools/PrivacyPolicy.html`, is dated the 25th and goes on the owner's site before set C goes on sale.
+- **Growth Journal:** GROW-187 to GROW-191.
+
+### The rulings
+
+- **"Clear" is archive, not delete:** the build session can be reopened from the Archived list, its conversation kept.
+- **The theme census is kept, the caches are not.** Making the renders again takes hours of capture on two runtimes, and their
+  figures are committed (`Tools/theme-pairs.json`, `docs/DESIGN.md`); `build/` is ignored, so keeping them changes no commit.
+  The owner may delete `build/themes` whenever they like.
+- **`claude/determined-kapitsa-8d668e` stays.** Set C's design session, archived on the 22nd, was on it, but the owner did not
+  name it, and it holds nothing `main` lacks.
+
+### Files touched
+
+`CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` (two entries) and this file.
+
+### Verification
+
+No gate: the fast-forward made `main`'s tree the one the build session's final gate ran on (its checkpoint above), and nothing
+changed after it. This pass printed 148 Swift files in the seven targets, each named in *Files on disk*; 1181 phone `@Test`, 77
+watch and 82 UI `func test`; 153 counted rows equal to `wc -l`; every rule citation resolving. `git worktree list` names this
+checkout alone.

@@ -4,6 +4,19 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-25, 19:35 (hundred-and-thirty-first pass — `/doc_sync` on the owner's "Yes, push", after set C came
+into `main` by a fast-forward; on `main`, HEAD `7adf2f1`, seven commits ahead of `origin/main`; these records staged, not
+committed). What it checked and wrote, every figure printed:
+- 148 `.swift` files in the seven targets, each named in *Files on disk*; 1181 phone `@Test`, 77 watch, 82 UI `func test`. All
+  unchanged, since no file in a target changed after `7adf2f1`;
+- *Current state*'s new headline: set C's last two commits, `main` fast-forwarded to `7adf2f1` on the owner's word, and the build
+  session cleared — archived, its two branches deleted, its worktree removed and its theme census kept in `build/themes`;
+- *Files on disk*: 153 counted rows equal to `wc -l` by script, the other three the `Screenshots/` rows already read gone; a note
+  that set C's rows are on `main`;
+- `CLAUDE.md`: set C's bullet says on `main` since `7adf2f1`. `docs/ROADMAP.md`: set C's note, merged. `tasks/lessons.md`: one
+  entry, an archived session's worktree left on disk. `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: checked, no change.
+  Every `` rule `nn-name` `` citation resolves. Growth Journal: GROW-187 to GROW-191.
+
 **Last updated:** 2026-11-25, 13:16 (hundred-and-thirtieth pass — set C's records, plan Task 22, in the set C build session's
 worktree: on `feature/set-c`, HEAD `5d2f22c`, steps 1–4 committed and step 5 — set C on sale, the privacy policy and the final
 review's fixes — staged with these records, not committed). What it checked and wrote, every figure printed:
@@ -2511,6 +2524,8 @@ recounted — every counted row in this section, 152 (147 for the targets, five 
 `WaterBuddyWatchWidgetBundle.swift` still read by hand (9). Outside every target, three new rows — the measurement
 harness's `MeasureContrast.swift`, `CaptureThemeCensus.sh` and `theme-pairs.json` — and `GenerateAppIcon.swift` recounted.
 "Set C, staged" on a row means steps 1–4's commits on the branch (`2cf4f8f` … `5d2f22c`) or step 5's staging, not `main`.)*
+*(2026-11-25, hundred-and-thirty-first pass: set C's rows are on `main` — step 5 committed as `cd5e930`, then a fast-forward to
+`7adf2f1`. 153 counted rows equal to `wc -l` by script; the other three are the `Screenshots/` rows read gone on 2026-11-23.)*
 
 *(2026-11-01, hundred-and-sixth pass: five new rows, for export, and six recounted, each against `wc -l`. "Export, staged"
 means staged on `feature/export`, not committed.)*
@@ -3067,6 +3082,29 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Set C on `main` — a fast-forward to `7adf2f1` — and its build session cleared; not pushed** (2026-11-25, 19:14 to 19:35; on
+`main`, HEAD `7adf2f1`, seven commits ahead of `origin/main`, these records staged).
+- **The owner's word**, "After set C finishes, merge them into main and clear the set C.", given in the store session on the
+  24th and kept in the build session's ledger until it sent "done" at 19:15.
+- **Set C's last two commits**, on the owner's `/commit` in the build session: step 5, set C on sale and the privacy policy,
+  `cd5e930`; its records, `7adf2f1`.
+- **The merge:** `main` fast-forwarded from `1a8af08` to `7adf2f1` at 19:16 — seven commits, 104 files. `main`'s tree is the one
+  the build session's final gate ran on (the headline below), and the gate was not run again. None of the 104 files is among the
+  six the owner holds uncommitted in this checkout, which stayed as they were.
+- **The clear:** the build session unpinned and archived; `feature/set-c` and `claude/hopeful-edison-f6b307` deleted. The archive
+  detached the worktree's HEAD and left its folder on disk (12 GB), with no kept worktree in the app's record, so it was removed
+  with `git worktree remove` once its theme census — 2,000 renders with their logs and tables, 8,474 files, 8.3 GB — had moved to
+  this checkout's `build/themes`, ignored by git and where `Tools/MeasureContrast.swift` and `Tools/CaptureThemeCensus.sh` look.
+  About 3.8 GB of build caches went. The build's 78 rulings are in the design session's notes:
+  `~/Library/Application Support/Claude/side-session-notes/local_061126c5-85e2-4d4d-9819-e4a9ddae8d39/2026-11-25-set-c-step-5-report.md`.
+- **Left:** set C is on sale in code, so any build from `main` sells it, and #236 comes before the next upload; then #237; the
+  privacy policy published on the owner's site before set C goes on sale — the live page read *Last updated 20 November 2026* at
+  19:34, where `PRIVACY.md` and `Tools/PrivacyPolicy.html` are dated the 25th (rule `70-privacy`); and the Spanish (Mexico) page's
+  four steps at set C's release (`AppStore/README.md` §6). #242's rule wording and #136's welcome note are the owner's.
+  `claude/determined-kapitsa-8d668e`, the branch set C's archived design session was on, holds nothing `main` lacks and was left.
+- **Growth Journal:** GROW-187 to GROW-191 — set C built, its gate, the boot wait that hung, the merge, and the worktree an archive
+  left on disk.
 
 **Set C built on `feature/set-c` — five themes, five app icons and the vessel library, on sale in code — walked, reviewed and
 gated; not merged, not pushed** (2026-11-23, 03:25, to 2026-11-25, 13:16; in the set C build session's worktree, on
