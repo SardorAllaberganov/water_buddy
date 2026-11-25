@@ -6342,3 +6342,14 @@ longer fit: its panes follow the week the sample's dates land on, and the lead p
 **The rule:** a release after a feature takes the app's captures again, and reads every cut-out in the framing page's measure
 mode against the new captures, then every framed shot by eye. Every claim in the description is read against the build,
 its numbers first.
+
+## 2026-11-26 — A simulator named in a destination is every project's
+
+**What happened.** Release 1.4.2's gate booted WaterBuddy's *iPhone 16* on iOS 18.6, the device rule `85-testing`'s 18.6 run
+names, and twice it did not come up: the time-limited `bootstatus` gave up, the device read *Shutdown*, then *Shutting Down*.
+Another session's shell was waiting on `bootstatus` for that same device. A destination written as `name=iPhone 16` picks
+whichever phone of that name and runtime it finds, and another project's gate on this Mac can name the same one.
+
+**The rule:** for a gate on a Mac other sessions share, make a WaterBuddy-only simulator of the same model and runtime — named
+*WaterBuddy …* — and pin it by UDID (`-destination id=…`). A simulator build runs on any phone of its runtime, so the build does
+not change. Never shut down a device another session is using; shut down only the one you made.

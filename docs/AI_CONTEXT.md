@@ -4,6 +4,16 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-26, 01:50 (hundred-and-thirty-third pass — `/doc_sync` on the owner's "Run the doc sync", after
+release 1.4.2's `/commit`, `main`'s fast-forward and push, and the privacy policy's publication; on `main`, HEAD `7b97a91`,
+level with `origin/main`; these records staged, not committed). What it checked and wrote, every figure printed:
+- 148 `.swift` files in the seven targets; 1181 phone `@Test`, 77 watch, 83 UI `func test`. All unchanged since the last pass:
+  no file in a target changed after it;
+- *Current state*'s new headline: the seven commits, `main` moved and pushed, the policy live, and what is left;
+- `CLAUDE.md`: the `AppStore/` row says uploaded. `docs/ROADMAP.md`: 1.4.2's note. `tasks/lessons.md`: one entry, a by-name
+  simulator is every project's. `HISTORY.md`: a checkpoint. `docs/STATE.md`, `docs/WIDGET.md` and `docs/DESIGN.md`: checked,
+  no change. Every `` rule `nn-name` `` citation resolves.
+
 **Last updated:** 2026-11-26, 01:10 (hundred-and-thirty-second pass — release 1.4.2's records, begun at 23:35 and brought up
 to the finished gate and the archive; on `release/1.4.2` from `eca5615`; the release's work and these records staged, not
 committed). What it checked and wrote, every figure printed:
@@ -3095,6 +3105,28 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**Release 1.4.2 committed, on `main` and pushed; the privacy policy live; TestFlight, the walk and the submission wait**
+(2026-11-26, 01:18 to 01:50; on `main`, HEAD `7b97a91`, level with `origin/main`; these records staged).
+- **The owner's `/commit`**, approved by "Ok": seven commits on `release/1.4.2`, `80fc1bd` to `7b97a91` — the version; the
+  release's design; the themes capture and its framing; the store shots; the listing in four languages; the policy's wording;
+  the records — with the owner's six Xcode re-saves left out. `release/1.4.2` pushed as a new branch. Its compiled files are
+  the uploaded build's: the committed tree differs from the archived export only in five records files, outside every target.
+- **`main` moved** on the owner's "Move main": fast-forwarded to `7b97a91` and pushed, `eca5615..7b97a91`. `release/1.4.2`
+  stands at the same commit.
+- **The privacy policy published** on the owner's "Publish it" (the release's R3): `Tools/PrivacyPolicy.html` as
+  `waterbuddy/privacy/index.html` in the owner's `SardorAllaberganov.github.io`, commit `1451cfd` *Update WaterBuddy's privacy
+  policy for 1.4.2*, its diff only set C's lines, R4's and the dates; pushed `a76b62a..1451cfd` at 01:44. Read live at 01:44:38:
+  *Last updated 25 November 2026* in both places, *the three vessels on WaterBuddy's Home screen* twice, the theme's row, and
+  no 20 November left.
+- **Supersedes** the headline below where it says the work is staged, `main` stands at `eca5615` and the policy is to be
+  published.
+- **Left:** Connect's processing of 1.4.2 (8), not read here — the built-in browser is not signed in to App Store Connect;
+  then, from TestFlight on the owner's iPhone, #237's icons and #236's device walk; the walk's widget and watch tables; the
+  version page and *Submit for Review*, each on the owner's word. `.claude/app-profile.md` for the owner's `app-dev` skill is
+  the owner's to add.
+- **Growth Journal:** GROW-223 (`main` moved) and GROW-224 (the policy), each written before its push; GROW-222 is another
+  session's.
 
 **Release 1.4.2 — set C's version — prepared on `release/1.4.2`, gated, archived and uploaded; staged; the walk waits**
 (2026-11-25, 21:00, to 2026-11-26, 01:10; `release/1.4.2` from `main` at `eca5615`; 54 paths staged, the owner's six re-saves

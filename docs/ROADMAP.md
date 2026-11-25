@@ -482,6 +482,9 @@ store session at 19:16, on the owner's word, and the build session archived. Not
 9, the words in four languages with the Spanish (Mexico) page, the policy's wording. Gated by 01:04 on the 26th and archived on
 the owner's "Yes, fetch profiles", then uploaded to App Store Connect on their "Upload it" (01:08). Waiting: the owner's
 `/commit`, TestFlight (#237) and the device walk (#236), and the submission, each on the owner's word.)*
+*(2026-11-26, 01:50: committed as `80fc1bd`–`7b97a91` on the owner's `/commit`; `main` fast-forwarded to `7b97a91` and pushed on
+their "Move main"; the privacy policy of 25 November live on their site on "Publish it". Waiting: TestFlight (#237), the device
+walk (#236) and the submission, each on the owner's word.)*
 
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.

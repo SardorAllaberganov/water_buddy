@@ -16536,3 +16536,34 @@ as the archive needed. 01:06:33–01:08:43, *Upload succeeded*, `EXPORT SUCCEEDE
 ### Verification
 
 The upload's own log, `build/release-1.4.2/upload.log`. Not read: Connect's build list, its processing, TestFlight.
+
+## [2026-11-26] — Release 1.4.2 committed and on `main`; the privacy policy published
+
+### What happened
+
+- **The owner's `/commit`**, approved by "Ok": seven commits on `release/1.4.2`, `80fc1bd`–`7b97a91`. They hold the version, the
+  release's design, the themes capture, the store shots, the listing, the policy's wording and the records; the owner's six
+  Xcode re-saves were left out. `release/1.4.2` was pushed as a new branch.
+- **`main` moved** on "Move main": fast-forwarded to `7b97a91` and pushed, `eca5615..7b97a91`.
+- **The policy published** on "Publish it", the release's R3: commit `1451cfd` on the owner's `SardorAllaberganov.github.io`,
+  pushed `a76b62a..1451cfd`.
+- **This pass:** `docs/AI_CONTEXT.md`'s headline, `CLAUDE.md`'s `AppStore/` row, `docs/ROADMAP.md`'s note and one lesson.
+  Growth Journal: GROW-223 and GROW-224, each before its push.
+
+### The rulings
+
+- The committed tree was compared with the archived export before the push: they differ in five records files only, so the
+  uploaded build is the commit's compiled content.
+- The policy's page is the repository's `Tools/PrivacyPolicy.html` byte for byte. Its diff against the live page held only set
+  C's lines, R4's and the dates.
+
+### Files touched
+
+`CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file; on the owner's site,
+`waterbuddy/privacy/index.html`.
+
+### Verification
+
+No gate: no file in a target changed after the gate of the checkpoint above. This pass printed 148 Swift files; 1181 phone `@Test`,
+77 watch, 83 UI `func test`; every rule citation resolving. The live policy was read at 01:44:38: *Last updated 25 November 2026*
+in both places, the new sentence twice, no 20 November left.
