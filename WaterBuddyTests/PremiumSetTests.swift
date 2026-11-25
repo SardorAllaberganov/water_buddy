@@ -25,12 +25,13 @@ struct PremiumSetTests {
     }
 
     /// Set A went on sale with the recap (spec `2026-10-24-monthly-recap-design.md` §3.8), set B with its last
-    /// feature (spec `2026-10-30-coaching-design.md`).
+    /// feature (spec `2026-10-30-coaching-design.md`), set C with the icons (spec `2026-11-22-set-c-design.md`, D22).
     @Test func everySetIsOnSaleNowEveryFeatureIsBuilt() {
         #expect(PremiumSet.understand.isOnSale)
         #expect(PremiumSet.coached.isOnSale)
         #expect(PremiumSet.portable.isOnSale)
-        #expect(PremiumSet.onSale == [.understand, .coached, .portable])
+        #expect(PremiumSet.personal.isOnSale)
+        #expect(PremiumSet.onSale == [.understand, .coached, .portable, .personal])
     }
 
     /// D10: Settings' Premium card keeps its three previews — four abreast break at the ordinary sizes.
@@ -104,10 +105,10 @@ struct PremiumSetTests {
         #expect(PremiumSet.Feature.allCases.filter { $0.caption(in: strings) != nil } == [.monthView, .patterns, .insights])
     }
 
-    @Test func setCListsItsThreeFeaturesAndIsNotYetOnSale() {
+    @Test func setCListsItsThreeFeaturesAndIsOnSale() {
         #expect(PremiumSet.personal.features == [.themes, .appIcons, .vessels])
-        #expect(!PremiumSet.personal.isOnSale, "on sale only with its last step (D22)")
-        #expect(!PremiumSet.onSale.contains(.personal))
+        #expect(PremiumSet.personal.isOnSale, "on sale with its last step, the icons (D22)")
+        #expect(PremiumSet.onSale.contains(.personal))
         #expect(PremiumSet.personal.features.allSatisfy { $0.caption(in: AppLanguage.english.bundle) == nil },
                 "the Settings card's three previews are taken (set B's D10)")
     }

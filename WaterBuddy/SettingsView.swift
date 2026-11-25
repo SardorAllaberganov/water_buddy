@@ -508,9 +508,6 @@ private struct AppearanceCard: View {
     @State private var icon: AppTheme = .aurora
     @ScaledMetric(relativeTo: .body) private var swatch: CGFloat = 44
 
-    /// An icon's side: a home-screen icon's size, over the 44-pt tap floor (rule `65-accessibility`).
-    private let iconSide: CGFloat = 52
-
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Appearance", bundle: strings).cardTitle()
@@ -552,20 +549,7 @@ private struct AppearanceCard: View {
                         }
                     }
                 } label: {
-                    let shape = RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous)
-                    Image(theme.iconPreviewName)
-                        .resizable()
-                        .frame(width: iconSide, height: iconSide)
-                        .clipShape(shape)
-                        .overlay {
-                            shape.strokeBorder(.white.opacity(icon == theme ? LiquidGlass.Selection.ringOpacity : 0),
-                                               lineWidth: LiquidGlass.Selection.ringWidth)
-                        }
-                        .overlay {
-                            if locked {
-                                Image(systemName: "lock.fill").font(.caption.weight(.semibold)).foregroundStyle(.white)
-                            }
-                        }
+                    SettingsView.IconTile(theme: theme, selected: icon == theme, locked: locked)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(PressStyle())
@@ -629,6 +613,52 @@ private struct AppearanceCard: View {
     /// The swatch: 44 pt at the default size, never under the tap floor, capped so five still share a row as long as
     /// they can (rule `65-accessibility`).
     private var diameter: CGFloat { min(max(swatch, 44), 60) }
+}
+
+extension SettingsView {
+
+    /// One icon in the Appearance card's row: the theme's preview, its ring when iOS shows it, and its lock while
+    /// locked. Not `private`, so `AppIconTests` can render it.
+    ///
+    /// **The lock sits on a disc at the corner, never at the centre.** Every preview draws its white drop at the
+    /// centre, and the swatches' white lock laid there measured about 1:1: the four locked icons looked as choosable
+    /// as Aurora's (the final review's Important 1; `aLockedIconShowsItsLock`). The disc is the theme's `top`, the ink
+    /// white is measured against on the primary surface, so the lock holds 7:1 in every theme. Both are ratios of the
+    /// tile, which is capped: a text style would outgrow it at the accessibility sizes (rule `65-accessibility`).
+    struct IconTile: View {
+        let theme: AppTheme
+        let selected: Bool
+        let locked: Bool
+
+        @Environment(\.aurora) private var aurora
+
+        /// An icon's side: a home-screen icon's size, over the 44-pt tap floor (rule `65-accessibility`).
+        static let side: CGFloat = 52
+        /// The lock's disc, and the glyph on it, as fractions of ``side``.
+        static let lockDisc: CGFloat = 0.42
+        static let lockGlyph: CGFloat = 0.2
+
+        var body: some View {
+            let shape = RoundedRectangle(cornerRadius: LiquidGlass.innerCornerRadius, style: .continuous)
+            Image(theme.iconPreviewName)
+                .resizable()
+                .frame(width: Self.side, height: Self.side)
+                .clipShape(shape)
+                .overlay {
+                    shape.strokeBorder(.white.opacity(selected ? LiquidGlass.Selection.ringOpacity : 0),
+                                       lineWidth: LiquidGlass.Selection.ringWidth)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    if locked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: Self.side * Self.lockGlyph, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: Self.side * Self.lockDisc, height: Self.side * Self.lockDisc)
+                            .background(Circle().fill(aurora.top))
+                    }
+                }
+        }
+    }
 }
 
 // MARK: - The language picker

@@ -12,7 +12,7 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 20 November 2026
+**Last updated:** 25 November 2026
 
 ---
 
@@ -54,7 +54,9 @@ Everything below stays on your own devices, in WaterBuddy's own storage. The app
 | Your daily goal | A number of millilitres. |
 | The current day | A date marker, used to start a new day at midnight. |
 | Your three quick-add amounts | Three amounts in millilitres: the Cup, the Glass and the Bottle. |
+| Your vessels | Each vessel you keep: its icon, its amount and, for one of your own, the name you gave it. Cup, Glass and Bottle are always there. |
 | Your chosen language | English, Russian or Uzbek, or nothing at all if the app follows your device's language. |
+| Your theme | Which of the five themes you chose, or nothing if you kept Aurora. |
 | Your reminders setting | Whether you turned reminders on, the schedule they follow if you set your own, and whether they come only when you're behind. |
 | Your Apple Health setting | Whether you turned Apple Health on. |
 | Two internal flags | Whether you have chosen a goal yet, and whether a one-time move of older settings has already happened. |
@@ -66,15 +68,15 @@ Everything below stays on your own devices, in WaterBuddy's own storage. The app
 | What | Details |
 |---|---|
 | Servings logged on the Watch that your iPhone has not confirmed yet | The amount, the moment and the identifier of each. Removed as soon as your iPhone confirms it. |
-| A copy of what your iPhone last sent | Today's total, your goal, your three amounts, your language, whether you have chosen a goal, when the copy was made, when your iPhone's day starts and ends, and the identifiers of up to 256 Watch servings your iPhone has already counted. The Watch and its complications use it to show the right figures before the next sync. |
+| A copy of what your iPhone last sent | Today's total, your goal, your three amounts, your language, your theme, the icons and names of the three vessels on your Home screen, whether you have chosen a goal, when the copy was made, when your iPhone's day starts and ends, and the identifiers of up to 256 Watch servings your iPhone has already counted. The Watch and its complications use it to show the right figures before the next sync. |
 
 **Held by iOS itself, on your iPhone:** up to 64 pending reminder notifications, if you turn reminders on. See *Notifications*.
 
 **Worked out when shown, and stored nowhere:** your streak, your month view, your patterns, your insights, your monthly recap and your pace. Each is computed from your servings on your iPhone every time it is drawn.
 
-**Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes; only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); the recap image (made in memory when you open the recap); and the export file (made in memory when you tap *Export your servings*).
+**Never stored:** whether you have Premium (the app asks Apple's StoreKit each time it starts and keeps the answer in memory); the weight and activity level you may enter in the first-run goal calculator (they suggest a goal on screen and are forgotten when the screen closes; only the goal you then choose is saved); the wording Apple's on-device model writes for an insight (kept in memory until the app closes); the recap image (made in memory when you open the recap); the export file (made in memory when you tap *Export your servings*); and which app icon you chose (iOS keeps that choice, and WaterBuddy stores nothing about it).
 
-**That is the complete list.** WaterBuddy stores no name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record of its own, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
+**That is the complete list.** WaterBuddy stores no personal name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record of its own, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
 
 **Copied to Apple Health, only if you turn it on:** each serving's amount and moment, as Water. See *Apple Health, if you turn it on* below.
 
@@ -102,17 +104,18 @@ Your iPhone and the Apple Watch paired with it exchange data through Apple's Wat
 **From your iPhone to your Watch**, so the Watch shows the right figures:
 - today's total, your goal and your three amounts, in millilitres
 - your language (or nothing, if you follow your device's language)
+- your theme, and the icons and names of the three vessels on your Home screen
 - whether you have chosen a goal
 - when the message was composed, and when your iPhone's day starts and ends
 - the identifiers of servings your iPhone has already counted, so your Watch can stop resending them
 
-Your iPhone may also send the same summary directly to your Watch's complication. Nothing else travels between the two: no name, no device identifier, no account, no location.
+Your iPhone may also send the same summary directly to your Watch's complication. Nothing else travels between the two: no personal name, no device identifier, no account, no location.
 
 **One caveat.** When your Watch hands a serving to iOS for delivery, iOS holds it in a system queue outside the app until your iPhone can be reached, and the queue survives the app being closed. If you delete a serving on your iPhone before its Watch copy arrives, the copy is not cancelled. Your iPhone recognises it when it arrives and discards it, so the deleted serving does not come back.
 
 ### 2. Premium, through Apple
 
-WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase (monthly, yearly or once) that adds a month view and full history, patterns, personal insights, a monthly recap, your own reminder schedule, a pace line, reminders only when you're behind, and a file of your servings.
+WaterBuddy is free, and logging water is free for everyone, always. **Premium** is an optional purchase (monthly, yearly or once) that adds a month view and full history, patterns, personal insights, a monthly recap, your own reminder schedule, a pace line, reminders only when you're behind, a file of your servings, and themes, app icons and your own vessels.
 
 Premium is sold and paid for entirely through Apple's App Store, under your Apple Account. When you open the Premium screen, the app asks the App Store for the plans, their prices in your country, and whether a free week is open to you. Buying, restoring a purchase, asking a parent to approve one (*Ask to Buy*) and managing a subscription all happen in Apple's own sheets. Apple processes the payment, and StoreKit checks the purchase on your iPhone.
 
@@ -161,7 +164,7 @@ The monthly recap (Premium) can be shared as an image, **only when you tap *Shar
 
 Insights (Premium) describe your last finished week: what changed, what went well, and one suggestion. **WaterBuddy decides what an insight says.** It writes its own sentences on your iPhone, from your weekly figures: averages, the days you met your goal, and when in the day you drank.
 
-When the app is in English, on an iPhone where Apple's on-device model is available and turned on, WaterBuddy may hand those sentences and the name of the vessel it suggests to Apple's on-device language model, to word them more naturally. It never hands over your servings, their times or anything else. The model runs on your iPhone. WaterBuddy uses only the on-device model, never Apple's Private Cloud Compute and never any other provider. The wording it returns is kept in memory until the app closes. It is shown only if every number in it is one the app gave it; otherwise the app's own sentences are shown. Each insight says who wrote it: WaterBuddy or Apple's on-device model. **An insight is not medical advice.**
+When the app is in English, on an iPhone where Apple's on-device model is available and turned on, WaterBuddy may hand those sentences and the name of the vessel it suggests — which may be a name you typed — to Apple's on-device language model, to word them more naturally. It never hands over your servings, their times or anything else. The model runs on your iPhone. WaterBuddy uses only the on-device model, never Apple's Private Cloud Compute and never any other provider. The wording it returns is kept in memory until the app closes. It is shown only if every number in it is one the app gave it; otherwise the app's own sentences are shown. Each insight says who wrote it: WaterBuddy or Apple's on-device model. **An insight is not medical advice.**
 
 ---
 

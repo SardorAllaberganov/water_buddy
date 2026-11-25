@@ -135,13 +135,13 @@ nonisolated enum PremiumSet: CaseIterable, Sendable, Equatable {
     /// (spec `2026-10-24-monthly-recap-design.md` §3.8); a Release build offers it only once the privacy
     /// policy's address is set (`PaywallView.isOffered(arguments:)`). **Set B went on sale with the pace
     /// line**, its last feature (spec `2026-10-30-coaching-design.md`). Export went on sale as it was built.
-    /// Set C goes on sale with its last step, Task 20 of its plan.
+    /// **Set C went on sale with the icons**, its last feature (spec `2026-11-22-set-c-design.md`, D22).
     var isOnSale: Bool {
         switch self {
         case .understand: true
         case .coached: true
         case .portable: true
-        case .personal: false
+        case .personal: true
         }
     }
 

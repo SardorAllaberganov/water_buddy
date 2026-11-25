@@ -146,7 +146,11 @@ struct HydrationView: View {
 
     var body: some View {
         layout
-            .containerBackground(for: .widget) { WidgetAurora() }
+            // The theme is handed to the background inside its own closure too: WidgetKit draws the container
+            // background apart from the layout, and nothing yet shows that a value injected below reaches it — no
+            // themed widget has been placed (`docs/AI_CONTEXT.md` #236). Without it a Dusk card could stand on
+            // Aurora's sky (the final review's Important 3). Correct either way.
+            .containerBackground(for: .widget) { WidgetAurora().environment(\.theme, entry.snapshot.theme) }
             // The app sets `.preferredColorScheme(.dark)` deliberately, because a preference
             // travels *up* and turns the status bar white too. A widget has no status bar and no
             // hosting controller to hear a preference, so here the value has to travel down the

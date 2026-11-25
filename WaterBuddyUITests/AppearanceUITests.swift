@@ -52,12 +52,40 @@ final class AppearanceUITests: XCTestCase {
     func testEachVesselIsOneButton() {
         let app = launch()
         app.buttons["Settings"].firstMatch.tap()
-        let before = ["Cup", "Glass", "Bottle"].map { app.buttons.matching(identifier: $0).count }
+        let names = ["Cup", "Glass", "Bottle"]
+        // A second button under the row — the `Button` surfaced again with its drawn words, "Cup, 150 ml" — is a
+        // second VoiceOver stop (`tasks/lessons.md`, 2026-08-28), and an exact label never matches it.
+        let surfaced = { (name: String) in app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", name + ", ")).count }
+        let before = names.map { app.buttons.matching(identifier: $0).count }
+        let surfacedBefore = names.map(surfaced)
         app.buttons["Your vessels"].tap()
         XCTAssertTrue(app.buttons["Add a vessel"].waitForExistence(timeout: 5))
-        for (name, count) in zip(["Cup", "Glass", "Bottle"], before) {
+        for (name, count) in zip(names, before) {
             XCTAssertEqual(app.buttons.matching(identifier: name).count - count, 1, "\(name)")
         }
+        for (name, count) in zip(names, surfacedBefore) {
+            XCTAssertEqual(surfaced(name) - count, 0, "\(name)'s row is surfaced as a second button")
+        }
+    }
+
+    /// At the largest text size a vessel's name stays whole (the final review's Minor 5, re-graded by the walk): beside
+    /// its glyph and its amount, a row's name had a third of the row, and "Bottle" broke into "Bot-tle" — its text two
+    /// lines tall where "Cup"'s is one (rule `65-accessibility`, *Dynamic Type*).
+    @MainActor
+    func testTheLibrarysNamesStayWholeAtTheLargestSize() {
+        let app = launch(["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
+        app.buttons["Settings"].firstMatch.tap()
+        let row = app.buttons["Your vessels"]
+        let clear = { (e: XCUIElement) in e.exists && e.isHittable && e.frame.maxY < app.windows.firstMatch.frame.maxY - 160 }
+        for _ in 0..<10 where !clear(row) { app.swipeUp() }
+        tapWhenReady(row)
+        XCTAssertTrue(app.buttons["Add a vessel"].waitForExistence(timeout: 5))
+        // The drawn name under each row's button: XCUITest lists it there, though VoiceOver reads the button alone.
+        let cup = app.buttons["Cup"].staticTexts["Cup"].firstMatch
+        let bottle = app.buttons["Bottle"].staticTexts["Bottle"].firstMatch
+        XCTAssertTrue(cup.exists && bottle.exists, "the rows' names are not listed")
+        XCTAssertLessThan(bottle.frame.height, cup.frame.height * 1.4,
+                          "Bottle's name is \(bottle.frame.height) pt tall, Cup's \(cup.frame.height): it broke across lines")
     }
 
     /// Each theme is one button, and a tap selects it.

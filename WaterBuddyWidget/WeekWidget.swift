@@ -62,7 +62,9 @@ struct WeekView: View {
         .widgetCard()
         .padding(HydrationView.cardInset)
         .widgetURL(WidgetLink.history)
-        .containerBackground(for: .widget) { WidgetAurora() }
+        // The theme inside the background's own closure too, for `HydrationView.body`'s reason (the final review's
+        // Important 3).
+        .containerBackground(for: .widget) { WidgetAurora().environment(\.theme, entry.snapshot.theme) }
         .environment(\.colorScheme, .dark)
         .environment(\.strings, entry.snapshot.language.bundle)
         .environment(\.locale, entry.snapshot.language.locale)

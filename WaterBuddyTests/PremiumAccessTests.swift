@@ -439,9 +439,10 @@ struct PaywallOfferTests {
     @Test func setAOnSaleWithoutAPrivacyLinkIsNotOffered() {
         #expect(!PaywallView.isOffered(debug: false, arguments: [], setsOnSale: PremiumSet.onSale.count,
                                        privacyPolicy: URL(string: "OWNER-PRIVACY-URL")))
-        // Set B joined set A on sale with the pace line (spec `2026-10-30-coaching-design.md`), and export joined
-        // both as it was built (spec `2026-11-01-export-design.md` D11).
-        #expect(PaywallView.shownSets(debug: false) == [.understand, .coached, .portable])
+        // Set B joined set A on sale with the pace line (spec `2026-10-30-coaching-design.md`), export joined
+        // both as it was built (spec `2026-11-01-export-design.md` D11), and set C joined them with the icons
+        // (spec `2026-11-22-set-c-design.md` D22).
+        #expect(PaywallView.shownSets(debug: false) == [.understand, .coached, .portable, .personal])
     }
 
     /// The policy's page is the owner's GitHub user site, pinned whole as Apple's terms are: a scheme
