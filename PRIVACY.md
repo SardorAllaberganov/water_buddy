@@ -68,7 +68,7 @@ Everything below stays on your own devices, in WaterBuddy's own storage. The app
 | What | Details |
 |---|---|
 | Servings logged on the Watch that your iPhone has not confirmed yet | The amount, the moment and the identifier of each. Removed as soon as your iPhone confirms it. |
-| A copy of what your iPhone last sent | Today's total, your goal, your three amounts, your language, your theme, the icons and names of the three vessels on your Home screen, whether you have chosen a goal, when the copy was made, when your iPhone's day starts and ends, and the identifiers of up to 256 Watch servings your iPhone has already counted. The Watch and its complications use it to show the right figures before the next sync. |
+| A copy of what your iPhone last sent | Today's total, your goal, your three amounts, your language, your theme, the icons and names of the three vessels on WaterBuddy's Home screen, whether you have chosen a goal, when the copy was made, when your iPhone's day starts and ends, and the identifiers of up to 256 Watch servings your iPhone has already counted. The Watch and its complications use it to show the right figures before the next sync. |
 
 **Held by iOS itself, on your iPhone:** up to 64 pending reminder notifications, if you turn reminders on. See *Notifications*.
 
@@ -104,7 +104,7 @@ Your iPhone and the Apple Watch paired with it exchange data through Apple's Wat
 **From your iPhone to your Watch**, so the Watch shows the right figures:
 - today's total, your goal and your three amounts, in millilitres
 - your language (or nothing, if you follow your device's language)
-- your theme, and the icons and names of the three vessels on your Home screen
+- your theme, and the icons and names of the three vessels on WaterBuddy's Home screen
 - whether you have chosen a goal
 - when the message was composed, and when your iPhone's day starts and ends
 - the identifiers of servings your iPhone has already counted, so your Watch can stop resending them
