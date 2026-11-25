@@ -252,10 +252,11 @@ Not yet chosen. All rights reserved until one is added.
 
 # App Store Connect
 
-Everything needed to fill in the listing for **version 1.4.1 (build 7)** — rewritten on 2026-10-25 from
-the 1.0 listing, against the app as built, again on 2026-11-04 for Apple Health, set B and export, and on
+Everything needed to fill in the listing for **version 1.4.2 (build 8)** — rewritten on 2026-10-25 from
+the 1.0 listing, against the app as built, again on 2026-11-04 for Apple Health, set B and export, on
 2026-11-20 for search: the name, the subtitle and the keywords, with English (U.K.) and Russian listings
-beside the en-US one (spec `docs/superpowers/specs/2026-11-20-release-1-4-1-design.md`).
+beside the en-US one (spec `docs/superpowers/specs/2026-11-20-release-1-4-1-design.md`), and on 2026-11-25 for
+set C, with a Spanish (Mexico) listing (spec `docs/superpowers/specs/2026-11-25-release-set-c-design.md`).
 **Character counts were verified programmatically**, not
 estimated (`bash Tools/VerifyListing.sh`): every field is inside Apple's limit, and one, the subtitle, is
 exactly at it.
@@ -270,7 +271,8 @@ ruling, 2026-11-06); this section stays the master copy, so a change here is mad
 (1.3.3) among it — and WaterBuddy Premium: set A, set B and export (1.4), with the finish across the app
 (spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`). 1.4 is live since 2026-11-13. 1.4.1 fixes
 the yearly saving where prices are written with a decimal comma (#162), and asks for a rating on the first
-goal day.
+goal day; it is live since 2026-11-22. 1.4.2 brings set C: four more themes, an app icon for each, and a library
+of the user's own vessels, with the quick-add vessels going up to 2,000 ml for everyone.
 
 ## App Information
 
@@ -283,7 +285,7 @@ goal day.
 | **Primary category** | Health & Fitness |
 | **Secondary category** | Lifestyle *(optional; may be left empty)* |
 | **Primary language** | English (U.S.) |
-| **Other listings** | English (U.K.) and Russian, new in 1.4.1 — [`AppStore/en-GB/`](AppStore/en-GB) and [`AppStore/ru/`](AppStore/ru), one file per field |
+| **Other listings** | English (U.K.) and Russian, new in 1.4.1 — [`AppStore/en-GB/`](AppStore/en-GB) and [`AppStore/ru/`](AppStore/ru); Spanish (Mexico), new in 1.4.2 — [`AppStore/es-MX/`](AppStore/es-MX); one file per field |
 | **Content rights** | Contains no third-party content |
 | **Age rating** | **4+.** No violence, mature themes, gambling, user-generated content, messaging, web browsing or ads. Apple revised the questionnaire in 2025; answer any new question on the same facts — the app gives no medical or treatment advice, and its goal calculator and insights each say *not medical advice* |
 | **Price** | **Free, with in-app purchases** — WaterBuddy Premium, below |
@@ -294,7 +296,7 @@ goal day.
 
 | Field | |
 |---|---|
-| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). 🔴 **Publish it again before 1.4.1 is submitted**: its §3, on the rating request, changed. If Connect asks for the address in English (U.K.) or Russian, it is the same |
+| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). 🔴 **Publish it again before 1.4.2 is submitted**: it is dated 25 November 2026, and names set C's theme, vessels and the Watch's copy of them. If Connect asks for the address in English (U.K.), Russian or Spanish (Mexico), it is the same |
 | **Support URL** | `https://sardorallaberganov.github.io/waterbuddy/support/` — live since 2026-11-06: `Tools/Support.html`, read from the code (contact, logging, widgets and Siri, the Watch, reminders, Premium, your data), published as `waterbuddy/support/index.html` in the same repository. The same address in every language |
 | **Marketing URL** | optional |
 | **Terms of Use (EULA)** | Apple's standard licence — leave App Store Connect's EULA field at its default. The description links it, as guideline 3.1.2 asks of an app with subscriptions |
@@ -321,7 +323,7 @@ drink,hydration,intake,watch,daily,diary,log,fluid,habit,h2o,goal,streak,bottle,
 > If you change the **name** or the **subtitle**, run `bash Tools/VerifyListing.sh`: it checks this list for
 > overlap and counts every field.
 
-## Description (≤4000) — **3987/4000**
+## Description (≤4000) — **3984/4000**
 
 The first ~170 characters are all that show before the "more" link, so the opening sentence carries
 the whole pitch on its own (it is 170). The *WaterBuddy Premium* paragraph is what guideline 2.3.2
@@ -334,7 +336,7 @@ One tap logs a glass - from your Home Screen, your Lock Screen, Control Center o
 A water tracker only earns its place if you are still using it in week three, and the surest way to keep using one is never having to stop what you are doing.
 
 LOGGING
-- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml, each editable from 50 to 1,000 ml.
+- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml, each editable from 50 to 2,000 ml.
 - A daily goal from 1,000 to 4,000 ml - or let WaterBuddy suggest one from your weight and how active you are. It keeps neither.
 - A vessel of moving water shows today's percentage and the exact millilitres.
 - Undo a pour with one tap. Reach your goal and the screen celebrates, and a day streak counts along.
@@ -361,18 +363,19 @@ APPLE HEALTH
 Optional, and off until you turn it on in Settings: each serving is written to Apple Health as Water, and corrected or deleted there when you change it here. WaterBuddy reads nothing from Health.
 
 WATERBUDDY PREMIUM
-Optional extras:
 - Month view: every day you have logged, a month at a glance.
 - Your patterns: when in the day you drink, weekdays against weekends, your usual first and last drink.
-- Personal insights each week, worked out from your own figures on your iPhone. Where Apple's on-device model is available, it can word them, in English. Not medical advice.
+- Personal insights each week, worked out from your own figures on your iPhone. Not medical advice.
 - A monthly recap: your month in one card, yours to share as an image.
 - Your own reminder schedule: hours, interval and quiet days.
 - A pace line on Home, and reminders only when you are behind.
 - Export every serving as a CSV file.
+- Four more themes beside Aurora, with an app icon to match each.
+- Your own vessels, up to nine, each with a name and an icon. Put any of them on Home.
 Premium is a monthly or yearly subscription - the yearly plan starts with a free week - or a one-time lifetime purchase. Logging water is always free.
 
 PRIVATE BY CONSTRUCTION
-No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads and no third-party code: every framework in WaterBuddy is Apple's own, and there is no networking code in it. What you log travels only between your own iPhone and Apple Watch, into Apple Health if you turn it on, and out as a recap image or an export file only when you share one.
+No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads, no third-party code and no networking code. What you log travels only between your own iPhone and Apple Watch, into Apple Health if you turn it on, and out as a recap image or an export file only when you share one.
 
 MADE TO LIVE WITH
 - A dark liquid-glass design over a slowly moving aurora.
@@ -387,13 +390,18 @@ Subscriptions renew automatically unless cancelled at least 24 hours before the 
 Requires iOS 17 or later on iPhone; the Log Water control needs iOS 18, and the Apple Watch app watchOS 26.
 ```
 
-## What's New — version 1.4.1 — **133/4000**
+## What's New — version 1.4.2 — **365/4000**
 
-Written against **1.4**, which is live (Apple's Lookup API, 2026-11-20). The rating request's new moment is
-not named here: it is how the app asks, not something a person uses.
+Written against **1.4.1**, which is live (Apple's Lookup API, 2026-11-25): set C, roadmap items 1.4.5 and 1.4.8
+(`docs/superpowers/specs/2026-11-25-release-set-c-design.md` §5.1). The 2,000 ml is set C's D12, and it reaches
+free users too: the quick-add sliders run to two litres for everyone.
 
 ```
-The yearly plan now shows the right saving in every region. It used to read too low wherever prices are written with a decimal comma.
+New in Premium:
+- Four more themes beside Aurora: Lagoon, Dusk, Midnight and Bloom, with an app icon to match each.
+- Your own vessels: add up to nine, each with a name and an icon, and put any vessel on Home. The one in the middle is what your widget, Siri, Control Center, reminders and Apple Watch log.
+
+For everyone: the quick-add vessels now go up to 2,000 ml.
 ```
 
 ## In-App Purchases — WaterBuddy Premium
@@ -486,13 +494,13 @@ Store Connect should not prompt. If it does:
 In [`AppStore/screenshots/`](AppStore/screenshots), English only, every file checked by
 `bash Tools/VerifyScreenshots.sh`. **Two iPhone wells are filled** (read in Media Manager on 2026-11-13): the
 one Connect requires is *iPhone with Dynamic Island (medium display)*, the 6.1″ and 6.3″ phones, which refuses
-a 6.9″ shot, and the 6.9″ well is optional. For 1.4.1, remove 1.4's ten from each iPhone well, then drag in the
+a 6.9″ shot, and the 6.9″ well is optional. For 1.4.2, remove 1.4.1's ten from each iPhone well, then drag in the
 new ten in name order; `AppStore/README.md` §3 has the steps in order.
 
 | Slot | Size | Files |
 |---|---|---|
 | iPhone 6.3″ (Dynamic Island, medium) — **required** | 1206 × 2622 | `iPhone-6.3/` — the same ten, scaled evenly from `iPhone-6.9/` and trimmed by one pixel column |
-| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**: eight from 1.4's capture of 2026-11-06, two from the capture pair's of 2026-11-21 |
+| iPhone 6.9″ (Dynamic Island, large) | 1320 × 2868 | `iPhone-6.9/` — ten, **framed**: eight from the capture of 2026-11-25, two from the capture pair's of 2026-11-21 |
 | Apple Watch | 416 × 496 (Series 12, 46mm, watchOS 27.0) | `AppleWatch/1-wrist.png` — **required**, because the app embeds a watchOS app; one meets it |
 | Product page header | 3840 × 1646 | `ProductPageHeader/1-one-tap.mp4`, the looping video since 1.4.1: 8 s, 30 fps, H.264, no audio. The still, `1-one-tap.png` (*One tap. Watch it fill.*), stays beside it |
 
@@ -502,7 +510,9 @@ the ten; the five Premium shots carry a *Premium* tag. `bash Tools/CaptureScreen
 any day) writes the raw screens into `captures/iPhone-6.9/`, kept as the input, and
 `bash Tools/FrameScreenshots.sh` frames them into `iPhone-6.9/` under their upload names. **1.4.1 adds two shots
 of the system's own surfaces**, the Home Screen's widgets and the Lock Screen, taken on the capture pair, and
-drops the goal step and export (`docs/superpowers/specs/2026-11-20-release-1-4-1-design.md` §6, R4).
+drops the goal step and export (`docs/superpowers/specs/2026-11-20-release-1-4-1-design.md` §6, R4). **1.4.2 puts
+the themes in slot 9**, in place of the patterns, and takes the app's own screens again, after set C changed
+Settings' vessels card (`docs/superpowers/specs/2026-11-25-release-set-c-design.md` §6, R2).
 
 Upload in this order — only the **first three** appear on search results and install cards:
 
@@ -516,11 +526,11 @@ Upload in this order — only the **first three** appear on search results and i
 | 6 | `6-schedule.png` | Reminders on your hours | Premium: your own reminder schedule, a quiet day |
 | 7 | `7-month.png` | A whole month on one page | Premium: the month before's calendar and figures |
 | 8 | `8-insights.png` | Insights from your own week | Premium: last week's insights |
-| 9 | `9-patterns.png` | Learn when you drink | Premium: the month's patterns |
+| 9 | `9-themes.png` | Make it yours | Premium: Settings' Appearance card in Lagoon, its five themes and icons |
 | 10 | `10-recap.png` | Share your month | Premium: the month before's recap card |
 
 `1-wrist.png` is the watch app, synced from the phone, at 65 %, taken on 2026-10-26 by
-`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.1 keeps it.
+`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.2 keeps it.
 
 **The header loops since 1.4.1** (2026-11-22, on the owner's ask, modelled on Glazzy's). `Tools/ProductPageHeader.html`
 draws the header at `?t=` seconds into an 8-second loop. In it, a tap on the Glass fills the vessel from 1,050 to 1,300
@@ -534,7 +544,7 @@ frames folder> AppStore/screenshots/ProductPageHeader/1-one-tap.mp4` renders the
 ```
 No account or login is required. On first launch a short welcome asks for a daily goal (it can suggest one from weight and activity level, which it does not keep); the app is fully usable straight after. No demo credentials are needed.
 
-WaterBuddy Premium unlocks Month view, Patterns, Insights and the Monthly recap in the History tab; a custom reminder schedule, "Only when behind" and "Export your servings" in Settings; and a pace line on Home. It is sold through StoreKit as a monthly or yearly auto-renewable subscription (the yearly with a one-week free trial) or a one-time lifetime purchase. Open the paywall from Settings > See Premium, from any locked Premium row in Settings, or from History's locked Month or Insights; Restore Purchases is on the same screen. Logging water is free and never locked.
+WaterBuddy Premium unlocks Month view, Patterns, Insights and the Monthly recap in the History tab; a custom reminder schedule, "Only when behind", "Export your servings", "Your vessels" and four themes beyond Aurora with their app icons in Settings; and a pace line on Home. "Your vessels" adds up to nine vessels of the user's own and puts any of them on Home; the themes and icons are in Settings > Appearance, where Aurora and the standard icon stay free. Changing the app icon shows iOS's own alert. It is sold through StoreKit as a monthly or yearly auto-renewable subscription (the yearly with a one-week free trial) or a one-time lifetime purchase. Open the paywall from Settings > See Premium, from any locked Premium row in Settings, or from History's locked Month or Insights; Restore Purchases is on the same screen. Logging water is free and never locked.
 
 Premium's screens need some history before they show content. Month view shows at once; Insights and Patterns each say how many days of water they need until they have them. Servings can be added to today and the six days before it with the + in History. Insights appear once the last finished week holds four days with water, Patterns once the month holds seven finished days with water (today is not counted), and the Monthly recap for a finished month with seven days of water - so a new install shows no recap.
 

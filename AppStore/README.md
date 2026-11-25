@@ -1,66 +1,51 @@
-# WaterBuddy 1.4.1 (build 7) — the App Store upload
+# WaterBuddy 1.4.2 (build 8) — the App Store upload
 
-Everything the 1.4.1 version page asks for, in one place: the text, one file per field and per language, and
+Everything the 1.4.2 version page asks for, in one place: the text, one file per field and per language, and
 every screenshot. This folder holds **the current version only** (the owner's ruling, 2026-11-06). **The main
-`README.md` stays the master copy of the en-US text** — change both, or neither. `en-GB/` and `ru/` are their
-own: English (U.K.) is en-US's text word for word but for its keywords, and Russian is written for Russian
-searches. After any change to any field, run `bash Tools/VerifyListing.sh`: it counts every field in every
-language, checks the keyword rules, and compares en-US with `README.md` and en-GB with en-US.
+`README.md` stays the master copy of the en-US text** — change both, or neither. `en-GB/`, `ru/` and `es-MX/` are
+their own: English (U.K.) is en-US's text word for word but for its keywords and its name, and Russian and Spanish
+(Mexico) are written for their own searches. After any change to any field, run `bash Tools/VerifyListing.sh`: it
+counts every field in every language, checks the keyword rules, and compares en-US with `README.md` and en-GB with
+en-US.
 
 Each `.txt` file is exactly what goes in its field: open it, select all, copy, paste. The files end without a
-newline, so the paste is exact. Every count below is the one `VerifyListing.sh` printed on 2026-11-20, but the U.K.
-and Russian names', printed on 2026-11-22 (section 2's note).
+newline, so the paste is exact. Every count below is the one `VerifyListing.sh` printed on 2026-11-25.
 
-The search research the words come from is in [`research/2026-11-20/`](research/2026-11-20): the report, the
-terms tried, and the ranks read in the US, Russian and Uzbek stores.
+The search research the words come from is in [`research/2026-11-20/`](research/2026-11-20) — the report, the
+terms tried, and the ranks read in the US, Russian and Uzbek stores — and, for Spanish (Mexico), in
+[`research/2026-11-23/`](research/2026-11-23).
 
 ## 1. Before you submit — in order, and yours
 
-**Done, 2026-11-21 to 22, in the owner's Chrome on their "go": steps 1 to 9. 1.4.1 (7) is *Waiting for Review* since 01:18
-on 22 November.** It went as written but in four places:
-- Connect refused the U.K. name, then the Russian one, as "already being used". Each took step 3's fallback (section 2's note).
-- The two new languages had no Privacy Policy URL, so each was given the same address (section 4).
-- The header became a looping video, confirmed by the owner before the submission (section 3).
-- After the 00:29 submission, the owner ruled out the loop's fade back. Connect locks the header while a version waits for
-  review, so 1.4.1 was taken out of review, given the video that drains back, and submitted again at 01:18.
+1.4.1 (7) is live since 2026-11-22; how its upload went is in this file's history in git. 1.4.2 is set C's version
+(`docs/superpowers/specs/2026-11-25-release-set-c-design.md`). Set C is on sale in this build, so steps 1 and 2 come
+before anything is submitted.
 
-Step 10 and the real purchase below are still the owner's.
+1. **The walk** (#236, spec §4): the widgets, the control, a reminder's button and the watch in each theme, on a
+   simulator holding Premium from Xcode's Run with the local StoreKit file, and their contrast tables in
+   `docs/DESIGN.md`. A pair under its floor stops the release for your ruling.
+2. **TestFlight** (spec §7): 1.4.2 (8) uploaded on your word; on your iPhone, from TestFlight, each alternate icon
+   in light, dark and tinted (#237), and the small widget in StandBy in a theme. If an icon's dark or tinted form
+   does not survive distribution, the release stops there.
+3. **Publish the policy again.** 1.4.2 adds the theme, the vessels and the Watch's copy of them: publish
+   `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in the `SardorAllaberganov.github.io` repository,
+   then check that `https://sardorallaberganov.github.io/waterbuddy/privacy/` reads *Last updated 25 November 2026*
+   and *the three vessels on WaterBuddy's Home screen*. The policy promises it changes before or with the app.
+4. **A new version.** 1.4.1 is live, so Connect offers **+ Version**: make **1.4.2**.
+5. **App Information — Spanish (Mexico).** Add it as a localization with section 6's name and subtitle; the other
+   three keep theirs. Its Privacy Policy URL is en-US's (section 4).
+6. **The version page, language by language** (the language menu at the top right): Promotional Text,
+   Description, Keywords, What's New and Support URL, from section 2 and, for Spanish (Mexico), section 6. Its
+   Support URL is en-US's.
+7. **The screenshots** — section 3: remove 1.4.1's ten from each iPhone well, then drag in the new ten. Every
+   language shows en-US's set.
+8. **Build 8** — *1.4.2 (8)*, once Connect has processed it.
+9. **The three purchases** read *Approved*, as they have since 1.4; set C adds none.
+10. **App Review notes** — [`review-notes.txt`](review-notes.txt), which now names set C's rows.
+11. **Submit for Review**, on your word.
 
-1. **Publish the policy again, first.** 1.4.1 changes when the app asks for a rating, and the policy says so:
-   publish `Tools/PrivacyPolicy.html` as `waterbuddy/privacy/index.html` in the `SardorAllaberganov.github.io`
-   repository, then check that `https://sardorallaberganov.github.io/waterbuddy/privacy/` reads *after a pour
-   on the Home screen reaches your daily goal* and *Last updated 20 November 2026*. The policy promises it
-   changes before or with the app.
-2. **A new version.** 1.4 is live (released 2026-11-13, read from Apple's lookup on 2026-11-20), so Connect
-   offers **+ Version**: make **1.4.1**.
-3. **App Information — the names.** en-US: the name and subtitle in section 2. Then add **English (U.K.)** and
-   **Russian** as localizations, each with its own name and subtitle. Connect changes a name only with a new
-   version, which is why it happens now. If Connect refuses a name as taken, use `Water Tracker: WaterBuddy`
-   or `Трекер воды — WaterBuddy`: write it into the language's `name.txt`, run `VerifyListing.sh`, then paste.
-   If a new language asks for its own Privacy Policy URL, it is the same address (section 4).
-4. **The version page, language by language** (the language menu at the top right): Promotional Text,
-   Description, Keywords, What's New and Support URL, each from section 2.
-5. **The screenshots** — section 3. English (U.K.) and Russian show en-US's set (the ruling R3 of
-   `docs/superpowers/specs/2026-11-20-release-1-4-1-design.md`); check that each language shows the ten.
-6. **Build 7** — *1.4.1 (7)*, once Connect has processed it.
-7. **The three purchases** were sold with 1.4: check that they read *Approved*. One that does not is selected
-   on this version page.
-8. **Three checks by hand, on an iOS 27 simulator, before submitting** — nothing automated sees them:
-   - the paywall on a simulator in a decimal-comma region (this Mac's are `en_UZ`) says *save 44%* (#162);
-   - with `-WaterBuddyReviewPrompt`, the first pour on Home that reaches the goal brings the rating request
-     after the confetti, and an *Undo* inside that pause brings none;
-   - Settings' *Only when behind*: for a free user a tap opens the paywall, and with Premium held it turns on
-     and off. App Review's notes send reviewers to this row. On 2026-11-21 a quick tap there did nothing while
-     the app was busy, a person's tap and not only the UI tests' (#229). It was fixed the same day, and this
-     check passed by hand on the fixed build.
-
-   All three passed on 2026-11-21, the third after its fix. Run them again only if the code changes before you
-   submit.
-9. **Submit for Review.**
-10. **On the day 1.4.1 is released:** the prices by country — section 5.
-
-Still open from 1.4, unchanged: **one real purchase** (#156) — a sandbox purchase, a restore and a refund on a
-real iPhone.
+The prices by country stay as set on 2026-11-24 (section 5). Still open from 1.4: **one real purchase** (#156) — a
+sandbox purchase, a restore and a refund on a real iPhone; step 2's purchase from TestFlight comes closest.
 
 ## 2. The fields
 
@@ -72,11 +57,13 @@ The name and subtitle are on *App Information*; the rest is on the version page.
 | Subtitle | 30 characters | [`subtitle.txt`](subtitle.txt) — 30 | [`subtitle.txt`](en-GB/subtitle.txt) — 30 | [`subtitle.txt`](ru/subtitle.txt) — 29 |
 | Keywords | 100 bytes | [`keywords.txt`](keywords.txt) — 99 | [`keywords.txt`](en-GB/keywords.txt) — 98 | [`keywords.txt`](ru/keywords.txt) — 100 |
 | Promotional Text | 170 characters | [`promotional-text.txt`](promotional-text.txt) — 136 | [`promotional-text.txt`](en-GB/promotional-text.txt) — 136 | [`promotional-text.txt`](ru/promotional-text.txt) — 168 |
-| What's New | 4000 characters | [`whats-new.txt`](whats-new.txt) — 133 | [`whats-new.txt`](en-GB/whats-new.txt) — 133 | [`whats-new.txt`](ru/whats-new.txt) — 123 |
-| Description | 4000 characters | [`description.txt`](description.txt) — 3987 | [`description.txt`](en-GB/description.txt) — 3987 | [`description.txt`](ru/description.txt) — 3993 |
+| What's New | 4000 characters | [`whats-new.txt`](whats-new.txt) — 365 | [`whats-new.txt`](en-GB/whats-new.txt) — 365 | [`whats-new.txt`](ru/whats-new.txt) — 357 |
+| Description | 4000 characters | [`description.txt`](description.txt) — 3984 | [`description.txt`](en-GB/description.txt) — 3984 | [`description.txt`](ru/description.txt) — 3965 |
 
-What's New is written against **1.4**, which is live. Promotional Text can be changed later without a new
-build; the name, subtitle and keywords cannot.
+What's New is written against **1.4.1**, which is live: set C, and the quick-add vessels' 2,000 ml for everyone.
+The descriptions gain set C's two Premium lines and the 2,000 ml, and make room in three cuts (spec §5.1). The
+name, subtitle, keywords and promotional text are 1.4.1's in all three languages. Promotional Text can be changed
+later without a new build; the name, subtitle and keywords cannot.
 
 *(2026-11-22: Connect saved en-US's new name, then refused the same name for English (U.K.) as "already being used",
 most likely because en-US's was still pending. It then refused *Трекер воды: WaterBuddy* for Russian. Each language
@@ -90,9 +77,9 @@ The rest of the page, as 1.4 had it:
 | Support URL | `https://sardorallaberganov.github.io/waterbuddy/support/` — the same in every language |
 | Marketing URL | optional |
 | Copyright | `2026 Sardor Allaberganov` |
-| Build | **1.4.1 (7)** |
+| Build | **1.4.2 (8)** |
 | In-App Purchases and Subscriptions | the three of section 5, approved with 1.4 |
-| App Review notes | [`review-notes.txt`](review-notes.txt) — 2446 / 4000 bytes, unchanged; sign-in **not** required, no demo account |
+| App Review notes | [`review-notes.txt`](review-notes.txt) — 2739 / 4000 bytes, set C's rows added to the Premium paragraph; sign-in **not** required, no demo account |
 | App Review contact | Sardor Allaberganov, `sardorallaberganov96@gmail.com`, 🔴 your phone |
 
 ## 3. Screenshots — remove 1.4's ten, then drag in these in name order
@@ -122,7 +109,7 @@ back to 1,050 with the figures counting down (a fade back read as a swap, the ow
 | 6 | `6-schedule.png` | Reminders on your hours | Premium: your own reminder schedule, a quiet day |
 | 7 | `7-month.png` | A whole month on one page | Premium: the month before's calendar and figures |
 | 8 | `8-insights.png` | Insights from your own week | Premium: last week's insights |
-| 9 | `9-patterns.png` | Learn when you drink | Premium: the month's patterns |
+| 9 | `9-themes.png` | Make it yours | Premium: Settings' Appearance card in Lagoon, its five themes and icons; the card lifted out |
 | 10 | `10-recap.png` | Share your month | Premium: the month before's recap card |
 
 The free core takes 1–5 and Premium 6–10, each Premium shot tagged *Premium*. 1.4's goal step and export leave
@@ -132,11 +119,18 @@ the set (R4); their captures stay in `captures/`.
 and 1,300 ml, and the ten framed; `iPhone-6.9/` and `iPhone-6.3/` hold 1.4.1's ten under the names above. 1.4's
 ten are gone from both folders.)*
 
+*(2026-11-25, 1.4.2: the themes take slot 9 from the patterns (spec R2). The app's own screens were taken again at
+21:21–21:36 with the new `13-themes`, because set C changed Settings' vessels card, which shot 5 shows; the pair's
+two of 2026-11-21 are kept. Insights' two cut-outs were measured again on the new capture, and the ten framed and
+read; `9-patterns.png` is gone from both folders.)*
+
 How each set is made:
 
 - `bash Tools/CaptureScreenshots.sh` (1:45–11:45 PM) writes the app's own screens into
-  `screenshots/captures/iPhone-6.9/`, on a throwaway store seeded with three months of servings. 1.4's capture
-  of 2026-11-06 is kept there.
+  `screenshots/captures/iPhone-6.9/`, on a throwaway store seeded with three months of servings, and Settings'
+  Appearance card in Lagoon as `13-themes`. The capture of 2026-11-25 is kept there. The script begins with
+  `xcrun simctl shutdown all`; while other projects' sessions hold simulators on this Mac, run its steps by hand
+  instead, shutting down only the capture phone.
 - `bash Tools/CapturePairScreenshots.sh setup` makes the capture pair, *WaterBuddy Store iPhone* and *WaterBuddy
   Store Watch*, with a lived-in week on it (also before 11:45 PM). Once a surface is placed — never by tapping a
   widget's pour button — `bash Tools/CapturePairScreenshots.sh shoot 02-widgets`, `shoot 04-lock-screen` or
@@ -210,12 +204,13 @@ twice the yearly (spec §7):
 - Which country is in which group: the World Bank's lists, as the release playbook keeps them, in
   `~/.claude/skills/aso/references/price-tiers.md` (the 2027 fiscal year's lists, published each July).
 
-## 6. Spanish (Mexico) — goes up with set C's version, not 1.4.1
+## 6. Spanish (Mexico) — new with 1.4.2
 
 Approved by the owner on 2026-11-23 ("Wait for set C"). Apple's localization page lists Spanish (Mexico) among the US
 store's languages, so this page's name, subtitle and keywords add a second set of search words there. It is also the
 default page in Mexico and 15 other Latin American stores. Connect changes a name only with a new version, and 1.4.1 is
-live, so the page waits for set C's version. The screenshots stay en-US's, Connect's default for a new language.
+live, so the page goes up with 1.4.2, set C's version. The screenshots stay en-US's, Connect's default for a new
+language.
 
 | Field | Limit | Spanish (Mexico) — `es-MX/` |
 |---|---|---|
@@ -223,14 +218,15 @@ live, so the page waits for set C's version. The screenshots stay en-US's, Conne
 | Subtitle | 30 characters | [`subtitle.txt`](es-MX/subtitle.txt) — 30 |
 | Keywords | 100 bytes | [`keywords.txt`](es-MX/keywords.txt) — 96 |
 | Promotional Text | 170 characters | [`promotional-text.txt`](es-MX/promotional-text.txt) — 168 |
-| Description | 4000 characters | [`description.txt`](es-MX/description.txt) — 3980 |
-| What's New | 4000 characters | written with set C's |
+| Description | 4000 characters | [`description.txt`](es-MX/description.txt) — 3988 |
+| What's New | 4000 characters | [`whats-new.txt`](es-MX/whats-new.txt) — 420 |
 | Support URL, Privacy Policy URL | — | en-US's addresses: Connect leaves a new language's empty (section 1) |
 
 - **The description is 1.4.1's in Spanish, shortened to fit,** because Spanish runs longer: its second paragraph is
   cut. It adds that the app is in English, Russian and Uzbek, *not Spanish*, and that the Siri phrases work only in
-  English and Russian. Every change set C makes to the English page goes into this one too.
+  English and Russian. Set C's changes to the English page are in it: the 2,000 ml, set C's two Premium lines (the
+  themes keep the English names the app shows), and the same cuts, the privacy line among them.
 - **The keywords** take no word already on the en-US page or in the Spanish name and subtitle, and no accents. The
   research is in [`research/2026-11-23/spanish-mexico.md`](research/2026-11-23/spanish-mexico.md).
-- **`VerifyListing.sh` doesn't read `es-MX/` yet,** because it requires a What's New in every language. Add `es-MX`
-  to its `LISTINGS` once set C's What's New is written. The counts above are from the same rules, run on 2026-11-23.
+- **`VerifyListing.sh` reads `es-MX/` since 1.4.2**, its What's New written; the counts above are its own, printed on
+  2026-11-25.

@@ -1,1 +1,5 @@
-The yearly plan now shows the right saving in every region. It used to read too low wherever prices are written with a decimal comma.
+New in Premium:
+- Four more themes beside Aurora: Lagoon, Dusk, Midnight and Bloom, with an app icon to match each.
+- Your own vessels: add up to nine, each with a name and an icon, and put any vessel on Home. The one in the middle is what your widget, Siri, Control Center, reminders and Apple Watch log.
+
+For everyone: the quick-add vessels now go up to 2,000 ml.

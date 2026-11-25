@@ -9,6 +9,7 @@
 #  Reads  AppStore/        the en-US fields, one file each, and README.md's App Store Connect blocks
 #         AppStore/en-GB/  the English (U.K.) listing — the en-US text but for its keywords
 #         AppStore/ru/     the Russian listing
+#         AppStore/es-MX/  the Spanish (Mexico) listing, since 1.4.2 (AppStore/README.md §6)
 #  Exits 1 on a missing or empty file, a trailing newline, a field over its limit, a keyword that breaks a
 #  rule, an en-US file unlike its README block, or an en-GB field unlike en-US's. Prints every count either
 #  way. Reads only.
@@ -34,7 +35,7 @@ LIMITS = {
     "description.txt": (4000, "chars"),
     "review-notes.txt": (4000, "bytes"),
 }
-LISTINGS = [("en-US", "AppStore"), ("en-GB", "AppStore/en-GB"), ("ru", "AppStore/ru")]
+LISTINGS = [("en-US", "AppStore"), ("en-GB", "AppStore/en-GB"), ("ru", "AppStore/ru"), ("es-MX", "AppStore/es-MX")]
 failures = []
 texts = {}
 

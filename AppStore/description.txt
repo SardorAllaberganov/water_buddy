@@ -3,7 +3,7 @@ One tap logs a glass - from your Home Screen, your Lock Screen, Control Center o
 A water tracker only earns its place if you are still using it in week three, and the surest way to keep using one is never having to stop what you are doing.
 
 LOGGING
-- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml, each editable from 50 to 1,000 ml.
+- Three quick-add vessels: Cup 150 ml, Glass 250 ml, Bottle 500 ml, each editable from 50 to 2,000 ml.
 - A daily goal from 1,000 to 4,000 ml - or let WaterBuddy suggest one from your weight and how active you are. It keeps neither.
 - A vessel of moving water shows today's percentage and the exact millilitres.
 - Undo a pour with one tap. Reach your goal and the screen celebrates, and a day streak counts along.
@@ -30,18 +30,19 @@ APPLE HEALTH
 Optional, and off until you turn it on in Settings: each serving is written to Apple Health as Water, and corrected or deleted there when you change it here. WaterBuddy reads nothing from Health.
 
 WATERBUDDY PREMIUM
-Optional extras:
 - Month view: every day you have logged, a month at a glance.
 - Your patterns: when in the day you drink, weekdays against weekends, your usual first and last drink.
-- Personal insights each week, worked out from your own figures on your iPhone. Where Apple's on-device model is available, it can word them, in English. Not medical advice.
+- Personal insights each week, worked out from your own figures on your iPhone. Not medical advice.
 - A monthly recap: your month in one card, yours to share as an image.
 - Your own reminder schedule: hours, interval and quiet days.
 - A pace line on Home, and reminders only when you are behind.
 - Export every serving as a CSV file.
+- Four more themes beside Aurora, with an app icon to match each.
+- Your own vessels, up to nine, each with a name and an icon. Put any of them on Home.
 Premium is a monthly or yearly subscription - the yearly plan starts with a free week - or a one-time lifetime purchase. Logging water is always free.
 
 PRIVATE BY CONSTRUCTION
-No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads and no third-party code: every framework in WaterBuddy is Apple's own, and there is no networking code in it. What you log travels only between your own iPhone and Apple Watch, into Apple Health if you turn it on, and out as a recap image or an export file only when you share one.
+No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads, no third-party code and no networking code. What you log travels only between your own iPhone and Apple Watch, into Apple Health if you turn it on, and out as a recap image or an export file only when you share one.
 
 MADE TO LIVE WITH
 - A dark liquid-glass design over a slowly moving aurora.

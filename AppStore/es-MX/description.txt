@@ -1,7 +1,7 @@
 Un toque registra un vaso desde tu pantalla de inicio, la pantalla bloqueada, el Centro de control o tu Apple Watch, y ves cómo se llena. Sin cuenta y sin servidor.
 
 REGISTRO
-- Tres recipientes para registrar rápido: taza de 150 ml, vaso de 250 ml y botella de 500 ml, cada uno ajustable de 50 a 1,000 ml.
+- Tres recipientes para registrar rápido: taza de 150 ml, vaso de 250 ml y botella de 500 ml, cada uno ajustable de 50 a 2,000 ml.
 - Una meta diaria de 1,000 a 4,000 ml, o deja que WaterBuddy te sugiera una según tu peso y tu nivel de actividad. No guarda ninguno de los dos.
 - Un recipiente con agua en movimiento muestra el porcentaje de hoy y los mililitros exactos.
 - Deshaz un registro con un toque. Al llegar a tu meta, la pantalla lo celebra y tu racha suma un día.
@@ -28,18 +28,19 @@ APP SALUD
 Opcional, y apagado hasta que lo actives: cada registro se guarda en la app Salud como Agua y se corrige o borra ahí cuando lo cambias aquí. WaterBuddy no lee nada de Salud.
 
 WATERBUDDY PREMIUM
-Extras opcionales:
 - Vista mensual: todo tu mes de un vistazo.
 - Tus patrones: a qué hora tomas agua, entre semana contra el fin de semana, y tu primer y último vaso habituales.
-- Análisis semanales, calculados con tus datos en tu iPhone. Donde esté disponible, el modelo de Apple en el dispositivo puede redactarlos, en inglés. No es consejo médico.
+- Análisis semanales, calculados con tus datos en tu iPhone. No es consejo médico.
 - Resumen mensual: tu mes en una tarjeta, para compartir como imagen.
 - Tu propio horario de recordatorios: horas, intervalo y días sin avisos.
 - Una línea de ritmo en la pantalla principal y recordatorios solo cuando te quedes atrás.
 - Exporta todos tus registros como archivo CSV.
+- Cuatro temas más además de Aurora, cada uno con su ícono de app.
+- Tus propios recipientes, hasta nueve, con nombre e ícono. Pon cualquiera en la pantalla principal.
 Premium es una suscripción mensual o anual (el plan anual empieza con una semana gratis) o una compra única de por vida. Registrar agua siempre es gratis.
 
 PRIVADA POR DISEÑO
-Sin cuenta, servidor, nube, analíticas, rastreo, anuncios ni código de terceros: WaterBuddy solo usa frameworks de Apple y no tiene código de red. Lo que registras solo viaja entre tu iPhone y tu Apple Watch, a Salud si lo activas, y sale como imagen o archivo solo cuando tú lo compartes.
+Sin cuenta, servidor, nube, analíticas, rastreo, anuncios, código de terceros ni código de red. Lo que registras solo viaja entre tu iPhone y tu Apple Watch, a Salud si lo activas, y sale como imagen o archivo solo cuando tú lo compartes.
 
 HECHA PARA EL DÍA A DÍA
 - Un diseño oscuro de vidrio líquido sobre una aurora que se mueve despacio.
