@@ -99,9 +99,10 @@ h1 em { font-style: normal; background: linear-gradient(90deg, #7FF6F6 0%, #5EF0
   </div>
 </div>
 <script>
-// The ten, in upload order: shot i is the strip's i-th window (release 1.4.1's spec §6.2).
+// The ten, in upload order: shot i is the strip's i-th window (release 1.4.1's spec §6.2; since 1.4.2 the themes take
+// slot 9 from the patterns, spec `2026-11-25-release-set-c-design.md` §6).
 const SHOTS = ['01-home', '02-widgets', '04-lock-screen', '03-history', '10-settings', '11-schedule',
-               '05-month', '06-insights', '07-patterns', '08-recap'];
+               '05-month', '06-insights', '13-themes', '08-recap'];
 
 const COPY = {
   '01-home':        { lines: ['One tap.', 'Watch it <em>fill.</em>'], pill: 'No account · No cloud' },
@@ -112,7 +113,7 @@ const COPY = {
   '11-schedule':    { lines: ['Reminders on', '<em>your hours</em>'], premium: true },
   '05-month':       { lines: ['A whole <em>month</em>', 'on one page'], premium: true },
   '06-insights':    { lines: ['<em>Insights</em> from', 'your own week'], premium: true },
-  '07-patterns':    { lines: ['Learn <em>when</em>', 'you drink'], premium: true },
+  '13-themes':      { lines: ['Make it', '<em>yours</em>'], premium: true },
   '08-recap':       { lines: ['<em>Share</em>', 'your month'], premium: true },
 };
 
@@ -167,14 +168,13 @@ const SCENE = [
   { kind: 'note', shot: 6, x: 470, y: 1300, rot: -5, size: 36, text: 'a full ring: goal met', arrow: { from: [130, -30], to: 'month.calendar', at: [250, 250], bend: [30, 0] } },
   // 8 · Insights: the lead pane lifted out of the phone; Worth knowing floats on into Patterns.
   { kind: 'phone', shot: 7, src: '06-insights', x: 300, y: 1040, width: 400, rot: -6 },
-  { kind: 'cut', name: 'insights.lead', shot: 7, src: '06-insights', rect: [68, 813, 1184, 425], scale: 0.45, on: true, dx: 40, rot: 4 },
-  { kind: 'cut', name: 'insights.knowing', shot: 7, src: '06-insights', rect: [70, 1286, 1179, 225], scale: 0.45, on: true, away: [660, 470], rot: -3, flow: true },
+  { kind: 'cut', name: 'insights.lead', shot: 7, src: '06-insights', rect: [68, 813, 1184, 516], scale: 0.45, on: true, dx: 40, rot: 4 },
+  { kind: 'cut', name: 'insights.knowing', shot: 7, src: '06-insights', rect: [70, 1637, 1179, 223], scale: 0.45, on: true, away: [660, 470], rot: -3, flow: true },
   { kind: 'note', shot: 7, x: 430, y: 1250, rot: -6, size: 36, text: 'from your own figures', arrow: { from: [70, -30], to: 'insights.lead', at: [190, 98], bend: [60, 10] } },
-  // 9 · Patterns: the chart and the first and last drinks lifted out of a phone turned right.
-  { kind: 'phone', shot: 8, src: '07-patterns', x: 360, y: 960, width: 400, rot: 6 },
-  { kind: 'cut', name: 'patterns.chart', shot: 8, src: '07-patterns', rect: [68, 1293, 1184, 477], scale: 0.46, on: true, dx: -40, rot: -8 },
-  { kind: 'cut', name: 'patterns.first', shot: 8, src: '07-patterns', rect: [68, 2328, 580, 222], scale: 0.46, on: true, dx: -40, rot: -10 },
-  { kind: 'cut', name: 'patterns.last', shot: 8, src: '07-patterns', rect: [672, 2328, 580, 222], scale: 0.46, on: true, dx: 40, rot: -2 },
+  // 9 · Themes: the Appearance card, in Lagoon, lifted out of a phone turned right.
+  { kind: 'phone', shot: 8, src: '13-themes', x: 360, y: 960, width: 400, rot: 6 },
+  { kind: 'cut', name: 'themes.card', shot: 8, src: '13-themes', rect: [71, 509, 1178, 835], scale: 0.46, on: true, dx: -40, rot: -6 },
+  { kind: 'note', shot: 8, x: 420, y: 1290, rot: -6, size: 36, text: 'an icon to match', arrow: { from: [-60, -30], to: 'themes.card', at: [40, 150], bend: [-30, -10] } },
   // 10 · The recap, no phone: the card turned, the button and the promise under it.
   { kind: 'cut', name: 'recap.card', shot: 9, src: '08-recap', rect: [70, 434, 1178, 1254], scale: 0.5, x: 330, y: 755, rot: -5 },
   { kind: 'cut', name: 'recap.share', shot: 9, src: '08-recap', rect: [68, 2524, 1184, 176], shape: 'capsule', scale: 0.44, x: 350, y: 1160, rot: 2 },

@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-#  Tools/CaptureScreenshots.sh — the ten iPhone App Store screenshots the app's own screens make,
+#  Tools/CaptureScreenshots.sh — the eleven iPhone captures the app's own screens make (the eleventh, 13-themes,
+#  since 1.4.2: `docs/superpowers/specs/2026-11-25-release-set-c-design.md` §6),
 #  English only (specs `docs/superpowers/specs/2026-10-25-store-page-design.md` §1 and
 #  `2026-11-04-release-1-4-design.md` §6). Shots 02 and 04 — the Home Screen and the Lock Screen — and
 #  the watch's three are `Tools/CapturePairScreenshots.sh`'s; 1.4's set carries none of 02 and 04.
@@ -121,7 +122,7 @@ xcrun simctl status_bar "$PHONE" override \
   --cellularMode active --cellularBars 4 --operatorName "" \
   --batteryState charged --batteryLevel 100
 
-echo "── 4. drive it (two launches: a free user, then a Premium holder) ─────────────"
+echo "── 4. drive it (a free user, a Premium holder, then a holder in Lagoon) ────────"
 # `id=` rather than a platform/OS/name triple: the device is already booted with the overrides on it,
 # and naming it by identity is what stops xcodebuild resolving a sibling instead. The private
 # -derivedDataPath keeps this out of the DerivedData the gate uses.
@@ -130,6 +131,7 @@ xcodebuild test \
   -scheme WaterBuddy \
   -destination "id=$PHONE" \
   -only-testing:WaterBuddyUITests/AppStoreScreenshotUITests/testCaptureAppStoreScreenshots \
+  -only-testing:WaterBuddyUITests/AppStoreScreenshotUITests/testCaptureThemesShot \
   -parallel-testing-enabled NO \
   -derivedDataPath "$DD" \
   -resultBundlePath "$RESULT"
@@ -143,16 +145,16 @@ xcrun xcresulttool export attachments \
   --output-path "$WORK/attachments"
 
 echo "── 6. rename UUID → slot ────────────────────────────────────────────────────"
-# The ten slugs are named explicitly so a partial run fails loudly; 02 and 04 are the pair
+# The eleven slugs are named explicitly so a partial run fails loudly; 02 and 04 are the pair
 # script's, and this list leaves them alone. The full census (Tools/CaptureFullCensus.sh)
 # deliberately omits this list, because several of its shots are conditional and a missing one there
 # is a recorded outcome rather than a failure.
 python3 "$ROOT/Tools/RenameScreenshots.py" "$WORK/attachments" "$OUT" \
-  01-home,03-history,05-month,06-insights,07-patterns,08-recap,09-goal-setup,10-settings,11-schedule,12-export
+  01-home,03-history,05-month,06-insights,07-patterns,08-recap,09-goal-setup,10-settings,11-schedule,12-export,13-themes
 
 echo "── 7. verify ────────────────────────────────────────────────────────────────"
 bash "$ROOT/Tools/VerifyScreenshots.sh"
 
 echo
-echo "Done. Ten raw iPhone screenshots in $OUT; frame them with: bash Tools/FrameScreenshots.sh"
+echo "Done. Eleven raw iPhone screenshots in $OUT; frame them with: bash Tools/FrameScreenshots.sh"
 echo "Shots 02 and 04 and the watch's three are a separate, human-driven run: bash Tools/CapturePairScreenshots.sh"

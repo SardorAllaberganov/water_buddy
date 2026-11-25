@@ -24,7 +24,7 @@ OUT="$ROOT/AppStore/screenshots/iPhone-6.9"
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 # capture:upload name, in upload order — the page's own table lists the slugs in this order.
 SHOTS="01-home:1-home 02-widgets:2-widgets 04-lock-screen:3-lock-screen 03-history:4-history 10-settings:5-settings
-11-schedule:6-schedule 05-month:7-month 06-insights:8-insights 07-patterns:9-patterns 08-recap:10-recap"
+11-schedule:6-schedule 05-month:7-month 06-insights:8-insights 13-themes:9-themes 08-recap:10-recap"
 
 usage() { echo "usage: FrameScreenshots.sh [--in DIR] [--out DIR]" >&2; exit 2; }
 while [ $# -gt 0 ]; do

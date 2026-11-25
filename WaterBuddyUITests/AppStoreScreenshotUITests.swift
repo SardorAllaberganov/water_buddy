@@ -311,6 +311,36 @@ final class AppStoreScreenshotUITests: XCTestCase {
         XCTAssertTrue(closeExport.waitForNonExistence(timeout: 5), "the export sheet did not close")
     }
 
+    /// The set's ninth shot since 1.4.2: Settings' Appearance card, a holder's, in Lagoon (spec
+    /// `2026-11-25-release-set-c-design.md` §6). A launch of its own, beside the store method's two: the fresh
+    /// start with the store's sample, Premium held, and `-WaterBuddyTheme`, which sets the theme through its
+    /// setter in the fresh start's throwaway suite. The icon row shows the icon iOS shows, Aurora's on a
+    /// capture device — the icon is its own choice (spec D4). Run by `Tools/CaptureScreenshots.sh`.
+    @MainActor
+    func testCaptureThemesShot() throws {
+        let app = XCUIApplication()
+        app.launchArguments += storeLaunch + ["-WaterBuddyPremiumHeld", "YES", "-WaterBuddyTheme", "lagoon"]
+        app.launch()
+        XCTAssertTrue(
+            app.buttons["Get Started"].waitForExistence(timeout: 30),
+            "the themes launch is not a new install"
+        )
+        completeWelcomeIfShown(app)
+        XCTAssertTrue(app.otherElements["Today's hydration"].waitForExistence(timeout: 10), "the root did not swap to HomeView")
+        app.buttons["Settings"].firstMatch.tap()
+
+        // ── 13 · the Appearance card, near the page's foot ───────────────────────────────────────
+        // Flung until the swatches stand clear of the floating bar; the page's foot stops the fling, and the
+        // settle lets its bounce end. Nothing is tapped on the way: the card's theme is the argument's.
+        let lagoon = app.buttons["Lagoon"]
+        XCTAssertTrue(lagoon.waitForExistence(timeout: 10), "Settings draws no theme swatches for a holder")
+        clearOfTheBar(lagoon, in: app)
+        XCTAssertTrue(lagoon.isSelected, "Lagoon is not the chosen theme — the theme argument was not read")
+        XCTAssertTrue(app.staticTexts["App icon"].exists, "the Appearance card draws no icon row")
+        Thread.sleep(forTimeInterval: settle)
+        capture("13-themes")
+    }
+
     /// Builds the set's week through History's sheet into the device's own stores, for the widgets and
     /// the watch — run only by `Tools/CapturePairScreenshots.sh`, on a new phone it made (spec §3.4).
     ///
