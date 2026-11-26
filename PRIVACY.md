@@ -12,7 +12,7 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 25 November 2026
+**Last updated:** 26 November 2026
 
 ---
 
@@ -55,7 +55,7 @@ Everything below stays on your own devices, in WaterBuddy's own storage. The app
 | The current day | A date marker, used to start a new day at midnight. |
 | Your three quick-add amounts | Three amounts in millilitres: the Cup, the Glass and the Bottle. |
 | Your vessels | Each vessel you keep: its icon, its amount and, for one of your own, the name you gave it. Cup, Glass and Bottle are always there. |
-| Your chosen language | English, Russian or Uzbek, or nothing at all if the app follows your device's language. |
+| Your chosen language | English, Russian, Uzbek or Spanish, or nothing at all if the app follows your device's language. |
 | Your theme | Which of the five themes you chose, or nothing if you kept Aurora. |
 | Your reminders setting | Whether you turned reminders on, the schedule they follow if you set your own, and whether they come only when you're behind. |
 | Your Apple Health setting | Whether you turned Apple Health on. |
