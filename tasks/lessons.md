@@ -6373,3 +6373,36 @@ state, and the version's state after the submission.
 - Before *Save*, check the field's value equals the text and that *Save* is enabled.
 - Read back with the page's own `fetch` from `/iris/v1/apps/<id>/…`, reading only, and compare SHA-256s with the files.
 - Every change stays in the page's own controls.
+
+## 2026-11-26 — A helper that clears Apple's bar is blind to the app's own; place a control with a held drag
+
+**What happened.** Settings' language card shrank from four rows to one. On iOS 18.6,
+`testALapsedHoldersSettingsKeepWorkingAndTurnOffForFree` then failed in its group and alone: *Only when behind* rested at
+y 760–791, under the app's own floating bar. `behindSwitch(in:)` scrolled clear of `app.tabBars`, which lists Apple's bar (iOS 26
+and later) and not the app's own `GlassTabBar`. XCUITest lists that bar's three buttons, not the glass six points around them.
+It read the switch as hittable and tapped (74.7, 763.0), inside the glass. The first fix used a swipe: it cleared the bar, but
+the fling carried the page on, and the control above the switch went under the status bar, where its tap reached nothing.
+
+**The rule:**
+- A helper that keeps a control clear of the bar finds either bar: Apple's through `app.tabBars`, the app's own from its *Home*
+  button less `GlassTabBar`'s padding. There is one, `scrollClearOfTheBar(_:in:)` in `WelcomeUITests.swift`.
+- Place a control with a held drag (`press(forDuration:thenDragTo:withVelocity:thenHoldForDuration:)`), never a swipe: a swipe
+  flings past where it was aimed.
+- A change that moves a screen's controls re-runs the bar-sensitive UI tests on both runtimes before it is called done.
+
+## 2026-11-26 — The simulator tool chooses a device itself when none is named
+
+**What happened.** With this session's simulator attached, a `screenshot` call without `device` showed another project's iPhone
+16 Pro, in the middle of that session's gate. It was a screenshot only; nothing was tapped.
+
+**The rule:** on a Mac other sessions share, every iOS Simulator tool call names the device by UDID, `attach` included.
+
+## 2026-11-26 — Walk a new row at the largest text size, in the language with the longest words
+
+**What happened.** The language sheet passed its UI tests and read well at the default size. At the largest size its *Follow
+device* row broke *dispositivo* with a hyphen: the glyph and the tick left the name a narrow column. Moving the glyph above the
+text was not enough; the tick on the right still took the width. At the accessibility sizes each row's tick now stands on its
+first line, and the name takes the row's width.
+
+**The rule:** walk a new row at the largest size in the language with the longest words, Spanish here. At the accessibility
+sizes give the name the row's whole width: a trailing tick or chevron moves to the first line.

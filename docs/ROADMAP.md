@@ -616,6 +616,10 @@ forbids a Live Activity today, because the total it would show counts pours the 
 all four string catalogues, the store listing, the header's phrase, and `knownRegions`
 (rule `15-project`). Added here, after the copy has settled, so no feature is translated twice.
 Which languages is a decision for that time.
+*(2026-11-26: the first, **Latin American Spanish** (`es-419`), built on `feature/spanish` on the owner's "Need to add the
+spanish to the app itself language and the Language selector should be different look" and "Go" — and with it Settings'
+language selector, one row opening a sheet from the bottom (spec `2026-11-26-spanish-and-language-selector-design.md`). Staged,
+not committed; it ships in 1.4.3 (9), after 1.4.2 is released (R4), with the store's text in four listings.)*
 
 **1.5.4 — Caffeine.** Milligrams of caffeine counted from coffee and tea servings, a daily limit,
 and a reminder at a cut-off hour the user chooses. After 1.5.1, which stores the drink on each

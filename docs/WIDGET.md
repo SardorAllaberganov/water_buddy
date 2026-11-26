@@ -599,7 +599,10 @@ list for exactly this reason — six shared files now, not four.
 
 ## The extension carries its own localisation
 
-The widget ships in English, Russian and Uzbek, and **it has its own `Localizable.xcstrings`** —
+*(2026-11-26, Latin American Spanish, staged: the widget's catalogue counted then — 26 keys, 22 of them in English,
+Russian, Uzbek and `es-419`, each marked `manual`. The figures in the paragraph below are an earlier pass's.)*
+
+The widget ships in English, Russian, Uzbek and Latin American Spanish, and **it has its own `Localizable.xcstrings`** —
 `WaterBuddyWidget/Localizable.xcstrings`, 19 keys. **Fifteen are hand-written** — marked `manual`,
 in all three languages: ten it shares with the app, a strict subset of the app's 103 (75 until the
 redesign's stage 5, staged 2026-10-14, which added 28 and touched none of the ten; 73 until stage
@@ -686,7 +689,7 @@ Lock Screen rectangle's `spokenFigures(in:locale:)` takes the locale too. Render
 the section was not updated with it; the code won.)*
 
 Five strings in the widget's catalogue are `AddWaterIntent`'s entire Shortcuts-facing vocabulary, and
-all five ship in English, Russian and Uzbek:
+all five ship in English, Russian, Uzbek and Latin American Spanish:
 
 | String | Where the user sees it |
 |---|---|

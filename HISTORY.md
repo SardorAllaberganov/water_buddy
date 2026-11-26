@@ -16614,3 +16614,84 @@ file in a target.
 - **Growth Journal:** GROW-231 and GROW-232, read back by fetch.
 - **Not run:** the gate, because no source changed.
 - **Not done:** TestFlight's checks and the walk.
+
+## [2026-11-26] — Latin American Spanish in the app, and the language selector as one row and a sheet; staged
+
+On `feature/spanish` from `ab1c3b1`, from the owner's "Need to add the spanish to the app itself language and the Language
+selector should be different look". Staged, not committed.
+
+### What changed
+
+- **Spanish (`es-419`)** joins the app as `AppLanguage.spanish`, last in the menu, named *Español*. It is in all six catalogues
+  (counted from the index: the app 306 of 310 keys, the widget 22 of 26, the watch 13 of 14, the watch widget 4 of 5, Siri's 6
+  phrases, the Info.plist's 2) and in `knownRegions`. One new key, *Your iPhone's language: %1$@*. The privacy policy names
+  Spanish. Rules `15-project`, `50-views`, `65-accessibility`, `70-privacy` and `85-testing` say what the owner approved.
+- **The selector:** Settings' four rows became one *Language* row opening `LanguageSheet`, a sheet from the bottom at half
+  height: *Follow device* with the language it draws today, then each language with its greeting. A tap chooses and closes. At
+  the accessibility sizes each row's tick stands on its first line, after the walk found *dispositivo* hyphenated.
+- **Tests:** 1181 → 1187 phone `@Test`, 83 → 85 UI `func test` (`LanguageUITests`), 77 watch with Spanish checks in two.
+- **#209 on iOS 18.6, fixed in the tests:** the four bar-clearing loops knew Apple's bar alone. One helper,
+  `scrollClearOfTheBar(_:in:)`, now finds the app's own bar too and moves the page by a held drag. The store capture keeps its
+  own copy.
+
+### The rulings it rests on
+
+- The spec's R1–R6, approved with "Go": `es-419`; one row and a sheet from the bottom ("it should open bottom menu"); Siri in
+  Spanish; 1.4.3 (9) after 1.4.2 is released; the Spanish written here, reviewed by a second agent, the table to the owner; theme
+  names translated.
+- "Yes, plain commands": the gate as one-off commands, after a script file was denied.
+- The test helper's fix and the sheet's layout at the largest size: taken during the work, recorded here and in #209.
+
+### Files touched
+
+Staged, 37 paths: `.claude/rules/15-project.md`, `50-views.md`, `65-accessibility.md`, `70-privacy.md`, `85-testing.md`;
+`CLAUDE.md`; `HISTORY.md`; `PRIVACY.md`; `Tools/PrivacyPolicy.html`; `WaterBuddy.xcodeproj/project.pbxproj`;
+`WaterBuddy/AppShortcuts.xcstrings`, `DataManager.swift`, `InfoPlist.xcstrings`, `InsightWriter.swift`, `LanguageSheet.swift`
+(new), `Localizable.xcstrings`, `SettingsView.swift`; `WaterBuddyTests/AppLanguageTests.swift`, `LocalizationTests.swift`,
+`SiriPhraseTests.swift`; `WaterBuddyUITests/AppStoreScreenshotUITests.swift`, `CoachingUITests.swift`, `ExportUITests.swift`,
+`GoalSetupUITests.swift`, `LanguageUITests.swift` (new), `PremiumUITests.swift`, `WelcomeUITests.swift`;
+`WaterBuddyWatch/Localizable.xcstrings`; `WaterBuddyWatchTests/WristViewLogicTests.swift`;
+`WaterBuddyWatchWidget/Localizable.xcstrings`; `WaterBuddyWidget/Localizable.xcstrings`; `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/superpowers/specs/2026-11-26-spanish-and-language-selector-design.md`
+(new); `tasks/lessons.md`. Left unstaged, the owner's: `.claude/settings.json`, the two watch schemes, and their re-saved
+`AppShortcuts.xcstrings` and the watch's two catalogues — staged as `HEAD` plus the Spanish.
+
+### Verification
+
+- **Phone unit tests:** 1187 in 130 suites passed, on tree `800c7f6` and on the final tree `1e144b8`.
+- **UI, iOS 27.0** (*WaterBuddy Gate 27*): on `800c7f6`, 111 executed, 1 skipped by its guard, 0 failures. On `1961497`, the five
+  changed classes passed. On `1e144b8`, `LanguageUITests` and `testEverySettingsControlIsOneElement` passed.
+- **UI, iOS 18.6** (*WaterBuddy Gate 18.6*): on `800c7f6`, 111 executed, 1 skipped, 1 failure, #209's, which also failed alone.
+  On `1961497`, that test alone three of three, and `CoachingUITests`, `PremiumUITests`, `ExportUITests` and `LanguageUITests`
+  passed. `WelcomeUITests` and the final tree not run on 18.6: another project's gate holds that runtime, at its request.
+- **Watch unit tests:** 77 in 7 suites passed. **Both widget builds** succeeded. Both on `800c7f6`; nothing of theirs changed
+  after.
+- **Warnings**, clean builds by file and message: the app scheme 20 and 36 sites on every tree; the phone widget 17, the watch 2,
+  the watch widget 17 — as 1.4.2's.
+- **The walk**, iOS 27.0, in Spanish: the welcome, Home, History, Settings, the sheet, the paywall; the largest text size. Not
+  walked: the widgets, the watch, the app's own bar on 18.6.
+- **The staged code** is the tested tree `1e144b8`: only docs differ from it.
+
+## [2026-11-26] — Spanish: the iOS 18.6 checks the checkpoint above left; staged
+
+The checkpoint above left `WelcomeUITests`, the final tree and the app's own bar on iOS 18.6 until another project's gate let go
+of that runtime, at its request. That gate ended at 20:43, its session said; these ran from 20:45 on *WaterBuddy Gate 18.6*
+(iPhone 16, iOS 18.6), pinned by UDID, the only simulator booted. Staged, not committed; docs only.
+
+### Verification
+
+- **UI, iOS 18.6**, on the final tree `1e144b8`'s build, `test-without-building`, parallel testing off: `WelcomeUITests` **13
+  executed, 0 failures** (189.0 s); `LanguageUITests` **2 executed, 0 failures** (40.5 s), the second finding *Configuración*
+  on the bar after *Español*. `CoachingUITests` not run again: `LanguageSheet.swift` is the only code that differs from
+  `1961497`, where it passed on 18.6, and no coaching test opens the sheet.
+- **Seen on 18.6**, in Spanish through `-AppleLanguages`, on that simulator's own test data: the app's own bar draws *Inicio ·
+  Historial · Configuración* whole, and at the largest text size *Configuración* shrinks by its `minimumScaleFactor`, still
+  whole; Settings' *Idioma* row; the sheet at half height and, at the largest size, at half and full height, every word whole.
+  At the largest size Home's vessel captions rest under the bar until the page scrolls — in English the same, so not this
+  change's (`docs/DESIGN.md`, *Large text: what gives way*). Pictures 20–27 in `build/spanish/walk/`. The text size was set
+  back to the default and the simulator shut down by its UDID.
+- **Not walked:** the widgets and the watch in Spanish.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the hundred-and-thirty-sixth pass) and `HISTORY.md`, both already among the 37 staged paths.
