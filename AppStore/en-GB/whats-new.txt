@@ -1,5 +1,3 @@
-New in Premium:
-- Four more themes beside Aurora: Lagoon, Dusk, Midnight and Bloom, with an app icon to match each.
-- Your own vessels: add up to nine, each with a name and an icon, and put any vessel on Home. The one in the middle is what your widget, Siri, Control Center, reminders and Apple Watch log.
+WaterBuddy is now in Spanish. It starts in Spanish on an iPhone set to Spanish, and you can choose Español in Settings > Language. The widgets, Control Center, reminders and the Apple Watch app switch with it, and Siri's phrases work in Spanish too.
 
-For everyone: the quick-add vessels now go up to 2,000 ml.
+Language in Settings is now one row that opens the list of languages.

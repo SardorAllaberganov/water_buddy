@@ -12,7 +12,7 @@ WITHOUT OPENING THE APP
 - Home Screen widgets: small and medium, with a button that logs your Glass, and a week widget of your last seven days. The small one also works in StandBy.
 - Lock Screen widgets: a ring, a line, and a rectangle with its own button.
 - A Log Water control for Control Center, the Lock Screen and the Action Button (iOS 18 and later).
-- Siri: say "Log water in WaterBuddy", or ask "How much water today in WaterBuddy". In English and Russian.
+- Siri: say "Log water in WaterBuddy", or ask "How much water today in WaterBuddy". In English, Russian and Spanish.
 - Log a Glass straight from a reminder, without opening the app.
 
 APPLE WATCH
@@ -38,7 +38,7 @@ WATERBUDDY PREMIUM
 - A pace line on Home, and reminders only when you are behind.
 - Export every serving as a CSV file.
 - Four more themes beside Aurora, with an app icon to match each.
-- Your own vessels, up to nine, each with a name and an icon. Put any of them on Home.
+- Your own vessels, up to nine, each with a name and an icon. Put any on Home.
 Premium is a monthly or yearly subscription - the yearly plan starts with a free week - or a one-time lifetime purchase. Logging water is always free.
 
 PRIVATE BY CONSTRUCTION
@@ -46,7 +46,7 @@ No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads, 
 
 MADE TO LIVE WITH
 - A dark liquid-glass design over a slowly moving aurora.
-- English, Russian and Uzbek, switched inside the app.
+- English, Russian, Uzbek and Spanish, switched inside the app.
 - VoiceOver, Dynamic Type, Reduce Motion and Reduce Transparency.
 
 WHAT IT IS NOT

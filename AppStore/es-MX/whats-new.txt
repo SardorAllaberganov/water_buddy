@@ -1,5 +1,3 @@
-Nuevo en Premium:
-- Cuatro temas más además de Aurora: Lagoon, Dusk, Midnight y Bloom, cada uno con su ícono de app.
-- Tus propios recipientes: agrega hasta nueve, cada uno con su nombre e ícono, y pon cualquiera en la pantalla principal. El del centro es el que registran tu widget, Siri, el Centro de control, los recordatorios y tu Apple Watch.
+WaterBuddy ya está en español. Si tu iPhone está en español, la app se abre en tu idioma; también puedes elegir Español en Configuración > Idioma. Los widgets, el Centro de control, los recordatorios y la app de Apple Watch cambian con ella, y las frases de Siri funcionan en español: di "Registra agua en WaterBuddy".
 
-Para todos: los recipientes de registro rápido ahora llegan a 2,000 ml.
+En Configuración, Idioma ahora es una sola fila que abre la lista de idiomas.

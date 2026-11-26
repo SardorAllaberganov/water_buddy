@@ -252,11 +252,12 @@ Not yet chosen. All rights reserved until one is added.
 
 # App Store Connect
 
-Everything needed to fill in the listing for **version 1.4.2 (build 8)** — rewritten on 2026-10-25 from
+Everything needed to fill in the listing for **version 1.4.3 (build 9)** — rewritten on 2026-10-25 from
 the 1.0 listing, against the app as built, again on 2026-11-04 for Apple Health, set B and export, on
 2026-11-20 for search: the name, the subtitle and the keywords, with English (U.K.) and Russian listings
 beside the en-US one (spec `docs/superpowers/specs/2026-11-20-release-1-4-1-design.md`), and on 2026-11-25 for
-set C, with a Spanish (Mexico) listing (spec `docs/superpowers/specs/2026-11-25-release-set-c-design.md`).
+set C, with a Spanish (Mexico) listing (spec `docs/superpowers/specs/2026-11-25-release-set-c-design.md`), and
+on 2026-11-27 for Spanish in the app (spec `docs/superpowers/specs/2026-11-26-spanish-and-language-selector-design.md`).
 **Character counts were verified programmatically**, not
 estimated (`bash Tools/VerifyListing.sh`): every field is inside Apple's limit, and one, the subtitle, is
 exactly at it.
@@ -272,8 +273,11 @@ ruling, 2026-11-06); this section stays the master copy, so a change here is mad
 (spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`). 1.4 is live since 2026-11-13. 1.4.1 fixes
 the yearly saving where prices are written with a decimal comma (#162), and asks for a rating on the first
 goal day; it is live since 2026-11-22. 1.4.2 brings set C: four more themes, an app icon for each, and a library
-of the user's own vessels, with the quick-add vessels going up to 2,000 ml for everyone. 1.4.2 (8) is in review
-since 2026-11-26, 10:39, with the Spanish (Mexico) page, set to be released by hand after approval.
+of the user's own vessels, with the quick-add vessels going up to 2,000 ml for everyone, and the Spanish (Mexico)
+page; 1.4.2 (8) was approved on 2026-11-26 at 21:47 and released by hand at 22:26. 1.4.3 brings Latin American
+Spanish into the app, its widgets, reminders, Siri and the Watch, and makes Settings' *Language* one row that opens
+a sheet. 1.4.3 (9) was uploaded on 2026-11-27 and its page filled in four languages; it waits on TestFlight for your
+checks, not yet submitted.
 
 ## App Information
 
@@ -297,7 +301,7 @@ since 2026-11-26, 10:39, with the Spanish (Mexico) page, set to be released by h
 
 | Field | |
 |---|---|
-| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). Published again on 2026-11-26 at 01:44, before 1.4.2 was submitted: it is dated 25 November 2026, and names set C's theme, vessels and the Watch's copy of them. English (U.K.), Russian and Spanish (Mexico) carry the same address in Connect |
+| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). Published again on 2026-11-26 at 01:44, before 1.4.2 was submitted: it is dated 25 November 2026, and names set C's theme, vessels and the Watch's copy of them. Published again on 2026-11-27 at 02:34 (`7002c42`), before 1.4.3 is submitted: dated 26 November 2026, it names Spanish among the app's languages. English (U.K.), Russian and Spanish (Mexico) carry the same address in Connect |
 | **Support URL** | `https://sardorallaberganov.github.io/waterbuddy/support/` — live since 2026-11-06: `Tools/Support.html`, read from the code (contact, logging, widgets and Siri, the Watch, reminders, Premium, your data), published as `waterbuddy/support/index.html` in the same repository. The same address in every language |
 | **Marketing URL** | optional |
 | **Terms of Use (EULA)** | Apple's standard licence — leave App Store Connect's EULA field at its default. The description links it, as guideline 3.1.2 asks of an app with subscriptions |
@@ -324,7 +328,7 @@ drink,hydration,intake,watch,daily,diary,log,fluid,habit,h2o,goal,streak,bottle,
 > If you change the **name** or the **subtitle**, run `bash Tools/VerifyListing.sh`: it checks this list for
 > overlap and counts every field.
 
-## Description (≤4000) — **3984/4000**
+## Description (≤4000) — **3994/4000**
 
 The first ~170 characters are all that show before the "more" link, so the opening sentence carries
 the whole pitch on its own (it is 170). The *WaterBuddy Premium* paragraph is what guideline 2.3.2
@@ -346,7 +350,7 @@ WITHOUT OPENING THE APP
 - Home Screen widgets: small and medium, with a button that logs your Glass, and a week widget of your last seven days. The small one also works in StandBy.
 - Lock Screen widgets: a ring, a line, and a rectangle with its own button.
 - A Log Water control for Control Center, the Lock Screen and the Action Button (iOS 18 and later).
-- Siri: say "Log water in WaterBuddy", or ask "How much water today in WaterBuddy". In English and Russian.
+- Siri: say "Log water in WaterBuddy", or ask "How much water today in WaterBuddy". In English, Russian and Spanish.
 - Log a Glass straight from a reminder, without opening the app.
 
 APPLE WATCH
@@ -372,7 +376,7 @@ WATERBUDDY PREMIUM
 - A pace line on Home, and reminders only when you are behind.
 - Export every serving as a CSV file.
 - Four more themes beside Aurora, with an app icon to match each.
-- Your own vessels, up to nine, each with a name and an icon. Put any of them on Home.
+- Your own vessels, up to nine, each with a name and an icon. Put any on Home.
 Premium is a monthly or yearly subscription - the yearly plan starts with a free week - or a one-time lifetime purchase. Logging water is always free.
 
 PRIVATE BY CONSTRUCTION
@@ -380,7 +384,7 @@ No account, no sign-up, no server, no cloud. No analytics, no tracking, no ads, 
 
 MADE TO LIVE WITH
 - A dark liquid-glass design over a slowly moving aurora.
-- English, Russian and Uzbek, switched inside the app.
+- English, Russian, Uzbek and Spanish, switched inside the app.
 - VoiceOver, Dynamic Type, Reduce Motion and Reduce Transparency.
 
 WHAT IT IS NOT
@@ -391,18 +395,16 @@ Subscriptions renew automatically unless cancelled at least 24 hours before the 
 Requires iOS 17 or later on iPhone; the Log Water control needs iOS 18, and the Apple Watch app watchOS 26.
 ```
 
-## What's New — version 1.4.2 — **365/4000**
+## What's New — version 1.4.3 — **320/4000**
 
-Written against **1.4.1**, which is live (Apple's Lookup API, 2026-11-25): set C, roadmap items 1.4.5 and 1.4.8
-(`docs/superpowers/specs/2026-11-25-release-set-c-design.md` §5.1). The 2,000 ml is set C's D12, and it reaches
-free users too: the quick-add sliders run to two litres for everyone.
+Written against **1.4.2**, which is live (released by hand on 2026-11-26 at 22:26, read in App Store Connect): Latin
+American Spanish, roadmap item 1.5.3 brought forward (`docs/superpowers/specs/2026-11-26-spanish-and-language-selector-design.md`
+§5). Siri's phrases in Spanish are the spec's R3; they are proved only by hand, with Siri set to Spanish.
 
 ```
-New in Premium:
-- Four more themes beside Aurora: Lagoon, Dusk, Midnight and Bloom, with an app icon to match each.
-- Your own vessels: add up to nine, each with a name and an icon, and put any vessel on Home. The one in the middle is what your widget, Siri, Control Center, reminders and Apple Watch log.
+WaterBuddy is now in Spanish. It starts in Spanish on an iPhone set to Spanish, and you can choose Español in Settings > Language. The widgets, Control Center, reminders and the Apple Watch app switch with it, and Siri's phrases work in Spanish too.
 
-For everyone: the quick-add vessels now go up to 2,000 ml.
+Language in Settings is now one row that opens the list of languages.
 ```
 
 ## In-App Purchases — WaterBuddy Premium
@@ -495,8 +497,8 @@ Store Connect should not prompt. If it does:
 In [`AppStore/screenshots/`](AppStore/screenshots), English only, every file checked by
 `bash Tools/VerifyScreenshots.sh`. **Two iPhone wells are filled** (read in Media Manager on 2026-11-13): the
 one Connect requires is *iPhone with Dynamic Island (medium display)*, the 6.1″ and 6.3″ phones, which refuses
-a 6.9″ shot, and the 6.9″ well is optional. For 1.4.2, remove 1.4.1's ten from each iPhone well, then drag in the
-new ten in name order; `AppStore/README.md` §3 has the steps in order.
+a 6.9″ shot, and the 6.9″ well is optional. 1.4.3 keeps 1.4.2's ten, which Connect copies into a new version, so
+nothing is uploaded; `AppStore/README.md` §3 says what to check.
 
 | Slot | Size | Files |
 |---|---|---|
@@ -531,7 +533,7 @@ Upload in this order — only the **first three** appear on search results and i
 | 10 | `10-recap.png` | Share your month | Premium: the month before's recap card |
 
 `1-wrist.png` is the watch app, synced from the phone, at 65 %, taken on 2026-10-26 by
-`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.2 keeps it.
+`bash Tools/CapturePairScreenshots.sh setup` then `shoot 01-wrist`; 1.4.2 and 1.4.3 keep it.
 
 **The header loops since 1.4.1** (2026-11-22, on the owner's ask, modelled on Glazzy's). `Tools/ProductPageHeader.html`
 draws the header at `?t=` seconds into an 8-second loop. In it, a tap on the Glass fills the vessel from 1,050 to 1,300
@@ -545,6 +547,8 @@ frames folder> AppStore/screenshots/ProductPageHeader/1-one-tap.mp4` renders the
 ```
 No account or login is required. On first launch a short welcome asks for a daily goal (it can suggest one from weight and activity level, which it does not keep); the app is fully usable straight after. No demo credentials are needed.
 
+New in 1.4.3: Latin American Spanish. Settings > Language opens a list of the app's languages (English, Russian, Uzbek, Spanish and Follow device); choosing Español switches the app, its widgets, reminders and the Apple Watch app at once. On a device set to Spanish, the app starts in Spanish.
+
 WaterBuddy Premium unlocks Month view, Patterns, Insights and the Monthly recap in the History tab; a custom reminder schedule, "Only when behind", "Export your servings", "Your vessels" and four themes beyond Aurora with their app icons in Settings; and a pace line on Home. "Your vessels" adds up to nine vessels of the user's own and puts any of them on Home; the themes and icons are in Settings > Appearance, where Aurora and the standard icon stay free. Changing the app icon shows iOS's own alert. It is sold through StoreKit as a monthly or yearly auto-renewable subscription (the yearly with a one-week free trial) or a one-time lifetime purchase. Open the paywall from Settings > See Premium, from any locked Premium row in Settings, or from History's locked Month or Insights; Restore Purchases is on the same screen. Logging water is free and never locked.
 
 Premium's screens need some history before they show content. Month view shows at once; Insights and Patterns each say how many days of water they need until they have them. Servings can be added to today and the six days before it with the + in History. Insights appear once the last finished week holds four days with water, Patterns once the month holds seven finished days with water (today is not counted), and the Monthly recap for a finished month with seven days of water - so a new install shows no recap.
@@ -557,7 +561,7 @@ The app collects no data and contains no networking code. Everything is stored l
 
 Notification permission is requested only when the user turns on reminders (in Settings, or on the welcome's last step), never at launch.
 
-Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBuddy".
+Siri, in English: "Log water in WaterBuddy" and "How much water today in WaterBuddy". Russian and Spanish versions of both phrases are included.
 ```
 
 | Field | |
