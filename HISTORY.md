@@ -16695,3 +16695,27 @@ of that runtime, at its request. That gate ended at 20:43, its session said; the
 ### Files touched
 
 `docs/AI_CONTEXT.md` (the hundred-and-thirty-sixth pass) and `HISTORY.md`, both already among the 37 staged paths.
+
+## [2026-11-26] — Spanish: the widgets, the control and the watch on the walk pair
+
+After the six commits (`28948ca` to `70c6384`) went to `origin/feature/spanish`, the owner's "Check them now" asked for the
+widgets and the watch in Spanish, which the checkpoints above left unwalked. Docs only; staged, not committed.
+
+### Verification
+
+On the walk pair — *WaterBuddy Walk iPhone* (iPhone 17, iOS 27.0) and *WaterBuddy Walk Watch* (Series 12 46 mm, watchOS 27.0),
+pinned by UDID — with the pushed code's build (`build/green5`), installed by `simctl`, the welcome walked, two servings poured
+and *Español* chosen in the app's sheet:
+- **Seen, in Spanish:** the small, medium and week widgets placed on the Home Screen — *750 ml*, *de 2,000 ml*, *+250 ml*,
+  *Últimos 7 días*, *0 de 7*, *Meta cumplida*, the days *V S D L M M J*; a tap on the week widget opened *Historial*; the
+  Control Center control, widened to show its title, *Registrar agua* beside the Glass. The gallery's names and descriptions
+  stayed English on an English phone, as WidgetKit resolves them.
+- **Seen, the watch app in Spanish through its own language** (`-AppleLanguages`): *0 de 2,000 ml*, *Sin sincronizar*.
+- **Not seen:** the Lock Screen widgets — the Lock Screen's editor drew no controls on this simulator and took no tap; the watch
+  following the phone — the pair never synced, *Not yet synced* after pours and after the phone app was installed again; the
+  three faces — the simulator tool takes no touch on a watch. Each stays a hand check, in DeviceHub or on a device.
+- Seven pictures in `build/spanish/walk-widgets/`. The pair was shut down by its UDIDs; its widgets and control stay placed.
+
+### Files touched
+
+`docs/AI_CONTEXT.md` (the hundred-and-thirty-seventh pass) and `HISTORY.md`.

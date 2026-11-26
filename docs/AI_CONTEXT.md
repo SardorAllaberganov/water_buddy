@@ -4,6 +4,12 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-26, 23:10 (hundred-and-thirty-seventh pass — the Spanish widgets, control and watch, checked on the
+walk pair after the owner's "Check them now"; on `feature/spanish`, HEAD `70c6384`, pushed; this record staged, not committed).
+What it wrote:
+- *Current state*: committed and pushed; what the walk pair showed in Spanish and what it could not; *Left*;
+- `HISTORY.md`: a checkpoint.
+
 **Last updated:** 2026-11-26, 22:40 (hundred-and-thirty-sixth pass — the Spanish work's checks on iOS 18.6, made once another
 project's gate let go of that runtime; on `feature/spanish`; staged, not committed). What it wrote, every figure printed:
 - *Current state*: on iOS 18.6, on the final tree `1e144b8`, `WelcomeUITests` 13 of 13 and `LanguageUITests` 2 of 2; the app's
@@ -3137,7 +3143,7 @@ issue #15.
 ## Current state
 
 **Latin American Spanish in the app, and Settings' language selector as one row and a sheet from the bottom — built, gated and
-walked on `feature/spanish`; staged, not committed** (2026-11-26, from the owner's "Need to add the spanish to the app itself
+walked on `feature/spanish`; committed in six commits, `28948ca` to `70c6384`, and pushed** (2026-11-26, from the owner's "Need to add the spanish to the app itself
 language and the Language selector should be different look"; the design approved with "Go"; on `feature/spanish` from
 `ab1c3b1`; spec `docs/superpowers/specs/2026-11-26-spanish-and-language-selector-design.md`).
 - **The language:** `AppLanguage.spanish`, `es-419`, last in the menu (R1), named *Español*; `knownRegions` gains `"es-419"`.
@@ -3181,9 +3187,20 @@ language and the Language selector should be different look"; the design approve
   Configuración* whole — at the largest size *Configuración* shrinks by its `minimumScaleFactor`, still whole; Settings' *Idioma*
   row; the sheet at half height and, at the largest size, at half and full height, every word whole. At the largest size Home's
   vessel captions rest under the bar until the page scrolls, in English the same (`docs/DESIGN.md`, *Large text: what gives
-  way*). **Not walked:** the widgets and the watch. Twenty-seven pictures in `build/spanish/walk/`.
-- **Left:** the owner's `/commit` and push; then 1.4.3 (9), after 1.4.2 is released — the store text in four listings, the
-  es-MX description's Siri lines, What's New, the policy's publication — each outward step on the owner's word.
+  way*). Twenty-seven pictures in `build/spanish/walk/`.
+- **The widgets, the control and the watch** (from 22:40, the owner's "Check them now", after the push), on the walk pair —
+  *WaterBuddy Walk iPhone*, iPhone 17, iOS 27.0, and *WaterBuddy Walk Watch*, watchOS 27.0 — with the pushed code's build and
+  *Español* chosen in the app's sheet: the small, medium and week widgets placed on the Home Screen draw in Spanish — *de 2,000
+  ml*, *Últimos 7 días*, *0 de 7 · Meta cumplida*, the days *V S D L M M J* — and a tap on the week widget opens *Historial*;
+  the Control Center control, widened to show its title, reads *Registrar agua* beside the Glass. The gallery's names stay
+  English on an English phone, as WidgetKit resolves them. **Not seen:** the Lock Screen widgets — the Lock Screen's editor drew
+  no controls on this simulator and took no tap; the watch following the phone — the pair never synced, *Not yet synced* after
+  pours and after the phone app was installed again, so the watch app was seen in Spanish only through its own language (*0 de
+  2,000 ml*, *Sin sincronizar*); and the three faces — the simulator tool takes no touch on a watch. Seven pictures in
+  `build/spanish/walk-widgets/`.
+- **Left:** the Lock Screen widgets, the watch following the phone and its three faces in Spanish, by hand — in DeviceHub or on
+  a device; then 1.4.3 (9), after 1.4.2 is released — the store text in four listings, the es-MX description's Siri lines,
+  What's New, the policy's publication — each outward step on the owner's word.
 
 **1.4.2 (8) submitted for review: *Waiting for Review*, set to be released by hand; TestFlight and the walk are owed before the release**
 (2026-11-26, from the owner's "Do them and submit" at about 10:20 to 10:39; on `main`, HEAD `4dadad1`; these records staged).
