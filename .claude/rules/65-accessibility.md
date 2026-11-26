@@ -71,8 +71,8 @@ rather than re-deriving it.
 
 ## Tap targets
 - Every tappable row carries an explicit `.frame(minHeight:)` of at least 44 — 44 for a tab slot and
-  for Settings' *Privacy Policy* link, 50 for a language row, 56 for a serving row and the primary
-  buttons. Never a fixed `height`
+  for Settings' *Privacy Policy* link, 50 for Settings' *Language* row, 56 for a serving row, a choice in
+  the language sheet and the primary buttons. Never a fixed `height`
 - Make the whole slot the target, not the glyph: `.frame(maxWidth: .infinity, minHeight: 44)` plus
   `.contentShape(Rectangle())` where the label does not already fill the row
 - In the widget, size every `Button(intent:)` label to at least `PourButton.minimumTarget` (44) with
@@ -165,6 +165,9 @@ rather than re-deriving it.
   the chosen one, value *Premium* and hint *Opens Premium* while locked — and each icon is one button,
   labelled with the theme's icon name, with the same traits. A swatch is told apart by its name and its
   ring, never by colour alone
+- Settings' *Language* is one button — label *Language*, value the chosen language's name, the note its
+  hint. In the language sheet each choice is one button — label the language's own name, *Follow device*
+  translated with its second line the value — `.isSelected` on the chosen one; the greetings are hidden
 - *Your vessels*: each vessel is one button — label its name, value its amount in millilitres, the
   middle Home vessel's hint *Your Glass*. In the editor each icon is one button, label its spoken name,
   `.isSelected` on the chosen; the name field's label is *Name*; the amount slider speaks the vessel's

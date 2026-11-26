@@ -137,6 +137,9 @@ from before this design was read, kept deliberately rather than renamed for its 
   `WaterSurface.swift`, all already in the three sets: set C adds no shared file and no membership edit. Every
   vessel icon exists on iOS 17 and watchOS 26 — `cup.and.heat.waves.fill`, iOS 18, is left out — so set C adds no
   version check (spec `2026-11-22-set-c-design.md` D13)
+- `LanguageSheet` is app-only and stays out of every exception set; `AppLanguage` lives in `DataManager.swift`,
+  already in all three, so Spanish adds no shared file and no membership edit
+  (spec `2026-11-26-spanish-and-language-selector-design.md`)
 - `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
   `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
   `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,
@@ -229,13 +232,13 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   report says they do not survive distribution, and a simulator cannot say
 
 ## Localization
-- `developmentRegion = en`, `knownRegions = (en, ru, uz, Base)`, and
+- `developmentRegion = en`, `knownRegions = (en, ru, uz, "es-419", Base)`, and
   `LOCALIZATION_PREFERS_STRING_CATALOGS = YES` at project level
 - Adding a language means the catalogue in **all four** of `WaterBuddy/`, `WaterBuddyWidget/`,
   `WaterBuddyWatch/` and `WaterBuddyWatchWidget/`, plus `knownRegions`, plus `AppLanguage.selectable`
   (rule `70-privacy`)
-- `WaterBuddy/AppShortcuts.xcstrings` is a fifth catalogue — Siri's phrases only, in `en` and `ru`,
-  because Siri has no Uzbek (rule `70-privacy`)
+- `WaterBuddy/AppShortcuts.xcstrings` is a fifth catalogue — Siri's phrases only, in `en`, `ru` and
+  `es-419`, because Siri has no Uzbek (rule `70-privacy`)
 - `WaterBuddy/InfoPlist.xcstrings` is a sixth catalogue — the Info.plist's two localised strings,
   `NSHealthUpdateUsageDescription`, which Health's sheet shows, and `NSHealthShareUsageDescription`, which
-  App Store Connect demands (*Submission*) — in `en`, `ru` and `uz`
+  App Store Connect demands (*Submission*) — in `en`, `ru`, `uz` and `es-419`

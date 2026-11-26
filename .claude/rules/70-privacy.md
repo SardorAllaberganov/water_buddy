@@ -323,14 +323,15 @@ Four limits hold:
   mirror both resolve the watch's own `Bundle.main`. The faces draw in `WristMirror.languageCode`'s
   language, resolved by their provider; their `.description` is resolved by WidgetKit and follows the
   watch's system language
-- The product ships exactly `en`, `ru` and `uz`. Never add a case to `AppLanguage.selectable` without
+- The product ships exactly `en`, `ru`, `uz` and `es-419` — Latin American Spanish, since spec
+  `2026-11-26-spanish-and-language-selector-design.md`. Never add a case to `AppLanguage.selectable` without
   shipping the matching translations in **all four** `Localizable.xcstrings` files, and keep
   `knownRegions` in step
 - Keep the four catalogues separate — `WaterBuddy/`, `WaterBuddyWidget/`, `WaterBuddyWatch/` and
   `WaterBuddyWatchWidget/`. A string catalogue is not shareable through a `membershipExceptions` entry
-- `WaterBuddy/AppShortcuts.xcstrings` holds Siri's phrases in English and Russian only — Siri has no
-  Uzbek. It is the one catalogue exempt from shipping all three; the intent's own strings live in the
-  app's `Localizable.xcstrings` in all three
+- `WaterBuddy/AppShortcuts.xcstrings` holds Siri's phrases in English, Russian and Latin American Spanish
+  — Siri has no Uzbek. It is the one catalogue exempt from shipping every language; the intent's own strings
+  live in the app's `Localizable.xcstrings` in all four
 - Every key in `sharedKeys` must resolve to the identical value in both bundles, in every language.
   Add any new widget-drawn or widget-filed string to it. The watch's copies of phone strings are held
   to the same standard: `LocalizationTests` compares them against the app bundle in every language
@@ -341,12 +342,13 @@ Four limits hold:
 - A count beside a noun takes plural variations in every catalogue that holds the key: *one* and
   *other* in English; *one*, *few*, *many* and *other* in Russian, where *other* — reached only by
   a fraction — takes the genitive singular. Uzbek keeps one value, because Uzbek puts a noun after
-  a number in the singular
+  a number in the singular. Spanish takes *one* and *other*: its *many* reaches only whole millions,
+  which no figure the app draws does
 - Store "follow the device" as the **absence** of `Key.language`, never the string `"system"`, and
   reject `"system"` in `AppLanguage(code:)`
 - Fall back to `.system` / `Bundle.main` for an unrecognised code, and say so only under `#if DEBUG`
-- Name each language in its own script and untranslated (`English`, `Русский`, `O‘zbekcha`);
-  translate only *Follow device*
+- Name each language in its own script and untranslated (`English`, `Русский`, `O‘zbekcha`, `Español`);
+  translate only *Follow device*. The language sheet's greetings are untranslated too (`AppLanguage.greeting`)
 - Never read a `.xcstrings` file off disk with `#filePath` in a test — assert against the built
   bundle via `Bundle.main`, `PlugIns/WaterBuddyWidgetExtension.appex`, `Watch/WaterBuddyWatch.app`
   and its `PlugIns/WaterBuddyWatchWidget.appex`

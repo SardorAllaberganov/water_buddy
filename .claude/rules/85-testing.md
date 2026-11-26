@@ -35,7 +35,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run,
   and so does `CoachingUITests`, for set B's controls with Premium held or lapsed, and so does
   `ExportUITests`, for a holder's export, and so do `AppearanceUITests`, for set C's card and library,
-  and the theme census. No other UI test passes it.
+  and `LanguageUITests`, so a language chosen in its test never outlives it, and the theme census. No
+  other UI test passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
   test. Every other UI test walks the welcome through `completeWelcomeIfShown(_:)` and chooses *Not

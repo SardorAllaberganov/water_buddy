@@ -135,6 +135,10 @@ persist anything.
   Settings' *Schedule* row, for Premium alone — the row opens the paywall for anyone else. Each change
   is written through `manager.reminderSchedule` as it is made; the sheet has no *Save*. Set B's rows are
   drawn where `PremiumAccess.gate(status:offered:)` says, as History's switch is
+- The language sheet is presented with `.sheet(item:)` bound to an optional `AppLanguage` — the language it opened
+  on — from Settings' *Language* row, for everyone. It opens at half height and can go to full, the one sheet below
+  full height, so a language added later costs Settings nothing; a tap on a language chooses it and closes the sheet
+  (spec `2026-11-26-spanish-and-language-selector-design.md` §4)
 - The export sheet is presented with `.sheet(item:)` bound to an optional `ServingsExport`, read once by the card's
   tap and handed to `ExportSheet` through `init`, for Premium alone — the card opens the paywall for anyone else.
   With no servings, or a failed read, the sheet does not open and the card says so. A lapse clears the selection, so
