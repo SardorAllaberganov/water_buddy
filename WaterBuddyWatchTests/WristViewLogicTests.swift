@@ -165,10 +165,11 @@ struct WristViewLogicTests {
 
     /// Review focus: a phone whose clock runs ahead of the watch's stamps `composedAt` in the
     /// watch's future. That reads "just now" in every language — never "Synced -3m ago".
-    @Test(arguments: ["en", "ru", "uz"])
+    @Test(arguments: ["en", "ru", "uz", "es-419"])
     func aMirrorFromThePhonesFutureReadsAsJustNow(language: String) throws {
         let strings = try #require(shipped(language))
-        let expected = ["en": "Synced just now", "ru": "Синхронизировано только что", "uz": "Hozirgina sinxronlandi"]
+        let expected = ["en": "Synced just now", "ru": "Синхронизировано только что", "uz": "Hozirgina sinxronlandi",
+                        "es-419": "Sincronizado hace un momento"]
         let watchNow = Date(timeIntervalSince1970: 1_000)
         let text = WristView.syncedCaption(composedAt: watchNow.addingTimeInterval(180), now: watchNow, strings: strings, locale: Locale(identifier: language))
         #expect(text == expected[language])
@@ -271,7 +272,7 @@ struct WristViewLogicTests {
     }
 
     /// The phone's own sentence for a quick-add vessel, in each language, in the form its count takes.
-    @Test(arguments: ["en", "ru", "uz"])
+    @Test(arguments: ["en", "ru", "uz", "es-419"])
     func eachButtonIsLabelledWithThePhonesSentence(language: String) throws {
         let strings = try #require(shipped(language))
         let glass = WristServing(slot: 1, nameKey: "Glass", customName: nil, symbol: "mug.fill", amount: 250)
@@ -279,6 +280,7 @@ struct WristViewLogicTests {
             "en": "Glass, add 250 millilitres",
             "ru": "Стакан, добавить 250 миллилитров",
             "uz": "Stakan, 250 millilitr qo‘shish",
+            "es-419": "Vaso, agregar 250 mililitros",
         ]
         #expect(WristView.pourLabel(for: glass, strings: strings, locale: Locale(identifier: language)) == expected[language])
     }

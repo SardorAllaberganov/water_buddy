@@ -9,6 +9,12 @@
             "value": "Add water in ${applicationName}"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrega agua en ${applicationName}"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -23,6 +29,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Check my water in ${applicationName}"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisa mi agua en ${applicationName}"
           }
         },
         "ru": {
@@ -41,6 +53,12 @@
             "value": "How much water have I had in ${applicationName}"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuánta agua he tomado en ${applicationName}"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -55,6 +73,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "How much water today in ${applicationName}"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuánta agua llevo hoy en ${applicationName}"
           }
         },
         "ru": {
@@ -73,6 +97,12 @@
             "value": "Log a glass in ${applicationName}"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra un vaso en ${applicationName}"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -87,6 +117,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Log water in ${applicationName}"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra agua en ${applicationName}"
           }
         },
         "ru": {

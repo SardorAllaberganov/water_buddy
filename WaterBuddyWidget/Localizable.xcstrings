@@ -11,6 +11,12 @@
             "value": "%1$@ of %2$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ de %2$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -29,6 +35,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d ml"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$d ml"
@@ -72,6 +84,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d por ciento. %2$d de %#@arg3@."
+          },
+          "substitutions": {
+            "arg3": {
+              "argNum": 3,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
                     }
                   }
                 }
@@ -168,6 +208,12 @@
             "value": "+%1$d ml"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%1$d ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -191,6 +237,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A glass now keeps you on track for the day."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un vaso ahora y sigues en buen camino hoy."
           }
         },
         "ru": {
@@ -223,6 +275,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Add %1$d millilitres"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Agregar %1$d mililitro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Agregar %1$d mililitros"
                 }
               }
             }
@@ -275,6 +345,12 @@
             "value": "Adds a serving of water to today's total in WaterBuddy."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrega un registro de agua al total de hoy en WaterBuddy."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -296,6 +372,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Amount"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cantidad"
           }
         },
         "ru": {
@@ -376,6 +458,74 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Promedio: %#@arg1@. Mejor día: %#@arg2@. Meta cumplida en %3$d de %#@arg4@."
+          },
+          "substitutions": {
+            "arg1": {
+              "argNum": 1,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            },
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            },
+            "arg4": {
+              "argNum": 4,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg día"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg días"
                     }
                   }
                 }
@@ -504,6 +654,12 @@
             "value": "Goal met"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta cumplida"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -525,6 +681,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hydration"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidratación"
           }
         },
         "ru": {
@@ -557,6 +719,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Last %1$d days"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Último %1$d día"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Últimos %1$d días"
                 }
               }
             }
@@ -609,6 +789,12 @@
             "value": "Log ${amount} ml of water"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrar ${amount} ml de agua"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -630,6 +816,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Log Water"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrar agua"
           }
         },
         "ru": {
@@ -655,6 +847,12 @@
             "value": "Millilitres of water to log."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mililitros de agua para registrar."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -678,6 +876,12 @@
             "value": "Open WaterBuddy to see your week."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre WaterBuddy para ver tu semana."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -699,6 +903,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Time for water"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hora de tomar agua"
           }
         },
         "ru": {
@@ -725,6 +935,12 @@
             "value": "Today's hydration"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidratación de hoy"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -746,6 +962,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Track today's hydration and log a glass without opening the app."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sigue tu hidratación de hoy y registra un vaso sin abrir la app."
           }
         },
         "ru": {
@@ -771,6 +993,12 @@
             "value": "Week"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semana"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -794,6 +1022,12 @@
             "value": "Your last seven days against your goal."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus últimos siete días frente a tu meta."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -815,6 +1049,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "of %1$d ml"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "de %1$d ml"
           }
         },
         "ru": {

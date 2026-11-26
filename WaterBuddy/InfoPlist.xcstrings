@@ -22,6 +22,12 @@
             "value" : "WaterBuddy reads back only the water it saved to Health itself, so it can correct or delete it when you change a serving."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy solo lee de Salud el agua que guardó ahí, para corregirla o eliminarla cuando cambias un registro."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -43,6 +49,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "WaterBuddy saves each serving you log to Apple Health as water. It reads nothing from Health."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WaterBuddy guarda cada uno de tus registros en Salud como agua. No lee nada de Salud."
           }
         },
         "ru" : {

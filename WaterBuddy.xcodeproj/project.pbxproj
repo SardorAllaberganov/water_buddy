@@ -475,6 +475,7 @@
 				en,
 				ru,
 				uz,
+				"es-419",
 				Base,
 			);
 			mainGroup = 9947C2123046293D00972CEA;

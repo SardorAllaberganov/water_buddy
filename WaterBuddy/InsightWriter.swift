@@ -137,13 +137,15 @@ final class InsightWriter {
         return true
     }
 
-    /// Whether the app's strings are English, the one language of WaterBuddy's three the model speaks:
-    /// *English* chosen, or *Follow device* on a phone whose localisation of this app is English.
+    /// Whether the app's strings are English, the one language of WaterBuddy's the model is handed: *English*
+    /// chosen, or *Follow device* on a phone whose localisation of this app is English. Spanish's insights stay
+    /// the app's own sentences, as Russian's and Uzbek's do (rule `70-privacy`, *FoundationModels, for the
+    /// insights*).
     nonisolated static func speaksEnglish(_ language: AppLanguage, main: Bundle = .main) -> Bool {
         switch language {
         case .english: true
         case .system: main.preferredLocalizations.first == "en"
-        case .russian, .uzbek: false
+        case .russian, .uzbek, .spanish: false
         }
     }
 

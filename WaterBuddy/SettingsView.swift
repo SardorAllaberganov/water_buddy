@@ -663,7 +663,10 @@ extension SettingsView {
 
 // MARK: - The language picker
 
-/// Switches the language the whole product draws in, **without a relaunch**.
+/// Switches the language the whole product draws in, **without a relaunch**: one row on Settings, naming the
+/// language the app is in, that opens the languages in a sheet from the bottom (``LanguageSheet``; spec
+/// `2026-11-26-spanish-and-language-selector-design.md` §4). A list in its own sheet holds any number of
+/// languages, where a list on this card grew with each one — the owner's reason (R2).
 ///
 /// ## Why this is a picker and not a link to iOS Settings
 ///
@@ -685,84 +688,77 @@ private struct LanguageCard: View {
 
     @Environment(DataManager.self) private var manager
     @Environment(\.strings) private var strings
-    @Environment(\.aurora) private var aurora
+    @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// Bumped on a real change, so the haptic fires on a switch rather than on a re-tap.
+    /// The language the sheet opened on: its `.sheet(item:)` selection (rule `50-views`).
+    @State private var choosing: AppLanguage?
+
+    /// Bumped by the row's tap, for the glyph's bounce and the tick (``Haptics/select``).
+    @State private var opens = 0
+
+    /// Bumped on a real change in the sheet, so the tick plays on a switch rather than on a re-tap. Held here,
+    /// on the card that stays, because the sheet closes in the same moment.
     @State private var switches = 0
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Language", bundle: strings)
-                .cardTitle()
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
-                .padding(.bottom, 6)
-
-            VStack(spacing: 0) {
-                ForEach(AppLanguage.allCases) { language in
-                    row(language)
-
-                    if language != AppLanguage.allCases.last {
-                        Hairline()
-                    }
-                }
-            }
-
-            Text("The app switches straight away. The widget follows on its next refresh.", bundle: strings)
-                .cardNote()
-                .padding(.top, 10)
-        }
-        // `.frosted` and `.raised`, matching every sibling on this screen.
-        .settingsCard()
-        // A choice among four peers, so the selection tick rather than `confirm`'s impact —
-        // the tick a tab or a day gives (``Haptics/select``).
-        .sensoryFeedback(Haptics.select, trigger: switches)
+    private var note: String {
+        strings.localizedString(
+            forKey: "The app switches straight away. The widget follows on its next refresh.", value: nil, table: nil
+        )
     }
 
-    private func row(_ language: AppLanguage) -> some View {
-        let isSelected = manager.language == language
+    /// The glyph beside the words, and above them at the accessibility sizes — Export's lockup, for Export's reason.
+    private var lockup: AnyLayout {
+        typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(spacing: 12))
+    }
 
-        return Button {
-            guard !isSelected else { return }
-            manager.language = language
-            switches += 1
+    var body: some View {
+        Button {
+            opens += 1
+            choosing = manager.language
         } label: {
-            HStack(spacing: 12) {
-                // The three languages name themselves in their own script; only *Follow device*
-                // is translated, because it names a behaviour rather than a language.
-                Text(language.name(in: strings))
-                    .font(.body)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 12) {
+                    lockup {
+                        Image(systemName: "globe")
+                            .font(.title2.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .symbolEffect(.bounce, value: opens)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Language", bundle: strings)
+                                .cardTitle()
+                            // In its own script, or *Follow device* in the app's language.
+                            Text(manager.language.name(in: strings))
+                                .cardNote()
+                                .contentTransition(.opacity)
+                        }
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .accessibilityHidden(true)
+                }
+                // Past the 44pt floor, and a `minHeight` so the row grows with the text (rule `65-accessibility`).
+                .frame(minHeight: 50)
 
-                Spacer(minLength: 8)
-
-                Image(systemName: "checkmark")
-                    // About the canvas's mark — 14 pt across, drawn in a 20-pt box — at the row's
-                    // own size, so it grows with the name.
-                    .font(.body.weight(.bold))
-                    // `.clear` rather than absent, so the row does not resize as the selection
-                    // moves and SwiftUI animates a colour instead of inserting a layer — the same
-                    // ruling `GlassTabBar` records for its glow.
-                    .foregroundStyle(isSelected ? aurora.accent : .clear)
-                    .shadow(color: isSelected ? aurora.accent.opacity(0.5) : .clear, radius: 8)
-                    // Once, on the row that was picked — and on the one that was left, where the
-                    // mark is clear and nothing shows.
-                    .symbolEffect(.bounce, value: isSelected)
+                Text(note)
+                    .cardNote()
             }
-            // Past the 44pt floor — the canvas's 50 — and a `minHeight` so the target grows with
-            // Dynamic Type rather than clipping the name (rule `65-accessibility`).
-            .frame(minHeight: 50)
-            .contentShape(Rectangle())
+            .settingsCard(interactive: true)
         }
         .buttonStyle(PressStyle())
-        // Label and trait on the `Button` itself. A wrapping
-        // `.accessibilityElement(children: .ignore)` around a control adds a stop instead of
-        // replacing one, which is how `HistoryView`'s rows were once announced twice
-        // (`tasks/lessons.md`).
-        .accessibilityLabel(language.name(in: strings))
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+        // One element: the title, the language it is in, and the note as its hint (rule `65-accessibility`).
+        .accessibilityLabel(Text("Language", bundle: strings))
+        .accessibilityValue(manager.language.name(in: strings))
+        .accessibilityHint(Text(note))
+        // A choice among peers, so the selection tick, as the tabs and the days give (``Haptics/select``).
+        .sensoryFeedback(Haptics.select, trigger: switches)
+        .sheet(item: $choosing) { opened in
+            LanguageSheet(opened: opened, chose: { switches += 1 })
+        }
     }
 }
 

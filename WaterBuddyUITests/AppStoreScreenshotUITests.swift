@@ -405,10 +405,14 @@ final class AppStoreScreenshotUITests: XCTestCase {
         // ── English, chosen ──────────────────────────────────────────────────────────────────────
         app.buttons["Settings"].tap()
         XCTAssertTrue(app.sliders["Daily water goal"].waitForExistence(timeout: 10), "the Settings tab did not draw")
+        // The Language row opens the languages in a sheet (spec 2026-11-26-spanish-and-language-selector §4).
+        let language = app.buttons["Language"]
+        scroll(app, from: settingsAnchor(app), until: language, step: 300, maxDrags: 5)
+        language.tap()
         let english = app.buttons["English"]
-        scroll(app, from: settingsAnchor(app), until: english, step: 300, maxDrags: 5)
+        XCTAssertTrue(english.waitForExistence(timeout: 5), "the language sheet did not open")
         english.tap()
-        let chosen = XCTNSPredicateExpectation(predicate: NSPredicate(format: "selected == true"), object: english)
+        let chosen = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", "English"), object: language)
         XCTAssertEqual(XCTWaiter().wait(for: [chosen], timeout: 5), .completed, "English was not chosen")
 
         // ── Home, left showing ───────────────────────────────────────────────────────────────────
@@ -677,7 +681,7 @@ extension AppStoreScreenshotUITests {
         Thread.sleep(forTimeInterval: settle)
         capture("14-settings-top-rest")
 
-        scroll(app, from: settingsAnchor(app), until: app.buttons["O‘zbekcha"], step: 300, maxDrags: 3)
+        scroll(app, from: settingsAnchor(app), until: app.buttons["Language"], step: 300, maxDrags: 3)
         capture("15-settings-scrolled-language")
         returnToTop(of: "Settings", in: app, proof: goalSlider)
 
@@ -751,10 +755,13 @@ extension AppStoreScreenshotUITests {
         }
 
         returnToTop(of: "Settings", in: app, proof: goalSlider)
-        scroll(app, from: settingsAnchor(app), until: app.buttons["Русский"], step: 300, maxDrags: 3)
+        scroll(app, from: settingsAnchor(app), until: app.buttons["Language"], step: 300, maxDrags: 3)
+        app.buttons["Language"].tap()
+        XCTAssertTrue(app.buttons["Русский"].waitForExistence(timeout: 5), "the language sheet did not open")
+        Thread.sleep(forTimeInterval: settle)
+        capture("22-settings-language-sheet")
         app.buttons["Русский"].tap()
         Thread.sleep(forTimeInterval: 2)
-        capture("22-settings-language-picker-ru-selected")
 
         tap(tabCentres[2], in: app)     // Settings
         Thread.sleep(forTimeInterval: settle)

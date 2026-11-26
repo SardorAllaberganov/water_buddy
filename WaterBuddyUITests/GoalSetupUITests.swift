@@ -1253,9 +1253,9 @@ final class GoalSetupUITests: XCTestCase {
         }
         XCTAssertEqual(app.switches.matching(identifier: "Smart reminders").count, 1, "the reminders switch is not one element")
         XCTAssertEqual(app.switches.matching(identifier: "Apple Health").count, 1, "the Apple Health switch is not one element")
-        for name in ["Follow device", "English", "Русский", "O‘zbekcha"] {
-            XCTAssertEqual(app.buttons.matching(identifier: name).count, 1, "the \(name) row is not one button")
-        }
+        // One Language row since spec `2026-11-26-spanish-and-language-selector-design.md` §4: the languages
+        // are its sheet's, where `LanguageUITests` counts them.
+        XCTAssertEqual(app.buttons.matching(identifier: "Language").count, 1, "the Language row is not one button")
     }
 
     /// Settings links the privacy policy for every user — App Review 5.1.1(i) asks for it "within the

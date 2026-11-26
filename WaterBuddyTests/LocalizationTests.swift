@@ -12,8 +12,9 @@ import UserNotifications
 
 // MARK: - Fixtures
 
-/// The languages the product ships beyond its development language.
-private let translated = ["ru", "uz"]
+/// The languages the product ships beyond its development language. Latin American Spanish joined them
+/// with spec `2026-11-26-spanish-and-language-selector-design.md` (R1).
+private let translated = ["ru", "uz", "es-419"]
 
 /// The app bundle, which hosts this test target.
 private let appBundle = Bundle.main
@@ -461,6 +462,9 @@ private func specifiers(in text: String) -> Set<String> {
         ("en", "Open WaterBuddy to see your week.", "Open WaterBuddy to see your week."),
         ("ru", "Open WaterBuddy to see your week.", "Откройте WaterBuddy, чтобы увидеть свою неделю."),
         ("uz", "Open WaterBuddy to see your week.", "Haftangizni ko‘rish uchun WaterBuddy’ni oching."),
+        ("es-419", "Week", "Semana"),
+        ("es-419", "Your last seven days against your goal.", "Tus últimos siete días frente a tu meta."),
+        ("es-419", "Open WaterBuddy to see your week.", "Abre WaterBuddy para ver tu semana."),
     ])
     func theWeekWidgetSaysWhatTheSpecSays(language: String, key: String, expected: String) {
         for (name, bundle) in [("app", appBundle), ("widget", widgetBundle)] as [(String, Bundle?)] {
@@ -534,32 +538,41 @@ private func specifiers(in text: String) -> Set<String> {
     /// actually happens when a catalogue is edited by hand: a key translated into one language and
     /// forgotten in the other, which falls back to English for half the users and is invisible to
     /// anyone testing in the other half.
-    @Test func bothLanguagesCoverExactlyTheSameKeys() {
+    @Test func everyLanguageCoversExactlyTheSameKeys() {
         for (name, bundle) in [("app", appBundle), ("widget", widgetBundle)] as [(String, Bundle?)] {
-            guard let ru = table(bundle, "ru"), let uz = table(bundle, "uz") else {
-                Issue.record("\(name): could not read the compiled string tables")
+            guard let ru = table(bundle, "ru") else {
+                Issue.record("\(name): could not read the compiled ru table")
                 continue
             }
-
-            // One interpolated *literal*, never a concatenation: swift-testing's `Comment` is
-            // `ExpressibleByStringInterpolation`, so a built `String` does not convert
-            // (`tasks/lessons.md`).
-            let onlyRu = Set(ru.keys).subtracting(uz.keys).sorted()
-            let onlyUz = Set(uz.keys).subtracting(ru.keys).sorted()
-
-            #expect(onlyRu.isEmpty, "\(name): translated into ru but not uz — \(onlyRu)")
-            #expect(onlyUz.isEmpty, "\(name): translated into uz but not ru — \(onlyUz)")
             #expect(!ru.isEmpty, "\(name): the ru table is empty")
+
+            // Every other translation against Russian's keys, both ways.
+            for language in translated where language != "ru" {
+                guard let other = table(bundle, language) else {
+                    Issue.record("\(name): could not read the compiled \(language) table")
+                    continue
+                }
+                // One interpolated *literal*, never a concatenation: swift-testing's `Comment` is
+                // `ExpressibleByStringInterpolation`, so a built `String` does not convert
+                // (`tasks/lessons.md`).
+                let onlyRu = Set(ru.keys).subtracting(other.keys).sorted()
+                let onlyOther = Set(other.keys).subtracting(ru.keys).sorted()
+
+                #expect(onlyRu.isEmpty, "\(name): translated into ru but not \(language) — \(onlyRu)")
+                #expect(onlyOther.isEmpty, "\(name): translated into \(language) but not ru — \(onlyOther)")
+            }
         }
     }
 
     /// The readers in this file see a key with plural forms, which the build moves out of
     /// `Localizable.strings` into `Localizable.stringsdict` (spec 2026-10-16 §6.2): two forms in
-    /// English, four in Russian, and Uzbek's one value.
+    /// English, four in Russian, Uzbek's one value, and Spanish's two — *many* reaches only whole
+    /// millions, which no figure the app draws does.
     @Test func theTablesSeeAKeyWithPluralForms() {
         #expect(table(appBundle, "en")?["Add %1$d millilitres"]?.count == 2)
         #expect(table(appBundle, "ru")?["Add %1$d millilitres"]?.count == 4)
         #expect(table(appBundle, "uz")?["Add %1$d millilitres"]?.count == 1)
+        #expect(table(appBundle, "es-419")?["Add %1$d millilitres"]?.count == 2)
     }
 
     /// Every string in the app, not just the shared ten, keeps its positional arguments in both
@@ -1033,6 +1046,12 @@ private func english(_ count: Int, _ one: String, _ other: String) -> String {
     count == 1 ? one : other
 }
 
+/// Spanish's whole-number forms by CLDR's rule: *one* for exactly one, *other* for the rest. Its third
+/// form, *many*, takes only whole millions, and no count here or on screen reaches one.
+private func spanish(_ count: Int, _ one: String, _ other: String) -> String {
+    count == 1 ? one : other
+}
+
 /// The counts spec §1 names: every Russian form, the teens that end in 1–4 and still take *many*, and a
 /// figure that groups.
 private let pluralCounts = [0, 1, 2, 5, 11, 12, 21, 22, 25, 101, 111, 1_001]
@@ -1260,6 +1279,51 @@ private func expected(_ key: String, _ language: String, _ n: [Int], _ locale: L
     case ("Nothing logged yet today — %1$lld millilitres to go.", "uz"):
         return "Bugun hali hech narsa qayd etilmagan — \(f[0]) millilitr qoldi."
 
+    default: return expectedSpanish(key, language, n, f)
+    }
+}
+
+/// Spec `2026-11-26-spanish-and-language-selector-design.md` §3.2: Latin American Spanish, each counted
+/// noun in the form its count takes.
+private func expectedSpanish(_ key: String, _ language: String, _ n: [Int], _ f: [String]) -> String? {
+    guard language == "es-419" else { return nil }
+    let ml = { (i: Int) in spanish(n[i], "mililitro", "mililitros") }
+    let days = { (i: Int) in spanish(n[i], "día", "días") }
+    switch key {
+    case "%1$d millilitres": return "\(f[0]) \(ml(0))"
+    case "%1$@, add %2$d millilitres": return "Glass, agregar \(f[1]) \(ml(1))"
+    case "%1$d millilitres to go": return spanish(n[0], "Falta \(f[0]) mililitro", "Faltan \(f[0]) mililitros")
+    case "%1$d of %2$d millilitres": return "\(f[0]) de \(f[1]) \(ml(1))"
+    case "%1$d percent. %2$d of %3$d millilitres.": return "\(f[0]) por ciento. \(f[1]) de \(f[2]) \(ml(2))."
+    case "Add %1$d millilitres": return "Agregar \(f[0]) \(ml(0))"
+    case "Use %1$d millilitres": return "Usar \(f[0]) \(ml(0))"
+    case averageKey:
+        return "Promedio: \(f[0]) \(ml(0)). Mejor día: \(f[1]) \(ml(1)). Meta cumplida en \(f[2]) de \(f[3]) \(days(3))."
+    case "Last %1$d days": return spanish(n[0], "Último \(f[0]) día", "Últimos \(f[0]) días")
+    case "%1$d days": return "\(f[0]) \(days(0))"
+    case "%1$d servings": return "\(f[0]) " + spanish(n[0], "registro", "registros")
+    case "%1$d of %2$d days": return "\(f[0]) de \(f[1]) \(days(1))"
+    case "%1$d of %2$d days on goal": return "\(f[0]) de \(f[1]) \(days(1)) con la meta cumplida"
+    case "Average %1$d millilitres a day": return "Promedio de \(f[0]) \(ml(0)) al día"
+    case "Up %1$d millilitres on the month before": return "\(f[0]) \(ml(0)) más que el mes anterior"
+    case "Down %1$d millilitres on the month before": return "\(f[0]) \(ml(0)) menos que el mes anterior"
+    case "%1$d millilitres a day": return "\(f[0]) \(ml(0)) al día"
+    case "Patterns need %1$d days of water": return "Los patrones necesitan \(f[0]) \(days(0)) con agua"
+    case "Insights need %1$d days of water in a week":
+        return "Los análisis necesitan \(f[0]) \(days(0)) con agua en una semana"
+    // A label and its count, as Russian and Uzbek write it: no noun stands beside the figure.
+    case "Goal met on %1$d days, up from %2$d.": return "Días con la meta cumplida: \(f[0]); la semana anterior, \(f[1])."
+    case "Your first drink came %1$d minutes earlier than the week before.":
+        return "Tomaste tu primer vaso \(f[0]) " + spanish(n[0], "minuto", "minutos") + " antes que la semana anterior."
+    case "Your first drink came %1$d minutes later than the week before.":
+        return "Tomaste tu primer vaso \(f[0]) " + spanish(n[0], "minuto", "minutos") + " más tarde que la semana anterior."
+    case "Nothing was logged on %1$d days.": return "No registraste nada en \(f[0]) \(days(0))."
+    case "%1$lld millilitres so far today — %2$lld millilitres to go.":
+        return "Hoy llevas \(f[0]) \(ml(0)) — " + spanish(n[1], "falta \(f[1]) mililitro", "faltan \(f[1]) mililitros") + "."
+    case "%1$lld millilitres so far today — you've reached your goal.":
+        return "Hoy llevas \(f[0]) \(ml(0)) — alcanzaste tu meta."
+    case "Nothing logged yet today — %1$lld millilitres to go.":
+        return "Todavía no registras nada hoy — " + spanish(n[0], "falta \(f[0]) mililitro", "faltan \(f[0]) mililitros") + "."
     default: return nil
     }
 }
@@ -1271,7 +1335,7 @@ struct PluralFormTests {
     /// Spec §6.1: every counted key, in every bundle that holds it, at every count, in the form §3.3
     /// gives it — a key with more than one counted argument varied one argument at a time, the
     /// others held at 5. The locale is the one `AppLanguage.locale` makes for a chosen language.
-    @Test(arguments: ["en", "ru", "uz"])
+    @Test(arguments: ["en", "ru", "uz", "es-419"])
     func everyCountedKeyTakesTheFormItsCountNeeds(language: String) throws {
         let locale = Locale(identifier: language)
         for counted in countedKeys {
@@ -1338,5 +1402,25 @@ struct PluralFormTests {
 
         #expect(locale.language.languageCode?.identifier == bundleLanguage,
                 "Follow device formats the \(bundleLanguage ?? "nil") table with \(locale.identifier)")
+    }
+}
+
+// MARK: - The language sheet (spec 2026-11-26-spanish-and-language-selector-design.md §4.5)
+
+/// *Follow device*'s second line in the language sheet: the one new key, in every language, naming the
+/// language *Follow device* draws in that language's own script. Not `@MainActor`: the helper is
+/// `nonisolated`.
+struct LanguageSheetStringTests {
+
+    @Test(arguments: [
+        ("en", "Your iPhone's language: Español"),
+        ("ru", "Язык iPhone: Español"),
+        ("uz", "iPhone tili: Español"),
+        ("es-419", "Idioma de tu iPhone: Español"),
+    ])
+    func followDevicesSecondLineNamesTheLanguage(language: String, expected: String) throws {
+        let strings = try #require(localization(appBundle, language), "the app ships no \(language) table")
+
+        #expect(strings.localized("Your iPhone's language: %1$@", "Español", locale: Locale(identifier: language)) == expected)
     }
 }

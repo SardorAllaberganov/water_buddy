@@ -20,6 +20,12 @@
             "value": "%1$@ of %2$@ ml"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ de %2$@ ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -58,6 +64,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, agregar %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
                     }
                   }
                 }
@@ -122,6 +156,12 @@
             "value": "%1$d ml"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -160,6 +200,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d por ciento. %2$d de %#@arg3@."
+          },
+          "substitutions": {
+            "arg3": {
+              "argNum": 3,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
                     }
                   }
                 }
@@ -256,6 +324,12 @@
             "value": "Bottle"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Botella"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -277,6 +351,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cup"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taza"
           }
         },
         "ru": {
@@ -302,6 +382,12 @@
             "value": "Glass"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vaso"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -323,6 +409,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not yet synced"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin sincronizar"
           }
         },
         "ru": {
@@ -348,6 +440,12 @@
             "value": "Not yet synced · default goal"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin sincronizar · meta predeterminada"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -369,6 +467,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set your goal in WaterBuddy on iPhone"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fija tu meta en WaterBuddy en el iPhone"
           }
         },
         "ru": {
@@ -394,6 +498,12 @@
             "value": "Synced %1$dm ago"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizado hace %1$d min"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -417,6 +527,12 @@
             "value": "Synced just now"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizado hace un momento"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -438,6 +554,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Today's hydration"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidratación de hoy"
           }
         },
         "ru": {

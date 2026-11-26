@@ -10,6 +10,12 @@
             "value": "%1$@ a year"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ al año"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -31,6 +37,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ free, then %2$@ a year"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ gratis, luego %2$@ al año"
           }
         },
         "ru": {
@@ -56,6 +68,12 @@
             "value": "%1$@ is charged each year until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se cobra %1$@ cada año hasta que canceles. Cancela al menos 24 horas antes de que se renueve, en la configuración de tu cuenta de Apple."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -77,6 +95,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@, once"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, un solo pago"
           }
         },
         "ru": {
@@ -102,6 +126,12 @@
             "value": "Buy Lifetime"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprar acceso de por vida"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -123,6 +153,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Extras for the way you drink. Logging water stays free."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extras para tu forma de tomar agua. Registrar agua sigue siendo gratis."
           }
         },
         "ru": {
@@ -148,6 +184,12 @@
             "value": "Free trial: %1$@. Then %2$@ is charged each year until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prueba gratis: %1$@. Luego se cobra %2$@ cada año hasta que canceles. Cancela al menos 24 horas antes de que se renueve, en la configuración de tu cuenta de Apple."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -169,6 +211,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lifetime"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De por vida"
           }
         },
         "ru": {
@@ -194,6 +242,12 @@
             "value": "Logging water is free, always."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrar agua es gratis, siempre."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -215,6 +269,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Manage Subscription"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Administrar suscripción"
           }
         },
         "ru": {
@@ -240,6 +300,12 @@
             "value": "One payment. It never renews."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un solo pago. Nunca se renueva."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -258,6 +324,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "Premium"
@@ -286,6 +358,12 @@
             "value": "Privacy Policy"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Política de privacidad"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -307,6 +385,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Restore Purchases"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar compras"
           }
         },
         "ru": {
@@ -332,6 +416,12 @@
             "value": "See Premium"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver Premium"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -353,6 +443,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Start Free Trial"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comenzar prueba gratis"
           }
         },
         "ru": {
@@ -378,6 +474,12 @@
             "value": "Subscribe"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suscribirse"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -399,6 +501,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Thank you"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gracias"
           }
         },
         "ru": {
@@ -424,6 +532,12 @@
             "value": "The App Store can't be reached right now."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede conectar con el App Store en este momento."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -445,6 +559,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The purchase didn't go through."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La compra no se completó."
           }
         },
         "ru": {
@@ -470,6 +590,12 @@
             "value": "Terms of Use"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Términos de uso"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -491,6 +617,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Try Again"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intentar de nuevo"
           }
         },
         "ru": {
@@ -516,6 +648,12 @@
             "value": "Waiting for approval."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando aprobación."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -534,6 +672,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WaterBuddy Premium"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "WaterBuddy Premium"
@@ -562,6 +706,12 @@
             "value": "Yearly"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anual"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -583,6 +733,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yearly, until %1$@"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anual, hasta el %1$@"
           }
         },
         "ru": {
@@ -608,6 +764,12 @@
             "value": "Monthly"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensual"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -629,6 +791,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "a month"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "al mes"
           }
         },
         "ru": {
@@ -654,6 +822,12 @@
             "value": "a year"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "al año"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -675,6 +849,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "once"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "un solo pago"
           }
         },
         "ru": {
@@ -700,6 +880,12 @@
             "value": "%1$@ a month"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ al mes"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -721,6 +907,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "save %1$@"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ahorra %1$@"
           }
         },
         "ru": {
@@ -746,6 +938,12 @@
             "value": "%1$@ free"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ gratis"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -767,6 +965,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Best value"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más conveniente"
           }
         },
         "ru": {
@@ -792,6 +996,12 @@
             "value": "Cancel any time"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancela cuando quieras"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -813,6 +1023,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yours for good"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuyo para siempre"
           }
         },
         "ru": {
@@ -838,6 +1054,12 @@
             "value": "%1$@ is charged each month until you cancel. Cancel at least 24 hours before it renews, in your Apple Account settings."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se cobra %1$@ cada mes hasta que canceles. Cancela al menos 24 horas antes de que se renueve, en la configuración de tu cuenta de Apple."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -859,6 +1081,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Monthly, until %1$@"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensual, hasta el %1$@"
           }
         },
         "ru": {
@@ -884,6 +1112,12 @@
             "value": "See how you really drink, and what would help."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descubre cómo tomas agua en realidad y qué te ayudaría."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -905,6 +1139,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Month view and full history"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vista mensual e historial completo"
           }
         },
         "ru": {
@@ -930,6 +1170,12 @@
             "value": "Every day you have logged, a month at a glance"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada día que registraste, un mes de un vistazo"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -951,6 +1197,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your patterns"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus patrones"
           }
         },
         "ru": {
@@ -976,6 +1228,12 @@
             "value": "When you drink, weekdays against weekends"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuándo tomas agua, entre semana contra el fin de semana"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -997,6 +1255,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Personal insights"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Análisis personales"
           }
         },
         "ru": {
@@ -1022,6 +1286,12 @@
             "value": "Each week, from your own figures, on your iPhone"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada semana, con tus propios datos, en tu iPhone"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1043,6 +1313,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A monthly recap"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un resumen mensual"
           }
         },
         "ru": {
@@ -1068,6 +1344,12 @@
             "value": "Your month in one card, yours to share"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu mes en una tarjeta, para compartir"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1089,6 +1371,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "New Premium features arrive in updates, included."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las nuevas funciones Premium llegan con las actualizaciones, sin costo adicional."
           }
         },
         "ru": {
@@ -1114,6 +1402,12 @@
             "value": "Month view"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vista mensual"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1135,6 +1429,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Patterns"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Patrones"
           }
         },
         "ru": {
@@ -1160,6 +1460,12 @@
             "value": "Insights"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Análisis"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1181,6 +1487,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Done"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         },
         "ru": {
@@ -1206,6 +1518,12 @@
             "value": "No purchases to restore."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay compras para restaurar."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1227,6 +1545,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "You have Premium."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tienes Premium."
           }
         },
         "ru": {
@@ -1262,6 +1586,12 @@
             "value": "%1$@ L"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ L"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1280,6 +1610,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ ml"
@@ -1308,6 +1644,12 @@
             "value": "%1$@ ml to go"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faltan %1$@ ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1331,6 +1673,12 @@
             "value": "%1$@ of %2$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ de %2$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1352,6 +1700,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ of %2$@ ml"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ de %2$@ ml"
           }
         },
         "ru": {
@@ -1392,6 +1746,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, agregar %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
                     }
                   }
                 }
@@ -1456,6 +1838,12 @@
             "value": "%1$@/%2$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@/%2$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1486,6 +1874,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%1$d days"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d día"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d días"
                 }
               }
             }
@@ -1538,6 +1944,12 @@
             "value": "%1$d kg"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d kg"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1556,6 +1968,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d lb"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$d lb"
@@ -1591,6 +2009,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%1$d millilitres"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitros"
                 }
               }
             }
@@ -1655,6 +2091,24 @@
             }
           }
         },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Falta %1$d mililitro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Faltan %1$d mililitros"
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "variations": {
             "plural": {
@@ -1702,6 +2156,12 @@
             "value": "%1$d ml"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1740,6 +2200,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d de %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg día"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg días"
                     }
                   }
                 }
@@ -1826,6 +2314,34 @@
             }
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d de %#@arg2@ con la meta cumplida"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg día"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg días"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1905,6 +2421,34 @@
             }
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d de %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -1977,6 +2521,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$d por ciento. %2$d de %#@arg3@."
+          },
+          "substitutions": {
+            "arg3": {
+              "argNum": 3,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
                     }
                   }
                 }
@@ -2085,6 +2657,24 @@
             }
           }
         },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d registro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d registros"
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "variations": {
             "plural": {
@@ -2167,6 +2757,54 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoy llevas %#@arg1@ — %#@arg2@."
+          },
+          "substitutions": {
+            "arg1": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            },
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "falta %arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "faltan %arg mililitros"
                     }
                   }
                 }
@@ -2285,6 +2923,34 @@
             }
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoy llevas %#@arg1@ — alcanzaste tu meta."
+          },
+          "substitutions": {
+            "arg1": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2342,6 +3008,12 @@
             "value": "+%1$d ml"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%1$d ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2385,6 +3057,12 @@
             "value": "A gentle nudge when it has been a while."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un aviso amable cuando ha pasado un rato."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2406,6 +3084,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A glass now keeps you on track for the day."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un vaso ahora y sigues en buen camino hoy."
           }
         },
         "ru": {
@@ -2431,6 +3115,12 @@
             "value": "A nudge every two hours from 9 AM to 9 PM, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un aviso cada dos horas de 9 a.m. a 9 p.m., que se omite si tomaste agua en la hora anterior. Al llegar a tu meta, se silencia el resto del día."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2452,6 +3142,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A nudge every two hours from 9 AM to 9 PM, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un aviso cada dos horas de 9 a.m. a 9 p.m., salvo si tomaste agua en la hora anterior o ya llegaste a tu meta. Tienes activado el resumen programado, así que los recordatorios pueden llegar juntos y no a la hora exacta."
           }
         },
         "ru": {
@@ -2477,6 +3173,12 @@
             "value": "A starting point, not medical advice."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un punto de partida, no un consejo médico."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2498,6 +3200,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Active"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alta"
           }
         },
         "ru": {
@@ -2530,6 +3238,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Add %1$d millilitres"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Agregar %1$d mililitro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Agregar %1$d mililitros"
                 }
               }
             }
@@ -2582,6 +3308,12 @@
             "value": "Add a serving"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar un registro"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2603,6 +3335,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Added %1$@ ml"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregaste %1$@ ml"
           }
         },
         "ru": {
@@ -2628,6 +3366,12 @@
             "value": "Adds your Glass to today's total in WaterBuddy."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrega tu Vaso al total de hoy en WaterBuddy."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2649,6 +3393,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Apple Health"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Salud"
           }
         },
         "ru": {
@@ -2674,6 +3424,12 @@
             "value": "Average"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Promedio"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2695,6 +3451,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Average %1$@ ml a day"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Promedio de %1$@ ml al día"
           }
         },
         "ru": {
@@ -2727,6 +3489,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Average %1$d millilitres a day"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Promedio de %1$d mililitro al día"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Promedio de %1$d mililitros al día"
                 }
               }
             }
@@ -2834,6 +3614,74 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Promedio: %#@arg1@. Mejor día: %#@arg2@. Meta cumplida en %3$d de %#@arg4@."
+          },
+          "substitutions": {
+            "arg1": {
+              "argNum": 1,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            },
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            },
+            "arg4": {
+              "argNum": 4,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg día"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg días"
                     }
                   }
                 }
@@ -2962,6 +3810,12 @@
             "value": "Back"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atrás"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -2983,6 +3837,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Back to this week"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver a esta semana"
           }
         },
         "ru": {
@@ -3008,6 +3868,12 @@
             "value": "Best day"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mejor día"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3029,6 +3895,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Best streak"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mejor racha"
           }
         },
         "ru": {
@@ -3054,6 +3926,12 @@
             "value": "Bottle"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Botella"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3075,6 +3953,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cancel"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
           }
         },
         "ru": {
@@ -3100,6 +3984,12 @@
             "value": "Continue"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3121,6 +4011,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cup"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taza"
           }
         },
         "ru": {
@@ -3146,6 +4042,12 @@
             "value": "Daily goal"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta diaria"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3167,6 +4069,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Daily water goal"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta diaria de agua"
           }
         },
         "ru": {
@@ -3192,6 +4100,12 @@
             "value": "Day streak"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Racha de días"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3213,6 +4127,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Days on goal"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metas cumplidas"
           }
         },
         "ru": {
@@ -3237,6 +4157,12 @@
             "value": "Delete"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3258,6 +4184,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Down %1$@ ml on the month before"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml menos que el mes anterior"
           }
         },
         "ru": {
@@ -3290,6 +4222,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Down %1$d millilitres on the month before"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitro menos que el mes anterior"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitros menos que el mes anterior"
                 }
               }
             }
@@ -3342,6 +4292,12 @@
             "value": "Edit serving"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar registro"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3363,6 +4319,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Edits this serving"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edita este registro"
           }
         },
         "ru": {
@@ -3388,6 +4350,12 @@
             "value": "Every day you have logged is kept. Premium shows it as months, with your patterns and a recap."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se guardan todos los días que registraste. Premium los muestra mes a mes, con tus patrones y un resumen."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3409,6 +4377,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Exercise most days"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entreno casi a diario"
           }
         },
         "ru": {
@@ -3434,6 +4408,12 @@
             "value": "Exercise some days"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entreno algunos días"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3455,6 +4435,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Follow device"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como en el dispositivo"
           }
         },
         "ru": {
@@ -3480,6 +4466,12 @@
             "value": "Get Started"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comenzar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3501,6 +4493,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Glass"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vaso"
           }
         },
         "ru": {
@@ -3526,6 +4524,12 @@
             "value": "Goal met"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta cumplida"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3547,6 +4551,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Goal reached"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta alcanzada"
           }
         },
         "ru": {
@@ -3572,6 +4582,12 @@
             "value": "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El acceso a Salud está desactivado para WaterBuddy. Actívalo en Configuración › Privacidad y seguridad › Salud › WaterBuddy."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3593,6 +4609,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "History"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historial"
           }
         },
         "ru": {
@@ -3618,6 +4640,12 @@
             "value": "Home"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicio"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3639,6 +4667,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Home pours these in one tap. Set each to what yours holds."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Inicio se registran con un toque. Ajusta cada uno a lo que le cabe al tuyo."
           }
         },
         "ru": {
@@ -3664,6 +4698,12 @@
             "value": "How active are you?"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu nivel de actividad"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3685,6 +4725,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "How much water do you want to drink each day?"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cuánta agua quieres tomar cada día?"
           }
         },
         "ru": {
@@ -3710,6 +4756,12 @@
             "value": "Hydration"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidratación"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3731,6 +4783,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Language"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma"
           }
         },
         "ru": {
@@ -3763,6 +4821,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Last %1$d days"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Último %1$d día"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Últimos %1$d días"
                 }
               }
             }
@@ -3815,6 +4891,12 @@
             "value": "Last drink %1$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Último registro: %1$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3836,6 +4918,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Light"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baja"
           }
         },
         "ru": {
@@ -3861,6 +4949,12 @@
             "value": "Log a Glass"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrar un vaso"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3882,6 +4976,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Measured against your current goal"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comparado con tu meta actual"
           }
         },
         "ru": {
@@ -3907,6 +5007,12 @@
             "value": "Moderate"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderada"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3928,6 +5034,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Month"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mes"
           }
         },
         "ru": {
@@ -3953,6 +5065,12 @@
             "value": "Mostly sitting"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me muevo poco"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -3974,6 +5092,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Next reminder %1$@"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Próximo recordatorio: %1$@"
           }
         },
         "ru": {
@@ -3999,6 +5123,12 @@
             "value": "Not now"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ahora no"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4022,6 +5152,12 @@
             "value": "Nothing logged that day"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No registraste nada ese día"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4043,6 +5179,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing logged yet today"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no registras nada hoy"
           }
         },
         "ru": {
@@ -4083,6 +5225,34 @@
                     "stringUnit": {
                       "state": "translated",
                       "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no registras nada hoy — %#@arg1@."
+          },
+          "substitutions": {
+            "arg1": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "falta %arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "faltan %arg mililitros"
                     }
                   }
                 }
@@ -4147,6 +5317,12 @@
             "value": "Notifications are turned off for WaterBuddy in iOS Settings, so reminders can't be delivered."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones de WaterBuddy están desactivadas en Configuración de iOS, así que los recordatorios no pueden llegar."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4168,6 +5344,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "One tap logs a glass. Watch your day fill up."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un toque registra un vaso. Mira cómo se llena tu día."
           }
         },
         "ru": {
@@ -4193,6 +5375,12 @@
             "value": "Open WaterBuddy to see your week."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre WaterBuddy para ver tu semana."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4214,6 +5402,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open iOS Settings"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Configuración de iOS"
           }
         },
         "ru": {
@@ -4239,6 +5433,12 @@
             "value": "Part of it"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parcial"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4260,6 +5460,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pick a vessel on the Home tab to log your first serving."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige un recipiente en la pestaña Inicio para hacer tu primer registro."
           }
         },
         "ru": {
@@ -4285,6 +5491,12 @@
             "value": "Quick-add vessels"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipientes de registro rápido"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4306,6 +5518,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reminders"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recordatorios"
           }
         },
         "ru": {
@@ -4331,6 +5549,12 @@
             "value": "Reminds you to drink every two hours between 9 AM and 9 PM"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te recuerda tomar agua cada dos horas entre las 9 a.m. y las 9 p.m."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4352,6 +5576,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Save"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar"
           }
         },
         "ru": {
@@ -4377,6 +5607,12 @@
             "value": "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda cada registro en Salud como agua. WaterBuddy no lee nada de Salud."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4398,6 +5634,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Serving amount"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cantidad"
           }
         },
         "ru": {
@@ -4423,6 +5665,12 @@
             "value": "Settings"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configuración"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4444,6 +5692,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Smart reminders"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recordatorios inteligentes"
           }
         },
         "ru": {
@@ -4469,6 +5723,12 @@
             "value": "Step %1$d of %2$d"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paso %1$d de %2$d"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4490,6 +5750,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tap + to add a serving you forgot."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + para agregar un registro que olvidaste."
           }
         },
         "ru": {
@@ -4515,6 +5781,12 @@
             "value": "Tells you how much water you've had today in WaterBuddy, and how much is left."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te dice cuánta agua llevas hoy en WaterBuddy y cuánta te falta."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4536,6 +5808,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The Glass is the one your widget, Siri and Control Center log."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Vaso es el que registran tu widget, Siri y el Centro de control."
           }
         },
         "ru": {
@@ -4561,6 +5839,12 @@
             "value": "The app switches straight away. The widget follows on its next refresh."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La app cambia al instante. El widget lo hace en su próxima actualización."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4582,6 +5866,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The same as the month before"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Igual que el mes anterior"
           }
         },
         "ru": {
@@ -4607,6 +5897,12 @@
             "value": "The week, today and every serving stay free. Nothing you logged is ever hidden or deleted."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La semana, el día de hoy y cada registro siguen siendo gratis. Nada de lo que registraste se oculta ni se elimina."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4628,6 +5924,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "This month"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este mes"
           }
         },
         "ru": {
@@ -4653,6 +5955,12 @@
             "value": "Time for water"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hora de tomar agua"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4674,6 +5982,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Today"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoy"
           }
         },
         "ru": {
@@ -4699,6 +6013,12 @@
             "value": "Today's Water"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agua de hoy"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4720,6 +6040,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Today's hydration"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidratación de hoy"
           }
         },
         "ru": {
@@ -4745,6 +6071,12 @@
             "value": "Track today's hydration and log a glass without opening the app."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sigue tu hidratación de hoy y registra un vaso sin abrir la app."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4766,6 +6098,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Turn on reminders"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar recordatorios"
           }
         },
         "ru": {
@@ -4791,6 +6129,12 @@
             "value": "Undo"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deshacer"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4812,6 +6156,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Up %1$@ ml on the month before"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml más que el mes anterior"
           }
         },
         "ru": {
@@ -4844,6 +6194,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Up %1$d millilitres on the month before"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitro más que el mes anterior"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitros más que el mes anterior"
                 }
               }
             }
@@ -4896,6 +6264,12 @@
             "value": "Use %1$@ ml"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usar %1$@ ml"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -4926,6 +6300,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Use %1$d millilitres"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Usar %1$d mililitro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Usar %1$d mililitros"
                 }
               }
             }
@@ -4978,6 +6370,12 @@
             "value": "Water logged."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agua registrada."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5011,6 +6409,12 @@
             "value": "Week"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semana"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5032,6 +6436,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Welcome to"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te damos la bienvenida a"
           }
         },
         "ru": {
@@ -5057,6 +6467,12 @@
             "value": "When"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fecha y hora"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5078,6 +6494,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "When you drank"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuándo tomaste agua"
           }
         },
         "ru": {
@@ -5103,6 +6525,12 @@
             "value": "Work it out for me"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calcúlalo por mí"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5124,6 +6552,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "You can change these later in Settings."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puedes cambiarlos después en Configuración."
           }
         },
         "ru": {
@@ -5149,6 +6583,12 @@
             "value": "You can change this later in Settings."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puedes cambiarlo después en Configuración."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5170,6 +6610,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your goal is %1$@ ml"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu meta es de %1$@ ml"
           }
         },
         "ru": {
@@ -5195,6 +6641,12 @@
             "value": "Your last seven days against your goal."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus últimos siete días frente a tu meta."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5216,6 +6668,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your weight"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu peso"
           }
         },
         "ru": {
@@ -5241,6 +6699,12 @@
             "value": "Your whole month at a glance"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo tu mes de un vistazo"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5259,6 +6723,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kg"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "kg"
@@ -5287,6 +6757,12 @@
             "value": "lb"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "lb"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5305,6 +6781,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ml"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "ml"
@@ -5333,6 +6815,12 @@
             "value": "now"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ahora"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5354,6 +6842,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "of %1$d ml"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "de %1$d ml"
           }
         },
         "ru": {
@@ -5379,6 +6873,12 @@
             "value": "From this month's finished days"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De los días terminados de este mes"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5400,6 +6900,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "When you drink"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuándo tomas agua"
           }
         },
         "ru": {
@@ -5425,6 +6931,12 @@
             "value": "Most around %1$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hora más frecuente: %1$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5446,6 +6958,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Weekdays"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entre semana"
           }
         },
         "ru": {
@@ -5471,6 +6989,12 @@
             "value": "Weekends"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fines de semana"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5492,6 +7016,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ ml a day"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml al día"
           }
         },
         "ru": {
@@ -5524,6 +7054,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%1$d millilitres a day"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitro al día"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$d mililitros al día"
                 }
               }
             }
@@ -5576,6 +7124,12 @@
             "value": "First drink, usually"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primer vaso habitual"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5597,6 +7151,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Last drink, usually"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Último vaso habitual"
           }
         },
         "ru": {
@@ -5629,6 +7189,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Patterns need %1$d days of water"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Los patrones necesitan %1$d día con agua"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Los patrones necesitan %1$d días con agua"
                 }
               }
             }
@@ -5681,6 +7259,12 @@
             "value": "The one thing"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo principal"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5702,6 +7286,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "What is working"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo que funciona"
           }
         },
         "ru": {
@@ -5727,6 +7317,12 @@
             "value": "Worth knowing"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bueno saberlo"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5748,6 +7344,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Writing…"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribiendo…"
           }
         },
         "ru": {
@@ -5773,6 +7375,12 @@
             "value": "Written by WaterBuddy from your own figures, on your iPhone. Not medical advice."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escrito por WaterBuddy con tus propios datos, en tu iPhone. No es consejo médico."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5794,6 +7402,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Written by Apple's on-device model from your own figures, on your iPhone. Not medical advice."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escrito por el modelo de Apple en el dispositivo con tus propios datos, en tu iPhone. No es consejo médico."
           }
         },
         "ru": {
@@ -5826,6 +7440,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Insights need %1$d days of water in a week"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Los análisis necesitan %1$d día con agua en una semana"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Los análisis necesitan %1$d días con agua en una semana"
                 }
               }
             }
@@ -5878,6 +7510,12 @@
             "value": "Next on %1$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Próximos análisis: %1$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5899,6 +7537,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A few lines each week on how you drank"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unas líneas cada semana sobre cómo tomaste agua"
           }
         },
         "ru": {
@@ -5924,6 +7568,12 @@
             "value": "Premium writes them from your own figures, on your iPhone, with one thing to try."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium las escribe con tus propios datos, en tu iPhone, con algo que puedes intentar."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5945,6 +7595,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Weekends ran %1$@ ml a day below weekdays."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los fines de semana tomaste %1$@ ml al día menos que entre semana."
           }
         },
         "ru": {
@@ -5970,6 +7626,12 @@
             "value": "Weekdays ran %1$@ ml a day below weekends."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entre semana tomaste %1$@ ml al día menos que los fines de semana."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -5991,6 +7653,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ ml a day less than the week before."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml al día menos que la semana anterior."
           }
         },
         "ru": {
@@ -6016,6 +7684,12 @@
             "value": "%1$@ ml a day more than the week before."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ml al día más que la semana anterior."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6037,6 +7711,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "An average day was %1$@ ml short of your goal."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un día promedio quedó %1$@ ml por debajo de tu meta."
           }
         },
         "ru": {
@@ -6062,6 +7742,12 @@
             "value": "An average day: %1$@ ml, against a goal of %2$@ ml."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un día promedio: %1$@ ml, frente a una meta de %2$@ ml."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6083,6 +7769,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Another %1$@ ml on each weekend day would help close the gap."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros %1$@ ml cada día del fin de semana ayudarían a cerrar la brecha."
           }
         },
         "ru": {
@@ -6108,6 +7800,12 @@
             "value": "Another %1$@ ml on each weekday would help close the gap."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros %1$@ ml cada día entre semana ayudarían a cerrar la brecha."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6129,6 +7827,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Another %1$@ ml each morning would help close the gap."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros %1$@ ml cada mañana ayudarían a cerrar la brecha."
           }
         },
         "ru": {
@@ -6154,6 +7858,12 @@
             "value": "Another %1$@ ml each afternoon would help close the gap."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros %1$@ ml cada tarde ayudarían a cerrar la brecha."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6175,6 +7885,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Another %1$@ ml each evening would help close the gap."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros %1$@ ml cada noche ayudarían a cerrar la brecha."
           }
         },
         "ru": {
@@ -6200,6 +7916,12 @@
             "value": "Every day on goal."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta cumplida todos los días."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6223,6 +7945,12 @@
             "value": "Your goal on every weekday."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu meta cumplida todos los días entre semana."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6244,6 +7972,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your goal on every weekend day."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu meta cumplida todos los días del fin de semana."
           }
         },
         "ru": {
@@ -6291,6 +8025,12 @@
             }
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Días con la meta cumplida: %1$d; la semana anterior, %2$d."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6321,6 +8061,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Your first drink came %1$d minutes earlier than the week before."
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Tomaste tu primer vaso %1$d minuto antes que la semana anterior."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Tomaste tu primer vaso %1$d minutos antes que la semana anterior."
                 }
               }
             }
@@ -6385,6 +8143,24 @@
             }
           }
         },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Tomaste tu primer vaso %1$d minuto más tarde que la semana anterior."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Tomaste tu primer vaso %1$d minutos más tarde que la semana anterior."
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "variations": {
             "plural": {
@@ -6444,6 +8220,24 @@
             }
           }
         },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "No registraste nada en %1$d día."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "No registraste nada en %1$d días."
+                }
+              }
+            }
+          }
+        },
         "ru": {
           "variations": {
             "plural": {
@@ -6491,6 +8285,12 @@
             "value": "Half your water came before %1$@."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La mitad de tu agua la tomaste antes de esta hora: %1$@."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6512,6 +8312,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Monthly recap"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resumen mensual"
           }
         },
         "ru": {
@@ -6537,6 +8343,12 @@
             "value": "A day, on average"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al día, en promedio"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6558,6 +8370,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Share as an image"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir como imagen"
           }
         },
         "ru": {
@@ -6583,6 +8401,12 @@
             "value": "Stays in the app, not on the image"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se queda en la app, no en la imagen"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6604,6 +8428,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The image leaves your phone only when you send it."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La imagen sale de tu teléfono solo cuando la envías."
           }
         },
         "ru": {
@@ -6629,6 +8459,12 @@
             "value": "Your own reminder schedule"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu propio horario de recordatorios"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6650,6 +8486,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your hours, your interval, your quiet days"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus horas, tu intervalo, tus días sin avisos"
           }
         },
         "ru": {
@@ -6675,6 +8517,12 @@
             "value": "A pace line"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una línea de ritmo"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6696,6 +8544,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Where you should be by now, on Home"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuánto deberías llevar a esta hora, en Inicio"
           }
         },
         "ru": {
@@ -6721,6 +8575,12 @@
             "value": "Reminders only when behind"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recordatorios solo cuando te atrases"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6742,6 +8602,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A nudge only when you need one"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un aviso solo cuando lo necesitas"
           }
         },
         "ru": {
@@ -6767,6 +8633,12 @@
             "value": "Schedule"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horario"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6785,6 +8657,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ – %2$@, %3$@"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ – %2$@, %3$@"
@@ -6813,6 +8691,12 @@
             "value": "From %1$@ to %2$@, %3$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De %1$@ a %2$@, %3$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6834,6 +8718,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "every hour"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cada hora"
           }
         },
         "ru": {
@@ -6866,6 +8756,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "every %1$d hours"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "cada %1$d hora"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "cada %1$d horas"
                 }
               }
             }
@@ -6918,6 +8826,12 @@
             "value": "Every hour"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada hora"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -6948,6 +8862,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Every %1$d hours"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Cada %1$d hora"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Cada %1$d horas"
                 }
               }
             }
@@ -7000,6 +8932,12 @@
             "value": "Not on %1$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Excepto: %1$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7021,6 +8959,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Use the standard schedule"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usar el horario estándar"
           }
         },
         "ru": {
@@ -7046,6 +8990,12 @@
             "value": "Standard schedule"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horario estándar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7067,6 +9017,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "First reminder"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primer recordatorio"
           }
         },
         "ru": {
@@ -7092,6 +9048,12 @@
             "value": "Last reminder"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Último recordatorio"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7113,6 +9075,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Days"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Días"
           }
         },
         "ru": {
@@ -7138,6 +9106,12 @@
             "value": "Only when behind"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo si te atrasas"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7159,6 +9133,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skips a reminder when you've already drunk your share for its hour."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omite un recordatorio si ya tomaste lo que te toca para esa hora."
           }
         },
         "ru": {
@@ -7184,6 +9164,12 @@
             "value": "Opens Premium"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre Premium"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7205,6 +9191,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "One day always keeps its reminders."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al menos un día conserva sus recordatorios."
           }
         },
         "ru": {
@@ -7230,6 +9222,12 @@
             "value": "Reminds you to drink at the hours of your schedule"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te recuerda tomar agua en las horas de tu horario"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7251,6 +9249,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "A nudge at each hour of your schedule, skipped if you drank in the hour before it. Reaching your goal silences the rest of the day."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un aviso en cada hora de tu horario, que se omite si tomaste agua en la hora anterior. Al llegar a tu meta, se silencia el resto del día."
           }
         },
         "ru": {
@@ -7276,6 +9280,12 @@
             "value": "A nudge at each hour of your schedule, unless you drank in the hour before it or have already reached your goal. Your notification summary is on, so reminders may arrive in a batch rather than on the hour."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un aviso en cada hora de tu horario, salvo si tomaste agua en la hora anterior o ya llegaste a tu meta. Tienes activado el resumen programado, así que los recordatorios pueden llegar juntos y no a la hora exacta."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7299,6 +9309,12 @@
             "value": "On track"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tiempo"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7320,6 +9336,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ ml behind"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atraso de %1$@ ml"
           }
         },
         "ru": {
@@ -7352,6 +9374,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%1$d millilitres behind"
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Atraso de %1$d mililitro"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Atraso de %1$d mililitros"
                 }
               }
             }
@@ -7404,6 +9444,12 @@
             "value": "Pace"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ritmo"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7425,6 +9471,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Export your servings"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportar tus registros"
           }
         },
         "ru": {
@@ -7450,6 +9502,12 @@
             "value": "Every serving as a CSV file, yours to keep"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada registro en un archivo CSV, tuyo para conservar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7471,6 +9529,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fecha, hora y cantidad en mililitros, nada más. El archivo sale de tu teléfono solo cuando lo envías."
           }
         },
         "ru": {
@@ -7496,6 +9560,12 @@
             "value": "Share as a CSV file"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir como archivo CSV"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7517,6 +9587,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Servings in this file"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registros en este archivo"
           }
         },
         "ru": {
@@ -7542,6 +9618,12 @@
             "value": "and %1$d more"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "y %1$d más"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7563,6 +9645,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing to export yet."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no hay nada para exportar."
           }
         },
         "ru": {
@@ -7588,6 +9676,12 @@
             "value": "Your servings could not be read. Try again."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron leer tus registros. Intenta de nuevo."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7609,6 +9703,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Themes"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temas"
           }
         },
         "ru": {
@@ -7634,6 +9734,12 @@
             "value": "App icons"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Íconos de la app"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7655,6 +9761,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your vessels"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus recipientes"
           }
         },
         "ru": {
@@ -7680,6 +9792,12 @@
             "value": "Four new skies for the app, its widgets and your Watch"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuatro cielos nuevos para la app, sus widgets y tu Apple Watch"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7701,6 +9819,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "An icon to match, on your Home Screen"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un ícono a juego, en tu pantalla de inicio"
           }
         },
         "ru": {
@@ -7726,6 +9850,12 @@
             "value": "Your own cups and bottles, named by you"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus propias tazas y botellas, con el nombre que elijas"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7747,6 +9877,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Add your own, and choose which three stand on Home"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrega los tuyos y elige los tres que van en Inicio"
           }
         },
         "ru": {
@@ -7772,6 +9908,12 @@
             "value": "Use the standard vessels"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usar los recipientes estándar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7793,6 +9935,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Puts Cup, Glass and Bottle back on Home. Your own vessels stay."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vuelve a poner Taza, Vaso y Botella en Inicio. Tus recipientes se quedan."
           }
         },
         "ru": {
@@ -7818,6 +9966,12 @@
             "value": "The middle one is your Glass: your widget, Siri, Control Center, reminders and your watch log it."
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El del centro es tu Vaso: lo registran tu widget, Siri, el Centro de control, los recordatorios y tu reloj."
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7839,6 +9993,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "On Home"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Inicio"
           }
         },
         "ru": {
@@ -7864,6 +10024,12 @@
             "value": "More vessels"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más recipientes"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7885,6 +10051,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Add a vessel"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar un recipiente"
           }
         },
         "ru": {
@@ -7910,6 +10082,12 @@
             "value": "Add to your vessels"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar a tus recipientes"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7931,6 +10109,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "New vessel"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipiente nuevo"
           }
         },
         "ru": {
@@ -7956,6 +10140,12 @@
             "value": "Edit vessel"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar recipiente"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -7977,6 +10167,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Put on Home"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poner en Inicio"
           }
         },
         "ru": {
@@ -8002,6 +10198,12 @@
             "value": "In place of %1$@"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En lugar de %1$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8023,6 +10225,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Name"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nombre"
           }
         },
         "ru": {
@@ -8048,6 +10256,12 @@
             "value": "Amount"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cantidad"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8069,6 +10283,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Twelve is the most."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doce es el máximo."
           }
         },
         "ru": {
@@ -8094,6 +10314,12 @@
             "value": "Your Glass"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu Vaso"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8115,6 +10341,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your Glass: the widget, Siri, Control Center, reminders and your watch log it"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu Vaso: lo registran el widget, Siri, el Centro de control, los recordatorios y tu reloj"
           }
         },
         "ru": {
@@ -8140,6 +10372,12 @@
             "value": "Mug"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taza grande"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8161,6 +10399,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wine glass"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copa"
           }
         },
         "ru": {
@@ -8186,6 +10430,12 @@
             "value": "Takeaway cup"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vaso para llevar"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8207,6 +10457,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Flask"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frasco"
           }
         },
         "ru": {
@@ -8232,6 +10488,12 @@
             "value": "Drop"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gota"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8250,6 +10512,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aurora"
+          }
+        },
+        "es-419": {
           "stringUnit": {
             "state": "translated",
             "value": "Aurora"
@@ -8278,6 +10546,12 @@
             "value": "Lagoon"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laguna"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8299,6 +10573,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dusk"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crepúsculo"
           }
         },
         "ru": {
@@ -8324,6 +10604,12 @@
             "value": "Midnight"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medianoche"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8345,6 +10631,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bloom"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Floración"
           }
         },
         "ru": {
@@ -8370,6 +10662,12 @@
             "value": "Appearance"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apariencia"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8391,6 +10689,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Theme"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema"
           }
         },
         "ru": {
@@ -8416,6 +10720,12 @@
             "value": "App icon"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ícono de la app"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8439,6 +10749,12 @@
             "value": "%1$@ icon"
           }
         },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ícono %1$@"
+          }
+        },
         "ru": {
           "stringUnit": {
             "state": "translated",
@@ -8449,6 +10765,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "«%1$@» belgisi"
+          }
+        }
+      }
+    },
+    "Your iPhone's language: %1$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your iPhone's language: %1$@"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma de tu iPhone: %1$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Язык iPhone: %1$@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone tili: %1$@"
           }
         }
       }

@@ -2654,6 +2654,12 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
     case russian = "ru"
     case uzbek = "uz"
 
+    /// Latin American Spanish, the Spanish (Mexico) store page's: one spelling for the stored code, the
+    /// `.lproj` and the locale, so figures read *2,000* and times *10:13 a.m.* Every Spanish phone reaches
+    /// this table on *Follow device*, Spain's included, by iOS's own matching
+    /// (spec `2026-11-26-spanish-and-language-selector-design.md` R1, D1).
+    case spanish = "es-419"
+
     var id: String { rawValue }
 
     /// What goes in the suite. `nil` for ``system``, which is why the setter *removes* the key.
@@ -2669,12 +2675,13 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
     /// `43-concurrency`).
     nonisolated var code: String? { self == .system ? nil : rawValue }
 
-    /// The shipped localisations, in the order the picker offers them under *Follow device*.
+    /// The shipped localisations, in the order the picker offers them under *Follow device*. A new
+    /// language goes last, so nobody's list moves (spec `2026-11-26-spanish-and-language-selector-design.md` D2).
     ///
     /// `theOfferedLanguagesAreExactlyTheOnesShipped` pins this against the `.lproj` folders that
     /// are actually in the bundle — an entry here with no strings behind it would silently draw
     /// English while claiming otherwise, and a user's own language is the one thing they can check.
-    nonisolated static let selectable: [AppLanguage] = [.english, .russian, .uzbek]
+    nonisolated static let selectable: [AppLanguage] = [.english, .russian, .uzbek, .spanish]
 
     /// Reads a stored code, falling back to ``system`` for anything unrecognised.
     ///
@@ -2743,7 +2750,34 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
         case .english: "English"
         case .russian: "Русский"
         case .uzbek: "O‘zbekcha"
+        case .spanish: "Español"
         }
+    }
+
+    /// The word the language sheet draws beside a language's name: a greeting in that language's own words,
+    /// **untranslated, as the name is** — it is how the language sounds, not a word about it. *Follow device*
+    /// names a behaviour and has none (spec `2026-11-26-spanish-and-language-selector-design.md` §4.2, D3a).
+    nonisolated var greeting: String? {
+        switch self {
+        case .system: nil
+        case .english: "Hello"
+        case .russian: "Привет"
+        case .uzbek: "Salom"
+        case .spanish: "Hola"
+        }
+    }
+
+    /// The language *Follow device* draws today, from the bundle's own resolution of the phone's languages —
+    /// `Bundle.main.preferredLocalizations` — so English on a phone in a language the app does not ship, and
+    /// never a guess from the phone's settings (spec §4.2, D5). The sheet names it under *Follow device*.
+    ///
+    /// Read through ``selectable`` and ``code``, both `nonisolated`, rather than `init(rawValue:)`, which this
+    /// target's default isolation infers onto the main actor (``code``'s reason).
+    nonisolated static func drawnOnFollowDevice(preferredLocalizations: [String]) -> AppLanguage {
+        for localization in preferredLocalizations {
+            if let match = selectable.first(where: { $0.code == localization }) { return match }
+        }
+        return .english
     }
 }
 

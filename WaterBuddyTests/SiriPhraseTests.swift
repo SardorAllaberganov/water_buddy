@@ -201,7 +201,7 @@ struct LogServingIntentTests {
     /// is proven to resolve first, or every check below would pass vacuously.
     @Test func theSiriReplyCarriesNoUserValues() throws {
         let key = LogServingIntent.reply.key
-        for language in ["en", "ru", "uz"] {
+        for language in ["en", "ru", "uz", "es-419"] {
             let bundle = try #require(lproj(language), "the app ships no \(language) localization")
             let reply = bundle.localizedString(forKey: key, value: missingKey, table: nil)
             #expect(reply != missingKey, "\(language) has no translation of Siri's reply")
@@ -256,13 +256,14 @@ struct LogTheGlassTests {
 
 // MARK: - The phrases
 
-/// Siri's phrases ship in English and Russian — Siri has no Uzbek — and every one names the app,
-/// without which Siri cannot tell whose shortcut it is (spec 2026-10-07-siri-phrase §3.2). Three for
-/// *Log a Glass*, three for *Today's Water* (spec 2026-10-18-todays-water §3.2).
+/// Siri's phrases ship in English, Russian and Latin American Spanish — Siri has no Uzbek — and every
+/// one names the app, without which Siri cannot tell whose shortcut it is (spec 2026-10-07-siri-phrase
+/// §3.2). Three for *Log a Glass*, three for *Today's Water* (spec 2026-10-18-todays-water §3.2). Spanish
+/// joined with spec `2026-11-26-spanish-and-language-selector-design.md` (R3).
 struct AppShortcutPhraseTests {
 
-    @Test func everyPhraseNamesTheAppInEnglishAndRussian() throws {
-        for language in ["en", "ru"] {
+    @Test func everyPhraseNamesTheAppInEveryLanguageSiriSpeaks() throws {
+        for language in ["en", "ru", "es-419"] {
             let path = try #require(
                 Bundle.main.path(forResource: "AppShortcuts", ofType: "strings", inDirectory: nil,
                                  forLocalization: language),
