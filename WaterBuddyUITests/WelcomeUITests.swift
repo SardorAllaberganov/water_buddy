@@ -98,6 +98,42 @@ func waitUntilDrawn(_ element: XCUIElement, timeout: TimeInterval = 5) -> Bool {
     return false
 }
 
+/// Scrolls a control up until it is hittable and clear of the floating tab bar, so the tap made next reaches the
+/// control (`docs/AI_CONTEXT.md` #209). The bar floats over the page's foot. XCUITest reads a control under it as
+/// hittable and taps the part of it the tree shows uncovered; the touch goes to the bar, and nothing changes.
+///
+/// **Either bar.** From iOS 26 the bar is Apple's, which XCUITest lists as a tab bar with its whole frame: on
+/// iOS 27.0 a switch at y 781–809, under a bar from y 791, was tapped at (328.5, 795.3) in the bar's corner
+/// (2026-11-01). Below iOS 26 it is the app's own, and XCUITest lists its three buttons but not the glass around
+/// them: on iOS 18.6 *Only when behind*, at y 760–791 under buttons from y 764, was tapped at (74.7, 763.0), inside
+/// the glass, and stayed on, in both of two runs (2026-11-26). The copies this replaced knew Apple's bar alone, or
+/// no bar. The store capture keeps its own: it runs on iOS 27 alone, and how far it scrolls frames its pictures.
+///
+/// **A drag, not a swipe.** The page moves by the drag's own length, three tenths of the screen, from the margin
+/// where no control stands, held still before it lifts so nothing flings on. A swipe flings: on 18.6 one carried
+/// *Only when behind* from under the bar to the top of the screen, and the control above it under the status bar,
+/// where its tap reached nothing (2026-11-26). A drag leaves the control in the screen's lower part, with what
+/// stands above it still in view.
+@MainActor
+func scrollClearOfTheBar(_ element: XCUIElement, in app: XCUIApplication) {
+    for _ in 0..<8 where !element.isHittable || element.frame.maxY > barTop(in: app) {
+        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.04, dy: 0.7))
+        let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.04, dy: 0.4))
+        from.press(forDuration: 0.05, thenDragTo: to, withVelocity: .slow, thenHoldForDuration: 0.3)
+    }
+}
+
+/// The top of the bar drawn over the page: Apple's, as XCUITest lists it, or the app's own, six points above its
+/// *Home* button — `GlassTabBar`'s `.padding(6)`, how far its glass reaches past its buttons, so the two change
+/// together. With no bar there is nothing to clear.
+@MainActor
+private func barTop(in app: XCUIApplication) -> CGFloat {
+    let apples = app.tabBars.firstMatch
+    if apples.exists { return apples.frame.minY }
+    let home = app.buttons["Home"].firstMatch
+    return home.exists ? home.frame.minY - 6 : .infinity
+}
+
 /// A volume as the welcome speaks it: *2,000 millilitres* — grouped by the device's own region, as
 /// the app groups it on *Follow device*, the language a fresh start has (spec 2026-10-16 §6.3). The
 /// gate devices are in `en_UZ`, which groups with a space: a figure written with a comma here would

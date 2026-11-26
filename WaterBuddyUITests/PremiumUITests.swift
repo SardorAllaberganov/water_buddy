@@ -76,8 +76,7 @@ final class PremiumUITests: XCTestCase {
 
         let card = app.buttons["Export your servings"]
         XCTAssertTrue(card.waitForExistence(timeout: 10), "no export card")
-        let bar = app.tabBars.firstMatch
-        for _ in 0..<6 where !card.isHittable || (bar.exists && card.frame.maxY > bar.frame.minY) { app.swipeUp() }
+        scrollClearOfTheBar(card, in: app)
         XCTAssertEqual(app.buttons.matching(identifier: "Export your servings").count, 1)
         XCTAssertEqual(card.value as? String, "Premium", "the lock is not spoken")
         let row = app.descendants(matching: .any)

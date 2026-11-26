@@ -57,18 +57,13 @@ final class CoachingUITests: XCTestCase {
         return row
     }
 
-    /// *Only when behind*, scrolled clear of the tab bar's whole frame. The bar floats over the page's foot, and
-    /// XCUITest taps a switch at its control: a run left the switch at y 781–809 under a bar from y 791, read it as
-    /// hittable — no scroll — and the touch at (328.5, 795.3), in the corner of the bar's frame, went to the bar
-    /// (`docs/AI_CONTEXT.md` #209). Without a bar, `isHittable` alone decides.
+    /// *Only when behind*, scrolled clear of the tab bar, whichever bar is drawn (``scrollClearOfTheBar(_:in:)``):
+    /// it is the switch whose taps the bar took, on iOS 27.0 and on 18.6 (`docs/AI_CONTEXT.md` #209).
     @MainActor
     private func behindSwitch(in app: XCUIApplication) -> XCUIElement {
         let behind = app.switches["Only when behind"]
         XCTAssertTrue(behind.waitForExistence(timeout: 5))
-        let bar = app.tabBars.firstMatch
-        for _ in 0..<5 where !behind.isHittable || (bar.exists && behind.frame.maxY > bar.frame.minY) {
-            app.swipeUp()
-        }
+        scrollClearOfTheBar(behind, in: app)
         return behind
     }
 

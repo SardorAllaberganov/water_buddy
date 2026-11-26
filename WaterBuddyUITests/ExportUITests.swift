@@ -46,15 +46,12 @@ final class ExportUITests: XCTestCase {
         tapWhenReady(button)
     }
 
-    /// The card, scrolled clear of the floating bar's whole frame (`docs/AI_CONTEXT.md` #209).
+    /// The card, scrolled clear of the floating bar (``scrollClearOfTheBar(_:in:)``, `docs/AI_CONTEXT.md` #209).
     @MainActor
     private func card(in app: XCUIApplication) -> XCUIElement {
         let card = app.buttons[Self.heading]
         XCTAssertTrue(card.waitForExistence(timeout: 10), "no export card")
-        let bar = app.tabBars.firstMatch
-        for _ in 0..<6 where !card.isHittable || (bar.exists && card.frame.maxY > bar.frame.minY) {
-            app.swipeUp()
-        }
+        scrollClearOfTheBar(card, in: app)
         return card
     }
 
