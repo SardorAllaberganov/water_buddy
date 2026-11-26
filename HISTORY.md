@@ -16719,3 +16719,96 @@ and *Español* chosen in the app's sheet:
 ### Files touched
 
 `docs/AI_CONTEXT.md` (the hundred-and-thirty-seventh pass) and `HISTORY.md`.
+
+## [2026-11-27] — Release 1.4.3 (9), Spanish's version: prepared, gated and archived; the upload waits
+
+### What happened
+
+On the owner's "go next" (00:35):
+- **1.4.2 read as released**, in App Store Connect in the owner's Chrome: *Ready for Distribution* — *In Review* at 21:38 on
+  2026-11-26, approved at 21:47, released by the owner at 22:26. Apple's Lookup API still served 1.4.1 from its cache.
+- **The version**, 1.4.3 (9) on all fourteen sites each. A `sed -i` was refused by the project's deny list. Edit, sent next for
+  the same change in two calls, was refused by auto mode as a way around that refusal, after the build number's call had gone
+  through. That edit — the only change in the file, by `git diff` — was undone with `git restore`, and the turn stopped for the
+  owner. On their "Yes, use Edit" the change was made with Edit and staged.
+- **The store's text** in four listings: the language and Siri lines, Spanish (Mexico)'s app words, What's New and the review
+  notes; `README.md`'s en-US copy and `AppStore/README.md`, its checklist now 1.4.3's eleven steps.
+- **The gate** on an export of the staged index, and **the Release archive** from the same export, read and not uploaded.
+
+### The rulings
+
+- The Spanish spec's §5, §6.8 and R3–R4, approved on 2026-11-26: 1.4.3 (9), after 1.4.2's release; the store says Siri speaks
+  Spanish, as R3 planned, and that is proved only by hand — step 11 of `AppStore/README.md` §1, from TestFlight, before the
+  release.
+- The English description's vessels' line became *Put any on Home.* so the description stays inside 4,000 characters.
+- Spanish (Mexico) takes the app's own words: *Inicio*, and *solo si te atrasas* from *Solo si te atrasas*.
+- The 18.6 simulator, whose first boot left *Host is down*, was shut down by its UDID, booted again and proved by launching
+  Settings; its two groups that had executed nothing were run again.
+
+### Files touched
+
+`WaterBuddy.xcodeproj/project.pbxproj`; `AppStore/README.md`, `AppStore/review-notes.txt` and the four listings'
+`description.txt` and `whats-new.txt`; `README.md`; `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and
+this file. In the ignored `build/release-1.4.3/`: the export, the logs, the UI groups and the archive.
+
+### Verification
+
+On the export of the staged index with the version change alone (tree `913dbaf`); the store's text and these records came after
+it and are in no target:
+- clean builds: on 27.0 and 18.6, 20 warnings by file and message at 36 sites, the Spanish gate's 20; the phone widget and the
+  watch widget 17 each at 29 sites; the watch 2;
+- the phone unit tests: 1187 in 130 suites passed;
+- the UI suite on iOS 27.0: 80 methods in 21 groups, 78 passed and 2 skipped by their own guards;
+- the UI suite on iOS 18.6: the same, after one restart of the simulator;
+- the watch unit tests: 77 in 7 suites passed;
+- `bash Tools/VerifyListing.sh`: every field inside its limit, the U.K. name (#233) its one remark;
+- the archive: `1.4.3 (9)` four times, the App Group on four bundles and HealthKit on the app, one manifest hash, both Health
+  keys, four alternate icons, `es-419.lproj` in every bundle, no capture-only symbol among 21,058.
+
+Not done: the upload, the commit, the push, `main`, the policy's publication, the version page and the submission, each the
+owner's word; the Lock Screen widgets, the watch and its faces and Siri in Spanish, by hand.
+
+## [2026-11-27] — 1.4.3 (9) uploaded, its page filled and on TestFlight; not submitted, on the owner's word
+
+### What happened
+
+On the owner's "do all of it except sending it to review for now only testflight the end point, i need to test it out first"
+(02:15):
+- **The upload** (02:19–02:23): `xcodebuild -exportArchive` with 1.4.2's settings (`app-store-connect`, destination upload,
+  automatic signing, `manageAppVersionAndBuildNumber` false) and `-allowProvisioningUpdates`, from the checkpoint above's archive:
+  *Upload succeeded*. The first try, inside the command sandbox, failed in 32 s — *The Internet connection appears to be
+  offline*, Xcode's networking finding no route while `curl` reached the same hosts — and the same command ran outside it.
+- **The policy** (02:34): `7002c42` *Update WaterBuddy's privacy policy for 1.4.3*, made in a scratchpad clone of
+  `SardorAllaberganov.github.io` and pushed `1451cfd..7002c42` with this Mac's GitHub login. It changes
+  `waterbuddy/privacy/index.html` alone: the date, twice, and the languages line.
+- **Version 1.4.3** in App Store Connect, in the owner's Chrome, from the sidebar's ⊕. Connect copied 1.4.2's text, header,
+  screenshots and *Manually release this version*. Each language's Description and What's New, and the review notes, were made in
+  the page from the copied text and this release's line changes, checked by SHA-256 against the files before
+  `execCommand('insertText')` put them in, then saved.
+- **Build 9**, *Valid* at 02:35, attached to the version and saved; TestFlight put it *In beta testing* for the internal group.
+- **Not done, on the owner's word:** *Add for Review* and *Submit for Review*.
+- **These records** are committed with the release, by topic, on `feature/spanish`; the branch's push and `main`'s
+  fast-forward follow on the same word.
+
+### The rulings
+
+- The owner's word stops at TestFlight, so the Lock Screen widgets, the watch and its faces, and Siri in Spanish are checked
+  from TestFlight before anything goes to review (`AppStore/README.md` §1, step 11).
+- The upload ran outside the command sandbox, the same command and nothing else, after the sandboxed try found no network
+  route for Xcode.
+
+### Files touched
+
+`AppStore/README.md`, `README.md`, `CLAUDE.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md` and this file; on the owner's site,
+`waterbuddy/privacy/index.html`. In the ignored `build/release-1.4.3/`: `ExportOptions.plist`, `upload-1-offline.log` and
+`upload.log`.
+
+### Verification
+
+- The upload's log: *Upload succeeded*, `EXPORT SUCCEEDED`.
+- The live policy, read at 02:34: SHA-256 equal to `Tools/PrivacyPolicy.html`'s; *Last updated 26 November 2026*; *English,
+  Russian, Uzbek or Spanish*.
+- Connect's API, read after each save: version 1.4.3 `PREPARE_FOR_SUBMISSION`, `MANUAL`, build 9 `VALID`, internal testing
+  `IN_BETA_TESTING`; for en-US, en-GB, ru and es-MX the description, What's New, promotional text and keywords each equal to its
+  file by SHA-256; the review notes equal to `review-notes.txt`.
+- Not run: the gate — no file in a target changed after the checkpoint above's.

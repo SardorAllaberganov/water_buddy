@@ -487,6 +487,7 @@ their "Move main"; the privacy policy of 25 November live on their site on "Publ
 walk (#236) and the submission, each on the owner's word.)*
 *(2026-11-26, 10:39: **1.4.2 (8) submitted for review** on the owner's "Do them and submit", with the Spanish (Mexico) page — *Waiting
 for Review*, set to be released by hand, because TestFlight (#237) and the device walk (#236) are still owed before it goes on sale.)*
+*(2026-11-26: *In Review* at 21:38, approved at 21:47, and **released by the owner at 22:26**, read in App Store Connect on 2026-11-27.)*
 
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.
@@ -620,6 +621,13 @@ Which languages is a decision for that time.
 spanish to the app itself language and the Language selector should be different look" and "Go" — and with it Settings'
 language selector, one row opening a sheet from the bottom (spec `2026-11-26-spanish-and-language-selector-design.md`). Staged,
 not committed; it ships in 1.4.3 (9), after 1.4.2 is released (R4), with the store's text in four listings.)*
+*(2026-11-26, night: committed in six commits and pushed on `feature/spanish`. 2026-11-27, on the owner's "go next": **1.4.3 (9)**
+prepared — the version, the store's text in four listings, the gate on 27.0 and 18.6, the Release archive — and staged. Waiting,
+each on the owner's word: the upload, `/commit` and the push, `main`, the policy's publication and the submission.)*
+*(2026-11-27, 02:40, on the owner's "do all of it except sending it to review": build 9 uploaded, the policy published, version
+1.4.3's page filled in four languages and read back; committed with these records, the push and `main`'s fast-forward following
+on the same word. **Not submitted**: TestFlight is the end point, for the owner's checks of Spanish on the Lock Screen, the watch
+and Siri.)*
 
 **1.5.4 — Caffeine.** Milligrams of caffeine counted from coffee and tea servings, a daily limit,
 and a reminder at a cut-off hour the user chooses. After 1.5.1, which stores the drink on each
