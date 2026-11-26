@@ -44,6 +44,14 @@ before anything is submitted.
 10. **App Review notes** — [`review-notes.txt`](review-notes.txt), which now names set C's rows.
 11. **Submit for Review**, on your word.
 
+*(2026-11-26: steps 3–11 done, and 1.4.2 (8) **Waiting for Review** since 10:39, on your "Do them and submit". Step 3 at
+01:44. Steps 4–11 in your Chrome that morning: Spanish (Mexico) added with its name, subtitle and Privacy Policy URL; the four
+languages' fields typed in and read back from Connect, each equal to its file by SHA-256; both iPhone wells emptied and the ten
+put back in order at 1206 × 2622 and 1320 × 2868, beside the watch's one; build 8; the purchases *Approved*; the notes.
+**Steps 1 and 2 were not done first**: the walk and TestFlight need your iPhone, or Xcode, which you declined. So the version
+is set to **Manually release this version**: after approval it waits for your *Release This Version*, once the icons (#237)
+and the walk (#236) have been seen on build 8. 1.4 and 1.4.1 were released automatically.)*
+
 The prices by country stay as set on 2026-11-24 (section 5). Still open from 1.4: **one real purchase** (#156) — a
 sandbox purchase, a restore and a refund on a real iPhone; step 2's purchase from TestFlight comes closest.
 

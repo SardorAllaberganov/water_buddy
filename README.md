@@ -272,7 +272,8 @@ ruling, 2026-11-06); this section stays the master copy, so a change here is mad
 (spec `docs/superpowers/specs/2026-11-04-release-1-4-design.md`). 1.4 is live since 2026-11-13. 1.4.1 fixes
 the yearly saving where prices are written with a decimal comma (#162), and asks for a rating on the first
 goal day; it is live since 2026-11-22. 1.4.2 brings set C: four more themes, an app icon for each, and a library
-of the user's own vessels, with the quick-add vessels going up to 2,000 ml for everyone.
+of the user's own vessels, with the quick-add vessels going up to 2,000 ml for everyone. 1.4.2 (8) is in review
+since 2026-11-26, 10:39, with the Spanish (Mexico) page, set to be released by hand after approval.
 
 ## App Information
 
@@ -296,7 +297,7 @@ of the user's own vessels, with the quick-add vessels going up to 2,000 ml for e
 
 | Field | |
 |---|---|
-| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). 🔴 **Publish it again before 1.4.2 is submitted**: it is dated 25 November 2026, and names set C's theme, vessels and the Watch's copy of them. If Connect asks for the address in English (U.K.), Russian or Spanish (Mexico), it is the same |
+| **Privacy Policy URL** | `https://sardorallaberganov.github.io/waterbuddy/privacy/` — the address the app links from Settings and the paywall (`PaywallView.privacyPolicy`). Live since 2026-11-06: `Tools/PrivacyPolicy.html`, published as `waterbuddy/privacy/index.html` in your `SardorAllaberganov.github.io` repository (known issue #159). Published again on 2026-11-26 at 01:44, before 1.4.2 was submitted: it is dated 25 November 2026, and names set C's theme, vessels and the Watch's copy of them. English (U.K.), Russian and Spanish (Mexico) carry the same address in Connect |
 | **Support URL** | `https://sardorallaberganov.github.io/waterbuddy/support/` — live since 2026-11-06: `Tools/Support.html`, read from the code (contact, logging, widgets and Siri, the Watch, reminders, Premium, your data), published as `waterbuddy/support/index.html` in the same repository. The same address in every language |
 | **Marketing URL** | optional |
 | **Terms of Use (EULA)** | Apple's standard licence — leave App Store Connect's EULA field at its default. The description links it, as guideline 3.1.2 asks of an app with subscriptions |

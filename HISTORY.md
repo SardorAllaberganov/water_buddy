@@ -16567,3 +16567,50 @@ The upload's own log, `build/release-1.4.2/upload.log`. Not read: Connect's buil
 No gate: no file in a target changed after the gate of the checkpoint above. This pass printed 148 Swift files; 1181 phone `@Test`,
 77 watch, 83 UI `func test`; every rule citation resolving. The live policy was read at 01:44:38: *Last updated 25 November 2026*
 in both places, the new sentence twice, no 20 November left.
+
+## [2026-11-26] — 1.4.2 (8) submitted for review, to be released by hand
+
+### What happened
+
+On the owner's "Do them and submit" (about 10:20), done in their Chrome (the release spec's §13) once they answered "Signed
+in". App Store Connect had signed out in Chrome and in the built-in browser, and the sign-in is theirs.
+- **Checked first:**
+  - the `aso` skill's release checklist;
+  - Apple's Lookup API: 1.4.1 live, 0 ratings, EN/RU/UZ;
+  - `bash Tools/VerifyListing.sh`: four listings inside every limit, the U.K. name (#233) its one problem;
+  - `bash Tools/VerifyScreenshots.sh`: 35 acceptable;
+  - each field file's SHA-256;
+  - TestFlight: 1.4.2 (8) *Ready to Submit*, one install and three sessions.
+- **Version 1.4.2** made from the sidebar's **+**. Connect copied 1.4.1's text, header and screenshots into it.
+- **Spanish (Mexico)** added on *App Information* with its name and subtitle; its Privacy Policy URL set on *App Privacy*.
+- **The fields**, each set with `execCommand('insertText')` and saved:
+  - en-US: the description, What's New and the review notes;
+  - en-GB and Russian: the description and What's New;
+  - Spanish (Mexico): the promotional text, description, keywords, What's New and support address.
+  Each was read back from Connect's API and equals its file by SHA-256.
+- **The screenshots:** both iPhone wells emptied, and the new ten uploaded into each in order (1206 × 2622 and 1320 × 2868), then
+  read back. The watch's shot and the header's video were kept.
+- **Build 8** added; the purchases read *Approved*.
+- **Manually release this version**, a ruling stated to the owner before it was set: #237 and #236 are owed before the release,
+  and both need the owner's iPhone or Xcode.
+- ***Submit for Review*** at 10:39 (`05:39:01Z`): *Waiting for Review*.
+
+### The rulings it rests on
+
+- The release spec's R1–R5 and D1–D9 (approved 2026-11-25).
+- The owner's "Do them and submit" for the page and the submission.
+- Manual release, this session's ruling, in the release's ledger.
+- Steps 1 and 2 of `AppStore/README.md` §1, the walk and TestFlight, were not done first. Both are owed before the release.
+
+### Files touched
+
+`CLAUDE.md`, `README.md`, `AppStore/README.md`, `docs/AI_CONTEXT.md`, `docs/ROADMAP.md`, `tasks/lessons.md` and this file. No
+file in a target.
+
+### Verification
+
+- **Read back in Connect:** every field of the four languages by SHA-256; the four App Information names and subtitles; the
+  screenshots by name, size and state; build 8; `MANUAL`; `WAITING_FOR_REVIEW`, submitted at `2026-11-26T05:39:01Z`.
+- **Growth Journal:** GROW-231 and GROW-232, read back by fetch.
+- **Not run:** the gate, because no source changed.
+- **Not done:** TestFlight's checks and the walk.

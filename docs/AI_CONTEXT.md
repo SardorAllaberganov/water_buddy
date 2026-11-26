@@ -4,6 +4,14 @@ Orientation for anyone (human or model) picking this repo up cold.
 Authority order is unchanged: **DocC on the type you are changing** → `.claude/rules/` →
 `CLAUDE.md` → this file. This document records *where the work stands*, never what the rules say.
 
+**Last updated:** 2026-11-26, 10:45 (hundred-and-thirty-fourth pass — 1.4.2 (8) submitted for review on the owner's "Do them
+and submit"; on `main`, HEAD `4dadad1`, level with `origin/main`; these records staged, not committed). What it wrote:
+- *Current state*'s new headline: the version page in four languages, the screenshots, build 8, manual release and the
+  submission, each read back from App Store Connect;
+- `CLAUDE.md`: the `AppStore/` row says submitted. `AppStore/README.md` §1: a dated note. `README.md`: 1.4.2 in review, and the
+  policy's row says published. `docs/ROADMAP.md`: 1.4.2's note. `tasks/lessons.md`: one entry. `HISTORY.md`: a checkpoint.
+  No file in a target changed, so the gate was not run and the counts stand as the pass below printed them.
+
 **Last updated:** 2026-11-26, 01:50 (hundred-and-thirty-third pass — `/doc_sync` on the owner's "Run the doc sync", after
 release 1.4.2's `/commit`, `main`'s fast-forward and push, and the privacy policy's publication; on `main`, HEAD `7b97a91`,
 level with `origin/main`; these records staged, not committed). What it checked and wrote, every figure printed:
@@ -3105,6 +3113,41 @@ on 2026-09-01, as part of the watchOS plan's final documentation task (owner edi
 issue #15.
 
 ## Current state
+
+**1.4.2 (8) submitted for review: *Waiting for Review*, set to be released by hand; TestFlight and the walk are owed before the release**
+(2026-11-26, from the owner's "Do them and submit" at about 10:20 to 10:39; on `main`, HEAD `4dadad1`; these records staged).
+- **Where:** the owner's Chrome (the release spec's §13), after their "Signed in". App Store Connect had signed out in Chrome and
+  in the built-in browser, and the sign-in is theirs. The `aso` skill's release checklist was run first.
+- **Read first:** Apple's Lookup API: 1.4.1 live, 0 ratings, EN/RU/UZ. TestFlight: 1.4.2 (8) *Ready to Submit*, one install and
+  three sessions in the internal group. `bash Tools/VerifyListing.sh`: the four listings inside every limit, the U.K. name (#233)
+  its one problem. `bash Tools/VerifyScreenshots.sh`: 35 acceptable.
+- **Version 1.4.2** made from the sidebar's **+**. Connect copied 1.4.1's text, header video and screenshots into it.
+- **Spanish (Mexico)** added on *App Information*: *Beber Agua - WaterBuddy*, *Recordatorio y contador diario*. Its Privacy Policy
+  URL set on *App Privacy*. The other three languages' names and subtitles unchanged.
+- **The fields**, each set with `document.execCommand('insertText')` and saved:
+  - en-US: the description, What's New and the review notes;
+  - en-GB and Russian: the description and What's New;
+  - Spanish (Mexico): the promotional text, description, keywords, What's New and support address.
+  Read back from Connect's own API: in all four languages the promotional text, description, keywords and What's New equal their
+  files by SHA-256, and the support address is set. The review notes (2,739 bytes) equal `review-notes.txt`, and the copyright is
+  unchanged.
+- **The screenshots:** both iPhone wells emptied with *Remove All*, which leaves the old shots in the Asset Library. The new ten
+  went into each in order, three a call: the medium well at 1206 × 2622 and the large well at 1320 × 2868, `9-themes` in slot 9.
+  Read back by file name, size and state. The watch's `1-wrist.png` and the header's video were kept.
+- **Build 8** added. The three purchases read *Approved*. Sign-in is not required, and the contact is unchanged.
+- **Manually release this version**, where 1.4 and 1.4.1 released automatically. #237's icons and #236's walk are owed before the
+  release (rule `15-project`; `AppStore/README.md` §1, steps 1 and 2), and both need the owner's iPhone or Xcode. The owner was
+  told before it was set, and answered "Signed in" without changing it.
+- ***Submit for Review*** at 10:39 (`2026-11-26T05:39:01Z`). Connect listed Spanish (Mexico)'s name, subtitle and privacy
+  addresses as the shared changes, then showed *1 Item Submitted*. The version reads `WAITING_FOR_REVIEW`, build 8, `MANUAL`.
+- **Left, the owner's:**
+  - from TestFlight on their iPhone: #237 (each alternate icon in light, dark and tinted) and #236 (a theme's widgets with
+    StandBy, the control and a reminder's button wearing their own middle vessel, the watch);
+  - the walk's widget and watch tables;
+  - *Release This Version* after approval.
+  Connect's banners were read and left: the age-rating answers for *Location Sharing and Dating* are due by 15 January 2027, and
+  China mainland's security assessment and AIGC declaration by 31 January 2027.
+- **Growth Journal:** GROW-231 (the submission) and GROW-232 (the lesson), each read back by fetch.
 
 **Release 1.4.2 committed, on `main` and pushed; the privacy policy live; TestFlight, the walk and the submission wait**
 (2026-11-26, 01:18 to 01:50; on `main`, HEAD `7b97a91`, level with `origin/main`; these records staged).

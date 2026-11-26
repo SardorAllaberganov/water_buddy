@@ -6353,3 +6353,23 @@ whichever phone of that name and runtime it finds, and another project's gate on
 **The rule:** for a gate on a Mac other sessions share, make a WaterBuddy-only simulator of the same model and runtime — named
 *WaterBuddy …* — and pin it by UDID (`-destination id=…`). A simulator build runs on any phone of its runtime, so the build does
 not change. Never shut down a device another session is using; shut down only the one you made.
+
+## 2026-11-26 — Connect's fields take `execCommand('insertText')`; read them back through Connect's own API
+
+**What happened.** For 1.4.1, `form_input` set the version page's fields and Connect put its own values straight back. Typing
+worked, but a 4,000-character description timed the browser tool out (2026-11-22, above).
+
+For 1.4.2, each field was focused, its text selected and replaced with `document.execCommand('insertText', false, text)` in a
+page script. Connect took it as typing: the counter moved and *Save* lit up. Fifteen fields in four languages, four
+descriptions among them, went in within seconds each.
+
+Reading them back field by field means a reload and a language switch each time. Connect's page reads its data from its own
+`/iris/v1/` API with the signed-in session. One `fetch` from the page returned every language's fields, each was hashed with
+`crypto.subtle`, and each hash equalled its file's SHA-256. The same API showed the screenshot sets by file name, size and
+state, and the version's state after the submission.
+
+**The rule:**
+- Fill a Connect field by focusing it, selecting all and inserting the text with `execCommand('insertText')`.
+- Before *Save*, check the field's value equals the text and that *Save* is enabled.
+- Read back with the page's own `fetch` from `/iris/v1/apps/<id>/…`, reading only, and compare SHA-256s with the files.
+- Every change stays in the page's own controls.

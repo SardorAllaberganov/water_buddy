@@ -485,6 +485,8 @@ the owner's "Yes, fetch profiles", then uploaded to App Store Connect on their "
 *(2026-11-26, 01:50: committed as `80fc1bd`–`7b97a91` on the owner's `/commit`; `main` fast-forwarded to `7b97a91` and pushed on
 their "Move main"; the privacy policy of 25 November live on their site on "Publish it". Waiting: TestFlight (#237), the device
 walk (#236) and the submission, each on the owner's word.)*
+*(2026-11-26, 10:39: **1.4.2 (8) submitted for review** on the owner's "Do them and submit", with the Spanish (Mexico) page — *Waiting
+for Review*, set to be released by hand, because TestFlight (#237) and the device walk (#236) are still owed before it goes on sale.)*
 
 **1.4.9 — Pace line.** Where the user should be by now across the reminder hours
 (`ReminderPlan.hours`, or 1.4.3's own), against where they are — *On track*, or how far behind.
