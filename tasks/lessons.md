@@ -6479,3 +6479,67 @@ exported from the result bundle; the test was deleted before the gate.
 
 **The rule:** before making new devices for a walk while the owner may be away, plan the steps that need taps as a temporary UI
 test from the start, or use a device they have already allowed. Delete such a test before the gate, and say so in the record.
+
+## 2026-11-27 — A widget bundle takes `if #available` and nothing more
+
+**What happened.** The Live Activity's layout for Apple Watch, `supplementalActivityFamilies`, is iOS 18's, and the app deploys to
+17. The plan listed the activity in `WaterBuddyWidgetBundle` behind `if #available(iOS 18.0, *)` with an iOS 17 form in the
+`else`; it failed to compile (*closure containing control flow statement cannot be used with result builder*). `if #unavailable`
+failed too (*generic parameter 'W' could not be inferred*), and a widget's own `body` has no builder that takes either.
+`WidgetBundleBuilder` builds a limited-availability widget through `if #available` alone, with no `else`.
+
+**The rule:** when one part of a widget's configuration needs a newer iOS than the app's floor, the whole widget takes that iOS:
+list it inside `if #available` with no `else`, give the app's switch for it the same check, and add it to rule `15-project`'s
+version checks. Ask the compiler before designing an `else` for a widget: it answers in one build.
+
+## 2026-11-27 — Keep a gate's warning lists when its builds are deleted
+
+**What happened.** The drinks session's build folders were deleted on the owner's word, to free 8.4 GB. The Live Activity's gate
+then had nothing to compare its warnings with: the lists by file and message had been written inside those folders. The
+baseline was rebuilt from a clean export of `HEAD`, two more clean builds on 27.0 and 18.6, before any comparison could start.
+
+**The rule:** before deleting a gate's builds, copy its warning lists, a few kilobytes, outside the folder being deleted, or
+write the lines into the record. A count without its lines is no baseline: the comparison is by file and message.
+
+## 2026-11-27 — A spec's layout is a guess until its renders are measured
+
+**What happened.** The spec drew the Live Activity's figures straight on the theme's aurora, the widget's backdrop. Measured on
+the walk's renders, the caption — *of 2 000 ml*, white at 0.82 — held 4.5:1 in one theme only, 3.15 to 3.72 in the other four.
+On the widget's own card, `widgetCard(fillingHeight: false)`, every figure cleared 5.27 in every theme.
+
+**The rule:** measure a new surface's text on its own renders, in all five themes, before the record calls its layout right, and
+before the gate, so the fix is gated with the rest. Where a figure falls short, stand it on the widget's archived pane, never on a
+heavier shadow (rule `60-design-system`).
+
+## 2026-11-27 — iOS asks *Allow* under a Live Activity the app started itself
+
+**What happened.** The spec said iOS *may* ask. On the simulator, on iOS 27.0, the first activity WaterBuddy started — locally, in
+the foreground, after the user turned its switch on — stood on the Lock Screen with *Allow Live Activities from WaterBuddy?* and
+*Don't Allow* and *Allow* beneath it, the activity drawn while the question waited. Its button's press, made in the expanded
+Island, logged nothing there, as rule `40-widget` expects of a simulator here.
+
+**The rule:** count iOS's question as part of the first start. What *Don't Allow* does — the app reads the answer back on its
+next return to the foreground and turns the switch off (`LiveWater.reconcile()`) — and the button's press are proved on a device
+(known issue #245).
+
+## 2026-11-27 — Tick the spec's walk list, not the walk you remember
+
+**What happened.** The Live Activity's first walk covered the five themes, a pour, two languages and the switch, and was taken as
+the walk. Writing the record, the spec's §9 named more: the largest text size, Reduce Transparency, the light appearance, a
+serving added in History, an *Undo* and the goal changed while the activity ran. They were walked hours later, after the gate.
+
+**The rule:** before a walk, copy the spec's walk list into the plan and tick each item as its picture is looked at. The walk
+ends when the list does, or when the record says which items were left and why.
+
+## 2026-11-27 — A walk's launch must prove which app came up
+
+**What happened.** Two runs of the Live Activity's second walk asked for DEBUG's fresh start and got a normal start instead, on
+the walk phone's own data: no welcome, and the switch the test turned was the device's own. Their pictures showed that app, and
+its pours went into the device's store, found only from the store's timestamps and a widget reading 78 % where the walk expected
+65 %. Why the arguments did not take is not known; a launch from `simctl` with the same argument gave the welcome. One of the runs
+also hung for minutes after a failure, collecting diagnostics, until its time limit killed it and left its result bundle
+unreadable.
+
+**The rule:** a walk's test asserts which app each launch gave — the welcome for a fresh start, the device's own tabs for a
+normal one — before it takes a picture, and runs with `-collect-test-diagnostics never`, as the gate's runner does. When a
+picture surprises you, read the store and the suite before reading the picture.

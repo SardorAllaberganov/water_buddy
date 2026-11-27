@@ -16871,3 +16871,66 @@ Staged, explicit paths: `WaterBuddy/WaterLog.swift`, `DataManager.swift`, `Drink
   passed**; both widget schemes built.
 - Counted: 155 `.swift` files in the seven targets; 1209 phone `@Test`, 77 watch, 88 UI `func test`.
 - The walk, on the simulator, as above. Not run here: VoiceOver (#244), an iOS 26 runtime (#243), a device.
+
+## [2026-11-27] — The Live Activity (roadmap 1.5.2): built, walked, gated and walked again
+
+### What happened
+
+On the owner's "go next", the design went to one spec, `docs/superpowers/specs/2026-11-27-live-activity-design.md`, approved
+with "Approve as is", and was built on `feature/live-activity` from `de99d6c` in the spec's §10 order, tests first:
+- **The app:** `LiveWater`, the one owner — Settings' switch turns it on and off, it watches the manager through Observation, and
+  the pure `LiveWaterPlan` decides each pass: start in the foreground, update, end or nothing; ActivityKit only through its
+  `Source`, with no push type. `Key.liveActivity`, `LiveWaterAttributes` and its content in `DataManager.swift`. The button's
+  `LiveActivityGlassIntent` logs through `logTheGlassInTheBackground()`, which now waits for the activity before the reminders.
+  Settings' card from iOS 18; `INFOPLIST_KEY_NSSupportsLiveActivities`.
+- **The widget extension:** `LiveWaterWidget` — the Lock Screen on the theme's aurora, its figures on the widget's card; the
+  Dynamic Island's three forms; Apple Watch's small layout; every figure `privacySensitive` with a quiet form — and the intent's
+  twin, which never runs. Listed inside an `if #available(iOS 18.0, *)` of its own.
+- **The rules and the policy**, as the spec approved them: `10-architecture`, `15-project`, `20-state`, `25-shared-storage`,
+  `30-rollover`, `40-widget`, `43-concurrency`, `50-views`, `60-design-system`, `65-accessibility`, `70-privacy`, `85-testing`,
+  `95-dependencies`; `PRIVACY.md` and `Tools/PrivacyPolicy.html`, not published.
+- **The first walk** (19:28–20:00) on *WaterBuddy Walk iPhone*, through a walk-only copy whose fresh start drove a real
+  activity: the five themes on the Lock Screen and in the Island, a pour, Russian and Spanish, the switch off; iOS's *Allow Live
+  Activities from WaterBuddy?* under the first activity; the button's press logging nothing. It found the figures short of
+  4.5:1 on the bare aurora in four themes; they moved onto the widget's card, where every one clears 5.27.
+- **The gate**, paused 20:10–21:22 while another session had the simulators at its request: green, one UI test failing once on
+  18.6 and passing alone (below).
+- **The second walk** (22:35–23:13), for the rest of the spec's walk list. Two runs that asked for the fresh start came up as a
+  normal start on the device's own data and are set aside; the rest ran on the normal start on purpose, each launch proved.
+  Every change followed on the Lock Screen view and the Island — a Home pour, a pour and its *Undo*, a History add, the goal;
+  the largest text size, Reduce Transparency and the light appearance drew whole and over their floors; the gated build,
+  installed with `simctl install`, redrew both placed widgets.
+
+### The rulings
+
+- The owner's approval of the spec ("Approve as is") covered R1–R7 and D1–D13.
+- Mid-run, the recommended option taken and reported (the owner's standing preference): the whole activity iOS 18's; the figures
+  on the widget's card; *Log a Glass* in both catalogues and `sharedKeys`; `nonisolated` on `AppLanguage(code:)` and four
+  `WaterSnapshot` members; `spokenFigures` internal; `widgetCard(fillingHeight:)`; the expanded Island's ring hidden from
+  VoiceOver; `logTheGlass(into:from:settling:)`; Settings' `readSystemState()` reconciling the switch; rules 10's and 95's import
+  lines; the warnings' baseline rebuilt from a `HEAD` export; the walk before the gate.
+- Paused for another session, at its request, from 20:10 to 21:22: no build and no simulator run in that time.
+
+### Files touched
+
+Staged, explicit paths: `WaterBuddy/DataManager.swift`, `LiveActivityGlassIntent.swift`, `LiveWater.swift`, `LiveWaterPlan.swift`
+(new), `LogServingIntent.swift`, `RootTabView.swift`, `SettingsView.swift`, `WaterBuddyApp.swift`, `Localizable.xcstrings`;
+`WaterBuddyWidget/LiveActivityGlassIntent.swift`, `LiveWaterWidget.swift` (new), `LockScreenWidget.swift`, `WaterBuddyWidget.swift`,
+`WaterBuddyWidgetBundle.swift`, `Localizable.xcstrings`; `WaterBuddy.xcodeproj/project.pbxproj`;
+`WaterBuddyTests/LiveWaterContentTests.swift`, `LiveWaterPlanTests.swift`, `LiveWaterTests.swift` (new), `DataManagerTests.swift`,
+`LocalizationTests.swift`; `WaterBuddyUITests/LiveActivityUITests.swift` (new); the thirteen rules above; `CLAUDE.md`,
+`PRIVACY.md`, `Tools/PrivacyPolicy.html`, `docs/STATE.md`, `docs/WIDGET.md`, `docs/DESIGN.md`, `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `tasks/lessons.md`, the spec and this file. The owner's six unstaged files are left as they were.
+
+### Verification
+
+- The gate, on an export of the staged index (tree `9469317`) against a clean build of a `HEAD` `de99d6c` export, pinned by UDID:
+  warnings by file and message, nothing new on any scheme — the app's 20 → 19 on 27.0 and on 18.6, the phone widget's and the
+  watch widget's 17 → 16, the watch's 2, the one gone `init(code:)`'s main-actor call; phone unit tests **1237 in 138 suites
+  passed**; UI on 27.0, 21 groups, 84 methods, **all passed, 1 skipped by its guard**; UI on 18.6, **all passed but one, 1
+  skipped by its guard** — `WelcomeUITests.testEveryWelcomeControlIsOneElement` failed once, its tap on *Get Started*
+  unanswered, and passed alone three times and in its group again; watch **77 passed**; both widget schemes built.
+- Counted: 164 `.swift` files in the seven targets; 1237 phone `@Test`, 77 watch, 89 UI `func test`.
+- The two walks, on the simulator, as above; contrast measured on their renders (`docs/DESIGN.md`). Not run here: a device —
+  the button's press, a locked phone, StandBy, Apple Watch's Smart Stack, CarPlay, the Mac, the day's end, *Don't Allow*,
+  VoiceOver (#245); a watch pour, a live theme change and the Island's minimal form on the simulator.

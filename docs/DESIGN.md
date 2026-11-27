@@ -7,6 +7,11 @@ figure here is transcribed from the source; the *arguments* are in the DocC on
 **Rule of the file:** record the measurement, not the adjective. "0.24 at 50%" survives a redesign
 argument; "looked better" does not.
 
+**Last updated:** 2026-11-27 (the Live Activity's own records, roadmap item 1.5.2, on `feature/live-activity` — not a
+`/doc_sync` pass). **One section is new:** *The Live Activity, measured* — the Lock Screen view's three white figures in all
+five themes, first on the bare aurora, where seven pairs fell short, then on the widget's card, where none does; the Island's
+drop; and the largest text size, Reduce Transparency and the light appearance from the second walk. No token moved.
+
 **Last updated:** 2026-11-25 (hundred-and-thirtieth pass — `/doc_sync` on set C's staged tree, on `feature/set-c`). The
 build wrote set C's measurements as it went — *The archived fills, derived* and *Themes, measured*, with each theme's
 tables and the library's pairs (Tasks 15–17, `9f3ce07`) — and this pass checked them against the code and moved
@@ -3173,6 +3178,56 @@ held at 7:1 or more in every theme by `thePrimaryLabelClearsSevenToOneEvenAtTheF
 `aLockedIconShowsItsLock` renders each lockable tile locked and open and requires the glyph the lock adds at 3:1 at least
 against the pixels round it. The census never drew the lock — it holds Premium — so no row above measures it. The
 swatches keep their centred white lock: it sits on each theme's dark gradient.
+
+## The Live Activity, measured
+
+*(2026-11-27, roadmap 1.5.2, staged on `feature/live-activity` — spec `2026-11-27-live-activity-design.md` §5; rule
+`60-design-system`'s *In the Live Activity*.)* **No token moved, and no new one.** The Lock Screen view stands on
+`WidgetAurora` for the content's theme. Its ring and figures stand on the Home Screen widgets' card,
+`widgetCard(fillingHeight: false)` — the pane on `Base.archived(for:)`, flat, at its content's height — beside the Glass on the
+primary surface at `PourButton.minimumTarget`, `ring: false`. The Dynamic Island draws on the system's black: the drop and the
+ring water's, `Aurora.classic.first`, the percentage white, the keyline water's. The view sets its own dark scheme, as the
+widgets do.
+
+**Method.** The walk's renders on *WaterBuddy Walk iPhone* (iPhone 17, iOS 27.0, 3× pixels): the Lock Screen view as
+Notification Center shows it, at 65 % — 1 300 of 2 000 ml — one launch a theme. A figure's box is found from its own glyphs, a
+run of bright rows at least 16 px tall in the figure's column; a shorter run is the card's rim. The ink is the brightest pixel in
+the box, the ground the brightest pixel in a band round it, 10 px (6 inside the ring), so each ratio is the worst on its frame.
+WCAG 2. An activity does not move, so one frame is the whole of it. The floors are small text's, 4.5:1, for all three: the
+percentage is bold at about 15 pt, and rule `65-accessibility` counts only a `.title3` bold heading as large.
+
+**First, on the bare aurora**, as the spec drew it — seven pairs short, in bold:
+
+| White, on the aurora | Floor | Aurora | Lagoon | Dusk | Midnight | Bloom |
+|---|---|---|---|---|---|---|
+| The total, *1 300 ml* (title 3, semibold) | 4.5 | 4.71 | **3.90** | **4.18** | 6.07 | 4.53 |
+| The caption, *of 2 000 ml* (subheadline, white 0.82) | 4.5 | **3.72** | **3.15** | **3.31** | 4.77 | **3.59** |
+| The ring's percentage (bold, rounded) | 4.5 | 4.63 | **4.46** | 4.53 | 8.02 | 4.86 |
+
+So the figures moved onto the card, the remedy rule `60-design-system` names — the widget's archived pane, never a heavier
+shadow — and were measured again on the same device, one launch a theme:
+
+| White, on the card | Floor | Aurora | Lagoon | Dusk | Midnight | Bloom |
+|---|---|---|---|---|---|---|
+| The total | 4.5 | 7.57 | 7.32 | 7.47 | 8.20 | 7.63 |
+| The caption | 4.5 | 5.94 | 5.82 | 5.91 | 6.39 | 5.98 |
+| The ring's percentage | 4.5 | 5.32 | 5.27 | 5.34 | 5.83 | 5.48 |
+
+**Nothing on the card is under its floor**; the nearest is the ring's percentage in Lagoon, 5.27. **The Island:** the drop,
+water's (0, 0.55, 1.00), is **6.20:1** on the Island's black against 3:1 for a glyph, and the white percentage 21:1.
+
+**The second walk**, the same way, in Aurora at 203 % (*3 050 of 1 500 ml*), each setting changed on the device:
+
+| White, on the card | Floor | Largest text size | Reduce Transparency | Light appearance |
+|---|---|---|---|---|
+| The total | 4.5 | 7.31 | 12.03 | 7.48 |
+| The caption | 4.5 | 5.94 | 8.67 | 5.94 |
+| The ring's percentage | 4.5 | 5.22 | 12.03 | 5.22 |
+
+At the largest size (*Accessibility XXXL*) the view and the Island's forms draw whole, nothing cut. Under Reduce Transparency
+the card draws its opaque fill and the aurora its gradient alone. In the light appearance the view draws as in dark, its own
+scheme; only iOS's question under it turns light. Not measured: Increase Contrast, StandBy, the watch's small layout and
+CarPlay — the last three a device's (known issue #245).
 
 ## Motion
 

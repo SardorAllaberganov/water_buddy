@@ -3,6 +3,11 @@
 The widget's surface as it actually stands. The *reasoning* lives in the DocC on
 `WaterBuddyWidget.swift` / `AddWaterIntent.swift` and in `.claude/rules/40-widget`.
 
+**Last updated:** 2026-11-27 (the Live Activity's own records, roadmap item 1.5.2, on `feature/live-activity` — not a
+`/doc_sync` pass). **A fifth widget:** `LiveWaterWidget`, the Live Activity, iOS 18 and later — a section, *The Live Activity*,
+below the control's. The four widgets' contract is unchanged; the Lock Screen widget's spoken sentence,
+`WaterSnapshot.spokenFigures(in:locale:)`, is now internal to the extension, so the activity speaks it too.
+
 **Last updated:** 2026-11-25 (hundred-and-thirtieth pass — `/doc_sync` on set C's staged tree, on `feature/set-c`: steps
 1–4 committed, step 5 staged, not merged). **Two contracts moved, both on the read path.** `WaterSnapshot` gains `theme`
 and `servingGlyph`, resolved from the cache and defaulted; the Home Screen and week widgets draw the stored theme, and the
@@ -846,6 +851,30 @@ what happens before the first unlock after a restart (#72), is the device check'
 app's picker in all three languages, a press logging the stored Glass — an edited one included — and
 a mutation run showing the reload is what delivers the edit. **Not proved:** a locked phone, a press
 before the first unlock, a Lock Screen slot, the Action Button and VoiceOver (spec §7.4, #75).
+
+## The Live Activity
+
+Added 2026-11-27 (roadmap item 1.5.2; spec `docs/superpowers/specs/2026-11-27-live-activity-design.md`, the authority for
+everything below; rules `40-widget`, `70-privacy`, `15-project`, `60-design-system`, `65-accessibility`, `85-testing`).
+
+| | |
+|---|---|
+| Type | `ActivityConfiguration(for: LiveWaterAttributes.self)` — `LiveWaterWidget`, in `WaterBuddyWidget/LiveWaterWidget.swift`, `@available(iOS 18.0, *)`; the bundle lists it after the Lock Screen widget inside `if #available(iOS 18.0, *)` |
+| Families | the Lock Screen (also its banner, StandBy's tap, CarPlay and the Mac), the Dynamic Island's compact, minimal and expanded forms, and Apple Watch's Smart Stack, `supplementalActivityFamilies([.small])` |
+| Attributes | `LiveWaterAttributes` (`DataManager.swift`, Foundation only), holding nothing; the `ActivityAttributes` conformance declared here and in the app's `LiveWater.swift` |
+| Content | `LiveWaterAttributes.ContentState`: today's total, the goal, the Glass's amount and glyph, the language's code and the theme's code — built from a `WaterSnapshot` by `ContentState(snapshot:)`, drawn back through `snapshot(stale:)`, never stored |
+| Stale date | the day's end, `DataManager.nextDayBoundary(after:calendar:)`; past it every view draws the snapshot `rolledOver()` — the new day, empty — as the midnight entry does |
+| Button | `Button(intent: LiveActivityGlassIntent())` — a `LiveActivityIntent` iOS runs in the **app's** process; the extension's copy of the intent is there to be named and never runs |
+| Figures | the percentage, today's total and the goal, each `.privacySensitive()`, with the Lock Screen widget's quiet form under `.privacy` redaction |
+| Who moves it | the app's `LiveWater`, alone: started in the foreground while Settings' switch is on, updated on every change the app's process makes, ended at once when the switch goes off. Nothing in the extension reaches it — a pour from a widget's button or the control shows on it the next time the app runs |
+
+**Why iOS 18 and later.** Apple Watch's small layout, `supplementalActivityFamilies`, is iOS 18's, and the bundle's builder
+takes an `if` with no `else` (measured: an `else`, and an `if #unavailable`, both failed to compile), so the activity could not
+stand below 18 without giving the watch its own layout up. Settings draws its card from 18 only.
+
+**Proved and not.** The pure halves — the plan, the content, the owner through its `Source` — are unit-tested; the rendering and
+the button's press are not. See the walk's record in `HISTORY.md` for what the simulator showed; the press, a locked phone,
+StandBy, Apple Watch's Smart Stack and CarPlay are the device check's.
 
 ## Building it
 

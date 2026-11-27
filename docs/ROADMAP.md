@@ -616,6 +616,14 @@ Health gets every drink as Water; the export names the drink. It ships as 1.5 (1
 server, it can only be updated when the app or one of its intents runs** — a pour from the app, a
 widget tap, a watch pour arriving — never pushed. **Needs a rule change** (§8): rule `70-privacy`
 forbids a Live Activity today, because the total it would show counts pours the watch sent.
+*(2026-11-27: built on `feature/live-activity`, gated and walked on the simulator; not committed, not
+released. Decided in `docs/superpowers/specs/2026-11-27-live-activity-design.md`, approved as written: a
+Settings switch, off until the user turns it on, for everyone, on iOS 18 and later; the Lock Screen
+widget's three figures and a button that logs the Glass; an empty day past the day's end; a small layout
+for Apple Watch; rule `70-privacy` amended in the same change. The widget tap named above is the one
+case it does not follow at once: the tap runs in the widget extension, which cannot reach the app's
+activity, so the activity shows it the next time the app runs (`docs/AI_CONTEXT.md` #246). It ships as
+1.5 (10), with Other drinks.)*
 
 **1.5.3 — New languages.** More App Store storefronts reached in their own language. Each one means
 all four string catalogues, the store listing, the header's phrase, and `knownRegions`
