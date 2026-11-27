@@ -12,7 +12,7 @@
 **Developer:** Sardor Allaberganov
 **Contact:** [sardorallaberganov96@gmail.com](mailto:sardorallaberganov96@gmail.com)
 **Effective date:** 24 October 2026
-**Last updated:** 26 November 2026
+**Last updated:** 27 November 2026
 
 ---
 
@@ -48,7 +48,7 @@ Everything below stays on your own devices, in WaterBuddy's own storage. The app
 
 | What | Details |
 |---|---|
-| Your water servings | For each serving you log: the amount in millilitres, the moment you logged it, and a random identifier made for that serving. This is your history. |
+| Your servings | For each serving you log: the amount in millilitres, the moment you logged it, what you drank (water, tea, coffee, juice or milk) and a random identifier made for that serving. This is your history. |
 | Today's total | Worked out again from your servings after every change, and kept so the widgets can show it at once. |
 | The last seven days' totals | Seven daily figures, kept for the week widget, which cannot read your history directly. |
 | Your daily goal | A number of millilitres. |
@@ -78,7 +78,7 @@ Everything below stays on your own devices, in WaterBuddy's own storage. The app
 
 **That is the complete list.** WaterBuddy stores no personal name, no email address, no account, no password, no payment details, no device identifier, no advertising identifier, no location, no health record of its own, no contacts, no photos, no audio, no IP address, no crash report and no analytics event. None of these is ever created, so none can be stored.
 
-**Copied to Apple Health, only if you turn it on:** each serving's amount and moment, as Water. See *Apple Health, if you turn it on* below.
+**Copied to Apple Health, only if you turn it on:** each serving's amount and moment, as Water, whatever you drank. See *Apple Health, if you turn it on* below.
 
 The app uses no Keychain, no iCloud storage and no CloudKit sync, so it does not back up your history itself. If your device's own backups are on, Apple makes them under Apple's terms.
 
@@ -156,7 +156,7 @@ The monthly recap (Premium) can be shared as an image, **only when you tap *Shar
 
 ### 8. A file of your servings you choose to share
 
-*Export your servings* (Premium) makes a CSV file of every serving you have logged, **only when you tap it**. The file leaves your iPhone **only when you tap *Share as a CSV file*** and choose where it goes. For each serving it holds the date, the time and the amount in millilitres, and nothing else: no goal, no streak, no identifier, no time zone and no device name. Times are given in the time zone your iPhone is in when you export. The app keeps no copy: the file is made in memory, and iOS writes whatever copy your destination asks for. You choose where it goes in iOS's share sheet, and once it arrives, what happens to it is up to the app or person you sent it to. WaterBuddy does not learn where it went, or that you sent it.
+*Export your servings* (Premium) makes a CSV file of every serving you have logged, **only when you tap it**. The file leaves your iPhone **only when you tap *Share as a CSV file*** and choose where it goes. For each serving it holds the date, the time, the amount in millilitres and what you drank, and nothing else: no goal, no streak, no identifier, no time zone and no device name. Times are given in the time zone your iPhone is in when you export. The app keeps no copy: the file is made in memory, and iOS writes whatever copy your destination asks for. You choose where it goes in iOS's share sheet, and once it arrives, what happens to it is up to the app or person you sent it to. WaterBuddy does not learn where it went, or that you sent it.
 
 ---
 
