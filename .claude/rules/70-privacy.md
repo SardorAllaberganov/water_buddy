@@ -206,7 +206,9 @@ Five limits are conditions of the permission:
 - **One way out.** Only through the system share sheet, from *Share as a CSV file* in the export sheet — `ShareLink`
   in `ExportSheet.swift`. Never from the widget, the watch, Siri, the control, a notification or a reminder's button,
   and never without the tap
-- **Three columns, and nothing else.** `date`, `time`, `amount_ml`, the headings fixed and in English in every
+- **Four columns, and nothing else.** `date`, `time`, `amount_ml` and, since 1.5, `drink`, the drink as its fixed
+  English word — `water`, `tea`, `coffee`, `juice` or `milk` (spec `2026-11-27-other-drinks-design.md` R6) — the
+  headings fixed and in English in every
   language: a format, not copy. Never a serving's id, the goal, the streak, a total, a time zone, the language or
   the device's name
 - **In memory only.** Built when the card is tapped, held in Settings' state, written to no file and to neither

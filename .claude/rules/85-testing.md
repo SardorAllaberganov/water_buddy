@@ -21,7 +21,10 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `UserDefaults(suiteName: "test.waterbuddy.\(UUID().uuidString)")` — and tears it down with
   `removePersistentDomain(forName:)` in a `defer`
 - Every fixture passes an **in-memory** `ModelContainer`. Letting `modelContainer:` default resolves
-  `DataManager.sharedModelContainer`, which is the live App Group store
+  `DataManager.sharedModelContainer`, which is the live App Group store. Two kinds of test write a store file
+  instead, each in a temporary folder of its own, never the App Group's: `UnreadableStore`'s, and
+  `DrinkSchemaTests`, which writes a store through the frozen version 1 and opens it through
+  `WaterBuddyMigrationPlan` (spec `2026-11-27-other-drinks-design.md` §3.2)
 - Every fixture passes `reloadWidgets: {}` **and** `rescheduleReminders: { _ in }`. The latter's
   production default builds a **real** `UNUserNotificationCenter`, and `init` reschedules — so merely
   constructing a manager reconciles against it and can remove real pending requests. A test that
@@ -35,7 +38,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   `AppStoreScreenshotUITests.testCaptureAppStoreScreenshots`, which needs the welcome on every run,
   and so does `CoachingUITests`, for set B's controls with Premium held or lapsed, and so does
   `ExportUITests`, for a holder's export, and so do `AppearanceUITests`, for set C's card and library,
-  and `LanguageUITests`, so a language chosen in its test never outlives it, and the theme census. No
+  and `LanguageUITests`, so a language chosen in its test never outlives it, and `DrinksUITests`, so no
+  serving poured in its test outlives it, and the theme census. No
   other UI test passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
@@ -119,7 +123,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
   `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
-  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`, `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests`. They are compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
+  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`, `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests`, `DrinkTests`. They are compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
   the plan stayed pure (rule `80-notifications`)

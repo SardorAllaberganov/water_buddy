@@ -160,4 +160,4 @@ warning here is a Swift 6 error later.
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
   `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
   `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`,
-  `AuroraPaletteTests`, `VesselLibraryTests` or `VesselGlyphTests` to make them compile. They are compile-time canaries: fix the declaration they read instead
+  `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests` or `DrinkTests` to make them compile. They are compile-time canaries: fix the declaration they read instead

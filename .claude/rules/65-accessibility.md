@@ -70,8 +70,8 @@ rather than re-deriving it.
   `.minimumScaleFactor(0.6)`
 
 ## Tap targets
-- Every tappable row carries an explicit `.frame(minHeight:)` of at least 44 — 44 for a tab slot and
-  for Settings' *Privacy Policy* link, 50 for Settings' *Language* row, 56 for a serving row, a choice in
+- Every tappable row carries an explicit `.frame(minHeight:)` of at least 44 — 44 for a tab slot, a drink's
+  capsule and Settings' *Privacy Policy* link, 50 for Settings' *Language* row, 56 for a serving row, a choice in
   the language sheet and the primary buttons. Never a fixed `height`
 - Make the whole slot the target, not the glyph: `.frame(maxWidth: .infinity, minHeight: 44)` plus
   `.contentShape(Rectangle())` where the label does not already fill the row
@@ -110,6 +110,13 @@ rather than re-deriving it.
 - A serving row's vessel name is drawn and never spoken — it is an inference from today's
   vessels. The sheet's three shortcuts are one button each: label the vessel's name, value its
   amount, `.isSelected` on the one whose amount is showing
+- A serving's drink, when it is not water, is drawn where the vessel's name stands **and spoken** — *Coffee, 150
+  millilitres*, from a `%d` key with plural forms — because a drink is stored, not guessed; water rows speak as
+  before. Home's row of drinks and the serving sheet's are one button each: label the drink's name,
+  `.isSelected` on the chosen one. A capsule is at least 44 pt each way and keeps its bold width, chosen or not.
+  Where Home's row outgrows the screen, which it does only past the default size, it scrolls rather than
+  squeezing a capsule; the sheet's wraps onto balanced lines inside its card, so no drink waits behind a scroll
+  (spec `2026-11-27-other-drinks-design.md` §5, §6)
 - Put `.accessibilityLabel` / `.accessibilityValue` / `.accessibilityHint` / `.accessibilityAddTraits`
   **on the control itself** — never on an `.accessibilityElement(children: .ignore)` wrapper around a
   `Button`, `Toggle` or `Slider`

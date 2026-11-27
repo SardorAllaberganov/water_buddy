@@ -26,10 +26,14 @@ after the body above had already conceded it.
   so this is mechanically true
 - A `#Preview` may build its own throwaway suite, but must tear it down with
   `removePersistentDomain(forName:)` in the same scope
-- The public mutation surface is `addLog(amount:at:)`, `addWater(amount:)`, `removeWater(amount:)`,
-  `deleteLog(_:)`, `undoLog(id:)`, `updateLog(_:newAmount:timestamp:)`, `saveDailyGoal(ml:)`,
+- The public mutation surface is `addLog(amount:at:drink:)`, `addWater(amount:)`, `removeWater(amount:)`,
+  `deleteLog(_:)`, `undoLog(id:)`, `updateLog(_:newAmount:timestamp:drink:)`, `saveDailyGoal(ml:)`,
   `resetIfNeeded()`, `dayDidTurn()`, `resetDailyProgress()` and `refresh()`. Anything new joins that
   list rather than reaching around it
+- A serving's drink is `WaterLog.drinkCode`, **absent for water**: a missing code, or one this build does not
+  know, reads as water. `addLog`'s `drink` defaults to water, and every one-tap door logs water; an edit of the
+  drink alone is saved, recomputed and announced like any other. Every drink counts in full, so no sum reads it
+  (spec `2026-11-27-other-drinks-design.md` R2, R4, §3)
 - `claimReviewRequest(version:)` joins that surface. It writes `Key.reviewRequestedVersion` and
   nothing else: it decides through `mayRequestReview(reachedToday:streak:askedVersion:version:)` and
   writes the version **before** it answers `true`, so nothing can ask without recording it. It

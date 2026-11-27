@@ -102,6 +102,12 @@ persist anything.
   `dayFraction(of:)` and `hours(_:onDayOf:)`
 - A view holds a serving's **id** when it must name one outside a sheet — `UndoOffer` — never the
   `WaterLog`
+- Home's drink is presentation state: `DrinkChoice` in `@State`, water when the app opens and again when it goes
+  to the background or Home's page is left — where the *Undo* offer ends — never stored. Home's row and the
+  serving sheet's drinks are one view, `DrinkPicker`: one row on Home, which fits the narrowest iPhone at the
+  default text size in every language (`theFiveDrinksFitHomeOnTheNarrowestPhoneInEveryLanguage`), and balanced
+  lines inside the sheet's card. The sheet edits a serving's drink with its amount and time, in one call (spec
+  `2026-11-27-other-drinks-design.md` R3, D4, §6)
 - A `ViewThatFits` is offered its row's whole width (`.frame(maxWidth: .infinity)`) and chooses
   among whole controls, never among labels inside one `Button`; a one-line candidate carries
   `.fixedSize()`. Without them Home's *Undo* was sized as one form and drew another, and drew
