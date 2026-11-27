@@ -170,12 +170,13 @@ When the app is in English, on an iPhone where Apple's on-device model is availa
 
 ## Where your figures appear outside the app
 
-Widgets and complications show your figures because you put them there.
+Widgets, complications and the Live Activity show your figures because you put them there.
 
 - Home Screen widgets, including the week widget, show today's progress and your last seven days.
 - The Lock Screen widget and StandBy show your percentage and total. If you turn off *Allow Access When Locked → Lock Screen Widgets* in iOS Settings, they show no figure until your iPhone is unlocked.
 - Your Watch's complications show today's figures, and hide them whenever watchOS asks apps to hide private data.
 - The Control Center control shows a button and a name, and no figure.
+- The Live Activity, only if you turn it on in Settings, shows your percentage, today's total and your goal on the Lock Screen and in the Dynamic Island. iOS also shows it in StandBy, on your Watch, in CarPlay and on your Mac. WaterBuddy starts, updates and ends it on your iPhone, and nothing is sent to a server. To take it away, turn the switch off, or turn off Live Activities for WaterBuddy in iOS Settings.
 
 A notification never shows a figure. See *Notifications*.
 
