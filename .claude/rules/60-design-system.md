@@ -160,8 +160,8 @@ measured.
   one fill
 
 ## Water
-- **Water is water.** The waves, the falling drop, the vessel's glow and the watch faces' gauges keep
-  `Aurora.classic`'s colours in every theme — the one reason code may name a palette
+- **Water is water.** The waves, the falling drop, the vessel's glow, the watch faces' gauges and the Live
+  Activity's ring and drop keep `Aurora.classic`'s colours in every theme — the one reason code may name a palette
 - Draw it with two `WaveShape`s travelling opposite ways at different frequencies (1.1 and 1.7), and
   keep `WaveShape.animatableData` exposing `level` only
 - The wave is damped to zero at both ends of the level and the water is inset from the rim, so an
@@ -217,6 +217,14 @@ measured.
   with no branch on `widgetRenderingMode` and no `colorScheme` override
 - The Control Center control draws nothing of its own — iOS draws its glyph and title in Control
   Center's own style — so it takes no glass, no `Aurora` colour and no tint
+
+## In the Live Activity
+- The Lock Screen view stands on `WidgetAurora` for the content's theme — flat, no `Material`, for the widget's
+  reason — its figures white and its ring water's. The Dynamic Island draws on the system's black: the drop and
+  the ring water's, the percentage white
+- Its button is the primary surface at `PourButton.minimumTarget`, `ring: false`, drawing the Glass's glyph
+- Its pairs are measured on its own renders, for each theme, never carried over from the widgets' tables
+  (`docs/DESIGN.md`). Where a figure falls short it stands on the widget's archived pane, never on a heavier shadow
 
 ## On the watch face
 - A face draws no glass and no aurora, and no theme. Its gauges are water, tinted

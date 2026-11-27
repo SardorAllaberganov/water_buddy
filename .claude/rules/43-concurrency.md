@@ -38,6 +38,13 @@ warning here is a Swift 6 error later.
   hears its manager's saves through `logsDidSaveNotification`, observed with `object:` that manager,
   `queue: .main` and `MainActor.assumeIsolated`. `HealthPlan` is `nonisolated` and imports Foundation alone
 - `ServingsExport` is `nonisolated` and imports `Foundation` alone
+- `LiveWater` is `@MainActor @Observable`, `HealthMirror`'s shape: ActivityKit only through `LiveWater.Source`,
+  built by `static func live()`, each closure reaching ActivityKit in its own body, and its passes on a
+  `ReconcileQueue` of its own. It watches the manager through `withObservationTracking`, whose `onChange` runs
+  synchronously on the thread of the mutation — the main actor's, since `DataManager` is — and asks for a pass
+  inside `MainActor.assumeIsolated`; each pass arms the next observation before it reads. `LiveWaterPlan` and
+  `LiveWaterAttributes` are `nonisolated` and import Foundation alone, and both copies of
+  `LiveActivityGlassIntent` implement `perform()` `@MainActor`
 - `AppTheme`, `Aurora`, `VesselGlyph`, `Vessel`, `VesselLibrary` and `WristVessel` are `nonisolated` and
   `Sendable`; the palettes are `nonisolated static let`, and every value derived from a theme — the glass
   tint, the scrims, `Base.archived(for:)`, `AuroraBackground.lights(in:)` — is a `nonisolated static func`
@@ -160,4 +167,5 @@ warning here is a Swift 6 error later.
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
   `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
   `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`,
-  `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests` or `DrinkTests` to make them compile. They are compile-time canaries: fix the declaration they read instead
+  `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests`, `DrinkTests`, `LiveWaterPlanTests` or
+  `LiveWaterContentTests` to make them compile. They are compile-time canaries: fix the declaration they read instead

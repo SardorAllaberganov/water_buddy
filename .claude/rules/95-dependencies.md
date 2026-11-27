@@ -19,7 +19,8 @@ framework, and the project file carries no package references at all.
   seedable value type instead of adding a package for it. The waves, the aurora, the confetti and
   the glass are all this
 - No file under `WaterBuddyWidget/` may `import SwiftData`. The extension's own sources import only
-  `AppIntents`, `WidgetKit` and `SwiftUI` (rule `40-widget`)
+  `AppIntents`, `WidgetKit` and `SwiftUI`, and `ActivityKit` in `LiveWaterWidget.swift` alone — an Apple SDK
+  framework, entering as an `import` (rule `40-widget`)
 - A Swift file importing a framework unavailable to iOS or watchOS (`AppKit`, or any macOS-only
   module) must live **outside** all seven synchronized root-group folders — verified against
   `project.pbxproj`'s own `PBXFileSystemSynchronizedRootGroup` count, one per native target — put it

@@ -39,7 +39,8 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   and so does `CoachingUITests`, for set B's controls with Premium held or lapsed, and so does
   `ExportUITests`, for a holder's export, and so do `AppearanceUITests`, for set C's card and library,
   and `LanguageUITests`, so a language chosen in its test never outlives it, and `DrinksUITests`, so no
-  serving poured in its test outlives it, and the theme census. No
+  serving poured in its test outlives it, and `LiveActivityUITests`, so the switch it turns never outlives it,
+  and the theme census. No
   other UI test passes it.
   `FreshStartTests` hands it to `WaterBuddyApp.freshStartManager(arguments:)` and clears the suite
   that makes — the one fixture here that is not UUID-named, because its fixed name is what is under
@@ -90,6 +91,10 @@ Exact counts belong in `docs/AI_CONTEXT.md`, re-derived every pass — see *Coun
   are proved by hand, on a device with Apple Intelligence on, in English
 - HealthKit is reached in a test only through `HealthMirror.Source`'s closures — never `Source.live()`.
   Health's sheet, the Health app's Water and a pour on a locked phone are proved by hand
+- ActivityKit is reached in a test only through `LiveWater.Source`'s closures — never `Source.live()` — and the
+  fresh start builds its `LiveWater` on `Source.silent()`, so no UI test starts an activity. The activity's
+  rendering is proved by hand on the simulator; its button's press, a locked phone, StandBy, Apple Watch's Smart
+  Stack and CarPlay on a device
 - Inject the `Calendar` and the `now: () -> Date` clock rather than waiting for a real day
 - Names are never reused across suites, because swift-testing runs `@Test` functions in parallel
   inside one process
@@ -123,7 +128,7 @@ held to the same non-negotiables, adapted for `WristModel` in place of `DataMana
   `PremiumSetTests`, `PaywallOfferTests`, `PaywallScreenTests`, `MonthHistoryTests`,
   `MonthLayoutTests`, `MonthPatternsTests`, `WeekInsightsTests`, `InsightCopyTests`,
   `MonthRecapTests`, `StoreSampleTests`, `HealthPlanTests`, `ReminderScheduleTests`, `ServingsExportTests`,
-  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`, `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests`, `DrinkTests`. They are compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
+  `ExportSheetTests`, `LandingTests`, `RollingFigureTests`, `PremiumRimTests`, `AppThemeTests`, `AuroraPaletteTests`, `VesselLibraryTests`, `VesselGlyphTests`, `DrinkTests`, `LiveWaterPlanTests`, `LiveWaterContentTests`. They are compile-time canaries for rule `43-concurrency`: fix the declaration they read rather than
   annotating the suite
 - `ReminderPlanTests` deliberately does not `import UserNotifications`. That is the canary proving
   the plan stayed pure (rule `80-notifications`)
@@ -238,7 +243,9 @@ change to set B, set a schedule, a quiet day and *Only when behind*, see *Next r
 the widget and see the schedule kept, and lapse an expired monthly to see the rows lock. After a change to
 export, share to *Save to Files* and open the file. After a change to a theme, see it on Home, History,
 Settings, the paywall and the recap's image, on the placed widgets and on the watch, and read its table again.
-After a change to the icons, set each from Settings and see its light, dark and tinted forms on the Home
+After a change to the Live Activity, turn it on, see the Lock Screen and the Dynamic Island follow a pour, an
+*Undo*, the goal, the theme and the language, and turn it off. After a change to the icons, set each from
+Settings and see its light, dark and tinted forms on the Home
 Screen — from a TestFlight install too. After a change to the library, add a vessel, put it in the middle,
 and see the widget, Control Center, the reminder's button and the watch log it and draw its glyph. The same
 applies to the watch face: install `WaterBuddyWatch` and add each of its three faces to a watch face

@@ -157,6 +157,10 @@ rather than re-deriving it.
   week, its value is the line it draws
 - Settings' *Apple Health* is one switch, its label the title it draws and its hint the line under it, on
   the `Toggle` itself — the *Smart reminders* row's shape
+- Settings' *Live Activity* is one switch in the same shape. The activity's figures are one element — label
+  *Today's hydration*, value the vessel's own sentence — and its button its own, *Add %1$d millilitres*, or
+  *Log Water* in the quiet form. The Island's compact and minimal forms are one element each, with the same label
+  and value, and the quiet form speaks no figure
 - Settings' *Schedule* is one button — label *Schedule*, value the schedule in words and its quiet days
   named in full, *Premium* added while locked; *Only when behind* is one switch, its line the hint (*Opens
   Premium* while locked). In the schedule sheet each hour is one control, label its row's title and value

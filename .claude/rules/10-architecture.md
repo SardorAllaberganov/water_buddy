@@ -18,7 +18,7 @@ globs: ["WaterBuddy/**/*.swift", "WaterBuddyWidget/**/*.swift", "WaterBuddyWatch
     ┌─────┴─────────────────┐                                        │
     ▼                       ▼                                        │
 SwiftData                UserDefaults suite  ◄───────────────────────┘
-WaterBuddy.store         16 keys, derived cache
+WaterBuddy.store         17 keys, derived cache
 source of truth          read by the app AND the widget
 app only
 ```
@@ -34,6 +34,7 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
 `Key.weekTotals`, the last seven days' totals the week widget draws, brings it to 11.
 `Key.healthEnabled`, the Apple Health switch, brings it to 12. `Key.reminderSchedule` and
 `Key.onlyWhenBehind`, set B's, bring it to 14. `Key.theme` and `Key.vessels`, set C's, bring it to 16.
+`Key.liveActivity`, the Live Activity's switch, brings it to 17.
 
 ## The rulings
 - **One writer per store — the one honest weakening.** `DataManager` remains the only writer to
@@ -88,11 +89,16 @@ ledger, lives in the 10 keys above, bringing the phone suite from 8 to 9;
   `20-state`)
 - **The app icon is iOS's.** `AppIconSwitcher`, app-only, asks iOS to change it and reads it back; the
   app stores nothing about it (rule `70-privacy`)
+- **The Live Activity is the app's, drawn by the extension.** `LiveWater`, app-only and
+  `@MainActor @Observable`, decides through the pure `LiveWaterPlan` and starts, updates and ends the one
+  activity through ActivityKit, from the app's process alone; `LiveWaterWidget` draws it from its content and
+  nothing else. It stores only Settings' switch, `Key.liveActivity` (rule `70-privacy`)
 
 ## Import direction
 - The widget may import from the six shared files. **Nothing shared may import from the widget or
   from a view**
-- `WaterBuddyWidget/` imports only `AppIntents`, `WidgetKit` and `SwiftUI` — never `SwiftData`
+- `WaterBuddyWidget/` imports only `AppIntents`, `WidgetKit` and `SwiftUI`, and `ActivityKit` in `LiveWaterWidget.swift`
+  alone — never `SwiftData`
 - `ReminderPlan` imports `Foundation` alone
 
 ## The shared six
@@ -123,3 +129,4 @@ membership* section.
 - `import FoundationModels` outside `InsightWriter.swift`, and any model but `SystemLanguageModel.default`
 - `import HealthKit` outside `HealthMirror.swift`, and any read of a type or a source but WaterBuddy's own Water
 - `UIApplication.setAlternateIconName` or `alternateIconName` outside `AppIconSwitcher`
+- `import ActivityKit` outside `LiveWater.swift` and `LiveWaterWidget.swift`, and an activity requested with a push type

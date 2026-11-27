@@ -140,6 +140,14 @@ from before this design was read, kept deliberately rather than renamed for its 
 - `LanguageSheet` is app-only and stays out of every exception set; `AppLanguage` lives in `DataManager.swift`,
   already in all three, so Spanish adds no shared file and no membership edit
   (spec `2026-11-26-spanish-and-language-selector-design.md`)
+- `LiveWater`, `LiveWaterPlan` and the app's `LiveActivityGlassIntent` are app-only and stay out of every exception
+  set; `LiveWaterWidget` and the extension's own `LiveActivityGlassIntent` are the widget extension's.
+  `LiveWaterAttributes` lives in `DataManager.swift`, already in all three, Foundation only: its `ActivityAttributes`
+  conformance is declared in each of the two files that import ActivityKit, so the Live Activity adds no shared file
+  and no membership edit (spec `2026-11-27-live-activity-design.md`). **The fourth version check is the activity's**:
+  Apple Watch's small layout, `supplementalActivityFamilies`, is iOS 18's and the bundle's builder takes an `if` with
+  no `else`, so the whole activity is iOS 18's — listed inside `if #available(iOS 18.0, *)`, as the control is.
+  Settings draws its card from 18 only, and `LiveWater.Source.live()` reports Live Activities not allowed below it
 - `StoreSample` — the store capture's seed — is app-only and DEBUG-only, its whole body inside
   `#if DEBUG`, and stays out of every exception set. `Tools/CaptureScreenshots.sh` and
   `Tools/CapturePairScreenshots.sh` drive the store capture; `CaptureWatchScreenshot.sh` is gone,
@@ -210,6 +218,9 @@ to the five-invocation gate — every item here fails at *upload*, after a succe
   (2026-11-07, "Missing purpose string in Info.plist"). Apple's check names the code's APIs or the
   entitlement, not what authorization asks for, and `HealthMirror` reads back WaterBuddy's own samples.
   `HealthPurposeTests` pins both keys in every language
+- **`INFOPLIST_KEY_NSSupportsLiveActivities = YES` on the app target's two configurations** (1.5.2). Without it
+  iOS refuses every start, and nothing says so on screen. The widget extension needs no key of its own, and the
+  Live Activity no entitlement: it is never started or updated by push
 - **The app icon is delivered inside the bundle, never uploaded separately.** App Store Connect has
   no icon upload field any more. The 1024² marketing icon comes out of the asset catalog, which is
   why `WaterBuddyWatch/Assets.xcassets/AppIcon.appiconset/Contents.json` must use the modern

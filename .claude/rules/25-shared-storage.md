@@ -36,6 +36,9 @@ it is the only thing the widget can read.
   code would pin the app to today's system language forever
 - `Key.healthEnabled` is absent until the user turns Apple Health on, as `Key.remindersEnabled` is: absent
   and `false` both mean off. Only the app reads or writes it; no snapshot, mirror or notification carries it
+- `Key.liveActivity` is absent until the user turns the Live Activity on, as `Key.healthEnabled` is: absent and
+  `false` both mean off. Only the app reads or writes it; no snapshot, mirror, notification or activity content
+  carries it
 - Set B's two keys carry meaning in their absence too: `Key.reminderSchedule` absent is the standard
   schedule — choosing *Standard schedule* removes it — and `Key.onlyWhenBehind` absent is off.
   `Key.reminderSchedule` is a positional `[Int]` of four — first, last, every, the quiet-weekday mask —

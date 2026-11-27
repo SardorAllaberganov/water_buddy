@@ -219,6 +219,25 @@ target the file joins.
   draws a week of zeros
 - Its gallery strings are static literals that name no figure
 
+## The Live Activity
+- `LiveWaterWidget` is a fifth widget in the same extension, in its own file: an
+  `ActivityConfiguration(for: LiveWaterAttributes.self)` for the Lock Screen, the Dynamic Island and Apple Watch's
+  Smart Stack (`supplementalActivityFamilies([.small])`). It is iOS 18's, as the control is — the watch's layout
+  is, and the bundle's builder takes an `if` with no `else` — listed after the Lock Screen widget inside
+  `if #available(iOS 18.0, *)`
+- It draws only the content iOS hands it — `LiveWaterAttributes.ContentState`, through its `snapshot` —
+  never `DataManager.shared`, never a read of the suite and never SwiftData: no provider runs for it
+- The content is built from a `WaterSnapshot` by `ContentState(snapshot:)`, so its percentage is
+  `WaterSnapshot.percentage`. Past its stale date, the day's end, it draws that snapshot `rolledOver()`, as the
+  midnight entry does
+- Its button is `Button(intent: LiveActivityGlassIntent())`, `.buttonStyle(.plain)`, framed to
+  `PourButton.minimumTarget`. The extension's copy of the intent never runs: iOS runs a `LiveActivityIntent` in
+  the app's process, whose copy logs the Glass. Both copies keep one title, `isDiscoverable = false`,
+  `openAppWhenRun = false` and `.alwaysAllowed`
+- It injects the content's language bundle and locale and its theme at its root, as every widget does
+- Nothing in the extension starts, updates or ends it: ActivityKit does not show the extension the app's
+  activities. A pour from a widget's button or the control reaches it the next time the app runs
+
 ## Proving it
 - The app scheme does not compile the widget's sources. Build the extension separately after any
   change here, and after any change to one of the six shared files (rule `15-project`)
@@ -232,3 +251,7 @@ target the file joins.
 - The simulator has no StandBy: draw the bare layout through its `#Preview`, and take the small
   widget into StandBy on a device, by day and at night. Place the week widget, tap it, and see
   History open
+- The Live Activity's rendering has no automated coverage either: turn it on in Settings and see the Lock
+  Screen and the Dynamic Island's compact, minimal and expanded forms follow a pour, an *Undo*, the goal, the
+  theme and the language. Its button's press does not run on a simulator here; it, a locked phone, StandBy,
+  Apple Watch's Smart Stack and CarPlay need a device

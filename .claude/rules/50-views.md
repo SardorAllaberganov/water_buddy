@@ -24,6 +24,8 @@ persist anything.
   never holds a `Product`; it is handed `PremiumAccess.Plan`s
 - Apple Health's switch reads `@Environment(HealthMirror.self)`: its binding calls `enable()` on and
   `disable()` off — one call each — and Settings draws the card only where `isAvailable`
+- The Live Activity's switch reads `@Environment(LiveWater.self)` the same way — `enable()` on, `disable()` off —
+  and Settings draws its card for everyone
 - The theme reaches a view as `@Environment(\.aurora)`, the palette of the `\.theme` its root injected
   beside `\.strings` and `\.locale`. A view never names a palette — `Aurora.classic` only for water —
   and never switches on a theme (rule `60-design-system`)

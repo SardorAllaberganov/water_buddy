@@ -108,6 +108,8 @@ changed.
 - The week widget turns over from the same midnight entry: `week(endingOn:)` at the entry's date
   takes yesterday from `Key.weekTotals` and today from the rolled-over total. `rolledOver()` still
   changes only the total
+- The Live Activity turns over by its stale date, `nextDayBoundary(after:calendar:)`: past it, its views draw
+  its content's snapshot `rolledOver()` until the app updates it. Nothing local ends an activity at midnight
 - Keep `readingLeavesTheStoreUntouched` and `readingAnEmptySuiteDoesNotCreateKeys` green for any
   change to the read path. If you add a key, extend the helper those tests compare against — it
   enumerates keys explicitly and will not notice a new one on its own

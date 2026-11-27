@@ -41,6 +41,10 @@ after the body above had already conceded it.
 - `healthEnabled` joins that surface. Its setter writes `Key.healthEnabled` and nothing else — no doorbell,
   no reschedule, no wrist publish, since nothing outside Settings draws it — and only `HealthMirror` sets it,
   after asking Health
+- `liveActivityEnabled` joins that surface. Its setter writes `Key.liveActivity` and nothing else — no doorbell,
+  no reschedule, no wrist publish, since nothing outside the app draws it — and only `LiveWater` sets it, after
+  asking iOS. The activity's content, `LiveWaterAttributes.ContentState`, is a consequence: built from a
+  `WaterSnapshot` by `ContentState(snapshot:)` and never stored (spec `2026-11-27-live-activity-design.md` D9)
 - `reminderSchedule` and `onlyWhenBehind` join that surface. Each setter writes its own key and
   reschedules, and rings no doorbell and publishes nothing to the wrist: nothing outside the app draws
   them. Setting `.standard` removes `Key.reminderSchedule`. Neither knows Premium — Settings decides who

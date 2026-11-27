@@ -46,16 +46,18 @@ Three limits are conditions of the permission:
   termination**. `deleteLog(_:)` removes the row and does not cancel the transfer. The apply
   ledger is what makes a re-sent copy of a deleted serving a no-op rather than a resurrection —
   a privacy mechanism as much as a correctness one.
-- **No wire field may reach a notification, a Live Activity, or any surface outside the two
-  apps' own screens — with two named carve-outs: the watch's own complication, on the watch's own
-  face, and the phone's own Lock Screen widget, on the phone's own Lock Screen.**
+- **No wire field may reach a notification, or any surface outside the two apps' own screens —
+  with three named carve-outs: the watch's own complication, on the watch's own face, the phone's own
+  Lock Screen widget, on the phone's own Lock Screen, and the phone's Live Activity, on the user's
+  switch.**
   `WaterBuddyWatchWidget/WaterBuddyWatchWidget.swift` renders today's figures, derived from the
   stored `WristMirror`, in three faces — circular, rectangular and corner — which are wire-derived
   values reaching a surface other than `WristView`'s own screen — but it is the exact precedent the
   phone side already permits for its own Home Screen widget (`WaterBuddyWidget`, drawing from
   `WaterSnapshot`, which is itself the phone's own non-screen surface for the identical class of
-  state). The underlying protection is unchanged and still absolute: a notification and a Live
-  Activity remain forbidden on both devices, in both directions, with no carve-out of any kind — this
+  state). The underlying protection is unchanged and still absolute: a notification remains
+  forbidden on both devices, in both directions, with no carve-out of any kind, and the phone's Live
+  Activity is held to its own section's terms (*The Live Activity, on the user's switch*, below) — this
   amendment only recognises that each device's own face-level complication was always meant to sit
   beside its device's own Home Screen widget as the one sanctioned "outside the app's own screen,
   inside the device's own ambient surfaces" reading, and the original wording simply never said so.
@@ -235,6 +237,30 @@ Four limits hold:
   alert
 - **The policy first.** `PRIVACY.md` and its page list the theme, the vessels and the Watch's copy of them before
   set C goes on sale
+
+## The Live Activity, on the user's switch
+
+The phone's Live Activity may show today on its Lock Screen and in its Dynamic Island (roadmap 1.5.2,
+`docs/superpowers/specs/2026-11-27-live-activity-design.md`). The figures are the user's own, and it runs only
+while they ask for it. iOS draws it, and by itself carries it further — StandBy, Apple Watch's Smart Stack,
+CarPlay and the Mac's menu bar — with no server, no account and no push. Its total counts the watch's pours,
+which is why it is a carve-out of *WatchConnectivity is a ruling, not an omission*, above.
+
+Five limits are conditions of the permission:
+- **On the user's switch.** Started only while Settings' *Live Activity* switch is on, and only by the app in
+  the foreground; ended at once when the switch goes off, or when iOS reports WaterBuddy's Live Activities off.
+  Never started from the welcome, a widget, the watch, Siri, the control or a notification
+- **Three figures, and nothing else.** The percentage, today's total and the goal, and on its button the
+  Glass's glyph. Never the streak, a serving, a drink, a reminder's time or a vessel's name
+- **Marked, as the Lock Screen widget is.** Every figure `.privacySensitive()`, and every view draws the Lock
+  Screen widget's quiet form whenever `redactionReasons` contains `.privacy`. Apple documents neither for a Live
+  Activity, so the sure controls are the user's: the switch, iOS's per-app setting and *Allow Access When
+  Locked › Live Activities*
+- **No push.** Requested with no push type, so no APNs token is ever made; started, updated and ended by the
+  app's own process alone. ActivityKit is imported by `LiveWater.swift` and `LiveWaterWidget.swift` alone
+- **Its button says nothing back.** It logs the Glass, as the Siri phrase does, and runs without unlocking where
+  iOS allows — `LiveActivityGlassIntent` is `.alwaysAllowed`, because logging water is harmless — and it is not
+  discoverable: no Shortcuts action, no Siri, no Spotlight
 
 ## The lock screen is a public surface
 - Never put a water total, a goal, a serving size, a percentage, or **any digit** into a
