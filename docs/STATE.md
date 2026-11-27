@@ -444,7 +444,7 @@ and which is authoritative matters more than either on its own:
 
 | | `WaterBuddy.store` (SwiftData) | `group.sardor.WaterBuddy` (`UserDefaults`) |
 |---|---|---|
-| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp` | sixteen keys (below; ten until 2026-10-20, `weekTotals` the eleventh; eleven until 2026-10-30, `healthEnabled` the twelfth, on `feature/apple-health`; twelve until 2026-10-31, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, on `feature/coaching`; fourteen until 2026-11-25, `theme` and `vessels` the fifteenth and sixteenth, on `feature/set-c`) |
+| Holds | every ``WaterLog`` — `id`, `amount`, `timestamp`, and since 1.5 `drinkCode` | sixteen keys (below; ten until 2026-10-20, `weekTotals` the eleventh; eleven until 2026-10-30, `healthEnabled` the twelfth, on `feature/apple-health`; twelve until 2026-10-31, `reminderSchedule` and `onlyWhenBehind` the thirteenth and fourteenth, on `feature/coaching`; fourteen until 2026-11-25, `theme` and `vessels` the fifteenth and sixteenth, on `feature/set-c`) |
 | Status | **source of truth** | **derived cache** |
 | Written by | `DataManager` (app *and* `AddWaterIntent` in the extension) | `DataManager` only |
 | Read by | the app — and the extension's own `DataManager`, inside `AddWaterIntent.perform()` and nowhere else | the app **and the widget** |
@@ -591,6 +591,15 @@ it stood and said so.)*
 | `id` | `UUID` | Stable across edits. **Not** `@Attribute(.unique)`: two processes insert here, and a unique constraint turns a benign collision into a failed save in whichever lost the race. |
 | `amount` | `Int` | Millilitres. Positive; non-positive servings are rejected by `addLog`, not stored as zero rows. |
 | `timestamp` | `Date` | When the serving happened. |
+| `drinkCode` | `String?` | What was drunk, since 1.5: `tea`, `coffee`, `juice` or `milk`, and **absent for water**, so every row from before 1.5 is water with nothing rewritten. Read through `WaterLog.drink`; a code this build does not know reads as water. Every drink counts in full, so no total reads it (spec `2026-11-27-other-drinks-design.md`). |
+
+**The store is versioned since 1.5** (`WaterLog.swift`). `WaterBuddySchemaV1` is today's shape before the drink —
+`id`, `amount`, `timestamp` — frozen as a nested copy and pinned to the model hash a probe read off a real store
+(`7TIyx…dBA=`); `WaterBuddySchemaV2` is the live class with `drinkCode`; `WaterBuddyMigrationPlan` holds one
+lightweight stage from 1 to 2 and is the one way a container is opened, at its `current` version, the plan's last:
+by every rung of `DataManager.sharedModelContainer`'s ladder and by the tests. The app and the widget extension
+open the store through the same plan, so whichever runs first after an update migrates it. A new field means a
+frozen copy of the version before it, one more stage, and `current` moved in the same change.
 
 **A `Date` here does not contradict rule `30-rollover`.** That rule forbids storing *the day* as an
 instant, because an instant re-read under a different time zone moves — which is how a user flying

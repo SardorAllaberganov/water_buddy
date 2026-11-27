@@ -6429,3 +6429,53 @@ booted again, it finished in 9 s, launched Settings, and every group passed.
 
 **The rule:** treat a `bootstatus` that times out as a broken boot: shut that one device down by its UDID and boot it again. Then
 prove it by launching an app (`xcrun simctl launch <udid> com.apple.Preferences`) before the first test group.
+
+## 2026-11-27 — To see a UI test fail against an older build, give it a test root of its own
+
+**What happened.** Other drinks' UI tests had to be seen failing against 1.4.3's app before the new code counted. Pointing the
+`.xctestrun`'s `UITargetAppPath`, then its `DependentProductPaths`, at the 1.4.3 build still installed the new app, and the
+tests would have passed for the wrong reason. A scratch test root holding the 1.4.3 app beside the new runner, under the
+unmodified plan, ran them against the old build, and both failed as they should.
+
+**The rule:** to run new UI tests against an older build, copy the new products to a test root of their own, put the old app in
+the new one's place, and run the unmodified `.xctestrun` from there. Read which app the run installed before trusting a result.
+
+## 2026-11-27 — A primary surface's frame takes in its ring
+
+**What happened.** `testTheSheetsDrinksStandInsideItsCard`, written to catch the sheet's drinks running past its card, passed
+against the broken row: it took the card's trailing edge from *Save*'s frame, and `.primarySurface`'s ring carries that frame
+6 pt past the card (374 → 380 pt), past *Milk*'s 379. Printing the frames showed it; measured from *Cancel*'s leading edge and
+the sheet's equal margins, the test failed at 379 against 374, as it should.
+
+**The rule:** never take a container's edge from a control drawn with `.primarySurface` (or anything with a ring or a shadow in
+its frame); measure from an edge the layout sets exactly. A layout test counts only once it has failed against the broken layout.
+
+## 2026-11-27 — "It fits" is a number: measure it on the narrowest iPhone, in every language
+
+**What happened.** `DrinkPicker`'s comment said the five drinks fit every iPhone at the ordinary text sizes. On the walk the row
+measured 337, 344 and 343 pt in English, Russian and Uzbek against the 327 a 375-pt iPhone leaves Home, and in the serving sheet,
+narrower still, it ran past the card on a 402-pt iPhone. The gate's phone is 402 pt wide, so nothing in the suite could see it.
+
+**The rule:** a line that says a row fits is a measurement, not a description: measure the row in the font it draws, in each
+language, at the narrowest supported width, and pin it with a test beside `sevenDaysClearTheTapFloorOnTheNarrowestPhone`. Where
+a row cannot fit a card at every size, wrap it; a scroll inside a card runs past the card's edge.
+
+## 2026-11-27 — A simulator just booted can keep the UI runner from starting
+
+**What happened.** The second gate's first five UI groups, on a gate phone booted moments before, executed nothing: *Failed to
+initialize for UI testing: Timed out waiting for AX loaded notification*, exit 65, with the load average at 48 from the boot
+itself. Rebooted, and started only once the load had fallen under 8, every group passed. Proving the boot by launching Settings
+was not enough on its own.
+
+**The rule:** after booting a simulator for UI tests, prove it by launching an app and wait for the load average to settle before
+the first group. A group that executes nothing is the device's problem, never the tests' — rerun it on a settled device.
+
+## 2026-11-27 — The simulator tool asks the owner for each new device
+
+**What happened.** The drinks walk made two new simulators, the smallest and the largest iPhone. The simulator tool's first call
+on the first of them waited for the owner's approval of that device and timed out — they were away — so nothing on it could be
+tapped. A temporary UI test then walked both, Home and the sheet in two languages at two text sizes, and its screenshots were
+exported from the result bundle; the test was deleted before the gate.
+
+**The rule:** before making new devices for a walk while the owner may be away, plan the steps that need taps as a temporary UI
+test from the start, or use a device they have already allowed. Delete such a test before the gate, and say so in the record.

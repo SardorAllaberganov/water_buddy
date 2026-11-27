@@ -607,6 +607,10 @@ toward the goal; whether the one-tap doors (widget, Siri, Control Center, the wa
 2026-10-15 the reminder's *Log a Glass*) keep logging water only. *(2026-10-21: and whether a drink
 counts toward the goal at its own share of water — decided here, for every user, never as a Premium
 extra: a total that changed when a subscription lapsed would break *The Premium line*, §1.)*
+*(2026-11-27: built on `feature/other-drinks`, gated and walked; not committed, not released. Decided in
+`docs/superpowers/specs/2026-11-27-other-drinks-design.md`, approved as written: water, tea, coffee,
+juice and milk, every one counting in full, for every user; the one-tap doors keep logging water; Apple
+Health gets every drink as Water; the export names the drink. It ships as 1.5 (10), after 1.4.3.)*
 
 **1.5.2 — Live Activity.** Today's progress on the Lock Screen and in the Dynamic Island. **With no
 server, it can only be updated when the app or one of its intents runs** — a pour from the app, a

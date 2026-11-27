@@ -16812,3 +16812,62 @@ On the owner's "do all of it except sending it to review for now only testflight
   `IN_BETA_TESTING`; for en-US, en-GB, ru and es-MX the description, What's New, promotional text and keywords each equal to its
   file by SHA-256; the review notes equal to `review-notes.txt`.
 - Not run: the gate — no file in a target changed after the checkpoint above's.
+
+## [2026-11-27] — Other drinks (roadmap 1.5.1): built, gated, walked, fixed where the walk found it wrong, gated again
+
+### What happened
+
+On the owner's "Other drinks", the design went to one spec, `docs/superpowers/specs/2026-11-27-other-drinks-design.md`, approved
+with "Approve as is", and was built on `feature/other-drinks` from `4b5c8f3` in the spec's §10 order, tests first:
+- **The store:** `WaterLog.drinkCode`, absent for water; `Drink`; `WaterBuddySchemaV1` (1.4.3's model, frozen; its hash
+  `7TIyxKKB…`, read from a 1.4.3 store) and `WaterBuddySchemaV2`; `WaterBuddyMigrationPlan`, one lightweight stage, opening every
+  container. `addLog` and `updateLog` take a drink.
+- **The screens:** `DrinkPicker` — Home's row of five above the vessels, on Water when the app opens; the serving sheet's
+  above the amount. History draws and speaks a drink where it draws a vessel's name. The export gains `drink`, its fourth column,
+  and its sheet's line names it. Words in four languages, reviewed by a second agent (no change).
+- **The rules and the policy**, as the spec approved them: `20-state`, `43-concurrency`, `50-views`, `65-accessibility`,
+  `70-privacy`, `85-testing`; `PRIVACY.md` and `Tools/PrivacyPolicy.html`, dated 27 November, not published.
+- **The first gate**, on tree `c79541a`: green — 1204 phone unit tests (one StoreKit test failing in the whole run and passing
+  alone, #158), 82 UI methods on 27.0 and on 18.6, 77 watch, warnings unchanged.
+- **The walk** (05:11–05:50), on *WaterBuddy Walk iPhone* and *Walk Watch*: 1.4.3 (9) used, then this build installed over it —
+  the drink column added, its three servings and their ids kept as water, version 2's hash; a coffee poured, undone, poured
+  again, named in History and changed to tea in its sheet; the widgets at 65 % and the watch at *1 300 of 2 000 ml*; the export's
+  file saved through *Save to Files* and read back: `date,time,amount_ml,drink`, `coffee`, `tea`, `water`.
+- **What the walk found:** the sheet's row ran past its card on a 402-pt iPhone (*Milk* at 379 pt, the card at 374); Home's row
+  did not fit a 375-pt iPhone at the default size in English, Russian or Uzbek (337, 344, 343 pt against 327); leaving Home's tab
+  returns the drink to Water.
+- **The fix:** capsules 10 pt inside and 6 apart, at least 44 wide, at their bold width chosen or not; the sheet's drinks on
+  the fewest, most even lines (`DrinkPicker.lines`, `BalancedLines`), 8 pt from the card's edge. RED first: four line tests and
+  `theFiveDrinksFitHomeOnTheNarrowestPhoneInEveryLanguage` (15 issues), and `testTheSheetsDrinksStandInsideItsCard` at 379
+  against 374 — after its first version had passed by measuring *Save*'s frame, ring and all. Then green.
+- **Walked again** on a new *WaterBuddy Walk SE* (18.6) and *WaterBuddy Walk Max* (27.0), English and Russian, the default and
+  the largest size: Home's row on one line at the default size, scrolling at the largest; the sheet on one line on the Max, three
+  over two on the SE and at the largest size; nothing moved on a choice. Taken by a temporary UI test, deleted before the gate.
+- **The second gate**, on tree `602faa4`: green.
+
+### The rulings
+
+- The owner's approval of the spec ("Approve as is") covered R1–R7 and D1–D9.
+- Mid-run, the recommended option taken and reported (the owner's standing preference): the row's tighter capsules and the
+  sheet's balanced lines; the tab turn's reset kept, where the *Undo* offer ends, and written down.
+- Left to the owner: Home's scroll on a 375 × 667 iPhone at the default size (#243), the spec's own fallback.
+
+### Files touched
+
+Staged, explicit paths: `WaterBuddy/WaterLog.swift`, `DataManager.swift`, `DrinkPicker.swift` (new), `HomeView.swift`,
+`HistoryView.swift`, `SettingsView.swift`, `ServingsExport.swift`, `ExportSheet.swift`, `Localizable.xcstrings`;
+`WaterBuddyTests/DrinkTests.swift`, `DrinkSchemaTests.swift`, `DrinkLoggingTests.swift` (new), `HealthMirrorTests.swift`,
+`LocalizationTests.swift`, `ScreenHeaderTests.swift`, `ServingsExportTests.swift`; `WaterBuddyUITests/DrinksUITests.swift`
+(new); `.claude/rules/20-state.md`, `43-concurrency.md`, `50-views.md`, `65-accessibility.md`, `70-privacy.md`,
+`85-testing.md`; `CLAUDE.md`, `PRIVACY.md`, `Tools/PrivacyPolicy.html`, `docs/STATE.md`, `docs/AI_CONTEXT.md`,
+`docs/ROADMAP.md`, `tasks/lessons.md`, the spec and this file. The owner's six unstaged files are left as they were.
+
+### Verification
+
+- The second gate, on an export of the staged index (tree `602faa4`), pinned by UDID: warnings by file and message unchanged on
+  every scheme — the app's 20 on 27.0 and on 18.6, the phone widget's and the watch widget's 17, the watch's 2; phone unit tests
+  **1209 in 133 suites passed**; UI on 27.0, 22 groups, 83 methods, **all passed, 1 skipped by its guard**, its first five
+  groups rerun after the simulator's boot had kept them from starting; UI on 18.6, **all passed, 1 skipped**; watch **77
+  passed**; both widget schemes built.
+- Counted: 155 `.swift` files in the seven targets; 1209 phone `@Test`, 77 watch, 88 UI `func test`.
+- The walk, on the simulator, as above. Not run here: VoiceOver (#244), an iOS 26 runtime (#243), a device.
