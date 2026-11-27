@@ -139,6 +139,7 @@ struct DataManagerTests {
             manager.language = .russian                    // language
             manager.remindersEnabled = true           // remindersEnabled
             manager.healthEnabled = true              // healthEnabled
+            manager.liveActivityEnabled = true        // liveActivity
             manager.reminderSchedule = ReminderPlan.Schedule.standard.with(every: 3)   // reminderSchedule
             manager.onlyWhenBehind = true             // onlyWhenBehind
             manager.addLog(amount: 250)               // currentWater

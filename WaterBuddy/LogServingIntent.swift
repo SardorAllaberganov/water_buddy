@@ -60,20 +60,30 @@ struct LogServingIntent: AppIntent {
         manager.addWater(amount: DataManager.usualServing(in: defaults))
     }
 
+    /// The Glass logged, and returning only once the Live Activity shows it: a launch iOS suspends before then would
+    /// leave the Lock Screen showing the total from before (spec `2026-11-27-live-activity-design.md` §4). Tested with
+    /// a manager and an owner of the test's own (`LiveWaterTests`).
+    @MainActor
+    static func logTheGlass(into manager: DataManager, from defaults: UserDefaults, settling live: LiveWater) async {
+        logTheGlass(into: manager, from: defaults)
+        await live.settled()
+    }
+
     /// Everything a one-tap log from the app's own process does: wait for the watch link, log the
-    /// Glass once, and wait for the re-plan to reach the notification centre. Siri's ``perform()``
-    /// and the reminder's *Log a Glass* (`ReminderResponder`) both run it, so the two doors log the
-    /// same Glass the same way.
+    /// Glass once, and wait for the Live Activity to show it and the re-plan to reach the notification
+    /// centre. Siri's ``perform()``, the reminder's *Log a Glass* (`ReminderResponder`) and the Live
+    /// Activity's button (`LiveActivityGlassIntent`) all run it, so the three doors log the same Glass
+    /// the same way.
     ///
-    /// When the app is not running, both launch it in the background, and iOS may suspend it once they
-    /// return — so this returns only after both waits (rule `80-notifications`).
+    /// When the app is not running, each launches it in the background, and iOS may suspend it once they
+    /// return — so this returns only after every wait (rule `80-notifications`).
     @MainActor
     static func logTheGlassInTheBackground() async {
         // The watch link first: this launch started activating it in `WaterBuddyApp.init()`, and a
         // publish before it is up is dropped.
         await WristLink.waitUntilActivated()
 
-        logTheGlass(into: .shared, from: DataManager.sharedDefaults)
+        await logTheGlass(into: .shared, from: DataManager.sharedDefaults, settling: .shared)
 
         // The re-plan `addWater` queued must reach the notification centre before the system can
         // suspend this background launch (rule `80-notifications`).

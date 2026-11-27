@@ -296,7 +296,8 @@ private struct LockScreenPourButton: View {
 
 // MARK: - Speech
 
-private extension WaterSnapshot {
+/// Internal to the extension, not private to this file: the Live Activity speaks the same sentence (`LiveWaterWidget`).
+extension WaterSnapshot {
 
     /// The Home Screen vessel's own sentence — the percentage and both volumes — so VoiceOver says the
     /// same thing about today on either screen, in the forms and the grouping of `locale`.

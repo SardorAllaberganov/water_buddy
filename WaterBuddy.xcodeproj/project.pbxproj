@@ -921,6 +921,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "WaterBuddy reads back only the water it saved to Health itself, so it can correct or delete it when you change a serving.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WaterBuddy saves each serving you log to Apple Health as water. It reads nothing from Health.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -962,6 +963,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "WaterBuddy reads back only the water it saved to Health itself, so it can correct or delete it when you change a serving.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "WaterBuddy saves each serving you log to Apple Health as water. It reads nothing from Health.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

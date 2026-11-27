@@ -838,6 +838,35 @@
         }
       }
     },
+    "Log a Glass": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log a Glass"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrar un vaso"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Записать стакан"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stakanni qayd etish"
+          }
+        }
+      }
+    },
     "Millilitres of water to log.": {
       "extractionState": "manual",
       "localizations": {

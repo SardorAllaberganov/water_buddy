@@ -119,6 +119,10 @@ final class DataManager {
         /// "missing" and "off" mean the same thing, so nothing materialises it. Read and written by the
         /// app alone: no widget, reminder or watch reads it (spec `2026-10-29-apple-health-design.md`).
         static let healthEnabled = prefix + "healthEnabled"
+        /// The Live Activity's switch. Absent until the user turns it on — like ``healthEnabled``, "missing" and
+        /// "off" mean the same thing, so nothing materialises it. Read and written by the app alone: no widget,
+        /// reminder, watch or activity content reads it (spec `2026-11-27-live-activity-design.md` D9).
+        static let liveActivity = prefix + "liveActivity"
         /// Set B's reminder schedule, as `ReminderPlan.Schedule.stored` — a positional `[Int]` of four: the
         /// first and the last reminder's hour, the interval, and the quiet-weekday mask. **Absent means the
         /// standard schedule**, so nothing materialises it and choosing *Standard schedule* removes it.
@@ -202,7 +206,7 @@ final class DataManager {
         /// disagree. Production code never reads this — it names the constants directly.
         static let all = [
             currentWater, dailyGoal, lastActiveDay, isGoalSet,
-            didMigrateFromStandard, remindersEnabled, healthEnabled, reminderSchedule, onlyWhenBehind,
+            didMigrateFromStandard, remindersEnabled, healthEnabled, liveActivity, reminderSchedule, onlyWhenBehind,
             language, theme, servings, vessels, reviewRequestedVersion,
             weekTotals, wristOutbox, wristMirror, wristApplied,
         ]
@@ -263,6 +267,7 @@ final class DataManager {
     @ObservationIgnored private var closedRun: (day: Int, goal: Int, zone: String, count: Int)?
     @ObservationIgnored private var storedRemindersEnabled: Bool
     @ObservationIgnored private var storedHealthEnabled: Bool
+    @ObservationIgnored private var storedLiveActivityEnabled: Bool
     @ObservationIgnored private var storedReminderSchedule: ReminderPlan.Schedule
     @ObservationIgnored private var storedOnlyWhenBehind: Bool
     @ObservationIgnored private var storedLanguage: AppLanguage
@@ -643,6 +648,24 @@ final class DataManager {
         }
     }
 
+    /// Whether today stands on the Lock Screen and in the Dynamic Island — Settings' *Live Activity* switch (spec
+    /// `2026-11-27-live-activity-design.md` D9). A preference like ``healthEnabled``, and as quiet: it rings no widget
+    /// doorbell, re-plans no reminder and reaches no watch, because none of them draws it. `LiveWater`, app-only, is
+    /// the one thing that acts on it, and the one thing that sets it — after asking iOS.
+    var liveActivityEnabled: Bool {
+        get {
+            access(keyPath: \.liveActivityEnabled)
+            return storedLiveActivityEnabled
+        }
+        set {
+            guard newValue != storedLiveActivityEnabled else { return }
+            withMutation(keyPath: \.liveActivityEnabled) {
+                storedLiveActivityEnabled = newValue
+                defaults.set(newValue, forKey: Key.liveActivity)
+            }
+        }
+    }
+
     /// The hours reminders fall on — set B's schedule, or the standard one (spec
     /// `2026-10-30-coaching-design.md`). A preference like ``remindersEnabled``, with its write-through and
     /// equality guard, and it re-plans at once; it rings no widget doorbell and reaches no watch, because
@@ -853,6 +876,7 @@ final class DataManager {
 
         storedRemindersEnabled = defaults.bool(forKey: Key.remindersEnabled)
         storedHealthEnabled = defaults.bool(forKey: Key.healthEnabled)
+        storedLiveActivityEnabled = defaults.bool(forKey: Key.liveActivity)
         storedReminderSchedule = Self.resolveReminderSchedule(in: defaults)
         storedOnlyWhenBehind = defaults.bool(forKey: Key.onlyWhenBehind)
         storedLanguage = Self.resolveLanguage(in: defaults)
@@ -2696,7 +2720,11 @@ enum AppLanguage: String, CaseIterable, Sendable, Identifiable {
     /// **Fail soft, and say so** (rule `75-diagnostics`): a corrupt suite, or a build that once
     /// shipped a language this one does not, must leave the app on the device language rather than
     /// blank. `"system"` is rejected too — it is a case name, never a stored value.
-    init(code: String?) {
+    ///
+    /// `nonisolated`, as ``code`` is: ``resolveLanguage(in:)`` and the Live Activity's content
+    /// (``LiveWaterAttributes/ContentState/snapshot(stale:)``) call it from no actor, and the app target's default
+    /// isolation would otherwise infer it `@MainActor` and warn there (rule `43-concurrency`).
+    nonisolated init(code: String?) {
         guard let code,
               let match = AppLanguage(rawValue: code),
               match != .system
@@ -4144,18 +4172,21 @@ struct WaterSnapshot: Sendable, Equatable {
     nonisolated var theme: AppTheme = .aurora
 
     /// Fraction of the goal reached today, clamped to `0...1`.
-    var progress: Double {
+    nonisolated var progress: Double {
         min(max(progressUnclamped, 0), 1)
     }
 
     /// Fraction of the goal reached today, *not* clamped — `1.5` means 150% of the goal.
-    var progressUnclamped: Double {
+    nonisolated var progressUnclamped: Double {
         guard dailyGoal > 0 else { return 0 }
         return Double(currentWater) / Double(dailyGoal)
     }
 
     /// The whole-percent figure the app shows, rounded the same way ``HomeView`` rounds it.
-    var percentage: Int {
+    ///
+    /// `nonisolated` with ``progress`` and ``progressUnclamped``, as ``remaining`` is: the Live Activity's content and
+    /// its non-`@MainActor` suite read them from no actor (rule `43-concurrency`).
+    nonisolated var percentage: Int {
         Int((progressUnclamped * 100).rounded())
     }
 
@@ -4222,10 +4253,70 @@ struct WaterSnapshot: Sendable, Equatable {
     /// merely unlikely. Any field added to this type from now on is carried across midnight for
     /// free, and `rollingOverChangesNothingExceptTheTotal` asserts the whole value rather than a
     /// list of them.
-    func rolledOver() -> WaterSnapshot {
+    nonisolated func rolledOver() -> WaterSnapshot {
         var next = self
         next.currentWater = 0
         return next
+    }
+}
+
+// MARK: - The Live Activity's content
+
+/// What the Live Activity carries (spec `2026-11-27-live-activity-design.md` §3): attributes that hold nothing, and a
+/// ``ContentState`` that holds today as the widgets draw it.
+///
+/// **In this file, Foundation only,** because both phone targets need it — the app starts and updates the activity,
+/// the widget extension draws it — and the shared set takes no seventh file (rule `40-widget`). Its conformance to
+/// ActivityKit's `ActivityAttributes` is declared in the two files that import ActivityKit, `LiveWater.swift` and
+/// `LiveWaterWidget.swift`, so this file imports nothing new; the watch's two targets compile it and never use it.
+///
+/// **Nothing static, on purpose** (D1): an activity's attributes are fixed for its life, and nothing about today is.
+nonisolated struct LiveWaterAttributes: Codable, Hashable, Sendable {
+
+    /// Today, as the activity draws it: the Lock Screen widget's figures, the Glass its button logs, and the language
+    /// and theme to draw in. **A consequence, never stored** (rule `20-state`): built from a `WaterSnapshot` by
+    /// ``init(snapshot:)`` and drawn back as one by ``snapshot(stale:)``, so the activity rounds as the widgets do.
+    struct ContentState: Codable, Hashable, Sendable {
+        var currentWater: Int
+        var dailyGoal: Int
+        /// The Glass's amount, which its button speaks.
+        var serving: Int
+        /// The Glass's glyph, which its button draws.
+        var servingGlyph: String
+        /// ``AppLanguage/code``: `nil` follows the device.
+        var languageCode: String?
+        /// ``AppTheme/code``: `nil` is Aurora.
+        var themeCode: String?
+    }
+}
+
+extension LiveWaterAttributes.ContentState {
+
+    /// Today's snapshot as the activity's content: everything it draws, and not the week, which it does not.
+    init(snapshot: WaterSnapshot) {
+        self.init(
+            currentWater: snapshot.currentWater,
+            dailyGoal: snapshot.dailyGoal,
+            serving: snapshot.serving,
+            servingGlyph: snapshot.servingGlyph,
+            languageCode: snapshot.language.code,
+            themeCode: snapshot.theme.code
+        )
+    }
+
+    /// The snapshot the activity's views draw. **Past its stale date** — the day's end — the new day, empty: the
+    /// widgets' midnight entry, ``WaterSnapshot/rolledOver()``, exactly, until the app updates it (rule
+    /// `30-rollover`). A code this build does not know reads as the device's language and Aurora.
+    func snapshot(stale: Bool) -> WaterSnapshot {
+        let drawn = WaterSnapshot(
+            currentWater: currentWater,
+            dailyGoal: dailyGoal,
+            language: AppLanguage(code: languageCode),
+            serving: serving,
+            servingGlyph: servingGlyph,
+            theme: AppTheme(code: themeCode)
+        )
+        return stale ? drawn.rolledOver() : drawn
     }
 }
 

@@ -594,9 +594,14 @@ extension View {
     /// aurora (``WidgetCardBackdrop``) — one definition, so the Hydration widget and the week widget
     /// sit side by side as one family. The inset from the widget's edge is the caller's
     /// (``HydrationView/cardInset``).
-    func widgetCard() -> some View {
+    ///
+    /// **`fillingHeight: false` keeps its content's height** — the Live Activity's card (`LiveWaterWidget`), which iOS
+    /// sizes from what it draws, so a card filling the height would stretch the activity to the tallest it may be. Its
+    /// figures stand on this card because on the bare aurora a caption fell short of 4.5:1 in four themes (measured on
+    /// the walk's renders, 2026-11-27).
+    func widgetCard(fillingHeight: Bool = true) -> some View {
         padding(HydrationView.cardPadding)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: fillingHeight ? .infinity : nil)
             .widgetPane(in: ContainerRelativeShape(), density: .frosted, elevation: .raised)
             // Under the pane, not over it: `.background` applied *after* `.widgetPane` lands
             // beneath the glass, which is where a backdrop belongs.

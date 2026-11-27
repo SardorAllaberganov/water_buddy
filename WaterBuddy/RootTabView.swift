@@ -590,4 +590,6 @@ private struct GlassTabBar: View {
         .environment(InsightWriter(source: .silent()))
         // Settings reads it; a canvas never reaches Health.
         .environment(HealthMirror(manager: manager, source: .silent()))
+        // And this; a canvas never reaches ActivityKit.
+        .environment(LiveWater(manager: manager, source: .silent()))
 }

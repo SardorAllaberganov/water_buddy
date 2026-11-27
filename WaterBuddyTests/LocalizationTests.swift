@@ -92,6 +92,8 @@ private let sharedKeys = [
     "+%1$d ml",
     "%1$d percent. %2$d of %3$d millilitres.",
     "Add %1$d millilitres",
+    // The Live Activity's button intent, declared in both targets under one title (rule `40-widget`).
+    "Log a Glass",
     "Time for water",
     "A glass now keeps you on track for the day.",
     "Week",
@@ -314,6 +316,13 @@ private let healthKeys = [
     "Apple Health",
     "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.",
     "Health access is off for WaterBuddy. Turn it on in Settings › Privacy & Security › Health › WaterBuddy.",
+]
+
+/// Settings' *Live Activity* card (spec `2026-11-27-live-activity-design.md` §6, §8).
+private let liveActivityKeys = [
+    "Live Activity",
+    "Today's water on the Lock Screen and in the Dynamic Island.",
+    "Live Activities are off for WaterBuddy in iOS Settings.",
 ]
 
 /// The app's Info.plist keys for Apple Health, localised in `InfoPlist.xcstrings` (`HealthPurposeTests`).
@@ -958,6 +967,21 @@ struct HealthStringTests {
     @Test(arguments: ["en"] + translated)
     func everyHealthStringExistsAndCarriesNoDigit(language: String) {
         for key in healthKeys {
+            let resolved = sentences(appBundle, language, key)
+            #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
+            for sentence in resolved ?? [] {
+                #expect(!sentence.contains { $0.isNumber }, "\"\(key)\" in \(language) carries a digit: \(sentence)")
+            }
+        }
+    }
+}
+
+/// Settings' Live Activity card, in every language, with no digit: the activity draws figures, its card none.
+struct LiveActivityStringTests {
+
+    @Test(arguments: ["en"] + translated)
+    func everyLiveActivityStringExistsAndCarriesNoDigit(language: String) {
+        for key in liveActivityKeys {
             let resolved = sentences(appBundle, language, key)
             #expect(resolved != nil, "\(language) has no value for \"\(key)\"")
             for sentence in resolved ?? [] {

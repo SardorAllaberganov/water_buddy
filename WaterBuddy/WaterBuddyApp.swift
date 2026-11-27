@@ -32,6 +32,10 @@ struct WaterBuddyApp: App {
     /// process (``HealthMirror``). It never reads what another app wrote.
     private let health: HealthMirror
 
+    /// Today on the Lock Screen and in the Dynamic Island, while the user's switch is on (``LiveWater``) — started,
+    /// updated and ended by this process alone.
+    private let live: LiveWater
+
     init() {
         // Resolve the App Group before anything draws, so the container probe and the one-shot
         // migration out of `UserDefaults.standard` both happen here, in the app, at a moment we
@@ -58,6 +62,8 @@ struct WaterBuddyApp: App {
             manager = fresh
             // A fresh start reaches no Health: the switch draws, and nothing is ever written.
             health = HealthMirror(manager: fresh, source: .silent())
+            // And no Live Activity: the switch draws and turns, and nothing reaches the Lock Screen.
+            live = LiveWater(manager: fresh, source: .silent())
             // No watch link: a paired watch's pours belong to the device's own store, which a
             // fresh start never opens.
             return
@@ -69,6 +75,9 @@ struct WaterBuddyApp: App {
         manager = DataManager.shared
         // After the manager, whose saves it hears; before anything draws, so the first save is heard.
         health = HealthMirror(manager: manager)
+        // The same: after the manager it watches, before anything draws — and the one the background intents wait for,
+        // built here so it watches from launch even when one of them is what launched the app.
+        live = LiveWater.shared
 
         #if canImport(WatchConnectivity)
         // `WristLink.session(_:didReceiveUserInfo:)` posts `didReceiveBatchNotification` rather
@@ -199,6 +208,7 @@ struct WaterBuddyApp: App {
                 .environment(premium)
                 .environment(writer)
                 .environment(health)
+                .environment(live)
         }
         .onChange(of: scenePhase) { _, phase in
             // Another process may have written while we were away — the widget's `AddWaterIntent`
@@ -219,6 +229,11 @@ struct WaterBuddyApp: App {
                 // And Health: a permission withdrawn while the app was away turns the switch off, and a
                 // pass catches up what the widget's button, the control or a locked phone logged.
                 Task { await health.reconcile() }
+
+                // And the Live Activity: iOS's permission read again, and a new one started if iOS ended the last
+                // after its eight hours — the one place, with Settings' switch, a start is allowed (spec
+                // `2026-11-27-live-activity-design.md` D5).
+                Task { await live.reconcile() }
             }
         }
     }

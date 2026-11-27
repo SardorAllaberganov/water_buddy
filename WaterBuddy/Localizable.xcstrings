@@ -5221,6 +5221,93 @@
         }
       }
     },
+    "Live Activities are off for WaterBuddy in iOS Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Activities are off for WaterBuddy in iOS Settings."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las actividades en vivo de WaterBuddy están desactivadas en Configuración de iOS."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эфир активности для WaterBuddy отключен в настройках iOS."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WaterBuddy uchun Live Activities iOS sozlamalarida o‘chirilgan."
+          }
+        }
+      }
+    },
+    "Live Activity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Activity"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actividad en vivo"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эфир активности"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Activity"
+          }
+        }
+      }
+    },
+    "Today's water on the Lock Screen and in the Dynamic Island.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's water on the Lock Screen and in the Dynamic Island."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El agua de hoy en la pantalla bloqueada y en la Dynamic Island."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вода за сегодня — на экране блокировки и в Dynamic Island."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugungi suv — qulflangan ekranda va Dynamic Island’da."
+          }
+        }
+      }
+    },
     "Measured against your current goal": {
       "extractionState": "manual",
       "localizations": {

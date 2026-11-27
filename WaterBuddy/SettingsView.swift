@@ -31,6 +31,7 @@ struct SettingsView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PremiumStore.self) private var premium
     @Environment(HealthMirror.self) private var health
+    @Environment(LiveWater.self) private var live
 
     /// The paywall, while it is open — its `.sheet(item:)` selection (rule `50-views`).
     @State private var paywall: PaywallView.Entry?
@@ -125,8 +126,14 @@ struct SettingsView: View {
                     )
                     .arrives(arrived, order: lead + 1).scrollDepth()
                     remindersCard.arrives(arrived, order: lead + 2).scrollDepth()
+                    // Under reminders: today on the Lock Screen is the other thing that reaches you between pours, and
+                    // it asks iOS too (spec `2026-11-27-live-activity-design.md` §6). From iOS 18, where the widget
+                    // extension has an activity to draw (`LiveWaterWidget`).
+                    if #available(iOS 18.0, *) {
+                        liveActivityCard.arrives(arrived, order: lead + 3).scrollDepth()
+                    }
                     // Under reminders: both are about what happens between pours, and both ask iOS first.
-                    healthCard.arrives(arrived, order: lead + 3).scrollDepth()
+                    healthCard.arrives(arrived, order: lead + 4).scrollDepth()
                     // Under Apple Health: both are your water leaving the app, and neither moves until you ask.
                     if premiumGate != .hidden {
                         ExportCard(
@@ -135,15 +142,15 @@ struct SettingsView: View {
                             opens: exportOpens,
                             action: startExport
                         )
-                            .arrives(arrived, order: lead + 4)
+                            .arrives(arrived, order: lead + 5)
                             .scrollDepth()
                         // Above the language: both are how the app looks to you (spec `2026-11-22-set-c-design.md` §3.8).
                         AppearanceCard(gate: premiumGate, openPaywall: { paywall = .settings })
-                            .arrives(arrived, order: lead + 5)
+                            .arrives(arrived, order: lead + 6)
                             .scrollDepth()
                     }
-                    LanguageCard().arrives(arrived, order: lead + 6).scrollDepth()
-                    privacyPolicyLink.arrives(arrived, order: lead + 7).scrollDepth()
+                    LanguageCard().arrives(arrived, order: lead + 7).scrollDepth()
+                    privacyPolicyLink.arrives(arrived, order: lead + 8).scrollDepth()
                     Spacer(minLength: 0)
                 }
                 // The reminders card changes what it says, and with it its height: when
@@ -414,6 +421,62 @@ struct SettingsView: View {
         return strings.localizedString(forKey: "Saves each serving to Apple Health as water. WaterBuddy reads nothing from Health.", value: nil, table: nil)
     }
 
+    // MARK: - Live Activity
+
+    /// The *Smart reminders* row's twin, as Apple Health's is: the switch's label is the card's title, drawn and spoken,
+    /// and the line under it is the switch's hint (spec `2026-11-27-live-activity-design.md` §6). Drawn for everyone: a
+    /// way of logging is never Premium, and the activity carries one. When iOS has Live Activities off for WaterBuddy,
+    /// the line says so and the reminders card's way into iOS Settings follows.
+    private var liveActivityCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Toggle(isOn: liveActivityBinding) {
+                Text("Live Activity", bundle: strings)
+                    .cardTitle()
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+            }
+            .toggleStyle(SwitchToggleStyle(tint: aurora.accent))
+            .frame(minHeight: 44)
+            // On the `Toggle` itself, as the reminders row's are (rule `65-accessibility`).
+            .accessibilityLabel(Text("Live Activity", bundle: strings))
+            .accessibilityHint(Text("Today's water on the Lock Screen and in the Dynamic Island.", bundle: strings))
+            // As the reminders row's: its taps through a `Button` over the row (#232).
+            .takesQuickTaps(liveActivityBinding)
+
+            Text(liveActivityExplanation)
+                .cardNote()
+            if !live.allowed {
+                openSettingsRow
+                    .transition(.opacity)
+            }
+        }
+        .settingsCard()
+    }
+
+    /// One call each way into the owner (rule `50-views`): on starts the activity, off ends it.
+    private var liveActivityBinding: Binding<Bool> {
+        Binding(
+            get: { manager.liveActivityEnabled },
+            set: { wantsIt in
+                guard wantsIt else {
+                    live.disable()
+                    return
+                }
+                enables += 1
+                live.enable()
+            }
+        )
+    }
+
+    private var liveActivityExplanation: String {
+        strings.localizedString(
+            forKey: live.allowed
+                ? "Today's water on the Lock Screen and in the Dynamic Island."
+                : "Live Activities are off for WaterBuddy in iOS Settings.",
+            value: nil, table: nil
+        )
+    }
+
     // MARK: - Export
 
     /// One read, on the tap and never before it: Settings would otherwise read the whole history each time it
@@ -477,6 +540,8 @@ struct SettingsView: View {
     /// is not a permission and stays this screen's own question.
     private func readSystemState() async {
         health.readStatus()
+        // iOS's word on Live Activities, read again as the reminders' is: turned off for WaterBuddy, the switch goes off.
+        await live.reconcile()
         authorization = await ReminderPermission.reconcile(manager, using: scheduler)
 
         deliveryIsBatched = await UNUserNotificationCenter.current()
@@ -1701,4 +1766,6 @@ private struct CheckShape: Shape {
 
     // The backdrop is `RootTabView`'s in the app; alone on the canvas the screen stands on one.
     return SettingsView().background { AuroraBackground() }.environment(manager).environment(PremiumStore(source: .silent())).environment(HealthMirror(manager: manager, source: .silent()))
+        // A canvas never reaches ActivityKit.
+        .environment(LiveWater(manager: manager, source: .silent()))
 }
