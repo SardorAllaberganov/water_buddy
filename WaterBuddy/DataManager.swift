@@ -947,16 +947,19 @@ final class DataManager {
     /// from a stale figure. Non-positive amounts are ignored in both directions — use
     /// ``deleteLog(_:)`` to take a serving back off.
     ///
+    /// `drink` is water unless Home's row or History's sheet chose another; every one-tap door logs water
+    /// (spec `2026-11-27-other-drinks-design.md` R4), and every drink counts in full (R2).
+    ///
     /// - Returns: the id of the row it inserted, or `nil` for a refused amount. `HomeView` is the
     ///   one caller that keeps it — it is what ``undoLog(id:)`` takes back — and every other
     ///   caller discards it.
     @discardableResult
-    func addLog(amount: Int, at date: Date? = nil) -> UUID? {
+    func addLog(amount: Int, at date: Date? = nil, drink: Drink = .water) -> UUID? {
         guard amount > 0 else { return nil }
         // The save below republishes the shown month; the re-read leaves it.
         refresh(republishingMonth: false)
 
-        let log = WaterLog(amount: amount, timestamp: date ?? now())
+        let log = WaterLog(amount: amount, timestamp: date ?? now(), drink: drink)
         modelContext.insert(log)
         forgetClosedRunIfNotToday(log.timestamp)
         saveAndRecompute()
@@ -1181,13 +1184,21 @@ final class DataManager {
     /// and publishing to the wrist only if it moved — and the bars and both days' rows republish.
     /// Like ``deleteLog(_:)``, this addresses the row by identity rather than computing from a total,
     /// so it does not ``refresh()`` first (rule `30-rollover`).
-    func updateLog(_ log: WaterLog, newAmount: Int, timestamp: Date? = nil) {
+    ///
+    /// `drink` is `nil` to keep the serving's drink. An edit that changes the drink alone is a real edit —
+    /// saved, recomputed and announced like any other — and one that changes nothing still saves nothing
+    /// (spec `2026-11-27-other-drinks-design.md` §3.3).
+    func updateLog(_ log: WaterLog, newAmount: Int, timestamp: Date? = nil, drink: Drink? = nil) {
         let newTimestamp = timestamp ?? log.timestamp
-        guard newAmount > 0, newAmount != log.amount || newTimestamp != log.timestamp else { return }
+        let newDrink = drink ?? log.drink
+        guard newAmount > 0,
+              newAmount != log.amount || newTimestamp != log.timestamp || newDrink != log.drink
+        else { return }
         // The day it leaves and the day it lands on.
         forgetClosedRunIfNotToday(log.timestamp, newTimestamp)
         log.amount = newAmount
         log.timestamp = newTimestamp
+        log.drink = newDrink
         saveAndRecompute()
     }
 
@@ -2446,17 +2457,17 @@ final class DataManager {
     /// `.standard` — the app keeps working and the widget goes blank, rather than the app
     /// crashing on launch (rule `25-shared-storage`). The final `try!` is reached only if an
     /// in-memory container cannot be created, which would mean SwiftData itself is unusable.
+    ///
+    /// **Every rung opens through ``WaterBuddyMigrationPlan``**, at its current version, so a store an
+    /// earlier build wrote is migrated where it is opened — by the app or by the widget extension, whichever
+    /// runs first after an update (spec `2026-11-27-other-drinks-design.md` §3.2). The ladder itself is as it
+    /// was.
     @available(watchOS, unavailable, message: "The watch holds no WaterLog store. See rule 25-shared-storage.")
     nonisolated static let sharedModelContainer: ModelContainer = {
-        let schema = Schema([WaterLog.self])
-
         if let container = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) {
             let url = container.appending(path: "WaterBuddy.store")
-            if let store = try? ModelContainer(
-                for: schema,
-                configurations: ModelConfiguration(schema: schema, url: url)
-            ) {
+            if let store = try? WaterBuddyMigrationPlan.container(at: url) {
                 return store
             }
             #if DEBUG
@@ -2472,11 +2483,8 @@ final class DataManager {
             #endif
         }
 
-        if let local = try? ModelContainer(for: schema) { return local }
-        return try! ModelContainer(
-            for: schema,
-            configurations: ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        )
+        if let local = try? WaterBuddyMigrationPlan.container(at: nil) { return local }
+        return try! WaterBuddyMigrationPlan.inMemoryContainer()
     }()
 
     /// Carries state written before the App Groups capability existed into the shared suite,

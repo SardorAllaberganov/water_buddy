@@ -45,7 +45,25 @@ struct ServingsExportTests {
             ServingsExport.Serving(amount: 500, timestamp: try instant(utc, 2026, 3, 3, 13, 2)),
         ]
         let export = try file(rows, today: try instant(utc, 2026, 11, 1), calendar: utc)
-        #expect(text(export) == "date,time,amount_ml\r\n2026-03-03,09:14,250\r\n2026-03-03,13:02,500\r\n")
+        #expect(text(export) == "date,time,amount_ml,drink\r\n2026-03-03,09:14,250,water\r\n2026-03-03,13:02,500,water\r\n")
+    }
+
+    /// The fourth column names what was drunk, as a fixed English word in every language, like the headings
+    /// (spec `2026-11-27-other-drinks-design.md` R6).
+    @Test func eachRowNamesItsDrink() throws {
+        let utc = try calendar("UTC")
+        let start = try instant(utc, 2026, 3, 3, 8)
+        let rows = Drink.allCases.enumerated().map { index, drink in
+            ServingsExport.Serving(amount: 200, timestamp: start.addingTimeInterval(Double(index) * 3_600), drink: drink)
+        }
+        let lines = text(try file(rows, today: start, calendar: utc)).components(separatedBy: "\r\n")
+        #expect(Array(lines[1...5]) == [
+            "2026-03-03,08:00,200,water",
+            "2026-03-03,09:00,200,tea",
+            "2026-03-03,10:00,200,coffee",
+            "2026-03-03,11:00,200,juice",
+            "2026-03-03,12:00,200,milk",
+        ])
     }
 
     /// `logs(since:)` answers newest first.
@@ -57,8 +75,8 @@ struct ServingsExportTests {
         ]
         let lines = text(try file(rows, today: try instant(utc, 2026, 11, 1), calendar: utc))
             .components(separatedBy: "\r\n")
-        #expect(lines[1] == "2026-03-03,08:00,250")
-        #expect(lines[2] == "2026-03-04,08:00,500")
+        #expect(lines[1] == "2026-03-03,08:00,250,water")
+        #expect(lines[2] == "2026-03-04,08:00,500,water")
     }
 
     /// History's `+` logs an old instant after newer rows, so the order is the instant's, never the input's.
@@ -71,7 +89,7 @@ struct ServingsExportTests {
         ]
         let lines = text(try file(rows, today: try instant(utc, 2026, 11, 1), calendar: utc))
             .components(separatedBy: "\r\n")
-        #expect(Array(lines[1...3]) == ["2026-03-01,08:00,100", "2026-03-05,08:00,200", "2026-03-09,08:00,300"])
+        #expect(Array(lines[1...3]) == ["2026-03-01,08:00,100,water", "2026-03-05,08:00,200,water", "2026-03-09,08:00,300,water"])
     }
 
     /// As History reads it: the wall clock in the zone the phone is in now (D6).
@@ -93,8 +111,8 @@ struct ServingsExportTests {
         ]
         let lines = text(try file(rows, today: try instant(utc, 2026, 11, 1, 20), calendar: angeles))
             .components(separatedBy: "\r\n")
-        #expect(lines[1] == "2026-11-01,01:30,250")
-        #expect(lines[2] == "2026-11-01,01:30,500")
+        #expect(lines[1] == "2026-11-01,01:30,250,water")
+        #expect(lines[2] == "2026-11-01,01:30,500,water")
     }
 
     @Test func aServingAtMidnightBelongsToTheDayItStarts() throws {
@@ -105,8 +123,8 @@ struct ServingsExportTests {
         ]
         let lines = text(try file(rows, today: try instant(utc, 2026, 11, 1), calendar: utc))
             .components(separatedBy: "\r\n")
-        #expect(lines[1] == "2026-03-03,23:59,100")
-        #expect(lines[2] == "2026-03-04,00:00,200")
+        #expect(lines[1] == "2026-03-03,23:59,100,water")
+        #expect(lines[2] == "2026-03-04,00:00,200,water")
     }
 
     @Test func twoServingsInOneMinuteStayTwoRows() throws {
@@ -130,8 +148,8 @@ struct ServingsExportTests {
             ServingsExport.Serving(amount: Int.max, timestamp: moment.addingTimeInterval(60)),
         ]
         let body = text(try file(rows, today: moment, calendar: utc))
-        #expect(body.contains(",100000\r\n"))
-        #expect(body.contains(",\(Int.max)\r\n"))
+        #expect(body.contains(",100000,water\r\n"))
+        #expect(body.contains(",\(Int.max),water\r\n"))
     }
 
     /// 02:00 UTC on the 1st is still the 31st in Los Angeles.
@@ -186,8 +204,8 @@ struct ServingsExportTests {
         let lines = text(export).components(separatedBy: "\r\n")
         #expect(export.count == 15_000)
         #expect(lines.count == 15_002)
-        #expect(lines[1] == "2021-01-01,08:00,250")
-        #expect(lines[15_000] == "2026-02-19,05:00,250")
+        #expect(lines[1] == "2021-01-01,08:00,250,water")
+        #expect(lines[15_000] == "2026-02-19,05:00,250,water")
     }
 
     private func previewed(servings: Int) throws -> ServingsExport {
@@ -205,12 +223,12 @@ struct ServingsExportTests {
         let text = try #require(String(data: export.data, encoding: .utf8))
         #expect(export.preview == Array(text.components(separatedBy: "\r\n").prefix(6)))
         #expect(export.preview == [
-            "date,time,amount_ml",
-            "2026-06-03,08:00,250",
-            "2026-06-03,09:00,251",
-            "2026-06-03,10:00,252",
-            "2026-06-03,11:00,253",
-            "2026-06-03,12:00,254"
+            "date,time,amount_ml,drink",
+            "2026-06-03,08:00,250,water",
+            "2026-06-03,09:00,251,water",
+            "2026-06-03,10:00,252,water",
+            "2026-06-03,11:00,253,water",
+            "2026-06-03,12:00,254,water"
         ])
     }
 

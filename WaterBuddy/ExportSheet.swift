@@ -150,7 +150,7 @@ struct ExportSheet: View {
 
     private var note: String {
         strings.localizedString(
-            forKey: "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+            forKey: "Date, time, amount in millilitres and drink, nothing else. The file leaves your phone only when you send it.",
             value: nil, table: nil
         )
     }

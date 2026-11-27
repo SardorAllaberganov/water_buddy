@@ -424,7 +424,9 @@ struct SettingsView: View {
             return
         }
         exportProblem = nil
-        let rows = manager.logs(since: nil)?.map { ServingsExport.Serving(amount: $0.amount, timestamp: $0.timestamp) }
+        let rows = manager.logs(since: nil)?.map {
+            ServingsExport.Serving(amount: $0.amount, timestamp: $0.timestamp, drink: $0.drink)
+        }
         switch ServingsExport.outcome(of: rows, today: premium.now(), calendar: .waterBuddyDay) {
         case .file(let file):
             exportOpens += 1

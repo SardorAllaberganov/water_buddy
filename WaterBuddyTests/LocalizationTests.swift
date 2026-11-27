@@ -118,6 +118,12 @@ private let homeKeys = [
     "Undo",
     "Day streak",
     "%1$d days",
+    // The drinks, Home's row and History's (spec 2026-11-27-other-drinks-design.md §5, §8).
+    "Water",
+    "Tea",
+    "Coffee",
+    "Juice",
+    "Milk",
 ]
 
 /// History's strings that the build's extraction cannot see — resolved with
@@ -198,6 +204,8 @@ private let historyKeys = [
     "Share as an image",
     "Stays in the app, not on the image",
     "The image leaves your phone only when you send it.",
+    // A serving's drink, spoken (spec 2026-11-27-other-drinks-design.md §6).
+    "%1$@, %2$d millilitres",
 ]
 
 /// The welcome's own strings (spec 2026-10-14 §8). The keys it shares with Settings or the reminder
@@ -293,7 +301,7 @@ private let premiumKeys = [
     // Export (spec `2026-11-01-export-design.md` §3.9).
     "Export your servings",
     "Every serving as a CSV file, yours to keep",
-    "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.",
+    "Date, time, amount in millilitres and drink, nothing else. The file leaves your phone only when you send it.",
     "Share as a CSV file",
     "Nothing to export yet.",
     "Your servings could not be read. Try again.",

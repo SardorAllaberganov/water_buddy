@@ -3096,7 +3096,7 @@ private struct ServingRow: View {
                 // regardless. The wrapper became a second element above it and every serving was
                 // announced twice — "250 millilitres, 21:22", then "250 ml, 21:22, button". Only the real
                 // accessibility tree shows that; no unit test in this project can see one.
-                .accessibilityLabel(strings.localized("%1$d millilitres", log.amount, locale: locale))
+                .accessibilityLabel(spoken)
                 .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
                 .accessibilityHint(Text("Edits this serving", bundle: strings))
         } else {
@@ -3104,7 +3104,7 @@ private struct ServingRow: View {
             // the right idiom, one element speaking what the button would (spec §3.9).
             pane(stacked: stacked)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(strings.localized("%1$d millilitres", log.amount, locale: locale))
+                .accessibilityLabel(spoken)
                 .accessibilityValue(log.timestamp.formatted(date: .omitted, time: .shortened))
         }
     }
@@ -3171,10 +3171,29 @@ private struct ServingRow: View {
             .monospacedDigit()
     }
 
-    /// Drawn, never spoken: the name is an inference from today's vessels.
+    /// What VoiceOver says of the serving: its amount, and before it the drink when that is not water — a
+    /// drink is stored, not guessed, so it is spoken; water rows speak as they always have (spec
+    /// `2026-11-27-other-drinks-design.md` §6).
+    private var spoken: String {
+        guard log.drink != .water else {
+            return strings.localized("%1$d millilitres", log.amount, locale: locale)
+        }
+        return strings.localized("%1$@, %2$d millilitres", drinkName, log.amount, locale: locale)
+    }
+
+    private var drinkName: String {
+        strings.localizedString(forKey: log.drink.nameKey, value: log.drink.nameKey, table: nil)
+    }
+
+    /// The drink, for a serving that is not water; for water, the vessel guessed from the amount, drawn
+    /// and never spoken — it is an inference from today's vessels.
     @ViewBuilder
     private var name: some View {
-        if let vessel {
+        if log.drink != .water {
+            Text(verbatim: drinkName)
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.9))
+        } else if let vessel {
             Text(vessel.name(in: strings))
                 .font(.footnote)
                 .foregroundStyle(.white.opacity(0.9))
@@ -3237,6 +3256,10 @@ private struct ServingSheet: View {
     /// The instant on the wheel.
     @State private var when: Date
 
+    /// The drink: water for a new serving, the serving's own when editing (spec
+    /// `2026-11-27-other-drinks-design.md` §6).
+    @State private var drink: Drink
+
     /// Bumped when the serving is saved, so the haptic fires on the tap rather than on any later
     /// change to the model.
     @State private var commits = 0
@@ -3257,14 +3280,15 @@ private struct ServingSheet: View {
         self.range = range
         self.saved = saved
 
-        let opening: (amount: Int, when: Date)
+        let opening: (amount: Int, when: Date, drink: Drink)
         switch editor {
-        case .adding(let instant): opening = (startingAmount, instant)
-        case .editing(let log): opening = (log.amount, log.timestamp)
+        case .adding(let instant): opening = (startingAmount, instant, .water)
+        case .editing(let log): opening = (log.amount, log.timestamp, log.drink)
         }
         openingAmount = opening.amount
         _amount = State(initialValue: opening.amount)
         _when = State(initialValue: opening.when)
+        _drink = State(initialValue: opening.drink)
     }
 
     /// Wide enough for the serving the sheet opened on and for each of the three shortcuts.
@@ -3302,6 +3326,8 @@ private struct ServingSheet: View {
         // A tick for each step of the slider and for a vessel picked. The amount under the
         // finger is the sheet's own state and no model value (rule `60-design-system`).
         .sensoryFeedback(Haptics.select, trigger: amount)
+        // And for a drink chosen: the sheet's own state, as the amount is.
+        .sensoryFeedback(Haptics.select, trigger: drink)
     }
 
     private var title: some View {
@@ -3320,6 +3346,13 @@ private struct ServingSheet: View {
 
     private var card: some View {
         VStack(spacing: 24) {
+            // What, then how much: the drink above the amount, drawn inside the card (spec
+            // `2026-11-27-other-drinks-design.md` §6). Closer to the card's edge than the shortcuts, since only
+            // the chosen capsule draws its edge: the room keeps the five on one line wherever it can, and they
+            // wrap where it cannot (`DrinkPicker`).
+            DrinkPicker(selection: drink, glass: false) { drink = $0 }
+                .padding(.horizontal, 8)
+
             readout
                 .padding(.horizontal, 24)
 
@@ -3515,9 +3548,9 @@ private struct ServingSheet: View {
                 // is this view's business to repeat (rule `20-state`).
                 switch editor {
                 case .adding:
-                    manager.addLog(amount: amount, at: when)
+                    manager.addLog(amount: amount, at: when, drink: drink)
                 case .editing(let log):
-                    manager.updateLog(log, newAmount: amount, timestamp: when)
+                    manager.updateLog(log, newAmount: amount, timestamp: when, drink: drink)
                 }
                 saved(when)
                 commits += 1

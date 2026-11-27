@@ -1,6 +1,258 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%1$@, %2$d millilitres": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg millilitre"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg millilitres"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitro"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg mililitros"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %#@arg2@"
+          },
+          "substitutions": {
+            "arg2": {
+              "argNum": 2,
+              "formatSpecifier": "d",
+              "variations": {
+                "plural": {
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитра"
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитров"
+                    }
+                  },
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитр"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg миллилитра"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$d millilitr"
+          }
+        }
+      }
+    },
+    "Coffee": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coffee"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Café"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кофе"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qahva"
+          }
+        }
+      }
+    },
+    "Juice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juice"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugo"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сок"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sharbat"
+          }
+        }
+      }
+    },
+    "Milk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Milk"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leche"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Молоко"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sut"
+          }
+        }
+      }
+    },
+    "Tea": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tea"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Té"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чай"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choy"
+          }
+        }
+      }
+    },
+    "Water": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Water"
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agua"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вода"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suv"
+          }
+        }
+      }
+    },
     "%1$@ a year": {
       "extractionState": "manual",
       "localizations": {
@@ -9522,31 +9774,31 @@
         }
       }
     },
-    "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it.": {
+    "Date, time, amount in millilitres and drink, nothing else. The file leaves your phone only when you send it.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Date, time and amount in millilitres, nothing else. The file leaves your phone only when you send it."
+            "value": "Date, time, amount in millilitres and drink, nothing else. The file leaves your phone only when you send it."
           }
         },
         "es-419": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fecha, hora y cantidad en mililitros, nada más. El archivo sale de tu teléfono solo cuando lo envías."
+            "value": "Fecha, hora, cantidad en mililitros y bebida, nada más. El archivo sale de tu teléfono solo cuando lo envías."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Дата, время и объём в миллилитрах, больше ничего. Файл покинет телефон, только когда вы его отправите."
+            "value": "Дата, время, объём в миллилитрах и напиток, больше ничего. Файл покинет телефон, только когда вы его отправите."
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sana, vaqt va millilitrdagi miqdor, boshqa hech narsa yo‘q. Fayl telefoningizdan faqat siz yuborganingizda chiqadi."
+            "value": "Sana, vaqt, millilitrdagi miqdor va ichimlik, boshqa hech narsa yo‘q. Fayl telefoningizdan faqat siz yuborganingizda chiqadi."
           }
         }
       }

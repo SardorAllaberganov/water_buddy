@@ -36,6 +36,30 @@ nonisolated struct UndoOffer: Equatable, Sendable {
     }
 }
 
+/// Home's row of drinks: **water when the app opens**, the drink a tap chooses for every pour after it, and
+/// water again once the app goes to the background (spec `2026-11-27-other-drinks-design.md` R3, D4) — or
+/// once Home's page is left: it lives in `HomeView`'s `@State`, and `RootTabView` builds a page afresh each
+/// time its tab is shown, so a tab turn and a return start on water too. Where the *Undo* offer ends, both.
+///
+/// So water stays one tap, a coffee is two, and someone who drinks tea all afternoon taps *Tea* once. A
+/// drink chosen and forgotten logs the next pours as that drink for one visit at most, and changes no total
+/// (R2). Presentation state, never stored (rule `50-views`). A value at file scope, and `nonisolated`, so
+/// `DrinkTests` reads it off the main actor (rule `43-concurrency`).
+nonisolated struct DrinkChoice: Equatable, Sendable {
+
+    /// The drink the next pour is logged as.
+    private(set) var drink: Drink = .water
+
+    mutating func choose(_ drink: Drink) {
+        self.drink = drink
+    }
+
+    /// Where the *Undo* offer already ends: the next visit starts on water.
+    mutating func appWentToBackground() {
+        drink = .water
+    }
+}
+
 struct HomeView: View {
 
     /// One entry in the quick-add row — a vessel the user recognises, and what it holds.
@@ -243,6 +267,12 @@ struct HomeView: View {
     /// The pour this screen can take back. Presentation state: it lives with the screen, and the
     /// screen ends it when it disappears — so leaving the tab ends the offer.
     @State private var undoOffer: UndoOffer?
+    /// The drink the next pour is logged as: water when the app opens, and again once it goes to the
+    /// background (``DrinkChoice``). Presentation state, never stored (rule `50-views`).
+    @State private var drinkChoice = DrinkChoice()
+    /// Bumped by a tap on a drink, so the selection tick fires on the user's own choice (rule
+    /// `60-design-system`, *Haptics*).
+    @State private var drinkPicks = 0
     /// Whether this screen has arrived — set a few frames after it is built (``Arrival``).
     @State private var arrived = false
     /// Whether the vessel has stood whole since: its water rises after it (``waterWait``).
@@ -273,7 +303,13 @@ struct HomeView: View {
                     header
                     vessel.arrives(arrived, order: Self.vesselOrder)
                     status.arrives(arrived, order: 1)
-                    quickAddRow.arrives(arrived, order: 2)
+                    // The drink above the vessels, so what and how much read together; one child, so
+                    // the column's arithmetic is unchanged and the vessel still gives way first.
+                    VStack(spacing: 12) {
+                        drinkRow
+                        quickAddRow
+                    }
+                    .arrives(arrived, order: 2)
                 }
                 .padding(Self.columnPadding)
                 .frame(maxWidth: .infinity)
@@ -292,6 +328,7 @@ struct HomeView: View {
         // The dark-appearance ruling lives on `RootTabView`: one hosting controller, one place to
         // declare the preference.
         .sensoryFeedback(Haptics.pour, trigger: pours)
+        .sensoryFeedback(Haptics.select, trigger: drinkPicks)
         .sensoryFeedback(Haptics.confirm, trigger: undos)
         .sensoryFeedback(trigger: manager.hasReachedGoal) { wasReached, isReached in
             // Only on the way up — crossing back down is a new day or an Undo, not an achievement.
@@ -309,7 +346,11 @@ struct HomeView: View {
         // afternoon. Only the background: Control Center or a notification pulled over the screen
         // is not leaving it.
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background { undoOffer = nil }
+            if phase == .background {
+                undoOffer = nil
+                // The next visit starts on water (spec `2026-11-27-other-drinks-design.md` D4).
+                drinkChoice.appWentToBackground()
+            }
             // Anything that takes the app out of `.active` ends a rating's wait — Control Center
             // too, which the offer survives: the request would otherwise meet the user on their
             // way back.
@@ -817,6 +858,16 @@ struct HomeView: View {
         Self.discDiameter(scaled: scaledGlassDisc, ceiling: Self.glassDiscCeiling)
     }
 
+    /// The five drinks, above the vessels (spec `2026-11-27-other-drinks-design.md` R3, §5): a tap chooses
+    /// what every pour after it is, until another is chosen, Home's page is left or the app goes to the
+    /// background (``DrinkChoice``). One tick, from the user's own tap.
+    private var drinkRow: some View {
+        DrinkPicker(selection: drinkChoice.drink, glass: true) { drink in
+            drinkChoice.choose(drink)
+            drinkPicks += 1
+        }
+    }
+
     /// The three vessels, side by side under the water.
     ///
     /// **The horizontal scroll is a Dynamic Type escape hatch, not a carousel** — so it is reached
@@ -931,7 +982,7 @@ struct HomeView: View {
     /// One call into the model, and the offer to take it back (rule `50-views`).
     private func pour(_ serving: Serving) {
         let wasReached = manager.hasReachedGoal
-        let id = manager.addLog(amount: serving.amount)
+        let id = manager.addLog(amount: serving.amount, drink: drinkChoice.drink)
         undoOffer = id.map { UndoOffer(id: $0, amount: serving.amount) }
         pours += 1
         poured[serving.id, default: 0] += 1

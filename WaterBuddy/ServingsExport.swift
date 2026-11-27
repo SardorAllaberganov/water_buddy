@@ -15,7 +15,9 @@ import Foundation
 ///
 /// **No locale and no bundle, on purpose.** The headings are fixed English in every language, a format and
 /// not copy (D3), and a date is a calendar's components, never a date style, so the file's bytes cannot
-/// follow the app's language. Three columns and nothing else — rule `70-privacy`'s *The export file*.
+/// follow the app's language. Four columns and nothing else — rule `70-privacy`'s *The export file* — the
+/// fourth, since 1.5, the drink, written as its fixed English word like the headings (spec
+/// `2026-11-27-other-drinks-design.md` R6).
 ///
 /// A row reads its instant on the calendar it is handed, the zone the phone is in now, as History does:
 /// ``WaterLog`` keeps no zone (D6).
@@ -28,6 +30,13 @@ nonisolated struct ServingsExport: Identifiable, Sendable, Equatable {
     nonisolated struct Serving: Sendable, Equatable {
         let amount: Int
         let timestamp: Date
+        let drink: Drink
+
+        init(amount: Int, timestamp: Date, drink: Drink = .water) {
+            self.amount = amount
+            self.timestamp = timestamp
+            self.drink = drink
+        }
     }
 
     /// What one read came to. A failed read stays apart from an empty history: it is never answered with a
@@ -60,7 +69,7 @@ nonisolated struct ServingsExport: Identifiable, Sendable, Equatable {
     /// How many servings the sheet shows.
     private static let previewServings = 5
 
-    private static let headings = "date,time,amount_ml"
+    private static let headings = "date,time,amount_ml,drink"
     /// RFC 4180's line ending.
     private static let lineEnding = "\r\n"
 
@@ -85,7 +94,7 @@ nonisolated struct ServingsExport: Identifiable, Sendable, Equatable {
     private static func line(for serving: Serving, calendar: Calendar) -> String {
         let clock = calendar.dateComponents([.hour, .minute], from: serving.timestamp)
         let time = String(format: "%02d:%02d", clock.hour ?? 0, clock.minute ?? 0)
-        return "\(day(of: serving.timestamp, calendar: calendar)),\(time),\(serving.amount)"
+        return "\(day(of: serving.timestamp, calendar: calendar)),\(time),\(serving.amount),\(serving.drink.rawValue)"
     }
 
     private static func day(of date: Date, calendar: Calendar) -> String {
